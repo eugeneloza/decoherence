@@ -106,7 +106,7 @@ procedure DStaticImage.DrawMe;
 begin
   if ImageReady then
     Image.Draw(x,y,w,h)
-  else WritelnLog('DStaticImage.DrawMe','ERROR: Cannot Draw');
+  //else WritelnLog('DStaticImage.DrawMe','ERROR: Cannot Draw');
 end;
 
 procedure DWindImage.DrawMe;

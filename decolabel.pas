@@ -5,18 +5,20 @@ unit DecoLabel;
 interface
 
 uses
-  {Classes, SysUtils}
-  DecoFont, CastleFonts, CastleVectors,
+  {Classes,} SysUtils,
+  DecoFont, CastleFonts, CastleVectors, CastleFontFamily,
   CastleLog, castleFilesUtils;
 
 {HTML disabled at the moment}
 Type DLabel=class(TObject)
+ public
   x,y,w,h:integer;
-  text:String;
+  text: string;            //todo read ftext write ftext
   color:TVector4Single;
   Font:TTextureFont;
   constructor Create;
   procedure DrawMe;
+  procedure calculateHeight;
 end;
 
 
@@ -28,16 +30,21 @@ begin
   Color:=Vector4Single(1,1,1,1);
 end;
 
+procedure DLabel.CalculateHeight;
+var R_Text: TRichText;
+begin
+  R_Text := TRichText.Create(font, text, true); ///html capable
+  try
+    R_Text.Wrap(w);
+    h:=font.RowHeight*(R_Text.Count-1);
+  finally FreeAndNil(R_Text); end;
+  writelnLog('DLabel.CalculateHeight','height ='+inttostr(h));
+end;
+
 procedure DLabel.DrawMe;
 begin
   if font<>nil then begin
-    //Font.PrintBrokenString(text,w,x,y,true,0);
-    Font.PrintBrokenString(x,y,Color,text,w,true,1,false);
-{    function PrintBrokenString(X0, Y0: Integer; const Color: TCastleColor;
-      const S: string; const MaxLineWidth: Integer;
-      const PositionsFirst: boolean;
-      const LineSpacing: Integer;
-      const Html: boolean = false): Integer;}
+    Font.PrintBrokenString(x,y,Color,text,w,true,0,true); ///html capable
   end else writelnLog('DLabel.DrawMe','ERROR: no font');
 end;
 

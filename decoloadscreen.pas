@@ -6,11 +6,10 @@ interface
 
 uses
   Classes, sysutils,
-  CastleLog, {CastleImages,} CastleWindow, castleFilesUtils,
+  CastleLog, CastleWindow, castleFilesUtils,
   castleVectors,
-  decoimages,
+  decoimages, decoLabel,
   decoloadfacts,
-  CastleGLImages, CastleControls,
   global_var, DecoFont;
 
 procedure MakeLoadScreen;
@@ -22,7 +21,7 @@ implementation
 const LoadScreenFolder='loadscreen/';
 var loadscreen_img:DStaticImage;
     Loadscreen_wind1,Loadscreen_wind2: DWindImage;
-    Loadscreen_label,Loadscreen_facts: TCastleLabel;
+    Loadscreen_label,Loadscreen_facts: DLabel;
     LoadScreen_ready:boolean=false; //safeguard agains accidental errors
 
 
@@ -45,13 +44,17 @@ begin
   if LoadScreen_img<> nil then LoadScreen_img.scaleMe(-1,0,true);
   if LoadScreen_wind2<> nil then LoadScreen_wind2.scaleMe(-1,-1,true);
   if LoadScreen_wind1<> nil then LoadScreen_wind1.scaleMe(-1,-1,true);
-
+  if loadscreen_label <>nil then begin
+    loadscreen_label.w:=round(window.width/3);
+    loadscreen_label.x:=32;
+    loadscreen_label.y:=window.Height -32;
+  end;
+  if loadscreen_facts <>nil then begin
+    loadscreen_facts.w:=round(window.width/3);
+    loadscreen_facts.x:=window.width - loadscreen_facts.w - 32;
+    loadscreen_facts.y:=32 - loadscreen_facts.h;
+  end;
   //if LoadImageReady then LoadScreen_img.ScaleMe(-1) else WritelnLog('OnLoadScreenResize','LoadScreen is not ready!');
-{  loadscreen_label.Left:=32;
-  loadscreen_label.bottom:=window.Height-loadscreen_label.calculatedheight-32;
-
-  loadscreen_facts.Left:=window.width - loadscreen_facts.calculatedWidth - 32;
-  loadscreen_facts.bottom:=32;}
 
 end;
 
@@ -112,15 +115,17 @@ begin
   LoadImageThread.Priority:=tpLower;
   LoadImageThread.Start;
 
-  loadscreen_facts.text.text:=GetRandomFact;
+  loadscreen_facts.text:=GetRandomFact;
+  loadscreen_facts.w:=round(window.width/3);//a quick fix for 'first fact bug' parsed with w=0;
+  loadScreen_facts.CalculateHeight;
 end;
 
 {-----------------------------------------------------------------------------}
 
 var RenderReady:boolean=false;
-    renderTime:single;
+    renderTime:float;
 procedure OnLoadScreenTimer;
-var phase:single;
+var phase:float;
     RenderStart:TDateTime;
 begin
  if RenderReady then begin
@@ -138,7 +143,7 @@ begin
       phase:=abs(sin(Pi*LoadScreen_img.x/(window.width-LoadScreen_img.w)));
       LoadScreen_img.image.Color:=vector4Single(1,1,1,phase);
       LoadScreen_facts.Color:=vector4Single(1,1,1,phase);
-      LoadScreen_facts.bottom:=32+LoadScreen_img.x div 3;
+      LoadScreen_facts.y:=32+LoadScreen_facts.h+LoadScreen_img.x div 3;
       if LoadScreen_img.x+LoadScreen_img.w>=window.width then NewLoadScreenImage;
     end;
 
@@ -180,8 +185,8 @@ begin
  if LoadScreen_img<>nil then LoadScreen_img.DrawMe;
  if LoadScreen_wind1<>nil then LoadScreen_Wind1.DrawMe;
  if LoadScreen_wind2<>nil then LoadScreen_wind2.DrawMe;
- LoadScreen_label.Render;
- loadScreen_facts.render;
+ if LoadScreen_label<>nil then LoadScreen_label.DrawMe;
+ if loadScreen_facts<>nil then loadScreen_facts.DrawMe;
 end;
 
 {*****************************************************************************}
@@ -206,15 +211,14 @@ begin
   LoadScreen_wind1.phase:=random;
 
   WritelnLog('MakeLoadScreen','Making labels.');
-  loadscreen_label:=TCastleLabel.create(Window);
-  loadscreen_label.text.text:='Добро пожаловать в Decoherence :)';
-  loadscreen_label.text.Add('Идёт загрузка, подождите...');
-  loadscreen_label.text.Add('П.С. пока "нечего грузить" :)');
-  loadscreen_label.text.Add('Просто нажмите любую клавишу...');
-  loadscreen_label.CustomFont:=RegularFont16;
+  loadscreen_label:=DLabel.create;
+  loadscreen_label.text:='Добро пожаловать в Decoherence :)'+slinebreak+'Идёт загрузка, подождите...'+slinebreak+'П.С. пока "нечего грузить" :)'+slinebreak+'Просто нажмите любую клавишу...';
+  loadscreen_label.color:=vector4Single(1,1,1,1);
+  loadscreen_label.Font:=RegularFont16;
 
-  loadscreen_facts:=TCastleLabel.create(Window);
-  LoadScreen_facts.CustomFont:=RegularFont16;
+  loadscreen_facts:=DLabel.create;
+  loadscreen_facts.color:=vector4Single(1,1,1,0);
+  LoadScreen_facts.Font:=RegularFont16;
 
   LoadFacts;
 
