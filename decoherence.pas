@@ -27,12 +27,13 @@ uses Classes, SysUtils,
      CastleWindow, CastleKeysMouse,
      decomouse,
      DecoLoadScreen,
+     decolevel,
      global_var;
 
 procedure doPress(Container: TUIContainer; const Event: TInputPressRelease);
 begin
   if Event.EventType = itMouseButton then doMousePress(Event);
-  DestroyLoadScreen;
+  Load_test_level;
 end;
 
 

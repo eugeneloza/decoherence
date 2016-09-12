@@ -26,11 +26,15 @@ implementation
 Procedure OnLoadScreenResize(Container: TUIContainer);
 begin
   WritelnLog('LoadScreen','LoadScreenResize');
+  WritelnLog('LoadScreen','wind1');
   Loadscreen_wind1.Image.Resize(window.width*2, window.Height,  riBilinear);
+  WritelnLog('LoadScreen','wind2');
   Loadscreen_wind2.Image.Resize(window.width*2, window.Height,  riBilinear);
 
+  WritelnLog('LoadScreen','img1');
   if Loadscreen_img.Image<>nil then
     Loadscreen_img.Image.Resize(round(loadscreen_img.image.Width/loadscreen_img.image.height*window.Height), window.Height,  riBilinear);
+  WritelnLog('LoadScreen','next');
   Loadscreen_img.left:=0;
   Loadscreen_img.bottom:=0;
 
@@ -246,6 +250,8 @@ begin
   loadscreen_facts.text.Add(Fact_line2);
 end;
 
+{---------------------------------------------------------------------------------}
+
 procedure NewLoadScreenImage;
 const N_LoadScrenImages=19;
 var s:string;
@@ -337,7 +343,7 @@ end;
 Procedure DestroyLoadScreen;
 begin
   WritelnLog('DestroyLoadScreen','Freeing all...');
-  Window.controls.Clear;
+  //Window.controls.Clear;
   freeandnil(Loadscreen_wind1);
   freeandnil(Loadscreen_wind2);
   freeandnil(Loadscreen_img);
