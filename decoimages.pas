@@ -8,14 +8,13 @@ uses classes, SysUtils, {fgl,}
   CastleLog, castleFilesUtils,
   {CastleControls,} CastleImages, castleVectors,
   CastleGLImages,
+  decointerface,
   decoglobal;
 
-type DAbstractImage=class(TPersistent)
+type DAbstractImage=class(DAbstractElement)
  public
-  w,h:integer;
-  constructor Create;
+  constructor Create(AOwner:TComponent); override;
   procedure LoadMe(filename:string); virtual; abstract;
-  procedure drawMe; virtual; abstract;
   procedure ScaleMe(const new_w:integer=0;const new_h:integer=0;const doInit:boolean=false); virtual; abstract;
  private
   ImageReady:boolean;
@@ -24,7 +23,6 @@ end;
 
 type DStaticImage=class(DAbstractImage)
  public
-  x,y:integer;
   Image:TGLImage;
   SourceImage:TCastleImage;
   {used temporarily to scale the image //thread-safe}
@@ -47,9 +45,9 @@ implementation
 
 {----------------------------------------------------------------}
 
-Constructor DAbstractImage.Create;
+Constructor DAbstractImage.Create(AOwner:TComponent);
 begin
-  inherited;
+  inherited create(AOwner);
   ImageReady:=false;
   ImageLoaded:=false;
 end;

@@ -79,7 +79,7 @@ begin
   LoadImageThreadReady:=false;
   WritelnLog('NewLoadScreenImage','Resetting image.');
   freeandnil(loadscreen_img);
-  LoadScreen_Img:=DStaticImage.Create;
+  LoadScreen_Img:=DStaticImage.Create(Window);
 
   repeat
     LoadImageNew:= random(N_LoadScrenImages)+1;
@@ -156,6 +156,7 @@ begin
     if (LoadImageReady) and (loadScreen_img.image<>nil) then begin
       LoadScreen_img.x+=1*2;
       phase:=abs(sin(Pi*LoadScreen_img.x/(window.width-LoadScreen_img.w)));
+      //if random<sqrt(cos(Pi*phase)) then LoadScreen_img.x+=1;
       LoadScreen_img.image.Color:=vector4Single(1,1,1,phase*0.8);
       LoadScreen_facts.Color:=vector4Single(1,1,1,phase);
       LoadScreen_facts.y:=32+{LoadScreen_facts.h+}LoadScreen_img.x div 3;
@@ -219,19 +220,19 @@ begin
 
   WritelnLog('MakeLoadScreen','Reading "Wind" image.');
  // if Loadscreen_wind1<>nil then WritelnLog('NewLoadScreenImage','Error: wind image already exists.');
-  Loadscreen_wind1:=DWindImage.create;
+  Loadscreen_wind1:=DWindImage.create(Window);
   Loadscreen_wind1.LoadMe(LoadScreenFolder+'WindClouds1_GIMP.jpg');
   Loadscreen_wind1.ScaleMe(-1,-1,true);
   LoadScreen_wind1.alpha:=0.1;
   LoadScreen_wind1.phase:=random;
-  Loadscreen_wind2:=DWindImage.create;
+  Loadscreen_wind2:=DWindImage.create(Window);
   Loadscreen_wind2.LoadMe(LoadScreenFolder+'WindClouds2_GIMP.jpg');
   Loadscreen_wind2.ScaleMe(-1,-1,true);
   LoadScreen_wind2.alpha:=0.1;
   LoadScreen_wind1.phase:=random;
 
   WritelnLog('MakeLoadScreen','Making labels.');
-  loadscreen_label:=DLabel.create;
+  loadscreen_label:=DLabel.create(Window);
   loadscreen_label.text:='Добро пожаловать в Decoherence :)'+decolinebreak+'Идёт загрузка, подождите...'+decolinebreak+'П.С. пока "нечего грузить" :)'+decolinebreak+'Просто нажмите любую клавишу...';
   loadscreen_label.color:=vector4Single(1,1,1,1);
   LoadScreen_label.shadow:=1;
@@ -239,7 +240,7 @@ begin
   LoadScreen_label.w:=round(window.width/3);//a quick fix for 'first fact bug' parsed with w=0;
   LoadScreen_label.InitGL;
 
-  loadscreen_facts:=DLabel.create;
+  loadscreen_facts:=DLabel.create(Window);
   loadscreen_facts.color:=vector4Single(1,1,1,0);
   loadscreen_facts.shadow:=1;
   LoadScreen_facts.Font:=RegularFont16;

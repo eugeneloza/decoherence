@@ -25,7 +25,7 @@ implementation
 uses Classes, SysUtils,
      CastleLog,
      CastleWindow, CastleKeysMouse,
-     decomouse,
+     decomouse, decointerface,
      DecoLoadScreen,
      decolevel,
      decoglobal;
@@ -33,10 +33,18 @@ uses Classes, SysUtils,
 
 {$R+}{$Q+}
 
+procedure doWindowRender;
+begin
+  DrawInterface
+end;
+
+{------------------------------------------------------------------}
+
 procedure doPress(Container: TUIContainer; const Event: TInputPressRelease);
 begin
   if Event.EventType = itMouseButton then doMousePress(Event);
-  Load_test_level;
+  Load_test_level;                         //ugly! I'll fix this soon.
+  window.OnRender:=@doWindowRender;
 end;
 
 
@@ -68,6 +76,7 @@ begin
   WritelnLog('ApplicationInitialize','Init finished');
 
   MakeLoadScreen;
+  InitInterface;
 end;
 
 function MyGetApplicationName: string;

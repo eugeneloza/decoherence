@@ -5,17 +5,19 @@ unit DecoFont;
 interface
 
 uses
-  sysutils,
+  sysutils, fgl,
   {$ifdef Android}
   castletexturefont_linbiolinumrg_16
   {$else}
   CastleFonts, CastleUnicode,
   {$endif}
   CastleStringUtils,
-  CastleImages,CastleTextureFontData, castleVectors, fgl,
+  CastleImages,CastleTextureFontData, castleVectors,
   CastleLog, castleFilesUtils;
 
-const NormalFontFile='fonts/LinBiolinum_R_G.ttf';
+{$ifndef Android}
+const NormalFontFile='interface/fonts/LinBiolinum_R_G.ttf';
+{$endif}
 
 const decolinebreak='@';
 
@@ -66,8 +68,8 @@ var ScreenX, ScreenY: integer;
     CharLen: Integer;
 
     imagewidth,imageheight,imagebonusheight,imagebaseline: integer;
-    P: PVector2Byte;
-    i:integer;
+   { P: PVector2Byte;
+    i:integer; }
 begin
   //first scan the line length and make the image of appropriate width and height
   imagewidth:=0;
@@ -89,6 +91,7 @@ begin
     C := UTF8CharacterToUnicode(TextPtr, CharLen);
   end;
 
+  //preform ALPHA on FFont.Image!
   Result:=TGrayscaleImage.create;
   Result.SetSize(imagewidth,ImageHeight+ImageBonusHeight+ImageBaseline);
   result.Clear(0{Vector2Byte(0,255)});
@@ -164,7 +167,7 @@ var DummyImage,ShadowImage:TGrayscaleAlphaImage;
 begin
   DummyImage:=broken_string_to_image(s);
   if (shadow_strength>0) and (shadow_length>0) then begin
-    Result:=dummyImage.MakeCopy as TGrayscaleAlphaImage;
+    Result:=TGrayscaleAlphaImage.Create(dummyImage.Width+shadow_length,dummyImage.Height+shadow_length);//dummyImage.MakeCopy as TGrayscaleAlphaImage;
     Result.Clear(vector2byte(0,0));
     shadowImage:=dummyImage.MakeCopy as TGrayscaleAlphaImage;
     for iteration:=1 to shadow_length do begin
@@ -172,12 +175,12 @@ begin
       for I := 1 to shadowImage.Width * shadowImage.Height * shadowImage.Depth do
         begin
           p^[1]:=round(p^[1] * shadow_strength / sqr(iteration));
-          p^[0]:=0;        //shadow color intensity might be specified here... or even an RGB color
+          p^[0]:=0;        //shadow color intensity might be specified here... or even an RGB color if make Shadow a TRGBAlphaImage
           Inc(P);
         end;
-      Result.DrawFrom(ShadowImage,iteration,-iteration,dmBlendSmart);
+      Result.DrawFrom(ShadowImage,iteration,shadow_length-iteration,dmBlendSmart);
     end;
-    Result.DrawFrom(dummyImage,0,0,dmBlendSmart);
+    Result.DrawFrom(dummyImage,0,Shadow_Length,dmBlendSmart);
     freeAndNil(ShadowImage);
     freeAndNil(DummyImage);
   end else
