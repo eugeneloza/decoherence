@@ -21,10 +21,10 @@ Type DLabel=class(TObject)
   Shadow:Float;
   constructor Create;
   procedure DrawMe;
-  procedure calculateHeight;
+  procedure InitGL;
  private
   BrokenString:DStringList;
-  R_Text: TRichText;
+  //R_Text: TRichText;
   GImage:TGLImage;
 end;
 
@@ -38,15 +38,28 @@ begin
   Shadow:=0;
 end;
 
-procedure DLabel.CalculateHeight;
-var DummyImage:TGrayscaleAlphaImage;
+procedure DLabel.InitGL;
+var DummyImage,ShadowImage,resultImage:TGrayscaleAlphaImage;
+    i,maxh{,maxw},iteration:integer;
+    P: PVector2Byte;
 begin
   //if GImage<>nil then GImage.Free;
   FreeAndNil(BrokenString);
   brokenString:=DStringList.create;
   BrokenString:=font.Break_String(text,w);
+  maxh:=0;
+  //maxw:=0;
+  for i:=0 to BrokenString.count-1 do begin
+    if maxh<BrokenString[i].height then maxh:=BrokenString[i].height;
+    //if maxw<s[i].width then maxw:=s[i].width;
+  end;
+  h:=maxh*BrokenString.Count;
 
-  DummyImage:=font.broken_string_to_image(BrokenString);
+  if shadow=0 then
+    DummyImage:=font.broken_string_to_image(BrokenString)
+  else
+    DummyImage:=font.broken_string_to_image_with_shadow(BrokenString,shadow,3);
+
   GImage:=TGLImage.create(DummyImage,true,true);
   freeAndNil(DummyImage);
 
@@ -60,6 +73,8 @@ begin
 end;
 
 procedure DLabel.DrawMe;
+var i:integer;
+    t:TDAteTime;
 begin
   if (GImage<>nil){ and (R_Text<>nil)} then begin
  {   if shadow>0 then begin
@@ -68,8 +83,18 @@ begin
       R_text.print(x-1,y+1,Vector4Single(0,0,0,shadow/3*color[3]),0);
     end;
     R_text.print(x,y,Color,0); ///html capable }
-    GImage.color:=color;
-    GImage.Draw(x,y);
+{    t:=now;
+    for i:=1 to 10000 do begin}
+      GImage.color:=color;
+      GImage.Draw(x,y);
+{    end;
+    writelnLog('','gl = '+floattostr((now-t)*24*60*60*1000)+' ms');
+    t:=now;
+    for i:=1 to 10000 do begin
+      Font.PrintBrokenString(x,y,Color,text,w,true,0,true);
+    end;
+    writelnLog('','brks = '+floattostr((now-t)*24*60*60*1000)+' ms');}
+
   end else writelnLog('DLabel.DrawMe','ERROR: no font');
 end;
 

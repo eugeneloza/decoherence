@@ -28,6 +28,7 @@ type DStringList = specialize TFPGObjectList<DString>;
 Type DFont=class(TTextureFont)
   function string_to_image(const s:string):TGrayscaleImage;
   function broken_string_to_image(const s:DStringList):TGrayscaleAlphaImage;
+  function broken_string_to_image_with_shadow(const s:DStringList;shadow_strength:single;shadow_length:integer):TGrayscaleAlphaImage;
   function Break_String(const s:string;const maxwidth:integer):DStringList;
 end;
 
@@ -99,7 +100,7 @@ begin
   while (C > 0) and (CharLen > 0) do
   begin
     G := FFont.Glyph(C);
-    if G <> nil then begin
+    if G <> nil then begin                      //todo sometimes consumes a pixel due to glyphs overlap
       result.DrawFrom(FFont.Image,
                       ScreenX - G.X,ScreenY - G.Y,
                       G.ImageX, G.ImageY, G.Width, G.Height);
@@ -152,6 +153,35 @@ begin
     Inc(P);
   end;
 
+end;
+
+{---------------------------------------------------------------------------}
+
+function DFont.broken_string_to_image_with_shadow(const s:DStringList;shadow_strength:single;shadow_length:integer):TGrayscaleAlphaImage;
+var DummyImage,ShadowImage:TGrayscaleAlphaImage;
+    iteration,i:integer;
+    P:Pvector2byte;
+begin
+  DummyImage:=broken_string_to_image(s);
+  if (shadow_strength>0) and (shadow_length>0) then begin
+    Result:=dummyImage.MakeCopy as TGrayscaleAlphaImage;
+    Result.Clear(vector2byte(0,0));
+    shadowImage:=dummyImage.MakeCopy as TGrayscaleAlphaImage;
+    for iteration:=1 to shadow_length do begin
+      P :=shadowImage.GrayscaleAlphaPixels;
+      for I := 1 to shadowImage.Width * shadowImage.Height * shadowImage.Depth do
+        begin
+          p^[1]:=round(p^[1] * shadow_strength / sqr(iteration));
+          p^[0]:=0;        //shadow color intensity might be specified here... or even an RGB color
+          Inc(P);
+        end;
+      Result.DrawFrom(ShadowImage,iteration,-iteration,dmBlendSmart);
+    end;
+    Result.DrawFrom(dummyImage,0,0,dmBlendSmart);
+    freeAndNil(ShadowImage);
+    freeAndNil(DummyImage);
+  end else
+    result:=DummyImage;
 end;
 
 {---------------------------------------------------------------------------}

@@ -132,7 +132,7 @@ begin
 
   loadscreen_facts.text:=GetRandomFact;
   loadscreen_facts.w:=round(window.width/3);//a quick fix for 'first fact bug' parsed with w=0;
-  loadScreen_facts.CalculateHeight;
+  loadScreen_facts.InitGL;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -237,7 +237,7 @@ begin
   LoadScreen_label.shadow:=1;
   loadscreen_label.Font:=RegularFont16;
   LoadScreen_label.w:=round(window.width/3);//a quick fix for 'first fact bug' parsed with w=0;
-  LoadScreen_label.CalculateHeight;
+  LoadScreen_label.InitGL;
 
   loadscreen_facts:=DLabel.create;
   loadscreen_facts.color:=vector4Single(1,1,1,0);

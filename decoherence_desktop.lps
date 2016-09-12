@@ -10,15 +10,16 @@
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
         <CursorPos Y="6"/>
-        <UsageCount Value="103"/>
+        <UsageCount Value="105"/>
       </Unit0>
       <Unit1>
         <Filename Value="decoimages.pas"/>
         <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
         <TopLine Value="97"/>
         <CursorPos X="3" Y="102"/>
-        <UsageCount Value="101"/>
+        <UsageCount Value="103"/>
         <Loaded Value="True"/>
       </Unit1>
       <Unit2>
@@ -27,30 +28,32 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="61"/>
         <CursorPos X="53" Y="18"/>
-        <UsageCount Value="97"/>
+        <UsageCount Value="99"/>
       </Unit2>
       <Unit3>
         <Filename Value="decoloadscreen.pas"/>
         <IsPartOfProject Value="True"/>
-        <TopLine Value="217"/>
-        <CursorPos Y="235"/>
-        <UsageCount Value="94"/>
+        <TopLine Value="232"/>
+        <CursorPos X="26" Y="232"/>
+        <UsageCount Value="96"/>
         <Loaded Value="True"/>
       </Unit3>
       <Unit4>
         <Filename Value="decofont.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="DecoFont"/>
-        <EditorIndex Value="-1"/>
-        <CursorPos X="25" Y="175"/>
-        <UsageCount Value="92"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="163"/>
+        <CursorPos Y="174"/>
+        <UsageCount Value="94"/>
+        <Loaded Value="True"/>
       </Unit4>
       <Unit5>
         <Filename Value="decolevel.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="28" Y="10"/>
-        <UsageCount Value="78"/>
+        <UsageCount Value="80"/>
       </Unit5>
       <Unit6>
         <Filename Value="android_font\castletexturefont_linbiolinumrg_16.pas"/>
@@ -59,17 +62,16 @@
         <WindowIndex Value="-1"/>
         <TopLine Value="-1"/>
         <CursorPos X="-1" Y="-1"/>
-        <UsageCount Value="37"/>
+        <UsageCount Value="39"/>
       </Unit6>
       <Unit7>
         <Filename Value="decolabel.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="DecoLabel"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="40"/>
-        <CursorPos X="5" Y="44"/>
-        <UsageCount Value="36"/>
+        <TopLine Value="44"/>
+        <CursorPos X="13" Y="58"/>
+        <UsageCount Value="38"/>
         <Loaded Value="True"/>
       </Unit7>
       <Unit8>
@@ -77,7 +79,7 @@
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="23" Y="8"/>
-        <UsageCount Value="36"/>
+        <UsageCount Value="38"/>
       </Unit8>
       <Unit9>
         <Filename Value="decoherence.pas"/>
@@ -295,7 +297,7 @@
         <UsageCount Value="10"/>
       </Unit36>
     </Units>
-    <JumpHistory Count="5" HistoryIndex="4">
+    <JumpHistory Count="19" HistoryIndex="18">
       <Position1>
         <Filename Value="decolabel.pas"/>
         <Caret Line="64" Column="44" TopLine="59"/>
@@ -316,6 +318,62 @@
         <Filename Value="decoloadscreen.pas"/>
         <Caret Line="235" TopLine="217"/>
       </Position5>
+      <Position6>
+        <Filename Value="decolabel.pas"/>
+        <Caret Line="44" Column="5" TopLine="40"/>
+      </Position6>
+      <Position7>
+        <Filename Value="decolabel.pas"/>
+        <Caret Line="55" Column="11" TopLine="55"/>
+      </Position7>
+      <Position8>
+        <Filename Value="decolabel.pas"/>
+        <Caret Line="52" Column="25" TopLine="43"/>
+      </Position8>
+      <Position9>
+        <Filename Value="decolabel.pas"/>
+        <Caret Line="41" Column="30" TopLine="34"/>
+      </Position9>
+      <Position10>
+        <Filename Value="decoloadscreen.pas"/>
+        <Caret Line="235" TopLine="217"/>
+      </Position10>
+      <Position11>
+        <Filename Value="decoloadscreen.pas"/>
+        <Caret Line="135" Column="20" TopLine="128"/>
+      </Position11>
+      <Position12>
+        <Filename Value="decolabel.pas"/>
+        <Caret Line="24" Column="19" TopLine="13"/>
+      </Position12>
+      <Position13>
+        <Filename Value="decoloadscreen.pas"/>
+        <Caret TopLine="16"/>
+      </Position13>
+      <Position14>
+        <Filename Value="decoloadscreen.pas"/>
+        <Caret Line="135" Column="26" TopLine="126"/>
+      </Position14>
+      <Position15>
+        <Filename Value="decofont.pas"/>
+        <Caret Line="32" TopLine="19"/>
+      </Position15>
+      <Position16>
+        <Filename Value="decofont.pas"/>
+        <Caret Line="162" Column="16" TopLine="166"/>
+      </Position16>
+      <Position17>
+        <Filename Value="decofont.pas"/>
+        <Caret Line="165" Column="39" TopLine="156"/>
+      </Position17>
+      <Position18>
+        <Filename Value="decofont.pas"/>
+        <Caret Line="161" Column="27" TopLine="157"/>
+      </Position18>
+      <Position19>
+        <Filename Value="decolabel.pas"/>
+        <Caret Line="63" TopLine="48"/>
+      </Position19>
     </JumpHistory>
   </ProjectSession>
 </CONFIG>
