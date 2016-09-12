@@ -10,32 +10,32 @@
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="91" Y="10"/>
-        <UsageCount Value="70"/>
+        <UsageCount Value="71"/>
       </Unit0>
       <Unit1>
         <Filename Value="decoimages.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="3"/>
         <CursorPos X="13" Y="8"/>
-        <UsageCount Value="68"/>
+        <UsageCount Value="69"/>
         <Loaded Value="True"/>
       </Unit1>
       <Unit2>
         <Filename Value="decomouse.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="43"/>
+        <TopLine Value="46"/>
         <CursorPos X="44" Y="63"/>
-        <UsageCount Value="64"/>
+        <UsageCount Value="65"/>
         <Loaded Value="True"/>
       </Unit2>
       <Unit3>
         <Filename Value="decoloadscreen.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="4"/>
-        <TopLine Value="459"/>
-        <CursorPos X="3" Y="466"/>
-        <UsageCount Value="61"/>
+        <TopLine Value="392"/>
+        <CursorPos X="45" Y="407"/>
+        <UsageCount Value="62"/>
         <Loaded Value="True"/>
       </Unit3>
       <Unit4>
@@ -45,7 +45,7 @@
         <EditorIndex Value="5"/>
         <TopLine Value="10"/>
         <CursorPos X="3" Y="8"/>
-        <UsageCount Value="59"/>
+        <UsageCount Value="60"/>
         <Loaded Value="True"/>
       </Unit4>
       <Unit5>
@@ -53,9 +53,9 @@
         <IsPartOfProject Value="True"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="27"/>
-        <CursorPos X="34" Y="34"/>
-        <UsageCount Value="45"/>
+        <TopLine Value="24"/>
+        <CursorPos X="5" Y="28"/>
+        <UsageCount Value="46"/>
         <Loaded Value="True"/>
       </Unit5>
       <Unit6>
@@ -201,123 +201,123 @@
     <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
         <Filename Value="decoloadscreen.pas"/>
-        <Caret Line="103" TopLine="93"/>
+        <Caret Line="370" Column="29" TopLine="362"/>
       </Position1>
       <Position2>
         <Filename Value="decoloadscreen.pas"/>
-        <Caret Line="89" Column="66" TopLine="73"/>
+        <Caret Line="375" Column="30" TopLine="367"/>
       </Position2>
       <Position3>
         <Filename Value="decoloadscreen.pas"/>
-        <Caret Line="64" Column="39" TopLine="56"/>
+        <Caret Line="68" Column="9" TopLine="54"/>
       </Position3>
       <Position4>
         <Filename Value="decoloadscreen.pas"/>
-        <Caret Line="370" Column="29" TopLine="362"/>
+        <Caret Line="43" TopLine="37"/>
       </Position4>
       <Position5>
         <Filename Value="decoloadscreen.pas"/>
-        <Caret Line="375" Column="30" TopLine="367"/>
+        <Caret Line="54" TopLine="47"/>
       </Position5>
       <Position6>
         <Filename Value="decoloadscreen.pas"/>
-        <Caret Line="68" Column="9" TopLine="54"/>
+        <Caret Line="41" Column="32" TopLine="36"/>
       </Position6>
       <Position7>
         <Filename Value="decoloadscreen.pas"/>
-        <Caret Line="43" TopLine="37"/>
+        <Caret Line="55" Column="54" TopLine="43"/>
       </Position7>
       <Position8>
         <Filename Value="decoloadscreen.pas"/>
-        <Caret Line="54" TopLine="47"/>
+        <Caret Line="40" TopLine="32"/>
       </Position8>
       <Position9>
-        <Filename Value="decoloadscreen.pas"/>
-        <Caret Line="41" Column="32" TopLine="36"/>
+        <Filename Value="decolevel.pas"/>
+        <Caret Line="34" Column="33" TopLine="19"/>
       </Position9>
       <Position10>
-        <Filename Value="decoloadscreen.pas"/>
-        <Caret Line="55" Column="54" TopLine="43"/>
+        <Filename Value="decolevel.pas"/>
+        <Caret Line="34" Column="33" TopLine="19"/>
       </Position10>
       <Position11>
-        <Filename Value="decoloadscreen.pas"/>
-        <Caret Line="40" TopLine="32"/>
+        <Filename Value="decolevel.pas"/>
+        <Caret Line="35" Column="40" TopLine="24"/>
       </Position11>
       <Position12>
         <Filename Value="decolevel.pas"/>
-        <Caret Line="34" Column="33" TopLine="19"/>
+        <Caret Line="36" Column="32" TopLine="28"/>
       </Position12>
       <Position13>
         <Filename Value="decolevel.pas"/>
-        <Caret Line="34" Column="33" TopLine="19"/>
+        <Caret Line="35" Column="9" TopLine="27"/>
       </Position13>
       <Position14>
-        <Filename Value="decolevel.pas"/>
-        <Caret Line="35" Column="40" TopLine="24"/>
-      </Position14>
-      <Position15>
-        <Filename Value="decolevel.pas"/>
-        <Caret Line="36" Column="32" TopLine="28"/>
-      </Position15>
-      <Position16>
-        <Filename Value="decolevel.pas"/>
-        <Caret Line="35" Column="9" TopLine="27"/>
-      </Position16>
-      <Position17>
         <Filename Value="decoherence.pas"/>
         <Caret Line="46" Column="16" TopLine="43"/>
-      </Position17>
-      <Position18>
+      </Position14>
+      <Position15>
         <Filename Value="global_var.pas"/>
         <Caret Line="28" Column="23" TopLine="15"/>
-      </Position18>
-      <Position19>
+      </Position15>
+      <Position16>
         <Filename Value="decoherence.pas"/>
         <Caret Line="51" Column="56" TopLine="39"/>
+      </Position16>
+      <Position17>
+        <Filename Value="decomouse.pas"/>
+        <Caret Line="43" Column="20" TopLine="31"/>
+      </Position17>
+      <Position18>
+        <Filename Value="decomouse.pas"/>
+        <Caret Line="47" Column="37" TopLine="32"/>
+      </Position18>
+      <Position19>
+        <Filename Value="decomouse.pas"/>
+        <Caret Line="60" Column="56" TopLine="38"/>
       </Position19>
       <Position20>
         <Filename Value="decomouse.pas"/>
-        <Caret Line="43" Column="20" TopLine="31"/>
+        <Caret Line="52" Column="22" TopLine="47"/>
       </Position20>
       <Position21>
-        <Filename Value="decomouse.pas"/>
-        <Caret Line="47" Column="37" TopLine="32"/>
+        <Filename Value="decoloadscreen.pas"/>
+        <Caret Line="396" Column="32" TopLine="379"/>
       </Position21>
       <Position22>
-        <Filename Value="decomouse.pas"/>
-        <Caret Line="60" Column="56" TopLine="38"/>
+        <Filename Value="decoloadscreen.pas"/>
+        <Caret Line="87" Column="27" TopLine="81"/>
       </Position22>
       <Position23>
-        <Filename Value="decomouse.pas"/>
-        <Caret Line="52" Column="22" TopLine="47"/>
+        <Filename Value="decoloadscreen.pas"/>
+        <Caret Line="92" Column="81" TopLine="79"/>
       </Position23>
       <Position24>
         <Filename Value="decoloadscreen.pas"/>
-        <Caret Line="396" Column="32" TopLine="379"/>
+        <Caret Line="98" Column="14" TopLine="85"/>
       </Position24>
       <Position25>
         <Filename Value="decoloadscreen.pas"/>
-        <Caret Line="87" Column="27" TopLine="81"/>
+        <Caret Line="396" Column="36" TopLine="389"/>
       </Position25>
       <Position26>
         <Filename Value="decoloadscreen.pas"/>
-        <Caret Line="92" Column="81" TopLine="79"/>
+        <Caret Line="88" Column="56" TopLine="75"/>
       </Position26>
       <Position27>
         <Filename Value="decoloadscreen.pas"/>
-        <Caret Line="98" Column="14" TopLine="85"/>
+        <Caret Line="466" Column="3" TopLine="459"/>
       </Position27>
       <Position28>
         <Filename Value="decoloadscreen.pas"/>
-        <Caret Line="396" Column="36" TopLine="389"/>
+        <Caret Line="58" TopLine="50"/>
       </Position28>
       <Position29>
         <Filename Value="decoloadscreen.pas"/>
-        <Caret Line="88" Column="56" TopLine="75"/>
+        <Caret Line="50" Column="4" TopLine="41"/>
       </Position29>
       <Position30>
         <Filename Value="decoloadscreen.pas"/>
-        <Caret Line="82" Column="81" TopLine="172"/>
+        <Caret Line="103" Column="35" TopLine="79"/>
       </Position30>
     </JumpHistory>
   </ProjectSession>

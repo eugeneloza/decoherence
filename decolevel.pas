@@ -25,6 +25,7 @@ begin
   Scene.Load(ApplicationData('level/test-level.x3d'));
   Scene.Spatial := [ssRendering, ssDynamicCollisions];
   Scene.ProcessEvents := true;
+  //Scene.Attributes.EnableTextures:=false;
 
   DestroyLoadScreen;
 
@@ -38,7 +39,6 @@ begin
   player.position:=Vector3Single(0,0,1);
   player.FallingEffect:=false;
   player.DefaultPreferredHeight:=1;
-
 
   Window.SceneManager.Items.Add(Scene);
   Window.SceneManager.MainScene := Scene;
