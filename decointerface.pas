@@ -6,10 +6,9 @@ interface
 
 uses
   Classes, fgl, sysutils,
-  CastleLog, {CastleWindow,} castleFilesUtils,
+  CastleLog, castleFilesUtils,
   castleVectors, CastleGLImages, CastleImages,
-  {decoimages, decoLabel,}
-  decoglobal{, DecoFont};
+  decoglobal;
 
 const Frames_Folder='interface/frames/';
 

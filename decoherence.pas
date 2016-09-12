@@ -99,7 +99,7 @@ end;
 
 function MyGetApplicationName: string;
 begin
-  Result := 'Decoherence 1';
+  Result := 'Decoherence-1';
 end;
 
 Initialization

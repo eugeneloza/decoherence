@@ -129,7 +129,6 @@ begin
     image.Color:=Vector4Single(1,1,1,alpha+alpha/4*sin(2*Pi*3*phase));
     phase_scaled:=round(Phase*w);
 
-    //image.draw(0,0);
     //draw first part of the image
     Image.Draw(phase_scaled,0,
                w-phase_scaled,h,

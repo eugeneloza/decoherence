@@ -7,11 +7,9 @@ interface
 uses
   sysutils, fgl,
   {$IFDEF Android}
-  castletexturefont_linbiolinumrg_16
-  {$ELSE}
-  CastleFonts, CastleUnicode,
+  castletexturefont_linbiolinumrg_16,
   {$ENDIF}
-  CastleStringUtils,
+  CastleFonts, CastleUnicode, CastleStringUtils,
   CastleImages,CastleTextureFontData, castleVectors,
   CastleLog, castleFilesUtils;
 
@@ -36,7 +34,7 @@ Type DFont=class(TTextureFont)
    AlphaFontImage: TGrayscaleAlphaImage;
 end;
 
-var MyCharSet:TUnicodeCharList;
+var {$IFNDEF Android}MyCharSet:TUnicodeCharList;{$ENDIF}
   RegularFont16:DFont;
 
 procedure InitializeFonts;
@@ -48,7 +46,7 @@ implementation
 procedure InitializeFonts;
 begin
    {$IFDEF Android}
-   RegularFont16:=TTextureFont.Create(TextureFont_LinBiolinumRG_16);
+   RegularFont16:=TTextureFont.Create(TextureFont_LinBiolinumRG_16) as DFont;
    {$ELSE}
    if MyCharSet=nil then begin
       MyCharSet:=TUnicodeCharList.Create;

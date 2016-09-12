@@ -25,7 +25,6 @@ Type DLabel=class(DAbstractElement)
   procedure InitGL;
  private
   BrokenString:DStringList;
-  //R_Text: TRichText;
   GImage:TGLImage;
 end;
 
@@ -40,11 +39,10 @@ begin
 end;
 
 procedure DLabel.InitGL;
-var DummyImage,ShadowImage,resultImage:TGrayscaleAlphaImage;
-    i,maxh{,maxw},iteration:integer;
-    P: PVector2Byte;
+var DummyImage:TGrayscaleAlphaImage;
+    i,maxh,iteration:integer;
 begin
-  //if GImage<>nil then GImage.Free;
+  //if GImage<>nil then GImage.Free;   //todo: memory leaks here!
   FreeAndNil(BrokenString);
   brokenString:=DStringList.create;
   BrokenString:=font.Break_String(text,w);
@@ -65,39 +63,13 @@ begin
 
   GImage:=TGLImage.create(DummyImage,true,true);
   freeAndNil(DummyImage);
-
-{  freeandnil(R_text);
-  R_Text := TRichText.Create(font, text, true); ///html capable
-  try
-    R_Text.Wrap(w);
-    h:=font.RowHeight*(R_Text.Count-1);
-  finally {FreeAndNil(R_Text);} end;
-  writelnLog('DLabel.CalculateHeight','height ='+inttostr(h)); }
 end;
 
 procedure DLabel.DrawMe;
-var i:integer;
-    t:TDAteTime;
 begin
-  if (GImage<>nil){ and (R_Text<>nil)} then begin
- {   if shadow>0 then begin
-      R_text.print(x+1,y-1,Vector4Single(0,0,0,shadow*color[3]),0);
-      R_text.print(x+2,y-2,Vector4Single(0,0,0,shadow/2*color[3]),0);
-      R_text.print(x-1,y+1,Vector4Single(0,0,0,shadow/3*color[3]),0);
-    end;
-    R_text.print(x,y,Color,0); ///html capable }
-{    t:=now;
-    for i:=1 to 10000 do begin}
-      GImage.color:=color;
-      GImage.Draw(x,y);
-{    end;
-    writelnLog('','gl = '+floattostr((now-t)*24*60*60*1000)+' ms');
-    t:=now;
-    for i:=1 to 10000 do begin
-      Font.PrintBrokenString(x,y,Color,text,w,true,0,true);
-    end;
-    writelnLog('','brks = '+floattostr((now-t)*24*60*60*1000)+' ms');}
-
+  if (GImage<>nil) then begin
+    GImage.color:=color;
+    GImage.Draw(x,y);
   end else writelnLog('DLabel.DrawMe','ERROR: no font');
 end;
 
