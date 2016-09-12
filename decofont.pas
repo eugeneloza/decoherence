@@ -6,18 +6,18 @@ interface
 
 uses
   sysutils, fgl,
-  {$ifdef Android}
+  {$IFDEF Android}
   castletexturefont_linbiolinumrg_16
-  {$else}
+  {$ELSE}
   CastleFonts, CastleUnicode,
-  {$endif}
+  {$ENDIF}
   CastleStringUtils,
   CastleImages,CastleTextureFontData, castleVectors,
   CastleLog, castleFilesUtils;
 
-{$ifndef Android}
+{$IFNDEF Android}
 const NormalFontFile='interface/fonts/LinBiolinum_R_G.ttf';
-{$endif}
+{$ENDIF}
 
 const decolinebreak='@';
 
@@ -45,16 +45,16 @@ implementation
 
 procedure InitializeFonts;
 begin
-   {$IfDef Android}
+   {$IFDEF Android}
    RegularFont16:=TTextureFont.Create(TextureFont_LinBiolinumRG_16);
-   {$else}
+   {$ELSE}
    if MyCharSet=nil then begin
       MyCharSet:=TUnicodeCharList.Create;
       MyCharSet.add(SimpleAsciiCharacters);
       MyCharSet.add('śЁЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮёйцукенгшщзхъфывапролджэячсмитьбюІЇЄіїє');
    end;
    RegularFont16:=DFont.Create(ApplicationData(NormalFontFile),16,true,MyCharSet);
-   {$endif}
+   {$ENDIF}
    WritelnLog('DecoFont:initialization','Fonts loaded successfully.');
 end;
 

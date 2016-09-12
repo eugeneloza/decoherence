@@ -16,14 +16,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 unit Decoherence;
 
 {$mode objfpc}{$H+}
+//{$DEFINE WriteLog}{$IFDEF Windows}{$APPTYPE GUI}{$ENDIF}
 
 interface
 
+const Version='Interfa2-160912-18';
 
 implementation
 
 uses Classes, SysUtils,
-     CastleLog,
+     CastleLog, CastleTimeUtils,
      CastleWindow, CastleKeysMouse,
      decomouse, decointerface,
      DecoLoadScreen,
@@ -33,7 +35,7 @@ uses Classes, SysUtils,
 
 {$R+}{$Q+}
 
-procedure doWindowRender;
+procedure doWindowRender(Container: TUIContainer);
 begin
   DrawInterface
 end;
@@ -44,21 +46,36 @@ procedure doPress(Container: TUIContainer; const Event: TInputPressRelease);
 begin
   if Event.EventType = itMouseButton then doMousePress(Event);
   Load_test_level;                         //ugly! I'll fix this soon.
-  window.OnRender:=@doWindowRender;
+  //window.OnRender:=@doWindowRender;
 end;
 
 
 {======================= initialization routines ==============================}
 
+function NiceDate:string;
+var s:String;
+    i:integer;
+begin
+  s:=DateTimeToAtStr(now);
+  result:='';
+  for i:=1 to length(s) do
+    if copy(s,i,1)=' ' then result+='_' else
+    if copy(s,i,1)=':' then result+='-' else
+    result+=copy(s,i,1);
+end;
+
 procedure ApplicationInitialize;
 begin
-  {$ifdef Android}
+  {$IFDEF Android}
   InitializeLog;
-  {$else}
-  {LogStream:=TFileStream.Create('log_'+inttostr(round(now*24*60*60))+'.txt',fmCreate);
-  InitializeLog('',LogStream);}
-  InitializeLog;
-  {$endif}
+  {$ELSE}
+    {$IFDEF WriteLog}
+      LogStream:=TFileStream.Create('log_'+NiceDate+'.txt',fmCreate);
+      InitializeLog(Version,LogStream);
+    {$ELSE}
+      InitializeLog;
+    {$ENDIF}
+  {$ENDIF}
   WritelnLog('ApplicationInitialize','Init');
 
   window.OnPress:=@doPress;

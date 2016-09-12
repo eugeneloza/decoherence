@@ -36,7 +36,7 @@ begin
   Player.Camera.GravityUp:=Vector3Single(0,0,1);
   Player.Up:=Vector3Single(0,0,1);
   Window.scenemanager.camera:=player.camera;
-  player.position:=Vector3Single(0,0,1);
+  player.position:=Vector3Single(0,0,2);
   player.FallingEffect:=false;
   player.DefaultPreferredHeight:=1;
 
