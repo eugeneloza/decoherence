@@ -22,18 +22,33 @@ interface
 
 implementation
 
-uses Classes, SysUtils, CastleLog, CastleWindow,
-    global_var;
+uses Classes, SysUtils,
+     CastleLog,
+     CastleWindow, CastleKeysMouse,
+     decomouse,
+     DecoLoadScreen,
+     global_var;
+
+procedure doPress(Container: TUIContainer; const Event: TInputPressRelease);
+begin
+  if Event.EventType = itMouseButton then doMousePress(Event);
+  DestroyLoadScreen;
+end;
+
+
+{======================= initialization routines ==============================}
 
 procedure ApplicationInitialize;
 begin
   InitializeLog;
   WritelnLog('ApplicationInitialize','Init');
 
+  window.OnPress:=@doPress;
+  TouchArray:=DTouchList.create;
+
 {  window.OnRender:=@doWindowRender;
   window.OnResize:=@doWindowResize;
 
-  window.OnPress:=@MenuKeyPress;
   window.onRelease:=@MenuKeyRelease;
   window.OnMotion:=nil;}
 
@@ -41,6 +56,8 @@ begin
   application.OnTimer:=@dotimer;}
 
   WritelnLog('ApplicationInitialize','Init finished');
+
+  MakeLoadScreen;
 end;
 
 function MyGetApplicationName: string;
@@ -49,10 +66,10 @@ begin
 end;
 
 Initialization
-OnGetApplicationName := @MyGetApplicationName;
-Window:=TCastleWindow.create(Application);
-{ This should be done as early as possible to mark our log lines correctly. }
-Application.MainWindow := Window;
-Application.OnInitialize := @ApplicationInitialize;
+  OnGetApplicationName := @MyGetApplicationName;
+  Window:=TCastleWindow.create(Application);
+  { This should be done as early as possible to mark our log lines correctly. }
+  Application.MainWindow := Window;
+  Application.OnInitialize := @ApplicationInitialize;
 end.
 

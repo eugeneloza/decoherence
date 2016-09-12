@@ -22,6 +22,8 @@ interface
 uses
   CastleWindow;
 
+type float=single;
+
 var Window:TCastleWindow;
 
 implementation
