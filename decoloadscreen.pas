@@ -377,9 +377,15 @@ end;
 
 {-----------------------------------------------------------------------------}
 
+var RenderReady:boolean=false;
+    renderTime:single;
 procedure OnLoadScreenTimer;
 var phase:single;
+    RenderStart:TDateTime;
 begin
+ if RenderReady then begin
+  RenderReady:=false;
+  RenderStart:=now;
   If LoadScreen_ready then begin
     if LoadImageThreadReady then begin
       Window.Controls.InsertBack(loadscreen_img);
@@ -397,20 +403,26 @@ begin
       if LoadScreen_img.Left+LoadScreen_img.image.Width>=window.width then NewLoadScreenImage;
     end;
 
-    LoadScreen_wind1.left:=LoadScreen_wind1.left-1;
-    if -LoadScreen_wind1.Left>=LoadScreen_wind1.image.Width div 2 then LoadScreen_wind1.left:=0;
+    if RenderTime<1/200 then begin
+      LoadScreen_wind1.left:=LoadScreen_wind1.left-1;
+      if -LoadScreen_wind1.Left>=LoadScreen_wind1.image.Width div 2 then LoadScreen_wind1.left:=0;
+    end;
     LoadScreen_wind2.left:=LoadScreen_wind2.left-2;
     if -LoadScreen_wind2.Left>=LoadScreen_wind2.image.Width div 2 then LoadScreen_wind2.left:=0;
 
-    phase:=sqr(sin(5*2*Pi*LoadScreen_wind1.Left/(LoadScreen_wind1.image.Width)));
-    (LoadScreen_wind1.Image as TRGBAlphaImage).ClearAlpha(50+round(11*Phase));
-    (LoadScreen_wind2.Image as TRGBAlphaImage).ClearAlpha(50-round(11*Phase));
+    if RenderTime<1/300 then begin
+      phase:=sqr(sin(5*2*Pi*LoadScreen_wind1.Left/(LoadScreen_wind1.image.Width)));
+      (LoadScreen_wind1.Image as TRGBAlphaImage).ClearAlpha(50+round(11*Phase));
+      (LoadScreen_wind2.Image as TRGBAlphaImage).ClearAlpha(50-round(11*Phase));
+    end;
 
-    loadscreen_wind1.imageChanged;
-    loadscreen_wind2.imageChanged;
-    loadscreen_IMG.ImageChanged;
+    //loadscreen_wind1.imageChanged;
+    //loadscreen_wind2.imageChanged;
+    //loadscreen_IMG.ImageChanged;
   end else WritelnLog('OnLoadScreenTimer','Error: LoadScreen is not ready.');
-
+  RenderReady:=true;
+  RenderTime:=(RenderTime*99+(now-RenderStart)*24*60*60)/100; {render time in ms}
+ end;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -418,6 +430,7 @@ end;
 
 Procedure DestroyLoadScreen;
 begin
+  RenderReady:=false;
   WritelnLog('DestroyLoadScreen','Freeing all...');
   //Window.controls.Clear;
   freeandnil(Loadscreen_wind1);
@@ -435,6 +448,8 @@ end;
 
 procedure MakeLoadScreen;
 begin
+  RenderReady:=false;
+  RenderTime:=0;
   WritelnLog('MakeLoadScreen','Initialize...');
   WritelnLog('MakeLoadScreen','Reading "Wind" image.');
   if Loadscreen_wind1<>nil then WritelnLog('NewLoadScreenImage','Error: wind image already exists.');
@@ -475,6 +490,7 @@ begin
   application.OnTimer:=@OnLoadScreenTimer;
   Window.OnResize:=@OnLoadScreenResize;
   OnLoadScreenResize(nil);
+  RenderReady:=true
 end;
 
 end.
