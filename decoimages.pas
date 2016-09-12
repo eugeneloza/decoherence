@@ -4,36 +4,130 @@ unit decoimages;
 
 interface
 
-uses classes, fgl,
-  CastleLog,
-  CastleControls, CastleImages, castleFilesUtils,
+uses classes, SysUtils, {fgl,}
+  CastleLog, castleFilesUtils,
+  {CastleControls,} CastleImages, castleVectors,
+  CastleGLImages,
   global_var;
 
-Type DImageFrame=class(TCastleImage)
-  timedelay:TDateTime;
+type DAbstractImage=class(TPersistent)
+ public
+  x,y,w,h:integer;
+  constructor Create;
+  procedure LoadMe(filename:string); virtual; abstract;
+  procedure drawMe; virtual; abstract;
+  procedure ScaleMe(const new_w:integer=0;const new_h:integer=0;const doInit:boolean=false); virtual; abstract;
+ private
+  ImageReady:boolean;
+  ImageLoaded:boolean;
 end;
 
-type DListOfImages=specialize TFPGObjectList<DImageFrame>;
+type DStaticImage=class(DAbstractImage)
+ public
+  Image:TGLImage;
+  SourceImage:TCastleImage;
+  {used temporarily to scale the image //thread-safe}
+  TmpImage:TCastleImage;
+  procedure LoadMe(filename:string); override;
+  procedure DrawMe; override;
+  procedure ScaleMe(const new_w:integer=0;const new_h:integer=0;const doInit:boolean=false); override;
+  {Initialize GL Image // thread-unsafe!!!}
+  procedure InitGL;
+end;
 
-type DImage=class(TCastleImageControl)
-  private
-
+type DWindImage=class(DStaticImage)
   public
-    animationstart:TDateTime;
-    animate:boolean;
-    Images:DListOfImages;
-    {t:time in miliseconds}
-    procedure LoadFrame(const file_name:string; tt:float);
+  phase:single;
+  alpha:single;
+  procedure DrawMe; override;
 end;
 
 implementation
 
-procedure DImage.LoadFrame(const file_name:string; tt:float);
-var newImage:DImageFrame;
+Constructor DAbstractImage.Create;
 begin
-  newImage:=LoadImage(ApplicationData(file_name)) as DImageFrame;
-  newImage.timedelay:=tt/1000/24/60/60; {convert to TDateTime}
-  images.Add(newImage);
+  inherited;
+  ImageReady:=false;
+  ImageLoaded:=false;
+end;
+
+procedure DStaticImage.LoadMe(filename:string);
+begin
+  WritelnLog('DSimpleImage.LoadMe',filename);
+  freeandnil(SourceImage);
+  freeandnil(Image);
+  SourceImage:=LoadImage(ApplicationData(filename));
+  w:=SourceImage.width;
+  h:=SourceImage.Height;
+  //don't load TGLImage until scaleMe!!!
+  ImageLoaded:=true;
+end;
+
+procedure DStaticImage.ScaleMe(const new_w:integer=0;const new_h:integer=0;const doInit:boolean=false);
+begin
+ ImageReady:=false;
+ if ImageLoaded then begin
+   if (new_h>0) and (new_w>0) then begin
+     h:=new_h;
+     w:=new_w;
+   end;
+   if new_w=-1 then begin
+     if new_h=-1 then begin
+       h:=window.height;
+       w:=window.width;
+     end else begin
+       h:=window.Height;
+       w:=round(h/SourceImage.Height*sourceImage.width);
+     end;
+   end;
+   WritelnLog('DStaticImage.ScaleMe',inttostr(w)+'x'+inttostr(h));
+   TmpImage:=SourceImage.CreateCopy as TCastleImage;
+   if (h>0) and (w>0) then
+     TmpImage.Resize(w,h,riBilinear);
+   if doInit then initGL;
+ end else WritelnLog('DStaticImage.ScaleMe','ERROR: Image not loaded!');
+end;
+
+procedure DStaticImage.InitGl;
+var OldImage:TGLImage;
+begin
+ if TmpImage=nil then ScaleMe(0,0,false);
+ OldImage:=Image;
+ // freeandnil(Image);         !!! MEMORY LEAKS HERE... but causes SIGSEGV if initGL is called twice...
+ Image:=TGLImage.create(TmpImage,true,true);
+ {if oldimage<>nil then begin
+   OldImage.Destroy; //freeandnil(oldimage);
+ end;}
+ freeandnil(tmpImage);
+ ImageReady:=true;
+end;
+
+procedure DStaticImage.DrawMe;
+begin
+  if ImageReady then
+    Image.Draw(x,y,w,h)
+  else WritelnLog('DStaticImage.DrawMe','ERROR: Cannot Draw');
+end;
+
+procedure DWindImage.DrawMe;
+var phase_scaled:integer;
+begin
+  if ImageReady then begin
+    image.Color:=Vector4Single(1,1,1,alpha+alpha/4*sin(2*Pi*3*phase));
+    phase_scaled:=round(Phase*w);
+
+    //image.draw(0,0);
+    //draw first part of the image
+    Image.Draw(phase_scaled,0,
+               w-phase_scaled,h,
+               0,0,
+               w-phase_scaled,h);
+    //draw second part of the image
+    Image.Draw(0,0,
+               phase_scaled,h,
+               w-phase_scaled,0,
+               phase_scaled,h);
+  end;
 end;
 
 end.
