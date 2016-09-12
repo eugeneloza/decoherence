@@ -5,9 +5,9 @@ unit DecoFont;
 interface
 
 uses
-  {Classes,} SysUtils, CastleFonts, CastleUnicode, CastleStringUtils, castleFilesUtils;
+  CastleFonts, CastleUnicode, CastleStringUtils, castleFilesUtils;
 
-const NormalFontFile='fonts'+pathdelim+'LinBiolinum_R_G.ttf';
+const NormalFontFile='fonts/LinBiolinum_R_G.ttf';
 
 var MyCharSet:TUnicodeCharList;
   RegularFont16:TTextureFont;

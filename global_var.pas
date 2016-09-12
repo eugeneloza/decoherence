@@ -20,11 +20,13 @@ unit global_var;
 interface
 
 uses
-  CastleWindow;
+  Classes,CastleWindow;
 
 type float=single;
 
 var Window:TCastleWindow;
+    LogStream:TFileStream;
+
 
 implementation
 

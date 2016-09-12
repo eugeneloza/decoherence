@@ -30,6 +30,9 @@ uses Classes, SysUtils,
      decolevel,
      global_var;
 
+
+{$R+}{$Q+}
+
 procedure doPress(Container: TUIContainer; const Event: TInputPressRelease);
 begin
   if Event.EventType = itMouseButton then doMousePress(Event);
@@ -41,7 +44,13 @@ end;
 
 procedure ApplicationInitialize;
 begin
+  {$ifdef Android}
   InitializeLog;
+  {$else}
+  {LogStream:=TFileStream.Create('log_'+inttostr(round(now*24*60*60))+'.txt',fmCreate);
+  InitializeLog('',LogStream);}
+  InitializeLog;
+  {$endif}
   WritelnLog('ApplicationInitialize','Init');
 
   window.OnPress:=@doPress;

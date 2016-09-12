@@ -5,12 +5,12 @@ unit decoloadscreen;
 interface
 
 uses
-  Classes, SysUtils,
+  Classes, sysutils,
   CastleLog, CastleControls, CastleImages, CastleWindow, castleFilesUtils,
   castleVectors,
   global_var, DecoFont;
 
-const LoadScreenFolder='loadscreen'+pathdelim;
+const LoadScreenFolder='loadscreen/';
 
 var loadscreen_img, Loadscreen_wind1,Loadscreen_wind2: TCastleImageControl;
     Loadscreen_label,Loadscreen_facts: TCastleLabel;
@@ -23,18 +23,105 @@ Procedure DestroyLoadScreen;
 
 implementation
 
+type TLoadImageThread = class(TThread)
+  private
+  protected
+    procedure Execute; override;
+end;
+var LoadImageThreadReady:boolean=false;
+    LoadImageReady:boolean=false;
+    LoadImageThread:TLoadImageThread;
+    LoadImageString:string;
+    LoadImageOld:integer=-1;
+    LastFact:integer=-1;
+
+{ Works fine but either awfully slow (normal), or very ugly (resize)
+So, forget about it :)
+
+function blur(source:TCastleImage):TCastleImage;
+const sigma=3;
+var destX,destY,sourceX,sourceY:integer;
+    PDest,PSource: PVector4Byte;
+    i:integer;
+    GetExp:single;
+    SumVector:Tvector4Single;
+ function ApproxExp(x:single):single;
+ begin
+   { MacLoren's expansion of 1/exp(x)=1/(1+x+x^2/2+x^3/6+x^4/24+...)}
+   result:=1/(1+x+sqr(x)/2);
+ end;
+begin
+  WritelnLog('LoadScreen','Start Blur');
+  result:=source.MakeCopy;
+  result.resize(source.Width div sigma, source.height div sigma);
+  result.resize(source.width,source.height,riBilinear);
+{  for DestY := 0 to result.Height - 1 do
+    for DestX := 0 to result.Width - 1 do
+    begin
+      //WritelnLog('LoadScreen','Blur '+inttostr(DestX));
+      SumVector:=Vector4Single(0,0,0,0);
+      for SourceY:=destY-2*sigma to destY+2*sigma do if (SourceY>=0) and (SourceY<source.height) then
+        for SourceX:=destX-2*sigma to destX+2*sigma do if (SourceX>=0) and (SourceX<source.width) then
+        begin
+          PSource := Source.PixelPtr(SourceX, SourceY);
+          GetExp:=ApproxExp((sqr(destX-SourceX)+sqr(destY-SourceY))/sigma);
+          for i:=0 to 3 do
+            SumVector[i]+=PSource^[i]/255*getExp;
+        end;
+      PDest := result.PixelPtr(DestX, DestY);
+      for i:=0 to 3 do
+        if SumVector[i]/3<1 then
+          PDest^[i]:=round(255*SumVector[i]/3)
+        else
+          PDest^[i]:=255;
+    end;  }
+  WritelnLog('LoadScreen','End Blur');
+end;
+}
+
+{ this procedure works better, but still loads the CPU at 13% (100% single core)
+procedure blur_rnd(source:TCastleImage);
+var DestY,DestX,copyX,copyY,value,i:integer;
+    PDest,PCopy:pvector4byte;
+begin
+  WritelnLog('LoadScreen','Start Blur');
+  for DestY := 0 to source.Height - 1 do
+    for DestX := 0 to source.Width - 1 do if random<0.01 then begin
+      repeat
+        copyX:=destX+random(3)-1;
+        copyY:=destY+random(3)-1;
+      until (copyX>=0) and (copyX<source.width) and (copyY>=0) and (copyY<source.height) and ((copyX<>destX) or (copyY<>destY));
+      PDest := source.PixelPtr(DestX, DestY);
+      PCopy := source.PixelPtr(copyX, copyY);
+      for i:=0 to 3 do begin
+        value:=PDest^[i]+PCopy^[i];
+        PDest^[i]:=value div 2;
+        PCopy^[i]:=value div 2;
+      end;
+    end;
+end;  }
+
+{----------------------------------------------------------------}
+
 Procedure OnLoadScreenResize(Container: TUIContainer);
 begin
   WritelnLog('LoadScreen','LoadScreenResize');
-  WritelnLog('LoadScreen','wind1');
+//  WritelnLog('LoadScreen','wind1');
   Loadscreen_wind1.Image.Resize(window.width*2, window.Height,  riBilinear);
-  WritelnLog('LoadScreen','wind2');
+//  WritelnLog('LoadScreen','wind2');
   Loadscreen_wind2.Image.Resize(window.width*2, window.Height,  riBilinear);
 
-  WritelnLog('LoadScreen','img1');
-  if Loadscreen_img.Image<>nil then
-    Loadscreen_img.Image.Resize(round(loadscreen_img.image.Width/loadscreen_img.image.height*window.Height), window.Height,  riBilinear);
-  WritelnLog('LoadScreen','next');
+//  WritelnLog('LoadScreen','img1');
+  if Loadscreen_img<>nil then begin
+//    WritelnLog('LoadScreen','Loadscreen_img exists');
+    if Loadscreen_img.Image<>nil then begin
+//      WritelnLog('LoadScreen','Loadscreen_img.Image exists');
+      if LoadImageReady then
+        Loadscreen_img.Image.Resize(round(loadscreen_img.image.Width/loadscreen_img.image.height*window.Height), window.Height,  riBilinear)
+      else WritelnLog('LoadScreen','Error: LoadImage is not ready');
+    end;
+  end;
+//  WritelnLog('LoadScreen','next');
   Loadscreen_img.left:=0;
   Loadscreen_img.bottom:=0;
 
@@ -49,25 +136,13 @@ end;
 
 {--------------------------------------------------------------------------------}
 
-type TLoadImageThread = class(TThread)
-  private
-  protected
-    procedure Execute; override;
-end;
-
-var LoadImageThreadReady:boolean=false;
-    LoadImageReady:boolean=false;
-    LoadImageThread:TLoadImageThread;
-    LoadImageString:string;
-    LoadImageOld:integer=-1;
-    LastFact:integer=-1;
-
 procedure TLoadImageThread.execute;
 begin
   LoadImageThreadReady:=false;
   WritelnLog('TLoadImageThread.execute','Image thread started.');
   loadscreen_img.image:=LoadImage(ApplicationData(LoadScreenFolder+LoadImageString), [TRGBAlphaImage]) as TRGBAlphaImage;
   Loadscreen_img.Image.Resize(round(loadscreen_img.image.Width/loadscreen_img.image.height*window.Height), window.Height,  riBilinear);
+  //LoadScreen_img.Image:=blur(LoadScreen_img.Image as TRGBAlphaImage);
   WritelnLog('TLoadImageThread.execute','Image thread finished.');
   LoadImageThreadReady:=true;
 end;
@@ -318,6 +393,7 @@ begin
       (LoadScreen_img.Image as TRGBAlphaImage).ClearAlpha(round(255*phase));
       LoadScreen_facts.Color:=vector4Single(1,1,1,phase);
       LoadScreen_facts.bottom:=32+LoadScreen_img.Left div 3;
+      //blur_rnd(LoadScreen_img.Image);
       if LoadScreen_img.Left+LoadScreen_img.image.Width>=window.width then NewLoadScreenImage;
     end;
 
@@ -378,6 +454,8 @@ begin
   loadscreen_label:=TCastleLabel.create(Window);
   loadscreen_label.text.text:='Добро пожаловать в Decoherence :)';
   loadscreen_label.text.Add('Идёт загрузка, подождите...');
+  loadscreen_label.text.Add('П.С. пока "нечего грузить" :)');
+  loadscreen_label.text.Add('Просто нажмите любую клавишу...');
   loadscreen_label.CustomFont:=RegularFont16;
 
   loadscreen_facts:=TCastleLabel.create(Window);
@@ -385,7 +463,7 @@ begin
 
   NewLoadScreenImage;
 
-WritelnLog('MakeLoadScreen','Adding controls.');
+  WritelnLog('MakeLoadScreen','Adding controls.');
   Window.Controls.InsertFront(loadscreen_wind1);
   Window.Controls.InsertFront(loadscreen_wind2);
   Window.Controls.InsertFront(loadscreen_label);
