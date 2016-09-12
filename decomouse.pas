@@ -7,7 +7,7 @@ interface
 uses classes, fgl,
   CastleLog,
   castleFilesUtils, CastleKeysMouse,
-  global_var, decoimages;
+  decoglobal, decoimages;
 
 type DTouch = class (TObject)
   FingerIndex:integer;

@@ -28,7 +28,7 @@ uses Classes, SysUtils,
      decomouse,
      DecoLoadScreen,
      decolevel,
-     global_var;
+     decoglobal;
 
 
 {$R+}{$Q+}

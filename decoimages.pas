@@ -8,11 +8,11 @@ uses classes, SysUtils, {fgl,}
   CastleLog, castleFilesUtils,
   {CastleControls,} CastleImages, castleVectors,
   CastleGLImages,
-  global_var;
+  decoglobal;
 
 type DAbstractImage=class(TPersistent)
  public
-  x,y,w,h:integer;
+  w,h:integer;
   constructor Create;
   procedure LoadMe(filename:string); virtual; abstract;
   procedure drawMe; virtual; abstract;
@@ -24,6 +24,7 @@ end;
 
 type DStaticImage=class(DAbstractImage)
  public
+  x,y:integer;
   Image:TGLImage;
   SourceImage:TCastleImage;
   {used temporarily to scale the image //thread-safe}
@@ -44,12 +45,16 @@ end;
 
 implementation
 
+{----------------------------------------------------------------}
+
 Constructor DAbstractImage.Create;
 begin
   inherited;
   ImageReady:=false;
   ImageLoaded:=false;
 end;
+
+{----------------------------------------------------------------}
 
 procedure DStaticImage.LoadMe(filename:string);
 begin
@@ -62,6 +67,8 @@ begin
   //don't load TGLImage until scaleMe!!!
   ImageLoaded:=true;
 end;
+
+{----------------------------------------------------------------}
 
 procedure DStaticImage.ScaleMe(const new_w:integer=0;const new_h:integer=0;const doInit:boolean=false);
 begin
@@ -76,7 +83,7 @@ begin
        h:=window.height;
        w:=window.width;
      end else begin
-       h:=window.Height;
+       h:=round(window.Height);
        w:=round(h/SourceImage.Height*sourceImage.width);
      end;
    end;
@@ -88,19 +95,25 @@ begin
  end else WritelnLog('DStaticImage.ScaleMe','ERROR: Image not loaded!');
 end;
 
+{----------------------------------------------------------------}
+
+
 procedure DStaticImage.InitGl;
-var OldImage:TGLImage;
+//var OldImage:TGLImage;
 begin
  if TmpImage=nil then ScaleMe(0,0,false);
- OldImage:=Image;
+ //OldImage:=Image;
  // freeandnil(Image);         !!! MEMORY LEAKS HERE... but causes SIGSEGV if initGL is called twice...
  Image:=TGLImage.create(TmpImage,true,true);
  {if oldimage<>nil then begin
    OldImage.Destroy; //freeandnil(oldimage);
  end;}
+ //if oldimage<>nil then OldImage.free;
  freeandnil(tmpImage);
  ImageReady:=true;
 end;
+
+{----------------------------------------------------------------}
 
 procedure DStaticImage.DrawMe;
 begin
@@ -108,6 +121,8 @@ begin
     Image.Draw(x,y,w,h)
   //else WritelnLog('DStaticImage.DrawMe','ERROR: Cannot Draw');
 end;
+
+{----------------------------------------------------------------}
 
 procedure DWindImage.DrawMe;
 var phase_scaled:integer;
@@ -127,6 +142,25 @@ begin
                phase_scaled,h,
                w-phase_scaled,0,
                phase_scaled,h);
+  end;
+end;
+
+{----------------------------------------------------------------}
+{----------------------------------------------------------------}
+{----------------------------------------------------------------}
+
+var BURNER_IMAGE_UNSCALED,BURNER_IMAGE:TCastleImage;
+procedure Init_burner_image;
+begin
+  if BURNER_IMAGE_UNSCALED=nil then BURNER_IMAGE_UNSCALED:=LoadImage(ApplicationData(Interface_Foler+'burner_Pattern_203_CC0_by_Nobiax_diffuse.png'), [TRGBImage]) as TRGBImage;
+  if BURNER_IMAGE=nil then begin
+    BURNER_IMAGE:=BURNER_IMAGE_UNSCALED.MakeCopy;
+    BURNER_IMAGE.Resize(window.width,window.height,riBilinear);
+  end;
+  if (BURNER_IMAGE.height<>window.height) or (BURNER_IMAGE.width<>window.width) then begin
+    FreeAndNil(BURNER_IMAGE);
+    BURNER_IMAGE:=BURNER_IMAGE_UNSCALED.MakeCopy;
+    BURNER_IMAGE.Resize(window.width,window.height,riBilinear);
   end;
 end;
 

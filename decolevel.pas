@@ -7,7 +7,7 @@ interface
 uses
   CastleWindow, CastleSceneCore, CastleScene, CastleFilesUtils,
   castlePlayer, castleVectors, castleCameras,
-  decoloadscreen,global_var;
+  decoloadscreen,decoglobal;
 
 procedure load_test_level;
 
