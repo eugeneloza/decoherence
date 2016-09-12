@@ -1,3 +1,17 @@
+{Copyright (C) 2012-2016 Yevhen Loza
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.}
 unit DecoFont;
 
 {$mode objfpc}{$H+}
@@ -81,7 +95,7 @@ begin
   C := UTF8CharacterToUnicode(TextPtr, CharLen);
   while (C > 0) and (CharLen > 0) do
   begin
-    G := FFont.Glyph(C);
+    G := FFont.Glyph(C);  //THIS LINE REQUIRES PUBLISHING OF FFONT IN TTextureFont
     if G <> nil then begin
       imagewidth+=G.AdvanceX;
       imagebonusheight+=G.advanceY;
@@ -95,9 +109,9 @@ begin
   //initialize ALPHA channel based on FFont.Image
   if AlphaFontImage=nil then begin
     AlphaFontImage:=TGrayscaleAlphaImage.create;
-    AlphaFontImage.SetSize(FFont.Image);
+    AlphaFontImage.SetSize(FFont.Image);        //THIS LINE REQUIRES PUBLISHING OF FFONT IN TTextureFont
     AlphaFontImage.Clear(Vector2Byte(0,255));
-    AlphaFontImage.DrawFrom(FFont.Image,0,0,dmAdd);
+    AlphaFontImage.DrawFrom(FFont.Image,0,0,dmAdd);     //THIS LINE REQUIRES PUBLISHING OF FFONT IN TTextureFont
      P :=AlphaFontImage.GrayscaleAlphaPixels;
      for I := 1 to AlphaFontImage.Width * AlphaFontImage.Height * AlphaFontImage.Depth do
      begin
@@ -117,7 +131,7 @@ begin
   C := UTF8CharacterToUnicode(TextPtr, CharLen);
   while (C > 0) and (CharLen > 0) do
   begin
-    G := FFont.Glyph(C);
+    G := FFont.Glyph(C);                       //THIS LINE REQUIRES PUBLISHING OF FFONT IN TTextureFont
     if G <> nil then begin
       result.DrawFrom(AlphaFontImage,
                       ScreenX - G.X,ScreenY - G.Y,
@@ -207,7 +221,7 @@ begin
   C := UTF8CharacterToUnicode(TextPtr, CharLen);
   while (C > 0) and (CharLen > 0) do
   begin
-    G := FFont.Glyph(C);
+    G := FFont.Glyph(C);                          //THIS LINE REQUIRES PUBLISHING OF FFONT IN TTextureFont
     if G <> nil then begin
       tmpString+=UnicodeToUTF8(C);
       imagebonusheight+=G.advanceY;
