@@ -233,7 +233,7 @@ begin
 
   WritelnLog('MakeLoadScreen','Making labels.');
   loadscreen_label:=DLabel.create(Window);
-  loadscreen_label.text:='Добро пожаловать в Decoherence :)'+decolinebreak+'Идёт загрузка, подождите...'+decolinebreak+'П.С. пока "нечего грузить" :)'+decolinebreak+'Просто нажмите любую клавишу...';
+  loadscreen_label.text:='Добро пожаловать в Decoherence :)'+decolinebreak+'Идёт загрузка, подождите...'+decolinebreak+'П.С. пока "почти нечего грузить" :)'+decolinebreak+'Просто нажмите любую клавишу...';
   loadscreen_label.color:=vector4Single(1,1,1,1);
   LoadScreen_label.shadow:=1;
   loadscreen_label.Font:=RegularFont16;

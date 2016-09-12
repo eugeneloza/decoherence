@@ -1,0 +1,9 @@
+rm *.o
+rm *.ppu
+rm *.so
+rm *.log
+rm *.dbg
+rm log_*.txt
+rm -r android_application/
+rm -r backup
+rm -r lib

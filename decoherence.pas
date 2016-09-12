@@ -16,11 +16,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 unit Decoherence;
 
 {$mode objfpc}{$H+}
-//{$DEFINE WriteLog}{$IFDEF Windows}{$APPTYPE GUI}{$ENDIF}
+{$DEFINE WriteLog}{$IFDEF Windows}{$APPTYPE GUI}{$ENDIF}
 
 interface
 
-const Version='Interfa2-160912-18';
+const Version='Interfa2-160912-19';
 
 implementation
 
@@ -45,8 +45,8 @@ end;
 procedure doPress(Container: TUIContainer; const Event: TInputPressRelease);
 begin
   if Event.EventType = itMouseButton then doMousePress(Event);
-  Load_test_level;                         //ugly! I'll fix this soon.
-  //window.OnRender:=@doWindowRender;
+  InitTestLevel;                         //ugly! I'll fix this soon.
+  window.OnRender:=@doWindowRender;
 end;
 
 
@@ -94,6 +94,7 @@ begin
 
   MakeLoadScreen;
   InitInterface;
+  Load_test_level;
 end;
 
 function MyGetApplicationName: string;

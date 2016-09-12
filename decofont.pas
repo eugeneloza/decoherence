@@ -28,10 +28,12 @@ end;
 type DStringList = specialize TFPGObjectList<DString>;
 
 Type DFont=class(TTextureFont)
-  function string_to_image(const s:string):TGrayscaleImage;
+  function string_to_image(const s:string):TGrayscaleAlphaImage;
   function broken_string_to_image(const s:DStringList):TGrayscaleAlphaImage;
   function broken_string_to_image_with_shadow(const s:DStringList;shadow_strength:single;shadow_length:integer):TGrayscaleAlphaImage;
   function Break_String(const s:string;const maxwidth:integer):DStringList;
+ private
+   AlphaFontImage: TGrayscaleAlphaImage;
 end;
 
 var MyCharSet:TUnicodeCharList;
@@ -60,7 +62,7 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-function DFont.string_to_image(const s:string):TGrayscaleImage;
+function DFont.string_to_image(const s:string):TGrayscaleAlphaImage;
 var ScreenX, ScreenY: integer;
     G: TTextureFontData.TGlyph;
     C: TUnicodeChar;
@@ -68,8 +70,9 @@ var ScreenX, ScreenY: integer;
     CharLen: Integer;
 
     imagewidth,imageheight,imagebonusheight,imagebaseline: integer;
-   { P: PVector2Byte;
-    i:integer; }
+
+    P: PVector2Byte;
+    i:integer;
 begin
   //first scan the line length and make the image of appropriate width and height
   imagewidth:=0;
@@ -91,10 +94,24 @@ begin
     C := UTF8CharacterToUnicode(TextPtr, CharLen);
   end;
 
-  //preform ALPHA on FFont.Image!
-  Result:=TGrayscaleImage.create;
+  //initialize ALPHA channel based on FFont.Image
+  if AlphaFontImage=nil then begin
+    AlphaFontImage:=TGrayscaleAlphaImage.create;
+    AlphaFontImage.SetSize(FFont.Image);
+    AlphaFontImage.Clear(Vector2Byte(0,255));
+    AlphaFontImage.DrawFrom(FFont.Image,0,0,dmAdd);
+     P :=AlphaFontImage.GrayscaleAlphaPixels;
+     for I := 1 to AlphaFontImage.Width * AlphaFontImage.Height * AlphaFontImage.Depth do
+     begin
+       p^[1]:=p^[0];
+       p^[0]:=255;
+       Inc(P);
+     end;
+  end;
+
+  Result:=TGrayscaleAlphaImage.create;
   Result.SetSize(imagewidth,ImageHeight+ImageBonusHeight+ImageBaseline);
-  result.Clear(0{Vector2Byte(0,255)});
+  result.Clear(Vector2Byte(0,0));
   //now draw all the glyphs onto the image
   ScreenX := 0;
   ScreenY := ImageBaseline;
@@ -103,33 +120,24 @@ begin
   while (C > 0) and (CharLen > 0) do
   begin
     G := FFont.Glyph(C);
-    if G <> nil then begin                      //todo sometimes consumes a pixel due to glyphs overlap
-      result.DrawFrom(FFont.Image,
+    if G <> nil then begin
+      result.DrawFrom(AlphaFontImage,
                       ScreenX - G.X,ScreenY - G.Y,
-                      G.ImageX, G.ImageY, G.Width, G.Height);
+                      G.ImageX, G.ImageY, G.Width, G.Height,dmBlendSmart);
       ScreenX += G.AdvanceX;
       ScreenY += G.AdvanceY;
     end;
     Inc(TextPtr, CharLen);
     C := UTF8CharacterToUnicode(TextPtr, CharLen);
   end;
-  //and finally set alpha-transparency
- { P :=result.GrayscaleAlphaPixels;
-  for I := 1 to result.Width * result.Height * result.Depth do
-  begin
-    p^[1]:=p^[0];
-    p^[0]:=255;
-    Inc(P);
-  end;  }
 end;
 
 {---------------------------------------------------------------------------}
 
 function DFont.broken_string_to_image(const s:DStringList):TGrayscaleAlphaImage;
-var dummyImage:TGrayscaleImage;
+var dummyImage:TGrayscaleAlphaImage;
     i:integer;
     maxh,maxw:integer;
-    P: PVector2Byte;
 begin
   maxh:=0;
   maxw:=0;
@@ -142,20 +150,9 @@ begin
   result.Clear(Vector2Byte(0,0));
   for i:=0 to s.count-1 do begin
     DummyImage:=string_to_image(s[i].value);
-    result.DrawFrom(DummyImage,0,maxh*(s.count-1-i),dmBlend);
+    result.DrawFrom(DummyImage,0,maxh*(s.count-1-i),dmBlendSmart);
     freeandnil(dummyImage);
   end;
-
-  //why shoud I do this again?! DrawFrom just keeps destination alpha... too bad.
-  //ok. I'll have to remix font to image then...
-  P :=result.GrayscaleAlphaPixels;
-  for I := 1 to result.Width * result.Height * result.Depth do
-  begin
-    p^[1]:=p^[0];
-    p^[0]:=255;
-    Inc(P);
-  end;
-
 end;
 
 {---------------------------------------------------------------------------}
