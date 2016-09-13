@@ -16,7 +16,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 unit Decoherence;
 
 {$mode objfpc}{$H+}
-{$DEFINE WriteLog}{$IFDEF Windows}{$APPTYPE GUI}{$ENDIF}
+//{$DEFINE WriteLog}{$IFDEF Windows}{$APPTYPE GUI}{$ENDIF}
 
 interface
 
@@ -90,7 +90,11 @@ begin
 {  application.TimerMilisec:=1000 div 60; //60 fps
   application.OnTimer:=@dotimer;}
 
+  randomize;
+
   WritelnLog('ApplicationInitialize','Init finished');
+
+
 
   MakeLoadScreen;
   InitInterface;

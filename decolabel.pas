@@ -35,6 +35,7 @@ Type DLabel=class(DAbstractElement)
   Font:DFont;
   Shadow:Float;
   constructor Create(AOwner:TComponent); override;
+  {destructor} Procedure DestroyMe;
   procedure DrawMe; override;
   procedure InitGL;
  private
@@ -52,9 +53,15 @@ begin
   Shadow:=0;
 end;
 
+procedure DLabel.DestroyMe;
+begin
+  FreeAndNil(BrokenString);
+  FreeAndNil(GImage);
+end;
+
 procedure DLabel.InitGL;
 var DummyImage:TGrayscaleAlphaImage;
-    i,maxh,iteration:integer;
+    i,maxh:integer;
 begin
   //if GImage<>nil then GImage.Free;   //todo: memory leaks here!
   FreeAndNil(BrokenString);
@@ -75,8 +82,9 @@ begin
 
   h:=DummyImage.height;
 
+  FreeAndNil(GImage);
   GImage:=TGLImage.create(DummyImage,true,true);
-  freeAndNil(DummyImage);
+  {freeAndNil(}DummyImage:=nil{)};
 end;
 
 procedure DLabel.DrawMe;

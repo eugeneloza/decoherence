@@ -65,7 +65,7 @@ begin
    if MyCharSet=nil then begin
       MyCharSet:=TUnicodeCharList.Create;
       MyCharSet.add(SimpleAsciiCharacters);
-      MyCharSet.add('śЁЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮёйцукенгшщзхъфывапролджэячсмитьбюІЇЄіїє');
+      MyCharSet.add('ЁЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮёйцукенгшщзхъфывапролджэячсмитьбюІЇЄіїє');
    end;
    RegularFont16:=DFont.Create(ApplicationData(NormalFontFile),16,true,MyCharSet);
    {$ENDIF}

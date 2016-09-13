@@ -29,7 +29,7 @@ type DAbstractImage=class(DAbstractElement)
  public
   constructor Create(AOwner:TComponent); override;
   procedure LoadMe(filename:string); virtual; abstract;
-  procedure ScaleMe(const new_w:integer=0;const new_h:integer=0;const doInit:boolean=false); virtual; abstract;
+  procedure ScaleMe(const new_w:integer=0;const new_h:integer=0); virtual; abstract;
  private
   ImageReady:boolean;
   ImageLoaded:boolean;
@@ -42,8 +42,9 @@ type DStaticImage=class(DAbstractImage)
   {used temporarily to scale the image //thread-safe}
   TmpImage:TCastleImage;
   procedure LoadMe(filename:string); override;
+  {destructor} procedure DestroyMe;
   procedure DrawMe; override;
-  procedure ScaleMe(const new_w:integer=0;const new_h:integer=0;const doInit:boolean=false); override;
+  procedure ScaleMe(const new_w:integer=0;const new_h:integer=0); override;
   {Initialize GL Image // thread-unsafe!!!}
   procedure InitGL;
 end;
@@ -68,11 +69,17 @@ end;
 
 {----------------------------------------------------------------}
 
+{Destructor}Procedure DStaticImage.DestroyMe;
+begin
+ freeandnil(SourceImage);
+ freeandnil(Image);
+ freeandnil(TmpImage);
+ inherited
+end;
+
 procedure DStaticImage.LoadMe(filename:string);
 begin
   WritelnLog('DSimpleImage.LoadMe',filename);
-  freeandnil(SourceImage);
-  freeandnil(Image);
   SourceImage:=LoadImage(ApplicationData(filename));
   w:=SourceImage.width;
   h:=SourceImage.Height;
@@ -82,7 +89,7 @@ end;
 
 {----------------------------------------------------------------}
 
-procedure DStaticImage.ScaleMe(const new_w:integer=0;const new_h:integer=0;const doInit:boolean=false);
+procedure DStaticImage.ScaleMe(const new_w:integer=0;const new_h:integer=0);
 begin
  ImageReady:=false;
  if ImageLoaded then begin
@@ -103,26 +110,19 @@ begin
    TmpImage:=SourceImage.CreateCopy as TCastleImage;
    if (h>0) and (w>0) then
      TmpImage.Resize(w,h,riBilinear);
-   if doInit then initGL;
  end else WritelnLog('DStaticImage.ScaleMe','ERROR: Image not loaded!');
 end;
 
 {----------------------------------------------------------------}
 
-
 procedure DStaticImage.InitGl;
-//var OldImage:TGLImage;
 begin
- if TmpImage=nil then ScaleMe(0,0,false);
- //OldImage:=Image;
- // freeandnil(Image);         !!! MEMORY LEAKS HERE... but causes SIGSEGV if initGL is called twice...
- Image:=TGLImage.create(TmpImage,true,true);
- {if oldimage<>nil then begin
-   OldImage.Destroy; //freeandnil(oldimage);
- end;}
- //if oldimage<>nil then OldImage.free;
- freeandnil(tmpImage);
- ImageReady:=true;
+ if TmpImage<>nil then begin
+  freeandnil(Image);
+  Image:=TGLImage.create(TmpImage,true,true);
+  tmpImage:=nil;
+  ImageReady:=true;
+ end;
 end;
 
 {----------------------------------------------------------------}

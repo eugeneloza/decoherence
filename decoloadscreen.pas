@@ -36,7 +36,7 @@ const LoadScreenFolder='interface/loadscreen/';
 var loadscreen_img:DStaticImage;
     Loadscreen_wind1,Loadscreen_wind2: DWindImage;
     Loadscreen_label,Loadscreen_facts: DLabel;
-    LoadScreen_ready:boolean=false; //safeguard agains accidental errors
+    LoadScreen_ready:boolean=false; //safeguard against accidental errors
 
 
 type TLoadImageThread = class(TThread)
@@ -55,9 +55,9 @@ var LoadImageThreadReady:boolean=false;
 Procedure OnLoadScreenResize(Container: TUIContainer);
 begin
   WritelnLog('LoadScreen','LoadScreenResize');
-  if LoadScreen_img<> nil then LoadScreen_img.scaleMe(-1,0,true);
-  if LoadScreen_wind2<> nil then LoadScreen_wind2.scaleMe(-1,-1,true);
-  if LoadScreen_wind1<> nil then LoadScreen_wind1.scaleMe(-1,-1,true);
+  if LoadScreen_img<> nil then begin LoadScreen_img.scaleMe(-1); loadScreen_img.InitGL end;
+  if LoadScreen_wind2<> nil then begin LoadScreen_wind2.scaleMe(-1,-1); LoadScreen_wind2.initGL end;
+  if LoadScreen_wind1<> nil then begin LoadScreen_wind1.scaleMe(-1,-1); LoadScreen_wind2.initGL end;
   if loadscreen_label <>nil then begin
     loadscreen_label.w:=round(window.width/3);
     loadscreen_label.x:=32;
@@ -86,12 +86,13 @@ end;
 {----------------------------------------------------------------------}
 
 procedure NewLoadScreenImage;
-const N_LoadScrenImages=34;
+const N_LoadScrenImages=42;
 var s:string;
     LoadImageNew:integer;
 begin
   LoadImageThreadReady:=false;
   WritelnLog('NewLoadScreenImage','Resetting image.');
+  if loadscreen_img<>nil then loadscreen_img.DestroyMe;
   freeandnil(loadscreen_img);
   LoadScreen_Img:=DStaticImage.Create(Window);
 
@@ -133,6 +134,14 @@ begin
     32:s:='fractal-spiral-1401066127NAn_CC0_by_Piotr_Siedlecki_[crop,glow].jpg';
     33:s:='rose-window-1397763406a2Y_CC0_by_Piotr_Siedlecki_[colorize].jpg';
     34:s:='turquoise-fractal_CC0_by_Sharon_Apted_[gmic,crop,colorize].jpg';
+    35:s:='golden-spiral_by_Piotr_Siedlecki_[crop].jpg';
+    36:s:='red-orange-and-yellow-kaleidoscope_CC0_by_Michelle_Arena_[crop,softglow].jpg';
+    37:s:='red-swirl-in-the-dark_CC0_by_Lynn_Greyling_[crop,glow].jpg';
+    38:s:='white-rotation-on-black_CC0_by_Lynn_Greyling_[gimp,gmic,crop].jpg';
+    39:s:='violet-tunnel_by_Piotr_Siedlecki_[gimp,crop].jpg';
+    40:s:='yellow-spiral_by_Piotr_Siedlecki_[gimp,crop].jpg';
+    41:s:='SunFlare_CC0_by-GIMP.jpg';
+    42:s:='LensFlare_CC0_by-GIMP.jpg';
     else WritelnLog('NewLoadScreenImage','ERROR. out of N_LoadScrenImages');
   end;
   WritelnLog('NewLoadScreenImage','Selected '+s+'.');
@@ -195,11 +204,15 @@ Procedure DestroyLoadScreen;
 begin
   RenderReady:=false;
   WritelnLog('DestroyLoadScreen','Freeing all...');
-  //Window.controls.Clear;
+  if LoadScreen_wind1<> nil then Loadscreen_wind1.DestroyMe;
   freeandnil(Loadscreen_wind1);
+  if Loadscreen_wind2<> nil then Loadscreen_wind2.DestroyMe;
   freeandnil(Loadscreen_wind2);
+  if Loadscreen_img<> nil then Loadscreen_img.DestroyMe;
   freeandnil(Loadscreen_img);
+  if loadscreen_label<> nil then loadscreen_label.DestroyMe;
   freeandnil(loadscreen_label);
+  if loadscreen_facts<> nil then loadscreen_facts.DestroyMe;
   freeandnil(loadscreen_facts);
   DestroyFacts;
   LoadScreen_ready:=false;
@@ -236,12 +249,14 @@ begin
  // if Loadscreen_wind1<>nil then WritelnLog('NewLoadScreenImage','Error: wind image already exists.');
   Loadscreen_wind1:=DWindImage.create(Window);
   Loadscreen_wind1.LoadMe(LoadScreenFolder+'WindClouds1_GIMP.jpg');
-  Loadscreen_wind1.ScaleMe(-1,-1,true);
+  Loadscreen_wind1.ScaleMe(-1,-1);
+  LoadScreen_wind1.initGL;
   LoadScreen_wind1.alpha:=0.1;
   LoadScreen_wind1.phase:=random;
   Loadscreen_wind2:=DWindImage.create(Window);
   Loadscreen_wind2.LoadMe(LoadScreenFolder+'WindClouds2_GIMP.jpg');
-  Loadscreen_wind2.ScaleMe(-1,-1,true);
+  Loadscreen_wind2.ScaleMe(-1,-1);
+  LoadScreen_wind2.initGL;
   LoadScreen_wind2.alpha:=0.1;
   LoadScreen_wind1.phase:=random;
 

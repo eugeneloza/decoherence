@@ -94,6 +94,7 @@ end;
 
 procedure DrawInterface;
 begin
+  //GUI draw children recoursive
 
 end;
 
@@ -115,10 +116,12 @@ end;
 procedure ResizeInterface;
 begin
   WriteLnLog('ResizeInterface','started');
+  {GUI always takes the whole screen and every child is scaled against it}
   GUI.x:=0;
   GUI.y:=0;
   GUI.w:=window.width;
   GUI.h:=window.height;
+  //GUI resize children recoursive
   WriteLnLog('ResizeInterface','finished');
 end;
 
