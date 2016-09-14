@@ -26,7 +26,7 @@ implementation
 
 uses Classes, SysUtils,
      CastleLog, CastleTimeUtils,
-     CastleWindow, CastleKeysMouse,
+     CastleWindow, CastleWindowTouch, CastleKeysMouse,
      decomouse, decointerface, DecoFont,
      DecoLoadScreen,
      decolevel,
@@ -38,6 +38,11 @@ uses Classes, SysUtils,
 procedure doWindowRender(Container: TUIContainer);
 begin
   DrawInterface
+{    UIFont.Print(10, 10, Yellow, Format('FPS : %f (real : %f). Shapes : %d / %d',
+   [Window.Fps.FrameTime,
+    Window.Fps.RealTime,
+    Window.SceneManager.Statistics.ShapesRendered,
+    Window.SceneManager.Statistics.ShapesVisible]));}
 end;
 
 {------------------------------------------------------------------}
@@ -82,6 +87,10 @@ begin
   {$ENDIF}
   WritelnLog('ApplicationInitialize','Init');
 
+   { Window.Container.UIScaling := usEncloseReferenceSize;
+    Window.Container.UIReferenceWidth := 1024;
+    Window.Container.UIReferenceHeight := 768;}
+
   window.OnPress:=@doPress;
   WritelnLog('ApplicationInitialize','DTouchList.create');
   TouchArray:=DTouchList.create;
@@ -99,6 +108,7 @@ begin
   MakeLoadScreen;
   InitInterface;
   Load_test_level;
+
 end;
 
 function MyGetApplicationName: string;
@@ -108,7 +118,7 @@ end;
 
 Initialization
   OnGetApplicationName := @MyGetApplicationName;
-  Window:=TCastleWindow.create(Application);
+  Window:=TCastleWindowTouch.create(Application);
   { This should be done as early as possible to mark our log lines correctly. }
   Application.MainWindow := Window;
   Application.OnInitialize := @ApplicationInitialize;

@@ -20,13 +20,13 @@ unit decoglobal;
 interface
 
 uses
-  Classes,CastleWindow;
+  Classes,CastleWindowTouch;
 
 const Interface_Foler='interface/';
 
 type float=single;
 
-var Window:TCastleWindow;
+var Window:TCastleWindowTouch;
     LogStream:TFileStream;
 
 

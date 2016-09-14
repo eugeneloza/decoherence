@@ -20,7 +20,7 @@ interface
 
 uses
   CastleLog,
-  CastleWindow, CastleSceneCore, CastleScene, CastleFilesUtils,
+  CastleWindow, CastleWindowTouch, CastleSceneCore, CastleScene, CastleFilesUtils,
   castlePlayer, castleVectors, castleCameras,
   decoloadscreen,decoglobal;
 
@@ -28,7 +28,8 @@ procedure load_test_level;
 Procedure InitTestLevel;
 
 var scene:TcastleScene;
-  player:TPlayer;
+  //player:TPlayer;
+  Camera:TWalkCamera;
 
 implementation
 
@@ -43,13 +44,15 @@ begin
   //Scene.Attributes.EnableTextures:=false;
   WritelnLog('load_test_level','Player');
 
-  Player := TPlayer.Create(Window.SceneManager);
-  player.Camera.MouseLook:=false;
-  Player.Camera.GravityUp:=Vector3Single(0,0,1);
-  Player.Up:=Vector3Single(0,0,1);
-  player.position:=Vector3Single(0,0,1);
-  player.FallingEffect:=false;
-  player.DefaultPreferredHeight:=1;
+  //Player := TPlayer.Create(Window.SceneManager);
+  //player.Camera.MouseLook:=false;
+  //Player.Camera.GravityUp:=Vector3Single(0,0,1);
+  //Player.Up:=Vector3Single(0,0,1);
+  //player.position:=Vector3Single(0,0,1);
+  //player.FallingEffect:=false;
+  //player.DefaultPreferredHeight:=1;
+  camera:=TWalkCamera.create(Window);//player.camera;
+  camera.SetView(Vector3Single(0,0,1),Vector3Single(0,1,0),Vector3Single(0,0,1),Vector3Single(0,0,1),true);
   WritelnLog('load_test_level','Finished');
 
 end;
@@ -59,11 +62,12 @@ begin
   if not loadedlevel then begin
      WritelnLog('InitTestLevel','Init');
      loadedlevel:=true;
-     Window.SceneManager.Items.Add(Player);
-     Window.SceneManager.Player := Player;
-     Window.scenemanager.camera:=player.camera;
+//     Window.SceneManager.Items.Add(Player);
+//     Window.SceneManager.Player := Player;
      Window.SceneManager.Items.Add(Scene);
      Window.SceneManager.MainScene := Scene;
+     Window.SceneManager.Camera:=camera;
+     Window.TouchInterface := tiCtlWalkDragRotate;
      DestroyLoadScreen;
   end;
 end;
