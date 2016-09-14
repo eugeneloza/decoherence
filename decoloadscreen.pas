@@ -56,8 +56,8 @@ Procedure OnLoadScreenResize(Container: TUIContainer);
 begin
   WritelnLog('LoadScreen','LoadScreenResize');
   if LoadScreen_img<> nil then begin LoadScreen_img.scaleMe(-1); loadScreen_img.InitGL end;
+  if LoadScreen_wind1<> nil then begin LoadScreen_wind1.scaleMe(-1,-1); LoadScreen_wind1.initGL end;
   if LoadScreen_wind2<> nil then begin LoadScreen_wind2.scaleMe(-1,-1); LoadScreen_wind2.initGL end;
-  if LoadScreen_wind1<> nil then begin LoadScreen_wind1.scaleMe(-1,-1); LoadScreen_wind2.initGL end;
   if loadscreen_label <>nil then begin
     loadscreen_label.w:=round(window.width/3);
     loadscreen_label.x:=32;

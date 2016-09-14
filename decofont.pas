@@ -59,8 +59,9 @@ implementation
 
 procedure InitializeFonts;
 begin
+  WritelnLog('DecoFont:InitializeFonts','Init started');
    {$IFDEF Android}
-   RegularFont16:=TTextureFont.Create(TextureFont_LinBiolinumRG_16) as DFont;
+   RegularFont16:=DFont.Create(TextureFont_LinBiolinumRG_16);
    {$ELSE}
    if MyCharSet=nil then begin
       MyCharSet:=TUnicodeCharList.Create;
@@ -69,7 +70,7 @@ begin
    end;
    RegularFont16:=DFont.Create(ApplicationData(NormalFontFile),16,true,MyCharSet);
    {$ENDIF}
-   WritelnLog('DecoFont:initialization','Fonts loaded successfully.');
+   WritelnLog('DecoFont:InitializeFonts','Fonts loaded successfully.');
 end;
 
 {-----------------------------------------------------------------------------}
@@ -261,6 +262,5 @@ end;
 
 
 initialization
-  InitializeFonts;
 end.
 

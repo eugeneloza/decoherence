@@ -20,14 +20,14 @@ unit Decoherence;
 
 interface
 
-const Version='Interfa2-160912-19';
+const Version='Interfa2-160913-25';
 
 implementation
 
 uses Classes, SysUtils,
      CastleLog, CastleTimeUtils,
      CastleWindow, CastleKeysMouse,
-     decomouse, decointerface,
+     decomouse, decointerface, DecoFont,
      DecoLoadScreen,
      decolevel,
      decoglobal;
@@ -52,6 +52,8 @@ end;
 
 {======================= initialization routines ==============================}
 
+{$IFNDEF Android}
+{$IFDEF WriteLog}
 function NiceDate:string;
 var s:String;
     i:integer;
@@ -63,6 +65,8 @@ begin
     if copy(s,i,1)=':' then result+='-' else
     result+=copy(s,i,1);
 end;
+{$ENDIF}
+{$ENDIF}
 
 procedure ApplicationInitialize;
 begin
@@ -79,21 +83,17 @@ begin
   WritelnLog('ApplicationInitialize','Init');
 
   window.OnPress:=@doPress;
+  WritelnLog('ApplicationInitialize','DTouchList.create');
   TouchArray:=DTouchList.create;
-
-{  window.OnRender:=@doWindowRender;
-  window.OnResize:=@doWindowResize;
-
-  window.onRelease:=@MenuKeyRelease;
-  window.OnMotion:=nil;}
 
 {  application.TimerMilisec:=1000 div 60; //60 fps
   application.OnTimer:=@dotimer;}
 
   randomize;
+  WritelnLog('ApplicationInitialize','InitializeFonts');
+  InitializeFonts;
 
   WritelnLog('ApplicationInitialize','Init finished');
-
 
 
   MakeLoadScreen;
@@ -103,7 +103,7 @@ end;
 
 function MyGetApplicationName: string;
 begin
-  Result := 'Decoherence-1';
+  Result := 'Decoherence 1';
 end;
 
 Initialization
