@@ -49,9 +49,23 @@ end;
 
 procedure doPress(Container: TUIContainer; const Event: TInputPressRelease);
 begin
-  if Event.EventType = itMouseButton then doMousePress(Event);
+  if Event.EventType = itMouseButton then begin
+    {should be vice versa: if interface didn't catch the press then invert control style
+    else catch click
+    will log an Error on right-click because the touch item was not created... hmm...}
+    if mbRight=event.MouseButton then camera.MouseLook:=not Camera.MouseLook
+    else
+    doMousePress(Event);
+  end;
   InitTestLevel;                         //ugly! I'll fix this soon.
   window.OnRender:=@doWindowRender;
+end;
+
+procedure doRelease(Container: TUIContainer; const Event: TInputPressRelease);
+begin
+  if Event.EventType = itMouseButton then begin
+    doMouseRelease(Event);
+  end;
 end;
 
 
@@ -92,6 +106,7 @@ begin
     Window.Container.UIReferenceHeight := 768;}
 
   window.OnPress:=@doPress;
+  window.onRelease:=@doRelease;
   WritelnLog('ApplicationInitialize','DTouchList.create');
   TouchArray:=DTouchList.create;
 

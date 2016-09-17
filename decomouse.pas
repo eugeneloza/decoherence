@@ -18,7 +18,7 @@ unit decomouse;
 
 interface
 
-uses classes, fgl,
+uses classes, fgl, sysUtils,
   CastleLog,
   castleFilesUtils, CastleKeysMouse,
   decoglobal, decoimages;
@@ -53,39 +53,47 @@ end;
 
 {-----------------------------------------------------------------------------}
 
+function GetFingerIndex(const Event: TInputPressRelease):integer;
+begin
+  if event.MouseButton=mbleft then
+    result:=event.FingerIndex
+  else if event.MouseButton=mbright then
+    result:=100
+  else if event.MouseButton=mbmiddle then
+    result:=200;
+end;
+
 procedure doMouseRelease(const Event: TInputPressRelease);
 var i,fingerindex:integer;
     found:boolean;
 begin
-  if event.MouseButton=mbleft then
-    fingerindex:=event.FingerIndex
-  else if event.MouseButton=mbright then
-    fingerindex:=100
-  else if event.MouseButton=mbmiddle then
-    fingerindex:=200;
-  i:=0;
-  found:=false;
-  Repeat
-    if touchArray[i].FingerIndex=fingerindex then found:=true else inc(i);
-  until (i>TouchArray.Count-1) or found;
-  if found then
-    TouchArray.Remove(touchArray[i])
-  else
-    WritelnLog('doMouseRelease','Touch event not found!');
+ if TouchArray.Count>0 then begin
+    fingerindex:=GetFingerIndex(Event);
+    i:=0;
+    found:=false;
+    Repeat
+      if touchArray[i].FingerIndex=fingerindex then found:=true else inc(i);
+    until (i>TouchArray.Count-1) or found;
+    WritelnLog('doMouseRelease','Caught mouse release finger='+inttostr(fingerindex)+'n='+inttostr(i));
+    if found then
+      TouchArray.Remove(touchArray[i])
+    else
+      WritelnLog('doMouseRelease','ERROR: Touch event not found!');
+ end else
+   WritelnLog('doMouseRelease','ERROR: Touch event list is empty!');
+
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure doMousePress(const Event: TInputPressRelease);
 var NewEventTouch:DTouch;
+    fingerindex:integer;
 begin
-  if event.MouseButton=mbleft then
-    NewEventTouch:=DTouch.create(event.Position[0],event.Position[1],event.FingerIndex)
-  else if event.MouseButton=mbright then
-    NewEventTouch:=DTouch.create(event.Position[0],event.Position[1],100)
-  else if event.MouseButton=mbmiddle then
-    NewEventTouch:=DTouch.create(event.Position[0],event.Position[1],200);
+  fingerindex:=GetFingerIndex(Event);
+  NewEventTouch:=DTouch.create(event.Position[0],event.Position[1],fingerindex);
   TouchArray.Add(NewEventTouch);
+  WritelnLog('doMouseRelease','Caught mouse press finger='+inttostr(FingerIndex));
 end;
 
 end.
