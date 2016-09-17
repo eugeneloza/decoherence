@@ -177,7 +177,7 @@ begin
       LoadImageReady:=true;
     end;
     if (LoadImageReady) and (loadScreen_img.image<>nil) then begin
-      LoadScreen_img.x+=1*2;
+      LoadScreen_img.x+=1{*2};
       phase:=abs(sin(Pi*LoadScreen_img.x/(window.width-LoadScreen_img.w)));
       //if random<sqrt(cos(Pi*phase)) then LoadScreen_img.x+=1;
       LoadScreen_img.image.Color:=vector4Single(1,1,1,phase*0.8);
@@ -262,7 +262,7 @@ begin
 
   WritelnLog('MakeLoadScreen','Making labels.');
   loadscreen_label:=DLabel.create(Window);
-  loadscreen_label.text:='Добро пожаловать в Decoherence :)'+decolinebreak+'Идёт загрузка, подождите...'+decolinebreak+'П.С. пока "почти нечего грузить" :)'+decolinebreak+'Просто нажмите любую клавишу...';
+  loadscreen_label.text:='Добро пожаловать в Decoherence :)'+dlinebreak+'Идёт загрузка, подождите...'+dlinebreak+'П.С. пока "почти нечего грузить" :)'+dlinebreak+'Просто нажмите любую клавишу...';
   loadscreen_label.color:=vector4Single(1,1,1,1);
   LoadScreen_label.shadow:=1;
   loadscreen_label.Font:=RegularFont16;

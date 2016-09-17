@@ -41,6 +41,7 @@ Type DLabel=class(DAbstractElement)
  private
   BrokenString:DStringList;
   GImage:TGLImage;
+  SourceImage:TGrayscaleAlphaImage;
 end;
 
 
@@ -55,36 +56,23 @@ end;
 
 procedure DLabel.DestroyMe;
 begin
-  FreeAndNil(BrokenString);
   FreeAndNil(GImage);
 end;
 
 procedure DLabel.InitGL;
-var DummyImage:TGrayscaleAlphaImage;
-    i,maxh:integer;
 begin
-  //if GImage<>nil then GImage.Free;   //todo: memory leaks here!
-  FreeAndNil(BrokenString);
-  brokenString:=DStringList.create;
-  BrokenString:=font.Break_String(text,w);
-  maxh:=0;
-  //maxw:=0;
-  for i:=0 to BrokenString.count-1 do begin
-    if maxh<BrokenString[i].height then maxh:=BrokenString[i].height;
-    //if maxw<s[i].width then maxw:=s[i].width;
-  end;
-  //  h:=maxh*BrokenString.Count;
+  BrokenString:=font.break_stings(text,w);
 
   if shadow=0 then
-    DummyImage:=font.broken_string_to_image(BrokenString)
+    SourceImage:=font.broken_string_to_image(BrokenString)
   else
-    DummyImage:=font.broken_string_to_image_with_shadow(BrokenString,shadow,3);
+    SourceImage:=font.broken_string_to_image_with_shadow(BrokenString,shadow,3);
 
-  h:=DummyImage.height;
+  h:=SourceImage.height;
 
   FreeAndNil(GImage);
-  GImage:=TGLImage.create(DummyImage,true,true);
-  {freeAndNil(}DummyImage:=nil{)};
+  GImage:=TGLImage.create(SourceImage,true,true);
+  SourceImage:=nil;
 end;
 
 procedure DLabel.DrawMe;
