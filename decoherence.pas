@@ -104,7 +104,6 @@ begin
 
   WritelnLog('ApplicationInitialize','Init finished');
 
-
   MakeLoadScreen;
   InitInterface;
   Load_test_level;

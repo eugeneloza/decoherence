@@ -23,7 +23,7 @@ uses
   CastleLog, CastleWindow, castleFilesUtils,
   castleVectors,
   decoimages, decoLabel,
-  decoloadfacts,
+  decofacts,
   decoglobal, DecoFont;
 
 procedure MakeLoadScreen;
@@ -48,7 +48,6 @@ var LoadImageThreadReady:boolean=false;
     LoadImageReady:boolean=false;
     LoadImageThread:TLoadImageThread;
     LoadImageString:string;
-    LoadImageOld:integer=-1;
 
 {----------------------------------------------------------------}
 
@@ -86,9 +85,7 @@ end;
 {----------------------------------------------------------------------}
 
 procedure NewLoadScreenImage;
-const N_LoadScrenImages=42;
 var s:string;
-    LoadImageNew:integer;
 begin
   LoadImageThreadReady:=false;
   WritelnLog('NewLoadScreenImage','Resetting image.');
@@ -96,56 +93,8 @@ begin
   freeandnil(loadscreen_img);
   LoadScreen_Img:=DStaticImage.Create(Window);
 
-  repeat
-    LoadImageNew:= random(N_LoadScrenImages)+1;
-  until LoadImageOld<>LoadImageNew;
-  case LoadImageNew of
-    1:s:='colour-of-nature-fractal_CC0_by_Sharon_Apted_[colorize].jpg';
-    2:s:='lovely-image_CC0_by_Sharon_Apted_[GMIC].jpg';
-    3:s:='pink-fractal-13086661465Zb_CC0_by_Sharon_Apted_[crop].jpg';
-    4:s:='alien-worm_CC0_by_Piotr_Siedlecki_[invert,colorize].jpg';
-    5:s:='angry-mantis_CC0_by_Sharon_Apted_[GMIC].jpg';
-    6:s:='beige-fractal_CC0_by_Sharon_Apted_[GMIC,colorize].jpg';
-    7:s:='blue-fractal-1307520582C9u_CC0_by_Sharon_Apted_[colorize,glow].jpg';
-    8:s:='colour-of-nature_CC0_by_Sharon_Apted_[GMIC,colorize].jpg';
-    9:s:='feathery-fractal-1308665767ois_CC0_by_Sharon_Apted_[Gimp,colorize,glow].jpg';
-    10:s:='fractal-1305618518XpG_CC0_by_Sharon_Apted_[glow].jpg';
-    11:s:='fractal-plate-like-image_CC0_by_Sharon_Apted_[glow,colorize].jpg';
-    12:s:='fractal-ball-3_CC0_by_Piotr_Siedlecki_[glow,colorize].jpg';
-    13:s:='fractal-spirals-1441742946ko2_CC0_by_Piotr_Siedlecki_[gmic,glow].jpg';
-    14:s:='fractal-splash-1441596688e0H_CC0_by_Piotr_Siedlecki_[colorize].jpg';
-    15:s:='pink-fantasy_CC0_by_Sharon_Apted_[gimp].jpg';
-    16:s:='pretty-fractal-1307075682Q9V_CC0_by_Sharon_Apted_[colozize].jpg';
-    17:s:='simple-fractal-13356910404Li_CC0_by_Sharon_Apted_[gimp].jpg';
-    18:s:='simply-green_CC0_by_Sharon_Apted_[crop].jpg';
-    19:s:='white-fractal-flower_CC0_by_Piotr_Siedlecki_[crop].jpg';
-    20:s:='hintergrund-tapete-1456752859roe_CC0_by_kai Stachowiak.jpg';
-    21:s:='a-flame-fractal_CC0_by_Sharon_Apted_[gmic].jpg';
-    22:s:='beautiful-fractal-1309767713KZe_CC0_by_Sharon Apted_[crop,gmic].jpg';
-    23:s:='colourful-fractal-1357555007a2W_CC0_by_Sharon_Apted_[gmic].jpg';
-    24:s:='colourful-star_CC0_by_Sharon_Apted_[gmic].jpg';
-    25:s:='cosmic-adventure_CC0_by_Sharon_Apted_[glow,color].jpg';
-    26:s:='feather-duster_CC0_by_Sharon_Apted_[glow].jpg';
-    27:s:='fractal-2014-1_CC0_by_Claudette Gallant_[crop].jpg';
-    28:s:='fractal-1309767060SE3_CC0_by_Sharon_Apted_[GIMP,GMIC].jpg';
-    29:s:='fractal-13075203504gu_CC0_by_Sharon_Apted_[glow,gmic].jpg';
-    30:s:='fractal-disks_CC0_by_Piotr_Siedlecki_[colorize].jpg';
-    31:s:='fractal-shield_CC0_by_Piotr_Siedlecki_[gmic,glow,crop].jpg';
-    32:s:='fractal-spiral-1401066127NAn_CC0_by_Piotr_Siedlecki_[crop,glow].jpg';
-    33:s:='rose-window-1397763406a2Y_CC0_by_Piotr_Siedlecki_[colorize].jpg';
-    34:s:='turquoise-fractal_CC0_by_Sharon_Apted_[gmic,crop,colorize].jpg';
-    35:s:='golden-spiral_by_Piotr_Siedlecki_[crop].jpg';
-    36:s:='red-orange-and-yellow-kaleidoscope_CC0_by_Michelle_Arena_[crop,softglow].jpg';
-    37:s:='red-swirl-in-the-dark_CC0_by_Lynn_Greyling_[crop,glow].jpg';
-    38:s:='white-rotation-on-black_CC0_by_Lynn_Greyling_[gimp,gmic,crop].jpg';
-    39:s:='violet-tunnel_by_Piotr_Siedlecki_[gimp,crop].jpg';
-    40:s:='yellow-spiral_by_Piotr_Siedlecki_[gimp,crop].jpg';
-    41:s:='SunFlare_CC0_by-GIMP.jpg';
-    42:s:='LensFlare_CC0_by-GIMP.jpg';
-    else WritelnLog('NewLoadScreenImage','ERROR. out of N_LoadScrenImages');
-  end;
+  s:=GetRandomFactImage;
   WritelnLog('NewLoadScreenImage','Selected '+s+'.');
-  LoadImageOld:= LoadImageNew;
   LoadImageString:=LoadScreenFolder+s;
 
   LoadImageThread:=TLoadImageThread.Create(true);
@@ -241,6 +190,8 @@ end;
 
 procedure MakeLoadScreen;
 begin
+  SetGameMode(gmLoadScreen);
+
   WritelnLog('MakeLoadScreen','Initialize...');
   RenderReady:=false;
   RenderTime:=0;
@@ -283,6 +234,8 @@ begin
   application.OnTimer:=@OnLoadScreenTimer;
   Window.OnResize:=@OnLoadScreenResize;
   window.OnRender:=@LoadScreenRender;
+  //window.OnUpdate:=@LoadScreenRender;
+  window.OnOpen:=@OnLoadScreenResize;
   //OnLoadScreenResize(nil);
   LoadScreen_ready:=true;
   RenderReady:=true;

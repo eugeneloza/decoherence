@@ -32,10 +32,11 @@ Type DAbstractElement=class(TComponent)
   procedure drawMe; virtual; abstract;
 end;
 
-Type DFrame=class(DAbstractElement)
+Type DFrame=class(TComponent)
  public
    Image:TGLImage;
-   constructor Create(img:TGLImage;AOwner:TComponent); virtual;
+   cornerTop,cornerbottom,cornerLeft,cornerRight:integer;
+   constructor Create(AOwner:TComponent); override;
  //image
 end;
 
@@ -58,7 +59,7 @@ end;
 Type DInterfaceContainer=class(DInterfaceElement)
 end;
 
-var frames:array[0..0] of TGlImage;
+var frames:array[0..1] of DFrame;
     GUI:DInterfaceContainer;
 
 procedure InitInterface;
@@ -105,7 +106,17 @@ begin
   WriteLnLog('InitInterface','started');
   Init_burner_image;
   GUI:=DInterfaceContainer.create(Window);
-  frames[0]:=TGLImage.create(ApplicationData(Frames_Folder+'frame.png'));
+  frames[0]:=DFrame.create(Window);
+  with frames[0] do begin
+    image:=TGLImage.create(ApplicationData(Frames_Folder+'frame.png'));
+    cornerTop:=1;CornerBottom:=1;cornerLeft:=1;CornerRight:=1;
+  end;
+  frames[1]:=DFrame.create(Window);
+  with frames[1] do begin
+    image:=TGLImage.create(ApplicationData(Frames_Folder+'frame_caption.png'));
+    cornerTop:=18;CornerBottom:=1;cornerLeft:=1;CornerRight:=1;
+  end;
+
 //  GUI.frame:=Dframe.create(frames[0],GUI);
   ResizeInterface;
   WriteLnLog('InitInterface','finished');
@@ -127,18 +138,16 @@ end;
 
 {============================================================================}
 
-constructor Dframe.Create(img:TGLImage;AOwner:TComponent);
+constructor Dframe.Create(AOwner:TComponent);
 begin
   inherited create(AOwner);
-  //will need to fix this for animated frames
-  Image:=img;
 end;
 
 {============================================================================}
 
 procedure DAbstractInterfaceElement.DrawFrame;
 begin
-  frame.image.Draw3x3(x,y,w,h,4,4,4,4); //frame.x...
+  frame.image.Draw3x3(x,y,w,h,frame.cornerTop,frame.CornerRight,frame.CornerBottom,Frame.CornerLeft); //frame.x...
 end;
 
 {============================================================================}

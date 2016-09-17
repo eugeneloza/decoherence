@@ -1,0 +1,31 @@
+﻿override "Loading..." on startup
+"src/ui/opengl/castlecontrolsimages.pas":
+Loading := TGrayscaleAlphaImage.Create(LoadingWidth, LoadingHeight, LoadingDepth);
+Move(LoadingPixels, Loading.RawPixels^, SizeOf(LoadingPixels));
+Loading.URL := 'embedded-image:/Loading';
+
+ LoadingPixels points to "src/ui/opengl/castlecontrolsimages.image_data"
+Color font in DecoFont
+TGrayscaleAlphaImage -> TRGBAlphaImage
+Android Log
+
+Загрузка фактов и списка картинок с диска
+
+Таблица соответствия фактов и картинок
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

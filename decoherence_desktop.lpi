@@ -129,7 +129,7 @@
         <UnitName Value="DecoLabel"/>
       </Unit6>
       <Unit7>
-        <Filename Value="decoloadfacts.pas"/>
+        <Filename Value="decofacts.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit7>
       <Unit8>

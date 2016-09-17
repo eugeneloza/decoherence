@@ -42,9 +42,6 @@ end;
 type DStringList = specialize TFPGObjectList<DString>;
 
 Type DFont=class(TTextureFont)
-  //todo :RGB Alpha image;
-  {Converts a single line of text to an image}
-  function string_to_image(const s:string):TGrayscaleAlphaImage;
   {Converts a broken string into a single image}
   function broken_string_to_image(const s:DStringList):TGrayscaleAlphaImage;
   {Converts a broken string into a single image with shadow}
@@ -52,6 +49,9 @@ Type DFont=class(TTextureFont)
   {Breaks a string to a DStringList}
   function break_stings(const s:String;const w:integer):DStringList;
  private
+  //todo :RGB Alpha image;
+  {Converts a single line of text to an image}
+  function string_to_image(const s:string):TGrayscaleAlphaImage;
 end;
 
 var {$IFNDEF Android}MyCharSet:TUnicodeCharList;{$ENDIF}
@@ -94,7 +94,7 @@ begin
   Print(0, TextHeight(s)-TextHeightBase(s), White, S);       //shift text up from a baseline
   PopProperties; // restore previous TargetImage value
 
-  //reset alpha for correct printing
+  //reset alpha for correct next drawing
   //todo: RGB alpha image
   P :=result.GrayscaleAlphaPixels;
   for I := 1 to result.Width * result.Height * result.Depth do
@@ -110,20 +110,23 @@ end;
 function DFont.broken_string_to_image(const s:DStringList):TGrayscaleAlphaImage;
 var dummyImage:TGrayscaleAlphaImage;
     i:integer;
-    maxh,maxw:integer;
+    maxh,maxhb,maxw:integer;
 begin
   maxh:=0;
+  maxhb:=0;
   maxw:=0;
   for i:=0 to s.count-1 do begin
-    if maxh<s[i].height{base} then maxh:=s[i].height{base};
+    if maxh<s[i].height then maxh:=s[i].height;
+    if maxhb<s[i].height-s[i].heightbase then maxhb:=s[i].height-s[i].heightbase;
     if maxw<s[i].width then maxw:=s[i].width;
   end;
+  writelnLog('',inttostr(maxhb));
   result:=TGRayScaleAlphaImage.create;
   result.SetSize(maxw,maxh*(s.count));
   result.Clear(Vector2Byte(0,0));
   for i:=0 to s.count-1 do begin
     DummyImage:=string_to_image(s[i].value);
-    result.DrawFrom(DummyImage,0,maxh*(s.count-1-i),dmBlendSmart);
+    result.DrawFrom(DummyImage,0,maxh*(s.count-1-i)+maxhb-(s[i].height-s[i].heightbase),dmBlendSmart);
     freeandnil(dummyImage);
   end;
 end;

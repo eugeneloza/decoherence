@@ -56,12 +56,19 @@ end;
 
 procedure DLabel.DestroyMe;
 begin
+  if BrokenString<> nil then BrokenString.Clear;
+  FreeAndNil(BrokenString);
   FreeAndNil(GImage);
 end;
 
 procedure DLabel.InitGL;
+var i:integer;
 begin
+  if BrokenString<> nil then BrokenString.Clear;
+  FreeAndNil(BrokenString);
   BrokenString:=font.break_stings(text,w);
+
+  // for i:=0 to brokenString.count-1 do writeLnLog('',inttostr(brokenstring[i].height));
 
   if shadow=0 then
     SourceImage:=font.broken_string_to_image(BrokenString)

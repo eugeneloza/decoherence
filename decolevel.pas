@@ -69,6 +69,7 @@ begin
      Window.SceneManager.Camera:=camera;
      Window.TouchInterface := tiCtlWalkDragRotate;
      DestroyLoadScreen;
+     setGameMode(gmTravel);
   end;
 end;
 
