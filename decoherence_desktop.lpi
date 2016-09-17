@@ -144,6 +144,7 @@
       <Unit10>
         <Filename Value="castletexturefont_linbiolinumrg_16.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="CastleTextureFont_LinBiolinumRG_16"/>
       </Unit10>
       <Unit11>
         <Filename Value="decoglobal.pas"/>

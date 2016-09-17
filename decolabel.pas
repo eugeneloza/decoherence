@@ -31,11 +31,10 @@ uses
 Type DLabel=class(DAbstractElement)
  public
   text: string;            //todo read ftext write ftext
-  color:TVector4Single;
   Font:DFont;
   Shadow:Float;
   constructor Create(AOwner:TComponent); override;
-  {destructor} Procedure DestroyMe;
+  {destructor} Procedure DestroyMe; override;
   procedure DrawMe; override;
   procedure InitGL; override;
  private
@@ -51,6 +50,7 @@ constructor DLabel.create(AOwner:TComponent);
 begin
   inherited create(AOwner);
   Color:=Vector4Single(1,1,1,1);
+  Opacity:=1;
   Shadow:=0;
 end;
 
@@ -85,6 +85,7 @@ end;
 procedure DLabel.DrawMe;
 begin
   if (GImage<>nil) then begin
+    Color[3]:=Opacity;
     GImage.color:=color;
     GImage.Draw(x,y);
   end else writelnLog('DLabel.DrawMe','ERROR: no font');

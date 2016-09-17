@@ -29,6 +29,8 @@ const Frames_Folder='interface/frames/';
 Type DAbstractElement=class(TComponent)
  public
   x,y,h,w:integer;
+  Opacity:single;
+  color:TVector4Single;
   procedure drawMe; virtual; abstract;
   procedure InitGL; virtual; abstract;
   procedure DestroyMe; virtual; abstract;
@@ -115,6 +117,7 @@ begin
   NewElement.y:=100;
   NewElement.w:=100;
   NewElement.h:=100;
+  NewElement.Opacity:=0.8;
   NewElement.InitGL;
   GUI.children.add(NewElement);
 end;
@@ -180,10 +183,15 @@ end;
 procedure DInterfaceElement.DrawMe;
 var i:integer;
 begin
-  if frameGL<>nil then
+  if frameGL<>nil then begin
     frameGL.Draw3x3(x,y,w,h,frame.cornerTop,frame.CornerRight,frame.CornerBottom,Frame.CornerLeft);
-  if content<>nil then
+    color[3]:=Opacity;
+    FrameGL.color:=Color;
+  end;
+  if content<>nil then begin
+    content.opacity:=Opacity;   //todo: different opacity for content
     content.drawMe;
+  end;
   //draw children recoursive
   for i:=0 to Children.count-1 do Children[i].DrawMe;
 end;
@@ -202,6 +210,8 @@ end;
 constructor DInterfaceElement.Create(AOwner:TComponent);
 begin
   inherited;
+  Opacity:=1;
+  color:=vector4Single(1,1,1,1);
   children:=DInterfaceChildrenList.create(true);
 end;
 

@@ -121,7 +121,7 @@ begin
   If LoadScreen_ready then begin
     if LoadImageThreadReady then begin
       LoadScreen_img.initGL;
-      LoadScreen_img.Image.Color:=vector4Single(1,1,1,0);
+      LoadScreen_img.Opacity:=0;
       LoadImageThreadReady:=false;
       LoadImageReady:=true;
     end;
@@ -129,8 +129,8 @@ begin
       LoadScreen_img.x+=1{*2};
       phase:=abs(sin(Pi*LoadScreen_img.x/(window.width-LoadScreen_img.w)));
       //if random<sqrt(cos(Pi*phase)) then LoadScreen_img.x+=1;
-      LoadScreen_img.image.Color:=vector4Single(1,1,1,phase*0.8);
-      LoadScreen_facts.Color:=vector4Single(1,1,1,phase);
+      LoadScreen_img.Opacity:=phase*0.8;
+      LoadScreen_facts.Opacity:=phase;
       LoadScreen_facts.y:=32+{LoadScreen_facts.h+}LoadScreen_img.x div 3;
       if LoadScreen_img.x+LoadScreen_img.w>=window.width then NewLoadScreenImage;
     end;
@@ -214,14 +214,15 @@ begin
   WritelnLog('MakeLoadScreen','Making labels.');
   loadscreen_label:=DLabel.create(Window);
   loadscreen_label.text:='Добро пожаловать в Decoherence :)'+dlinebreak+'Идёт загрузка, подождите...'+dlinebreak+'П.С. пока "почти нечего грузить" :)'+dlinebreak+'Просто нажмите любую клавишу...';
-  loadscreen_label.color:=vector4Single(1,1,1,1);
+//  loadscreen_label.color:=vector4Single(1,1,1,1);
   LoadScreen_label.shadow:=1;
   loadscreen_label.Font:=RegularFont16;
   LoadScreen_label.w:=round(window.width/3);//a quick fix for 'first fact bug' parsed with w=0;
   LoadScreen_label.InitGL;
 
   loadscreen_facts:=DLabel.create(Window);
-  loadscreen_facts.color:=vector4Single(1,1,1,0);
+  loadscreen_facts.Opacity:=0;
+//  loadscreen_facts.color:=vector4Single(1,1,1,0);
   loadscreen_facts.shadow:=1;
   LoadScreen_facts.Font:=RegularFont16;
 

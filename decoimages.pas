@@ -63,6 +63,7 @@ implementation
 Constructor DAbstractImage.Create(AOwner:TComponent);
 begin
   inherited create(AOwner);
+  color:=vector4Single(1,1,1,1);
   ImageReady:=false;
   ImageLoaded:=false;
 end;
@@ -129,8 +130,11 @@ end;
 
 procedure DStaticImage.DrawMe;
 begin
-  if ImageReady then
+  if ImageReady then begin
+    color[3]:=Opacity;
+    Image.color:=Color;
     Image.Draw(x,y,w,h)
+  end;
   //else WritelnLog('DStaticImage.DrawMe','ERROR: Cannot Draw');
 end;
 
@@ -140,7 +144,8 @@ procedure DWindImage.DrawMe;
 var phase_scaled:integer;
 begin
   if ImageReady then begin
-    image.Color:=Vector4Single(1,1,1,alpha+alpha/4*sin(2*Pi*3*phase));
+    color[3]:=alpha+alpha/4*sin(2*Pi*3*phase);
+    image.Color:=color;
     phase_scaled:=round(Phase*w);
 
     //draw first part of the image
