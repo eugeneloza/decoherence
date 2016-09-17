@@ -46,11 +46,16 @@ end;
 
 Type DAbstractInterfaceElement=class(DAbstractElement)
  public
+  {content of the Interface element: label or image}
   content:DAbstractElement;
+  {multiplier to opacity <1, e.g. overall opacity=1 FrameOpacity=0.8, frame final Opacity=1*0.8}
+  FrameOpacity:float;
+  {frame around the Interface element}
   frame:DFrame;
-  Parent:TComponent;
+  //Parent:TComponent;
   procedure InitGL; override;
   procedure DestroyMe; override;
+  constructor Create(AOwner:TComponent); override;
  private
    FrameImage:TRGBAlphaImage;
    FrameGL:TGLImage;
@@ -117,7 +122,6 @@ begin
   NewElement.y:=100;
   NewElement.w:=100;
   NewElement.h:=100;
-  NewElement.Opacity:=0.8;
   NewElement.InitGL;
   GUI.children.add(NewElement);
 end;
@@ -185,7 +189,7 @@ var i:integer;
 begin
   if frameGL<>nil then begin
     frameGL.Draw3x3(x,y,w,h,frame.cornerTop,frame.CornerRight,frame.CornerBottom,Frame.CornerLeft);
-    color[3]:=Opacity;
+    color[3]:=Opacity*FrameOpacity;
     FrameGL.color:=Color;
   end;
   if content<>nil then begin
@@ -209,9 +213,7 @@ end;
 
 constructor DInterfaceElement.Create(AOwner:TComponent);
 begin
-  inherited;
-  Opacity:=1;
-  color:=vector4Single(1,1,1,1);
+  inherited create(AOwner);
   children:=DInterfaceChildrenList.create(true);
 end;
 
@@ -293,6 +295,14 @@ procedure DAbstractInterfaceElement.DestroyMe;
 begin
  freeandnil(frameGL);
  Freeandnil(FrameImage);
+end;
+
+constructor DAbstractInterfaceElement.Create(AOwner:TComponent);
+begin
+  inherited create(AOwner);
+  Opacity:=1;
+  FrameOpacity:=0.8;
+  color:=vector4Single(1,1,1,1);
 end;
 
 end.

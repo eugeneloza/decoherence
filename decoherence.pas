@@ -50,12 +50,9 @@ end;
 procedure doPress(Container: TUIContainer; const Event: TInputPressRelease);
 begin
   if Event.EventType = itMouseButton then begin
-    {should be vice versa: if interface didn't catch the press then invert control style
-    else catch click
-    will log an Error on right-click because the touch item was not created... hmm...}
-    if mbRight=event.MouseButton then camera.MouseLook:=not Camera.MouseLook
-    else
     doMousePress(Event);
+    {if interface didn't catch the click then}
+    if mbRight=event.MouseButton then camera.MouseLook:=not Camera.MouseLook;
   end;
   InitTestLevel;                         //ugly! I'll fix this soon.
   window.OnRender:=@doWindowRender;
