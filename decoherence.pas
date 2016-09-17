@@ -121,5 +121,8 @@ Initialization
   { This should be done as early as possible to mark our log lines correctly. }
   Application.MainWindow := Window;
   Application.OnInitialize := @ApplicationInitialize;
+
+Finalization
+  WriteLnLog('Finalization','Bye...');
 end.
 

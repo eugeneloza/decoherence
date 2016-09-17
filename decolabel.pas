@@ -37,7 +37,7 @@ Type DLabel=class(DAbstractElement)
   constructor Create(AOwner:TComponent); override;
   {destructor} Procedure DestroyMe;
   procedure DrawMe; override;
-  procedure InitGL;
+  procedure InitGL; override;
  private
   BrokenString:DStringList;
   GImage:TGLImage;
@@ -62,7 +62,7 @@ begin
 end;
 
 procedure DLabel.InitGL;
-var i:integer;
+//var i:integer;
 begin
   if BrokenString<> nil then BrokenString.Clear;
   FreeAndNil(BrokenString);

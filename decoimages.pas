@@ -42,11 +42,11 @@ type DStaticImage=class(DAbstractImage)
   {used temporarily to scale the image //thread-safe}
   TmpImage:TCastleImage;
   procedure LoadMe(filename:string); override;
-  {destructor} procedure DestroyMe;
+  {destructor} procedure DestroyMe; override;
   procedure DrawMe; override;
   procedure ScaleMe(const new_w:integer=0;const new_h:integer=0); override;
   {Initialize GL Image // thread-unsafe!!!}
-  procedure InitGL;
+  procedure InitGL; override;
 end;
 
 type DWindImage=class(DStaticImage)
@@ -74,7 +74,7 @@ begin
  freeandnil(SourceImage);
  freeandnil(Image);
  freeandnil(TmpImage);
- inherited
+// inherited
 end;
 
 procedure DStaticImage.LoadMe(filename:string);

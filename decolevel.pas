@@ -22,6 +22,7 @@ uses
   CastleLog,
   CastleWindow, CastleWindowTouch, CastleSceneCore, CastleScene, CastleFilesUtils,
   castlePlayer, castleVectors, castleCameras,
+  decointerface,
   decoloadscreen,decoglobal;
 
 procedure load_test_level;
@@ -60,6 +61,7 @@ end;
 Procedure InitTestLevel;
 begin
   if not loadedlevel then begin
+     MakeInterface1;
      WritelnLog('InitTestLevel','Init');
      loadedlevel:=true;
 //     Window.SceneManager.Items.Add(Player);

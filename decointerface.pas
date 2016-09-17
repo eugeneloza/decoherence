@@ -30,11 +30,13 @@ Type DAbstractElement=class(TComponent)
  public
   x,y,h,w:integer;
   procedure drawMe; virtual; abstract;
+  procedure InitGL; virtual; abstract;
+  procedure DestroyMe; virtual; abstract;
 end;
 
 Type DFrame=class(TComponent)
  public
-   Image:TGLImage;
+   Image:TRGBAlphaImage;
    cornerTop,cornerbottom,cornerLeft,cornerRight:integer;
    constructor Create(AOwner:TComponent); override;
  //image
@@ -45,7 +47,13 @@ Type DAbstractInterfaceElement=class(DAbstractElement)
   content:DAbstractElement;
   frame:DFrame;
   Parent:TComponent;
-  procedure DrawFrame;
+  procedure InitGL; override;
+  procedure DestroyMe; override;
+ private
+   FrameImage:TRGBAlphaImage;
+   FrameGL:TGLImage;
+   procedure FrameResize3x3;
+   procedure ResizeChildren; virtual; Abstract;
 end;
 
 type DInterfaceChildrenList=specialize TFPGObjectList<DAbstractInterfaceElement>;
@@ -53,7 +61,11 @@ type DInterfaceChildrenList=specialize TFPGObjectList<DAbstractInterfaceElement>
 Type DInterfaceElement=class(DAbstractInterfaceElement)
  public
   children:DInterfaceChildrenList;
-  procedure ResizeChildren;
+  constructor Create(AOwner:TComponent); override;
+  procedure DrawMe; override;
+  procedure DestroyMe; override;
+ private
+  procedure ResizeChildren; override;
 end;
 
 Type DInterfaceContainer=class(DInterfaceElement)
@@ -63,6 +75,7 @@ var frames:array[0..1] of DFrame;
     GUI:DInterfaceContainer;
 
 procedure InitInterface;
+procedure MakeInterface1;
 procedure ResizeInterface;
 procedure DrawInterface;
 
@@ -93,10 +106,27 @@ end;
 {---------------------------------------------------------------------------}
 {---------------------------------------------------------------------------}
 
+procedure MakeInterface1;
+var newElement:DInterfaceElement;
+begin
+  NewElement:=DInterfaceElement.create(GUI);
+  NewElement.frame:=frames[1];
+  NewElement.x:=100;
+  NewElement.y:=100;
+  NewElement.w:=100;
+  NewElement.h:=100;
+  NewElement.InitGL;
+  GUI.children.add(NewElement);
+end;
+
+{---------------------------------------------------------------------------}
+{---------------------------------------------------------------------------}
+{---------------------------------------------------------------------------}
+
 procedure DrawInterface;
 begin
   //GUI draw children recoursive
-
+  GUI.drawMe;
 end;
 
 {---------------------------------------------------------------------------}
@@ -108,13 +138,13 @@ begin
   GUI:=DInterfaceContainer.create(Window);
   frames[0]:=DFrame.create(Window);
   with frames[0] do begin
-    image:=TGLImage.create(ApplicationData(Frames_Folder+'frame.png'));
+    image:=LoadImage(ApplicationData(Frames_Folder+'frame.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
     cornerTop:=1;CornerBottom:=1;cornerLeft:=1;CornerRight:=1;
   end;
   frames[1]:=DFrame.create(Window);
   with frames[1] do begin
-    image:=TGLImage.create(ApplicationData(Frames_Folder+'frame_caption.png'));
-    cornerTop:=18;CornerBottom:=1;cornerLeft:=1;CornerRight:=1;
+    image:=LoadImage(ApplicationData(Frames_Folder+'frame_caption.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
+    cornerTop:=19;CornerBottom:=1;cornerLeft:=1;CornerRight:=1;
   end;
 
 //  GUI.frame:=Dframe.create(frames[0],GUI);
@@ -132,6 +162,8 @@ begin
   GUI.y:=0;
   GUI.w:=window.width;
   GUI.h:=window.height;
+  GUI.frame:=nil;
+  GUI.content:=nil;
   //GUI resize children recoursive
   WriteLnLog('ResizeInterface','finished');
 end;
@@ -145,9 +177,15 @@ end;
 
 {============================================================================}
 
-procedure DAbstractInterfaceElement.DrawFrame;
+procedure DInterfaceElement.DrawMe;
+var i:integer;
 begin
-  frame.image.Draw3x3(x,y,w,h,frame.cornerTop,frame.CornerRight,frame.CornerBottom,Frame.CornerLeft); //frame.x...
+  if frameGL<>nil then
+    frameGL.Draw3x3(x,y,w,h,frame.cornerTop,frame.CornerRight,frame.CornerBottom,Frame.CornerLeft);
+  if content<>nil then
+    content.drawMe;
+  //draw children recoursive
+  for i:=0 to Children.count-1 do Children[i].DrawMe;
 end;
 
 {============================================================================}
@@ -155,7 +193,96 @@ end;
 procedure DInterfaceElement.ResizeChildren;
 var i:integer;
 begin
- for i:=0 to children.count-1 do {*******};
+ for i:=0 to children.count-1 do begin
+   //todo
+   children[i].resizeChildren;
+ end;
+end;
+
+constructor DInterfaceElement.Create(AOwner:TComponent);
+begin
+  inherited;
+  children:=DInterfaceChildrenList.create(true);
+end;
+
+procedure DInterfaceElement.DestroyMe;
+begin
+ freeandnil(children);
+ inherited;
+end;
+
+{-----------------------------------------------------------------------------}
+
+
+procedure DAbstractInterfaceElement.FrameResize3x3;
+var ScaledImageParts: array [0..2,0..2] of TCastleImage;
+    ix,iy: integer;
+    UnscaledWidth,UnscaledHeight:integer;
+    SourceXs,SourceYs,DestXs,DestYs: TVector4Integer;
+    CornersVector:TVector4Integer;
+begin
+  FrameImage:=frame.Image.CreateCopy as TRGBAlphaImage;
+  CornersVector:=Vector4Integer(frame.cornerTop,frame.cornerLeft,frame.cornerBottom,frame.cornerRight);
+
+  UnscaledWidth:=FrameImage.width;
+  UnscaledHeight:=FrameImage.height;
+
+  SourceXs[0]:=0;
+  SourceXs[1]:=CornersVector[3];
+  SourceXs[2]:=UnscaledWidth-CornersVector[1];
+  SourceXs[3]:=UnscaledWidth;
+  SourceYs[0]:=0;
+  SourceYs[1]:=CornersVector[2];
+  SourceYs[2]:=UnscaledHeight-CornersVector[0];
+  SourceYs[3]:=UnscaledHeight;
+  DestXs[0]:=0;
+  DestXs[1]:=CornersVector[3];
+  DestXs[2]:=w-CornersVector[1];
+  DestXs[3]:=w;
+  DestYs[0]:=0;
+  DestYs[1]:=CornersVector[2];
+  DestYs[2]:=h-CornersVector[0];
+  DestYs[3]:=h;
+
+  for ix:=0 to 2 do
+   for iy:=0 to 2 do begin
+     ScaledImageParts[ix,iy]:=TRGBAlphaImage.create;
+     ScaledImageParts[ix,iy].SetSize(SourceXs[ix+1]-SourceXs[ix],SourceYs[iy+1]-SourceYs[iy]);
+     ScaledImageParts[ix,iy].Clear(Vector4Byte(0,0,0,255));
+     ScaledImageParts[ix,iy].DrawFrom(FrameImage,0,0,SourceXs[ix],SourceYs[iy],SourceXs[ix+1]-SourceXs[ix],SourceYs[iy+1]-SourceYs[iy],dmBlend);
+     ScaledImageParts[ix,iy].Resize(DestXs[ix+1]-DestXs[ix],DestYs[iy+1]-DestYs[iy],riNearest);
+   end;
+
+  FrameImage.SetSize(w,h,1);
+  FrameImage.Clear(Vector4byte(0,0,0,255));
+  for ix:=0 to 2 do
+    for iy:=0 to 2 do FrameImage.DrawFrom(ScaledImageParts[ix,iy],DestXs[ix],DestYs[iy],0,0,DestXs[ix+1]-DestXs[ix],DestYs[iy+1]-DestYs[iy],dmBlend);
+
+  for ix:=0 to 2 do
+    for iy:=0 to 2 do freeAndNil(ScaledImageParts[ix,iy]);
+
+  //and burn the burner
+  FrameImage.DrawFrom(BURNER_IMAGE,0,0,x,y,w,h,dmMultiply);
+end;
+
+{------------------------------------------------------------------------}
+
+procedure DAbstractInterfaceElement.InitGl;
+begin
+  if frame<> nil then begin
+    FrameResize3x3;
+    //FrameImage.Resize3x3(w,h,CornersVector,riNearest);
+    freeandnil(FrameGL);
+    FrameGL:=TGLImage.create(FrameImage,true,true);
+    FrameImage:=nil;
+  end;
+  if Content<>nil then content.InitGl;
+end;
+
+procedure DAbstractInterfaceElement.DestroyMe;
+begin
+ freeandnil(frameGL);
+ Freeandnil(FrameImage);
 end;
 
 end.
