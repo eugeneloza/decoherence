@@ -10,7 +10,7 @@
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="42" Y="5"/>
-        <UsageCount Value="142"/>
+        <UsageCount Value="146"/>
       </Unit0>
       <Unit1>
         <Filename Value="decoimages.pas"/>
@@ -18,15 +18,15 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="146"/>
         <CursorPos Y="166"/>
-        <UsageCount Value="140"/>
+        <UsageCount Value="144"/>
       </Unit1>
       <Unit2>
         <Filename Value="decomouse.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="74"/>
+        <TopLine Value="80"/>
         <CursorPos X="33" Y="94"/>
-        <UsageCount Value="136"/>
+        <UsageCount Value="140"/>
         <Loaded Value="True"/>
       </Unit2>
       <Unit3>
@@ -35,7 +35,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="227"/>
         <CursorPos Y="247"/>
-        <UsageCount Value="133"/>
+        <UsageCount Value="137"/>
       </Unit3>
       <Unit4>
         <Filename Value="decofont.pas"/>
@@ -44,7 +44,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="179"/>
         <CursorPos Y="199"/>
-        <UsageCount Value="131"/>
+        <UsageCount Value="135"/>
       </Unit4>
       <Unit5>
         <Filename Value="decolevel.pas"/>
@@ -52,7 +52,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="59"/>
         <CursorPos Y="79"/>
-        <UsageCount Value="117"/>
+        <UsageCount Value="121"/>
       </Unit5>
       <Unit6>
         <Filename Value="decolabel.pas"/>
@@ -61,25 +61,26 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="74"/>
         <CursorPos X="61" Y="85"/>
-        <UsageCount Value="75"/>
+        <UsageCount Value="79"/>
       </Unit6>
       <Unit7>
         <Filename Value="decofacts.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="167"/>
-        <CursorPos Y="187"/>
-        <UsageCount Value="75"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="44"/>
+        <CursorPos Y="58"/>
+        <UsageCount Value="79"/>
+        <Loaded Value="True"/>
       </Unit7>
       <Unit8>
         <Filename Value="decointerface.pas"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="115"/>
+        <TopLine Value="31"/>
         <CursorPos Y="125"/>
         <FoldState Value=" T3j90EH"/>
-        <UsageCount Value="52"/>
+        <UsageCount Value="56"/>
         <Loaded Value="True"/>
       </Unit8>
       <Unit9>
@@ -87,8 +88,8 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="Decoherence"/>
         <TopLine Value="44"/>
-        <CursorPos X="47" Y="54"/>
-        <UsageCount Value="78"/>
+        <CursorPos X="117" Y="57"/>
+        <UsageCount Value="82"/>
         <Loaded Value="True"/>
       </Unit9>
       <Unit10>
@@ -96,15 +97,15 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="CastleTextureFont_LinBiolinumRG_16"/>
         <EditorIndex Value="-1"/>
-        <UsageCount Value="48"/>
+        <UsageCount Value="52"/>
       </Unit10>
       <Unit11>
         <Filename Value="decoglobal.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="3"/>
-        <TopLine Value="30"/>
+        <EditorIndex Value="4"/>
+        <TopLine Value="23"/>
         <CursorPos X="100" Y="47"/>
-        <UsageCount Value="68"/>
+        <UsageCount Value="72"/>
         <Loaded Value="True"/>
       </Unit11>
       <Unit12>

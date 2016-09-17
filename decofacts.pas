@@ -130,7 +130,7 @@ begin
 
   {---}
 
-  N_images:=41+1;
+  N_images:=43+1;
 
   setLength(image_text,N_images);
   image_text[00]:='colour-of-nature-fractal_CC0_by_Sharon_Apted_[colorize].jpg';
@@ -175,6 +175,8 @@ begin
   image_text[39]:='yellow-spiral_by_Piotr_Siedlecki_[gimp,crop].jpg';
   image_text[40]:='SunFlare_CC0_by-GIMP.jpg';
   image_text[41]:='LensFlare_CC0_by-GIMP.jpg';
+  image_text[42]:='Milky_Way_2005_CC0_by_NASA_[glow,crop].jpg';
+  image_text[43]:='Ocean_planet1_CC0_by_Merikanto_[gimp,gmic].jpg';
 end;
 
 procedure DestroyFacts;
