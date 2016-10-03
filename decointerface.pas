@@ -26,6 +26,15 @@ uses
 
 const Frames_Folder='interface/frames/';
 
+{1/17 of window.height is a "unit" in GUI scale.
+Basically calculated as 4 characters vertical space allocation
+3 lines of buttons for each
+and add one line at the bottom for menu button and other stuff
+i.e. 3*4+1 units in window.height
+Most often equal scale is used for width - in fractions of height to maintain squares etc.}
+
+const GUI_scale_unit_float=1/(4*3+1);
+
 Type DAbstractElement=class(TComponent)
  public
   x,y,h,w:integer;
@@ -76,13 +85,23 @@ Type DInterfaceElement=class(DAbstractInterfaceElement)
 end;
 
 Type DInterfaceContainer=class(DInterfaceElement)
+ public
+  {integer scale of GUI_scale_unit. I'm not very sure if it's correct to use it,
+   because it will make a 'hole' of window.height mod 17 size at the bottom...
+   but let it be for now, I can always remove it later}
+  GUI_scale:integer;
+  {This is the major workspace container size for action buttons, perks, text,
+  action bars and etc. Most of the interface is scaled and organized relative
+  to it. I might make it as a separate GUI container, but not sure if it's needed.}
+  mid_h,mid_w:integer;
 end;
 
 var frames:array[0..1] of DFrame;
     GUI:DInterfaceContainer;
 
-procedure InitInterface;
 procedure MakeInterface1;
+
+procedure InitInterface;
 procedure ResizeInterface;
 procedure DrawInterface;
 
@@ -117,11 +136,11 @@ procedure MakeInterface1;
 var newElement:DInterfaceElement;
 begin
   NewElement:=DInterfaceElement.create(GUI);
-  NewElement.frame:=frames[1];
+  NewElement.frame:=frames[0];
   NewElement.x:=100;
   NewElement.y:=100;
-  NewElement.w:=100;
-  NewElement.h:=100;
+  NewElement.w:=GUI.GUI_scale;
+  NewElement.h:=GUI.GUI_scale;
   NewElement.InitGL;
   GUI.children.add(NewElement);
 end;
@@ -171,6 +190,9 @@ begin
   GUI.y:=0;
   GUI.w:=window.width;
   GUI.h:=window.height;
+  GUI.GUI_scale:=round(GUI_scale_unit_float*window.height);
+  GUI.mid_h:=round((1-1/17)*GUI.h);
+  GUI.mid_w:=round((1-8/17)*GUI.w);
   GUI.frame:=nil;
   GUI.content:=nil;
   //GUI resize children recoursive
