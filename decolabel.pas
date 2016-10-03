@@ -30,7 +30,7 @@ uses
 {HTML disabled at the moment}
 Type DLabel=class(DAbstractElement)
  public
-  text: string;            //todo read ftext write ftext
+
   Font:DFont;
   Shadow:Float;
   constructor Create(AOwner:TComponent); override;
@@ -38,6 +38,12 @@ Type DLabel=class(DAbstractElement)
   procedure DrawMe; override;
   procedure InitGL; override;
  private
+  procedure settext(const value:string);
+  function gettext:string;
+ public
+  property text:string read gettext write settext;
+ private
+  ftext: string;
   BrokenString:DStringList;
   GImage:TGLImage;
   SourceImage:TGrayscaleAlphaImage;
@@ -61,6 +67,19 @@ begin
   FreeAndNil(GImage);
 end;
 
+procedure DLabel.settext(const value:string);
+begin
+  if ftext<>value then begin
+    ftext:=value;
+    initGL;          //todo: not sure about making it here. But let it remain here for now.
+  end;
+end;
+
+function DLabel.gettext:string;
+begin
+  result:=ftext;
+end;
+
 procedure DLabel.InitGL;
 //var i:integer;
 begin
@@ -69,6 +88,8 @@ begin
   BrokenString:=font.break_stings(text,w);
 
   // for i:=0 to brokenString.count-1 do writeLnLog('',inttostr(brokenstring[i].height));
+
+  SourceImage:=nil; // let it be as a safeguard here. I don't want to freeannil GImage before it is instantly created to avoid sigsegvs
 
   if shadow=0 then
     SourceImage:=font.broken_string_to_image(BrokenString)
@@ -79,7 +100,6 @@ begin
 
   FreeAndNil(GImage);
   GImage:=TGLImage.create(SourceImage,true,true);
-  SourceImage:=nil;
 end;
 
 procedure DLabel.DrawMe;

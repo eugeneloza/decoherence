@@ -102,9 +102,9 @@ begin
   LoadImageThread.Priority:=tpLower;
   LoadImageThread.Start;
 
-  loadscreen_facts.text:=GetRandomFact;
   loadscreen_facts.w:=round(window.width/3);//a quick fix for 'first fact bug' parsed with w=0;
-  loadScreen_facts.InitGL;
+  loadscreen_facts.text:=GetRandomFact;
+  //loadScreen_facts.InitGL;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -213,12 +213,12 @@ begin
 
   WritelnLog('MakeLoadScreen','Making labels.');
   loadscreen_label:=DLabel.create(Window);
-  loadscreen_label.text:='Добро пожаловать в Decoherence :)'+dlinebreak+'Идёт загрузка, подождите...'+dlinebreak+'П.С. пока "почти нечего грузить" :)'+dlinebreak+'Просто нажмите любую клавишу...';
 //  loadscreen_label.color:=vector4Single(1,1,1,1);
   LoadScreen_label.shadow:=1;
   loadscreen_label.Font:=RegularFont16;
   LoadScreen_label.w:=round(window.width/3);//a quick fix for 'first fact bug' parsed with w=0;
-  LoadScreen_label.InitGL;
+  loadscreen_label.text:='Добро пожаловать в Decoherence :)'+dlinebreak+'Идёт загрузка, подождите...'+dlinebreak+'П.С. пока "почти нечего грузить" :)'+dlinebreak+'Просто нажмите любую клавишу...';
+  //LoadScreen_label.InitGL;
 
   loadscreen_facts:=DLabel.create(Window);
   loadscreen_facts.Opacity:=0;
