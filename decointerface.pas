@@ -93,7 +93,7 @@ Type DInterfaceContainer=class(DInterfaceElement)
   {This is the major workspace container size for action buttons, perks, text,
   action bars and etc. Most of the interface is scaled and organized relative
   to it. I might make it as a separate GUI container, but not sure if it's needed.}
-  mid_h,mid_w:integer;
+  mid_h,mid_w,mid_startx,mid_starty:integer;
 end;
 
 var frames:array[0..1] of DFrame;
@@ -137,8 +137,16 @@ var newElement:DInterfaceElement;
 begin
   NewElement:=DInterfaceElement.create(GUI);
   NewElement.frame:=frames[0];
-  NewElement.x:=100;
-  NewElement.y:=100;
+  NewElement.x:=GUI.mid_startx;
+  NewElement.y:=GUI.mid_starty+GUI.mid_h-GUI.GUI_scale;
+  NewElement.w:=GUI.GUI_scale;
+  NewElement.h:=GUI.GUI_scale;
+  NewElement.InitGL;
+  GUI.children.add(NewElement);
+  NewElement:=DInterfaceElement.create(GUI);
+  NewElement.frame:=frames[0];
+  NewElement.x:=GUI.mid_startx+GUI.GUI_scale;
+  NewElement.y:=GUI.mid_starty+GUI.mid_h-GUI.GUI_scale;
   NewElement.w:=GUI.GUI_scale;
   NewElement.h:=GUI.GUI_scale;
   NewElement.InitGL;
@@ -190,9 +198,11 @@ begin
   GUI.y:=0;
   GUI.w:=window.width;
   GUI.h:=window.height;
-  GUI.GUI_scale:=round(GUI_scale_unit_float*window.height);
+  GUI.GUI_scale:=round(GUI_scale_unit_float*GUI.h);
   GUI.mid_h:=round((1-1/17)*GUI.h);
-  GUI.mid_w:=round((1-8/17)*GUI.w);
+  GUI.mid_w:=round((1-8/17)*GUI.h);
+  GUI.mid_startx:=round(4/17*GUI.h);
+  GUI.mid_starty:=0;
   GUI.frame:=nil;
   GUI.content:=nil;
   //GUI resize children recoursive
