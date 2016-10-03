@@ -33,6 +33,7 @@ type DAbstractImage=class(DAbstractElement)
  private
   ImageReady:boolean;
   ImageLoaded:boolean;
+  doRescale:boolean;
 end;
 
 type DStaticImage=class(DAbstractImage)
@@ -83,8 +84,8 @@ procedure DStaticImage.LoadMe(filename:string);
 begin
   WritelnLog('DSimpleImage.LoadMe',filename);
   SourceImage:=LoadImage(ApplicationData(filename));
-  w:=SourceImage.width;
-  h:=SourceImage.Height;
+  w:=-1;//SourceImage.width;
+  h:=-1;//SourceImage.Height;
   //don't load TGLImage until scaleMe!!!
   ImageLoaded:=true;
 end;
@@ -92,27 +93,38 @@ end;
 {----------------------------------------------------------------}
 
 procedure DStaticImage.ScaleMe(const new_w:integer=0;const new_h:integer=0);
+var hh,ww:integer;
 begin
  if ImageReady then writeLnLog('DStaticImage.ScaleMe','ERROR: DoubleLoading image!!!');
- ImageReady:=false;
+ if not doRescale then
  if ImageLoaded then begin
+   doRescale:=true;
+   ImageReady:=false;
    if (new_h>0) and (new_w>0) then begin
-     h:=new_h;
-     w:=new_w;
+     hh:=new_h;
+     ww:=new_w;
    end;
    if new_w=-1 then begin
      if new_h=-1 then begin
-       h:=window.height;
-       w:=window.width;
+       hh:=window.height;
+       ww:=window.width;
      end else begin
-       h:=round(window.Height);
-       w:=round(h/SourceImage.Height*sourceImage.width);
+       hh:=window.Height;
+       ww:=round(hh/SourceImage.Height*sourceImage.width);
      end;
    end;
-   WritelnLog('DStaticImage.ScaleMe',inttostr(w)+'x'+inttostr(h));
-   TmpImage:=SourceImage.CreateCopy as TCastleImage;
-   if (h>0) and (w>0) then
-     TmpImage.Resize(w,h,riBilinear);
+   if (h<>hh) or (w<>ww) or (Image=nil) then begin
+     h:=hh;
+     w:=ww;
+     WritelnLog('DStaticImage.ScaleMe',inttostr(w)+'x'+inttostr(h));
+     TmpImage:=SourceImage.CreateCopy as TCastleImage;
+     if (h>0) and (w>0) then
+       TmpImage.Resize(w,h,riBilinear);
+   end else begin
+     ImageReady:=true;
+     doRescale:=false;
+     WritelnLog('DStaticImage.ScaleMe','No need to rescale, skipping...');
+   end;
  end else WritelnLog('DStaticImage.ScaleMe','ERROR: Image not loaded!');
 end;
 
@@ -120,12 +132,16 @@ end;
 
 procedure DStaticImage.InitGl;
 begin
- if TmpImage<>nil then begin
-  freeandnil(Image);
-  Image:=TGLImage.create(TmpImage,true,true);
-  tmpImage:=nil;        //todo!!!
-  ImageReady:=true;
- end;
+ if doRescale then begin
+   if (TmpImage<>nil) then begin
+     WritelnLog('DStaticImage.InitGl','GL initialize');
+     freeandnil(Image);
+     Image:=TGLImage.create(TmpImage,true,true);
+     tmpImage:=nil;        //todo!!!
+     ImageReady:=true;
+     doRescale:=false;
+   end else WritelnLog('DStaticImage.InitGl','ERROR: TmpImage is nil!');
+ end else WritelnLog('DStaticImage.InitGl','Image not changed, skipping...');
 end;
 
 {----------------------------------------------------------------}
@@ -136,8 +152,7 @@ begin
     color[3]:=Opacity;
     Image.color:=Color;
     Image.Draw(x,y,w,h)
-  end;
-  //else WritelnLog('DStaticImage.DrawMe','ERROR: Cannot Draw');
+  end else WritelnLog('DStaticImage.DrawMe','ERROR: Static Image not ready to draw!');
 end;
 
 {----------------------------------------------------------------}
@@ -160,7 +175,7 @@ begin
                phase_scaled,h,
                w-phase_scaled,0,
                phase_scaled,h);
-  end;
+  end else WriteLnLog('DWindImage.DrawMe','ERROR: Wind image not ready to draw!');
 end;
 
 

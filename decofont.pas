@@ -120,7 +120,7 @@ begin
     if maxhb<s[i].height-s[i].heightbase then maxhb:=s[i].height-s[i].heightbase;
     if maxw<s[i].width then maxw:=s[i].width;
   end;
-  writelnLog('',inttostr(maxhb));
+//  writelnLog('DFont.broken_string_to_image','max height base = ', inttostr(maxhb));
   result:=TGRayScaleAlphaImage.create;
   result.SetSize(maxw,maxh*(s.count));
   result.Clear(Vector2Byte(0,0));
