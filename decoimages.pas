@@ -74,7 +74,8 @@ end;
 begin
  freeandnil(SourceImage);
  freeandnil(Image);
- freeandnil(TmpImage);
+ if tmpimage<>nil then WritelnLog('DStaticImage.DestroyMe','ERROR: tmpimage is not nil!');
+ //freeandnil(TmpImage);
 // inherited
 end;
 
@@ -92,6 +93,7 @@ end;
 
 procedure DStaticImage.ScaleMe(const new_w:integer=0;const new_h:integer=0);
 begin
+ if ImageReady then writeLnLog('DStaticImage.ScaleMe','ERROR: DoubleLoading image!!!');
  ImageReady:=false;
  if ImageLoaded then begin
    if (new_h>0) and (new_w>0) then begin
@@ -121,7 +123,7 @@ begin
  if TmpImage<>nil then begin
   freeandnil(Image);
   Image:=TGLImage.create(TmpImage,true,true);
-  tmpImage:=nil;
+  tmpImage:=nil;        //todo!!!
   ImageReady:=true;
  end;
 end;

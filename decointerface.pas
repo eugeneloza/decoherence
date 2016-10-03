@@ -151,7 +151,7 @@ begin
   frames[1]:=DFrame.create(Window);
   with frames[1] do begin
     image:=LoadImage(ApplicationData(Frames_Folder+'frame_caption.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
-    cornerTop:=19;CornerBottom:=1;cornerLeft:=1;CornerRight:=1;
+    cornerTop:=19;CornerBottom:=1;cornerLeft:=1;CornerRight:=1;            //todo: variable top line!
   end;
 
 //  GUI.frame:=Dframe.create(frames[0],GUI);
@@ -164,6 +164,8 @@ end;
 procedure ResizeInterface;
 begin
   WriteLnLog('ResizeInterface','started');
+  //Rescale Burner image if necessary
+  Init_burner_image;
   {GUI always takes the whole screen and every child is scaled against it}
   GUI.x:=0;
   GUI.y:=0;
