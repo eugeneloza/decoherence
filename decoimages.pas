@@ -137,7 +137,7 @@ begin
      WritelnLog('DStaticImage.InitGl','GL initialize');
      freeandnil(Image);
      Image:=TGLImage.create(TmpImage,true,true);
-     tmpImage:=nil;        //todo!!!
+     //tmpImage:=nil;        //Looks like the issue has been fixed. Still I'll have to keep an eye at this line
      ImageReady:=true;
      doRescale:=false;
    end else WritelnLog('DStaticImage.InitGl','ERROR: TmpImage is nil!');
