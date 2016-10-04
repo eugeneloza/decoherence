@@ -91,9 +91,9 @@ begin
   {$ELSE}
     {$IFDEF WriteLog}
       LogStream:=TFileStream.Create('log_'+NiceDate+'.txt',fmCreate);
-      InitializeLog(Version,LogStream);
+      InitializeLog(Version,LogStream,ldTime);
     {$ELSE}
-      InitializeLog;
+      InitializeLog(Version,nil,ldTime);
     {$ENDIF}
   {$ENDIF}
   WritelnLog('ApplicationInitialize','Init');

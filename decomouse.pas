@@ -74,7 +74,7 @@ begin
     Repeat
       if touchArray[i].FingerIndex=fingerindex then found:=true else inc(i);
     until (i>TouchArray.Count-1) or found;
-    WritelnLog('doMouseRelease','Caught mouse release finger='+inttostr(fingerindex)+'n='+inttostr(i));
+    WritelnLog('doMouseRelease','Caught mouse release finger='+inttostr(fingerindex)+' n='+inttostr(i));
     if found then
       TouchArray.Remove(touchArray[i])
     else
@@ -93,7 +93,7 @@ begin
   fingerindex:=GetFingerIndex(Event);
   NewEventTouch:=DTouch.create(event.Position[0],event.Position[1],fingerindex);
   TouchArray.Add(NewEventTouch);
-  WritelnLog('doMouseRelease','Caught mouse press finger='+inttostr(FingerIndex));
+  WritelnLog('doMousePress','Caught mouse press finger='+inttostr(FingerIndex));
 end;
 
 end.
