@@ -20,12 +20,12 @@ unit Decoherence;
 
 interface
 
-const Version='Interfa2-160913-25';
+const Version='Interfa2-161009-36';
 
 implementation
 
 uses Classes, SysUtils,
-     CastleLog, CastleTimeUtils,
+     CastleLog, {CastleTimeUtils,}
      CastleWindow, CastleWindowTouch, CastleKeysMouse,
      decomouse, decointerface, DecoFont,
      DecoLoadScreen,
@@ -93,7 +93,7 @@ begin
       LogStream:=TFileStream.Create('log_'+NiceDate+'.txt',fmCreate);
       InitializeLog(Version,LogStream,ldTime);
     {$ELSE}
-      InitializeLog(Version,nil,ldTime);
+      InitializeLog(Version,nil,ltTime);
     {$ENDIF}
   {$ENDIF}
   WritelnLog('ApplicationInitialize','Init');
