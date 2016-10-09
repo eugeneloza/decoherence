@@ -22,27 +22,27 @@ interface
 uses
   Classes,CastleWindowTouch;
 
-const Interface_Foler='interface/';
+const Interface_Foler = 'interface/';
 
-type float=single;
+type float = single;
 
-type TGameMode=(gmNone,gmLoadScreen,gmTravel);
+type TGameMode = (gmNone,gmLoadScreen,gmTravel);
   //gmCombat,gmInventory,gmLevelup,gmMenu,gmMainMenu,...
   //gm render mode??? gmInventory gmLevelUp gmLoadScreen gm3d gmMenu
 
-var Window:TCastleWindowTouch;
-    LogStream:TFileStream;
-    CurrentGameMode: TGameMode=gmNone;
-    LastGameMode: TGameMode=gmNone;
+var Window : TCastleWindowTouch;
+    LogStream : TFileStream;
+    CurrentGameMode : TGameMode = gmNone;
+    LastGameMode : TGameMode = gmNone;
 
-procedure SetGameMode(GM:TGameMode);
+procedure SetGameMode(GM : TGameMode);
 
 implementation
 
-procedure SetGameMode(GM:TGameMode);
+procedure SetGameMode(GM : TGameMode);
 begin
-  LastGameMode:=CurrentGameMode;
-  CurrentGameMode:=gm;
+  LastGameMode := CurrentGameMode;
+  CurrentGameMode := gm;
 end;
 
 

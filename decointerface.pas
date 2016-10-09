@@ -49,74 +49,74 @@ const ZeroAnimation : TAnimationState = (
   Opacity : 1
   );
 
-Type DAbstractElement=class(TComponent)
+Type DAbstractElement = class(TComponent)
  public
-  x,y,h,w:integer;
-  Opacity:single;
-  color:TVector4Single;
+  x, y, h, w : integer;
+  Opacity : single;
+  color : TVector4Single;
   procedure drawMe; virtual; abstract;
   procedure InitGL; virtual; abstract;
   procedure DestroyMe; virtual; abstract;
 end;
 
-Type DFrame=class(TComponent)
+Type DFrame = class(TComponent)
  public
-   Image:TRGBAlphaImage;
-   cornerTop,cornerbottom,cornerLeft,cornerRight:integer;
-   constructor Create(AOwner:TComponent); override;
+   Image : TRGBAlphaImage;
+   cornerTop, cornerbottom, cornerLeft, cornerRight : integer;
+   constructor Create(AOwner : TComponent); override;
  //image
 end;
 
-Type DAbstractInterfaceElement=class(DAbstractElement)
+Type DAbstractInterfaceElement = class(DAbstractElement)
  public
   { content of the Interface element: label or image }
-  content:DAbstractElement;
+  content : DAbstractElement;
   { multiplier to opacity <1, e.g. overall opacity=1 FrameOpacity=0.8, frame final Opacity=1*0.8 }
-  FrameOpacity:float;
+  FrameOpacity : float;
   { frame around the Interface element }
-  frame:DFrame;
+  frame : DFrame;
   //Parent:TComponent;
   { initializes GL content of the interface element }
   procedure InitGL; override;
   { looks like destructor... but I couldn't get destructor to work }
   procedure DestroyMe; override;
   { creates the instance }
-  constructor Create(AOwner:TComponent); override;
+  constructor Create(AOwner : TComponent); override;
   { saves the current state as TAnimationState }
-  Function GetAnimationState: TAnimationState;
+  Function GetAnimationState : TAnimationState;
  private
-   FrameImage:TRGBAlphaImage;
-   FrameGL:TGLImage;
+   FrameImage : TRGBAlphaImage;
+   FrameGL : TGLImage;
    procedure FrameResize3x3;
    procedure ResizeChildren; virtual; Abstract;
 end;
 
-type DInterfaceChildrenList=specialize TFPGObjectList<DAbstractInterfaceElement>;
+type DInterfaceChildrenList = specialize TFPGObjectList<DAbstractInterfaceElement>;
 
-Type DInterfaceElement=class(DAbstractInterfaceElement)
+Type DInterfaceElement = class(DAbstractInterfaceElement)
  public
-  children:DInterfaceChildrenList;
-  constructor Create(AOwner:TComponent); override;
+  children : DInterfaceChildrenList;
+  constructor Create(AOwner : TComponent); override;
   procedure DrawMe; override;
   procedure DestroyMe; override;
  private
   procedure ResizeChildren; override;
 end;
 
-Type DInterfaceContainer=class(DInterfaceElement)
+Type DInterfaceContainer = class(DInterfaceElement)
  public
   {integer scale of GUI_scale_unit. I'm not very sure if it's correct to use it,
    because it will make a 'hole' of window.height mod 17 size at the bottom...
    but let it be for now, I can always remove it later}
-  GUI_scale:integer;
+  GUI_scale : integer;
   {This is the major workspace container size for action buttons, perks, text,
   action bars and etc. Most of the interface is scaled and organized relative
   to it. I might make it as a separate GUI container, but not sure if it's needed.}
-  mid_h,mid_w,mid_startx,mid_starty:integer;
+  mid_h, mid_w, mid_startx, mid_starty : integer;
 end;
 
-var frames:array[0..1] of DFrame;
-    GUI:DInterfaceContainer;
+var frames : array[0..1] of DFrame;
+    GUI : DInterfaceContainer;
 
 procedure MakeInterface1;
 
@@ -134,15 +134,16 @@ var BURNER_IMAGE_UNSCALED,BURNER_IMAGE:TCastleImage;
 procedure Init_burner_image;
 begin
   WriteLnLog('Init_burner_image','started');
-  if BURNER_IMAGE_UNSCALED=nil then BURNER_IMAGE_UNSCALED:=LoadImage(ApplicationData(Interface_Foler+'burner_Pattern_203_CC0_by_Nobiax_diffuse.png'), [TRGBImage]) as TRGBImage;
+  if BURNER_IMAGE_UNSCALED = nil then
+    BURNER_IMAGE_UNSCALED := LoadImage(ApplicationData(Interface_Foler+'burner_Pattern_203_CC0_by_Nobiax_diffuse.png'), [TRGBImage]) as TRGBImage;
   if BURNER_IMAGE=nil then begin
-    BURNER_IMAGE:=BURNER_IMAGE_UNSCALED.MakeCopy;
-    BURNER_IMAGE.Resize(window.width,window.height,riBilinear);
+    BURNER_IMAGE := BURNER_IMAGE_UNSCALED.MakeCopy;
+    BURNER_IMAGE.Resize(window.width, window.height, riBilinear);
   end;
-  if (BURNER_IMAGE.height<>window.height) or (BURNER_IMAGE.width<>window.width) then begin
+  if (BURNER_IMAGE.height <> window.height) or (BURNER_IMAGE.width <> window.width) then begin
     FreeAndNil(BURNER_IMAGE);
-    BURNER_IMAGE:=BURNER_IMAGE_UNSCALED.MakeCopy;
-    BURNER_IMAGE.Resize(window.width,window.height,riBilinear);
+    BURNER_IMAGE := BURNER_IMAGE_UNSCALED.MakeCopy;
+    BURNER_IMAGE.Resize(window.width, window.height, riBilinear);
   end;
   WriteLnLog('Init_burner_image','finished');
 end;
@@ -155,19 +156,19 @@ procedure MakeInterface1;
 var newElement:DInterfaceElement;
 begin
   NewElement:=DInterfaceElement.create(GUI);
-  NewElement.frame:=frames[0];
-  NewElement.x:=GUI.mid_startx;
-  NewElement.y:=GUI.mid_starty+GUI.mid_h-GUI.GUI_scale;
-  NewElement.w:=GUI.GUI_scale;
-  NewElement.h:=GUI.GUI_scale;
+  NewElement.frame := frames[0];
+  NewElement.x := GUI.mid_startx;
+  NewElement.y := GUI.mid_starty+GUI.mid_h-GUI.GUI_scale;
+  NewElement.w := GUI.GUI_scale;
+  NewElement.h := GUI.GUI_scale;
   NewElement.InitGL;
   GUI.children.add(NewElement);
-  NewElement:=DInterfaceElement.create(GUI);
-  NewElement.frame:=frames[0];
-  NewElement.x:=GUI.mid_startx+GUI.GUI_scale;
-  NewElement.y:=GUI.mid_starty+GUI.mid_h-GUI.GUI_scale;
-  NewElement.w:=GUI.GUI_scale;
-  NewElement.h:=GUI.GUI_scale;
+  NewElement := DInterfaceElement.create(GUI);
+  NewElement.frame := frames[0];
+  NewElement.x := GUI.mid_startx+GUI.GUI_scale;
+  NewElement.y := GUI.mid_starty+GUI.mid_h-GUI.GUI_scale;
+  NewElement.w := GUI.GUI_scale;
+  NewElement.h := GUI.GUI_scale;
   NewElement.InitGL;
   GUI.children.add(NewElement);
 end;
@@ -188,19 +189,19 @@ procedure InitInterface;
 begin
   WriteLnLog('InitInterface','started');
   Init_burner_image;
-  GUI:=DInterfaceContainer.create(Window);
-  frames[0]:=DFrame.create(Window);
+  GUI := DInterfaceContainer.create(Window);
+  frames[0] := DFrame.create(Window);
   with frames[0] do begin
-    image:=LoadImage(ApplicationData(Frames_Folder+'frame.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
-    cornerTop:=1;CornerBottom:=1;cornerLeft:=1;CornerRight:=1;
+    image := LoadImage(ApplicationData(Frames_Folder+'frame.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
+    cornerTop := 1;CornerBottom := 1;cornerLeft := 1;CornerRight := 1;
   end;
-  frames[1]:=DFrame.create(Window);
+  frames[1] := DFrame.create(Window);
   with frames[1] do begin
-    image:=LoadImage(ApplicationData(Frames_Folder+'frame_caption.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
-    cornerTop:=19;CornerBottom:=1;cornerLeft:=1;CornerRight:=1;            //todo: variable top line!
+    image := LoadImage(ApplicationData(Frames_Folder+'frame_caption.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
+    cornerTop := 19;CornerBottom := 1;cornerLeft := 1;CornerRight := 1;            //todo: variable top line!
   end;
 
-//  GUI.frame:=Dframe.create(frames[0],GUI);
+//  GUI.frame := Dframe.create(frames[0],GUI);
   ResizeInterface;
   WriteLnLog('InitInterface','finished');
 end;
@@ -213,17 +214,17 @@ begin
   //Rescale Burner image if necessary
   Init_burner_image;
   {GUI always takes the whole screen and every child is scaled against it}
-  GUI.x:=0;
-  GUI.y:=0;
-  GUI.w:=window.width;
-  GUI.h:=window.height;
-  GUI.GUI_scale:=round(GUI_scale_unit_float*GUI.h);
-  GUI.mid_h:=round((1-1/17)*GUI.h);
-  GUI.mid_w:=round((1-8/17)*GUI.h);
-  GUI.mid_startx:=round(4/17*GUI.h);
-  GUI.mid_starty:=0;
-  GUI.frame:=nil;
-  GUI.content:=nil;
+  GUI.x := 0;
+  GUI.y := 0;
+  GUI.w := window.width;
+  GUI.h := window.height;
+  GUI.GUI_scale := round(GUI_scale_unit_float*GUI.h);
+  GUI.mid_h := round((1-1/17)*GUI.h);
+  GUI.mid_w := round((1-8/17)*GUI.h);
+  GUI.mid_startx := round(4/17*GUI.h);
+  GUI.mid_starty := 0;
+  GUI.frame := nil;
+  GUI.content := nil;
   //GUI resize children recoursive
   WriteLnLog('ResizeInterface','finished');
 end;
@@ -242,15 +243,15 @@ var i:integer;
 begin
   if frameGL<>nil then begin
     frameGL.Draw3x3(x,y,w,h,frame.cornerTop,frame.CornerRight,frame.CornerBottom,Frame.CornerLeft);
-    color[3]:=Opacity*FrameOpacity;
-    FrameGL.color:=Color;
+    color[3] := Opacity*FrameOpacity;
+    FrameGL.color := Color;
   end;
   if content<>nil then begin
-    content.opacity:=Opacity;   //todo: different opacity for content
+    content.opacity := Opacity;   //todo: different opacity for content
     content.drawMe;
   end;
   //draw children recoursive
-  for i:=0 to Children.count-1 do Children[i].DrawMe;
+  for i := 0 to Children.count-1 do Children[i].DrawMe;
 end;
 
 {============================================================================}
@@ -258,7 +259,7 @@ end;
 procedure DInterfaceElement.ResizeChildren;
 var i:integer;
 begin
- for i:=0 to children.count-1 do begin
+ for i := 0 to children.count-1 do begin
    //todo
    children[i].resizeChildren;
  end;
@@ -267,7 +268,7 @@ end;
 constructor DInterfaceElement.Create(AOwner:TComponent);
 begin
   inherited create(AOwner);
-  children:=DInterfaceChildrenList.create(true);
+  children := DInterfaceChildrenList.create(true);
 end;
 
 procedure DInterfaceElement.DestroyMe;
@@ -286,32 +287,32 @@ var ScaledImageParts: array [0..2,0..2] of TCastleImage;
     SourceXs,SourceYs,DestXs,DestYs: TVector4Integer;
     CornersVector:TVector4Integer;
 begin
-  FrameImage:=frame.Image.CreateCopy as TRGBAlphaImage;
-  CornersVector:=Vector4Integer(frame.cornerTop,frame.cornerLeft,frame.cornerBottom,frame.cornerRight);
+  FrameImage := frame.Image.CreateCopy as TRGBAlphaImage;
+  CornersVector := Vector4Integer(frame.cornerTop,frame.cornerLeft,frame.cornerBottom,frame.cornerRight);
 
-  UnscaledWidth:=FrameImage.width;
-  UnscaledHeight:=FrameImage.height;
+  UnscaledWidth := FrameImage.width;
+  UnscaledHeight := FrameImage.height;
 
-  SourceXs[0]:=0;
-  SourceXs[1]:=CornersVector[3];
-  SourceXs[2]:=UnscaledWidth-CornersVector[1];
-  SourceXs[3]:=UnscaledWidth;
-  SourceYs[0]:=0;
-  SourceYs[1]:=CornersVector[2];
-  SourceYs[2]:=UnscaledHeight-CornersVector[0];
-  SourceYs[3]:=UnscaledHeight;
-  DestXs[0]:=0;
-  DestXs[1]:=CornersVector[3];
-  DestXs[2]:=w-CornersVector[1];
-  DestXs[3]:=w;
-  DestYs[0]:=0;
-  DestYs[1]:=CornersVector[2];
-  DestYs[2]:=h-CornersVector[0];
-  DestYs[3]:=h;
+  SourceXs[0] := 0;
+  SourceXs[1] := CornersVector[3];
+  SourceXs[2] := UnscaledWidth-CornersVector[1];
+  SourceXs[3] := UnscaledWidth;
+  SourceYs[0] := 0;
+  SourceYs[1] := CornersVector[2];
+  SourceYs[2] := UnscaledHeight-CornersVector[0];
+  SourceYs[3] := UnscaledHeight;
+  DestXs[0] := 0;
+  DestXs[1] := CornersVector[3];
+  DestXs[2] := w-CornersVector[1];
+  DestXs[3] := w;
+  DestYs[0] := 0;
+  DestYs[1] := CornersVector[2];
+  DestYs[2] := h-CornersVector[0];
+  DestYs[3] := h;
 
-  for ix:=0 to 2 do
-   for iy:=0 to 2 do begin
-     ScaledImageParts[ix,iy]:=TRGBAlphaImage.create;
+  for ix := 0 to 2 do
+   for iy := 0 to 2 do begin
+     ScaledImageParts[ix,iy] := TRGBAlphaImage.create;
      ScaledImageParts[ix,iy].SetSize(SourceXs[ix+1]-SourceXs[ix],SourceYs[iy+1]-SourceYs[iy]);
      ScaledImageParts[ix,iy].Clear(Vector4Byte(0,0,0,255));
      ScaledImageParts[ix,iy].DrawFrom(FrameImage,0,0,SourceXs[ix],SourceYs[iy],SourceXs[ix+1]-SourceXs[ix],SourceYs[iy+1]-SourceYs[iy],dmBlend);
@@ -320,11 +321,11 @@ begin
 
   FrameImage.SetSize(w,h,1);
   FrameImage.Clear(Vector4byte(0,0,0,255));
-  for ix:=0 to 2 do
-    for iy:=0 to 2 do FrameImage.DrawFrom(ScaledImageParts[ix,iy],DestXs[ix],DestYs[iy],0,0,DestXs[ix+1]-DestXs[ix],DestYs[iy+1]-DestYs[iy],dmBlend);
+  for ix := 0 to 2 do
+    for iy := 0 to 2 do FrameImage.DrawFrom(ScaledImageParts[ix,iy],DestXs[ix],DestYs[iy],0,0,DestXs[ix+1]-DestXs[ix],DestYs[iy+1]-DestYs[iy],dmBlend);
 
-  for ix:=0 to 2 do
-    for iy:=0 to 2 do freeAndNil(ScaledImageParts[ix,iy]);
+  for ix := 0 to 2 do
+    for iy := 0 to 2 do freeAndNil(ScaledImageParts[ix,iy]);
 
   //and burn the burner
   FrameImage.DrawFrom(BURNER_IMAGE,0,0,x,y,w,h,dmMultiply);
@@ -334,11 +335,11 @@ end;
 
 Function DAbstractInterfaceElement.GetAnimationState: TAnimationState;
 begin
-  result.h:=h;
-  result.w:=w;
-  result.x:=x;
-  result.y:=y;
-  result.Opacity:=Opacity;
+  result.h := h;
+  result.w := w;
+  result.x := x;
+  result.y := y;
+  result.Opacity := Opacity;
 end;
 
 {------------------------------------------------------------------------}
@@ -350,8 +351,8 @@ begin
     FrameResize3x3;
     //FrameImage.Resize3x3(w,h,CornersVector,riNearest);
     freeandnil(FrameGL);
-    FrameGL:=TGLImage.create(FrameImage,true,true);
-    FrameImage:=nil;
+    FrameGL := TGLImage.create(FrameImage,true,true);
+    FrameImage := nil;
   end;
   if Content<>nil then content.InitGl;
 end;
@@ -365,9 +366,9 @@ end;
 constructor DAbstractInterfaceElement.Create(AOwner:TComponent);
 begin
   inherited create(AOwner);
-  Opacity:=1;
-  FrameOpacity:=0.8;
-  color:=vector4Single(1,1,1,1);
+  Opacity := 1;
+  FrameOpacity := 0.8;
+  color := vector4Single(1,1,1,1);
 end;
 
 end.

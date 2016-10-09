@@ -1,6 +1,6 @@
 {Copyright (C) 2012-2016 Yevhen Loza
 
-This program is free software: you can redistribute it and/or modify
+This program is free software:  you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
@@ -11,7 +11,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with this program. If not, see <http://www.gnu.org/licenses/>.}
+along with this program. If not, see <http : //www.gnu.org/licenses/>.}
 unit DecoLabel;
 
 {$mode objfpc}{$H+}
@@ -28,36 +28,36 @@ uses
   decoglobal;
 
 {HTML disabled at the moment}
-Type DLabel=class(DAbstractElement)
+Type DLabel = class(DAbstractElement)
  public
 
-  Font:DFont;
-  Shadow:Float;
-  constructor Create(AOwner:TComponent); override;
+  Font : DFont;
+  Shadow : Float;
+  constructor Create(AOwner : TComponent); override;
   {destructor} Procedure DestroyMe; override;
   procedure DrawMe; override;
   procedure InitGL; override;
  private
-  procedure settext(const value:string);
-  function gettext:string;
+  procedure settext(const value : string);
+  function gettext : string;
  public
-  property text:string read gettext write settext;
+  property text : string read gettext write settext;
  private
-  ftext: string;
-  BrokenString:DStringList;
-  GImage:TGLImage;
-  SourceImage:TGrayscaleAlphaImage;
+  ftext :  string;
+  BrokenString : DStringList;
+  GImage : TGLImage;
+  SourceImage : TGrayscaleAlphaImage;
 end;
 
 
 implementation
 
-constructor DLabel.create(AOwner:TComponent);
+constructor DLabel.create(AOwner : TComponent);
 begin
   inherited create(AOwner);
-  Color:=Vector4Single(1,1,1,1);
-  Opacity:=1;
-  Shadow:=0;
+  Color := Vector4Single(1,1,1,1);
+  Opacity := 1;
+  Shadow := 0;
 end;
 
 procedure DLabel.DestroyMe;
@@ -67,46 +67,46 @@ begin
   FreeAndNil(GImage);
 end;
 
-procedure DLabel.settext(const value:string);
+procedure DLabel.settext(const value : string);
 begin
   if ftext<>value then begin
-    ftext:=value;
-    initGL;          //todo: not sure about making it here. But let it remain here for now.
+    ftext := value;
+    initGL;          //todo :  not sure about making it here. But let it remain here for now.
   end;
 end;
 
-function DLabel.gettext:string;
+function DLabel.gettext : string;
 begin
-  result:=ftext;
+  result := ftext;
 end;
 
 procedure DLabel.InitGL;
-//var i:integer;
+//var i : integer;
 begin
   if BrokenString<> nil then BrokenString.Clear;
   FreeAndNil(BrokenString);
-  BrokenString:=font.break_stings(text,w);
+  BrokenString := font.break_stings(text,w);
 
-  // for i:=0 to brokenString.count-1 do writeLnLog('',inttostr(brokenstring[i].height));
+  // for i := 0 to brokenString.count-1 do writeLnLog('',inttostr(brokenstring[i].height));
 
-  SourceImage:=nil; // let it be as a safeguard here. I don't want to freeannil GImage before it is instantly created to avoid sigsegvs
+  SourceImage := nil; // let it be as a safeguard here. I don't want to freeannil GImage before it is instantly created to avoid sigsegvs
 
-  if shadow=0 then
-    SourceImage:=font.broken_string_to_image(BrokenString)
+  if shadow = 0 then
+    SourceImage := font.broken_string_to_image(BrokenString)
   else
-    SourceImage:=font.broken_string_to_image_with_shadow(BrokenString,shadow,3);
+    SourceImage := font.broken_string_to_image_with_shadow(BrokenString,shadow,3);
 
-  h:=SourceImage.height;
+  h := SourceImage.height;
 
   FreeAndNil(GImage);
-  GImage:=TGLImage.create(SourceImage,true,true);
+  GImage := TGLImage.create(SourceImage,true,true);
 end;
 
 procedure DLabel.DrawMe;
 begin
   if (GImage<>nil) then begin
-    Color[3]:=Opacity;
-    GImage.color:=color;
+    Color[3] := Opacity;
+    GImage.color := color;
     GImage.Draw(x,y);
   end else writelnLog('DLabel.DrawMe','ERROR: no font');
 end;

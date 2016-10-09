@@ -4,7 +4,7 @@
     <PathDelim Value="\"/>
     <Version Value="9"/>
     <BuildModes Active="Default"/>
-    <Units Count="55">
+    <Units Count="52">
       <Unit0>
         <Filename Value="decoherence_desktop.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -16,36 +16,35 @@
         <Filename Value="decoimages.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="126"/>
-        <CursorPos X="112" Y="140"/>
+        <TopLine Value="149"/>
+        <CursorPos X="21" Y="166"/>
         <UsageCount Value="202"/>
       </Unit1>
       <Unit2>
         <Filename Value="decomouse.pas"/>
         <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="16"/>
-        <CursorPos X="35" Y="30"/>
-        <UsageCount Value="198"/>
+        <CursorPos X="20" Y="94"/>
+        <UsageCount Value="202"/>
         <Loaded Value="True"/>
       </Unit2>
       <Unit3>
         <Filename Value="decoloadscreen.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="2"/>
-        <TopLine Value="123"/>
-        <CursorPos X="41" Y="139"/>
-        <UsageCount Value="195"/>
-        <Loaded Value="True"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="227"/>
+        <CursorPos X="27" Y="184"/>
+        <UsageCount Value="200"/>
       </Unit3>
       <Unit4>
         <Filename Value="decofont.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="DecoFont"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="108"/>
-        <CursorPos X="3" Y="123"/>
-        <UsageCount Value="193"/>
+        <TopLine Value="17"/>
+        <CursorPos X="41" Y="27"/>
+        <UsageCount Value="199"/>
       </Unit4>
       <Unit5>
         <Filename Value="decolevel.pas"/>
@@ -53,16 +52,16 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="59"/>
         <CursorPos Y="79"/>
-        <UsageCount Value="179"/>
+        <UsageCount Value="185"/>
       </Unit5>
       <Unit6>
         <Filename Value="decolabel.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="DecoLabel"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="71"/>
-        <CursorPos X="136" Y="92"/>
-        <UsageCount Value="137"/>
+        <TopLine Value="95"/>
+        <CursorPos X="40" Y="106"/>
+        <UsageCount Value="143"/>
       </Unit6>
       <Unit7>
         <Filename Value="decofacts.pas"/>
@@ -70,25 +69,25 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="44"/>
         <CursorPos Y="58"/>
-        <UsageCount Value="137"/>
+        <UsageCount Value="143"/>
       </Unit7>
       <Unit8>
         <Filename Value="decointerface.pas"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="3"/>
-        <TopLine Value="36"/>
-        <CursorPos X="14" Y="49"/>
-        <FoldState Value=" T3k40Ea"/>
-        <UsageCount Value="114"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="253"/>
+        <CursorPos X="36" Y="370"/>
+        <FoldState Value=" T3k40FT"/>
+        <UsageCount Value="120"/>
         <Loaded Value="True"/>
       </Unit8>
       <Unit9>
         <Filename Value="decoherence.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="Decoherence"/>
-        <CursorPos X="16" Y="28"/>
-        <UsageCount Value="140"/>
+        <TopLine Value="118"/>
+        <CursorPos X="32" Y="135"/>
+        <UsageCount Value="146"/>
         <Loaded Value="True"/>
       </Unit9>
       <Unit10>
@@ -96,16 +95,15 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="CastleTextureFont_LinBiolinumRG_16"/>
         <EditorIndex Value="-1"/>
-        <UsageCount Value="110"/>
+        <UsageCount Value="116"/>
       </Unit10>
       <Unit11>
         <Filename Value="decoglobal.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="4"/>
-        <TopLine Value="2"/>
-        <CursorPos X="15" Y="28"/>
-        <UsageCount Value="130"/>
-        <Loaded Value="True"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="9"/>
+        <CursorPos X="28" Y="42"/>
+        <UsageCount Value="136"/>
       </Unit11>
       <Unit12>
         <Filename Value="android_font\castletexturefont_linbiolinumrg_16.pas"/>
@@ -132,417 +130,319 @@
         <UsageCount Value="1"/>
       </Unit14>
       <Unit15>
-        <Filename Value="V:\CGE\castle-engine\src\ui\opengl\castlecontrols.pas"/>
-        <UnitName Value="CastleControls"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="58"/>
-        <UsageCount Value="0"/>
-      </Unit15>
-      <Unit16>
         <Filename Value="font\castletexturefont_linbiolinumrg_16.pas"/>
         <UnitName Value="CastleTextureFont_LinBiolinumRG_16"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="6551"/>
         <UsageCount Value="6"/>
-      </Unit16>
-      <Unit17>
+      </Unit15>
+      <Unit16>
         <Filename Value="V:\CGE\castle-engine\src\fonts\opengl\castlefonts.pas"/>
         <UnitName Value="CastleFonts"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="13"/>
         <CursorPos X="26" Y="372"/>
         <UsageCount Value="2"/>
-      </Unit17>
-      <Unit18>
+      </Unit16>
+      <Unit17>
         <Filename Value="E:\PROGR\lazarus\fpc\3.0.0\source\rtl\objpas\classes\classesh.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="1733"/>
         <CursorPos X="3" Y="1740"/>
         <UsageCount Value="1"/>
-      </Unit18>
-      <Unit19>
+      </Unit17>
+      <Unit18>
         <Filename Value="V:\CGE\castle-engine\src\net\castleuriutils.pas"/>
         <UnitName Value="CastleURIUtils"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="511"/>
         <CursorPos Y="515"/>
         <UsageCount Value="8"/>
-      </Unit19>
-      <Unit20>
+      </Unit18>
+      <Unit19>
         <Filename Value="V:\CGE\castle-engine\src\images\castleimages_draw.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="1215"/>
         <CursorPos X="40" Y="1002"/>
         <UsageCount Value="1"/>
-      </Unit20>
-      <Unit21>
+      </Unit19>
+      <Unit20>
         <Filename Value="V:\CGE\castle-engine\src\3d\castlecameras.pas"/>
         <UnitName Value="CastleCameras"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="390"/>
         <CursorPos X="7" Y="397"/>
         <UsageCount Value="7"/>
-      </Unit21>
-      <Unit22>
+      </Unit20>
+      <Unit21>
         <Filename Value="V:\CGE\castle-engine\src\base\castlelog.pas"/>
         <UnitName Value="CastleLog"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="166"/>
         <CursorPos X="41" Y="182"/>
         <UsageCount Value="1"/>
-      </Unit22>
-      <Unit23>
+      </Unit21>
+      <Unit22>
         <Filename Value="V:\CGE\castle-engine\src\ui\castlekeysmouse.pas"/>
         <UnitName Value="CastleKeysMouse"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="247"/>
         <CursorPos X="19" Y="253"/>
         <UsageCount Value="7"/>
-      </Unit23>
-      <Unit24>
-        <Filename Value="V:\CGE\castle-engine\src\images\opengl\castleglutils.pas"/>
-        <UnitName Value="CastleGLUtils"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="1929"/>
-        <CursorPos Y="1938"/>
-        <UsageCount Value="0"/>
-      </Unit24>
-      <Unit25>
+      </Unit22>
+      <Unit23>
         <Filename Value="V:\CGE\castle-engine\src\fonts\opengl\castlefontfamily.pas"/>
         <UnitName Value="CastleFontFamily"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="72"/>
         <CursorPos X="22" Y="156"/>
         <UsageCount Value="1"/>
-      </Unit25>
-      <Unit26>
+      </Unit23>
+      <Unit24>
         <Filename Value="V:\CGE\castle-engine\src\fonts\castletexturefontdata.pas"/>
         <UnitName Value="CastleTextureFontData"/>
         <EditorIndex Value="-1"/>
         <UsageCount Value="1"/>
-      </Unit26>
-      <Unit27>
-        <Filename Value="E:\PROGR\lazarus\fpc\3.0.0\source\rtl\objpas\fgl.pp"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="177"/>
-        <CursorPos X="14" Y="183"/>
-        <UsageCount Value="0"/>
-      </Unit27>
-      <Unit28>
+      </Unit24>
+      <Unit25>
         <Filename Value="V:\CGE\castle-engine\src\base\castleunicode.pas"/>
         <UnitName Value="CastleUnicode"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="63"/>
         <CursorPos X="23" Y="74"/>
         <UsageCount Value="1"/>
-      </Unit28>
-      <Unit29>
+      </Unit25>
+      <Unit26>
         <Filename Value="E:\PROGR\lazarus\fpc\3.0.0\source\rtl\win32\system.pp"/>
         <UnitName Value="System"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="34"/>
         <CursorPos X="2" Y="43"/>
         <UsageCount Value="1"/>
-      </Unit29>
-      <Unit30>
+      </Unit26>
+      <Unit27>
         <Filename Value="E:\PROGR\lazarus\fpc\3.0.0\source\rtl\win\sysutils.pp"/>
         <EditorIndex Value="-1"/>
         <UsageCount Value="1"/>
-      </Unit30>
-      <Unit31>
+      </Unit27>
+      <Unit28>
         <Filename Value="E:\PROGR\lazarus\fpc\3.0.0\source\rtl\objpas\sysutils\datih.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="126"/>
         <CursorPos X="10" Y="136"/>
         <UsageCount Value="1"/>
-      </Unit31>
-      <Unit32>
+      </Unit28>
+      <Unit29>
         <Filename Value="V:\CGE\castle-engine\src\base\castletimeutils.pas"/>
         <UnitName Value="CastleTimeUtils"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="187"/>
         <CursorPos X="4" Y="115"/>
         <UsageCount Value="1"/>
-      </Unit32>
-      <Unit33>
+      </Unit29>
+      <Unit30>
         <Filename Value="D:\VST\CGE\castle-engine\src\fonts\opengl\castlefonts.pas"/>
         <UnitName Value="CastleFonts"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="1252"/>
         <CursorPos X="37" Y="1260"/>
         <UsageCount Value="2"/>
-      </Unit33>
-      <Unit34>
+      </Unit30>
+      <Unit31>
         <Filename Value="D:\home\eugene\CGE\src\fonts\opengl\castlefonts.pas"/>
         <UnitName Value="CastleFonts"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="353"/>
         <CursorPos Y="370"/>
         <UsageCount Value="1"/>
-      </Unit34>
-      <Unit35>
+      </Unit31>
+      <Unit32>
         <Filename Value="D:\VST\CGE\castle-engine\src\window\castlewindow.pas"/>
         <UnitName Value="CastleWindow"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="576"/>
         <CursorPos X="3" Y="584"/>
         <UsageCount Value="3"/>
-      </Unit35>
-      <Unit36>
+      </Unit32>
+      <Unit33>
         <Filename Value="D:\VST\CGE\castle-engine\src\ui\castleuicontrols.pas"/>
         <UnitName Value="CastleUIControls"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="194"/>
         <CursorPos X="3" Y="186"/>
         <UsageCount Value="3"/>
-      </Unit36>
-      <Unit37>
+      </Unit33>
+      <Unit34>
         <Filename Value="D:\VST\CGE\castle-engine\src\3d\castle3d.pas"/>
         <UnitName Value="Castle3D"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="3169"/>
         <CursorPos X="24" Y="3179"/>
         <UsageCount Value="2"/>
-      </Unit37>
-      <Unit38>
+      </Unit34>
+      <Unit35>
         <Filename Value="D:\VST\CGE\castle-engine\src\fonts\castletexturefontdata.pas"/>
         <UnitName Value="CastleTextureFontData"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="522"/>
         <CursorPos X="3" Y="520"/>
         <UsageCount Value="2"/>
-      </Unit38>
-      <Unit39>
+      </Unit35>
+      <Unit36>
         <Filename Value="D:\usr\share\fpcsrc\3.0.0\rtl\objpas\fgl.pp"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="161"/>
         <CursorPos X="14" Y="185"/>
         <UsageCount Value="2"/>
-      </Unit39>
-      <Unit40>
+      </Unit36>
+      <Unit37>
         <Filename Value="D:\VST\CGE\castle-engine\src\ui\opengl\castleglcontainer.pas"/>
         <UnitName Value="CastleGLContainer"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="21"/>
         <CursorPos X="3" Y="31"/>
         <UsageCount Value="3"/>
-      </Unit40>
-      <Unit41>
+      </Unit37>
+      <Unit38>
         <Filename Value="D:\VST\CGE\castle-engine\src\images\opengl\castleglimages_tglimage.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="363"/>
         <CursorPos X="15" Y="377"/>
         <UsageCount Value="3"/>
-      </Unit41>
-      <Unit42>
+      </Unit38>
+      <Unit39>
         <Filename Value="D:\VST\CGE\castle-engine\src\images\castleimages.pas"/>
         <UnitName Value="CastleImages"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="2093"/>
         <CursorPos Y="2102"/>
         <UsageCount Value="3"/>
-      </Unit42>
-      <Unit43>
+      </Unit39>
+      <Unit40>
         <Filename Value="..\..\..\VST\CGE\castle-engine\src\ui\castlekeysmouse.pas"/>
         <UnitName Value="CastleKeysMouse"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="242"/>
         <CursorPos X="44" Y="253"/>
         <UsageCount Value="6"/>
-      </Unit43>
-      <Unit44>
+      </Unit40>
+      <Unit41>
         <Filename Value="..\..\..\VST\CGE\castle-engine\src\window\gtk\castlewindow_gtk.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="582"/>
         <CursorPos Y="595"/>
         <UsageCount Value="4"/>
-      </Unit44>
-      <Unit45>
+      </Unit41>
+      <Unit42>
         <Filename Value="..\..\..\..\home\eugene\CGE\src\base\castlelog.pas"/>
         <UnitName Value="CastleLog"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="232"/>
         <CursorPos X="58" Y="180"/>
         <UsageCount Value="9"/>
-      </Unit45>
-      <Unit46>
+      </Unit42>
+      <Unit43>
         <Filename Value="..\..\..\..\usr\share\fpcsrc\3.0.0\rtl\objpas\classes\classesh.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="1800"/>
         <CursorPos X="17" Y="1810"/>
         <UsageCount Value="7"/>
-      </Unit46>
-      <Unit47>
+      </Unit43>
+      <Unit44>
         <Filename Value="..\..\..\..\usr\share\fpcsrc\3.0.0\rtl\inc\mathh.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="88"/>
         <CursorPos X="14" Y="98"/>
         <UsageCount Value="7"/>
-      </Unit47>
-      <Unit48>
+      </Unit44>
+      <Unit45>
         <Filename Value="..\..\..\..\home\eugene\CGE\src\base\castletimeutils.pas"/>
         <UnitName Value="CastleTimeUtils"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="432"/>
         <CursorPos X="64" Y="446"/>
         <UsageCount Value="8"/>
-      </Unit48>
-      <Unit49>
+      </Unit45>
+      <Unit46>
         <Filename Value="..\..\..\..\usr\share\fpcsrc\3.0.0\rtl\objpas\sysutils\datih.inc"/>
         <EditorIndex Value="-1"/>
         <UsageCount Value="8"/>
-      </Unit49>
-      <Unit50>
+      </Unit46>
+      <Unit47>
         <Filename Value="..\..\..\..\home\eugene\CGE\src\images\castleimages.pas"/>
         <UnitName Value="CastleImages"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="100"/>
         <CursorPos X="28" Y="111"/>
         <UsageCount Value="14"/>
-      </Unit50>
-      <Unit51>
+      </Unit47>
+      <Unit48>
         <Filename Value="..\..\..\VST\CGE\castle-engine\src\base\castlelog.pas"/>
         <UnitName Value="CastleLog"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="294"/>
         <CursorPos X="48" Y="305"/>
-        <UsageCount Value="12"/>
-      </Unit51>
-      <Unit52>
+        <UsageCount Value="11"/>
+      </Unit48>
+      <Unit49>
         <Filename Value="..\..\..\VST\CGE\castle-engine\src\base\castletimeutils.pas"/>
         <UnitName Value="CastleTimeUtils"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="31" Y="17"/>
         <UsageCount Value="11"/>
-      </Unit52>
-      <Unit53>
+      </Unit49>
+      <Unit50>
         <Filename Value="..\..\..\..\usr\share\fpcsrc\3.0.0\rtl\inc\systemh.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="785"/>
         <CursorPos X="11" Y="795"/>
-        <UsageCount Value="10"/>
-      </Unit53>
-      <Unit54>
+        <UsageCount Value="9"/>
+      </Unit50>
+      <Unit51>
         <Filename Value="..\..\..\..\usr\share\fpcsrc\3.0.0\rtl\inc\system.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="588"/>
         <CursorPos X="32" Y="590"/>
         <UsageCount Value="9"/>
-      </Unit54>
+      </Unit51>
     </Units>
-    <JumpHistory Count="28" HistoryIndex="27">
+    <JumpHistory Count="9" HistoryIndex="8">
       <Position1>
-        <Filename Value="decoloadscreen.pas"/>
-        <Caret Line="106" TopLine="91"/>
-      </Position1>
-      <Position2>
-        <Filename Value="decoloadscreen.pas"/>
-        <Caret Line="107" Column="26" TopLine="91"/>
-      </Position2>
-      <Position3>
-        <Filename Value="decoloadscreen.pas"/>
-        <Caret Line="123" Column="28" TopLine="106"/>
-      </Position3>
-      <Position4>
-        <Filename Value="decoloadscreen.pas"/>
-        <Caret Line="204" Column="26" TopLine="187"/>
-      </Position4>
-      <Position5>
-        <Filename Value="decoloadscreen.pas"/>
-        <Caret Line="210" Column="26" TopLine="194"/>
-      </Position5>
-      <Position6>
-        <Filename Value="decoloadscreen.pas"/>
-        <Caret Line="214" Column="23" TopLine="205"/>
-      </Position6>
-      <Position7>
-        <Filename Value="decoloadscreen.pas"/>
-        <Caret Line="221" Column="28" TopLine="205"/>
-      </Position7>
-      <Position8>
-        <Filename Value="decoloadscreen.pas"/>
-        <Caret Line="57" Column="87" TopLine="47"/>
-      </Position8>
-      <Position9>
-        <Filename Value="decoloadscreen.pas"/>
-        <Caret Line="58" Column="96" TopLine="47"/>
-      </Position9>
-      <Position10>
-        <Filename Value="decoloadscreen.pas"/>
-        <Caret Line="59" Column="96" TopLine="47"/>
-      </Position10>
-      <Position11>
-        <Filename Value="decointerface.pas"/>
-        <Caret Line="31" Column="17" TopLine="22"/>
-      </Position11>
-      <Position12>
-        <Filename Value="decointerface.pas"/>
-        <Caret Line="32" Column="15" TopLine="25"/>
-      </Position12>
-      <Position13>
-        <Filename Value="decointerface.pas"/>
-        <Caret Line="176" Column="37" TopLine="166"/>
-      </Position13>
-      <Position14>
-        <Filename Value="decointerface.pas"/>
-        <Caret Line="230" Column="27" TopLine="219"/>
-      </Position14>
-      <Position15>
-        <Filename Value="decointerface.pas"/>
-        <Caret Line="143" Column="26" TopLine="131"/>
-      </Position15>
-      <Position16>
         <Filename Value="decoherence.pas"/>
         <Caret Line="96" Column="41" TopLine="84"/>
-      </Position16>
-      <Position17>
-        <Filename Value="decoloadscreen.pas"/>
-        <Caret Line="131" Column="18" TopLine="120"/>
-      </Position17>
-      <Position18>
-        <Filename Value="decoloadscreen.pas"/>
-        <Caret Line="138" Column="39" TopLine="122"/>
-      </Position18>
-      <Position19>
-        <Filename Value="decoloadscreen.pas"/>
-        <Caret Line="139" Column="41" TopLine="123"/>
-      </Position19>
-      <Position20>
+      </Position1>
+      <Position2>
         <Filename Value="decoherence.pas"/>
         <Caret Line="96" Column="41" TopLine="107"/>
-      </Position20>
-      <Position21>
+      </Position2>
+      <Position3>
         <Filename Value="decoherence.pas"/>
         <Caret Line="92" Column="21" TopLine="85"/>
-      </Position21>
-      <Position22>
+      </Position3>
+      <Position4>
         <Filename Value="decoherence.pas"/>
         <Caret Line="98" Column="31" TopLine="86"/>
-      </Position22>
-      <Position23>
+      </Position4>
+      <Position5>
         <Filename Value="decoherence.pas"/>
         <Caret Line="96" Column="33" TopLine="86"/>
-      </Position23>
-      <Position24>
+      </Position5>
+      <Position6>
         <Filename Value="decoherence.pas"/>
         <Caret Line="97" Column="15" TopLine="86"/>
-      </Position24>
-      <Position25>
+      </Position6>
+      <Position7>
         <Filename Value="decoherence.pas"/>
         <Caret Line="100" Column="77" TopLine="86"/>
-      </Position25>
-      <Position26>
-        <Filename Value="decointerface.pas"/>
-        <Caret Line="327" Column="9" TopLine="307"/>
-      </Position26>
-      <Position27>
-        <Filename Value="decointerface.pas"/>
-        <Caret Line="41" Column="13" TopLine="30"/>
-      </Position27>
-      <Position28>
-        <Filename Value="decointerface.pas"/>
-        <Caret Line="45" Column="9" TopLine="35"/>
-      </Position28>
+      </Position7>
+      <Position8>
+        <Filename Value="decoherence.pas"/>
+        <Caret Line="28" Column="16"/>
+      </Position8>
+      <Position9>
+        <Filename Value="decomouse.pas"/>
+        <Caret Line="30" Column="35" TopLine="16"/>
+      </Position9>
     </JumpHistory>
   </ProjectSession>
 </CONFIG>

@@ -52,10 +52,10 @@ begin
   if Event.EventType = itMouseButton then begin
     doMousePress(Event);
     {if interface didn't catch the click then}
-    if mbRight=event.MouseButton then camera.MouseLook:=not Camera.MouseLook;
+    if mbRight=event.MouseButton then camera.MouseLook := not Camera.MouseLook;
   end;
   InitTestLevel;                         //ugly! I'll fix this soon.
-  window.OnRender:=@doWindowRender;
+  window.OnRender := @doWindowRender;
 end;
 
 procedure doRelease(Container: TUIContainer; const Event: TInputPressRelease);
@@ -74,9 +74,9 @@ function NiceDate:string;
 var s:String;
     i:integer;
 begin
-  s:=DateTimeToAtStr(now);
-  result:='';
-  for i:=1 to length(s) do
+  s := DateTimeToAtStr(now);
+  result := '';
+  for i := 1 to length(s) do
     if copy(s,i,1)=' ' then result+='_' else
     if copy(s,i,1)=':' then result+='-' else
     result+=copy(s,i,1);
@@ -90,7 +90,7 @@ begin
   InitializeLog;
   {$ELSE}
     {$IFDEF WriteLog}
-      LogStream:=TFileStream.Create('log_'+NiceDate+'.txt',fmCreate);
+      LogStream := TFileStream.Create('log_'+NiceDate+'.txt',fmCreate);
       InitializeLog(Version,LogStream,ldTime);
     {$ELSE}
       InitializeLog(Version,nil,ltTime);
@@ -98,17 +98,17 @@ begin
   {$ENDIF}
   WritelnLog('ApplicationInitialize','Init');
 
-   { Window.Container.UIScaling := usEncloseReferenceSize;
-    Window.Container.UIReferenceWidth := 1024;
-    Window.Container.UIReferenceHeight := 768;}
+   { Window.Container.UIScaling  :=  usEncloseReferenceSize;
+    Window.Container.UIReferenceWidth  :=  1024;
+    Window.Container.UIReferenceHeight  :=  768;}
 
-  window.OnPress:=@doPress;
-  window.onRelease:=@doRelease;
+  window.OnPress := @doPress;
+  window.onRelease := @doRelease;
   WritelnLog('ApplicationInitialize','DTouchList.create');
-  TouchArray:=DTouchList.create;
+  TouchArray := DTouchList.create;
 
-{  application.TimerMilisec:=1000 div 60; //60 fps
-  application.OnTimer:=@dotimer;}
+{  application.TimerMilisec := 1000 div 60; //60 fps
+  application.OnTimer := @dotimer;}
 
   randomize;
   WritelnLog('ApplicationInitialize','InitializeFonts');
@@ -124,15 +124,15 @@ end;
 
 function MyGetApplicationName: string;
 begin
-  Result := 'Decoherence 1';
+  Result  :=  'Decoherence 1';
 end;
 
 Initialization
-  OnGetApplicationName := @MyGetApplicationName;
-  Window:=TCastleWindowTouch.create(Application);
+  OnGetApplicationName  :=  @MyGetApplicationName;
+  Window := TCastleWindowTouch.create(Application);
   { This should be done as early as possible to mark our log lines correctly. }
-  Application.MainWindow := Window;
-  Application.OnInitialize := @ApplicationInitialize;
+  Application.MainWindow  :=  Window;
+  Application.OnInitialize  :=  @ApplicationInitialize;
 
 Finalization
   WriteLnLog('Finalization','Bye...');
