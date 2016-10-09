@@ -49,6 +49,8 @@ const ZeroAnimation : TAnimationState = (
   Opacity : 1
   );
 
+const defaultAnimationLength = 1000; {in ms}
+
 Type DAbstractElement = class(TComponent)
  public
   x, y, h, w : integer;
@@ -82,13 +84,16 @@ Type DAbstractInterfaceElement = class(DAbstractElement)
   procedure DestroyMe; override;
   { creates the instance }
   constructor Create(AOwner : TComponent); override;
-  { saves the current state as TAnimationState }
-  Function GetAnimationState : TAnimationState;
+  { changes current values based on current animation }
+  procedure AnimateMe; virtual; abstract;
  private
    FrameImage : TRGBAlphaImage;
    FrameGL : TGLImage;
    procedure FrameResize3x3;
    procedure ResizeChildren; virtual; Abstract;
+ private
+  doAnimation : boolean;
+  procedure AskParentForAnimation; virtual; abstract;
 end;
 
 type DInterfaceChildrenList = specialize TFPGObjectList<DAbstractInterfaceElement>;
@@ -96,11 +101,23 @@ type DInterfaceChildrenList = specialize TFPGObjectList<DAbstractInterfaceElemen
 Type DInterfaceElement = class(DAbstractInterfaceElement)
  public
   children : DInterfaceChildrenList;
+  parent : DAbstractInterfaceElement;
   constructor Create(AOwner : TComponent); override;
   procedure DrawMe; override;
   procedure DestroyMe; override;
+  { saves the current state as TAnimationState }
+  Function GetAnimationState : TAnimationState;
+  { animates the element from current to some TAnimationState }
+  Procedure AnimateTo(NewAnimationState : TAnimationState;
+                    NewAnimationLength : integer = defaultAnimationLength);
+  { changes current values based on current animation }
+  procedure AnimateMe; override;
  private
   procedure ResizeChildren; override;
+ private
+  LastAnimationState,NextAnimationState,CurrentAnimationState : TAnimationState;
+  AnimationStartTime,AnimationLength : TDateTime;
+  procedure AskParentForAnimation; override;
 end;
 
 Type DInterfaceContainer = class(DInterfaceElement)
@@ -155,20 +172,23 @@ end;
 procedure MakeInterface1;
 var newElement:DInterfaceElement;
 begin
-  NewElement:=DInterfaceElement.create(GUI);
-  NewElement.frame := frames[0];
+  NewElement := DInterfaceElement.create(GUI);
   NewElement.x := GUI.mid_startx;
   NewElement.y := GUI.mid_starty+GUI.mid_h-GUI.GUI_scale;
   NewElement.w := GUI.GUI_scale;
   NewElement.h := GUI.GUI_scale;
+  NewElement.AnimateTo(NewElement.GetAnimationState);
+  NewElement.frame := frames[0];
   NewElement.InitGL;
   GUI.children.add(NewElement);
+
   NewElement := DInterfaceElement.create(GUI);
-  NewElement.frame := frames[0];
   NewElement.x := GUI.mid_startx+GUI.GUI_scale;
   NewElement.y := GUI.mid_starty+GUI.mid_h-GUI.GUI_scale;
   NewElement.w := GUI.GUI_scale;
   NewElement.h := GUI.GUI_scale;
+  NewElement.AnimateTo(NewElement.GetAnimationState);
+  NewElement.frame := frames[0];
   NewElement.InitGL;
   GUI.children.add(NewElement);
 end;
@@ -242,7 +262,8 @@ procedure DInterfaceElement.DrawMe;
 var i:integer;
 begin
   if frameGL<>nil then begin
-    frameGL.Draw3x3(x,y,w,h,frame.cornerTop,frame.CornerRight,frame.CornerBottom,Frame.CornerLeft);
+    //frameGL.Draw3x3(x,y,w,h,frame.cornerTop,frame.CornerRight,frame.CornerBottom,Frame.CornerLeft);
+    FrameGL.Draw(x,y,w,h);
     color[3] := Opacity*FrameOpacity;
     FrameGL.color := Color;
   end;
@@ -269,6 +290,7 @@ constructor DInterfaceElement.Create(AOwner:TComponent);
 begin
   inherited create(AOwner);
   children := DInterfaceChildrenList.create(true);
+  LastAnimationState := ZeroAnimation;
 end;
 
 procedure DInterfaceElement.DestroyMe;
@@ -333,18 +355,6 @@ end;
 
 {------------------------------------------------------------------------}
 
-Function DAbstractInterfaceElement.GetAnimationState: TAnimationState;
-begin
-  result.h := h;
-  result.w := w;
-  result.x := x;
-  result.y := y;
-  result.Opacity := Opacity;
-end;
-
-{------------------------------------------------------------------------}
-
-
 procedure DAbstractInterfaceElement.InitGl;
 begin
   if frame<> nil then begin
@@ -352,7 +362,7 @@ begin
     //FrameImage.Resize3x3(w,h,CornersVector,riNearest);
     freeandnil(FrameGL);
     FrameGL := TGLImage.create(FrameImage,true,true);
-    FrameImage := nil;
+    //FrameImage := nil;
   end;
   if Content<>nil then content.InitGl;
 end;
@@ -360,7 +370,7 @@ end;
 procedure DAbstractInterfaceElement.DestroyMe;
 begin
  freeandnil(frameGL);
- Freeandnil(FrameImage);
+ //Freeandnil(FrameImage);
 end;
 
 constructor DAbstractInterfaceElement.Create(AOwner:TComponent);
@@ -370,6 +380,61 @@ begin
   FrameOpacity := 0.8;
   color := vector4Single(1,1,1,1);
 end;
+
+{------------------------------------------------------------------------}
+
+
+procedure DInterfaceElement.AnimateTo(NewAnimationState : TAnimationState;
+                    NewAnimationLength : Integer);
+begin
+  LastAnimationState := CurrenAnimationState;
+  NextAnimationState := NewAnimationState;
+  AnimationStartTime := now;
+  AnimationLength    := (NewAnimationLength+random*200-100) /24/60/60/1000;
+  doAnimation        := true;
+end;
+
+Function DInterfaceElement.GetAnimationState: TAnimationState;
+begin
+  result.h := h;
+  result.w := w;
+  result.x := x;
+  result.y := y;
+  result.Opacity := Opacity;
+end;
+
+procedure DInterfaceElement.AnimateMe;
+var t : single;
+    i : integer;
+begin
+ if DoAnimation then begin
+  if now - AnimationStartTime <= AnimationLength then begin
+    t := sin(now - AnimationStartTime / AnimationLength);
+    currentAnimationState.x := round(LastAnimationState.x+(NextAnimationState.x-LastAnimationState.x)*t);
+    currentAnimationState.y := round(LastAnimationState.y+(NextAnimationState.y-LastAnimationState.y)*t);
+    currentAnimationState.h := round(LastAnimationState.h+(NextAnimationState.h-LastAnimationState.h)*t);
+    currentAnimationState.w := round(LastAnimationState.w+(NextAnimationState.w-LastAnimationState.w)*t);
+    currentAnimationState.Opacity := LastAnimationState.Opacity+(NextAnimationState.Opacity-LastAnimationState.Opacity)*t;
+  end else DoAnimation:=false;
+  { if children's animations aren't finished then they'll ask parent
+    to continue animation }
+  for i := 0 to children.count-1 do begin
+    //todo
+    children[i].AnimateMe;
+  end;
+ end;
+end;
+
+procedure DInterfaceElement.AskParentForAnimation;
+begin
+  DoAnimation := true;
+  if parent <> nil then
+    parent.AskParentForAnimation
+  else
+    writeLog('DAbstractInterfaceElement.AskParentForAnimation','ERROR: Parent is nil!');
+end;
+
+{------------------------------------------------------------------------}
 
 end.
 
