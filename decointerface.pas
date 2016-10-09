@@ -33,7 +33,21 @@ and add one line at the bottom for menu button and other stuff
 i.e. 3*4+1 units in window.height
 Most often equal scale is used for width - in fractions of height to maintain squares etc.}
 
-const GUI_scale_unit_float=1/(4*3+1);
+const GUI_scale_unit_float = 1/(4*3+1);
+
+{ animation takes place from initial TAnimationState to Final TAnimationState}
+type TAnimationState = record
+  x, y, h, w : integer;
+  Opacity : single;
+end;
+
+const ZeroAnimation : TAnimationState = (
+  x : 0;
+  y : 0;
+  h : 0;
+  w : 0;
+  Opacity : 1
+  );
 
 Type DAbstractElement=class(TComponent)
  public
@@ -55,16 +69,21 @@ end;
 
 Type DAbstractInterfaceElement=class(DAbstractElement)
  public
-  {content of the Interface element: label or image}
+  { content of the Interface element: label or image }
   content:DAbstractElement;
-  {multiplier to opacity <1, e.g. overall opacity=1 FrameOpacity=0.8, frame final Opacity=1*0.8}
+  { multiplier to opacity <1, e.g. overall opacity=1 FrameOpacity=0.8, frame final Opacity=1*0.8 }
   FrameOpacity:float;
-  {frame around the Interface element}
+  { frame around the Interface element }
   frame:DFrame;
   //Parent:TComponent;
+  { initializes GL content of the interface element }
   procedure InitGL; override;
+  { looks like destructor... but I couldn't get destructor to work }
   procedure DestroyMe; override;
+  { creates the instance }
   constructor Create(AOwner:TComponent); override;
+  { saves the current state as TAnimationState }
+  Function GetAnimationState: TAnimationState;
  private
    FrameImage:TRGBAlphaImage;
    FrameGL:TGLImage;
@@ -312,6 +331,18 @@ begin
 end;
 
 {------------------------------------------------------------------------}
+
+Function DAbstractInterfaceElement.GetAnimationState: TAnimationState;
+begin
+  result.h:=h;
+  result.w:=w;
+  result.x:=x;
+  result.y:=y;
+  result.Opacity:=Opacity;
+end;
+
+{------------------------------------------------------------------------}
+
 
 procedure DAbstractInterfaceElement.InitGl;
 begin

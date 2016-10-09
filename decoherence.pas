@@ -25,7 +25,7 @@ const Version='Interfa2-161009-36';
 implementation
 
 uses Classes, SysUtils,
-     CastleLog, {CastleTimeUtils,}
+     CastleLog,
      CastleWindow, CastleWindowTouch, CastleKeysMouse,
      decomouse, decointerface, DecoFont,
      DecoLoadScreen,
