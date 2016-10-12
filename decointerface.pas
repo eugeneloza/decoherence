@@ -65,7 +65,6 @@ Type DFrame = class(TComponent)
    Image : TRGBAlphaImage;
    cornerTop, cornerbottom, cornerLeft, cornerRight : integer;
    constructor Create(AOwner : TComponent); override;
- //image
 end;
 
 Type DAbstractInterfaceElement = class(DAbstractElement)
@@ -83,6 +82,7 @@ Type DAbstractInterfaceElement = class(DAbstractElement)
   { creates the instance }
   constructor Create(AOwner : TComponent); override;
  private
+   fx,fy,fw,fh : float;
    FrameImage : TRGBAlphaImage;
    FrameGL : TGLImage;
    procedure FrameResize3x3;
