@@ -43,7 +43,7 @@ type DStaticImage=class(DAbstractImage)
   {used temporarily to scale the image //thread-safe}
   TmpImage:TCastleImage;
   procedure LoadMe(filename:string); override;
-  {destructor} procedure DestroyMe; override;
+  destructor Destroy; override;
   procedure DrawMe; override;
   procedure ScaleMe(const new_w:integer=0;const new_h:integer=0); override;
   {Initialize GL Image // thread-unsafe!!!}
@@ -71,13 +71,13 @@ end;
 
 {----------------------------------------------------------------}
 
-{Destructor}Procedure DStaticImage.DestroyMe;
+Destructor DStaticImage.Destroy;
 begin
  freeandnil(SourceImage);
  freeandnil(Image);
  if tmpimage<>nil then WritelnLog('DStaticImage.DestroyMe','ERROR: tmpimage is not nil!');
  //freeandnil(TmpImage);
-// inherited
+ inherited
 end;
 
 procedure DStaticImage.LoadMe(filename:string);

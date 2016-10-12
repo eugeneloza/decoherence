@@ -34,7 +34,7 @@ Type DLabel = class(DAbstractElement)
   Font : DFont;
   Shadow : Float;
   constructor Create(AOwner : TComponent); override;
-  {destructor} Procedure DestroyMe; override;
+  destructor Destroy; override;
   procedure DrawMe; override;
   procedure InitGL; override;
  private
@@ -60,11 +60,12 @@ begin
   Shadow := 0;
 end;
 
-procedure DLabel.DestroyMe;
+destructor DLabel.Destroy;
 begin
   if BrokenString<> nil then BrokenString.Clear;
   FreeAndNil(BrokenString);
   FreeAndNil(GImage);
+  inherited
 end;
 
 procedure DLabel.settext(const value : string);

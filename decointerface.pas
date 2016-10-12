@@ -58,7 +58,6 @@ Type DAbstractElement = class(TComponent)
   color : TVector4Single;
   procedure drawMe; virtual; abstract;
   procedure InitGL; virtual; abstract;
-  procedure DestroyMe; virtual; abstract;
 end;
 
 Type DFrame = class(TComponent)
@@ -80,20 +79,19 @@ Type DAbstractInterfaceElement = class(DAbstractElement)
   //Parent:TComponent;
   { initializes GL content of the interface element }
   procedure InitGL; override;
-  { looks like destructor... but I couldn't get destructor to work }
-  procedure DestroyMe; override;
+  destructor Destroy; override;
   { creates the instance }
   constructor Create(AOwner : TComponent); override;
-  { changes current values based on current animation }
-  procedure AnimateMe; virtual; abstract;
  private
    FrameImage : TRGBAlphaImage;
    FrameGL : TGLImage;
    procedure FrameResize3x3;
    procedure ResizeChildren; virtual; Abstract;
  private
-  doAnimation : boolean;
-  procedure AskParentForAnimation; virtual; abstract;
+{  doAnimation : boolean;
+  { changes current values based on current animation }
+  procedure AnimateMe; virtual; abstract;
+  procedure AskParentForAnimation; virtual; abstract;  }
 end;
 
 type DInterfaceChildrenList = specialize TFPGObjectList<DAbstractInterfaceElement>;
@@ -104,20 +102,18 @@ Type DInterfaceElement = class(DAbstractInterfaceElement)
   parent : DAbstractInterfaceElement;
   constructor Create(AOwner : TComponent); override;
   procedure DrawMe; override;
-  procedure DestroyMe; override;
-  { saves the current state as TAnimationState }
+  destructor Destroy; override;
+{  { saves the current state as TAnimationState }
   Function GetAnimationState : TAnimationState;
   { animates the element from current to some TAnimationState }
   Procedure AnimateTo(NewAnimationState : TAnimationState;
-                    NewAnimationLength : integer = defaultAnimationLength);
-  { changes current values based on current animation }
-  procedure AnimateMe; override;
+                    NewAnimationLength : integer = defaultAnimationLength);   }
  private
   procedure ResizeChildren; override;
  private
-  LastAnimationState,NextAnimationState,CurrentAnimationState : TAnimationState;
+{  LastAnimationState,NextAnimationState,CurrentAnimationState : TAnimationState;
   AnimationStartTime,AnimationLength : TDateTime;
-  procedure AskParentForAnimation; override;
+  procedure AskParentForAnimation; override;}
 end;
 
 Type DInterfaceContainer = class(DInterfaceElement)
@@ -177,7 +173,7 @@ begin
   NewElement.y := GUI.mid_starty+GUI.mid_h-GUI.GUI_scale;
   NewElement.w := GUI.GUI_scale;
   NewElement.h := GUI.GUI_scale;
-  NewElement.AnimateTo(NewElement.GetAnimationState);
+//  NewElement.AnimateTo(NewElement.GetAnimationState);
   NewElement.frame := frames[0];
   NewElement.InitGL;
   GUI.children.add(NewElement);
@@ -187,7 +183,7 @@ begin
   NewElement.y := GUI.mid_starty+GUI.mid_h-GUI.GUI_scale;
   NewElement.w := GUI.GUI_scale;
   NewElement.h := GUI.GUI_scale;
-  NewElement.AnimateTo(NewElement.GetAnimationState);
+//  NewElement.AnimateTo(NewElement.GetAnimationState);
   NewElement.frame := frames[0];
   NewElement.InitGL;
   GUI.children.add(NewElement);
@@ -290,11 +286,12 @@ constructor DInterfaceElement.Create(AOwner:TComponent);
 begin
   inherited create(AOwner);
   children := DInterfaceChildrenList.create(true);
-  LastAnimationState := ZeroAnimation;
+  //LastAnimationState := ZeroAnimation;
 end;
 
-procedure DInterfaceElement.DestroyMe;
+Destructor DInterfaceElement.Destroy;
 begin
+ children.Clear;
  freeandnil(children);
  inherited;
 end;
@@ -367,10 +364,11 @@ begin
   if Content<>nil then content.InitGl;
 end;
 
-procedure DAbstractInterfaceElement.DestroyMe;
+destructor DAbstractInterfaceElement.Destroy;
 begin
  freeandnil(frameGL);
  //Freeandnil(FrameImage);
+ inherited
 end;
 
 constructor DAbstractInterfaceElement.Create(AOwner:TComponent);
@@ -383,27 +381,7 @@ end;
 
 {------------------------------------------------------------------------}
 
-
-procedure DInterfaceElement.AnimateTo(NewAnimationState : TAnimationState;
-                    NewAnimationLength : Integer);
-begin
-  LastAnimationState := CurrenAnimationState;
-  NextAnimationState := NewAnimationState;
-  AnimationStartTime := now;
-  AnimationLength    := (NewAnimationLength+random*200-100) /24/60/60/1000;
-  doAnimation        := true;
-end;
-
-Function DInterfaceElement.GetAnimationState: TAnimationState;
-begin
-  result.h := h;
-  result.w := w;
-  result.x := x;
-  result.y := y;
-  result.Opacity := Opacity;
-end;
-
-procedure DInterfaceElement.AnimateMe;
+{procedure DInterfaceElement.AnimateMe;
 var t : single;
     i : integer;
 begin
@@ -432,7 +410,7 @@ begin
     parent.AskParentForAnimation
   else
     writeLog('DAbstractInterfaceElement.AskParentForAnimation','ERROR: Parent is nil!');
-end;
+end;}
 
 {------------------------------------------------------------------------}
 

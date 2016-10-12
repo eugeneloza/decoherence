@@ -77,6 +77,7 @@ procedure TLoadImageThread.execute;
 begin
   WritelnLog('TLoadImageThread.execute','Image thread started.');
   LoadScreen_Img.LoadMe(LoadImageString);
+  if loadscreen_img=nil then exit; //fix bug if the image didn't load completely but was destroyed
   LoadScreen_Img.ScaleMe(-1);
   WritelnLog('TLoadImageThread.execute','Image thread finished.');
   LoadImageThreadReady:=true;
@@ -89,7 +90,6 @@ var s:string;
 begin
   LoadImageThreadReady := false;
   WritelnLog('NewLoadScreenImage','Resetting image.');
-  if loadscreen_img <> nil then loadscreen_img.DestroyMe;
   freeandnil(loadscreen_img);
   LoadScreen_Img := DStaticImage.Create(Window);
 
@@ -153,15 +153,10 @@ Procedure DestroyLoadScreen;
 begin
   RenderReady := false;
   WritelnLog('DestroyLoadScreen','Freeing all...');
-  if LoadScreen_wind1 <> nil then Loadscreen_wind1.DestroyMe;
   freeandnil(Loadscreen_wind1);
-  if Loadscreen_wind2 <> nil then Loadscreen_wind2.DestroyMe;
   freeandnil(Loadscreen_wind2);
-  if Loadscreen_img <> nil then Loadscreen_img.DestroyMe;
   freeandnil(Loadscreen_img);
-  if loadscreen_label <> nil then loadscreen_label.DestroyMe;
   freeandnil(loadscreen_label);
-  if loadscreen_facts <> nil then loadscreen_facts.DestroyMe;
   freeandnil(loadscreen_facts);
   DestroyFacts;
   LoadScreen_ready := false;
