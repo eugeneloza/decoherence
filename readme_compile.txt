@@ -1,6 +1,6 @@
 You can compile the source simply by opening *.lpr in Lazarus IDE and pushing F9 to complie&run.
 
-This version requires Castle Game Engine to compile (at least GIT version 14.09.2016). You can download it here https://github.com/castle-engine/castle-engine and follow installation instructions here http://castle-engine.sourceforge.net/tutorial_install.php
+This version requires Castle Game Engine to compile (at least GIT version 13.10.2016). You can download it here https://github.com/castle-engine/castle-engine and follow installation instructions here http://castle-engine.sourceforge.net/tutorial_install.php
 
 Linux version requires 32bit GTK+2 (Thanks Akien for the information).
 (Debian/Ubuntu package reference):

@@ -17,22 +17,21 @@ unit Decoherence;
 
 {$mode objfpc}{$H+}
 //{$DEFINE WriteLog}{$IFDEF Windows}{$APPTYPE GUI}{$ENDIF}
+{$R+}{$Q+}
 
 interface
 
-const Version='interfa3-161012-39new';
+const Version='interfa3-161013-40';
 
 implementation
 
-{$R+}{$Q+}
-
 uses Classes, SysUtils,
-     CastleLog, CastleUtils,
+     CastleLog,
      CastleWindow, CastleWindowTouch, CastleKeysMouse,
      {decomouse, decointerface, DecoFont,
      DecoLoadScreen,
      decolevel,}
-     decoglobal;
+     decointerface, decoglobal;
 
 
 
@@ -71,7 +70,6 @@ begin
     {$ENDIF}
   {$ENDIF}
   WritelnLog('ApplicationInitialize','Init');
-  writeLogMultiline('abrakadabra','bumbala'+nl+'bumbalam');
 
   //window.OnPress := @doPress;
   //window.onRelease := @doRelease;
