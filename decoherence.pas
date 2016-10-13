@@ -20,51 +20,25 @@ unit Decoherence;
 
 interface
 
-const Version='Interfa2-161009-36';
+const Version='interfa3-161012-39new';
 
 implementation
 
+{$R+}{$Q+}
+
 uses Classes, SysUtils,
-     CastleLog,
+     CastleLog, CastleUtils,
      CastleWindow, CastleWindowTouch, CastleKeysMouse,
-     decomouse, decointerface, DecoFont,
+     {decomouse, decointerface, DecoFont,
      DecoLoadScreen,
-     decolevel,
+     decolevel,}
      decoglobal;
 
 
-{$R+}{$Q+}
 
-procedure doWindowRender(Container: TUIContainer);
-begin
-  DrawInterface
-{    UIFont.Print(10, 10, Yellow, Format('FPS : %f (real : %f). Shapes : %d / %d',
-   [Window.Fps.FrameTime,
-    Window.Fps.RealTime,
-    Window.SceneManager.Statistics.ShapesRendered,
-    Window.SceneManager.Statistics.ShapesVisible]));}
-end;
 
-{------------------------------------------------------------------}
-
-procedure doPress(Container: TUIContainer; const Event: TInputPressRelease);
-begin
-  if Event.EventType = itMouseButton then begin
-    doMousePress(Event);
-    {if interface didn't catch the click then}
-    if mbRight=event.MouseButton then camera.MouseLook := not Camera.MouseLook;
-  end;
-  InitTestLevel;                         //ugly! I'll fix this soon.
-  window.OnRender := @doWindowRender;
-end;
-
-procedure doRelease(Container: TUIContainer; const Event: TInputPressRelease);
-begin
-  if Event.EventType = itMouseButton then begin
-    doMouseRelease(Event);
-  end;
-end;
-
+{==========================================================================}
+{==========================================================================}
 
 {======================= initialization routines ==============================}
 
@@ -97,30 +71,26 @@ begin
     {$ENDIF}
   {$ENDIF}
   WritelnLog('ApplicationInitialize','Init');
+  writeLogMultiline('abrakadabra','bumbala'+nl+'bumbalam');
 
-   { Window.Container.UIScaling  :=  usEncloseReferenceSize;
-    Window.Container.UIReferenceWidth  :=  1024;
-    Window.Container.UIReferenceHeight  :=  768;}
+  //window.OnPress := @doPress;
+  //window.onRelease := @doRelease;
+  //WritelnLog('ApplicationInitialize','DTouchList.create');
+  //TouchArray := DTouchList.create;
 
-  window.OnPress := @doPress;
-  window.onRelease := @doRelease;
-  WritelnLog('ApplicationInitialize','DTouchList.create');
-  TouchArray := DTouchList.create;
+  //randomize;
+  //WritelnLog('ApplicationInitialize','InitializeFonts');
+  //InitializeFonts;
 
-{  application.TimerMilisec := 1000 div 60; //60 fps
-  application.OnTimer := @dotimer;}
+  //WritelnLog('ApplicationInitialize','Init finished');
 
-  randomize;
-  WritelnLog('ApplicationInitialize','InitializeFonts');
-  InitializeFonts;
-
-  WritelnLog('ApplicationInitialize','Init finished');
-
-  MakeLoadScreen;
-  InitInterface;
-  Load_test_level;
+  //MakeLoadScreen;
+  //InitInterface;
+  //Load_test_level;
 
 end;
+
+{==========================================================================}
 
 function MyGetApplicationName: string;
 begin
