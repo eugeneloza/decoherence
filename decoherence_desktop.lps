@@ -8,16 +8,16 @@
         <Filename Value="decoherence_desktop.lpr"/>
         <IsPartOfProject Value="True"/>
         <CursorPos Y="7"/>
-        <UsageCount Value="29"/>
+        <UsageCount Value="32"/>
         <Loaded Value="True"/>
       </Unit0>
       <Unit1>
         <Filename Value="decoglobal.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="3"/>
-        <TopLine Value="14"/>
+        <TopLine Value="15"/>
         <CursorPos Y="33"/>
-        <UsageCount Value="29"/>
+        <UsageCount Value="32"/>
         <Loaded Value="True"/>
       </Unit1>
       <Unit2>
@@ -27,7 +27,7 @@
         <EditorIndex Value="1"/>
         <TopLine Value="17"/>
         <CursorPos Y="27"/>
-        <UsageCount Value="29"/>
+        <UsageCount Value="32"/>
         <Loaded Value="True"/>
       </Unit2>
       <Unit3>
@@ -35,9 +35,9 @@
         <IsPartOfProject Value="True"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="58"/>
-        <CursorPos X="48" Y="69"/>
-        <UsageCount Value="27"/>
+        <TopLine Value="139"/>
+        <CursorPos X="12" Y="158"/>
+        <UsageCount Value="30"/>
         <Loaded Value="True"/>
       </Unit3>
       <Unit4>
@@ -160,7 +160,7 @@
         <UsageCount Value="10"/>
       </Unit19>
     </Units>
-    <JumpHistory Count="23" HistoryIndex="22">
+    <JumpHistory Count="28" HistoryIndex="27">
       <Position1>
         <Filename Value="decoherence_desktop.lpr"/>
         <Caret Line="6" Column="5"/>
@@ -252,6 +252,26 @@
         <Filename Value="decointerface.pas"/>
         <Caret Line="69" Column="48" TopLine="14"/>
       </Position23>
+      <Position24>
+        <Filename Value="decointerface.pas"/>
+        <Caret Line="44" Column="23" TopLine="34"/>
+      </Position24>
+      <Position25>
+        <Filename Value="decointerface.pas"/>
+        <Caret Line="117" Column="49" TopLine="112"/>
+      </Position25>
+      <Position26>
+        <Filename Value="decointerface.pas"/>
+        <Caret Line="166" TopLine="103"/>
+      </Position26>
+      <Position27>
+        <Filename Value="decointerface.pas"/>
+        <Caret Line="41" Column="22" TopLine="32"/>
+      </Position27>
+      <Position28>
+        <Filename Value="decointerface.pas"/>
+        <Caret Line="60" TopLine="46"/>
+      </Position28>
     </JumpHistory>
   </ProjectSession>
 </CONFIG>
