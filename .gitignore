@@ -1,0 +1,17 @@
+*.compiled
+*.rsj
+*.rst
+*.o
+*.or
+*.ppu
+*.blend1
+*.blend2
+*~
+*.apk
+*.a
+*.log
+*.lps
+decoherence_desktop
+decoherence_desktop.exe
+backup
+library
