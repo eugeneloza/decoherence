@@ -41,22 +41,41 @@ const
   GUI_grid = (4*3+1);
   GUI_scale_unit_float = 1/GUI_grid;
 
+type
+  { Yes, that looks stupid for now. But I'll simplify it later }
+  Txywh = class(TObject)
+  public
+    { integer "box" }
+    x1,y1,x2,y2,w,h:integer;
+    { float }
+    fx,fy,fw,fh: float;
+    { assign float and convert to Integer }
+    procedure setsize(const newx,newy,neww,newh:float);
+  end;
+
+type
+  { extended Txywh with opacity for animations }
+  Txywha = class(Txywh)
+  public
+    opacity: float;
+  end;
+
 Type
   { most abstract container suitable for images, labels and interface elements
     Just defines the box and rescaling }
   DAbstractElement = class(TComponent)
   public
     procedure InitGL;
-    procedure setsize(const newx,newy,neww,newh:float);
-    procedure Rescale;
     constructor create(AOwner:TComponent); override;
     destructor destroy; override;
   private
-    { these values are "strict" they are determined by rescale and unaffected
-      by animations }
-    x1,y1,x2,y2,w,h: integer;
-    fx,fy,fw,fh: float;
-
+    { these values are "strict" and unaffected by animations. Usually determines
+      the basic stage and implies image rescale and init GL. }
+    base: Txywh;
+    { Last and Next animation states. }
+    last, next: Txywha;
+//    animation_start, animation_end: TDateTime;
+//    Free_on_end: boolean;
     { keeps from accidentally re-initing GL }
     InitGLPending: boolean;
     ImageReady: boolean;
@@ -82,6 +101,7 @@ Type
   DInterfaceContainer = class(DInterfaceElement)
   public
     { random generator used for all interface random events }
+    wdith,height:integer;
     rnd: TCastleRandom;
     constructor create(AOwner:TComponent); override;
     destructor destroy; override;
@@ -96,20 +116,7 @@ implementation
 {=============================================================================}
 
 
-procedure DAbstractElement.InitGL;
-begin
-  if InitGLPending then begin
-    InitGLPending:=false;
-    if ScaledImage<>nil then begin
-      WriteLnLog('DAbstractElement.InitGL','Initializing...');
-      FreeAndNil(GLImage);
-      GLImage := TGLImage.create(ScaledImage,true,true);
-      ImageReady := true;
-    end else WriteLnLog('DAbstractElement.InitGL','ERROR: Scaled Image is nil!');
-  end;
-end;
-
-procedure DAbstractElement.setsize(const newx,newy,neww,newh:float);
+procedure Txywh.setsize(const newx,newy,neww,newh:float);
 begin
   if (abs(newx)>GUI_grid) or (abs(newy)>GUI_grid) or
      (((neww<0) or (neww>GUI_grid)) and ((neww<>fullwidth) and (neww<>fullheight))) or
@@ -127,13 +134,8 @@ begin
   fw:=neww;
   fh:=newh;
 
-  self.Rescale;
-
-end;
-
-procedure DAbstractElement.Rescale;
-begin
   { convert float to integer }
+
   if fx>0 then
     x1 := round(GUI.h*fx*GUI_scale_unit_float)
   else
@@ -164,15 +166,26 @@ begin
   y2:=y1+h;
 end;
 
-procedure DAbstractElement.RescaleImage;
-begin
+{============================================================================}
 
+procedure DAbstractElement.InitGL;
+begin
+  if InitGLPending then begin
+    InitGLPending:=false;
+    if ScaledImage<>nil then begin
+      WriteLnLog('DAbstractElement.InitGL','Initializing...');
+      FreeAndNil(GLImage);
+      GLImage := TGLImage.create(ScaledImage,true,true);
+      ImageReady := true;
+    end else WriteLnLog('DAbstractElement.InitGL','ERROR: Scaled Image is nil!');
+  end;
 end;
 
 {----------------------------------------------------------------------------}
 
 constructor DAbstractElement.Create(AOwner: TComponent);
 begin
+  inherited Create(AOwner);
   InitGLPending := false;
   imageReady := false;
 end;
