@@ -76,6 +76,7 @@ Type
     constructor create(AOwner:TComponent); override;
     destructor destroy; override;
     procedure rescale; virtual;
+    procedure draw; virtual; abstract;
   private
     { Last and Next animation states. }
     last, next: Txywha;

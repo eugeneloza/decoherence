@@ -26,6 +26,7 @@ type
     GLImage: TGLImage;
     { initialize GL image. NOT THREAD SAFE! }
     procedure InitGL;
+    procedure draw; override;
   end;
 
 
@@ -36,7 +37,6 @@ begin
   if InitGLPending then begin
     InitGLPending:=false;
     if ScaledImage<>nil then begin
-      WriteLnLog('DAbstractElement.InitGL','Initializing...');
       FreeAndNil(GLImage);
       GLImage := TGLImage.create(ScaledImage,true,true);
       ImageReady := true;
@@ -66,7 +66,17 @@ begin
   if (scaledImage = nil) or (ScaledImage.Width <> base.w) or (ScaledImage.height <> base.h) then begin
     scaledImage := SourceImage.CreateCopy as TCastleImage;
     scaledImage.Resize(base.w,base.h,InterfaceScalingMethod);
+    InitGLPending := true;
+  end
+ else
+   writeLnLog('DAbstractImage.RescaleImage','ERROR: base.initialized = false');
+end;
 
+procedure DAbstractImage.draw;
+begin
+  if ImageReady then begin
+    GLImage.color:=vector4single(1,1,1,1); //todo
+    GLIMage.Draw(base.x1,base.y1,base.w,base.h);
   end;
 end;
 
