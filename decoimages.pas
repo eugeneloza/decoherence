@@ -13,16 +13,19 @@ type
   DAbstractImage = class(DAbstractElement)
   { General routines shared by images and labels }
   public
+    { Thread-safe part of rescaling the image }
+    procedure RescaleImage;
+    constructor create(AOwner:TComponent); override;
+    destructor destroy; override;
+  private
+    SourceImage: TCastleImage;  //todo scale Source Image for max screen resolution ? //todo never store on Android.
+    ScaledImage: TCastleImage;
     { keeps from accidentally re-initing GL }
     InitGLPending: boolean;
     ImageReady: boolean;
-    SourceImage: TCastleImage;  //todo scale Source Image for max screen resolution ? //todo never store on Android.
-    ScaledImage: TCastleImage;
     GLImage: TGLImage;
+    { initialize GL image. NOT THREAD SAFE! }
     procedure InitGL;
-    constructor create(AOwner:TComponent); override;
-    destructor destroy; override;
-    //procedure RescaleImage;
   end;
 
 
@@ -55,6 +58,16 @@ begin
   {freeandnil(ScaledImage);}
   FreeAndNil(SourceImage);
   inherited;
+end;
+
+procedure DAbstractImage.RescaleImage;
+begin
+ if base.initialized then
+  if (scaledImage = nil) or (ScaledImage.Width <> base.w) or (ScaledImage.height <> base.h) then begin
+    scaledImage := SourceImage.CreateCopy as TCastleImage;
+    scaledImage.Resize(base.w,base.h,InterfaceScalingMethod);
+
+  end;
 end;
 
 {----------------------------------------------------------------------------}

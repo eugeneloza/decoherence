@@ -21,13 +21,15 @@ interface
 uses
   Classes, fgl, sysutils,
   CastleLog, castleFilesUtils, CastleRandom,
-  castleVectors,
+  castleVectors, castleImages,
   decoglobal;
 
 const Frames_Folder = 'interface/frames/';
 
 const fullwidth = -1;
       fullheight = -2;
+
+const InterfaceScalingMethod: TResizeInterpolation = riBilinear;
 
 
 {1/17 of window.height is a "unit" in GUI scale.
@@ -49,9 +51,11 @@ type
     x1,y1,x2,y2,w,h:integer;
     { float }
     fx,fy,fw,fh: float;
+    initialized: boolean;
     { assign float and convert to Integer }
     procedure setsize(const newx,newy,neww,newh:float);
     procedure recalculate;
+    constructor create(AOwner: TComponent); override;
   end;
 
 type
@@ -66,13 +70,13 @@ Type
     Just defines the box and rescaling }
   DAbstractElement = class(TComponent)
   public
+    { these values are "strict" and unaffected by animations. Usually determines
+      the basic stage and implies image rescale and init GL. }
+    base: Txywh;
     constructor create(AOwner:TComponent); override;
     destructor destroy; override;
     procedure rescale; virtual;
   private
-    { these values are "strict" and unaffected by animations. Usually determines
-      the basic stage and implies image rescale and init GL. }
-    base: Txywh;
     { Last and Next animation states. }
     last, next: Txywha;
 //    animation_start, animation_end: TDateTime;
@@ -89,7 +93,7 @@ Type
   DInterfaceElement = class(DAbstractInterfaceElement)
   public
     children: DInterfaceChildrenList;
-    constructor create(AOwner:TComponent); override;
+    constructor create(AOwner: TComponent); override;
     destructor destroy; override;
     procedure Rescale; override;
   end;
@@ -115,9 +119,16 @@ implementation
 {=============================================================================}
 
 
+constructor Txywh.create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  initialized:=false;
+
+end;
+
 procedure Txywh.setsize(const newx,newy,neww,newh:float);
 begin
-  if (abs(newx)>GUI_grid) or (abs(newy)>GUI_grid) or
+    if (abs(newx)>GUI_grid) or (abs(newy)>GUI_grid) or
      (((neww<0) or (neww>GUI_grid)) and ((neww<>fullwidth) and (neww<>fullheight))) or
      (((newh<0) or (newh>GUI_grid)) and (newh<>fullheight)) then
   begin
@@ -134,7 +145,6 @@ begin
   fh:=newh;
 
   recalculate;
-
 end;
 
 procedure Txywh.recalculate;
@@ -169,6 +179,8 @@ begin
 
   x2:=x1+w;
   y2:=y1+h;
+
+  initialized:=true;
 end;
 
 {============================================================================}

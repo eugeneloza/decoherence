@@ -31,6 +31,7 @@ uses Classes, SysUtils,
      {decomouse, decointerface, DecoFont,
      DecoLoadScreen,
      decolevel,}
+     decoimages,
      decointerface, decoglobal;
 
 
@@ -73,7 +74,7 @@ begin
   {$ELSE}
     {$IFDEF WriteLog}
       LogStream := TFileStream.Create('log_'+NiceDate+'.txt',fmCreate);
-      InitializeLog(Version,LogStream,ldTime);
+      InitializeLog(Version,LogStream,ltTime);
     {$ELSE}
       InitializeLog(Version,nil,ltTime);
     {$ENDIF}
