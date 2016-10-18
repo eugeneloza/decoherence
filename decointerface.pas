@@ -21,7 +21,7 @@ interface
 uses
   Classes, fgl, sysutils,
   CastleLog, castleFilesUtils, CastleRandom,
-  castleVectors, CastleGLImages, CastleImages,
+  castleVectors,
   decoglobal;
 
 const Frames_Folder = 'interface/frames/';
@@ -43,7 +43,7 @@ const
 
 type
   { Yes, that looks stupid for now. But I'll simplify it later }
-  Txywh = class(TObject)
+  Txywh = class(TComponent)
   public
     { integer "box" }
     x1,y1,x2,y2,w,h:integer;
@@ -51,6 +51,7 @@ type
     fx,fy,fw,fh: float;
     { assign float and convert to Integer }
     procedure setsize(const newx,newy,neww,newh:float);
+    procedure recalculate;
   end;
 
 type
@@ -65,9 +66,9 @@ Type
     Just defines the box and rescaling }
   DAbstractElement = class(TComponent)
   public
-    procedure InitGL;
     constructor create(AOwner:TComponent); override;
     destructor destroy; override;
+    procedure rescale; virtual;
   private
     { these values are "strict" and unaffected by animations. Usually determines
       the basic stage and implies image rescale and init GL. }
@@ -76,13 +77,6 @@ Type
     last, next: Txywha;
 //    animation_start, animation_end: TDateTime;
 //    Free_on_end: boolean;
-    { keeps from accidentally re-initing GL }
-    InitGLPending: boolean;
-    ImageReady: boolean;
-    SourceImage: TCastleImage;  //todo scale Source Image for max screen resolution ? //todo never store on Android.
-    ScaledImage: TCastleImage;
-    GLImage: TGLImage;
-    procedure RescaleImage;
   end;
 
 Type
@@ -95,16 +89,21 @@ Type
   DInterfaceElement = class(DAbstractInterfaceElement)
   public
     children: DInterfaceChildrenList;
+    constructor create(AOwner:TComponent); override;
+    destructor destroy; override;
+    procedure Rescale; override;
   end;
 
 Type
   DInterfaceContainer = class(DInterfaceElement)
   public
+    { just = window.height, wihdow.width. Maybe I'll deprecate it later }
+    width,height:integer;
     { random generator used for all interface random events }
-    wdith,height:integer;
     rnd: TCastleRandom;
     constructor create(AOwner:TComponent); override;
     destructor destroy; override;
+    procedure Rescale; override;
 end;
 
 var GUI: DInterfaceContainer;
@@ -134,33 +133,39 @@ begin
   fw:=neww;
   fh:=newh;
 
+  recalculate;
+
+end;
+
+procedure Txywh.recalculate;
+begin
   { convert float to integer }
 
   if fx>0 then
-    x1 := round(GUI.h*fx*GUI_scale_unit_float)
+    x1 := round(GUI.height*fx*GUI_scale_unit_float)
   else
-    x1 := GUI.w - round(GUI.h*fx*GUI_scale_unit_float);
+    x1 := GUI.width - round(GUI.height*fx*GUI_scale_unit_float);
 
   if fy>0 then
-    y1 := round(GUI.h*fy*GUI_scale_unit_float)     // turn over y-axis?
+    y1 := round(GUI.height*fy*GUI_scale_unit_float)     // turn over y-axis?
   else
-    y1 := GUI.h - round(GUI.h*fy*GUI_scale_unit_float);
+    y1 := GUI.height - round(GUI.height*fy*GUI_scale_unit_float);
 
   if fw = fullwidth then begin
-    w := GUI.w;
+    w := GUI.width;
     x1 := 0
   end
   else
   if fw = fullheight then
-    w := GUI.h
+    w := GUI.height
   else
-    w := round(GUI.h*fw*GUI_scale_unit_float);
+    w := round(GUI.height*fw*GUI_scale_unit_float);
 
   if fh = fullheight then begin
-    h := GUI.h;
+    h := GUI.height;
     y1 := 0
   end else
-    h := round(GUI.h*fh*GUI_scale_unit_float);
+    h := round(GUI.height*fh*GUI_scale_unit_float);
 
   x2:=x1+w;
   y2:=y1+h;
@@ -168,35 +173,60 @@ end;
 
 {============================================================================}
 
-procedure DAbstractElement.InitGL;
+
+procedure DAbstractElement.rescale;
 begin
-  if InitGLPending then begin
-    InitGLPending:=false;
-    if ScaledImage<>nil then begin
-      WriteLnLog('DAbstractElement.InitGL','Initializing...');
-      FreeAndNil(GLImage);
-      GLImage := TGLImage.create(ScaledImage,true,true);
-      ImageReady := true;
-    end else WriteLnLog('DAbstractElement.InitGL','ERROR: Scaled Image is nil!');
-  end;
+  base.recalculate;
+  last.recalculate;
+  next.recalculate;
 end;
 
 {----------------------------------------------------------------------------}
 
+
 constructor DAbstractElement.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  InitGLPending := false;
-  imageReady := false;
+  base := Txywh.Create(self);
+  last := Txywha.Create(self);
+  next := Txywha.Create(self);
 end;
 
 destructor DAbstractElement.destroy;
 begin
-  FreeAndNil(GLImage);
-  //scaledImage is automatically freed by GlImage
-  FreeAndNil(SourceImage);
+  //actulally this is not needed as they are owned by the class
+{  freeandnil(base);
+  freeandnil(last);
+  freeandnil(next);}
+
   inherited;
 end;
+
+{=============================================================================}
+{=========================== interface element ===============================}
+{=============================================================================}
+
+procedure DInterfaceElement.rescale;
+var i:integer;
+begin
+  inherited;
+  for i:=0 to children.Count-1 do children[i].rescale;
+end;
+
+{-----------------------------------------------------------------------------}
+
+constructor DInterfaceElement.create(AOwner: TComponent);
+begin
+  inherited create(AOwner);
+  children := DInterfaceChildrenList.Create(true);
+end;
+
+destructor DInterfaceElement.destroy;
+begin
+  freeandnil(children);
+  inherited;
+end;
+
 
 {=============================================================================}
 {========================== interface container ==============================}
@@ -207,12 +237,22 @@ begin
   writeLnLog('DInterfaceContainer.create','Creating interface.');
   inherited create(AOwner);
   rnd := TCastleRandom.Create;
+
+  width := -1;
+  height := -1;
 end;
 
 destructor DInterfaceContainer.destroy;
 begin
   writeLnLog('DInterfaceContainer.destroy','Game over...');
   freeandnil(rnd);
+  inherited;
+end;
+
+procedure DInterfaceContainer.rescale;
+begin
+  GUI.width := window.Width;
+  GUI.height := window.Height;
   inherited;
 end;
 

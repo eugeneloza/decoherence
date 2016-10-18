@@ -39,6 +39,15 @@ uses Classes, SysUtils,
 {==========================================================================}
 {==========================================================================}
 
+{ this procedure is mostly needed for Desktops and in normal situations
+  should be called only once, but Windows has it's own ideas }
+Procedure OnWindowResize(Container : TUIContainer);
+begin
+  if (window.width<>GUI.width) or (window.height<>GUI.height) then
+    GUI.rescale;
+end;
+
+
 {======================= initialization routines ==============================}
 
 {$IFNDEF Android}
@@ -70,6 +79,9 @@ begin
     {$ENDIF}
   {$ENDIF}
   WritelnLog('ApplicationInitialize','Init');
+
+  GUI := DInterfaceContainer.create(Window);
+
 
   //window.OnPress := @doPress;
   //window.onRelease := @doRelease;
