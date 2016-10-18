@@ -17,6 +17,7 @@ type
     procedure RescaleImage;
     constructor create(AOwner:TComponent); override;
     destructor destroy; override;
+    procedure draw; override;
   private
     SourceImage: TCastleImage;  //todo scale Source Image for max screen resolution ? //todo never store on Android.
     ScaledImage: TCastleImage;
@@ -26,9 +27,15 @@ type
     GLImage: TGLImage;
     { initialize GL image. NOT THREAD SAFE! }
     procedure InitGL;
-    procedure draw; override;
   end;
 
+type
+  { most simple image type }
+  DStaticImage = class(DAbstractImage)
+  public
+    Opacity: float;
+    Function GetAnimationState: Txywha; override;
+  end;
 
 implementation
 
@@ -73,14 +80,26 @@ begin
 end;
 
 procedure DAbstractImage.draw;
+var currentAnimationState:Txywha;
 begin
   if ImageReady then begin
-    GLImage.color:=vector4single(1,1,1,1); //todo
-    GLIMage.Draw(base.x1,base.y1,base.w,base.h);
+    //animate
+    currentAnimationState:=GetAnimationState;
+    GLImage.color:=vector4single(1,1,1,currentAnimationState.Opacity); //todo
+    GLIMage.Draw(currentAnimationState.x1,currentAnimationState.y1,currentAnimationState.w,currentAnimationState.h); //todo
   end;
 end;
 
 {----------------------------------------------------------------------------}
+
+Function DStaticImage.GetAnimationState: Txywha;
+begin
+  result := Txywha.create(nil);
+  result.x1 := base.x1;
+  result.x2 := base.x2;
+  result.opacity := Opacity;
+end;
+
 
 end.
 

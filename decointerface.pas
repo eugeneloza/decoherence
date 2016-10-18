@@ -77,6 +77,7 @@ Type
     destructor destroy; override;
     procedure rescale; virtual;
     procedure draw; virtual; abstract;
+    function GetAnimationState: Txywha; virtual;
   private
     { Last and Next animation states. }
     last, next: Txywha;
@@ -192,6 +193,22 @@ begin
   base.recalculate;
   last.recalculate;
   next.recalculate;
+end;
+
+{----------------------------------------------------------------------------}
+
+Function DAbstractElement.GetAnimationState: Txywha;
+begin
+  if true then begin //todo!!!!!!!!!!!!!!!!!!!!!!!
+    result := Txywha.create(nil);
+    result.x1 := base.x1;
+    result.x2 := base.x2;
+    result.y1 := base.y1;
+    result.y2 := base.y2;
+    result.h := base.h;
+    result.w := base.w;
+    result.opacity := 1;
+  end;
 end;
 
 {----------------------------------------------------------------------------}
