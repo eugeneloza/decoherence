@@ -60,7 +60,7 @@ type
   DWindImage = class (DAbstractImage)
   public
     color: TVector4Single; //todo
-    windspeed: float;   {seconds to scroll the full screen}
+    phasespeed: float;   {1/seconds to scroll the full screen}
     Opacity: float;
     { completely overrides the default drawing procedure }
     procedure draw; override;
@@ -177,11 +177,14 @@ end;
 procedure DWindImage.CyclePhase;
 var phaseshift: float;
 begin
-  phaseshift:=(now-lasttime)/24/60/60*windspeed;
+  phaseshift:=(now-lasttime)/24/60/60*phaseSpeed;
   if phaseshift<0.5 then begin
     phase += phaseshift*(1+0.1*GUI.rnd.Random);
+    if phase>1 then phase -= 1;
     opacityphase += phaseshift*3*(1+0.2*GUI.rnd.Random);
+    if opacityphase>1 then opacityphase -= 1;
   end else begin
+    //if pause was too long reinitialize with random phases.
     phase := GUI.rnd.Random;
     opacityphase := GUI.rnd.Random;
   end;

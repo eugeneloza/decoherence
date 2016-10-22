@@ -30,7 +30,9 @@ Type
     width,height:integer;
     { random generator used for all interface random events }
     rnd: TCastleRandom;
+    { wind images to provide background }
     wind1,wind2: DWindImage;
+
     constructor create(AOwner:TComponent); override;
     destructor destroy; override;
     procedure Rescale; override;
@@ -53,7 +55,12 @@ begin
   writeLnLog('DInterfaceContainer.create','Creating interface.');
   inherited create(AOwner);
   rnd := TCastleRandom.Create;
-
+  Wind1 := DWindImage.create(self);
+  Wind1.phasespeed := 1/(5+rnd.Random);
+  Wind1.Load(LoadScreen_Folder+'WindClouds1_GIMP.jpg');
+  Wind2 := DWindImage.create(self);
+  Wind2.phasespeed := 1/(Pi+rnd.Random);
+  Wind2.Load(LoadScreen_Folder+'WindClouds2_GIMP.jpg');
   width := -1;
   height := -1;
 end;

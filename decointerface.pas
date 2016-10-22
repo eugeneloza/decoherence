@@ -24,6 +24,7 @@ uses
   decoglobal;
 
 const Frames_Folder = 'interface/frames/';
+      LoadScreen_folder = 'interface/loadscreen/';
 
 const fullwidth = -1;
       fullheight = -2;
@@ -93,6 +94,7 @@ type DInterfaceChildrenList = specialize TFPGObjectList<DAbstractInterfaceElemen
 Type
   DInterfaceElement = class(DAbstractInterfaceElement)
   public
+    parent: DAbstractInterfaceElement;
     children: DInterfaceChildrenList;
     procedure draw; override;
     constructor create(AOwner: TComponent); override;
@@ -239,12 +241,13 @@ end;
 constructor DInterfaceElement.create(AOwner: TComponent);
 begin
   inherited create(AOwner);
+  if AOwner is DAbstractInterfaceElement then parent:=AOwner as DAbstractInterfaceElement;
   children := DInterfaceChildrenList.Create(true);
 end;
 
 destructor DInterfaceElement.destroy;
 begin
-  freeandnil(children);
+  freeandnil(children);   //this should fire as recoursive because children owns elements, which in turn will fire their destructors onfree
   inherited;
 end;
 
