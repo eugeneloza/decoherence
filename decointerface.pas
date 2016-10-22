@@ -147,30 +147,30 @@ begin
   { convert float to integer }
 
   if fx>0 then
-    x1 := round(GUI.height*fx*GUI_scale_unit_float)
+    x1 := round(Window.height*fx*GUI_scale_unit_float)
   else
-    x1 := GUI.width - round(GUI.height*fx*GUI_scale_unit_float);
+    x1 := Window.width - round(Window.height*fx*GUI_scale_unit_float);
 
   if fy>0 then
-    y1 := round(GUI.height*fy*GUI_scale_unit_float)     // turn over y-axis?
+    y1 := round(Window.height*fy*GUI_scale_unit_float)     // turn over y-axis?
   else
-    y1 := GUI.height - round(GUI.height*fy*GUI_scale_unit_float);
+    y1 := Window.height - round(Window.height*fy*GUI_scale_unit_float);
 
   if fw = fullwidth then begin
-    w := GUI.width;
+    w := Window.width;
     x1 := 0
   end
   else
   if fw = fullheight then
-    w := GUI.height
+    w := Window.height
   else
-    w := round(GUI.height*fw*GUI_scale_unit_float);
+    w := round(Window.height*fw*GUI_scale_unit_float);
 
   if fh = fullheight then begin
-    h := GUI.height;
+    h := Window.height;
     y1 := 0
   end else
-    h := round(GUI.height*fh*GUI_scale_unit_float);
+    h := round(Window.height*fh*GUI_scale_unit_float);
 
   x2:=x1+w;
   y2:=y1+h;

@@ -123,7 +123,8 @@ procedure DAbstractImage.rescale;
 begin
   inherited;
   RescaleImage;
-  //InitGL;
+  //todo;
+  InitGL;
 end;
 
 procedure DAbstractImage.RescaleImage;
@@ -170,6 +171,7 @@ constructor DWindImage.create(AOwner: TComponent);
 begin
   inherited;
   lasttime := now-1;
+  color:=vector4Single(1,1,1,1);
 {  phase := GUI.rnd.Random;
   opacityphase := GUI.rnd.Random;}
 end;
@@ -177,17 +179,18 @@ end;
 procedure DWindImage.CyclePhase;
 var phaseshift: float;
 begin
-  phaseshift:=(now-lasttime)/24/60/60*phaseSpeed;
+  phaseshift:=(now-lasttime)*24*60*60*phaseSpeed;
   if phaseshift<0.5 then begin
-    phase += phaseshift*(1+0.1*GUI.rnd.Random);
-    if phase>1 then phase -= 1;
-    opacityphase += phaseshift*3*(1+0.2*GUI.rnd.Random);
-    if opacityphase>1 then opacityphase -= 1;
+    phase -= phaseshift*(1+0.1*GUI.rnd.Random);
+    if phase<0 then phase += 1;
+    opacityphase -= phaseshift/2*(1+0.2*GUI.rnd.Random);
+    if opacityphase<0 then opacityphase += 1;
   end else begin
     //if pause was too long reinitialize with random phases.
     phase := GUI.rnd.Random;
     opacityphase := GUI.rnd.Random;
   end;
+  lasttime:=now;
 end;
 
 procedure DWindImage.Draw;
@@ -197,18 +200,18 @@ begin
     CyclePhase;
     color[3] := Opacity + Opacity/4 * sin(2*Pi*opacityphase);
     GLImage.Color := color;
-    phase_scaled := round(Phase*GUI.width);
+    phase_scaled := round(Phase*Window.width);
 
     //draw first part of the image
     GLImage.Draw(phase_scaled,0,
-                 GUI.width-phase_scaled,GUI.height,
+                 Window.width-phase_scaled,Window.height,
                  0,0,
-                 GUI.width-phase_scaled,GUI.height);
+                 Window.width-phase_scaled,Window.height);
     //draw second part of the image
     GLImage.Draw(0,0,
-                 phase_scaled,GUI.height,
-                 GUI.width-phase_scaled,0,
-                 phase_scaled,GUI.height);
+                 phase_scaled,Window.height,
+                 Window.width-phase_scaled,0,
+                 phase_scaled,Window.height);
   end else WriteLnLog('DWindImage.DrawMe','ERROR: Wind image not ready to draw!');
 end;
 

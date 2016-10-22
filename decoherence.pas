@@ -37,10 +37,15 @@ uses Classes, SysUtils,
 
 { this procedure is mostly needed for Desktops and in normal situations
   should be called only once, but Windows has it's own ideas }
-Procedure OnWindowResize(Container : TUIContainer);
+Procedure WindowResize(Container : TUIContainer);
 begin
   if (window.width<>GUI.width) or (window.height<>GUI.height) then
     GUI.rescale;
+end;
+
+Procedure WindowRender(Container : TUIContainer);
+begin
+  GUI.draw;
 end;
 
 
@@ -77,7 +82,10 @@ begin
   WritelnLog('ApplicationInitialize','Init');
 
   GUI := DInterfaceContainer.create(Window);
+  GUI.rescale;
 
+  window.OnResize:=@WindowResize;
+  window.OnRender:=@WindowRender;
 
   //window.OnPress := @doPress;
   //window.onRelease := @doRelease;

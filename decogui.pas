@@ -36,6 +36,8 @@ Type
     constructor create(AOwner:TComponent); override;
     destructor destroy; override;
     procedure Rescale; override;
+    procedure draw; override;
+    procedure loadwind;
 end;
 
 var GUI: DInterfaceContainer;
@@ -55,14 +57,23 @@ begin
   writeLnLog('DInterfaceContainer.create','Creating interface.');
   inherited create(AOwner);
   rnd := TCastleRandom.Create;
-  Wind1 := DWindImage.create(self);
-  Wind1.phasespeed := 1/(5+rnd.Random);
-  Wind1.Load(LoadScreen_Folder+'WindClouds1_GIMP.jpg');
-  Wind2 := DWindImage.create(self);
-  Wind2.phasespeed := 1/(Pi+rnd.Random);
-  Wind2.Load(LoadScreen_Folder+'WindClouds2_GIMP.jpg');
+  LoadWind;
   width := -1;
   height := -1;
+end;
+
+procedure DInterfaceContainer.LoadWind;
+begin
+  Wind1 := DWindImage.create(self);
+  Wind1.phasespeed := 1/(15+rnd.Random);
+  Wind1.Load(LoadScreen_Folder+'WindClouds1_GIMP.jpg');
+  Wind1.Opacity:=0.1;
+  wind1.base.setsize(0,0,fullwidth,fullheight);
+  Wind2 := DWindImage.create(self);
+  Wind2.phasespeed := 1/(10+rnd.Random);
+  Wind2.Load(LoadScreen_Folder+'WindClouds2_GIMP.jpg');
+  wind2.base.setsize(0,0,fullwidth,fullheight);
+  Wind2.Opacity:=0.1;
 end;
 
 destructor DInterfaceContainer.destroy;
@@ -74,9 +85,18 @@ end;
 
 procedure DInterfaceContainer.rescale;
 begin
-  GUI.width := window.Width;
-  GUI.height := window.Height;
+  writeLnLog('DInterfaceContainer.rescale',inttostr(window.Width)+'x'+inttostr(window.Height));
+  width := window.Width;
+  height := window.Height;
+  wind1.rescale;
+  wind2.rescale;
   inherited;
+end;
+
+procedure DInterfaceContainer.Draw;
+begin
+  wind1.draw;
+  wind2.draw;
 end;
 
 end.
