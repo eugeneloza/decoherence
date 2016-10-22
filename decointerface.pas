@@ -94,18 +94,18 @@ Type
   DInterfaceElement = class(DAbstractInterfaceElement)
   public
     children: DInterfaceChildrenList;
+    procedure draw; override;
     constructor create(AOwner: TComponent); override;
     destructor destroy; override;
     procedure Rescale; override;
   end;
 
 
-
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
 uses sysutils, CastleLog, castleFilesUtils,
-  decogui; //todo
+  decogui;
 
 {=============================================================================}
 {=========================== Abstract element ================================}
@@ -248,7 +248,13 @@ begin
   inherited;
 end;
 
-
+procedure DInterfaceElement.draw;
+var i:integer;
+begin
+  //frame.draw;
+  //content.draw;
+  for i:=0 to children.Count-1 do children[i].draw;
+end;
 
 
 end.
