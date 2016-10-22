@@ -30,13 +30,14 @@ type
   public
     { Thread-safe part of rescaling the image }
     procedure RescaleImage;
+    procedure rescale; override;
     constructor create(AOwner:TComponent); override;
     destructor destroy; override;
     procedure draw; override;
   private
     SourceImage: TCastleImage;  //todo scale Source Image for max screen resolution ? //todo never store on Android.
     ScaledImage: TCastleImage;
-    { keeps from accidentally re-initing GL }
+    { keeps from accidentally re-initializing GL }
     InitGLPending: boolean;
     ImageReady: boolean;
     GLImage: TGLImage;
@@ -50,6 +51,17 @@ type
   public
     Opacity: float;
     Function GetAnimationState: Txywha; override;
+  end;
+
+type
+  { Wind and smoke effects used in different situations }
+  //todo might be descendant of DStaticImage
+  DWindImage = class (DAbstractImage)
+  public
+    color: TVector4Single;
+    procedure draw; override;
+  private
+    phase: float;
   end;
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
@@ -86,6 +98,13 @@ begin
   inherited;
 end;
 
+procedure DAbstractImage.rescale;
+begin
+  inherited;
+  RescaleImage;
+  //InitGL;
+end;
+
 procedure DAbstractImage.RescaleImage;
 begin
  if base.initialized then
@@ -117,6 +136,32 @@ begin
   result.x1 := base.x1;
   result.x2 := base.x2;
   result.opacity := Opacity;
+end;
+
+
+{=============================================================================}
+{========================= wind image ========================================}
+{=============================================================================}
+
+procedure DWindImage.Draw;
+var phase_scaled:integer;
+begin
+  if ImageReady then begin
+    color[3] := 0.2+0.2/4*sin(2*Pi*3*phase);
+    GLImage.Color := color;
+    phase_scaled := round(Phase*GUI.width);
+
+    //draw first part of the image
+    GLImage.Draw(phase_scaled,0,
+                 GUI.width-phase_scaled,GUI.height,
+                 0,0,
+                 GUI.width-phase_scaled,GUI.height);
+    //draw second part of the image
+    GLImage.Draw(0,0,
+                 phase_scaled,GUI.height,
+                 GUI.width-phase_scaled,0,
+                 phase_scaled,GUI.height);
+  end else WriteLnLog('DWindImage.DrawMe','ERROR: Wind image not ready to draw!');
 end;
 
 

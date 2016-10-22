@@ -30,6 +30,7 @@ Type
     width,height:integer;
     { random generator used for all interface random events }
     rnd: TCastleRandom;
+    wind1,wind2: DWindImage;
     constructor create(AOwner:TComponent); override;
     destructor destroy; override;
     procedure Rescale; override;

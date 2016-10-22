@@ -251,6 +251,7 @@ end;
 procedure DInterfaceElement.draw;
 var i:integer;
 begin
+  //todo
   //frame.draw;
   //content.draw;
   for i:=0 to children.Count-1 do children[i].draw;
