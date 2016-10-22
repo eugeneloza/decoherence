@@ -37,7 +37,10 @@ type
     Function GetAnimationState: Txywha; override;
   end;
 
+{+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
+
+uses decogui; //todo
 
 procedure DAbstractImage.InitGL;
 begin

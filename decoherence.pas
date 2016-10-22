@@ -23,6 +23,7 @@ interface
 
 const Version='interfa3-161013-40';
 
+{+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
 uses Classes, SysUtils,
@@ -31,8 +32,8 @@ uses Classes, SysUtils,
      {decomouse, decointerface, DecoFont,
      DecoLoadScreen,
      decolevel,}
-     decoimages,
-     decointerface, decoglobal;
+     decogui,
+     decoglobal;
 
 
 

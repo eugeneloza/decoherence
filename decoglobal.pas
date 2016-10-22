@@ -27,7 +27,7 @@ type float = single;
 var Window : TCastleWindowTouch;
     LogStream : TFileStream;
 
-
+{+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
 end.
