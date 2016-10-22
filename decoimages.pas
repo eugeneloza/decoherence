@@ -78,6 +78,15 @@ type
     procedure cyclephase;
   end;
 
+type
+  { A floating image for LoadScreens }
+  DFloatImage = class(DPhasedImage)
+  public
+    procedure Draw; override;
+  private
+    procedure CyclePhase;
+  end;
+
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
@@ -131,7 +140,7 @@ procedure DAbstractImage.rescale;
 begin
   inherited;
   RescaleImage;
-  //todo;
+  //todo!!!!!!!!!!!!!!! Not thread safe
   InitGL;
 end;
 
@@ -178,7 +187,7 @@ end;     }
 constructor DPhasedImage.create(AOwner: TComponent);
 begin
   inherited;
-  lasttime := now-1;
+  lasttime := -1;
   color:=vector4Single(1,1,1,1);
 end;
 
@@ -190,6 +199,7 @@ end;
 procedure DWindImage.CyclePhase;
 var phaseshift: float;
 begin
+  if lasttime=-1 then lasttime:=now;
   phaseshift:=(now-lasttime)*24*60*60*phaseSpeed;
   if phaseshift<0.5 then begin
     phase -= phaseshift*(1+0.1*GUI.rnd.Random);
@@ -203,6 +213,8 @@ begin
   end;
   lasttime:=now;
 end;
+
+
 procedure DWindImage.Draw;
 var phase_scaled:integer;
 begin
@@ -222,9 +234,37 @@ begin
                  phase_scaled,Window.height,
                  Window.width-phase_scaled,0,
                  phase_scaled,Window.height);
-  end else WriteLnLog('DWindImage.DrawMe','ERROR: Wind image not ready to draw!');
+  end else WriteLnLog('DWindImage.Draw','ERROR: Wind image not ready to draw!');
 end;
 
+{=============================================================================}
+{========================= float image =======================================}
+{=============================================================================}
+
+procedure DFloatImage.CyclePhase;
+var phaseshift: float;
+begin
+  if lasttime=-1 then lasttime:=now;
+  phaseshift:=(now-lasttime)*24*60*60*phaseSpeed;
+  phase -= phaseshift*(1+0.1*GUI.rnd.Random);
+  if phase>1 then begin
+    phase:=1;
+    //reloadimage;
+  end;
+  lasttime:=now;
+end;
+
+procedure DFloatImage.draw;
+var x:integer;
+begin
+  if ImageReady then begin
+    cyclePhase;
+    color[3] := Opacity*sin(phase);
+    GLImage.color := Color;
+    x:=round((window.width-base.w)*phase);
+    GLImage.Draw(x,0);
+  end else WritelnLog('DStaticImage.DrawMe','ERROR: Static Image not ready to draw!');
+end;
 
 end.
 
