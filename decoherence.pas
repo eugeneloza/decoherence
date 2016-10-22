@@ -45,6 +45,7 @@ end;
 
 Procedure WindowRender(Container : TUIContainer);
 begin
+ //todo if renderfinished, but this might conflict with 3D world render
   GUI.draw;
 end;
 

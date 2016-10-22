@@ -50,26 +50,34 @@ type
   { most simple image type }
   DStaticImage = class(DAbstractImage)
   public
+{    Opacity: float;
+    Function GetAnimationState: Txywha; override;}
+  end;
+
+type
+  { abstract "phased image" that moves and morphs with "phase" }
+  DPhasedImage = class(DAbstractImage)
+  public
+    color: TVector4Single; //todo
+    phasespeed: float;   {1/seconds to scroll the full screen}
     Opacity: float;
-    Function GetAnimationState: Txywha; override;
+    constructor create(AOwner: TComponent); override;
+  private
+    phase, opacityphase: float;
+    lasttime: TDateTime;
   end;
 
 type
   { Wind and smoke effects used in different situations }
   //todo might be descendant of DStaticImage
-  DWindImage = class (DAbstractImage)
+  DWindImage = class (DPhasedImage)
   public
-    color: TVector4Single; //todo
-    phasespeed: float;   {1/seconds to scroll the full screen}
-    Opacity: float;
     { completely overrides the default drawing procedure }
     procedure draw; override;
-    constructor create(AOwner: TComponent); override;
   private
-    phase, opacityphase: float;
-    lasttime: TDateTime;
     procedure cyclephase;
   end;
+
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
@@ -154,27 +162,30 @@ end;
 {========================= static image ========================================}
 {=============================================================================}
 
-Function DStaticImage.GetAnimationState: Txywha;
+{Function DStaticImage.GetAnimationState: Txywha;
 begin
   result := Txywha.create(nil);
   result.x1 := base.x1;
   result.x2 := base.x2;
   result.opacity := Opacity;
+end;     }
+
+
+{=============================================================================}
+{======================== phased image =======================================}
+{=============================================================================}
+
+constructor DPhasedImage.create(AOwner: TComponent);
+begin
+  inherited;
+  lasttime := now-1;
+  color:=vector4Single(1,1,1,1);
 end;
 
 
 {=============================================================================}
 {========================= wind image ========================================}
 {=============================================================================}
-
-constructor DWindImage.create(AOwner: TComponent);
-begin
-  inherited;
-  lasttime := now-1;
-  color:=vector4Single(1,1,1,1);
-{  phase := GUI.rnd.Random;
-  opacityphase := GUI.rnd.Random;}
-end;
 
 procedure DWindImage.CyclePhase;
 var phaseshift: float;
@@ -192,7 +203,6 @@ begin
   end;
   lasttime:=now;
 end;
-
 procedure DWindImage.Draw;
 var phase_scaled:integer;
 begin
