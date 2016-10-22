@@ -34,6 +34,7 @@ type
     constructor create(AOwner:TComponent); override;
     destructor destroy; override;
     procedure draw; override;
+    procedure Load(const filename:string);
   private
     SourceImage: TCastleImage;  //todo scale Source Image for max screen resolution ? //todo never store on Android.
     ScaledImage: TCastleImage;
@@ -58,17 +59,37 @@ type
   //todo might be descendant of DStaticImage
   DWindImage = class (DAbstractImage)
   public
-    color: TVector4Single;
+    color: TVector4Single; //todo
+    windspeed: float;
+    Opacity: float;
+    { completely overrides the default drawing procedure }
     procedure draw; override;
+    constructor create(AOwner: TComponent); override;
   private
-    phase: float;
+    phase, opacityphase: float;
+    lasttime: TDateTime;
+    procedure cyclephase;
   end;
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
-uses SysUtils, CastleLog,
+uses SysUtils, CastleLog, CastleFilesUtils,
      decogui;
+
+{-----------------------------------------------------------------------------}
+
+procedure DAbstractImage.Load(const filename: string);
+begin
+  WritelnLog('DAbstractImage.LoadImage',filename);
+  SourceImage := LoadImage(ApplicationData(filename));
+{  w := -1;//SourceImage.width;
+  h := -1;//SourceImage.Height;
+  //don't load TGLImage until scaleMe!!!}
+//  ImageLoaded := true;
+end;
+
+{----------------------------------------------------------------------------}
 
 procedure DAbstractImage.InitGL;
 begin
@@ -128,7 +149,9 @@ begin
   end;
 end;
 
-{----------------------------------------------------------------------------}
+{=============================================================================}
+{========================= static image ========================================}
+{=============================================================================}
 
 Function DStaticImage.GetAnimationState: Txywha;
 begin
@@ -143,11 +166,33 @@ end;
 {========================= wind image ========================================}
 {=============================================================================}
 
+constructor DWindImage.create(AOwner: TComponent);
+begin
+  inherited;
+  lasttime := now-1;
+{  phase := GUI.rnd.Random;
+  opacityphase := GUI.rnd.Random;}
+end;
+
+procedure DWindImage.CyclePhase;
+var phaseshift: float;
+begin
+  phaseshift:=(now-lasttime)*windspeed;
+  if phaseshift<0.5 then begin
+    phase += phaseshift;
+    opacityphase += phaseshift*3;
+  end else begin
+    phase := GUI.rnd.Random;
+    opacityphase := GUI.rnd.Random;
+  end;
+end;
+
 procedure DWindImage.Draw;
 var phase_scaled:integer;
 begin
   if ImageReady then begin
-    color[3] := 0.2+0.2/4*sin(2*Pi*3*phase);
+    cyclePhase;
+    color[3] := Opacity + Opacity/4 * sin(2*Pi*opacityphase);
     GLImage.Color := color;
     phase_scaled := round(Phase*GUI.width);
 
