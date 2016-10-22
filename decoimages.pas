@@ -60,7 +60,7 @@ type
   DWindImage = class (DAbstractImage)
   public
     color: TVector4Single; //todo
-    windspeed: float;
+    windspeed: float;   {seconds to scroll the full screen}
     Opacity: float;
     { completely overrides the default drawing procedure }
     procedure draw; override;
@@ -177,10 +177,10 @@ end;
 procedure DWindImage.CyclePhase;
 var phaseshift: float;
 begin
-  phaseshift:=(now-lasttime)*windspeed;
+  phaseshift:=(now-lasttime)/24/60/60*windspeed;
   if phaseshift<0.5 then begin
-    phase += phaseshift;
-    opacityphase += phaseshift*3;
+    phase += phaseshift*(1+0.1*GUI.rnd.Random);
+    opacityphase += phaseshift*3*(1+0.2*GUI.rnd.Random);
   end else begin
     phase := GUI.rnd.Random;
     opacityphase := GUI.rnd.Random;
@@ -191,7 +191,7 @@ procedure DWindImage.Draw;
 var phase_scaled:integer;
 begin
   if ImageReady then begin
-    cyclePhase;
+    CyclePhase;
     color[3] := Opacity + Opacity/4 * sin(2*Pi*opacityphase);
     GLImage.Color := color;
     phase_scaled := round(Phase*GUI.width);
