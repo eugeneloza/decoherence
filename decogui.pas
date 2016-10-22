@@ -4,9 +4,7 @@ unit decogui;
 
 interface
 
-uses Classes, SysUtils, {fgl,}
-  CastleLog, {castleFilesUtils,} CastleRandom,
-  {castleVectors, castleImages,}
+uses classes, CastleRandom,
   decointerface, decoimages,
   decoglobal;
 
@@ -26,6 +24,8 @@ var GUI: DInterfaceContainer;
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
+
+uses SysUtils, CastleLog;
 
 
 {=============================================================================}

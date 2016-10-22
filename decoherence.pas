@@ -29,9 +29,6 @@ implementation
 uses Classes, SysUtils,
      CastleLog,
      CastleWindow, CastleWindowTouch, CastleKeysMouse,
-     {decomouse, decointerface, DecoFont,
-     DecoLoadScreen,
-     decolevel,}
      decogui,
      decoglobal;
 

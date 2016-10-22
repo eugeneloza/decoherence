@@ -19,8 +19,7 @@ unit decointerface;
 interface
 
 uses
-  Classes, fgl, sysutils,
-  CastleLog, castleFilesUtils, CastleRandom,
+  Classes, fgl,
   castleVectors, castleImages,
   decoglobal;
 
@@ -105,7 +104,8 @@ Type
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
-uses decogui; //todo
+uses sysutils, CastleLog, castleFilesUtils,
+  decogui; //todo
 
 {=============================================================================}
 {=========================== Abstract element ================================}

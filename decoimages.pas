@@ -4,7 +4,7 @@ unit decoimages;
 
 interface
 
-uses SysUtils, Classes, CastleLog,
+uses Classes,
   castleVectors, CastleGLImages, CastleImages,
   decointerface,
   decoglobal;
@@ -40,7 +40,8 @@ type
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
-uses decogui; //todo
+uses SysUtils, CastleLog,
+     decogui; //todo
 
 procedure DAbstractImage.InitGL;
 begin

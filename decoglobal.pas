@@ -20,7 +20,7 @@ unit decoglobal;
 interface
 
 uses
-  Classes,CastleWindowTouch;
+  Classes, CastleWindowTouch;
 
 type float = single;
 
