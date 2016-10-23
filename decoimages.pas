@@ -34,7 +34,7 @@ type
     constructor create(AOwner:TComponent); override;
     destructor destroy; override;
     procedure draw; override;
-    procedure Load(const filename:string);
+    procedure Load(const filename:string); virtual;
   private
     SourceImage: TCastleImage;  //todo scale Source Image for max screen resolution ? //todo never store on Android.
     ScaledImage: TCastleImage;
@@ -62,6 +62,7 @@ type
     phasespeed: float;   {1/seconds to scroll the full screen}
     Opacity: float;
     constructor create(AOwner: TComponent); override;
+    procedure Load(const filename:string); override;
   private
     phase, opacityphase: float;
     lasttime: TDateTime;
@@ -140,8 +141,6 @@ procedure DAbstractImage.rescale;
 begin
   inherited;
   RescaleImage;
-  //todo!!!!!!!!!!!!!!! Not thread safe
-  InitGL;
 end;
 
 procedure DAbstractImage.RescaleImage;
@@ -187,10 +186,14 @@ end;     }
 constructor DPhasedImage.create(AOwner: TComponent);
 begin
   inherited;
-  lasttime := -1;
   color:=vector4Single(1,1,1,1);
 end;
 
+Procedure DPhasedImage.Load(const filename:string);
+begin
+  inherited Load(filename);
+  lasttime := -1;
+end;
 
 {=============================================================================}
 {========================= wind image ========================================}
@@ -234,7 +237,10 @@ begin
                  phase_scaled,Window.height,
                  Window.width-phase_scaled,0,
                  phase_scaled,Window.height);
-  end else WriteLnLog('DWindImage.Draw','ERROR: Wind image not ready to draw!');
+  end else begin
+    if InitGLPending then InitGL;
+//    WriteLnLog('DWindImage.Draw','ERROR: Wind image not ready to draw!');
+  end;
 end;
 
 {=============================================================================}
@@ -263,7 +269,10 @@ begin
     GLImage.color := Color;
     x:=round((window.width-base.w)*phase);
     GLImage.Draw(x,0);
-  end else WritelnLog('DStaticImage.DrawMe','ERROR: Static Image not ready to draw!');
+  end else begin
+    if InitGLPending then InitGL;
+  //   WritelnLog('DStaticImage.DrawMe','ERROR: Static Image not ready to draw!');
+  end;
 end;
 
 end.
