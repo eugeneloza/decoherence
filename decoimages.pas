@@ -28,44 +28,54 @@ type
   DAbstractImage = class(DAbstractElement)
   { General routines shared by images and labels }
   public
-    { Thread-safe part of rescaling the image }
-    procedure RescaleImage;
-    procedure rescale; override;
+    color: TVector4Single; //todo
+    { very simple draw procedure }
+    procedure draw; override;
     constructor create(AOwner:TComponent); override;
     destructor destroy; override;
-    procedure draw; override;
-    procedure Load(const filename:string); virtual;
-  private
-    SourceImage: TCastleImage;  //todo scale Source Image for max screen resolution ? //todo never store on Android.
-    ScaledImage: TCastleImage;
-    { keeps from accidentally re-initializing GL }
-    InitGLPending: boolean;
-    ImageReady: boolean;
-    GLImage: TGLImage;
     { initialize GL image. NOT THREAD SAFE! }
     procedure InitGL;
+    { frees an image without freeing the whole instance }
+    procedure FreeImage;
+  private
+    GLImage: TGLImage;
+  public
+    ImageReady, ImageLoaded: boolean;
+    { keeps from accidentally re-initializing GL }
+    InitGLPending: boolean;
+    SourceImage: TCastleImage;  //todo scale Source Image for max screen resolution ? //todo never store on Android.
+    ScaledImage: TCastleImage;
   end;
 
 type
   { most simple image type }
   DStaticImage = class(DAbstractImage)
   public
-{    Opacity: float;
-    Function GetAnimationState: Txywha; override;}
+
+    { if thread is running }
+    ThreadWorking: boolean;
+    { loads image in realtime }
+    procedure Load(const filename:string); virtual;
+    { loads image in a thread }
+    procedure LoadThread(const filename:string);
+    { Thread-safe part of rescaling the image }
+    procedure rescale; override;
+  private
+    procedure RescaleImage;
   end;
 
 type
   { abstract "phased image" that moves and morphs with "phase" }
-  DPhasedImage = class(DAbstractImage)
+  DPhasedImage = class(DStaticImage)
   public
-    color: TVector4Single; //todo
     phasespeed: float;   {1/seconds to scroll the full screen}
     Opacity: float;
     constructor create(AOwner: TComponent); override;
     procedure Load(const filename:string); override;
   private
-    phase, opacityphase: float;
     lasttime: TDateTime;
+  public
+    phase, opacityphase: float;
   end;
 
 type
@@ -88,6 +98,8 @@ type
     procedure CyclePhase;
   end;
 
+var LoadNewFloaterImage: boolean;
+
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
@@ -95,17 +107,58 @@ implementation
 uses SysUtils, CastleLog, CastleFilesUtils,
      decogui;
 
+type TLoadImageThread = class(TThread)
+  private
+  protected
+    Target: DStaticImage;
+    Source: String;
+    procedure Execute; override;
+end;
+
+procedure TLoadImageThread.execute;
+begin
+  target.ThreadWorking:=true;
+  WritelnLog('TLoadImageThread.execute','Image thread started.');
+  Target.Load(Source);
+  if Target=nil then begin
+    WritelnLog('TLoadImageThread.execute','Image was destroyed before it was loaded!');
+    exit; //fix bug if the image didn't load completely but was destroyed
+  end;
+  Target.rescale;
+  WritelnLog('TLoadImageThread.execute','Image thread finished.');
+  target.ThreadWorking:=false;
+end;
+
 {-----------------------------------------------------------------------------}
 
-procedure DAbstractImage.Load(const filename: string);
+procedure DStaticImage.LoadThread(const filename: string);
+var LoadImageThread: TLoadImageThread;
+begin
+ if not ThreadWorking then begin
+   LoadImageThread := TLoadImageThread.Create(true);
+   LoadImageThread.Target := self;
+   LoadImageThread.Source := filename;
+   LoadImageThread.FreeOnTerminate := true;
+   LoadImageThread.Priority := tpLower;
+   LoadImageThread.Start;
+ end;
+end;
+
+procedure DStaticImage.Load(const filename: string);
 begin
   WritelnLog('DAbstractImage.LoadImage',filename);
   SourceImage := LoadImage(ApplicationData(filename));
-{  w := -1;//SourceImage.width;
-  h := -1;//SourceImage.Height;
-  //don't load TGLImage until scaleMe!!!}
-//  ImageLoaded := true;
+  ImageLoaded := true;
 end;
+
+procedure DAbstractImage.FreeImage;
+begin
+  freeandnil(GLImage);
+  freeandnil(SourceImage);
+  ImageReady := false;
+  ImageLoaded := false;
+end;
+
 
 {----------------------------------------------------------------------------}
 
@@ -124,8 +177,10 @@ end;
 constructor DAbstractImage.create(AOwner: TComponent);
 begin
   inherited create(AOwner);
+  color:=vector4Single(1,1,1,1);
   InitGLPending := false;
   imageReady := false;
+  imageLoaded := false;
 end;
 
 destructor DAbstractImage.destroy;
@@ -137,22 +192,29 @@ begin
   inherited;
 end;
 
-procedure DAbstractImage.rescale;
+procedure DStaticImage.rescale;
 begin
   inherited;
+  base.fixProportions(sourceImage.Width,sourceImage.height);
+{  last.fixProportions(sourceImage.Width,sourceImage.height);
+  next.fixProportions(sourceImage.Width,sourceImage.height);}
   RescaleImage;
 end;
 
-procedure DAbstractImage.RescaleImage;
+procedure DStaticImage.RescaleImage;
 begin
- if base.initialized then
-  if (scaledImage = nil) or (ScaledImage.Width <> base.w) or (ScaledImage.height <> base.h) then begin
-    scaledImage := SourceImage.CreateCopy as TCastleImage;
-    scaledImage.Resize(base.w,base.h,InterfaceScalingMethod);
-    InitGLPending := true;
-  end
- else
-   writeLnLog('DAbstractImage.RescaleImage','ERROR: base.initialized = false');
+ if ImageLoaded then begin
+   if base.initialized then
+    if (scaledImage = nil) or (ScaledImage.Width <> base.w) or (ScaledImage.height <> base.h) then begin
+      ImageReady:=false;
+      FreeAndNil(GLImage);
+      scaledImage := SourceImage.CreateCopy as TCastleImage;
+      scaledImage.Resize(base.w,base.h,InterfaceScalingMethod);
+      InitGLPending := true;
+    end
+   else
+     writeLnLog('DAbstractImage.RescaleImage','ERROR: base.initialized = false');
+ end;
 end;
 
 procedure DAbstractImage.draw;
@@ -163,6 +225,9 @@ begin
     currentAnimationState:=GetAnimationState;
     GLImage.color:=vector4single(1,1,1,currentAnimationState.Opacity); //todo
     GLIMage.Draw(currentAnimationState.x1,currentAnimationState.y1,currentAnimationState.w,currentAnimationState.h); //todo
+  end else begin
+    if InitGLPending then InitGL;
+  //   WritelnLog('DStaticImage.DrawMe','ERROR: Static Image not ready to draw!');
   end;
 end;
 
@@ -186,7 +251,6 @@ end;     }
 constructor DPhasedImage.create(AOwner: TComponent);
 begin
   inherited;
-  color:=vector4Single(1,1,1,1);
 end;
 
 Procedure DPhasedImage.Load(const filename:string);
@@ -250,12 +314,16 @@ end;
 procedure DFloatImage.CyclePhase;
 var phaseshift: float;
 begin
-  if lasttime=-1 then lasttime:=now;
-  phaseshift:=(now-lasttime)*24*60*60*phaseSpeed;
-  phase -= phaseshift*(1+0.1*GUI.rnd.Random);
+  if lasttime = -1 then begin
+    lasttime := now;
+    phase := 0;
+  end;
+  phaseshift := (now-lasttime)*24*60*60*phaseSpeed;
+  phase += phaseshift*(1+0.1*GUI.rnd.Random);
   if phase>1 then begin
     phase:=1;
-    //reloadimage;
+    LoadNewFloaterImage:=true;
+    ImageLoaded:=false;
   end;
   lasttime:=now;
 end;
@@ -265,7 +333,7 @@ var x:integer;
 begin
   if ImageReady then begin
     cyclePhase;
-    color[3] := Opacity*sin(phase);
+    color[3] := Opacity*sin(Pi*phase);
     GLImage.color := Color;
     x:=round((window.width-base.w)*phase);
     GLImage.Draw(x,0);

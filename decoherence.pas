@@ -95,7 +95,7 @@ begin
 
   //randomize;
   //WritelnLog('ApplicationInitialize','InitializeFonts');
-  //InitializeFonts;
+  //
 
   //WritelnLog('ApplicationInitialize','Init finished');
 

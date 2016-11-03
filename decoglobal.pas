@@ -25,7 +25,9 @@ uses
 type float = single;
 
 var Window : TCastleWindowTouch;
+    {$IFNDEF Android}
     LogStream : TFileStream;
+    {$ENDIF}
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation

@@ -28,6 +28,7 @@ const Frames_Folder = 'interface/frames/';
 
 const fullwidth = -1;
       fullheight = -2;
+      proportionalscale = -3;
 
 const InterfaceScalingMethod: TResizeInterpolation = riBilinear;
 
@@ -56,6 +57,8 @@ type
     procedure setsize(const newx,newy,neww,newh:float);
     procedure recalculate;
     constructor create(AOwner: TComponent); override;
+    { provides for proportional width/height scaling for some images }
+    procedure FixProportions(ww,hh:integer);
   end;
 
 type
@@ -72,7 +75,7 @@ Type
   public
     { these values are "strict" and unaffected by animations. Usually determines
       the basic stage and implies image rescale and init GL. }
-    base: Txywh;
+    base: Txywha;
     constructor create(AOwner:TComponent); override;
     destructor destroy; override;
     procedure rescale; virtual;
@@ -124,10 +127,10 @@ end;
 procedure Txywh.setsize(const newx,newy,neww,newh:float);
 begin
     if (abs(newx)>GUI_grid) or (abs(newy)>GUI_grid) or
-     (((neww<0) or (neww>GUI_grid)) and ((neww<>fullwidth) and (neww<>fullheight))) or
-     (((newh<0) or (newh>GUI_grid)) and (newh<>fullheight)) then
+     (((neww<0) or (neww>GUI_grid)) and ((neww<>proportionalscale) and (neww<>fullwidth) and (neww<>fullheight))) or
+     (((newh<0) or (newh>GUI_grid)) and ((neww<>proportionalscale) and (newh<>fullheight))) then
   begin
-    writeLnLog('DAbstractElement.setsize','ERROR: Incorrect newx,newy,neww,newh!');
+    writeLnLog('Txywh.setsize','ERROR: Incorrect newx,newy,neww,newh!');
     exit;
   end;
 
@@ -146,15 +149,15 @@ procedure Txywh.recalculate;
 begin
   { convert float to integer }
 
-  if fx>0 then
+  if fx>=0 then
     x1 := round(Window.height*fx*GUI_scale_unit_float)
   else
-    x1 := Window.width - round(Window.height*fx*GUI_scale_unit_float);
+    x1 := Window.width + round(Window.height*fx*GUI_scale_unit_float);
 
-  if fy>0 then
+  if fy>=0 then
     y1 := round(Window.height*fy*GUI_scale_unit_float)     // turn over y-axis?
   else
-    y1 := Window.height - round(Window.height*fy*GUI_scale_unit_float);
+    y1 := Window.height + round(Window.height*fy*GUI_scale_unit_float);
 
   if fw = fullwidth then begin
     w := Window.width;
@@ -172,10 +175,19 @@ begin
   end else
     h := round(Window.height*fh*GUI_scale_unit_float);
 
-  x2:=x1+w;
-  y2:=y1+h;
+  x2 := x1+w;
+  y2 := y1+h;
 
-  initialized:=true;
+  initialized := true;
+end;
+
+procedure Txywh.FixProportions(ww,hh:integer);
+begin
+  if fw = proportionalscale then
+    w := round(h*ww/hh)
+  else                                 //they can't be proportional both
+  if fh = proportionalscale then
+    h := round(w*hh/ww);
 end;
 
 {============================================================================}
@@ -200,7 +212,7 @@ begin
     result.y2 := base.y2;
     result.h := base.h;
     result.w := base.w;
-    result.opacity := 1;
+    result.opacity := base.Opacity;
   end;
 end;
 
@@ -210,7 +222,7 @@ end;
 constructor DAbstractElement.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  base := Txywh.Create(self);
+  base := Txywha.Create(self);
   last := Txywha.Create(self);
   next := Txywha.Create(self);
 end;
