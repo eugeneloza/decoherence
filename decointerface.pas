@@ -32,6 +32,7 @@ const fullwidth = -1;
 
 const InterfaceScalingMethod: TResizeInterpolation = riBilinear;
 
+const defaultanimationduration = 300 /1000/60/60/24; {in ms}
 
 {1/17 of window.height is a "unit" in GUI scale.
 Basically calculated as 4 characters vertical space allocation
@@ -49,23 +50,25 @@ type
   Txywh = class(TComponent)
   public
     { integer "box" }
-    x1,y1,x2,y2,w,h:integer;
+    x1,y1,x2,y2,w,h: integer;
     { float }
     fx,fy,fw,fh: float;
+    opacity: float;
     initialized: boolean;
     { assign float and convert to Integer }
-    procedure setsize(const newx,newy,neww,newh:float);
+    procedure setsize(const newx,newy,neww,newh: float);
+    procedure backwardsetsize(const neww,newh: integer);
     procedure recalculate;
     constructor create(AOwner: TComponent); override;
     { provides for proportional width/height scaling for some images }
-    procedure FixProportions(ww,hh:integer);
+    procedure FixProportions(ww,hh: integer);
   end;
 
 type
-  { extended Txywh with opacity for animations }
   Txywha = class(Txywh)
   public
-    opacity: float;
+    //function makecopy:Txywh;
+    procedure copyxywh(source: Txywh);
   end;
 
 Type
@@ -73,19 +76,26 @@ Type
     Just defines the box and rescaling }
   DAbstractElement = class(TComponent)
   public
-    { these values are "strict" and unaffected by animations. Usually determines
-      the basic stage and implies image rescale and init GL. }
-    base: Txywha;
     constructor create(AOwner:TComponent); override;
     destructor destroy; override;
+    { changes the scale of the element relative to current window size }
     procedure rescale; virtual;
+    { draw the element }
     procedure draw; virtual; abstract;
+    { gets current animation state. =base if animation finished. Not very
+     efficient as it creates/disposes a copy of the txywha every frame. TODO}
     function GetAnimationState: Txywha; virtual;
   private
     { Last and Next animation states. }
     last, next: Txywha;
-//    animation_start, animation_end: TDateTime;
 //    Free_on_end: boolean;
+  public
+    { these values are "strict" and unaffected by animations. Usually determines
+      the basic stage and implies image rescale and init GL. }
+    animationstart: TDateTime;
+    animationduration: single;
+    base: Txywha;
+    procedure setbasesize(const newx,newy,neww,newh,newo: float; animate: boolean);
   end;
 
 Type
@@ -126,7 +136,7 @@ end;
 
 procedure Txywh.setsize(const newx,newy,neww,newh:float);
 begin
-    if (abs(newx)>GUI_grid) or (abs(newy)>GUI_grid) or
+  if (abs(newx)>GUI_grid) or (abs(newy)>GUI_grid) or
      (((neww<0) or (neww>GUI_grid)) and ((neww<>proportionalscale) and (neww<>fullwidth) and (neww<>fullheight))) or
      (((newh<0) or (newh>GUI_grid)) and ((neww<>proportionalscale) and (newh<>fullheight))) then
   begin
@@ -181,6 +191,15 @@ begin
   initialized := true;
 end;
 
+procedure Txywh.backwardsetsize(const neww,newh: integer);
+begin
+  w := neww;
+  h := newh;
+  fw := neww/window.height;
+  fh := newh/window.height;
+end;
+
+
 procedure Txywh.FixProportions(ww,hh:integer);
 begin
   if fw = proportionalscale then
@@ -188,6 +207,33 @@ begin
   else                                 //they can't be proportional both
   if fh = proportionalscale then
     h := round(w*hh/ww);
+end;
+
+procedure Txywha.copyxywh(source: Txywh);
+begin
+  x1 := source.x1;
+  y1 := source.y1;
+  x2 := source.x2;
+  y2 := source.y2;
+  w := source.w;
+  h := source.h;
+  fx := source.fx;
+  fy := source.fy;
+  fw := source.fw;
+  fh := source.fh;
+  opacity := source.opacity;
+  initialized := source.initialized;
+{ result := Txywh.create(self);
+  result.x1 := x1;
+  result.x2 := x2;
+  result.y1 := y1;
+  result.y2 := y2;
+  result.fx := fx;
+  result.fy := fy;
+  result.fw := fw;
+  result.fh := fh;
+  result.opacity := opacity;
+  result.initialized := initialized;}
 end;
 
 {============================================================================}
@@ -200,19 +246,51 @@ begin
   next.recalculate;
 end;
 
+procedure DAbstractElement.setbasesize(const newx,newy,neww,newh,newo: float; animate: boolean);
+var tmpxywh:Txywha;
+begin
+  base.setsize(newx,newy,neww,newh);
+  base.opacity := newo;
+  if animate then begin
+    tmpxywh := GetAnimationState;   //getanimationstate needs "last" so we can't freeannil it yet
+    freeandnil(last);
+    last := tmpxywh;
+    next.copyxywh(base);
+    animationstart := -1;
+    animationduration := defaultanimationduration;
+  end;
+end;
+
 {----------------------------------------------------------------------------}
 
 Function DAbstractElement.GetAnimationState: Txywha;
+var phase: single;
 begin
   if true then begin //todo!!!!!!!!!!!!!!!!!!!!!!!
-    result := Txywha.create(nil);
-    result.x1 := base.x1;
-    result.x2 := base.x2;
-    result.y1 := base.y1;
-    result.y2 := base.y2;
-    result.h := base.h;
-    result.w := base.w;
-    result.opacity := base.Opacity;
+    result := Txywha.create(self);
+    if (last.initialized) and (next.initialized) and
+      ((animationstart = -1) or (now-animationstart < animationduration)) then begin
+      if animationstart=-1 then animationstart:=now;
+      phase := (now-animationstart)/animationduration; //animationtime
+      //make curve slower at ends and sharper at middle
+      if phase<0.5 then phase := sqr(2*phase)/2 else phase := 1 - sqr(2*(1-phase))/2;
+      result.x1 := last.x1+round((next.x1-last.x1)*phase);
+      result.x2 := last.x2+round((next.x2-last.x2)*phase);
+      result.y1 := last.y1+round((next.y1-last.y1)*phase);
+      result.y2 := last.y2+round((next.y2-last.y2)*phase);
+      result.h := last.h+round((next.h-last.h)*phase);
+      result.w := last.w+round((next.w-last.w)*phase);
+      result.opacity := last.opacity+round((next.opacity-last.opacity)*phase);
+    end else begin
+      {should be "next" here}
+      result.x1 := base.x1;
+      result.x2 := base.x2;
+      result.y1 := base.y1;
+      result.y2 := base.y2;
+      result.h := base.h;
+      result.w := base.w;
+      result.opacity := base.Opacity;
+    end;
   end;
 end;
 

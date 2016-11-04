@@ -225,6 +225,7 @@ begin
     currentAnimationState:=GetAnimationState;
     GLImage.color:=vector4single(1,1,1,currentAnimationState.Opacity); //todo
     GLIMage.Draw(currentAnimationState.x1,currentAnimationState.y1,currentAnimationState.w,currentAnimationState.h); //todo
+    freeandnil(currentAnimationState);
   end else begin
     if InitGLPending then InitGL;
   //   WritelnLog('DStaticImage.DrawMe','ERROR: Static Image not ready to draw!');

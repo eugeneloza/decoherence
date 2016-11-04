@@ -40,6 +40,7 @@ Type
     { wind images to provide background }
     wind1,wind2: DWindImage;
     floater: DFloatImage;
+    background: DStaticImage;
     LoadScreenLabel, FloaterLabel: DLabel;
     procedure DoLoadNewImage;
     procedure loadwind;
@@ -59,7 +60,7 @@ uses SysUtils, CastleLog,
   decofacts;
 
 const LoadScreenFolder='interface/loadscreen/';
-
+      BackgroundsFolder='interface/background/';
 
 {=============================================================================}
 {========================== interface container ==============================}
@@ -71,14 +72,12 @@ begin
   inherited create(AOwner);
   rnd := TCastleRandom.Create;
   LoadWind;
-  InitializeFonts;
   LoadFacts;
 
   Last_render_time := now;
   FPS_count := 0;
   FPS_Label := DLabel.create(self);
-  FPS_Label.base.setsize(0,0,1,1);
-  FPS_Label.base.Opacity := 1;
+  FPS_Label.setbasesize(0,0,1,1,1,false);
   FPS_Label.Shadow := 0;
   FPS_Label.Font := RegularFont16;
   FPS_Label.text := 'x';
@@ -113,7 +112,7 @@ procedure DInterfaceContainer.rescale;
 begin
   writeLnLog('DInterfaceContainer.rescale',inttostr(window.Width)+'x'+inttostr(window.Height));
   if window.width < window.height then begin
-    // BUG HERE! DOESN'T WORK AS EXPECTED in Linux !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    // BUG HERE! DOESN'T WORK AS EXPECTED (in Linux) !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     writeLnLog('DInterfaceContainer.rescale','ERROR: Only landscape orientation supported!');
     window.width := window.height+10;
   end;
@@ -122,6 +121,10 @@ begin
   wind1.rescale;
   wind2.rescale;
   if floater<>nil then floater.rescale;
+  if fps_label<>nil then fps_label.rescale;
+  if floaterLabel<>nil then floaterlabel.rescale;
+  if LoadScreenLabel<>nil then LoadScreenLabel.rescale;
+  if background<>nil then background.rescale; //todo maybe just check show/hide
   inherited;
 end;
 
@@ -135,43 +138,51 @@ begin
   floater.base.setsize(0,0,proportionalscale,fullheight);
   floater.LoadThread(LoadScreenFolder+GetRandomFactImage);
 
-  if LoadScreenLabel=nil then LoadScreenLabel := DLabel.create(self);
-  LoadScreenLabel.base.setsize(1,-2,10,10);
-  LoadScreenLabel.base.Opacity := 1;
-  LoadScreenLabel.Shadow := 1;
-  LoadScreenLabel.Font := RegularFont16;
+  if LoadScreenLabel=nil then begin
+    LoadScreenLabel := DLabel.create(self);
+    LoadScreenLabel.setbasesize(1,-2,10,10,1,false);
+    LoadScreenLabel.Shadow := 1;
+    LoadScreenLabel.Font := RegularFont16;
+  end;
   LoadScreenLabel.text := 'Добро пожаловать в Decoherence :)'+dlinebreak+'Идёт загрузка, подождите...'+dlinebreak+'П.С. пока "почти нечего грузить" :)'+dlinebreak+'Просто нажмите любую клавишу...';
 
-  if floaterLabel = nil then FloaterLabel := DLabel.create(self);
-  floaterLabel.base.setsize(-11,1,10,10);
-  floaterLabel.base.Opacity := 0;
-  floaterLabel.Font := RegularFont16;
-  floaterLabel.Shadow := 1;
+  if floaterLabel = nil then begin
+    FloaterLabel := DLabel.create(self);
+    floaterLabel.Font := RegularFont16;
+    floaterLabel.Shadow := 1;
+  end;
+  floaterLabel.setbasesize(-11,1,10,10,0,false); //need to reset it each new fact, because w is reset to realwidth after text initialize
   floaterLabel.text := GetRandomFact;
+
+  if background=nil then begin
+    background := DStaticImage.create(self);
+    background.LoadThread(BackgroundsFolder+'spaceship-1548838_1280_CC0_by_PRIO5D_[gmic].jpg');
+    background.setbasesize(0,0,fullwidth,fullheight,1,false);
+  end;
 end;
 
 procedure DInterfaceContainer.Draw;
 begin
   if (floater = nil) or (LoadNewFloaterImage) then DoLoadNewImage;
+  background.draw;
   floater.draw;
   wind1.draw;
   wind2.draw;
-  LoadScreenLabel.base.Opacity := 1;
   LoadScreenLabel.draw;
 
-  floaterLabel.base.fy := 1 + 5*Floater.phase;
+{  floaterLabel.base.fy := 1 + 5*Floater.phase;
   floaterLabel.base.recalculate;
   floaterLabel.base.w := floaterLabel.RealWidth;           //make something as "keep scale"? or override dlabel.draw? (NO, animations!)
-  floaterLabel.base.h := floaterLabel.RealHeight;
+  floaterLabel.base.h := floaterLabel.RealHeight;}
+  floaterLabel.base.y1 := round((1 + 5*Floater.phase)*Window.height*GUI_scale_unit_float);
   floaterLabel.base.Opacity := sin(Pi*Floater.Phase);
   floaterLabel.draw;
 
   if ((now-Last_render_time)*24*60*60>=1) then begin
-    FPS_label.text := Inttostr(FPS_count);
+    FPS_label.text := Inttostr(FPS_count){+' '+inttostr(round(Window.Fps.RealTime))};
     FPS_count := 0;
     Last_Render_time:=now;
   end else inc(FPS_count);
-  FPS_label.base.Opacity := 1;
   FPS_label.draw;
 end;
 

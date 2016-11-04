@@ -30,6 +30,7 @@ Type DLabel = class(DAbstractImage)
   Shadow: Float;
   constructor Create(AOwner: TComponent); override;
   destructor Destroy; override;
+  procedure Rescale; override;
  private
   procedure PrepareTextImage;
   procedure settext(const value: string);
@@ -73,6 +74,13 @@ begin
   result := ftext;
 end;
 
+procedure DLabel.Rescale;
+begin
+  inherited;
+  base.w := RealWidth;           //make something as "keep scale"? or override dlabel.draw? (NO, animations!)
+  base.h := RealHeight;
+end;
+
 procedure DLabel.PrepareTextImage;
 begin
   if BrokenString<> nil then BrokenString.Clear;
@@ -96,8 +104,9 @@ begin
   ImageLoaded := true;     //not good...
   //Rescale;
   ScaledImage := SourceImage.MakeCopy;
-  base.w := RealWidth;
-  base.h := RealHeight;
+  base.backwardsetsize(RealWidth,RealHeight)
+{  base.w := ;
+  base.h := RealHeight;}
 end;
 
 end.

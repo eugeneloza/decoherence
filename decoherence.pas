@@ -21,7 +21,7 @@ unit Decoherence;
 
 interface
 
-const Version='interfa3-161013-40';
+const Version='interfa3-161103-44';
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
@@ -29,7 +29,8 @@ implementation
 uses Classes, SysUtils,
      CastleLog,
      CastleWindow, CastleWindowTouch, CastleKeysMouse,
-     decogui,
+     decogui, decomouse, decofont,
+     decolevel,
      decoglobal;
 
 {==========================================================================}
@@ -45,8 +46,28 @@ end;
 
 Procedure WindowRender(Container : TUIContainer);
 begin
- //todo if renderfinished, but this might conflict with 3D world render
+ //todo if renderfinished to make frameskip, but this might conflict with 3D world render
   GUI.draw;
+end;
+
+{======================== Mouse & keyboard =================================}
+
+procedure doPress(Container: TUIContainer; const Event: TInputPressRelease);
+begin
+  if Event.EventType = itMouseButton then begin
+    doMousePress(Event);
+    {if interface didn't catch the click then}
+    if mbRight=event.MouseButton then camera.MouseLook := not Camera.MouseLook;
+  end;
+  InitTestLevel;                         //ugly! I'll fix this soon.
+  //window.OnRender := @doWindowRender;
+end;
+
+procedure doRelease(Container: TUIContainer; const Event: TInputPressRelease);
+begin
+  if Event.EventType = itMouseButton then begin
+    doMouseRelease(Event);
+  end;
 end;
 
 
@@ -82,26 +103,25 @@ begin
   {$ENDIF}
   WritelnLog('ApplicationInitialize','Init');
 
-  GUI := DInterfaceContainer.create(Window);
-  GUI.rescale;
-
   window.OnResize:=@WindowResize;
   window.OnRender:=@WindowRender;
 
-  //window.OnPress := @doPress;
-  //window.onRelease := @doRelease;
-  //WritelnLog('ApplicationInitialize','DTouchList.create');
-  //TouchArray := DTouchList.create;
+  window.OnPress := @doPress;
+  window.onRelease := @doRelease;
+  WritelnLog('ApplicationInitialize','DTouchList.create');
+  TouchArray := DTouchList.create;
 
-  //randomize;
-  //WritelnLog('ApplicationInitialize','InitializeFonts');
-  //
+  WritelnLog('ApplicationInitialize','Initialize fonts');
+  InitializeFonts;
 
-  //WritelnLog('ApplicationInitialize','Init finished');
+  WritelnLog('ApplicationInitialize','Initialize interface');
+  GUI := DInterfaceContainer.create(Window);
+  GUI.rescale;
 
-  //MakeLoadScreen;
+  WritelnLog('ApplicationInitialize','Init finished');
+
   //InitInterface;
-  //Load_test_level;
+  Load_test_level; //remake it
 
 end;
 
