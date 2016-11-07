@@ -16,6 +16,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 unit decoimages;
 
 {$mode objfpc}{$H+}
+{$INCLUDE compilerconfig.inc}
 
 interface
 
@@ -34,7 +35,7 @@ type
     constructor create(AOwner:TComponent); override;
     destructor destroy; override;
     { initialize GL image. NOT THREAD SAFE! }
-    procedure InitGL;
+    procedure InitGL;{ override;}
     { frees an image without freeing the whole instance }
     procedure FreeImage;
   private
@@ -115,6 +116,8 @@ type TLoadImageThread = class(TThread)
     procedure Execute; override;
 end;
 
+{----------------------------------------------------------------------------}
+
 procedure TLoadImageThread.execute;
 begin
   target.ThreadWorking:=true;
@@ -144,12 +147,18 @@ begin
  end;
 end;
 
+{----------------------------------------------------------------------------}
+
 procedure DStaticImage.Load(const filename: string);
 begin
   WritelnLog('DAbstractImage.LoadImage',filename);
   SourceImage := LoadImage(ApplicationData(filename));
+  RealWidth := SourceImage.Width;
+  RealHeight := SourceImage.Height;
   ImageLoaded := true;
 end;
+
+{----------------------------------------------------------------------------}
 
 procedure DAbstractImage.FreeImage;
 begin
@@ -158,7 +167,6 @@ begin
   ImageReady := false;
   ImageLoaded := false;
 end;
-
 
 {----------------------------------------------------------------------------}
 
@@ -174,6 +182,8 @@ begin
   end;
 end;
 
+{----------------------------------------------------------------------------}
+
 constructor DAbstractImage.create(AOwner: TComponent);
 begin
   inherited create(AOwner);
@@ -182,6 +192,8 @@ begin
   imageReady := false;
   imageLoaded := false;
 end;
+
+{----------------------------------------------------------------------------}
 
 destructor DAbstractImage.destroy;
 begin
@@ -192,23 +204,29 @@ begin
   inherited;
 end;
 
+{----------------------------------------------------------------------------}
+
 procedure DStaticImage.rescale;
 begin
   inherited;
-  base.fixProportions(sourceImage.Width,sourceImage.height);
+  base.fixProportions(RealWidth,Realheight);
 {  last.fixProportions(sourceImage.Width,sourceImage.height);
   next.fixProportions(sourceImage.Width,sourceImage.height);}
   RescaleImage;
 end;
 
+{----------------------------------------------------------------------------}
+
 procedure DStaticImage.RescaleImage;
 begin
+ {$IFNDEF AllowRescale}If sourceImage=nil then exit;{$ENDIF}
  if ImageLoaded then begin
    if base.initialized then
     if (scaledImage = nil) or (ScaledImage.Width <> base.w) or (ScaledImage.height <> base.h) then begin
       ImageReady:=false;
       FreeAndNil(GLImage);
       scaledImage := SourceImage.CreateCopy as TCastleImage;
+      {$IFNDEF AllowRescale}freeandnil(sourceImage);{$ENDIF}
       scaledImage.Resize(base.w,base.h,InterfaceScalingMethod);
       InitGLPending := true;
     end
@@ -217,18 +235,17 @@ begin
  end;
 end;
 
+{----------------------------------------------------------------------------}
+
 procedure DAbstractImage.draw;
-var currentAnimationState:Txywha;
 begin
   if ImageReady then begin
     //animate
-    currentAnimationState:=GetAnimationState;
-    GLImage.color:=vector4single(1,1,1,currentAnimationState.Opacity); //todo
+    GetAnimationState;
+    GLImage.color := vector4single(1,1,1,currentAnimationState.Opacity); //todo
     GLIMage.Draw(currentAnimationState.x1,currentAnimationState.y1,currentAnimationState.w,currentAnimationState.h); //todo
-    freeandnil(currentAnimationState);
   end else begin
     if InitGLPending then InitGL;
-  //   WritelnLog('DStaticImage.DrawMe','ERROR: Static Image not ready to draw!');
   end;
 end;
 
@@ -253,6 +270,8 @@ constructor DPhasedImage.create(AOwner: TComponent);
 begin
   inherited;
 end;
+
+{----------------------------------------------------------------------------}
 
 Procedure DPhasedImage.Load(const filename:string);
 begin
@@ -282,6 +301,7 @@ begin
   lasttime:=now;
 end;
 
+{----------------------------------------------------------------------------}
 
 procedure DWindImage.Draw;
 var phase_scaled:integer;
@@ -328,6 +348,8 @@ begin
   end;
   lasttime:=now;
 end;
+
+{----------------------------------------------------------------------------}
 
 procedure DFloatImage.draw;
 var x:integer;

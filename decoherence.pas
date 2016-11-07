@@ -15,13 +15,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 
 unit Decoherence;
 
+{$INCLUDE compilerconfig.inc}
 {$mode objfpc}{$H+}
 //{$DEFINE WriteLog}{$IFDEF Windows}{$APPTYPE GUI}{$ENDIF}
-{$R+}{$Q+}
+
 
 interface
 
-const Version='interfa3-161103-44';
+const Version='interfa3-161106-47';
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
@@ -29,38 +30,48 @@ implementation
 uses Classes, SysUtils,
      CastleLog,
      CastleWindow, CastleWindowTouch, CastleKeysMouse,
-     decogui, decomouse, decofont,
+     decogui, decointerface, decomouse, decofont,
      decolevel,
-     decoglobal;
+     decoglobal, decogamemode;
 
 {==========================================================================}
 {==========================================================================}
 
-{ this procedure is mostly needed for Desktops and in normal situations
-  should be called only once, but Windows has it's own ideas }
+{$IFDEF AllowRescale}
+{ this procedure is mostly needed for Desktops in windowed mode
+  and in normal situations should be called only once }
 Procedure WindowResize(Container : TUIContainer);
 begin
-  if (window.width<>GUI.width) or (window.height<>GUI.height) then
+  if (window.width<>GUI.width) or (window.height<>GUI.height) then begin
     GUI.rescale;
+  end;
 end;
+{$ENDIF}
 
+var RenderFinished: boolean = true;
 Procedure WindowRender(Container : TUIContainer);
 begin
- //todo if renderfinished to make frameskip, but this might conflict with 3D world render
-  GUI.draw;
+  //todo if renderfinished to make frameskip, but this might conflict with 3D world render
+  if RenderFinished then begin
+    RenderFinished := false;
+    GUI.draw;
+    RenderFinished := true;
+  end else
+    WriteLnLog('WindowRender','CRITICAL ERROR!!! Interface render frameskip!');
 end;
 
 {======================== Mouse & keyboard =================================}
 
 procedure doPress(Container: TUIContainer; const Event: TInputPressRelease);
 begin
+  // todo Joystick
   if Event.EventType = itMouseButton then begin
     doMousePress(Event);
     {if interface didn't catch the click then}
     if mbRight=event.MouseButton then camera.MouseLook := not Camera.MouseLook;
   end;
-  InitTestLevel;                         //ugly! I'll fix this soon.
-  //window.OnRender := @doWindowRender;
+  SetGameMode(gmCharacterGeneration);
+  //InitTestLevel;                         //ugly! I'll fix this soon.
 end;
 
 procedure doRelease(Container: TUIContainer; const Event: TInputPressRelease);
@@ -70,6 +81,31 @@ begin
   end;
 end;
 
+
+procedure doMotion(Container: TUIContainer; const Event: TInputMotion);
+var i: integer;
+    tmpLink: DAbstractElement;
+begin
+  {check for drag-n-drops}
+  {if Event.EventType = itMouseButton then} begin
+    if touchArray.count>0 then begin
+     i:=0;
+     repeat
+       if touchArray[i].fingerindex=event.fingerindex then begin
+         //
+         break
+       end;
+       inc(i);
+     until (i>=touchArray.Count);
+    end;
+
+  end;
+  {mouse over}
+  {if no drag-n-drop then}
+  tmpLink := GUI.IsMouseOver(round(event.Position[0]),round(event.Position[1]));
+  if tmpLink <> nil then
+    writelnLog('doMotion','Motion caught');
+end;
 
 {======================= initialization routines ==============================}
 
@@ -91,6 +127,7 @@ end;
 
 procedure ApplicationInitialize;
 begin
+  //initialize the log
   {$IFDEF Android}
   InitializeLog;
   {$ELSE}
@@ -101,24 +138,40 @@ begin
       InitializeLog(Version,nil,ltTime);
     {$ENDIF}
   {$ENDIF}
+  WritelnLog('(i)','Compillation Date: ' + {$I %DATE%} + ' Time: ' + {$I %TIME%});
+  WritelnLog('(i)','Target CPU: ' + {$I %FPCTARGETCPU%} +
+               ' Target OS: ' +  {$I %FPCTARGETOS%} +
+               ' FPC version: ' + {$I %FPCVERSION%});
+  WritelnLog('FullScreen mode',{$IFDEF Fullscreen}'ON'{$ELSE}'OFF'{$ENDIF});
+  WritelnLog('Allow rescale',{$IFDEF AllowRescale}'ON'{$ELSE}'OFF'{$ENDIF});
   WritelnLog('ApplicationInitialize','Init');
 
-  window.OnResize:=@WindowResize;
-  window.OnRender:=@WindowRender;
+  {$IFDEF Fullscreen}window.fullscreen := true;{$ENDIF}
 
+  //doesn't work in Linux?
+  {$IFNDEF AllowRescale}window.ResizeAllowed := raOnlyAtOpen;{$ENDIF}
+  //Assign window events
   window.OnPress := @doPress;
   window.onRelease := @doRelease;
+  window.OnMotion := @doMotion;
+
   WritelnLog('ApplicationInitialize','DTouchList.create');
   TouchArray := DTouchList.create;
 
   WritelnLog('ApplicationInitialize','Initialize fonts');
   InitializeFonts;
 
+  //create GUI
   WritelnLog('ApplicationInitialize','Initialize interface');
   GUI := DInterfaceContainer.create(Window);
   GUI.rescale;
 
+  {$IFDEF AllowRescale}window.OnResize := @WindowResize;{$ENDIF}
+  window.OnRender := @WindowRender;
+
   WritelnLog('ApplicationInitialize','Init finished');
+
+  SetGameMode(gmLoadScreen);
 
   //InitInterface;
   Load_test_level; //remake it
@@ -135,7 +188,6 @@ end;
 Initialization
   OnGetApplicationName  :=  @MyGetApplicationName;
   Window := TCastleWindowTouch.create(Application);
-  { This should be done as early as possible to mark our log lines correctly. }
   Application.MainWindow  :=  Window;
   Application.OnInitialize  :=  @ApplicationInitialize;
 

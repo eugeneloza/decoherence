@@ -15,6 +15,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 unit decofacts;
 
 {$mode objfpc}{$H+}
+{$INCLUDE compilerconfig.inc}
 
 interface
 

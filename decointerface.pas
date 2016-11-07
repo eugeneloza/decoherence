@@ -15,22 +15,20 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 unit decointerface;
 
 {$mode objfpc}{$H+}
+{$INCLUDE compilerconfig.inc}
 
 interface
 
 uses
   Classes, fgl,
-  castleVectors, castleImages,
+  castleVectors, castleImages, CastleGLImages,
   decoglobal;
 
-const Frames_Folder = 'interface/frames/';
+const Interface_Foler = 'interface/';
+      Frames_Folder = 'interface/frames/'; {Interface_folder+}
       LoadScreen_folder = 'interface/loadscreen/';
 
-const fullwidth = -1;
-      fullheight = -2;
-      proportionalscale = -3;
-
-const InterfaceScalingMethod: TResizeInterpolation = riBilinear;
+const InterfaceScalingMethod: TResizeInterpolation = riBilinear;  //to quickly change it. Maybe will be a variable some day to support older PCs.
 
 const defaultanimationduration = 300 /1000/60/60/24; {in ms}
 
@@ -45,8 +43,14 @@ const
   GUI_grid = (4*3+1);
   GUI_scale_unit_float = 1/GUI_grid;
 
+
+{ constants for special scaling cases }
+const fullwidth = -1;
+      fullheight = -2;
+      proportionalscale = -3;
 type
-  { Yes, that looks stupid for now. But I'll simplify it later }
+  { Yes, that looks stupid for now. But I'll simplify it later. Maybe.
+   Contains redunant data on animation with possible rescaling in mind.}
   Txywh = class(TComponent)
   public
     { integer "box" }
@@ -57,7 +61,9 @@ type
     initialized: boolean;
     { assign float and convert to Integer }
     procedure setsize(const newx,newy,neww,newh: float);
+    { get integer and convert to float }
     procedure backwardsetsize(const neww,newh: integer);
+    { transform floats to integer }
     procedure recalculate;
     constructor create(AOwner: TComponent); override;
     { provides for proportional width/height scaling for some images }
@@ -65,6 +71,7 @@ type
   end;
 
 type
+  { to make copies }
   Txywha = class(Txywh)
   public
     //function makecopy:Txywh;
@@ -76,15 +83,18 @@ Type
     Just defines the box and rescaling }
   DAbstractElement = class(TComponent)
   public
+    CurrentAnimationState: Txywha;
+    procedure GetAnimationState; virtual;
+
     constructor create(AOwner:TComponent); override;
     destructor destroy; override;
     { changes the scale of the element relative to current window size }
     procedure rescale; virtual;
-    { draw the element }
+    { draw the element / as abstract as it might be :) }
     procedure draw; virtual; abstract;
+    //procedure InitGL; virtual; abstract; //no need for an abstract method?
     { gets current animation state. =base if animation finished. Not very
      efficient as it creates/disposes a copy of the txywha every frame. TODO}
-    function GetAnimationState: Txywha; virtual;
   private
     { Last and Next animation states. }
     last, next: Txywha;
@@ -95,32 +105,141 @@ Type
     animationstart: TDateTime;
     animationduration: single;
     base: Txywha;
+    RealWidth, RealHeight: integer;
     procedure setbasesize(const newx,newy,neww,newh,newo: float; animate: boolean);
   end;
 
 Type
+ { Several types of frames, including with captions }
+ DFrame = class(TComponent)
+ public
+   SourceImage: TRGBAlphaImage;
+   cornerTop, cornerbottom, cornerLeft, cornerRight: integer;
+end;
+
+type TSimpleProcedure = procedure(sender: DAbstractElement);
+type TXYProcedure = procedure(sender: DAbstractElement; x,y:integer);
+
+
+Type
+  {Element with a frame and content}
   DAbstractInterfaceElement = class(DAbstractElement)
+  public
+    { content of the Interface element: label or image }
+    Content: DAbstractElement;    {actually DAbstractImage, but cyclic references are not allowed}
+    { multiplier to opacity <1, e.g. overall opacity=0.8 FrameOpacity=0.8, frame final Opacity=0.8*0.8 }
+    FrameOpacity: float;
+    { frame behind the Interface element }
+    frame: DFrame;
+    procedure draw; override;
+    procedure rescale; override;
+    constructor create(AOwner:TComponent); override;
+    destructor destroy; override;
+  private
+    {GL image of the frame}
+    GLFrame: TGLImage;
+    {scaled frame image}
+    FrameImage: TRGBAlphaImage;
+    {duplicates AbstractImage properties, but is private, so sohuldn't conflict}
+    InitGLPending: boolean;
+    FrameReady: boolean;
+    {Resizes the element's frame to fit base size}
+    procedure FrameResize3x3;
+    { initialize GL image. NOT THREAD SAFE! / Almost a copy of AbstractImage.initGl}
+    procedure InitGL;{ override;}
+  {public
+    ID: integer;}
+
+  { mouse handling }
+
+  public
+    {if mouse is over this element}
+    MouseOver: boolean;
+    {if this element is active (clickable)}
+    Active: boolean;
+    {are these coordinates in this element's box?}
+    function IAmHere(xx,yy: integer): boolean;
+    {returns self if IAmHere and runs all possible events}
+    function isMouseOver(xx,yy: integer): DAbstractElement; virtual;
+  public
+    {events}
+    OnMouseEnter: TSimpleProcedure;
+    OnMouseLeave: TSimpleProcedure;
+    OnMouseOver: TXYProcedure;
   end;
 
-type DInterfaceChildrenList = specialize TFPGObjectList<DAbstractInterfaceElement>;
+type DInterfaceElementsList = specialize TFPGObjectList<DAbstractInterfaceElement>;
+
 
 Type
   DInterfaceElement = class(DAbstractInterfaceElement)
   public
     parent: DAbstractInterfaceElement;
-    children: DInterfaceChildrenList;
+    children: DInterfaceElementsList;
     procedure draw; override;
     constructor create(AOwner: TComponent); override;
     destructor destroy; override;
     procedure Rescale; override;
+  public
+    procedure Grab(Child: DAbstractInterfaceElement);
+    {returns self if IAmHere and runs all possible events}
+    function isMouseOver(xx,yy: integer): DAbstractElement; override;
+
   end;
 
+Var SimpleFrame, CaptionFrame: DFrame;
+    {contains global list of all interface elements}
+    InterfaceList: DInterfaceElementsList;
 
+procedure Init_burner_image;
+procedure InitInterface;
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
-uses sysutils, CastleLog, castleFilesUtils,
-  decogui;
+uses sysutils, CastleLog, castleFilesUtils;
+
+{-------------------- BURNER IMAGE --------------------------------------------}
+
+var BURNER_IMAGE_UNSCALED,BURNER_IMAGE:TCastleImage;
+procedure Init_burner_image;
+begin
+  {$IFNDEF AllowRescale}if BURNER_IMAGE<>nil then exit;{$ENDIF}
+  WriteLnLog('Init_burner_image','started');
+  if BURNER_IMAGE_UNSCALED = nil then
+    BURNER_IMAGE_UNSCALED := LoadImage(ApplicationData(Interface_Foler+'burner_Pattern_203_CC0_by_Nobiax_diffuse.png'), [TRGBImage]) as TRGBImage;
+  if (BURNER_IMAGE=nil) or (BURNER_IMAGE.height <> window.height) or (BURNER_IMAGE.width <> window.width) then begin
+    FreeAndNil(BURNER_IMAGE);
+    BURNER_IMAGE := BURNER_IMAGE_UNSCALED.MakeCopy;
+    BURNER_IMAGE.Resize(window.width, window.height, riBilinear);
+  end;
+  {$IFNDEF AllowRescale}FreeAndNil(BURNER_IMAGE_UNSCALED);{$ENDIF}
+
+  WriteLnLog('Init_burner_image','finished');
+end;
+
+{-------------------- INIT INTERFACE ------------------------------------------}
+
+procedure InitInterface;
+begin
+  WriteLnLog('InitInterface','started');
+  Init_burner_image;
+
+  SimpleFrame := DFrame.create(Window);
+  with SimpleFrame do begin
+    SourceImage := LoadImage(ApplicationData(Frames_Folder+'frame.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
+    cornerTop := 1; CornerBottom := 1; cornerLeft := 1; CornerRight := 1;
+  end;
+
+  CaptionFrame := DFrame.create(Window);
+  with CaptionFrame do begin
+    SourceImage := LoadImage(ApplicationData(Frames_Folder+'frame_caption.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
+    cornerTop := 19; CornerBottom := 1; cornerLeft := 1; CornerRight := 1;            //todo: variable top line!
+  end;
+
+  InterfaceList := DInterfaceElementsList.create(false);
+
+  WriteLnLog('InitInterface','finished');
+end;
 
 {=============================================================================}
 {=========================== Abstract element ================================}
@@ -131,8 +250,9 @@ constructor Txywh.create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   initialized:=false;
-
 end;
+
+{----------------------------------------------------------------------------}
 
 procedure Txywh.setsize(const newx,newy,neww,newh:float);
 begin
@@ -154,6 +274,8 @@ begin
 
   recalculate;
 end;
+
+{----------------------------------------------------------------------------}
 
 procedure Txywh.recalculate;
 begin
@@ -191,6 +313,9 @@ begin
   initialized := true;
 end;
 
+{----------------------------------------------------------------------------}
+
+
 procedure Txywh.backwardsetsize(const neww,newh: integer);
 begin
   w := neww;
@@ -199,6 +324,7 @@ begin
   fh := newh/window.height;
 end;
 
+{----------------------------------------------------------------------------}
 
 procedure Txywh.FixProportions(ww,hh:integer);
 begin
@@ -208,6 +334,8 @@ begin
   if fh = proportionalscale then
     h := round(w*hh/ww);
 end;
+
+{----------------------------------------------------------------------------}
 
 procedure Txywha.copyxywh(source: Txywh);
 begin
@@ -238,7 +366,6 @@ end;
 
 {============================================================================}
 
-
 procedure DAbstractElement.rescale;
 begin
   base.recalculate;
@@ -246,15 +373,16 @@ begin
   next.recalculate;
 end;
 
+{----------------------------------------------------------------------------}
+
 procedure DAbstractElement.setbasesize(const newx,newy,neww,newh,newo: float; animate: boolean);
-var tmpxywh:Txywha;
 begin
   base.setsize(newx,newy,neww,newh);
   base.opacity := newo;
   if animate then begin
-    tmpxywh := GetAnimationState;   //getanimationstate needs "last" so we can't freeannil it yet
+    GetAnimationState;   //getanimationstate needs "last" so we can't freeannil it yet
     freeandnil(last);
-    last := tmpxywh;
+    last := CurrentAnimationState;
     next.copyxywh(base);
     animationstart := -1;
     animationduration := defaultanimationduration;
@@ -263,33 +391,32 @@ end;
 
 {----------------------------------------------------------------------------}
 
-Function DAbstractElement.GetAnimationState: Txywha;
+procedure DAbstractElement.GetAnimationState;
 var phase: single;
 begin
   if true then begin //todo!!!!!!!!!!!!!!!!!!!!!!!
-    result := Txywha.create(self);
     if (last.initialized) and (next.initialized) and
       ((animationstart = -1) or (now-animationstart < animationduration)) then begin
       if animationstart=-1 then animationstart:=now;
       phase := (now-animationstart)/animationduration; //animationtime
       //make curve slower at ends and sharper at middle
       if phase<0.5 then phase := sqr(2*phase)/2 else phase := 1 - sqr(2*(1-phase))/2;
-      result.x1 := last.x1+round((next.x1-last.x1)*phase);
-      result.x2 := last.x2+round((next.x2-last.x2)*phase);
-      result.y1 := last.y1+round((next.y1-last.y1)*phase);
-      result.y2 := last.y2+round((next.y2-last.y2)*phase);
-      result.h := last.h+round((next.h-last.h)*phase);
-      result.w := last.w+round((next.w-last.w)*phase);
-      result.opacity := last.opacity+round((next.opacity-last.opacity)*phase);
+      CurrentAnimationState.x1 := last.x1+round((next.x1-last.x1)*phase);
+      CurrentAnimationState.x2 := last.x2+round((next.x2-last.x2)*phase);
+      CurrentAnimationState.y1 := last.y1+round((next.y1-last.y1)*phase);
+      CurrentAnimationState.y2 := last.y2+round((next.y2-last.y2)*phase);
+      CurrentAnimationState.h := last.h+round((next.h-last.h)*phase);
+      CurrentAnimationState.w := last.w+round((next.w-last.w)*phase);
+      CurrentAnimationState.opacity := last.opacity+round((next.opacity-last.opacity)*phase);
     end else begin
       {should be "next" here}
-      result.x1 := base.x1;
-      result.x2 := base.x2;
-      result.y1 := base.y1;
-      result.y2 := base.y2;
-      result.h := base.h;
-      result.w := base.w;
-      result.opacity := base.Opacity;
+      CurrentAnimationState.x1 := base.x1;
+      CurrentAnimationState.x2 := base.x2;
+      CurrentAnimationState.y1 := base.y1;
+      CurrentAnimationState.y2 := base.y2;
+      CurrentAnimationState.h := base.h;
+      CurrentAnimationState.w := base.w;
+      CurrentAnimationState.opacity := base.Opacity;
     end;
   end;
 end;
@@ -303,7 +430,10 @@ begin
   base := Txywha.Create(self);
   last := Txywha.Create(self);
   next := Txywha.Create(self);
+  CurrentAnimationState := Txywha.Create(self);
 end;
+
+{----------------------------------------------------------------------------}
 
 destructor DAbstractElement.destroy;
 begin
@@ -313,6 +443,182 @@ begin
   freeandnil(next);}
 
   inherited;
+end;
+
+{=============================================================================}
+{================== Abstract interface element ===============================}
+{=============================================================================}
+
+procedure DAbstractInterfaceElement.rescale;
+begin
+  if frame<>nil then FrameResize3x3;
+  //content.rescale;
+end;
+
+{----------------------------------------------------------------------------}
+
+constructor DAbstractInterfaceElement.create(AOwner: TComponent);
+begin
+  inherited create(AOwner);
+  //ID := -1;
+  FrameOpacity := 0.8;
+  MouseOver := false;
+  Active := false;
+end;
+
+{-----------------------------------------------------------------------------}
+
+destructor DAbstractInterfaceElement.destroy;
+begin
+  InterfaceList.Remove(self);
+  FreeAndNil(GLFrame);
+  //if owns content destroy it here;
+  //FreeAndNil(content);
+  inherited;
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DAbstractInterfaceElement.FrameResize3x3;
+var ScaledImageParts: array [0..2,0..2] of TCastleImage;
+    ix,iy: integer;
+    UnscaledWidth,UnscaledHeight:integer;
+    SourceXs,SourceYs,DestXs,DestYs: TVector4Integer;
+    CornersVector:TVector4Integer;
+begin
+  FrameReady := false;
+  if base.initialized = false then begin
+    writeLnLog('DAbstractInterfaceElement.FrameResize3x3','ERROR: Base is not initialized!');
+  end;
+
+  FrameImage := frame.SourceImage.CreateCopy as TRGBAlphaImage;
+  CornersVector := Vector4Integer(frame.cornerTop,frame.cornerLeft,frame.cornerBottom,frame.cornerRight);
+
+  UnscaledWidth := FrameImage.width;
+  UnscaledHeight := FrameImage.height;
+
+  SourceXs[0] := 0;
+  SourceXs[1] := CornersVector[3];
+  SourceXs[2] := UnscaledWidth-CornersVector[1];
+  SourceXs[3] := UnscaledWidth;
+  SourceYs[0] := 0;
+  SourceYs[1] := CornersVector[2];
+  SourceYs[2] := UnscaledHeight-CornersVector[0];
+  SourceYs[3] := UnscaledHeight;
+  DestXs[0] := 0;
+  DestXs[1] := CornersVector[3];
+  DestXs[2] := base.w-CornersVector[1];
+  DestXs[3] := base.w;
+  DestYs[0] := 0;
+  DestYs[1] := CornersVector[2];
+  DestYs[2] := base.h-CornersVector[0];
+  DestYs[3] := base.h;
+
+  for ix := 0 to 2 do
+   for iy := 0 to 2 do begin
+     ScaledImageParts[ix,iy] := TRGBAlphaImage.create;
+     ScaledImageParts[ix,iy].SetSize(SourceXs[ix+1]-SourceXs[ix],SourceYs[iy+1]-SourceYs[iy]);
+     ScaledImageParts[ix,iy].Clear(Vector4Byte(0,0,0,255));
+     ScaledImageParts[ix,iy].DrawFrom(FrameImage,0,0,SourceXs[ix],SourceYs[iy],SourceXs[ix+1]-SourceXs[ix],SourceYs[iy+1]-SourceYs[iy],dmBlend);
+     ScaledImageParts[ix,iy].Resize(DestXs[ix+1]-DestXs[ix],DestYs[iy+1]-DestYs[iy],riNearest);
+   end;
+
+  FrameImage.SetSize(base.w,base.h,1);
+  FrameImage.Clear(Vector4byte(0,0,0,255));
+  for ix := 0 to 2 do
+    for iy := 0 to 2 do FrameImage.DrawFrom(ScaledImageParts[ix,iy],DestXs[ix],DestYs[iy],0,0,DestXs[ix+1]-DestXs[ix],DestYs[iy+1]-DestYs[iy],dmBlend);
+
+  for ix := 0 to 2 do
+    for iy := 0 to 2 do freeAndNil(ScaledImageParts[ix,iy]);
+
+  //and burn the burner
+  FrameImage.DrawFrom(BURNER_IMAGE,0,0,base.x1,base.y1,base.w,base.h,dmMultiply);
+
+  initGLPending := true;
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DAbstractInterfaceElement.InitGL;
+begin
+  //content makes his own initGL on first draw
+  if InitGLPending then begin
+    InitGLPending := false;
+    if FrameImage<>nil then begin
+      freeandnil(GLFrame);
+      GLFrame := TGLImage.create(FrameImage,true,true);
+      FrameReady := true;
+    end;
+  end;
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DAbstractInterfaceElement.draw;
+begin
+  GetAnimationState;
+  if frame<>nil then begin
+    if FrameReady then begin
+      GLFrame.color := vector4single(1,1,1,currentAnimationState.Opacity * FrameOpacity);     //todo
+      GLFrame.Draw(currentAnimationState.x1,currentAnimationState.y1,currentAnimationState.w,currentAnimationState.h);
+    end else begin
+      if InitGLPending then InitGL;
+    end;
+  end;
+  //todo
+  if content<>nil then begin
+    Content.base.copyxywh(currentAnimationState);
+    Content.draw;
+  end;
+end;
+
+{========== Abstract intarface element : Mouse handling =====================}
+
+function DAbstractInterfaceElement.IAmHere(xx,yy: integer): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+begin
+  //get current element location... maybe, use not current animation, but "base"? Or completely ignore items being animated?
+  GetAnimationState;
+  if (xx>=CurrentAnimationState.x1) and (xx<=CurrentAnimationState.x2) and
+     (yy>=CurrentAnimationState.y1) and (yy<=CurrentAnimationState.y2)
+  then
+    result := true
+  else
+    result := false;
+end;
+
+function DAbstractInterfaceElement.isMouseOver(xx,yy: integer): DAbstractElement;
+begin
+  if IAmHere(xx,yy) then begin
+    if MouseOver = false then begin
+      if Assigned(onMouseEnter) then onMouseEnter(self);
+      MouseOver := true;
+    end;
+    if Assigned(onMouseOver) then onMouseOver(self,xx,yy);
+    //if active
+    result := self;
+  end else begin
+    if MouseOver then begin
+      if Assigned(onMouseLeave) then onMouseLeave(self);
+      MouseOver := false;
+    end;
+
+    result := nil;
+  end;
+end;
+
+function DInterfaceElement.isMouseOver(xx,yy: integer): DAbstractElement;
+var i: integer;
+    tmplink: DAbstractElement;
+begin
+  inherited isMouseOver(xx,yy);
+  //if rsult<>nil ... *or drag-n-drop should get the lowest child?
+
+  // recoursively scan all children
+  for i := 0 to children.count-1 do begin
+    tmpLink := children[i].isMouseOver(xx,yy);
+    if tmpLink <> nil then result := tmpLink;
+    //break; // if drag-n-drop one is enough
+  end;
 end;
 
 {=============================================================================}
@@ -332,8 +638,10 @@ constructor DInterfaceElement.create(AOwner: TComponent);
 begin
   inherited create(AOwner);
   if AOwner is DAbstractInterfaceElement then parent:=AOwner as DAbstractInterfaceElement;
-  children := DInterfaceChildrenList.Create(true);
+  children := DInterfaceElementsList.Create(true);
 end;
+
+{----------------------------------------------------------------------------}
 
 destructor DInterfaceElement.destroy;
 begin
@@ -341,13 +649,20 @@ begin
   inherited;
 end;
 
+{----------------------------------------------------------------------------}
+
 procedure DInterfaceElement.draw;
 var i:integer;
 begin
-  //todo
-  //frame.draw;
-  //content.draw;
+  inherited;
   for i:=0 to children.Count-1 do children[i].draw;
+end;
+
+procedure DInterfaceElement.Grab(Child: DAbstractInterfaceElement);
+begin
+  children.Add(Child);
+  if (Child is DInterfaceElement) then (Child as DInterfaceElement).Parent := self; //not sure about this line
+  {Child.ID := }InterfaceList.Add(Child); //global ID of the element
 end;
 
 

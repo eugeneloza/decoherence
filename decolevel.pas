@@ -15,6 +15,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 unit decolevel;
 
 {$mode objfpc}{$H+}
+{$INCLUDE compilerconfig.inc}
 
 interface
 
@@ -31,7 +32,9 @@ var scene:TcastleScene;
   //player:TPlayer;
   Camera:TWalkCamera;
 
+{+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
+uses DecoGameMode;
 
 var loadedlevel:boolean=false;
 procedure load_test_level;
@@ -53,6 +56,7 @@ begin
   //player.DefaultPreferredHeight:=1;
   camera:=TWalkCamera.create(Window);//player.camera;
   camera.SetView(Vector3Single(0,0,1),Vector3Single(0,1,0),Vector3Single(0,0,1),Vector3Single(0,0,1),true);
+  camera.MoveSpeed:=5;
   WritelnLog('load_test_level','Finished');
 
 end;
@@ -68,6 +72,7 @@ begin
      Window.SceneManager.MainScene := Scene;
      Window.SceneManager.Camera:=camera;
      Window.TouchInterface := tiCtlWalkDragRotate;
+     SetGameMode(gmTravel);
   end;
 end;
 

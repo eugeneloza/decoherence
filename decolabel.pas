@@ -16,6 +16,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 unit decolabel;
 
 {$mode objfpc}{$H+}
+{$INCLUDE compilerconfig.inc}
 
 interface
 
@@ -25,7 +26,6 @@ uses classes,
 
 Type DLabel = class(DAbstractImage)
  public
-  RealWidth,RealHeight: integer;
   Font: DFont;
   Shadow: Float;
   constructor Create(AOwner: TComponent); override;
@@ -48,11 +48,15 @@ implementation
 
 uses sysutils;
 
+{----------------------------------------------------------------------------}
+
 constructor DLabel.create(AOwner : TComponent);
 begin
   inherited create(AOwner);
   Shadow := 0;
 end;
+
+{----------------------------------------------------------------------------}
 
 destructor DLabel.Destroy;
 begin
@@ -60,6 +64,8 @@ begin
   FreeAndNil(BrokenString);
   inherited
 end;
+
+{----------------------------------------------------------------------------}
 
 procedure DLabel.settext(const value : string);
 begin
@@ -69,10 +75,14 @@ begin
   end;
 end;
 
+{----------------------------------------------------------------------------}
+
 function DLabel.gettext : string;
 begin
   result := ftext;
 end;
+
+{----------------------------------------------------------------------------}
 
 procedure DLabel.Rescale;
 begin
@@ -80,6 +90,8 @@ begin
   base.w := RealWidth;           //make something as "keep scale"? or override dlabel.draw? (NO, animations!)
   base.h := RealHeight;
 end;
+
+{----------------------------------------------------------------------------}
 
 procedure DLabel.PrepareTextImage;
 begin
@@ -104,6 +116,7 @@ begin
   ImageLoaded := true;     //not good...
   //Rescale;
   ScaledImage := SourceImage.MakeCopy;
+  {$IFNDEF AllowRescale}freeandnil(sourceImage);{$ENDIF}
   base.backwardsetsize(RealWidth,RealHeight)
 {  base.w := ;
   base.h := RealHeight;}
