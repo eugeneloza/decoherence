@@ -61,7 +61,7 @@ type
     initialized: boolean;
     { assign float and convert to Integer }
     procedure setsize(const newx,newy,neww,newh: float);
-    { get integer and convert to float }
+    { get integer and convert to float / for fixed-size objects }
     procedure backwardsetsize(const neww,newh: integer);
     { transform floats to integer }
     procedure recalculate;
@@ -86,7 +86,7 @@ Type
     CurrentAnimationState: Txywha;
     procedure GetAnimationState; virtual;
 
-    constructor create(AOwner:TComponent); override;
+    constructor create(AOwner: TComponent); override;
     destructor destroy; override;
     { changes the scale of the element relative to current window size }
     procedure rescale; virtual;
@@ -118,7 +118,7 @@ Type
 end;
 
 type TSimpleProcedure = procedure(sender: DAbstractElement);
-type TXYProcedure = procedure(sender: DAbstractElement; x,y:integer);
+type TXYProcedure = procedure(sender: DAbstractElement; x,y: integer);
 
 
 Type
@@ -147,20 +147,17 @@ Type
     procedure FrameResize3x3;
     { initialize GL image. NOT THREAD SAFE! / Almost a copy of AbstractImage.initGl}
     procedure InitGL;{ override;}
-  {public
-    ID: integer;}
-
-  { mouse handling }
-
   public
-    {if mouse is over this element}
-    MouseOver: boolean;
     {if this element is active (clickable)}
-    Active: boolean;
+    CanMouseOver: boolean;
+    CanDrag: boolean;
     {are these coordinates in this element's box?}
     function IAmHere(xx,yy: integer): boolean;
     {returns self if IAmHere and runs all possible events}
     function isMouseOver(xx,yy: integer): DAbstractElement; virtual;
+  private
+    {if mouse is over this element}
+    MouseOver: boolean;
   public
     {events}
     OnMouseEnter: TSimpleProcedure;
@@ -249,14 +246,14 @@ end;
 constructor Txywh.create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  initialized:=false;
+  initialized := false;
 end;
 
 {----------------------------------------------------------------------------}
 
 procedure Txywh.setsize(const newx,newy,neww,newh:float);
 begin
-  if (abs(newx)>GUI_grid) or (abs(newy)>GUI_grid) or
+  if (abs(newx) > GUI_grid) or (abs(newy) > GUI_grid) or
      (((neww<0) or (neww>GUI_grid)) and ((neww<>proportionalscale) and (neww<>fullwidth) and (neww<>fullheight))) or
      (((newh<0) or (newh>GUI_grid)) and ((neww<>proportionalscale) and (newh<>fullheight))) then
   begin
@@ -326,7 +323,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure Txywh.FixProportions(ww,hh:integer);
+procedure Txywh.FixProportions(ww,hh: integer);
 begin
   if fw = proportionalscale then
     w := round(h*ww/hh)
@@ -397,7 +394,7 @@ begin
   if true then begin //todo!!!!!!!!!!!!!!!!!!!!!!!
     if (last.initialized) and (next.initialized) and
       ((animationstart = -1) or (now-animationstart < animationduration)) then begin
-      if animationstart=-1 then animationstart:=now;
+      if animationstart = -1 then animationstart := now;
       phase := (now-animationstart)/animationduration; //animationtime
       //make curve slower at ends and sharper at middle
       if phase<0.5 then phase := sqr(2*phase)/2 else phase := 1 - sqr(2*(1-phase))/2;
@@ -451,8 +448,8 @@ end;
 
 procedure DAbstractInterfaceElement.rescale;
 begin
-  if frame<>nil then FrameResize3x3;
-  //content.rescale;
+  if frame <> nil then FrameResize3x3;
+  //content.rescale;   //todo
 end;
 
 {----------------------------------------------------------------------------}
@@ -463,7 +460,8 @@ begin
   //ID := -1;
   FrameOpacity := 0.8;
   MouseOver := false;
-  Active := false;
+  CanMouseOver := false;
+  CanDrag := false;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -473,7 +471,7 @@ begin
   InterfaceList.Remove(self);
   FreeAndNil(GLFrame);
   //if owns content destroy it here;
-  //FreeAndNil(content);
+  //FreeAndNil(content);      //todo
   inherited;
 end;
 
@@ -557,7 +555,7 @@ end;
 procedure DAbstractInterfaceElement.draw;
 begin
   GetAnimationState;
-  if frame<>nil then begin
+  if frame <> nil then begin
     if FrameReady then begin
       GLFrame.color := vector4single(1,1,1,currentAnimationState.Opacity * FrameOpacity);     //todo
       GLFrame.Draw(currentAnimationState.x1,currentAnimationState.y1,currentAnimationState.w,currentAnimationState.h);
@@ -566,7 +564,7 @@ begin
     end;
   end;
   //todo
-  if content<>nil then begin
+  if content <> nil then begin
     Content.base.copyxywh(currentAnimationState);
     Content.draw;
   end;
@@ -578,8 +576,8 @@ function DAbstractInterfaceElement.IAmHere(xx,yy: integer): boolean; {$IFDEF SUP
 begin
   //get current element location... maybe, use not current animation, but "base"? Or completely ignore items being animated?
   GetAnimationState;
-  if (xx>=CurrentAnimationState.x1) and (xx<=CurrentAnimationState.x2) and
-     (yy>=CurrentAnimationState.y1) and (yy<=CurrentAnimationState.y2)
+  if (xx >= CurrentAnimationState.x1) and (xx <= CurrentAnimationState.x2) and
+     (yy >= CurrentAnimationState.y1) and (yy <= CurrentAnimationState.y2)
   then
     result := true
   else
@@ -588,21 +586,20 @@ end;
 
 function DAbstractInterfaceElement.isMouseOver(xx,yy: integer): DAbstractElement;
 begin
+  result := nil;
   if IAmHere(xx,yy) then begin
     if MouseOver = false then begin
       if Assigned(onMouseEnter) then onMouseEnter(self);
       MouseOver := true;
     end;
     if Assigned(onMouseOver) then onMouseOver(self,xx,yy);
-    //if active
-    result := self;
+    if CanMouseOver then  //todo
+      result := self
   end else begin
     if MouseOver then begin
       if Assigned(onMouseLeave) then onMouseLeave(self);
       MouseOver := false;
     end;
-
-    result := nil;
   end;
 end;
 
@@ -610,7 +607,7 @@ function DInterfaceElement.isMouseOver(xx,yy: integer): DAbstractElement;
 var i: integer;
     tmplink: DAbstractElement;
 begin
-  inherited isMouseOver(xx,yy);
+  result := inherited isMouseOver(xx,yy);
   //if rsult<>nil ... *or drag-n-drop should get the lowest child?
 
   // recoursively scan all children
@@ -626,7 +623,7 @@ end;
 {=============================================================================}
 
 procedure DInterfaceElement.rescale;
-var i:integer;
+var i: integer;
 begin
   inherited;
   for i:=0 to children.Count-1 do children[i].rescale;
@@ -637,7 +634,7 @@ end;
 constructor DInterfaceElement.create(AOwner: TComponent);
 begin
   inherited create(AOwner);
-  if AOwner is DAbstractInterfaceElement then parent:=AOwner as DAbstractInterfaceElement;
+  if AOwner is DAbstractInterfaceElement then parent := AOwner as DAbstractInterfaceElement;
   children := DInterfaceElementsList.Create(true);
 end;
 
@@ -652,7 +649,7 @@ end;
 {----------------------------------------------------------------------------}
 
 procedure DInterfaceElement.draw;
-var i:integer;
+var i: integer;
 begin
   inherited;
   for i:=0 to children.Count-1 do children[i].draw;

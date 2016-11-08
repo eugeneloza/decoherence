@@ -22,7 +22,7 @@ unit Decoherence;
 
 interface
 
-const Version='interfa3-161106-47';
+const Version='interfa3-161107-48';
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
@@ -31,7 +31,7 @@ uses Classes, SysUtils,
      CastleLog,
      CastleWindow, CastleWindowTouch, CastleKeysMouse,
      decogui, decointerface, decomouse, decofont,
-     decolevel,
+     decolevel, decoactor,
      decoglobal, decogamemode;
 
 {==========================================================================}
@@ -104,7 +104,7 @@ begin
   {if no drag-n-drop then}
   tmpLink := GUI.IsMouseOver(round(event.Position[0]),round(event.Position[1]));
   if tmpLink <> nil then
-    writelnLog('doMotion','Motion caught');
+    writelnLog('doMotion','Motion caught '+tmpLink.ClassName);
 end;
 
 {======================= initialization routines ==============================}
