@@ -154,15 +154,21 @@ Type
     {are these coordinates in this element's box?}
     function IAmHere(xx,yy: integer): boolean;
     {returns self if IAmHere and runs all possible events}
-    function isMouseOver(xx,yy: integer): DAbstractElement; virtual;
+    function ifMouseOver(xx,yy: integer; AllTree: boolean): DAbstractElement; virtual;
   private
     {if mouse is over this element}
-    MouseOver: boolean;
+    isMouseOver: boolean;
   public
     {events}
     OnMouseEnter: TSimpleProcedure;
     OnMouseLeave: TSimpleProcedure;
     OnMouseOver: TXYProcedure;
+    OnMousePress: TXYProcedure;
+    OnMouseRelease: TXYProcedure;
+    OnDrop: TXYProcedure;
+    dragx,dragy: integer;
+    procedure drag(x,y: integer);
+    procedure startdrag(x,y: integer);
   end;
 
 type DInterfaceElementsList = specialize TFPGObjectList<DAbstractInterfaceElement>;
@@ -180,7 +186,7 @@ Type
   public
     procedure Grab(Child: DAbstractInterfaceElement);
     {returns self if IAmHere and runs all possible events}
-    function isMouseOver(xx,yy: integer): DAbstractElement; override;
+    function ifMouseOver(xx,yy: integer; AllTree: boolean): DAbstractElement; override;
 
   end;
 
@@ -459,7 +465,7 @@ begin
   inherited create(AOwner);
   //ID := -1;
   FrameOpacity := 0.8;
-  MouseOver := false;
+  isMouseOver := false;
   CanMouseOver := false;
   CanDrag := false;
 end;
@@ -584,38 +590,55 @@ begin
     result := false;
 end;
 
-function DAbstractInterfaceElement.isMouseOver(xx,yy: integer): DAbstractElement;
+{-----------------------------------------------------------------------------}
+
+function DAbstractInterfaceElement.ifMouseOver(xx,yy: integer; AllTree: boolean): DAbstractElement;
 begin
   result := nil;
   if IAmHere(xx,yy) then begin
-    if MouseOver = false then begin
+    if isMouseOver = false then begin
       if Assigned(onMouseEnter) then onMouseEnter(self);
-      MouseOver := true;
+      isMouseOver := true;
     end;
     if Assigned(onMouseOver) then onMouseOver(self,xx,yy);
     if CanMouseOver then  //todo
       result := self
   end else begin
-    if MouseOver then begin
+    if isMouseOver then begin
       if Assigned(onMouseLeave) then onMouseLeave(self);
-      MouseOver := false;
+      isMouseOver := false;
     end;
   end;
 end;
 
-function DInterfaceElement.isMouseOver(xx,yy: integer): DAbstractElement;
+function DInterfaceElement.ifMouseOver(xx,yy: integer; AllTree: boolean): DAbstractElement;
 var i: integer;
     tmplink: DAbstractElement;
 begin
-  result := inherited isMouseOver(xx,yy);
+  result := inherited ifMouseOver(xx,yy,AllTree);
   //if rsult<>nil ... *or drag-n-drop should get the lowest child?
 
   // recoursively scan all children
   for i := 0 to children.count-1 do begin
-    tmpLink := children[i].isMouseOver(xx,yy);
+    tmpLink := children[i].ifMouseOver(xx,yy,true);
     if tmpLink <> nil then result := tmpLink;
-    //break; // if drag-n-drop one is enough
+    if not AllTree then break; // if drag-n-drop one is enough
   end;
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DAbstractInterfaceElement.startdrag(x,y: integer);
+begin
+  dragx := base.x1 - x;
+  dragy := base.y1 - y;
+end;
+
+
+procedure DAbstractInterfaceElement.drag(x,y: integer);
+begin
+  base.x1 := dragx + x;
+  base.y1 := dragy + y;
 end;
 
 {=============================================================================}

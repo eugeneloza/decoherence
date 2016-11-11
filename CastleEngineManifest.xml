@@ -1,16 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project name="Decoherence-1"
   caption="Decoherence-1"
-  qualified_name="localhost.home.eugene.decoherence1"
+  qualified_name="localhost.debian.eugeneloza.decoherence1"
+  author="Eugene Loza"
+
   standalone_source="decoherence_desktop.lpr"
   android_source="decoherence_android.lpr"
   android_project="android_application/"
-  screen_orientation="landscape"
-  author="Eugene Loza">
-  <android project_type="integrated" /> <!-- necessary for sound to work -->
+  screen_orientation="landscape">
+
   <icons>
     <icon path="decoherence_icon.png" />
   </icons>
+
+  <android project_type="integrated" /> <!-- necessary for sound to work -->
   <package>
     <exclude path="data/interface/fonts/*" /> <!-- no freetype lib available yet, using pre-generated fonts -->
   </package>
@@ -18,5 +21,4 @@
     <dependency name="Zlib" /> <!-- zlib, to read .gz files -->
     <dependency name="Png" /> <!-- libpng, to read .png files -->
   </dependencies>
-  <android project_type="integrated" /> <!-- necessary for sound to work -->
 </project>

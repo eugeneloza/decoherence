@@ -85,26 +85,33 @@ end;
 procedure doMotion(Container: TUIContainer; const Event: TInputMotion);
 var i: integer;
     tmpLink: DAbstractElement;
+    dragging: boolean;
 begin
   {check for drag-n-drops}
-  {if Event.EventType = itMouseButton then} begin
+  dragging := false;
+  {if Event.EventType = itMouseButton then }begin
     if touchArray.count>0 then begin
      i:=0;
      repeat
        if touchArray[i].fingerindex=event.fingerindex then begin
-         //
-         break
+         touchArray[i].update(Event);
+         if (touchArray[i].click_element<>nil) and (touchArray[i].click_element.CanDrag) then begin
+           touchArray[i].click_element.drag(round(event.Position[0]),round(event.Position[1]));
+           dragging := true;
+         end;
+         break;
        end;
        inc(i);
      until (i>=touchArray.Count);
     end;
 
   end;
-  {mouse over}
-  {if no drag-n-drop then}
-  tmpLink := GUI.IsMouseOver(round(event.Position[0]),round(event.Position[1]));
-  if tmpLink <> nil then
-    writelnLog('doMotion','Motion caught '+tmpLink.ClassName);
+  {mouse over / if no drag-n-drop}
+  if not dragging then begin
+    tmpLink := GUI.IfMouseOver(round(event.Position[0]),round(event.Position[1]),true);
+    if tmpLink <> nil then
+      writelnLog('doMotion','Motion caught '+tmpLink.ClassName);
+  end;
 end;
 
 {======================= initialization routines ==============================}
@@ -139,9 +146,6 @@ begin
     {$ENDIF}
   {$ENDIF}
   WritelnLog('(i)','Compillation Date: ' + {$I %DATE%} + ' Time: ' + {$I %TIME%});
-  WritelnLog('(i)','Target CPU: ' + {$I %FPCTARGETCPU%} +
-               ' Target OS: ' +  {$I %FPCTARGETOS%} +
-               ' FPC version: ' + {$I %FPCVERSION%});
   WritelnLog('FullScreen mode',{$IFDEF Fullscreen}'ON'{$ELSE}'OFF'{$ENDIF});
   WritelnLog('Allow rescale',{$IFDEF AllowRescale}'ON'{$ELSE}'OFF'{$ENDIF});
   WritelnLog('ApplicationInitialize','Init');

@@ -9,7 +9,7 @@
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="21" Y="5"/>
-        <UsageCount Value="183"/>
+        <UsageCount Value="184"/>
       </Unit0>
       <Unit1>
         <Filename Value="decoglobal.pas"/>
@@ -17,33 +17,33 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="17"/>
         <CursorPos X="5" Y="28"/>
-        <UsageCount Value="183"/>
+        <UsageCount Value="184"/>
       </Unit1>
       <Unit2>
         <Filename Value="decoherence.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="Decoherence"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="24"/>
-        <CursorPos X="27" Y="34"/>
-        <UsageCount Value="183"/>
+        <TopLine Value="82"/>
+        <CursorPos X="45" Y="92"/>
+        <UsageCount Value="184"/>
         <Loaded Value="True"/>
       </Unit2>
       <Unit3>
         <Filename Value="decointerface.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="2"/>
-        <TopLine Value="7"/>
-        <CursorPos X="27" Y="16"/>
-        <FoldState Value=" T3lS0E{"/>
+        <IsVisibleTab Value="True"/>
+        <WindowIndex Value="1"/>
+        <TopLine Value="158"/>
+        <CursorPos Y="169"/>
         <ExtraEditorCount Value="1"/>
         <ExtraEditor1>
-          <IsVisibleTab Value="True"/>
-          <WindowIndex Value="1"/>
-          <TopLine Value="169"/>
-          <CursorPos X="70" Y="183"/>
+          <EditorIndex Value="3"/>
+          <TopLine Value="624"/>
+          <CursorPos X="23" Y="641"/>
+          <FoldState Value=" T3lY0Ep"/>
         </ExtraEditor1>
-        <UsageCount Value="181"/>
+        <UsageCount Value="182"/>
         <Loaded Value="True"/>
       </Unit3>
       <Unit4>
@@ -52,14 +52,13 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="261"/>
         <CursorPos X="12" Y="278"/>
-        <UsageCount Value="150"/>
+        <UsageCount Value="151"/>
       </Unit4>
       <Unit5>
         <Filename Value="decogui.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="1"/>
-        <TopLine Value="40"/>
-        <UsageCount Value="138"/>
+        <EditorIndex Value="2"/>
+        <UsageCount Value="139"/>
         <Loaded Value="True"/>
       </Unit5>
       <Unit6>
@@ -67,14 +66,14 @@
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="30" Y="18"/>
-        <UsageCount Value="85"/>
+        <UsageCount Value="86"/>
       </Unit6>
       <Unit7>
         <Filename Value="decofont.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
         <CursorPos Y="19"/>
-        <UsageCount Value="77"/>
+        <UsageCount Value="78"/>
       </Unit7>
       <Unit8>
         <Filename Value="decolabel.pas"/>
@@ -82,15 +81,16 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="72"/>
         <CursorPos X="12" Y="89"/>
-        <UsageCount Value="77"/>
+        <UsageCount Value="78"/>
       </Unit8>
       <Unit9>
         <Filename Value="decomouse.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="4"/>
-        <CursorPos X="30" Y="18"/>
-        <UsageCount Value="72"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="80"/>
+        <CursorPos X="11" Y="92"/>
+        <UsageCount Value="73"/>
+        <Loaded Value="True"/>
       </Unit9>
       <Unit10>
         <Filename Value="decolevel.pas"/>
@@ -98,7 +98,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="43"/>
         <CursorPos X="22" Y="59"/>
-        <UsageCount Value="65"/>
+        <UsageCount Value="66"/>
       </Unit10>
       <Unit11>
         <Filename Value="decogamemode.pas"/>
@@ -106,229 +106,234 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="15"/>
         <CursorPos X="11" Y="13"/>
-        <UsageCount Value="60"/>
+        <UsageCount Value="61"/>
       </Unit11>
       <Unit12>
+        <Filename Value="decoactor.pas"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="4"/>
+        <CursorPos X="31" Y="4"/>
+        <UsageCount Value="22"/>
+        <Loaded Value="True"/>
+      </Unit12>
+      <Unit13>
         <Filename Value="decoloadscreen.pas"/>
         <EditorIndex Value="-1"/>
         <CursorPos Y="7"/>
         <UsageCount Value="25"/>
-      </Unit12>
-      <Unit13>
+      </Unit13>
+      <Unit14>
         <Filename Value="../../VST/CGE/castle-engine/src/base/castlelog.pas"/>
         <UnitName Value="CastleLog"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="100"/>
         <CursorPos X="25" Y="108"/>
         <UsageCount Value="8"/>
-      </Unit13>
-      <Unit14>
+      </Unit14>
+      <Unit15>
         <Filename Value="../../../VST/CGE/castle-engine/src/base/castlelog.pas"/>
         <UnitName Value="CastleLog"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="222"/>
         <CursorPos X="3" Y="229"/>
         <UsageCount Value="7"/>
-      </Unit14>
-      <Unit15>
+      </Unit15>
+      <Unit16>
         <Filename Value="../../../VST/CGE/castle-engine/src/images/castleimages.pas"/>
         <UnitName Value="CastleImages"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="61"/>
         <UsageCount Value="8"/>
-      </Unit15>
-      <Unit16>
+      </Unit16>
+      <Unit17>
         <Filename Value="../../../VST/CGE/castle-engine/src/fonts/opengl/castlefonts.pas"/>
         <UnitName Value="CastleFonts"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="432"/>
         <CursorPos X="14" Y="440"/>
         <UsageCount Value="5"/>
-      </Unit16>
-      <Unit17>
+      </Unit17>
+      <Unit18>
         <Filename Value="../../../VST/CGE/castle-engine/src/3d/castle3d.pas"/>
         <UnitName Value="Castle3D"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="2868"/>
         <CursorPos Y="2878"/>
         <UsageCount Value="6"/>
-      </Unit17>
-      <Unit18>
+      </Unit18>
+      <Unit19>
         <Filename Value="../../../VST/CGE/castle-engine/src/window/castlewindowtouch.pas"/>
         <UnitName Value="CastleWindowTouch"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="3" Y="45"/>
         <UsageCount Value="6"/>
-      </Unit18>
-      <Unit19>
+      </Unit19>
+      <Unit20>
         <Filename Value="../../../VST/CGE/castle-engine/src/base/castleconf.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="56"/>
         <CursorPos X="28" Y="74"/>
         <UsageCount Value="8"/>
-      </Unit19>
-      <Unit20>
+      </Unit20>
+      <Unit21>
         <Filename Value="../../../VST/CGE/castle-engine/src/base/castleclassutils.pas"/>
         <UnitName Value="CastleClassUtils"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="194"/>
         <CursorPos X="11" Y="204"/>
         <UsageCount Value="7"/>
-      </Unit20>
-      <Unit21>
+      </Unit21>
+      <Unit22>
         <Filename Value="../../../VST/CGE/castle-engine/src/ui/castlekeysmouse.pas"/>
         <UnitName Value="CastleKeysMouse"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="441"/>
         <CursorPos X="71" Y="460"/>
         <UsageCount Value="6"/>
-      </Unit21>
-      <Unit22>
+      </Unit22>
+      <Unit23>
         <Filename Value="compilerconfig.inc"/>
         <EditorIndex Value="-1"/>
         <CursorPos Y="5"/>
         <UsageCount Value="10"/>
-      </Unit22>
-      <Unit23>
+      </Unit23>
+      <Unit24>
         <Filename Value="/usr/share/fpcsrc/3.0.0/rtl/objpas/fgl.pp"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="473"/>
         <CursorPos X="3" Y="475"/>
         <UsageCount Value="8"/>
-      </Unit23>
-      <Unit24>
+      </Unit24>
+      <Unit25>
         <Filename Value="../../../VST/CGE/castle-engine/src/window/castlewindow.pas"/>
         <UnitName Value="CastleWindow"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="569"/>
         <CursorPos X="48" Y="581"/>
         <UsageCount Value="10"/>
-      </Unit24>
-      <Unit25>
-        <Filename Value="decoactor.pas"/>
-        <IsPartOfProject Value="True"/>
-        <EditorIndex Value="3"/>
-        <CursorPos X="31" Y="4"/>
-        <UsageCount Value="21"/>
-        <Loaded Value="True"/>
       </Unit25>
     </Units>
-    <JumpHistory Count="29" HistoryIndex="28">
+    <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
-        <Filename Value="decointerface.pas"/>
+        <Filename Value="decoactor.pas"/>
+        <Caret Line="17" TopLine="5"/>
       </Position1>
       <Position2>
-        <Filename Value="decointerface.pas"/>
-        <Caret Line="248" Column="12" TopLine="231"/>
+        <Filename Value="decoactor.pas"/>
+        <Caret Line="22" Column="29" TopLine="12"/>
       </Position2>
       <Position3>
-        <Filename Value="decointerface.pas"/>
-        <Caret Line="426" Column="12" TopLine="409"/>
+        <Filename Value="decoactor.pas"/>
+        <Caret Line="42" Column="10" TopLine="32"/>
       </Position3>
       <Position4>
-        <Filename Value="decointerface.pas"/>
-        <Caret Line="442" Column="12" TopLine="425"/>
+        <Filename Value="decoactor.pas"/>
+        <Caret Line="7" Column="25"/>
       </Position4>
       <Position5>
         <Filename Value="decointerface.pas"/>
-        <Caret Line="459" Column="12" TopLine="442"/>
+        <Caret Line="652" Column="8" TopLine="494"/>
       </Position5>
       <Position6>
         <Filename Value="decointerface.pas"/>
-        <Caret Line="475" Column="12" TopLine="458"/>
+        <Caret Line="160" Column="7" TopLine="149"/>
       </Position6>
       <Position7>
         <Filename Value="decointerface.pas"/>
-        <Caret Line="610" Column="22" TopLine="593"/>
+        <Caret Line="157" Column="16" TopLine="141"/>
       </Position7>
       <Position8>
         <Filename Value="decointerface.pas"/>
-        <Caret Line="628" Column="12" TopLine="611"/>
+        <Caret Line="183" Column="16" TopLine="174"/>
       </Position8>
       <Position9>
         <Filename Value="decointerface.pas"/>
-        <Caret Line="636" Column="12" TopLine="619"/>
+        <Caret Line="462" Column="5" TopLine="452"/>
       </Position9>
       <Position10>
         <Filename Value="decointerface.pas"/>
-        <Caret Line="646" Column="12" TopLine="629"/>
+        <Caret Line="587" Column="38" TopLine="577"/>
       </Position10>
       <Position11>
         <Filename Value="decointerface.pas"/>
-        <Caret Line="654" Column="12" TopLine="637"/>
+        <Caret Line="601" Column="9" TopLine="581"/>
       </Position11>
       <Position12>
-        <Filename Value="decogui.pas"/>
-        <Caret Line="214" Column="80" TopLine="214"/>
+        <Filename Value="decointerface.pas"/>
+        <Caret Line="610" Column="25" TopLine="596"/>
       </Position12>
       <Position13>
-        <Filename Value="decogui.pas"/>
-        <Caret Line="261" Column="12" TopLine="244"/>
+        <Filename Value="decoherence.pas"/>
+        <Caret Line="34" Column="27" TopLine="60"/>
       </Position13>
       <Position14>
-        <Filename Value="decogui.pas"/>
-        <Caret Line="82" Column="12" TopLine="72"/>
+        <Filename Value="decointerface.pas"/>
+        <Caret Line="615" Column="30" TopLine="605"/>
       </Position14>
       <Position15>
-        <Filename Value="decogui.pas"/>
-        <Caret Line="125" Column="12" TopLine="108"/>
+        <Filename Value="decointerface.pas"/>
+        <Caret Line="11" Column="28"/>
       </Position15>
       <Position16>
-        <Filename Value="decogui.pas"/>
-        <Caret Line="163" Column="12" TopLine="147"/>
+        <Filename Value="decointerface.pas"/>
+        <Caret Line="617" Column="25" TopLine="601"/>
       </Position16>
       <Position17>
         <Filename Value="decointerface.pas"/>
-        <Caret Line="248" Column="12" TopLine="238"/>
+        <Caret Line="610" Column="48" TopLine="600"/>
       </Position17>
       <Position18>
-        <Filename Value="decointerface.pas"/>
-        <Caret Line="426" Column="12" TopLine="409"/>
+        <Filename Value="decoherence.pas"/>
+        <Caret Line="95" Column="20" TopLine="93"/>
       </Position18>
       <Position19>
-        <Filename Value="decointerface.pas"/>
-        <Caret Line="442" Column="12" TopLine="425"/>
+        <Filename Value="decoherence.pas"/>
+        <Caret Line="105" Column="84" TopLine="95"/>
       </Position19>
       <Position20>
-        <Filename Value="decogui.pas"/>
-        <Caret Line="260" Column="21" TopLine="235"/>
+        <Filename Value="decoherence.pas"/>
+        <Caret Line="73" Column="68" TopLine="67"/>
       </Position20>
       <Position21>
-        <Filename Value="decogui.pas"/>
-        <Caret TopLine="16"/>
+        <Filename Value="decomouse.pas"/>
+        <Caret Line="83" TopLine="71"/>
       </Position21>
       <Position22>
-        <Filename Value="decoactor.pas"/>
-        <Caret Line="14" Column="35"/>
+        <Filename Value="decomouse.pas"/>
+        <Caret Line="82" Column="11" TopLine="72"/>
       </Position22>
       <Position23>
-        <Filename Value="decoactor.pas"/>
-        <Caret Line="7" Column="14"/>
+        <Filename Value="decomouse.pas"/>
+        <Caret Line="103" TopLine="92"/>
       </Position23>
       <Position24>
-        <Filename Value="decoactor.pas"/>
-        <Caret Line="8" Column="13"/>
+        <Filename Value="decomouse.pas"/>
+        <Caret Line="85" Column="9" TopLine="76"/>
       </Position24>
       <Position25>
-        <Filename Value="decoactor.pas"/>
-        <Caret Line="17" TopLine="5"/>
+        <Filename Value="decomouse.pas"/>
+        <Caret Line="103" Column="86" TopLine="94"/>
       </Position25>
       <Position26>
-        <Filename Value="decoactor.pas"/>
-        <Caret Line="22" Column="29" TopLine="12"/>
+        <Filename Value="decomouse.pas"/>
+        <Caret Line="106" Column="8" TopLine="94"/>
       </Position26>
       <Position27>
-        <Filename Value="decoactor.pas"/>
-        <Caret Line="42" Column="10" TopLine="32"/>
+        <Filename Value="decomouse.pas"/>
+        <Caret Line="107" Column="5" TopLine="73"/>
       </Position27>
       <Position28>
-        <Filename Value="decoactor.pas"/>
-        <Caret Line="7" Column="25"/>
+        <Filename Value="decomouse.pas"/>
+        <Caret Line="93" Column="45" TopLine="76"/>
       </Position28>
       <Position29>
-        <Filename Value="decointerface.pas"/>
-        <Caret Line="652" Column="8" TopLine="494"/>
+        <Filename Value="decomouse.pas"/>
+        <Caret Line="61" Column="34" TopLine="51"/>
       </Position29>
+      <Position30>
+        <Filename Value="decoherence.pas"/>
+        <Caret Line="109" Column="34" TopLine="101"/>
+      </Position30>
     </JumpHistory>
   </ProjectSession>
 </CONFIG>
