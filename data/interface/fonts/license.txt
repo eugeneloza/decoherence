@@ -1,0 +1,4 @@
+LinBiolinum_RB_G.ttf
+LinBiolinum_R_G.ttf
+OFL by Philipp H. Poll (SIL Open Font License)
+https://fontlibrary.org/ru/font/linux-biolinum

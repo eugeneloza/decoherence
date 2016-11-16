@@ -213,7 +213,7 @@ begin
   {$IFNDEF AllowRescale}if BURNER_IMAGE<>nil then exit;{$ENDIF}
   WriteLnLog('Init_burner_image','started');
   if BURNER_IMAGE_UNSCALED = nil then
-    BURNER_IMAGE_UNSCALED := LoadImage(ApplicationData(Interface_Foler+'burner_Pattern_203_CC0_by_Nobiax_diffuse.png'), [TRGBImage]) as TRGBImage;
+    BURNER_IMAGE_UNSCALED := LoadImage(ApplicationData(Interface_Foler+'burner/burner_Pattern_203_CC0_by_Nobiax_diffuse.png'), [TRGBImage]) as TRGBImage;
   if (BURNER_IMAGE=nil) or (BURNER_IMAGE.height <> window.height) or (BURNER_IMAGE.width <> window.width) then begin
     FreeAndNil(BURNER_IMAGE);
     BURNER_IMAGE := BURNER_IMAGE_UNSCALED.MakeCopy;

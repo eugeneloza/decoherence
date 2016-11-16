@@ -155,14 +155,14 @@ begin
   image_text[16] := 'simple-fractal-13356910404Li_CC0_by_Sharon_Apted_[gimp].jpg';
   image_text[17] := 'simply-green_CC0_by_Sharon_Apted_[crop].jpg';
   image_text[18] := 'white-fractal-flower_CC0_by_Piotr_Siedlecki_[crop].jpg';
-  image_text[19] := 'hintergrund-tapete-1456752859roe_CC0_by_kai Stachowiak.jpg';
+  image_text[19] := 'hintergrund-tapete-1456752859roe_CC0_by_kai_Stachowiak.jpg';
   image_text[20] := 'a-flame-fractal_CC0_by_Sharon_Apted_[gmic].jpg';
-  image_text[21] := 'beautiful-fractal-1309767713KZe_CC0_by_Sharon Apted_[crop,gmic].jpg';
+  image_text[21] := 'beautiful-fractal-1309767713KZe_CC0_by_Sharon_Apted_[crop,gmic].jpg';
   image_text[22] := 'colourful-fractal-1357555007a2W_CC0_by_Sharon_Apted_[gmic].jpg';
   image_text[23] := 'colourful-star_CC0_by_Sharon_Apted_[gmic].jpg';
   image_text[24] := 'cosmic-adventure_CC0_by_Sharon_Apted_[glow,color].jpg';
   image_text[25] := 'feather-duster_CC0_by_Sharon_Apted_[glow].jpg';
-  image_text[26] := 'fractal-2014-1_CC0_by_Claudette Gallant_[crop].jpg';
+  image_text[26] := 'fractal-2014-1_CC0_by_Claudette_Gallant_[crop].jpg';
   image_text[27] := 'fractal-1309767060SE3_CC0_by_Sharon_Apted_[GIMP,GMIC].jpg';
   image_text[28] := 'fractal-13075203504gu_CC0_by_Sharon_Apted_[glow,gmic].jpg';
   image_text[29] := 'fractal-disks_CC0_by_Piotr_Siedlecki_[colorize].jpg';

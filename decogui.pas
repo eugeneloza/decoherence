@@ -71,6 +71,7 @@ uses SysUtils, CastleLog,
 
 const LoadScreenFolder='interface/loadscreen/';
       BackgroundsFolder='interface/background/';
+      WindFolder='interface/wind/';
 
 {=============================================================================}
 {========================== interface container ==============================}
@@ -103,13 +104,13 @@ procedure DInterfaceContainer.LoadWind;
 begin
   Wind1 := DWindImage.create(self);
   Wind1.phasespeed := 1/(15+rnd.Random);
-  Wind1.Load(LoadScreen_Folder+'WindClouds1_GIMP.jpg');
+  Wind1.Load(WindFolder+'WindClouds1_GIMP.jpg');
   Wind1.Opacity:=0.1;
   wind1.base.setsize(0,0,fullwidth,fullheight);
   Wind1.rescale;
   Wind2 := DWindImage.create(self);
   Wind2.phasespeed := 1/(10+rnd.Random);
-  Wind2.Load(LoadScreen_Folder+'WindClouds2_GIMP.jpg');
+  Wind2.Load(WindFolder+'WindClouds2_GIMP.jpg');
   wind2.base.setsize(0,0,fullwidth,fullheight);
   Wind2.Opacity:=0.1;
   Wind2.rescale;
@@ -240,7 +241,7 @@ procedure DInterfaceContainer.DrawCharacterGenerationBackground;
 begin
   if background=nil then begin
     background := DStaticImage.create(self);
-    background.LoadThread(BackgroundsFolder+'spaceship-1548838_1280_CC0_by_PRIO5D_[gmic].jpg');
+    background.LoadThread(BackgroundsFolder+'spaceship-1548838_1280_CC0_by_JAKO5D_[gmic].jpg');
     background.setbasesize(0,0,fullwidth,fullheight,1,false);
   end;
   background.draw;
