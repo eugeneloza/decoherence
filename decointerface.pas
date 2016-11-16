@@ -93,8 +93,9 @@ Type
     { draw the element / as abstract as it might be :) }
     procedure draw; virtual; abstract;
     //procedure InitGL; virtual; abstract; //no need for an abstract method?
-    { gets current animation state. =base if animation finished. Not very
-     efficient as it creates/disposes a copy of the txywha every frame. TODO}
+    { updates the data of the class with current external data, most often
+      just gets the current animation state }
+    procedure update; virtual;
   private
     { Last and Next animation states. }
     last, next: Txywha;
@@ -125,6 +126,9 @@ Type
   {Element with a frame and content}
   DAbstractInterfaceElement = class(DAbstractElement)
   public
+    {whether Interface element owns its contents? If true they'll bee freed
+     on destroy // using TComponent Inheritance for now}
+    //OwnsContent: boolean;
     { content of the Interface element: label or image }
     Content: DAbstractElement;    {actually DAbstractImage, but cyclic references are not allowed}
     { multiplier to opacity <1, e.g. overall opacity=0.8 FrameOpacity=0.8, frame final Opacity=0.8*0.8 }
@@ -424,6 +428,11 @@ begin
   end;
 end;
 
+procedure DAbstractElement.update;
+begin
+  GetAnimationState;
+end;
+
 {----------------------------------------------------------------------------}
 
 
@@ -464,6 +473,7 @@ constructor DAbstractInterfaceElement.create(AOwner: TComponent);
 begin
   inherited create(AOwner);
   //ID := -1;
+  //OwnsContent := false;
   FrameOpacity := 0.8;
   isMouseOver := false;
   CanMouseOver := false;
@@ -477,7 +487,7 @@ begin
   InterfaceList.Remove(self);
   FreeAndNil(GLFrame);
   //if owns content destroy it here;
-  //FreeAndNil(content);      //todo
+  //if OwnsContent then FreeAndNil(content);
   inherited;
 end;
 
@@ -560,7 +570,7 @@ end;
 
 procedure DAbstractInterfaceElement.draw;
 begin
-  GetAnimationState;
+  update;
   if frame <> nil then begin
     if FrameReady then begin
       GLFrame.color := vector4single(1,1,1,currentAnimationState.Opacity * FrameOpacity);     //todo

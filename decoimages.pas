@@ -22,7 +22,7 @@ interface
 
 uses Classes,
   castleVectors, CastleGLImages, CastleImages,
-  decointerface,
+  decointerface, decoactor,
   decoglobal;
 
 type
@@ -98,6 +98,36 @@ type
   private
     procedure CyclePhase;
   end;
+
+Type TBarStyle = (bsVertical,bsHorizontal);
+
+Type
+  { Generic bar used for progress bars and health bars }
+  DBarImage = class(DStaticImage)
+  public
+    { minimmum, maximum, current maximum and current position
+      minimum usually is zero and automatically set in constructor }
+    min, max, currentMax, position: single;
+    { vertical or horizontal style of the bar }
+    kind: TBarStyle;
+    procedure draw; override;
+    constructor create(AOwner: TComponent); override;
+  end;
+
+Type TStatBarStyle = (sbHealth, sbStamina, sbConcentration, sbMetaphysics);
+
+Type
+  { bar to display health for mobs and primary 4 stats for player characters }
+  DStatBarImage = class(DBarImage)
+  public
+    { Points to the actor for who the health is displayed}
+    Target: DActor;
+    { determines which value to display: Health, Stamina, Concentration or Metaphysics}
+    Style: TStatBarStyle;
+    procedure update; override;
+    procedure draw; override;
+  end;
+
 
 var LoadNewFloaterImage: boolean;
 
@@ -241,7 +271,7 @@ procedure DAbstractImage.draw;
 begin
   if ImageReady then begin
     //animate
-    GetAnimationState;
+    update;
     GLImage.color := vector4single(1,1,1,currentAnimationState.Opacity); //todo
     GLIMage.Draw(currentAnimationState.x1,currentAnimationState.y1,currentAnimationState.w,currentAnimationState.h); //todo
   end else begin
@@ -253,14 +283,7 @@ end;
 {========================= static image ========================================}
 {=============================================================================}
 
-{Function DStaticImage.GetAnimationState: Txywha;
-begin
-  result := Txywha.create(nil);
-  result.x1 := base.x1;
-  result.x2 := base.x2;
-  result.opacity := Opacity;
-end;     }
-
+//...
 
 {=============================================================================}
 {======================== phased image =======================================}
@@ -364,6 +387,62 @@ begin
     if InitGLPending then InitGL;
   //   WritelnLog('DStaticImage.DrawMe','ERROR: Static Image not ready to draw!');
   end;
+end;
+
+{=============================================================================}
+{=========================== bar image =======================================}
+{=============================================================================}
+
+procedure DBarImage.draw;
+begin
+  if imageReady then begin
+    //...
+  end else
+    if InitGLPending then InitGL;
+end;
+
+constructor DBarImage.create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  min := 0;
+  max := 1;
+  position := 0;
+  Kind := bsHorizontal;
+end;
+
+procedure DStatBarImage.update;
+begin
+  inherited;
+  min := 0;
+  //maybe pointers will be better? Still, it doesn't look inefficient;
+  case Style of
+    sbHealth: begin
+                max := Target.MaxMaxHp;
+                CurrentMax := Target.MaxHp;
+                Position := Target.Hp;
+              end;
+    sbStamina: begin
+                max := Target.MaxMaxSta;
+                CurrentMax := Target.MaxSta;
+                Position := Target.Sta;
+              end;
+    sbConcentration: begin
+                max := Target.MaxMaxConc;
+                CurrentMax := Target.MaxConc;
+                Position := Target.Conc;
+              end;
+    sbMetaphysics: begin
+                max := Target.MaxMaxMph;
+                CurrentMax := Target.MaxMph;
+                Position := Target.Mph;
+              end;
+  end;
+end;
+
+procedure DStatBarImage.draw;
+begin
+  update;
+  inherited draw;
 end;
 
 end.

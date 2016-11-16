@@ -31,7 +31,7 @@ uses Classes, SysUtils,
      CastleLog,
      CastleWindow, CastleWindowTouch, CastleKeysMouse,
      decogui, decointerface, decomouse, decofont,
-     decolevel, decoactor,
+     decolevel, decoactor, decointerfaceplus,
      decoglobal, decogamemode;
 
 {==========================================================================}
