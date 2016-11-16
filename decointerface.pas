@@ -561,6 +561,7 @@ begin
     if FrameImage<>nil then begin
       freeandnil(GLFrame);
       GLFrame := TGLImage.create(FrameImage,true,true);
+      FrameImage := nil;
       FrameReady := true;
     end;
   end;

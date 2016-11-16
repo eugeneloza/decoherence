@@ -158,6 +158,7 @@ begin
   window.OnPress := @doPress;
   window.onRelease := @doRelease;
   window.OnMotion := @doMotion;
+  application.LimitFPS := 60;
 
   WritelnLog('ApplicationInitialize','DTouchList.create');
   TouchArray := DTouchList.create;
