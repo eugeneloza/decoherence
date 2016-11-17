@@ -12,7 +12,12 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.}
-unit decointerfaceplus;
+
+{---------------------------------------------------------------------------}
+
+{ Contains groups of items containing several specific interface elements
+  used in different game situations }
+unit decointerfacecomposite;
 
 {$mode objfpc}{$H+}
 {$INCLUDE compilerconfig.inc}
@@ -23,35 +28,13 @@ uses classes,
   decointerface,
   decoglobal;
 
-Type
-  {provides a simple integer output into a label}
-  DIntegerLabel = class (DAbstractInterfaceElement)
-  public
-    {pointer to the value it monitors}
-    value: Pinteger;
-    constructor create(AOwner: TComponent); override;
-    procedure update; override;
-  end;
+
 
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 
 implementation
-uses SysUtils,
-  decolabel;
-
-constructor DIntegerLabel.create(AOwner: TComponent);
-begin
-  inherited create(AOwner);
-  content := DLabel.create(self);
-  //ownsContent := true;
-end;
-
-procedure DIntegerLabel.update;
-begin
-  inherited;
-  (content as DLabel).Text := inttostr(value^);
-end;
+//uses decolabel, decoimages;
 
 
 

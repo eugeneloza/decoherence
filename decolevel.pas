@@ -12,6 +12,10 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.}
+
+{---------------------------------------------------------------------------}
+
+{ Temporary unit "loads" a game level and sets up the camera }
 unit decolevel;
 
 {$mode objfpc}{$H+}

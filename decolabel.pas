@@ -13,6 +13,9 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.}
 
+{---------------------------------------------------------------------------}
+
+{ Works with different types of labels }
 unit decolabel;
 
 {$mode objfpc}{$H+}
@@ -24,23 +27,62 @@ uses classes,
   decoimages, decofont,
   decoglobal;
 
-Type DLabel = class(DAbstractImage)
- public
-  Font: DFont;
-  Shadow: Float;
-  constructor Create(AOwner: TComponent); override;
-  destructor Destroy; override;
-  procedure Rescale; override;
- private
-  procedure PrepareTextImage;
-  procedure settext(const value: string);
-  function gettext: string;
- public
-  property text: string read gettext write settext;
- private
-  ftext:  string;
-  BrokenString: DStringList;
-end;
+Type
+  { a powerful text label, converted to GLImage to be extremely fast }
+  DLabel = class(DAbstractImage)
+  public
+    { font to print the label }
+    Font: DFont;
+    { shadow intensity. Shadow=0 is no shadow }
+    Shadow: Float;
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    procedure Rescale; override;
+  private
+    procedure PrepareTextImage;
+    procedure settext(const value: string);
+    function gettext: string;
+  public
+    { text at the label }
+    property text: string read gettext write settext;
+  private
+    ftext:  string;
+    BrokenString: DStringList;
+  end;
+
+Type
+  {provides a simple integer output into a label}
+  DIntegerLabel = class (DLabel)
+  public
+    { pointer to the value it monitors }
+    value: Pinteger;
+    procedure update; override;
+  end;
+
+Type
+  {provides a simple string output into a label}
+  DStringLabel = class (DLabel)
+  public
+    { pointer to the value it monitors }
+    value: Pstring;
+    procedure update; override;
+  end;
+
+Type
+  {provides a simple float output into a label}
+  DFloatLabel = class (DLabel)
+  public
+    { pointer to the value it monitors }
+    value: PFloat;
+    { how many digits after point are displayed?
+      0 - float is rounded to integer (1.6423 -> 2)
+      1 - one digit like 1.2
+      2 - two digits like 1.03
+      no more needed at the moment }
+    Digits: integer;
+    constructor Create(AOwner: TComponent); override;
+    procedure update; override;
+  end;
 
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 
@@ -120,6 +162,46 @@ begin
   base.backwardsetsize(RealWidth,RealHeight)
 {  base.w := ;
   base.h := RealHeight;}
+end;
+
+{=============================================================================}
+{========================= Integer label =====================================}
+{=============================================================================}
+
+procedure DIntegerLabel.update;
+begin
+  inherited;
+  Text := inttostr(value^);
+end;
+
+{=============================================================================}
+{========================== String label =====================================}
+{=============================================================================}
+
+procedure DStringLabel.update;
+begin
+  inherited;
+  Text := value^;
+end;
+
+{=============================================================================}
+{=========================== Float label =====================================}
+{=============================================================================}
+
+Constructor DFloatLabel.create(AOwner: TComponent);
+begin
+  inherited create(AOwner);
+  Digits := 0;
+end;
+
+procedure DFloatLabel.update;
+begin
+  inherited;
+  case Digits of
+    1: Text := inttostr(trunc(value^))+'.'+inttostr(round(frac(value^)*10));
+    2: Text := inttostr(trunc(value^))+'.'+inttostr(round(frac(value^)*100));
+    else Text := inttostr(round(value^));
+  end;
 end;
 
 end.

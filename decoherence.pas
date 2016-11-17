@@ -13,6 +13,10 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.}
 
+{---------------------------------------------------------------------------}
+
+{ Core file of the game }
+
 unit Decoherence;
 
 {$INCLUDE compilerconfig.inc}
@@ -31,7 +35,8 @@ uses Classes, SysUtils,
      CastleLog,
      CastleWindow, CastleWindowTouch, CastleKeysMouse,
      decogui, decointerface, decomouse, decofont,
-     decolevel, decoactor, decointerfaceplus,
+     decolevel,
+     decoactor, decointerfacecomposite,
      decoglobal, decogamemode;
 
 {==========================================================================}

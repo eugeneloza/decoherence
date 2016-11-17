@@ -13,6 +13,9 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.}
 
+{---------------------------------------------------------------------------}
+
+{ Works with different types of images }
 unit decoimages;
 
 {$mode objfpc}{$H+}
@@ -44,15 +47,16 @@ type
     ImageReady, ImageLoaded: boolean;
     { keeps from accidentally re-initializing GL }
     InitGLPending: boolean;
-    SourceImage: TCastleImage;  //todo scale Source Image for max screen resolution ? //todo never store on Android.
+    SourceImage: TCastleImage;  //todo scale Source Image for max screen resolution ?
     ScaledImage: TCastleImage;
+    {due to a little bug I have to define these separately}
+    ScaledWidth, ScaledHeight: integer;
   end;
 
 type
   { most simple image type }
   DStaticImage = class(DAbstractImage)
   public
-
     { if thread is running }
     ThreadWorking: boolean;
     { loads image in realtime }
@@ -185,6 +189,8 @@ begin
   SourceImage := LoadImage(ApplicationData(filename));
   RealWidth := SourceImage.Width;
   RealHeight := SourceImage.Height;
+  ScaledWidth := -1;
+  ScaledHeight := -1;
   ImageLoaded := true;
 end;
 
@@ -205,12 +211,14 @@ procedure DAbstractImage.InitGL;
 begin
   if InitGLPending then begin
     InitGLPending:=false;
-    if ScaledImage<>nil then begin
+    {if ScaledImage<>nil then} begin
       FreeAndNil(GLImage);
+      ScaledWidth := ScaledImage.width;
+      ScaledHeight := ScaledImage.height;
       GLImage := TGLImage.create(ScaledImage,true,true);
       ScaledImage := nil;
       ImageReady := true;
-    end else WriteLnLog('DAbstractElement.InitGL','ERROR: Scaled Image is nil!');
+    end {else WriteLnLog('DAbstractElement.InitGL','ERROR: Scaled Image is nil!');}
   end;
 end;
 
@@ -273,7 +281,7 @@ begin
  {$IFNDEF AllowRescale}If sourceImage=nil then exit;{$ENDIF}
  if ImageLoaded then begin
    if base.initialized then
-    if (scaledImage = nil){ or (ScaledImage.Width <> base.w) or (ScaledImage.height <> base.h)} then begin
+    if (ScaledWidth <> base.w) or (ScaledHeight <> base.h) then begin
       ImageReady:=false;
       FreeAndNil(GLImage);
       scaledImage := SourceImage.CreateCopy as TCastleImage;
@@ -397,6 +405,7 @@ end;
 procedure DBarImage.draw;
 begin
   if imageReady then begin
+    update;
     //...
   end else
     if InitGLPending then InitGL;
@@ -442,7 +451,7 @@ end;
 
 procedure DStatBarImage.draw;
 begin
-  update;
+  //update;
   inherited draw;
 end;
 

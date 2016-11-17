@@ -150,7 +150,7 @@
         <IsPartOfProject Value="True"/>
       </Unit12>
       <Unit13>
-        <Filename Value="decointerfaceplus.pas"/>
+        <Filename Value="decointerfacecomposite.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit13>
     </Units>

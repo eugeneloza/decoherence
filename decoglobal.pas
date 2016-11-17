@@ -13,6 +13,10 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.}
 
+{---------------------------------------------------------------------------}
+
+{ Defines some generic variables }
+
 unit decoglobal;
 
 {$mode objfpc}{$H+}
@@ -23,7 +27,9 @@ interface
 uses
   Classes, CastleWindowTouch;
 
-type float = single;
+{ for easy changing into double in case needed }
+type Float = single;
+     pFloat = ^float;
 
 var Window : TCastleWindowTouch;
     {$IFNDEF Android}

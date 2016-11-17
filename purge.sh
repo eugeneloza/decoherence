@@ -3,6 +3,7 @@ rm *.ppu
 rm *.so
 rm *.log
 rm *.dbg
+rm *.bak
 rm log_*.txt
 rm -r android_application/
 rm -r backup
