@@ -4,6 +4,6 @@ program decoherence_desktop;
 Uses {$IFDEF UNIX}cthreads,{$ENDIF} decoglobal, decoherence;
 
 begin
-  window.openandrun;
+  window.OpenAndRun;
 end.
 

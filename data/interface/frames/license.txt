@@ -1,1 +1,5 @@
-CC0 by Eugene Loza made in GIMP
+blackframe.png
+frame.png
+frame_caption.png
+CC0 by Eugene Loza
+made in GIMP

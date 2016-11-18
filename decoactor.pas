@@ -18,12 +18,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 { Describes characters and creatures basic behaviour }
 unit decoactor;
 
-{$mode objfpc}{$H+}
 {$INCLUDE compilerconfig.inc}
 
 interface
 
-uses classes, castleLog,
+uses classes,
   decoglobal;
 
 {Maybe, add some basic actor (visible only, no collisions)}
@@ -34,7 +33,7 @@ Type
     fHP,fMAXHP,fMAXMAXHP: float;
     { maybe, move all non-HP to deco player character? }
     fSTA,fMAXSTA,fMAXMAXSTA: float;
-    fCONC,fMAXCONC,fMAXMAXCONC: float;
+    fCNC,fMAXCNC,fMAXMAXCNC: float;
     fMPH,fMAXMPH,fMAXMAXMPH: float;
     Procedure setHP(value: float);
     Procedure setmaxHP(value: float);
@@ -42,13 +41,14 @@ Type
     Procedure setSTA(value: float);
     Procedure setmaxSTA(value: float);
     Procedure setmaxmaxSTA(value: float);
-    Procedure setCONC(value: float);
-    Procedure setmaxCONC(value: float);
-    Procedure setmaxmaxCONC(value: float);
+    Procedure setCNC(value: float);
+    Procedure setmaxCNC(value: float);
+    Procedure setmaxmaxCNC(value: float);
     Procedure setMPH(value: float);
     Procedure setmaxMPH(value: float);
     Procedure setmaxmaxMPH(value: float);
   public
+    constructor create(AOwner: TComponent); override;
     { getters and setters }
     Property HP: float read fHP write sethp;
     Property maxHP: float read fMAXHP write setmaxhp;
@@ -58,10 +58,10 @@ Type
     Property maxSTA: float read fMAXSTA write setmaxSTA;
     Property maxmaxSTA: float read fMAXMAXSTA write setmaxmaxSTA;
     procedure resetSTA;
-    Property CONC: float read fCONC write setCONC;
-    Property maxCONC: float read fMAXCONC write setmaxCONC;
-    Property maxmaxCONC: float read fMAXMAXCONC write setmaxmaxCONC;
-    procedure resetCONC;
+    Property CNC: float read fCNC write setCNC;
+    Property maxCNC: float read fMAXCNC write setmaxCNC;
+    Property maxmaxCNC: float read fMAXMAXCNC write setmaxmaxCNC;
+    procedure resetCNC;
     Property MPH: float read fMPH write setMPH;
     Property maxMPH: float read fMAXMPH write setmaxMPH;
     Property maxmaxMPH: float read fMAXMAXMPH write setmaxmaxMPH;
@@ -79,23 +79,35 @@ Type
     function consumeSTA(consumption: float; skill: float): boolean;
     function restoreSTA(restoration: float; skill: float): boolean;
     procedure drainSTA(drain: float; skill: float);
-    function consumeCONC(consumption: float; skill: float): boolean;
-    function restoreCONC(restoration: float; skill: float): boolean;
-    procedure drainCONC(drain: float; skill: float);
+    function consumeCNC(consumption: float; skill: float): boolean;
+    function restoreCNC(restoration: float; skill: float): boolean;
+    procedure drainCNC(drain: float; skill: float);
     function consumeMPH(consumption: float; skill: float): boolean;
     function restoreMPH(restoration: float; skill: float): boolean;
     procedure drainMPH(drain: float; skill: float);
 end;
 
-Type
-  {player character - the most complex actor available :)}
-  DPlayerCharacter = class(DActor)
-  public
-    Procedure die; override;
-end;
+
 
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
+
+uses castleLog;
+
+constructor DActor.create(AOwner: TComponent);
+begin
+  inherited create(AOwner);
+  setmaxmaxHP(100);
+  setmaxmaxSTA(100);
+  setmaxmaxCNC(100);
+  setmaxmaxMPH(100);
+  resetHP;
+  resetSTA;
+  resetCNC;
+  resetMPH;
+end;
+
+{----------------------------------------------------------------------------}
 
 Procedure DActor.setHP(value: float);
 begin
@@ -109,6 +121,7 @@ begin
 end;
 Procedure DActor.setmaxmaxHP(value: float);
 begin
+  if maxmaxHP<value then heal(value-fmaxmaxHP,1);
   fmaxmaxHP := value;
   If value < 0 then die;
 end;
@@ -132,6 +145,7 @@ begin
 end;
 Procedure DActor.setmaxmaxSTA(value: float);
 begin
+  if maxmaxSTA<value then restoreSTA(value-fmaxmaxSTA,1);
   fmaxmaxSTA := value;
   If value < 0 then {EXAUSTED STATE};
 end;
@@ -143,25 +157,26 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-Procedure DActor.setCONC(value: float);
+Procedure DActor.setCNC(value: float);
 begin
-  If value < fmaxCONC then fCONC := value else fCONC := fmaxCONC;
+  If value < fmaxCNC then fCNC := value else fCNC := fmaxCNC;
   If value < 0 then {BURN-OUT STATE};
 end;
-Procedure DActor.setmaxCONC(value: float);
+Procedure DActor.setmaxCNC(value: float);
 begin
-  If value < fmaxmaxCONC then fmaxCONC := value else fmaxCONC := fmaxmaxCONC;
+  If value < fmaxmaxCNC then fmaxCNC := value else fmaxCNC := fmaxmaxCNC;
   If value < 0 then {BURN-OUT STATE};
 end;
-Procedure DActor.setmaxmaxCONC(value: float);
+Procedure DActor.setmaxmaxCNC(value: float);
 begin
-  fmaxmaxCONC := value;
+  if maxmaxCNC<value then restoreCNC(value-fmaxmaxCNC,1);
+  fmaxmaxCNC := value;
   If value < 0 then {BURN-OUT STATE};
 end;
-procedure DActor.resetCONC;
+procedure DActor.resetCNC;
 begin
-  fmaxCONC := fmaxmaxCONC;
-  fCONC := fmaxCONC;
+  fmaxCNC := fmaxmaxCNC;
+  fCNC := fmaxCNC;
 end;
 
 {---------------------------------------------------------------------------}
@@ -178,6 +193,7 @@ begin
 end;
 Procedure DActor.setmaxmaxMPH(value: float);
 begin
+  if maxmaxMPH<value then restoreMPH(value-fmaxmaxMPH,1);
   fmaxmaxMPH := value;
   If value < 0 then {* STATE};
 end;
@@ -235,27 +251,27 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-function DActor.consumeCONC(consumption: float; skill: float): boolean;
+function DActor.consumeCNC(consumption: float; skill: float): boolean;
 begin
-  if (CONC>consumption) then begin
-    setCONC(CONC-consumption);
-    setmaxCONC(maxCONC-consumption*skill); // todo
+  if (CNC>consumption) then begin
+    setCNC(CNC-consumption);
+    setmaxCNC(maxCNC-consumption*skill); // todo
     result := true;
   end else result := false;
 end;
-function DActor.restoreCONC(restoration: float; skill: float): boolean;
+function DActor.restoreCNC(restoration: float; skill: float): boolean;
 begin
-  if (CONC<maxCONC) or ((maxCONC<maxmaxCONC) and (skill>0)) then begin
-    setCONC(CONC+restoration);
-    setMaxCONC(MaxCONC+restoration*skill); // todo
+  if (CNC<maxCNC) or ((maxCNC<maxmaxCNC) and (skill>0)) then begin
+    setCNC(CNC+restoration);
+    setMaxCNC(MaxCNC+restoration*skill); // todo
     result := true;
   end else
     result := false;
 end;
-procedure DActor.drainCONC(drain: float; skill: float);
+procedure DActor.drainCNC(drain: float; skill: float);
 begin
-  setCONC(CONC-drain);
-  setmaxCONC(maxCONC-drain*skill); // todo
+  setCNC(CNC-drain);
+  setmaxCNC(maxCNC-drain*skill); // todo
 end;
 
 {-----------------------------------------------------------------------------}
@@ -283,14 +299,6 @@ begin
   setmaxMPH(maxMPH-drain*skill); // todo
 end;
 
-{==========================================================================}
-{================ Player Character ========================================}
-{==========================================================================}
-
-Procedure DPlayerCharacter.die;
-begin
-  WriteLnLog('DPlayerCharacter.die','Character has died');
-end;
 
 end.
 

@@ -18,7 +18,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 { Contains most of interface basics and grouping }
 unit decointerface;
 
-{$mode objfpc}{$H+}
 {$INCLUDE compilerconfig.inc}
 
 interface
@@ -29,8 +28,10 @@ uses
   decoglobal;
 
 const Interface_Foler = 'interface/';
-      Frames_Folder = 'interface/frames/'; {Interface_folder+}
-      LoadScreen_folder = 'interface/loadscreen/';
+      Frames_Folder = Interface_Foler+'frames/';
+      LoadScreen_folder = Interface_Foler+'loadscreen/';
+      ProgressBar_folder = Interface_Foler+'progressbar/';
+
 
 const InterfaceScalingMethod: TResizeInterpolation = riBilinear;  //to quickly change it. Maybe will be a variable some day to support older PCs.
 
@@ -198,16 +199,22 @@ Type
 
   end;
 
-Var SimpleFrame, CaptionFrame: DFrame;
+Var {simple outline around black box}
+    SimpleFrame,
+    {a frame with 19px header}
+    CaptionFrame,
+    {Just black background with no frame}
+    BlackFrame: DFrame;
     {contains global list of all interface elements}
-    InterfaceList: DInterfaceElementsList;
+    //InterfaceList: DInterfaceElementsList;
 
 procedure Init_burner_image;
 procedure InitInterface;
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
-uses sysutils, CastleLog, castleFilesUtils;
+uses sysutils, CastleLog, castleFilesUtils,
+  decointerfacecomposite;
 
 {-------------------- BURNER IMAGE --------------------------------------------}
 
@@ -247,7 +254,15 @@ begin
     cornerTop := 19; CornerBottom := 1; cornerLeft := 1; CornerRight := 1;            //todo: variable top line!
   end;
 
-  InterfaceList := DInterfaceElementsList.create(false);
+  BlackFrame := DFrame.create(Window);
+  with BlackFrame do begin
+    SourceImage := LoadImage(ApplicationData(Frames_Folder+'blackframe.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
+    cornerTop := 0; CornerBottom := 0; cornerLeft := 0; CornerRight := 0;
+  end;
+
+  InitCompositeInterface;
+
+  //InterfaceList := DInterfaceElementsList.create(false);
 
   WriteLnLog('InitInterface','finished');
 end;
@@ -488,7 +503,7 @@ end;
 
 destructor DAbstractInterfaceElement.destroy;
 begin
-  InterfaceList.Remove(self);
+  //InterfaceList.Remove(self);
   FreeAndNil(GLFrame);
   //if owns content destroy it here;
   //if OwnsContent then FreeAndNil(content);
@@ -697,7 +712,7 @@ procedure DInterfaceElement.Grab(Child: DAbstractInterfaceElement);
 begin
   children.Add(Child);
   if (Child is DInterfaceElement) then (Child as DInterfaceElement).Parent := self; //not sure about this line
-  {Child.ID := }InterfaceList.Add(Child); //global ID of the element
+  //{Child.ID := }InterfaceList.Add(Child); //global ID of the element
 end;
 
 

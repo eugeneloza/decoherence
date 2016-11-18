@@ -15,29 +15,27 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 
 {---------------------------------------------------------------------------}
 
-{ Defines some generic variables }
-
-unit decoglobal;
+{ Creates large interface blocks for different game situations containing
+  large amounts of interface elements and composite interface elements }
+unit decointerfaceblocks;
 
 {$INCLUDE compilerconfig.inc}
 
 interface
 
-uses
-  Classes, CastleWindowTouch;
+uses classes,
+  decointerface, decointerfacecomposite,
+  decoglobal;
 
-{ for easy changing into double in case needed }
-type Float = single;
-     pFloat = ^float;
 
-var Window : TCastleWindowTouch;
-    {$IFNDEF Android}
-    LogStream : TFileStream;
-    {$ENDIF}
 
-{+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
+
+{+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
+
 implementation
+//uses decolabel, decoimages;
+
+
 
 end.
-
 

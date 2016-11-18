@@ -15,11 +15,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 
 {---------------------------------------------------------------------------}
 
-{ A generic container for the interface and its routines }
+{ A highets-level container for the interface and its routines }
 unit decogui;
 
 {$INCLUDE compilerconfig.inc}
-{$mode objfpc}{$H+}
 
 interface
 
@@ -60,7 +59,8 @@ Type
     FPS_label: DLabel;
     FPS_count: Integer;
     Last_render_time: TDateTime;
-
+  public
+    procedure MakeCharacterGenerationInterface;
 end;
 
 var GUI: DInterfaceContainer;
@@ -70,11 +70,12 @@ implementation
 
 uses SysUtils, CastleLog,
   decofacts,
+  decointerfacecomposite, decointerfaceblocks,
   decogamemode;
 
-const LoadScreenFolder='interface/loadscreen/';
-      BackgroundsFolder='interface/background/';
-      WindFolder='interface/wind/';
+const LoadScreenFolder=Interface_Foler+'loadscreen/';
+      BackgroundsFolder=Interface_Foler+'background/';
+      WindFolder=Interface_Foler+'wind/';
 
 {=============================================================================}
 {========================== interface container ==============================}
@@ -85,9 +86,6 @@ begin
   writeLnLog('DInterfaceContainer.create','Creating interface.');
   inherited create(AOwner);
   rnd := TCastleRandom.Create;
-
-  LoadFacts;
-  InitInterface;
 
   Last_render_time := now;
   FPS_count := 0;
@@ -271,6 +269,13 @@ begin
     Last_Render_time:=now;
   end else inc(FPS_count);
   FPS_label.draw;
+end;
+
+{======================== Interface modes creation ===========================}
+
+procedure DInterfaceContainer.MakeCharacterGenerationInterface;
+begin
+
 end;
 
 end.

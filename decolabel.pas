@@ -18,7 +18,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 { Works with different types of labels }
 unit decolabel;
 
-{$mode objfpc}{$H+}
 {$INCLUDE compilerconfig.inc}
 
 interface

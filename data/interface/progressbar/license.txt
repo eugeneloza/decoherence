@@ -1,0 +1,4 @@
+horizontalbar.png
+verticalbar.png
+CC0 by EugeneLoza
+made in GIMP > color gradient

@@ -20,7 +20,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 unit Decoherence;
 
 {$INCLUDE compilerconfig.inc}
-{$mode objfpc}{$H+}
 //{$DEFINE WriteLog}{$IFDEF Windows}{$APPTYPE GUI}{$ENDIF}
 
 
@@ -35,7 +34,7 @@ uses Classes, SysUtils,
      CastleLog,
      CastleWindow, CastleWindowTouch, CastleKeysMouse,
      decogui, decointerface, decomouse, decofont,
-     decolevel,
+     decolevel, decofacts,
      decoactor, decointerfacecomposite,
      decoglobal, decogamemode;
 
@@ -172,9 +171,13 @@ begin
   InitializeFonts;
 
   //create GUI
-  WritelnLog('ApplicationInitialize','Initialize interface');
+  WritelnLog('ApplicationInitialize','Create interface');
   GUI := DInterfaceContainer.create(Window);
   GUI.rescale;
+
+  WritelnLog('ApplicationInitialize','Initialize interface');
+  LoadFacts;
+  InitInterface;
 
   {$IFDEF AllowRescale}window.OnResize := @WindowResize;{$ENDIF}
   window.OnRender := @WindowRender;

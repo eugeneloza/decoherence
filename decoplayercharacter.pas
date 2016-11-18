@@ -15,29 +15,44 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 
 {---------------------------------------------------------------------------}
 
-{ Defines some generic variables }
-
-unit decoglobal;
+{ Definitions and routines for player character and recruitable characters }
+unit decoplayercharacter;
 
 {$INCLUDE compilerconfig.inc}
 
 interface
 
-uses
-  Classes, CastleWindowTouch;
+uses classes,
+  decoactor,
+  decoglobal;
 
-{ for easy changing into double in case needed }
-type Float = single;
-     pFloat = ^float;
+Type
+  {player character - the most complex actor available :)}
+  DPlayerCharacter = class(DActor)
+  public
+    Procedure die; override;
+    constructor create(AOwner: Tcomponent); override;
+end;
 
-var Window : TCastleWindowTouch;
-    {$IFNDEF Android}
-    LogStream : TFileStream;
-    {$ENDIF}
 
-{+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
+{+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
+
 implementation
 
-end.
+uses castleLog;
 
+constructor DPlayerCharacter.create(AOwner: TComponent);
+begin
+  inherited create(AOwner);
+end;
+
+{----------------------------------------------------------------------------}
+
+Procedure DPlayerCharacter.die;
+begin
+  WriteLnLog('DPlayerCharacter.die','Character has died');
+end;
+
+
+end.
 

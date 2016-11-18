@@ -18,7 +18,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 { Temporary(?) unit "loads" facts and loadscreen images }
 unit decofacts;
 
-{$mode objfpc}{$H+}
 {$INCLUDE compilerconfig.inc}
 
 interface

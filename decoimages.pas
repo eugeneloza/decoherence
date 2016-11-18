@@ -18,7 +18,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 { Works with different types of images }
 unit decoimages;
 
-{$mode objfpc}{$H+}
 {$INCLUDE compilerconfig.inc}
 
 interface
@@ -61,6 +60,8 @@ type
     ThreadWorking: boolean;
     { loads image in realtime }
     procedure Load(const filename:string); virtual;
+    procedure Load(const CopyImage: TCastleImage);
+    procedure afterload; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
     { loads image in a thread }
     procedure LoadThread(const filename:string);
     { Thread-safe part of rescaling the image }
@@ -185,8 +186,18 @@ end;
 
 procedure DStaticImage.Load(const filename: string);
 begin
-  WritelnLog('DAbstractImage.LoadImage',filename);
+  WritelnLog('DStaticImage.LoadImage',filename);
   SourceImage := LoadImage(ApplicationData(filename));
+  afterload;
+end;
+procedure DStaticImage.Load(const CopyImage: TCastleImage);
+begin
+  WritelnLog('DStaticImage.LoadImage','Copying image from '+CopyImage.ClassName);
+  SourceImage := CopyImage.MakeCopy;
+  afterload;
+end;
+procedure DStaticImage.afterload;
+begin
   RealWidth := SourceImage.Width;
   RealHeight := SourceImage.Height;
   ScaledWidth := -1;
@@ -437,9 +448,9 @@ begin
                 Position := Target.Sta;
               end;
     sbConcentration: begin
-                max := Target.MaxMaxConc;
-                CurrentMax := Target.MaxConc;
-                Position := Target.Conc;
+                max := Target.MaxMaxCNC;
+                CurrentMax := Target.MaxCNC;
+                Position := Target.CNC;
               end;
     sbMetaphysics: begin
                 max := Target.MaxMaxMph;
@@ -451,7 +462,7 @@ end;
 
 procedure DStatBarImage.draw;
 begin
-  //update;
+  //update; //already present in parent call
   inherited draw;
 end;
 
