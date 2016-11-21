@@ -31,7 +31,7 @@ Type
   DInterfaceContainer = class(DInterfaceElement)
   public
     { just = window.height, wihdow.width. Maybe I'll deprecate it later }
-    width,height:integer;
+    width,height: integer;
     { random generator used for all interface random events }
     rnd: TCastleRandom;
 
@@ -71,11 +71,8 @@ implementation
 uses SysUtils, CastleLog,
   decofacts,
   decointerfacecomposite, decointerfaceblocks,
+  decoplayercharacter,
   decogamemode;
-
-const LoadScreenFolder=Interface_Foler+'loadscreen/';
-      BackgroundsFolder=Interface_Foler+'background/';
-      WindFolder=Interface_Foler+'wind/';
 
 {=============================================================================}
 {========================== interface container ==============================}
@@ -113,7 +110,7 @@ begin
   Wind2.phasespeed := 1/(10+rnd.Random);
   Wind2.Load(WindFolder+'WindClouds2_GIMP.jpg');
   wind2.base.setsize(0,0,fullwidth,fullheight);
-  Wind2.Opacity:=0.1;
+  Wind2.Opacity := 0.1;
   Wind2.rescale;
 end;
 
@@ -144,19 +141,19 @@ begin
   base.setsize(0,0,fullwidth,fullheight);
 
   { rescale special elements }
-  if fps_label<>nil then fps_label.rescale;
+  if fps_label <> nil then fps_label.rescale;
 
   if (CurrentGameMode=gmLoadScreen) or (CurrentGameMode=gmCharacterGeneration) then begin
-    if wind1<>nil then wind1.rescale;
-    if wind2<>nil then wind2.rescale;
+    if wind1 <> nil then wind1.rescale;
+    if wind2 <> nil then wind2.rescale;
   end;
   if CurrentGameMode=gmLoadScreen then begin
-    if floater<>nil then floater.rescale;
-    if floaterLabel<>nil then floaterlabel.rescale;
-    if LoadScreenLabel<>nil then LoadScreenLabel.rescale;
+    if floater <> nil then floater.rescale;
+    if floaterLabel <> nil then floaterlabel.rescale;
+    if LoadScreenLabel <> nil then LoadScreenLabel.rescale;
   end;
 
-  if background<>nil then background.rescale; //todo maybe just check show/hide
+  if background <> nil then background.rescale; //todo maybe just check show/hide
 
   { rescale burner image }
   Init_burner_image;
@@ -169,7 +166,7 @@ end;
 
 procedure DInterfaceContainer.DoLoadNewImage;
 begin
-  if floater=nil then floater := DFloatImage.create(self);
+  if floater = nil then floater := DFloatImage.create(self);
   floater.FreeImage;
   LoadNewFloaterImage := false;
   floater.opacity := 0.8;
@@ -215,7 +212,7 @@ end;
 
 procedure DInterfaceContainer.DrawWind; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
-  if wind1=nil then LoadWind;
+  if wind1 = nil then LoadWind;
   wind1.draw;
   wind2.draw;
 end;
@@ -240,7 +237,7 @@ end;
 
 procedure DInterfaceContainer.DrawCharacterGenerationBackground;
 begin
-  if background=nil then begin
+  if background = nil then begin
     background := DStaticImage.create(self);
     background.LoadThread(BackgroundsFolder+'spaceship-1548838_1280_CC0_by_JAKO5D_[gmic].jpg');
     background.setbasesize(0,0,fullwidth,fullheight,1,false);
@@ -259,11 +256,11 @@ begin
   if CurrentGameMode = gmCharacterGeneration then DrawCharacterGenerationBackground else
   if CurrentGameMode = gmLoadScreen then DrawLoadScreen;
 
-  //draw the interface
+  //draw the interface {children}
   inherited draw;
 
   //draw FPS label
-  if ((now-Last_render_time)*24*60*60>=1) then begin
+  if ((now-Last_render_time)*24*60*60 >= 1) then begin
     FPS_label.text := Inttostr(FPS_count){+' '+inttostr(round(Window.Fps.RealTime))};
     FPS_count := 0;
     Last_Render_time:=now;
@@ -274,8 +271,13 @@ end;
 {======================== Interface modes creation ===========================}
 
 procedure DInterfaceContainer.MakeCharacterGenerationInterface;
+var i: integer;
+  tmp: DPartyView;
 begin
-
+  for i := 0 to maxparty do
+    Party[i] := DPlayerCharacter.create(Window);
+  tmp := DPartyView.create(self);
+  GUI.children.add(tmp);
 end;
 
 end.

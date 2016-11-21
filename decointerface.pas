@@ -27,12 +27,6 @@ uses
   castleVectors, castleImages, CastleGLImages,
   decoglobal;
 
-const Interface_Foler = 'interface/';
-      Frames_Folder = Interface_Foler+'frames/';
-      LoadScreen_folder = Interface_Foler+'loadscreen/';
-      ProgressBar_folder = Interface_Foler+'progressbar/';
-
-
 const InterfaceScalingMethod: TResizeInterpolation = riBilinear;  //to quickly change it. Maybe will be a variable some day to support older PCs.
 
 const defaultanimationduration = 300 /1000/60/60/24; {in ms}
@@ -88,6 +82,7 @@ Type
     Just defines the box and rescaling }
   DAbstractElement = class(TComponent)
   public
+    {stores current animation state, recalculated at every render}
     CurrentAnimationState: Txywha;
     procedure GetAnimationState; virtual;
 
@@ -105,6 +100,8 @@ Type
     { Last and Next animation states. }
     last, next: Txywha;
 //    Free_on_end: boolean;
+    fvisible: boolean;
+    procedure setvisible(value: boolean);
   public
     { these values are "strict" and unaffected by animations. Usually determines
       the basic stage and implies image rescale and init GL. }
@@ -112,7 +109,13 @@ Type
     animationduration: single;
     base: Txywha;
     RealWidth, RealHeight: integer;
-    procedure setbasesize(const newx,newy,neww,newh,newo: float; animate: boolean);
+    procedure setbasesize(const newx,newy,neww,newh,newo: float; animate: boolean); virtual;
+    {if the element is visible, if false then draw will not be called.
+     PAY ATTENTION: if assigned to a single interface element then the animations
+     and initGL will occur as they would normally. BUT if assigned to a
+     composite parent element, its children WILL NOT do anything like this and
+     will be frozen until visible=true. Maybe I'll fix this.}
+    property visible: boolean read fvisible write setvisible;
   end;
 
 Type
@@ -129,7 +132,7 @@ type TXYProcedure = procedure(sender: DAbstractElement; x,y: integer);
 
 Type
   {Element with a frame and content}
-  DAbstractInterfaceElement = class(DAbstractElement)
+  DSingleInterfaceElement = class(DAbstractElement)
   public
     {whether Interface element owns its contents? If true they'll bee freed
      on destroy // using TComponent Inheritance for now}
@@ -144,6 +147,8 @@ Type
     procedure rescale; override;
     constructor create(AOwner:TComponent); override;
     destructor destroy; override;
+    //also resizes content and frame
+    procedure setbasesize(const newx,newy,neww,newh,newo: float; animate: boolean); override;
   private
     {GL image of the frame}
     GLFrame: TGLImage;
@@ -175,25 +180,25 @@ Type
     OnMousePress: TXYProcedure;
     OnMouseRelease: TXYProcedure;
     OnDrop: TXYProcedure;
-    dragx,dragy: integer;
+    dragx, dragy: integer;
     procedure drag(x,y: integer);
     procedure startdrag(x,y: integer);
   end;
 
-type DInterfaceElementsList = specialize TFPGObjectList<DAbstractInterfaceElement>;
+type DInterfaceElementsList = specialize TFPGObjectList<DSingleInterfaceElement>;
 
 
 Type
-  DInterfaceElement = class(DAbstractInterfaceElement)
+  DInterfaceElement = class(DSingleInterfaceElement)
   public
-    parent: DAbstractInterfaceElement;
+    parent: DSingleInterfaceElement;
     children: DInterfaceElementsList;
     procedure draw; override;
     constructor create(AOwner: TComponent); override;
     destructor destroy; override;
     procedure Rescale; override;
   public
-    procedure Grab(Child: DAbstractInterfaceElement);
+    procedure Grab(Child: DSingleInterfaceElement);
     {returns self if IAmHere and runs all possible events}
     function ifMouseOver(xx,yy: integer; AllTree: boolean): DAbstractElement; override;
 
@@ -291,12 +296,12 @@ begin
   end;
 
   { stop if nothing was changed }
-  if (fx=newx) and (fy=newy) and (fw=neww) and (fh=newh) then exit;
+  if (fx = newx) and (fy = newy) and (fw = neww) and (fh = newh) then exit;
 
-  fx:=newx;
-  fy:=newy;
-  fw:=neww;
-  fh:=newh;
+  fx := newx;
+  fy := newy;
+  fw := neww;
+  fh := newh;
 
   recalculate;
 end;
@@ -307,7 +312,7 @@ procedure Txywh.recalculate;
 begin
   { convert float to integer }
 
-  if fx>=0 then
+  if fx >= 0 then
     x1 := round(Window.height*fx*GUI_scale_unit_float)
   else
     x1 := Window.width + round(Window.height*fx*GUI_scale_unit_float);
@@ -401,6 +406,13 @@ end;
 
 {----------------------------------------------------------------------------}
 
+procedure DAbstractElement.setvisible(value: boolean);
+begin
+  fvisible := value;
+end;
+
+{----------------------------------------------------------------------------}
+
 procedure DAbstractElement.setbasesize(const newx,newy,neww,newh,newo: float; animate: boolean);
 begin
   base.setsize(newx,newy,neww,newh);
@@ -413,7 +425,27 @@ begin
     animationstart := -1;
     animationduration := defaultanimationduration;
   end;
+  //rescale; //????
 end;
+
+procedure DSingleInterfaceElement.setbasesize(const newx,newy,neww,newh,newo: float; animate: boolean);
+begin
+  inherited setBaseSize(newx,newy,neww,newh,newo,animate);
+  //frame should be automatically resized during "rescale"...
+  if content <> nil then begin
+    content.setbasesize(newx,newy,neww,newh,newo,animate);
+    content.base.backwardsetsize(base.w-frame.cornerLeft-frame.cornerRight,
+                                 base.h-frame.cornerBottom-frame.cornerTop);
+    //content.base.recalculate;
+    //fix content by frame size;
+    inc(content.base.x1,frame.cornerLeft);
+    inc(content.base.y1,frame.cornerBottom);
+    dec(content.base.x2,frame.cornerRight+frame.cornerLeft);
+    dec(content.base.y2,frame.cornerTop+frame.cornerBottom);
+  end;
+
+end;
+
 
 {----------------------------------------------------------------------------}
 
@@ -458,6 +490,7 @@ end;
 constructor DAbstractElement.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+  visible := true;
   base := Txywha.Create(self);
   last := Txywha.Create(self);
   next := Txywha.Create(self);
@@ -477,18 +510,24 @@ begin
 end;
 
 {=============================================================================}
-{================== Abstract interface element ===============================}
+{=================== Single interface element ===============================}
 {=============================================================================}
 
-procedure DAbstractInterfaceElement.rescale;
+procedure DSingleInterfaceElement.rescale;
 begin
   if frame <> nil then FrameResize3x3;
-  //content.rescale;   //todo
+  if content <> nil then begin
+    content.base.copyxywh(base);
+  {  content.base.backwardsetsize(base.w-2,base.h-2);  //todo framewidth
+    inc(content.base.x1,1);
+    inc(content.base.y1,1);      }
+    content.rescale;   //todo
+  end;
 end;
 
 {----------------------------------------------------------------------------}
 
-constructor DAbstractInterfaceElement.create(AOwner: TComponent);
+constructor DSingleInterfaceElement.create(AOwner: TComponent);
 begin
   inherited create(AOwner);
   //ID := -1;
@@ -501,7 +540,7 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-destructor DAbstractInterfaceElement.destroy;
+destructor DSingleInterfaceElement.destroy;
 begin
   //InterfaceList.Remove(self);
   FreeAndNil(GLFrame);
@@ -512,11 +551,11 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DAbstractInterfaceElement.FrameResize3x3;
+procedure DSingleInterfaceElement.FrameResize3x3;
 var ScaledImageParts: array [0..2,0..2] of TCastleImage;
     ix,iy: integer;
-    UnscaledWidth,UnscaledHeight:integer;
-    SourceXs,SourceYs,DestXs,DestYs: TVector4Integer;
+    UnscaledWidth, UnscaledHeight:integer;
+    SourceXs, SourceYs, DestXs, DestYs: TVector4Integer;
     CornersVector:TVector4Integer;
 begin
   FrameReady := false;
@@ -572,7 +611,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DAbstractInterfaceElement.InitGL;
+procedure DSingleInterfaceElement.InitGL;
 begin
   //content makes his own initGL on first draw
   if InitGLPending then begin
@@ -588,9 +627,12 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DAbstractInterfaceElement.draw;
+procedure DSingleInterfaceElement.draw;
 begin
   update;
+
+  if not visible then exit;
+
   if frame <> nil then begin
     if FrameReady then begin
       GLFrame.color := vector4single(1,1,1,currentAnimationState.Opacity * FrameOpacity);     //todo
@@ -608,7 +650,7 @@ end;
 
 {========== Abstract intarface element : Mouse handling =====================}
 
-function DAbstractInterfaceElement.IAmHere(xx,yy: integer): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+function DSingleInterfaceElement.IAmHere(xx,yy: integer): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
   //get current element location... maybe, use not current animation, but "base"? Or completely ignore items being animated?
   GetAnimationState;
@@ -622,7 +664,7 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-function DAbstractInterfaceElement.ifMouseOver(xx,yy: integer; AllTree: boolean): DAbstractElement;
+function DSingleInterfaceElement.ifMouseOver(xx,yy: integer; AllTree: boolean): DAbstractElement;
 begin
   result := nil;
   if IAmHere(xx,yy) then begin
@@ -658,14 +700,14 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-procedure DAbstractInterfaceElement.startdrag(x,y: integer);
+procedure DSingleInterfaceElement.startdrag(x,y: integer);
 begin
   dragx := base.x1 - x;
   dragy := base.y1 - y;
 end;
 
 
-procedure DAbstractInterfaceElement.drag(x,y: integer);
+procedure DSingleInterfaceElement.drag(x,y: integer);
 begin
   base.x1 := dragx + x;
   base.y1 := dragy + y;
@@ -687,7 +729,7 @@ end;
 constructor DInterfaceElement.create(AOwner: TComponent);
 begin
   inherited create(AOwner);
-  if AOwner is DAbstractInterfaceElement then parent := AOwner as DAbstractInterfaceElement;
+  if AOwner is DSingleInterfaceElement then parent := AOwner as DSingleInterfaceElement;
   children := DInterfaceElementsList.Create(true);
 end;
 
@@ -705,10 +747,10 @@ procedure DInterfaceElement.draw;
 var i: integer;
 begin
   inherited;
-  for i:=0 to children.Count-1 do children[i].draw;
+  for i := 0 to children.Count-1 do children[i].draw;
 end;
 
-procedure DInterfaceElement.Grab(Child: DAbstractInterfaceElement);
+procedure DInterfaceElement.Grab(Child: DSingleInterfaceElement);
 begin
   children.Add(Child);
   if (Child is DInterfaceElement) then (Child as DInterfaceElement).Parent := self; //not sure about this line

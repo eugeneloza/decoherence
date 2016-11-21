@@ -26,6 +26,8 @@ uses classes,
   decoactor,
   decoglobal;
 
+const maxparty = 6; {7 characters}
+
 Type
   {player character - the most complex actor available :)}
   DPlayerCharacter = class(DActor)
@@ -34,6 +36,7 @@ Type
     constructor create(AOwner: Tcomponent); override;
 end;
 
+var Party: array[0..maxparty] of DPlayerCharacter;
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 

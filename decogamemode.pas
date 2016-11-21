@@ -51,7 +51,7 @@ begin
 
   case GM of
     {gmLoadScreen}//built automatically when game mode is enabled (?)
-    gmCharacterGeneration: GUI.MakeCharacterGenerationInterface;
+    gmCharacterGeneration, gmTravel: GUI.MakeCharacterGenerationInterface;
   end;
 
 

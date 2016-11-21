@@ -126,9 +126,9 @@ begin
   maxhb := 0;
   maxw  := 0;
   for i := 0 to s.count-1 do begin
-    if maxh<s[i].height then maxh := s[i].height;
-    if maxhb<s[i].height-s[i].heightbase then maxhb := s[i].height-s[i].heightbase;
-    if maxw<s[i].width then maxw := s[i].width;
+    if maxh < s[i].height then maxh := s[i].height;
+    if maxhb < s[i].height-s[i].heightbase then maxhb := s[i].height-s[i].heightbase;
+    if maxw < s[i].width then maxw := s[i].width;
   end;
 //  writelnLog('DFont.broken_string_to_image','max height base  =  ', inttostr(maxhb));
   result := TGRayScaleAlphaImage.create;

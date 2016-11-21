@@ -1,1 +1,0 @@
-Make bars 1px high, or change pattern along the axis, e.g. by clouds or noise

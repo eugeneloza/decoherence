@@ -121,7 +121,7 @@ begin
 end;
 Procedure DActor.setmaxmaxHP(value: float);
 begin
-  if maxmaxHP<value then heal(value-fmaxmaxHP,1);
+  if maxmaxHP < value then heal(value-fmaxmaxHP,1);
   fmaxmaxHP := value;
   If value < 0 then die;
 end;
@@ -145,7 +145,7 @@ begin
 end;
 Procedure DActor.setmaxmaxSTA(value: float);
 begin
-  if maxmaxSTA<value then restoreSTA(value-fmaxmaxSTA,1);
+  if maxmaxSTA < value then restoreSTA(value-fmaxmaxSTA,1);
   fmaxmaxSTA := value;
   If value < 0 then {EXAUSTED STATE};
 end;
@@ -169,7 +169,7 @@ begin
 end;
 Procedure DActor.setmaxmaxCNC(value: float);
 begin
-  if maxmaxCNC<value then restoreCNC(value-fmaxmaxCNC,1);
+  if maxmaxCNC < value then restoreCNC(value-fmaxmaxCNC,1);
   fmaxmaxCNC := value;
   If value < 0 then {BURN-OUT STATE};
 end;
@@ -193,7 +193,7 @@ begin
 end;
 Procedure DActor.setmaxmaxMPH(value: float);
 begin
-  if maxmaxMPH<value then restoreMPH(value-fmaxmaxMPH,1);
+  if maxmaxMPH < value then restoreMPH(value-fmaxmaxMPH,1);
   fmaxmaxMPH := value;
   If value < 0 then {* STATE};
 end;
@@ -216,7 +216,7 @@ end;
 
 function DActor.heal(value: float; skill: float): boolean;
 begin
-  if (HP<maxHP) or ((maxHP<maxmaxHP) and (skill>0)) then begin
+  if (HP < maxHP) or ((maxHP < maxmaxHP) and (skill > 0)) then begin
     setHP(HP+value);
     setMaxHP(MaxHP+value*skill); // todo
     result := true;
@@ -228,7 +228,7 @@ end;
 
 function DActor.consumeSTA(consumption: float; skill: float): boolean;
 begin
-  if (STA>consumption) then begin
+  if (STA > consumption) then begin
     setSTA(STA-consumption);
     setmaxSTA(maxSTA-consumption*skill); // todo
     result := true;
@@ -236,7 +236,7 @@ begin
 end;
 function DActor.restoreSTA(restoration: float; skill: float): boolean;
 begin
-  if (STA<maxSTA) or ((maxSTA<maxmaxSTA) and (skill>0)) then begin
+  if (STA < maxSTA) or ((maxSTA < maxmaxSTA) and (skill > 0)) then begin
     setSTA(STA+restoration);
     setMaxSTA(MaxSTA+restoration*skill); // todo
     result := true;
@@ -253,7 +253,7 @@ end;
 
 function DActor.consumeCNC(consumption: float; skill: float): boolean;
 begin
-  if (CNC>consumption) then begin
+  if (CNC > consumption) then begin
     setCNC(CNC-consumption);
     setmaxCNC(maxCNC-consumption*skill); // todo
     result := true;
@@ -261,7 +261,7 @@ begin
 end;
 function DActor.restoreCNC(restoration: float; skill: float): boolean;
 begin
-  if (CNC<maxCNC) or ((maxCNC<maxmaxCNC) and (skill>0)) then begin
+  if (CNC < maxCNC) or ((maxCNC < maxmaxCNC) and (skill > 0)) then begin
     setCNC(CNC+restoration);
     setMaxCNC(MaxCNC+restoration*skill); // todo
     result := true;
@@ -278,7 +278,7 @@ end;
 
 function DActor.consumeMPH(consumption: float; skill: float): boolean;
 begin
-  if (MPH>consumption) then begin
+  if (MPH > consumption) then begin
     setMPH(MPH-consumption);
     setmaxMPH(maxMPH-consumption*skill); // todo
     result := true;
@@ -286,7 +286,7 @@ begin
 end;
 function DActor.restoreMPH(restoration: float; skill: float): boolean;
 begin
-  if (MPH<maxMPH) or ((maxMPH<maxmaxMPH) and (skill>0)) then begin
+  if (MPH < maxMPH) or ((maxMPH < maxmaxMPH) and (skill > 0)) then begin
     setMPH(MPH+restoration);
     setMaxMPH(MaxMPH+restoration*skill); // todo
     result := true;

@@ -30,25 +30,45 @@ uses classes,
 
 
 type
+  { wrapper for composite Interface elements with ArrangeChildren procedure
+    each child will define its own arrange method }
   DAbstractCompositeInterfaceElement = class(DInterfaceElement)
   public
-    procedure ArrangeChildren; virtual; abstract;
+    { arranges children within base.w, base.h }
+    procedure ArrangeChildren(animate: boolean); virtual; abstract;
+    procedure setbasesize(const newx,newy,neww,newh,newo: float; animate: boolean); override;
 end;
 
 type
+  {HP,STA,CNC and MPH vertical bars for a player character}
   DPlayerBars = class(DAbstractCompositeInterfaceElement)
   private
     ftarget: DActor;
     procedure settarget(value: DActor);
   public
     {these are links for easier access to the children}
-    HP_bar,STA_bar,CNC_bar,MPH_bar: integer;
+    HP_bar, STA_bar, CNC_bar, MPH_bar: DSingleInterfaceElement;
+    {the character being monitored}
     property Target: DActor read ftarget write settarget;
     constructor create(AOwner: TComponent); override;
-    procedure ArrangeChildren; override;
+    procedure ArrangeChildren(animate: boolean); override;
 end;
 
-var HealthBarImage: TCastleImage; //not freed automatically!!!
+type
+  { character portrait. Some day it might be replaced for TUIContainer of
+    the 3d character face :) Only 2D inanimated image for now... }
+  DPortrait = class(DSingleInterfaceElement)
+  private
+    fTarget: DPlayerCharacter;
+    procedure settarget(value: DPlayerCharacter);
+  public
+    property Target: DPlayerCharacter read ftarget write settarget;
+    constructor create(AOwner: TComponent); override;
+  end;
+
+
+var HealthBarImage: TCastleImage; //todo not freed automatically!!!
+    PortraitIMG: TCastleImage; //todo!!!
 
 procedure InitCompositeInterface;
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
@@ -58,87 +78,123 @@ uses CastleLog, CastleFilesUtils, castleVectors,
   decogui,
   decolabel;
 
+procedure DAbstractCompositeInterfaceElement.setbasesize(const newx,newy,neww,newh,newo: float; animate: boolean);
+begin
+  inherited setbasesize(newx,newy,neww,newh,newo,animate);
+  ArrangeChildren(animate);
+end;
+
+{===========================================================================}
+
 procedure InitCompositeInterface;
 begin
   HealthBarImage := LoadImage(ApplicationData(ProgressBar_folder+'verticalbar.png'));
+  PortraitIMG := LoadImage(ApplicationData(PortraitFolder+'AF.jpg'));
 end;
 
-{---------------------------------------------------------------------------}
+{===========================================================================}
+{=================== player bars ===========================================}
+{===========================================================================}
 
 constructor DPlayerBars.create(AOwner: TComponent);
 var tmp_bar: DStatBarImage;
-    tmp_element: DInterfaceElement;
+    tmp_element: DSingleInterfaceElement;
 begin
   inherited create(AOwner);
   frame := BlackFrame;
 
-  //or make parent nil? as they are freed by freeing children?
-  tmp_element := DInterfaceElement.create(self);
+  //or make parent nil? as they are freed by freeing children? Keep an eye out for troubles...
+  tmp_element := DSingleInterfaceElement.create(self);
   tmp_bar := DStatBarImage.create(tmp_element);
   tmp_bar.Load(HealthBarImage);
   tmp_bar.Style := sbHealth;
-  tmp_bar.color := Vector4Single(1,0,0,1);
+  tmp_bar.Kind := bsVertical;
   tmp_element.Content := tmp_bar;
   tmp_element.frame := SimpleFrame;
-  HP_bar := self.children.add(tmp_element);
+  HP_bar := tmp_element;
+  self.children.add(tmp_element);
 
-  tmp_element := DInterfaceElement.create(self);
+  tmp_element := DSingleInterfaceElement.create(self);
   tmp_bar := DStatBarImage.create(tmp_element);
   tmp_bar.Load(HealthBarImage);
   tmp_bar.Style := sbStamina;
-  tmp_bar.color := Vector4Single(1,1,0,1);
+  tmp_bar.Kind := bsVertical;
   tmp_element.Content := tmp_bar;
   tmp_element.frame := SimpleFrame;
-  STA_bar := self.children.add(tmp_element);
+  STA_bar := tmp_element;
+  self.children.add(tmp_element);
 
-  tmp_element := DInterfaceElement.create(self);
+  tmp_element := DSingleInterfaceElement.create(self);
   tmp_bar := DStatBarImage.create(tmp_element);
   tmp_bar.Load(HealthBarImage);
   tmp_bar.Style := sbConcentration;
-  tmp_bar.color := Vector4Single(0,1,1,1);
+  tmp_bar.Kind := bsVertical;
   tmp_element.Content := tmp_bar;
   tmp_element.frame := SimpleFrame;
-  CNC_bar := self.children.add(tmp_element);
+  CNC_bar := tmp_element;
+  self.children.add(tmp_element);
 
-  tmp_element := DInterfaceElement.create(self);
+  tmp_element := DSingleInterfaceElement.create(self);
   tmp_bar := DStatBarImage.create(tmp_element);
   tmp_bar.Load(HealthBarImage);
   tmp_bar.Style := sbMetaphysics;
-  tmp_bar.color := Vector4Single(1,0,1,1);
+  tmp_bar.Kind := bsVertical;
   tmp_element.Content := tmp_bar;
   tmp_element.frame := SimpleFrame;
-  MPH_bar := self.children.add(tmp_element);
+  MPH_bar := tmp_element;
+  self.children.add(tmp_element);
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure DPlayerBars.settarget(value: DActor);
 begin
-  if ftarget<>value then begin
+  if ftarget <> value then begin
     ftarget := value;
-    //and drop the target to all children
-    (children[HP_bar].Content as DStatBarImage).Target := ftarget;
-    (children[STA_bar].Content as DStatBarImage).Target := ftarget;
-    (children[CNC_bar].Content as DStatBarImage).Target := ftarget;
-    (children[MPH_bar].Content as DStatBarImage).Target := ftarget;
+    //and copy the target to all children
+    (HP_bar.content as DStatBarImage).Target := ftarget;
+    (STA_bar.content as DStatBarImage).Target := ftarget;
+    (CNC_bar.content as DStatBarImage).Target := ftarget;
+    (MPH_bar.content as DStatBarImage).Target := ftarget;
   end;
 end;
 
 {-----------------------------------------------------------------------------}
 
-procedure DPlayerBars.ArrangeChildren;
+procedure DPlayerBars.ArrangeChildren(animate: boolean);
+var scalex: float;
 begin
   if not base.initialized then begin
     writeLnLog('DPlayerBars.ArrangeChildren','ERROR: Base is not initialized!');
     exit;
   end;
-  //...
-  if ftarget.maxmaxmph>0 then begin
-  //...
-  end else begin
-  //...
-  end;
+  {metaphysics bar is displayed only if the character is known to posess metaphysic skills}
+  if ftarget.maxmaxmph > 0 then scalex := base.fw/4 else scalex := base.fw/3;
+  HP_bar. setbasesize(base.fx         ,base.fy,scalex,base.fh,base.opacity,animate);
+  STA_bar.setbasesize(base.fx+  scalex,base.fy,scalex,base.fh,base.opacity,animate);
+  CNC_bar.setbasesize(base.fx+2*scalex,base.fy,scalex,base.fh,base.opacity,animate);
+  if ftarget.maxmaxmph > 0 then
+  MPH_bar.setbasesize(base.fx+3*scalex,base.fy,scalex,base.fh,base.opacity,animate);
 end;
+
+{========================== Character portrait ===============================}
+
+procedure DPortrait.settarget(value: DPlayerCharacter);
+begin
+  ftarget := value;
+  (content as DStaticImage).freeImage;
+  WriteLnLog('DPortrait.settarget','Load from portrait');
+  (content as DStaticImage).Load(PortraitFolder+'AF.jpg'{PortraitIMG});  //todo
+end;
+
+constructor DPortrait.create(AOwner: TComponent);
+begin
+  inherited create(AOwner);
+  content := DStaticImage.create(self);
+  frame := BlackFrame;
+end;
+
+{=============================================================================}
 
 end.
 

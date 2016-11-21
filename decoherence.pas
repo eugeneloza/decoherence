@@ -16,7 +16,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 {---------------------------------------------------------------------------}
 
 { Core file of the game }
-
 unit Decoherence;
 
 {$INCLUDE compilerconfig.inc}
@@ -25,13 +24,13 @@ unit Decoherence;
 
 interface
 
-const Version='interfa3-161107-48';
+const Version='interfa3-161120-56';
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
 uses Classes, SysUtils,
-     CastleLog,
+     CastleLog, CastleTimeUtils,
      CastleWindow, CastleWindowTouch, CastleKeysMouse,
      decogui, decointerface, decomouse, decofont,
      decolevel, decofacts,
@@ -51,6 +50,21 @@ begin
   end;
 end;
 {$ENDIF}
+
+function NiceDate:string;
+var s:String;
+    i:integer;
+begin
+  s := DateTimeToAtStr(now);
+  result := '';
+  for i := 1 to length(s) do
+    if copy(s,i,1)=' ' then result+='_' else
+    if copy(s,i,1)=':' then result+='-' else
+    result+=copy(s,i,1);
+end;
+
+
+{-------------------------------------------------------------------------}
 
 var RenderFinished: boolean = true;
 Procedure WindowRender(Container : TUIContainer);
@@ -73,10 +87,15 @@ begin
     doMousePress(Event);
     {if interface didn't catch the click then}
     if mbRight=event.MouseButton then camera.MouseLook := not Camera.MouseLook;
+  end else if Event.EventType = itKey then begin
+    if event.key = K_P{rintScreen} then
+       Window.SaveScreen('deco_'+NiceDate+'.jpg');
   end;
   SetGameMode(gmCharacterGeneration);
   //InitTestLevel;                         //ugly! I'll fix this soon.
 end;
+
+{--------------------------------------------------------------------------}
 
 procedure doRelease(Container: TUIContainer; const Event: TInputPressRelease);
 begin
@@ -85,6 +104,7 @@ begin
   end;
 end;
 
+{--------------------------------------------------------------------------}
 
 procedure doMotion(Container: TUIContainer; const Event: TInputMotion);
 var i: integer;
@@ -120,22 +140,6 @@ end;
 
 {======================= initialization routines ==============================}
 
-{$IFNDEF Android}
-{$IFDEF WriteLog}
-function NiceDate:string;
-var s:String;
-    i:integer;
-begin
-  s := DateTimeToAtStr(now);
-  result := '';
-  for i := 1 to length(s) do
-    if copy(s,i,1)=' ' then result+='_' else
-    if copy(s,i,1)=':' then result+='-' else
-    result+=copy(s,i,1);
-end;
-{$ENDIF}
-{$ENDIF}
-
 procedure ApplicationInitialize;
 begin
   //initialize the log
@@ -156,8 +160,6 @@ begin
 
   {$IFDEF Fullscreen}window.fullscreen := true;{$ENDIF}
 
-  //doesn't work in Linux?
-  {$IFNDEF AllowRescale}window.ResizeAllowed := raOnlyAtOpen;{$ENDIF}
   //Assign window events
   window.OnPress := @doPress;
   window.onRelease := @doRelease;
@@ -198,9 +200,11 @@ begin
   Result  :=  'Decoherence 1';
 end;
 
+{++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 Initialization
   OnGetApplicationName  :=  @MyGetApplicationName;
   Window := TCastleWindowTouch.create(Application);
+  {$IFNDEF AllowRescale}window.ResizeAllowed := raOnlyAtOpen;{$ENDIF}
   Application.MainWindow  :=  Window;
   Application.OnInitialize  :=  @ApplicationInitialize;
 

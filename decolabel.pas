@@ -101,7 +101,7 @@ end;
 
 destructor DLabel.Destroy;
 begin
-  if BrokenString<> nil then BrokenString.Clear;
+  if BrokenString <> nil then BrokenString.Clear;
   FreeAndNil(BrokenString);
   inherited
 end;
@@ -110,7 +110,7 @@ end;
 
 procedure DLabel.settext(const value : string);
 begin
-  if ftext<>value then begin
+  if ftext <> value then begin
     ftext := value;
     PrepareTextImage;
   end;

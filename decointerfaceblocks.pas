@@ -25,16 +25,65 @@ interface
 
 uses classes,
   decointerface, decointerfacecomposite,
+  decoplayercharacter,
   decoglobal;
 
 
+type
+  {presents 7 characters with health bars, portraits and characters control space }
+  DPartyView = class (DAbstractCompositeInterfaceElement)
+  public
+    PartyBars: array [0..maxparty] of DPlayerBars;
+    Portraits: array [0..maxparty] of DPortrait;
+    procedure ArrangeChildren(animate: boolean); override;
+    constructor create(AOwner: TComponent); override;
+  end;
 
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
-
 implementation
-//uses decolabel, decoimages;
+//uses ;
 
+procedure DPartyView.ArrangeChildren(animate: boolean);
+var i: integer;
+begin
+  {rescale party stat bars}
+  for i := 0 to maxparty do begin
+    if not odd(i) then
+      PartyBars[i].setbasesize(0,1+(maxparty-i+1) div 2*3,1,3,1,animate)
+    else
+      PartyBars[i].setbasesize(-1,1+(maxparty-i+1) div 2*3,1,3,1,animate);
+    PartyBars[i].rescale;
+  end;
+
+  {rescale party portraits}
+  for i := 0 to maxparty do begin
+    if not odd(i) then
+      portraits[i].setbasesize(1,1+(maxparty-i+1) div 2*3,2,3,1,animate)
+    else
+      portraits[i].setbasesize(-3,1+(maxparty-i+1) div 2*3,2,3,1,animate);
+    portraits[i].rescale;
+  end;
+end;
+
+constructor DPartyView.create(AOwner: TComponent);
+var i: integer;
+begin
+  inherited Create(AOwner);
+  for i := 0 to maxparty do begin
+    //create stat bars
+    PartyBars[i] := DPlayerBars.create(self);
+    PartyBars[i].target := party[i];
+    self.children.Add(PartyBars[i]);
+
+    //create portraits
+    Portraits[i] := DPortrait.create(self);
+    Portraits[i].target := party[i];
+    self.children.Add(Portraits[i]);
+  end;
+  setbasesize(0,0,fullwidth,fullheight,1,false);
+//  ArrangeChildren(false); //automatically arranged on TCompositeElement.setbasesize
+end;
 
 
 end.

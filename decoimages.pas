@@ -28,8 +28,8 @@ uses Classes,
   decoglobal;
 
 type
-  DAbstractImage = class(DAbstractElement)
   { General routines shared by images and labels }
+  DAbstractImage = class(DAbstractElement)
   public
     color: TVector4Single; //todo
     { very simple draw procedure }
@@ -104,7 +104,7 @@ type
     procedure CyclePhase;
   end;
 
-Type TBarStyle = (bsVertical,bsHorizontal);
+Type TBarStyle = (bsVertical, bsHorizontal);
 
 Type
   { Generic bar used for progress bars and health bars }
@@ -131,8 +131,8 @@ Type
     Style: TStatBarStyle;
     procedure update; override;
     procedure draw; override;
+    constructor create(AOwner: TComponent); override;
   end;
-
 
 var LoadNewFloaterImage: boolean;
 
@@ -155,16 +155,16 @@ end;
 
 procedure TLoadImageThread.execute;
 begin
-  target.ThreadWorking:=true;
+  target.ThreadWorking := true;
   WritelnLog('TLoadImageThread.execute','Image thread started.');
   Target.Load(Source);
   if Target=nil then begin
     WritelnLog('TLoadImageThread.execute','Image was destroyed before it was loaded!');
-    exit; //fix bug if the image didn't load completely but was destroyed
+    exit; //fix bug if the image didn't load completely but was already destroyed
   end;
   Target.rescale;
   WritelnLog('TLoadImageThread.execute','Image thread finished.');
-  target.ThreadWorking:=false;
+  target.ThreadWorking := false;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -238,7 +238,7 @@ end;
 constructor DAbstractImage.create(AOwner: TComponent);
 begin
   inherited create(AOwner);
-  color:=vector4Single(1,1,1,1);
+  color := vector4Single(1,1,1,1);
   InitGLPending := false;
   imageReady := false;
   imageLoaded := false;
@@ -263,6 +263,9 @@ begin
   if ImageReady then begin
     //animate
     update;
+
+    if not visible then exit;
+
     GLImage.color := vector4single(1,1,1,currentAnimationState.Opacity); //todo
     GLIMage.Draw(currentAnimationState.x1,currentAnimationState.y1,currentAnimationState.w,currentAnimationState.h); //todo
   end else begin
@@ -351,6 +354,9 @@ var phase_scaled:integer;
 begin
   if ImageReady then begin
     CyclePhase;
+
+    if not visible then exit;
+
     color[3] := Opacity + Opacity/4 * sin(2*Pi*opacityphase);
     GLImage.Color := color;
     phase_scaled := round(Phase*Window.width);
@@ -395,13 +401,16 @@ end;
 {----------------------------------------------------------------------------}
 
 procedure DFloatImage.draw;
-var x:integer;
+var x: integer;
 begin
   if ImageReady then begin
     cyclePhase;
+
+    if not visible then exit;
+
     color[3] := Opacity*sin(Pi*phase);
     GLImage.color := Color;
-    x:=round((window.width-base.w)*phase);
+    x := round((window.width-base.w)*phase);
     GLImage.Draw(x,0);
   end else begin
     if InitGLPending then InitGL;
@@ -414,13 +423,29 @@ end;
 {=============================================================================}
 
 procedure DBarImage.draw;
+var x: integer;
 begin
   if imageReady then begin
     update;
-    //...
+
+    if not visible then exit;
+      GLImage.color := color;
+      if max = min then begin
+        writeLnLog('DBarImage.draw','ERROR: Division by zero!');
+        exit;
+      end;
+      if Kind = bsVertical then begin
+        x := round(base.h * position/(max-min));
+        GLImage.draw(base.x1,base.y1,base.w,x);
+      end else begin
+        x := round(base.w * position/(max-min));
+        GLImage.draw(base.x1,base.y1,x,base.h);
+      end;
   end else
     if InitGLPending then InitGL;
 end;
+
+{---------------------------------------------------------------------------}
 
 constructor DBarImage.create(AOwner: TComponent);
 begin
@@ -428,12 +453,17 @@ begin
   min := 0;
   max := 1;
   position := 0;
-  Kind := bsHorizontal;
+  Kind := bsHorizontal;   //default for most progressbars and enemy health
 end;
+
+{================ Stat Bar image =========================================}
 
 procedure DStatBarImage.update;
 begin
-  inherited;
+  if target=nil then exit; //don't waste time if target isn't present
+
+    inherited update;
+
   min := 0;
   //maybe pointers will be better? Still, it doesn't look inefficient;
   case Style of
@@ -441,29 +471,44 @@ begin
                 max := Target.MaxMaxHp;
                 CurrentMax := Target.MaxHp;
                 Position := Target.Hp;
+                color := Vector4Single(1,0,0,1);  //red  ? maybe green->red?
               end;
     sbStamina: begin
                 max := Target.MaxMaxSta;
                 CurrentMax := Target.MaxSta;
                 Position := Target.Sta;
+                color := Vector4Single(1,1,0,1);  //yellow
               end;
     sbConcentration: begin
                 max := Target.MaxMaxCNC;
                 CurrentMax := Target.MaxCNC;
                 Position := Target.CNC;
+                color := Vector4Single(0,1,1,1);  //cyan
               end;
     sbMetaphysics: begin
                 max := Target.MaxMaxMph;
                 CurrentMax := Target.MaxMph;
                 Position := Target.Mph;
+                color := Vector4Single(1,0,1,1);  //purple
               end;
   end;
 end;
 
+{---------------------------------------------------------------------------}
+
 procedure DStatBarImage.draw;
 begin
+  if target = nil then exit; //don't draw if target is absent
   //update; //already present in parent call
   inherited draw;
+end;
+
+{---------------------------------------------------------------------------}
+
+constructor DStatBarImage.create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  //Kind := bsVertical;   //default for player bars display
 end;
 
 end.
