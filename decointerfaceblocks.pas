@@ -50,18 +50,18 @@ begin
   {rescale party stat bars}
   for i := 0 to maxparty do begin
     if not odd(i) then
-      PartyBars[i].setbasesize(0,1+(maxparty-i+1) div 2*3,1,3,1,animate)
+      PartyBars[i].setbasesize(0,1+(maxparty-i+1) div 2*3,0.5,3,1,animate)
     else
-      PartyBars[i].setbasesize(-1,1+(maxparty-i+1) div 2*3,1,3,1,animate);
+      PartyBars[i].setbasesize(-0.5,1+(maxparty-i+1) div 2*3,0.5,3,1,animate);
     PartyBars[i].rescale;
   end;
 
   {rescale party portraits}
   for i := 0 to maxparty do begin
     if not odd(i) then
-      portraits[i].setbasesize(1,1+(maxparty-i+1) div 2*3,2,3,1,animate)
+      portraits[i].setbasesize(0.5,1+(maxparty-i+1) div 2*3,2.5,3,1,animate)
     else
-      portraits[i].setbasesize(-3,1+(maxparty-i+1) div 2*3,2,3,1,animate);
+      portraits[i].setbasesize(-3,1+(maxparty-i+1) div 2*3,2.5,3,1,animate);
     portraits[i].rescale;
   end;
 end;

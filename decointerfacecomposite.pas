@@ -26,7 +26,7 @@ interface
 uses classes,
   castleImages,
   decointerface, decoactor, decoplayercharacter,
-  decoglobal, decoimages;
+  decoglobal;
 
 
 type
@@ -43,11 +43,12 @@ type
   {HP,STA,CNC and MPH vertical bars for a player character}
   DPlayerBars = class(DAbstractCompositeInterfaceElement)
   private
+    {these are links for easier access to the children}
+    HP_bar, STA_bar, CNC_bar, MPH_bar: DSingleInterfaceElement;
+    {target character}
     ftarget: DActor;
     procedure settarget(value: DActor);
   public
-    {these are links for easier access to the children}
-    HP_bar, STA_bar, CNC_bar, MPH_bar: DSingleInterfaceElement;
     {the character being monitored}
     property Target: DActor read ftarget write settarget;
     constructor create(AOwner: TComponent); override;
@@ -67,6 +68,25 @@ type
   end;
 
 
+//todo: float label is identical except pinteger -> pfloat
+type
+  { a simple editor for an integer variable featuring plus and minus
+    buttons }
+  DIntegerEdit = class(DAbstractCompositeInterfaceElement)
+  private
+    iLabel: DSingleInterfaceElement;
+    PlusButton, MinusButton: DSingleInterfaceElement;
+    fTarget: PInteger;
+    procedure settarget(value: PInteger);
+  public
+    property Target: Pinteger read ftarget write settarget;
+    constructor create(AOwner: TComponent); override;
+    procedure ArrangeChildren(animate: boolean); override;
+  end;
+
+  {integer with bonus edit}
+
+
 var HealthBarImage: TCastleImage; //todo not freed automatically!!!
     PortraitIMG: TCastleImage; //todo!!!
 
@@ -75,8 +95,7 @@ procedure InitCompositeInterface;
 
 implementation
 uses CastleLog, CastleFilesUtils, castleVectors,
-  decogui,
-  decolabel;
+  decogui, decoimages, decolabel;
 
 procedure DAbstractCompositeInterfaceElement.setbasesize(const newx,newy,neww,newh,newo: float; animate: boolean);
 begin
@@ -177,7 +196,9 @@ begin
   MPH_bar.setbasesize(base.fx+3*scalex,base.fy,scalex,base.fh,base.opacity,animate);
 end;
 
+{=============================================================================}
 {========================== Character portrait ===============================}
+{=============================================================================}
 
 procedure DPortrait.settarget(value: DPlayerCharacter);
 begin
@@ -195,6 +216,53 @@ begin
 end;
 
 {=============================================================================}
+{============================== Integer edit =================================}
+{=============================================================================}
+
+procedure incTarget(Sender: TObject);
+begin
+  if sender is DSingleInterfaceElement then {
+    if (sender as DSingleInterfaceElement).parent is DIntegerEdit
+      inc(((sender as DSingleInterfaceElement).parent is DIntegerEdit).Target^)}; //todo!!!!!!!!!
+end;
+
+constructor DIntegerEdit.create(AOwner: TComponent);
+var tmp: DIntegerLabel;
+    tmpimg: DStaticImage;
+begin
+  inherited create(AOwner);
+  ilabel := DSingleInterfaceElement.create(self);
+  tmp := DIntegerLabel.create(ilabel);
+  ilabel.content := tmp;
+  ilabel.frame := simpleframe;
+
+  PlusButton := DSingleInterfaceElement.create(self);
+  //PlusButton.parent
+  PlusButton.CanMouseOver := true;
+  PlusButton.OnMousePress := @IncTarget;
+  tmpImg := DStaticImage.create(PlusButton);
+  //tmpImg.LoadThread('');
+  PlusButton.content := tmpImg;
+  MinusButton := DSingleInterfaceElement.create(self);
+  tmpImg := DStaticImage.create(MinusButton);
+  //tmpImg.LoadThread('');
+  MinusButton.content := tmpImg;
+end;
+
+procedure DIntegerEdit.settarget(value: pinteger);
+begin
+  if ftarget <> value then begin
+    ftarget := value;
+    (ilabel.content as DIntegerLabel).value := value;
+    //reset button activity
+  end;
+end;
+
+procedure DIntegerEdit.ArrangeChildren(animate: boolean);
+begin
+
+end;
+
 
 end.
 
