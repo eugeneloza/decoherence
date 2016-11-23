@@ -34,8 +34,9 @@ type
     each child will define its own arrange method }
   DAbstractCompositeInterfaceElement = class(DInterfaceElement)
   public
-    { arranges children within base.w, base.h }
+    { arranges children within base.w, base.h of this container }
     procedure ArrangeChildren(animate: boolean); virtual; abstract;
+    { additionally calls ArrangeChildren }
     procedure setbasesize(const newx,newy,neww,newh,newo: float; animate: boolean); override;
 end;
 
@@ -63,6 +64,7 @@ type
     fTarget: DPlayerCharacter;
     procedure settarget(value: DPlayerCharacter);
   public
+    {Player character which portrait is displayed}
     property Target: DPlayerCharacter read ftarget write settarget;
     constructor create(AOwner: TComponent); override;
   end;
@@ -74,11 +76,14 @@ type
     buttons }
   DIntegerEdit = class(DAbstractCompositeInterfaceElement)
   private
+    {sub-elements nicknames for easy access}
     iLabel: DSingleInterfaceElement;
     PlusButton, MinusButton: DSingleInterfaceElement;
+
     fTarget: PInteger;
     procedure settarget(value: PInteger);
   public
+    {integer to change}
     property Target: Pinteger read ftarget write settarget;
     constructor create(AOwner: TComponent); override;
     procedure ArrangeChildren(animate: boolean); override;
@@ -90,6 +95,7 @@ type
 var HealthBarImage: TCastleImage; //todo not freed automatically!!!
     PortraitIMG: TCastleImage; //todo!!!
 
+{reads some interface-related data, like loading health bars images}
 procedure InitCompositeInterface;
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 
@@ -97,18 +103,19 @@ implementation
 uses CastleLog, CastleFilesUtils, castleVectors,
   decogui, decoimages, decolabel;
 
-procedure DAbstractCompositeInterfaceElement.setbasesize(const newx,newy,neww,newh,newo: float; animate: boolean);
-begin
-  inherited setbasesize(newx,newy,neww,newh,newo,animate);
-  ArrangeChildren(animate);
-end;
-
-{===========================================================================}
 
 procedure InitCompositeInterface;
 begin
   HealthBarImage := LoadImage(ApplicationData(ProgressBar_folder+'verticalbar.png'));
   PortraitIMG := LoadImage(ApplicationData(PortraitFolder+'AF.jpg'));
+end;
+
+{===========================================================================}
+
+procedure DAbstractCompositeInterfaceElement.setbasesize(const newx,newy,neww,newh,newo: float; animate: boolean);
+begin
+  inherited setbasesize(newx,newy,neww,newh,newo,animate);
+  ArrangeChildren(animate);
 end;
 
 {===========================================================================}
@@ -131,7 +138,7 @@ begin
   tmp_element.Content := tmp_bar;
   tmp_element.frame := SimpleFrame;
   HP_bar := tmp_element;
-  self.children.add(tmp_element);
+  grab(tmp_element);
 
   tmp_element := DSingleInterfaceElement.create(self);
   tmp_bar := DStatBarImage.create(tmp_element);
@@ -141,7 +148,7 @@ begin
   tmp_element.Content := tmp_bar;
   tmp_element.frame := SimpleFrame;
   STA_bar := tmp_element;
-  self.children.add(tmp_element);
+  grab(tmp_element);
 
   tmp_element := DSingleInterfaceElement.create(self);
   tmp_bar := DStatBarImage.create(tmp_element);
@@ -151,7 +158,7 @@ begin
   tmp_element.Content := tmp_bar;
   tmp_element.frame := SimpleFrame;
   CNC_bar := tmp_element;
-  self.children.add(tmp_element);
+  grab(tmp_element);
 
   tmp_element := DSingleInterfaceElement.create(self);
   tmp_bar := DStatBarImage.create(tmp_element);
@@ -161,7 +168,7 @@ begin
   tmp_element.Content := tmp_bar;
   tmp_element.frame := SimpleFrame;
   MPH_bar := tmp_element;
-  self.children.add(tmp_element);
+  grab(tmp_element);
 end;
 
 {-----------------------------------------------------------------------------}
@@ -219,11 +226,12 @@ end;
 {============================== Integer edit =================================}
 {=============================================================================}
 
-procedure incTarget(Sender: TObject);
+procedure incTarget(Sender: DAbstractElement; x,y: integer);
 begin
-  if sender is DSingleInterfaceElement then {
-    if (sender as DSingleInterfaceElement).parent is DIntegerEdit
-      inc(((sender as DSingleInterfaceElement).parent is DIntegerEdit).Target^)}; //todo!!!!!!!!!
+  {hmm... looks complex...}
+  if sender is DSingleInterfaceElement then  //fool's check
+    if (sender as DSingleInterfaceElement).parent is DIntegerEdit then    //another fool's check :)
+      inc(((sender as DSingleInterfaceElement).parent as DIntegerEdit).Target^); //todo!!!!!!!!!
 end;
 
 constructor DIntegerEdit.create(AOwner: TComponent);
@@ -235,6 +243,7 @@ begin
   tmp := DIntegerLabel.create(ilabel);
   ilabel.content := tmp;
   ilabel.frame := simpleframe;
+  grab(ilabel);
 
   PlusButton := DSingleInterfaceElement.create(self);
   //PlusButton.parent
@@ -243,10 +252,13 @@ begin
   tmpImg := DStaticImage.create(PlusButton);
   //tmpImg.LoadThread('');
   PlusButton.content := tmpImg;
+  grab(PlusButton);
+
   MinusButton := DSingleInterfaceElement.create(self);
   tmpImg := DStaticImage.create(MinusButton);
   //tmpImg.LoadThread('');
   MinusButton.content := tmpImg;
+  grab(MinusButton);
 end;
 
 procedure DIntegerEdit.settarget(value: pinteger);

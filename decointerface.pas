@@ -82,7 +82,7 @@ Type
     Just defines the box and rescaling }
   DAbstractElement = class(TComponent)
   public
-    {stores current animation state, recalculated at every render}
+    {stores current animation state, recalculated by GetAnimationState at every render}
     CurrentAnimationState: Txywha;
     procedure GetAnimationState; virtual;
 
@@ -107,7 +107,9 @@ Type
       the basic stage and implies image rescale and init GL. }
     animationstart: TDateTime;
     animationduration: single;
+    {base state of the element. contains its coordinates and width/height}
     base: Txywha;
+    {source width/height of the element. Used to preserve proportions while scaling}
     RealWidth, RealHeight: integer;
     procedure setbasesize(const newx,newy,neww,newh,newo: float; animate: boolean); virtual;
     {if the element is visible, if false then draw will not be called.
@@ -123,9 +125,11 @@ Type
  DFrame = class(TComponent)
  public
    SourceImage: TRGBAlphaImage;
+   {frame borders}
    cornerTop, cornerbottom, cornerLeft, cornerRight: integer;
 end;
 
+{Definition of simple procedures for (mouse) events}
 type TSimpleProcedure = procedure(sender: DAbstractElement);
 type TXYProcedure = procedure(sender: DAbstractElement; x,y: integer);
 
@@ -134,6 +138,8 @@ Type
   {Element with a frame and content}
   DSingleInterfaceElement = class(DAbstractElement)
   public
+    {Higher-level element. Seldomly used in specific cases}
+    parent: DAbstractElement;
     {whether Interface element owns its contents? If true they'll bee freed
      on destroy // using TComponent Inheritance for now}
     //OwnsContent: boolean;
@@ -179,6 +185,7 @@ Type
     OnMouseOver: TXYProcedure;
     OnMousePress: TXYProcedure;
     OnMouseRelease: TXYProcedure;
+    {dragg-n-drop routines}
     OnDrop: TXYProcedure;
     dragx, dragy: integer;
     procedure drag(x,y: integer);
@@ -189,15 +196,17 @@ type DInterfaceElementsList = specialize TFPGObjectList<DSingleInterfaceElement>
 
 
 Type
+  {An interface element, that can contain "children"}
   DInterfaceElement = class(DSingleInterfaceElement)
   public
-    parent: DSingleInterfaceElement;
+    {list of the children of this interface element}
     children: DInterfaceElementsList;
     procedure draw; override;
     constructor create(AOwner: TComponent); override;
     destructor destroy; override;
     procedure Rescale; override;
   public
+    {assign given element as a child and sets its parent to self}
     procedure Grab(Child: DSingleInterfaceElement);
     {returns self if IAmHere and runs all possible events}
     function ifMouseOver(xx,yy: integer; AllTree: boolean): DAbstractElement; override;
@@ -210,10 +219,18 @@ Var {simple outline around black box}
     CaptionFrame,
     {Just black background with no frame}
     BlackFrame: DFrame;
-    {contains global list of all interface elements}
+
+    {contains global list of all interface elements // not needed yet}
     //InterfaceList: DInterfaceElementsList;
 
+    {this is a thrash can for interface elements to dispose them off safely
+     after "suicide animation" has finished}
+    //GarbageThrash: DInterfaceElementsList;
+
+{initializes "burner" image to bake some pattern over the interface images,
+ mostly used for frames}
 procedure Init_burner_image;
+{reads some interface-related data, like loading frames images}
 procedure InitInterface;
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
@@ -753,7 +770,7 @@ end;
 procedure DInterfaceElement.Grab(Child: DSingleInterfaceElement);
 begin
   children.Add(Child);
-  if (Child is DInterfaceElement) then (Child as DInterfaceElement).Parent := self; //not sure about this line
+  if (Child is DSingleInterfaceElement) then (Child as DSingleInterfaceElement).Parent := self; //not sure about this line
   //{Child.ID := }InterfaceList.Add(Child); //global ID of the element
 end;
 
