@@ -95,7 +95,7 @@
         <PackageName Value="castle_base"/>
       </Item2>
     </RequiredPackages>
-    <Units Count="16">
+    <Units Count="17">
       <Unit0>
         <Filename Value="decoherence_desktop.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -130,7 +130,7 @@
         <IsPartOfProject Value="True"/>
       </Unit7>
       <Unit8>
-        <Filename Value="decolabel.pas"/>
+        <Filename Value="decolabels.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit8>
       <Unit9>
@@ -161,6 +161,10 @@
         <Filename Value="decoplayercharacter.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit15>
+      <Unit16>
+        <Filename Value="decoperks.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit16>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

@@ -23,7 +23,7 @@ unit decogui;
 interface
 
 uses classes, CastleRandom,
-  decointerface, decoimages, decolabel,
+  decointerface, decoimages, decolabels,
   decofont,
   decoglobal;
 

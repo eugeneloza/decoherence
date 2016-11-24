@@ -25,7 +25,7 @@ interface
 
 uses classes,
   castleImages,
-  decointerface, decoactor, decoplayercharacter,
+  decointerface, decoactor, decoplayercharacter, decoperks,
   decoglobal;
 
 
@@ -101,7 +101,7 @@ procedure InitCompositeInterface;
 
 implementation
 uses CastleLog, CastleFilesUtils, castleVectors,
-  decogui, decoimages, decolabel;
+  decogui, decoimages, decolabels;
 
 
 procedure InitCompositeInterface;

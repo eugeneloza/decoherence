@@ -33,7 +33,7 @@ uses Classes, SysUtils,
      CastleLog, CastleTimeUtils,
      CastleWindow, CastleWindowTouch, CastleKeysMouse,
      decogui, decointerface, decomouse, decofont,
-     decolevel, decofacts,
+     decolevel, decofacts, decoperks,
      decoactor, decointerfacecomposite,
      decoglobal, decogamemode;
 
@@ -180,6 +180,7 @@ begin
   WritelnLog('ApplicationInitialize','Initialize interface');
   LoadFacts;
   InitInterface;
+  InitPerks;
 
   {$IFDEF AllowRescale}window.OnResize := @WindowResize;{$ENDIF}
   window.OnRender := @WindowRender;
