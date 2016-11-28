@@ -6,7 +6,7 @@
 {$IFNDEF Android}{$IFNDEF Fullscreen}{$DEFINE AllowRescale}{$ENDIF}{$ENDIF}
 
 {undefine rescale to save memory}
-//{$UNDEF AllowRescale}
+{$UNDEF AllowRescale}
 
 {generic variable to inline code. Just in case of bugs...}
 {$define SUPPORTS_INLINE}

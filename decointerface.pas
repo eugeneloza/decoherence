@@ -43,7 +43,17 @@ const
   GUI_scale_unit_float = 1/GUI_grid;
 
 
-{ constants for special scaling cases }
+Type
+ { Several types of frames, including with captions }
+ DFrame = class(TComponent)
+ public
+   SourceImage: TRGBAlphaImage;
+   {frame borders}
+   cornerTop, cornerbottom, cornerLeft, cornerRight: integer;
+   Rectagonal: boolean;
+end;
+
+ { constants for special scaling cases }
 const fullwidth = -1;
       fullheight = -2;
       proportionalscale = -3;
@@ -52,6 +62,7 @@ type
    Contains redunant data on animation with possible rescaling in mind.}
   Txywh = class(TComponent)
   public
+    //Property x1: integer get x1 set setx;  Setx -> set fx recalculate ffx
     { integer "box" }
     x1,y1,x2,y2,w,h: integer;
     { float }
@@ -62,6 +73,9 @@ type
     procedure setsize(const newx,newy,neww,newh: float);
     { get integer and convert to float / for fixed-size objects }
     procedure backwardsetsize(const neww,newh: integer);
+    procedure backwardsetxywh(const newx,newy,neww,newh: integer);
+    {substract frame width from the base}
+    Procedure SubstractFrame(frame: DFrame; AdditionalGap: integer = 0);
     { transform floats to integer }
     procedure recalculate;
     constructor create(AOwner: TComponent); override;
@@ -119,15 +133,6 @@ Type
      will be frozen until visible=true. Maybe I'll fix this.}
     property visible: boolean read fvisible write setvisible;
   end;
-
-Type
- { Several types of frames, including with captions }
- DFrame = class(TComponent)
- public
-   SourceImage: TRGBAlphaImage;
-   {frame borders}
-   cornerTop, cornerbottom, cornerLeft, cornerRight: integer;
-end;
 
 {Definition of simple procedures for (mouse) events}
 type TSimpleProcedure = procedure(sender: DAbstractElement);
@@ -368,9 +373,45 @@ procedure Txywh.backwardsetsize(const neww,newh: integer);
 begin
   w := neww;
   h := newh;
-  fw := neww/window.height;
-  fh := newh/window.height;
+  fw := GUI_grid*neww/window.height;
+  fh := GUI_grid*newh/window.height;
 end;
+
+procedure Txywh.backwardsetxywh(const newx,newy,neww,newh: integer);
+begin
+  //todo check for consistency
+  x1 := newx;
+  y1 := newy;
+  w := neww;
+  h := newh;
+  if newx<window.width div 2 then fx := GUI_grid*newx/window.height else fx := GUI_grid*(newx-Window.Width)/window.height;
+  fy := GUI_grid*newy/window.height;
+  fw := GUI_grid*neww/window.height;
+  fh := GUI_grid*newh/window.height;
+end;
+
+{----------------------------------------------------------------------------}
+
+Procedure Txywh.SubstractFrame(frame: DFrame; AdditionalGap: integer = 0);
+Begin
+  If (frame<>nil) and (frame.rectagonal) then begin
+    X1 := x1 + frame.cornerleft+AdditionalGap;
+    X2 := x2 - frame.cornerright-AdditionalGap;
+    W := w - frame.cornerleft - frame.cornerright -2*AdditionalGap;
+    Y1 := y1 + frame.cornertop+AdditionalGap;
+    Y2 := y2 - frame.cornerbottom-AdditionalGap;
+    H := h - frame.cornertop - frame.cornerbottom -2*AdditionalGap;
+    backwardsetxywh(x1,y1,w,h);
+  end else if AdditionalGap<>0 then begin
+    X1 := x1 + AdditionalGap;
+    X2 := x2 - AdditionalGap;
+    W := w - 2*AdditionalGap;
+    Y1 := y1 + AdditionalGap;
+    Y2 := y2 - AdditionalGap;
+    H := h - 2*AdditionalGap;
+    backwardsetxywh(x1,y1,w,h);
+  end;
+End;
 
 {----------------------------------------------------------------------------}
 
@@ -399,17 +440,6 @@ begin
   fh := source.fh;
   opacity := source.opacity;
   initialized := source.initialized;
-{ result := Txywh.create(self);
-  result.x1 := x1;
-  result.x2 := x2;
-  result.y1 := y1;
-  result.y2 := y2;
-  result.fx := fx;
-  result.fy := fy;
-  result.fw := fw;
-  result.fh := fh;
-  result.opacity := opacity;
-  result.initialized := initialized;}
 end;
 
 {============================================================================}
@@ -450,15 +480,8 @@ begin
   inherited setBaseSize(newx,newy,neww,newh,newo,animate);
   //frame should be automatically resized during "rescale"...
   if content <> nil then begin
-    content.setbasesize(newx,newy,neww,newh,newo,animate);
-    content.base.backwardsetsize(base.w-frame.cornerLeft-frame.cornerRight,
-                                 base.h-frame.cornerBottom-frame.cornerTop);
-    //content.base.recalculate;
-    //fix content by frame size;
-    inc(content.base.x1,frame.cornerLeft);
-    inc(content.base.y1,frame.cornerBottom);
-    dec(content.base.x2,frame.cornerRight+frame.cornerLeft);
-    dec(content.base.y2,frame.cornerTop+frame.cornerBottom);
+    content.base.copyxywh(base);
+    content.base.SubstractFrame(frame,1);
   end;
 
 end;
@@ -534,10 +557,8 @@ procedure DSingleInterfaceElement.rescale;
 begin
   if frame <> nil then FrameResize3x3;
   if content <> nil then begin
-    content.base.copyxywh(base);
-  {  content.base.backwardsetsize(base.w-2,base.h-2);  //todo framewidth
-    inc(content.base.x1,1);
-    inc(content.base.y1,1);      }
+    //content.base.copyxywh(base);
+    //content.base.SubstractFrame(frame,2);
     content.rescale;   //todo
   end;
 end;
@@ -660,7 +681,7 @@ begin
   end;
   //todo
   if content <> nil then begin
-    Content.base.copyxywh(currentAnimationState);
+    //Content.base.copyxywh(currentAnimationState);
     Content.draw;
   end;
 end;
