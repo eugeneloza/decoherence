@@ -87,7 +87,7 @@ begin
   Last_render_time := now;
   FPS_count := 0;
   FPS_Label := DLabel.create(self);
-  FPS_Label.setbasesize(0,0,1,1,1,false);
+  FPS_Label.setbasesize(0,0,0.05,0.05,1,false);
   FPS_Label.Shadow := 0;
   FPS_Label.Font := RegularFont16;
   FPS_Label.text := 'x';
@@ -176,7 +176,7 @@ begin
 
   if LoadScreenLabel=nil then begin
     LoadScreenLabel := DLabel.create(self);
-    LoadScreenLabel.setbasesize(1,-2,10,10,1,false);
+    LoadScreenLabel.setbasesize(1/17,-2/17,10/17,10/17,1,false);
     LoadScreenLabel.Shadow := 1;
     LoadScreenLabel.Font := RegularFont16;
   end;
@@ -187,7 +187,7 @@ begin
     floaterLabel.Font := RegularFont16;
     floaterLabel.Shadow := 1;
   end;
-  floaterLabel.setbasesize(-11,1,10,10,0,false); //need to reset it each new fact, because w is reset to realwidth after text initialize
+  floaterLabel.setbasesize(-11/17,1/17,10/17,10/17,0,false); //need to reset it each new fact, because w is reset to realwidth after text initialize
   floaterLabel.text := GetRandomFact;
 end;
 
@@ -228,7 +228,7 @@ begin
 
   LoadScreenLabel.draw;
 
-  floaterLabel.base.y1 := round((1 + 5*Floater.phase)*Window.height*GUI_scale_unit_float);
+  floaterLabel.base.y1 := round((1 + 5*Floater.phase)*Window.height/17);
   floaterLabel.base.Opacity := sin(Pi*Floater.Phase);
   floaterLabel.draw;
 end;

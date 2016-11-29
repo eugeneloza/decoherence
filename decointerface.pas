@@ -38,11 +38,6 @@ and add one line at the bottom for menu button and other stuff
 i.e. 3*4+1 units in window.height
 Most often equal scale is used for width - in fractions of height to maintain squares etc.}
 
-const
-  GUI_grid = (4*3+1);
-  GUI_scale_unit_float = 1/GUI_grid;
-
-
 Type
  { Several types of frames, including with captions }
  DFrame = class(TComponent)
@@ -309,9 +304,9 @@ end;
 
 procedure Txywh.setsize(const newx,newy,neww,newh:float);
 begin
-  if (abs(newx) > GUI_grid) or (abs(newy) > GUI_grid) or
-     (((neww<0) or (neww>GUI_grid)) and ((neww<>proportionalscale) and (neww<>fullwidth) and (neww<>fullheight))) or
-     (((newh<0) or (newh>GUI_grid)) and ((neww<>proportionalscale) and (newh<>fullheight))) then
+  if (abs(newx) > 1) or (abs(newy) > 1) or
+     (((neww<0) or (neww>1)) and ((neww<>proportionalscale) and (neww<>fullwidth) and (neww<>fullheight))) or
+     (((newh<0) or (newh>1)) and ((neww<>proportionalscale) and (newh<>fullheight))) then
   begin
     writeLnLog('Txywh.setsize','ERROR: Incorrect newx,newy,neww,newh!');
     exit;
@@ -335,14 +330,14 @@ begin
   { convert float to integer }
 
   if fx >= 0 then
-    x1 := round(Window.height*fx*GUI_scale_unit_float)
+    x1 := round(Window.height*fx)
   else
-    x1 := Window.width + round(Window.height*fx*GUI_scale_unit_float);
+    x1 := Window.width + round(Window.height*fx);
 
   if fy>=0 then
-    y1 := round(Window.height*fy*GUI_scale_unit_float)     // turn over y-axis?
+    y1 := round(Window.height*fy)     // turn over y-axis?
   else
-    y1 := Window.height + round(Window.height*fy*GUI_scale_unit_float);
+    y1 := Window.height + round(Window.height*fy);
 
   if fw = fullwidth then begin
     w := Window.width;
@@ -352,13 +347,13 @@ begin
   if fw = fullheight then
     w := Window.height
   else
-    w := round(Window.height*fw*GUI_scale_unit_float);
+    w := round(Window.height*fw);
 
   if fh = fullheight then begin
     h := Window.height;
     y1 := 0
   end else
-    h := round(Window.height*fh*GUI_scale_unit_float);
+    h := round(Window.height*fh);
 
   x2 := x1+w;
   y2 := y1+h;
@@ -373,8 +368,8 @@ procedure Txywh.backwardsetsize(const neww,newh: integer);
 begin
   w := neww;
   h := newh;
-  fw := GUI_grid*neww/window.height;
-  fh := GUI_grid*newh/window.height;
+  fw := neww/window.height;
+  fh := newh/window.height;
 end;
 
 procedure Txywh.backwardsetxywh(const newx,newy,neww,newh: integer);
@@ -384,10 +379,10 @@ begin
   y1 := newy;
   w := neww;
   h := newh;
-  if newx<window.width div 2 then fx := GUI_grid*newx/window.height else fx := GUI_grid*(newx-Window.Width)/window.height;
-  fy := GUI_grid*newy/window.height;
-  fw := GUI_grid*neww/window.height;
-  fh := GUI_grid*newh/window.height;
+  if newx<window.width div 2 then fx := newx/window.height else fx := (newx-Window.Width)/window.height;
+  fy := newy/window.height;
+  fw := neww/window.height;
+  fh := newh/window.height;
 end;
 
 {----------------------------------------------------------------------------}

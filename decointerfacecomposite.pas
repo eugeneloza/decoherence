@@ -89,7 +89,21 @@ type
     procedure ArrangeChildren(animate: boolean); override;
   end;
 
-  {integer with bonus edit}
+  {integer with "bonus" edit}
+
+type DPerksContainer = class(DAbstractCompositeInterfaceElement)
+  {container for buffs-debuffs, perks and actions}
+  private
+    fTarget: DPlayerCharacter;
+    procedure settarget(value: DPlayerCharacter);
+  public
+    property Target: DPlayerCharacter read ftarget write settarget;
+    procedure MakePerksList;
+    procedure ArrangeChildren(animate: boolean); override;
+    //procedure UpdatePerksList;
+  end;
+
+
 
 
 var HealthBarImage: TCastleImage; //todo not freed automatically!!!
@@ -209,10 +223,12 @@ end;
 
 procedure DPortrait.settarget(value: DPlayerCharacter);
 begin
-  ftarget := value;
-  (content as DStaticImage).freeImage;
-  WriteLnLog('DPortrait.settarget','Load from portrait');
-  (content as DStaticImage).Load(PortraitFolder+'AF.jpg'{PortraitIMG});  //todo
+  if ftarget <> value then begin
+    ftarget := value;
+    (content as DStaticImage).freeImage;
+    WriteLnLog('DPortrait.settarget','Load from portrait');
+    (content as DStaticImage).Load(PortraitFolder+'AF.jpg'{PortraitIMG});  //todo
+  end;
 end;
 
 constructor DPortrait.create(AOwner: TComponent);
@@ -272,7 +288,30 @@ end;
 
 procedure DIntegerEdit.ArrangeChildren(animate: boolean);
 begin
+  //todo ***
+end;
 
+{=============================================================================}
+{=========================== Perks container =================================}
+{=============================================================================}
+
+procedure DPerksContainer.settarget(value: DPlayerCharacter);
+begin
+  if ftarget <> value then begin
+    ftarget := value;
+    MakePerksList;
+  end;
+end;
+
+procedure DPerksContainer.MakePerksList;
+begin
+  //todo ***
+  ArrangeChildren(true);
+end;
+
+procedure DPerksContainer.ArrangeChildren(animate: boolean);
+begin
+  //todo ***
 end;
 
 
