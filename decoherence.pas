@@ -206,6 +206,8 @@ Initialization
   OnGetApplicationName  :=  @MyGetApplicationName;
   Window := TCastleWindowTouch.create(Application);
   {$IFNDEF AllowRescale}window.ResizeAllowed := raOnlyAtOpen;{$ENDIF}
+  window.width := 800;
+  window.height := 600;
   Application.MainWindow  :=  Window;
   Application.OnInitialize  :=  @ApplicationInitialize;
 

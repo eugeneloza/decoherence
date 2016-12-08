@@ -589,7 +589,6 @@ var ScaledImageParts: array [0..2,0..2] of TCastleImage;
     ix,iy: integer;
     UnscaledWidth, UnscaledHeight:integer;
     SourceXs, SourceYs, DestXs, DestYs: TVector4Integer;
-    CornersVector:TVector4Integer;
 begin
   FrameReady := false;
   if base.initialized = false then begin
@@ -597,26 +596,25 @@ begin
   end;
 
   FrameImage := frame.SourceImage.CreateCopy as TRGBAlphaImage;
-  CornersVector := Vector4Integer(frame.cornerTop,frame.cornerLeft,frame.cornerBottom,frame.cornerRight);
 
   UnscaledWidth := FrameImage.width;
   UnscaledHeight := FrameImage.height;
 
   SourceXs[0] := 0;
-  SourceXs[1] := CornersVector[3];
-  SourceXs[2] := UnscaledWidth-CornersVector[1];
+  SourceXs[1] := frame.cornerLeft;
+  SourceXs[2] := UnscaledWidth-frame.cornerRight;
   SourceXs[3] := UnscaledWidth;
   SourceYs[0] := 0;
-  SourceYs[1] := CornersVector[2];
-  SourceYs[2] := UnscaledHeight-CornersVector[0];
+  SourceYs[1] := frame.cornerBottom;
+  SourceYs[2] := UnscaledHeight-frame.cornerTop;
   SourceYs[3] := UnscaledHeight;
   DestXs[0] := 0;
-  DestXs[1] := CornersVector[3];
-  DestXs[2] := base.w-CornersVector[1];
+  DestXs[1] := frame.cornerLeft;
+  DestXs[2] := base.w-frame.cornerRight;
   DestXs[3] := base.w;
   DestYs[0] := 0;
-  DestYs[1] := CornersVector[2];
-  DestYs[2] := base.h-CornersVector[0];
+  DestYs[1] := frame.cornerBottom;
+  DestYs[2] := base.h-frame.cornerTop;
   DestYs[3] := base.h;
 
   for ix := 0 to 2 do

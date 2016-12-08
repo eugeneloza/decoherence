@@ -284,9 +284,9 @@ begin
     party[i].drainSTA(rnd.Random(80),1);
   end;
   tmp := DPartyView.create(self);
-  GUI.grab(tmp);
   tmp2 := DDecorations.create(self);
   GUI.grab(tmp2);
+  GUI.grab(tmp);
 end;
 
 end.

@@ -142,6 +142,7 @@ begin
   with decorationframe2_left do begin
     SourceImage := LoadImage(ApplicationData(DecorationsFolder+'frame_2_left_by_Alexey.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
     cornerTop := 6; CornerBottom := 9; cornerLeft := 2; CornerRight := 6;
+    //cornerTop := 0; CornerBottom := 0; cornerLeft := 0; CornerRight := 0;
   end;
   decorationframe2_right := DFrame.create(Window);
   with decorationframe2_right do begin
