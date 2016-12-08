@@ -38,6 +38,7 @@ const Interface_Foler    = 'interface/';
       LoadScreenFolder   = Interface_Foler+'loadscreen/';
       BackgroundsFolder  = Interface_Foler+'background/';
       WindFolder         = Interface_Foler+'wind/';
+      DecorationsFolder  = Interface_Foler+'decorations/';
       PortraitFolder     = 'portrait/';
 
 

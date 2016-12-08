@@ -23,6 +23,7 @@ unit decoactor;
 interface
 
 uses classes,
+  decostats,
   decoglobal;
 
 {Maybe, add some basic actor (visible only, no collisions)}
@@ -85,6 +86,8 @@ Type
     function consumeMPH(consumption: float; skill: float): boolean;
     function restoreMPH(restoration: float; skill: float): boolean;
     procedure drainMPH(drain: float; skill: float);
+  public
+    stats: DStats;
 end;
 
 

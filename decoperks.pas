@@ -6,6 +6,7 @@ interface
 
 uses classes, fgl,
   decoimages,
+  decostats,
   decoglobal;
 
 {Type

@@ -273,11 +273,20 @@ end;
 procedure DInterfaceContainer.MakeCharacterGenerationInterface;
 var i: integer;
   tmp: DPartyView;
+  tmp2: DDecorations;
 begin
-  for i := 0 to maxparty do
+  for i := 0 to maxparty do begin
     Party[i] := DPlayerCharacter.create(Window);
+    if i<4 then party[i].maxmaxMPH := 0;
+    party[i].hit(rnd.Random(80),1);
+    party[i].drainCNC(rnd.Random(80),1);
+    party[i].drainMPH(rnd.Random(80),1);
+    party[i].drainSTA(rnd.Random(80),1);
+  end;
   tmp := DPartyView.create(self);
-  GUI.children.add(tmp);
+  GUI.grab(tmp);
+  tmp2 := DDecorations.create(self);
+  GUI.grab(tmp2);
 end;
 
 end.

@@ -109,6 +109,11 @@ type DPerksContainer = class(DAbstractCompositeInterfaceElement)
 var HealthBarImage: TCastleImage; //todo not freed automatically!!!
     PortraitIMG: TCastleImage; //todo!!!
 
+    decorationframe1_left,decorationframe1_right,
+    decorationframe2_left,decorationframe2_right,
+    decorationframe2_bottomleft,decorationframe2_bottomright: DFrame;
+
+
 {reads some interface-related data, like loading health bars images}
 procedure InitCompositeInterface;
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
@@ -120,8 +125,40 @@ uses CastleLog, CastleFilesUtils, castleVectors,
 
 procedure InitCompositeInterface;
 begin
-  HealthBarImage := LoadImage(ApplicationData(ProgressBar_folder+'verticalbar.png'));
-  PortraitIMG := LoadImage(ApplicationData(PortraitFolder+'AF.jpg'));
+  HealthBarImage := LoadImage(ApplicationData(ProgressBar_folder+'verticalbar_by_Alexey.png'));
+  PortraitIMG := LoadImage(ApplicationData(PortraitFolder+'portrait_tmp.jpg'));
+
+  decorationframe1_left := DFrame.create(Window);
+  with decorationframe1_left do begin
+    SourceImage := LoadImage(ApplicationData(DecorationsFolder+'frame_1_left_by_Alexey.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
+    cornerTop := 3; CornerBottom := 23; cornerLeft := 2; CornerRight := 6;
+  end;
+  decorationframe1_right := DFrame.create(Window);
+  with decorationframe1_right do begin
+    SourceImage := LoadImage(ApplicationData(DecorationsFolder+'frame_1_right_by_Alexey.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
+    cornerTop := 3; CornerBottom := 23; cornerLeft := 6; CornerRight := 2;
+  end;
+  decorationframe2_left := DFrame.create(Window);
+  with decorationframe2_left do begin
+    SourceImage := LoadImage(ApplicationData(DecorationsFolder+'frame_2_left_by_Alexey.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
+    cornerTop := 6; CornerBottom := 9; cornerLeft := 2; CornerRight := 6;
+  end;
+  decorationframe2_right := DFrame.create(Window);
+  with decorationframe2_right do begin
+    SourceImage := LoadImage(ApplicationData(DecorationsFolder+'frame_2_right_by_Alexey.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
+    cornerTop := 6; CornerBottom := 9; cornerLeft := 6; CornerRight := 2;
+  end;
+  decorationframe2_bottomleft := DFrame.create(Window);
+  with decorationframe2_bottomleft do begin
+    SourceImage := LoadImage(ApplicationData(DecorationsFolder+'frame_2_bottomleft_by_Alexey.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
+    cornerTop := 6; CornerBottom := 2; cornerLeft := 0; CornerRight := 9;
+  end;
+  decorationframe2_bottomright := DFrame.create(Window);
+  with decorationframe2_bottomright do begin
+    SourceImage := LoadImage(ApplicationData(DecorationsFolder+'frame_2_bottomright_by_Alexey.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
+    cornerTop := 6; CornerBottom := 2; cornerLeft := 9; CornerRight := 0;
+  end;
+
 end;
 
 {===========================================================================}
@@ -213,8 +250,11 @@ begin
   HP_bar. setbasesize(base.fx         ,base.fy,scalex,base.fh,base.opacity,animate);
   STA_bar.setbasesize(base.fx+  scalex,base.fy,scalex,base.fh,base.opacity,animate);
   CNC_bar.setbasesize(base.fx+2*scalex,base.fy,scalex,base.fh,base.opacity,animate);
-  if ftarget.maxmaxmph > 0 then
   MPH_bar.setbasesize(base.fx+3*scalex,base.fy,scalex,base.fh,base.opacity,animate);
+  if ftarget.maxmaxmph > 0 then
+    MPH_bar.visible := true
+  else
+    MPH_bar.visible := false
 end;
 
 {=============================================================================}
@@ -227,7 +267,7 @@ begin
     ftarget := value;
     (content as DStaticImage).freeImage;
     WriteLnLog('DPortrait.settarget','Load from portrait');
-    (content as DStaticImage).Load(PortraitFolder+'AF.jpg'{PortraitIMG});  //todo
+    (content as DStaticImage).Load(PortraitIMG);  //todo
   end;
 end;
 
