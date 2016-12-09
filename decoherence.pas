@@ -91,8 +91,9 @@ begin
     if event.key = K_P{rintScreen} then
        Window.SaveScreen('deco_'+NiceDate+'.jpg');
   end;
-  SetGameMode(gmCharacterGeneration);
-  //InitTestLevel;                         //ugly! I'll fix this soon.
+//  SetGameMode(gmCharacterGeneration);
+  SetGameMode(gmTravel);
+  InitTestLevel;                         //ugly! I'll fix this soon.
 end;
 
 {--------------------------------------------------------------------------}
