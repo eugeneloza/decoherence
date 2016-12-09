@@ -636,15 +636,15 @@ begin
    for iy := 0 to 2 do begin
      ScaledImageParts[ix,iy] := TRGBAlphaImage.create;
      ScaledImageParts[ix,iy].SetSize(SourceXs[ix+1]-SourceXs[ix],SourceYs[iy+1]-SourceYs[iy]);
-     ScaledImageParts[ix,iy].Clear(Vector4Byte(0,0,0,255));
-     ScaledImageParts[ix,iy].DrawFrom(FrameImage,0,0,SourceXs[ix],SourceYs[iy],SourceXs[ix+1]-SourceXs[ix],SourceYs[iy+1]-SourceYs[iy],dmBlend);
+     ScaledImageParts[ix,iy].Clear(Vector4Byte(0,0,0,0));
+     ScaledImageParts[ix,iy].DrawFrom(FrameImage,0,0,SourceXs[ix],SourceYs[iy],SourceXs[ix+1]-SourceXs[ix],SourceYs[iy+1]-SourceYs[iy],dmBlendSmart);
      ScaledImageParts[ix,iy].Resize(DestXs[ix+1]-DestXs[ix],DestYs[iy+1]-DestYs[iy],riNearest);
    end;
 
   FrameImage.SetSize(base.w,base.h,1);
-  FrameImage.Clear(Vector4byte(0,0,0,255));
+  FrameImage.Clear(Vector4byte(0,0,0,0));
   for ix := 0 to 2 do
-    for iy := 0 to 2 do FrameImage.DrawFrom(ScaledImageParts[ix,iy],DestXs[ix],DestYs[iy],0,0,DestXs[ix+1]-DestXs[ix],DestYs[iy+1]-DestYs[iy],dmBlend);
+    for iy := 0 to 2 do FrameImage.DrawFrom(ScaledImageParts[ix,iy],DestXs[ix],DestYs[iy],0,0,DestXs[ix+1]-DestXs[ix],DestYs[iy+1]-DestYs[iy],dmBlendSmart);
 
   for ix := 0 to 2 do
     for iy := 0 to 2 do freeAndNil(ScaledImageParts[ix,iy]);
