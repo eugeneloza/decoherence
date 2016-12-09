@@ -110,13 +110,14 @@ var yy1,yy2: float;
 begin
   {********** INTERFACE DESIGN BY ALEXEY ******************}
   yy1 := (20+45+180*4-22)/800; {todo}
-  yy2 := yy1;//(20+45+180*4+15)/800;
-  frame1left.setbasesize(0,-yy1,46/800,yy1,1,false);
-  frame1right.setbasesize(-46/800,-yy1,46/800,yy1,1,false);
-  frame2left.setbasesize(0,-yy2,9/800,1-yy2,1,false);
-  frame2right.setbasesize(-9/800,-yy2,9/800,1-yy2,1,false);
-  frame2bottomleft.setbasesize(9/800,0,300/800,9/800,1,false);
-  frame2bottomright.setbasesize(-309/800,0,300/800,9/800,1,false);
+  //yy2 := yy1;//
+  yy2 := (20+45+180*4-22-27)/800;
+  frame1left.       setbasesize(       0, -yy1,  50/800,   yy1, 1, false);
+  frame1right.      setbasesize( -50/800, -yy1,  50/800,   yy1, 1, false);
+  frame2left.       setbasesize(       0,    0,   9/800, 1-yy2, 1, false);
+  frame2right.      setbasesize(  -9/800,    0,   9/800, 1-yy2, 1, false);
+  frame2bottomleft. setbasesize(   9/800,    0, 300/800, 9/800, 1, false);
+  frame2bottomright.setbasesize(-309/800,    0, 300/800, 9/800, 1, false);
   rescale;
 end;
 
@@ -135,13 +136,13 @@ begin
   grab(frame2left);
   frame2right := DSingleInterfaceElement.create(self);
   frame2right.frame := decorationframe2_right;
-  //grab(frame2right);
+  grab(frame2right);
   frame2bottomleft := DSingleInterfaceElement.create(self);
   frame2bottomleft.frame := decorationframe2_bottomleft;
-  //grab(frame2bottomleft);
+  grab(frame2bottomleft);
   frame2bottomright := DSingleInterfaceElement.create(self);
   frame2bottomright.frame := decorationframe2_bottomright;
-  //grab(frame2bottomright);
+  grab(frame2bottomright);
   setbasesize(0,0,fullwidth,fullheight,1,false);
 end;
 

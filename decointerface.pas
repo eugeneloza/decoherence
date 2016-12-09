@@ -366,10 +366,14 @@ end;
 
 procedure Txywh.backwardsetsize(const neww,newh: integer);
 begin
-  w := neww;
-  h := newh;
-  fw := neww/window.height;
-  fh := newh/window.height;
+  if neww>0 then begin
+    w := neww;
+    fw := neww/window.height;
+  end;
+  if newh>0 then begin
+    h := newh;
+    fh := newh/window.height;
+  end;
 end;
 
 procedure Txywh.backwardsetxywh(const newx,newy,neww,newh: integer);
@@ -599,6 +603,17 @@ begin
 
   UnscaledWidth := FrameImage.width;
   UnscaledHeight := FrameImage.height;
+
+  if frame.cornerLeft+frame.cornerRight+1 > base.w then begin
+    writeLnLog('DAbstractInterfaceElement.FrameResize3x3','Reset backwards base.w = '+inttostr(base.w)+' / cornerLeft+cornerRight = '+inttostr(frame.cornerLeft+frame.cornerRight));
+    base.w := frame.cornerLeft+frame.cornerRight+1;
+    base.backwardsetsize(base.w,-1);
+  end;
+  if frame.cornerTop+frame.cornerBottom+1>base.h then begin
+    writeLnLog('DAbstractInterfaceElement.FrameResize3x3','Reset backwards base.h = '+inttostr(base.h)+' / cornerTop+cornerBottom = '+inttostr(frame.cornerTop+frame.cornerBottom));
+    base.h := frame.cornerTop+frame.cornerBottom+1;
+    base.backwardsetsize(-1,base.h);
+  end;
 
   SourceXs[0] := 0;
   SourceXs[1] := frame.cornerLeft;
