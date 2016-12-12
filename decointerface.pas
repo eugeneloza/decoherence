@@ -31,12 +31,11 @@ const InterfaceScalingMethod: TResizeInterpolation = riBilinear;  //to quickly c
 
 const defaultanimationduration = 300 /1000/60/60/24; {in ms}
 
-{1/17 of window.height is a "unit" in GUI scale.
-Basically calculated as 4 characters vertical space allocation
-3 lines of buttons for each
-and add one line at the bottom for menu button and other stuff
-i.e. 3*4+1 units in window.height
-Most often equal scale is used for width - in fractions of height to maintain squares etc.}
+Type TAnimationStyle = (asNone,
+                        asFadeIn, asFadeOut, asFadeOutSuicide,
+                        asZoomIn, asZoomOut, asZoomOutSuicide,
+                        {asFlyInLeft, asFlyInRight, AsFlyInTop,}
+                        asFlyInRandom, asFlyOutRandom, asFlyOutRandomSuicide);
 
 Type
  { Several types of frames, including with captions }
@@ -122,7 +121,7 @@ Type
     base: Txywha;
     {source width/height of the element. Used to preserve proportions while scaling}
     RealWidth, RealHeight: integer;
-    procedure setbasesize(const newx,newy,neww,newh,newo: float; animate: boolean); virtual;
+    procedure setbasesize(const newx,newy,neww,newh,newo: float; animate: TAnimationStyle); virtual;
     {if the element is visible, if false then draw will not be called.
      PAY ATTENTION: if assigned to a single interface element then the animations
      and initGL will occur as they would normally. BUT if assigned to a
@@ -156,7 +155,7 @@ Type
     constructor create(AOwner:TComponent); override;
     destructor destroy; override;
     //also resizes content and frame
-    procedure setbasesize(const newx,newy,neww,newh,newo: float; animate: boolean); override;
+    procedure setbasesize(const newx,newy,neww,newh,newo: float; animate: TAnimationStyle); override;
   private
     {GL image of the frame}
     GLFrame: TGLImage;
@@ -485,11 +484,11 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DAbstractElement.setbasesize(const newx,newy,neww,newh,newo: float; animate: boolean);
+procedure DAbstractElement.setbasesize(const newx,newy,neww,newh,newo: float; animate: TAnimationStyle);
 begin
   base.setsize(newx,newy,neww,newh);
   base.opacity := newo;
-  if animate then begin
+  if animate<>asNone then begin
     GetAnimationState;   //getanimationstate needs "last" so we can't freeannil it yet
     freeandnil(last);
     last := CurrentAnimationState;
@@ -500,7 +499,7 @@ begin
   //rescale; //????
 end;
 
-procedure DSingleInterfaceElement.setbasesize(const newx,newy,neww,newh,newo: float; animate: boolean);
+procedure DSingleInterfaceElement.setbasesize(const newx,newy,neww,newh,newo: float; animate: TAnimationStyle);
 begin
   inherited setBaseSize(newx,newy,neww,newh,newo,animate);
   //frame should be automatically resized during "rescale"...

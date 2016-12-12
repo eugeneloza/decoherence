@@ -39,9 +39,9 @@ type
       basically at this level it is abstract, it just substracts the frame
       from base.w and base.h and does nothing more}
     var cnt_x,cnt_y,cnt_fw,cnt_fh: float;
-    procedure ArrangeChildren(animate: boolean); virtual;
+    procedure ArrangeChildren(animate: TAnimationStyle); virtual;
     { additionally calls ArrangeChildren }
-    procedure setbasesize(const newx,newy,neww,newh,newo: float; animate: boolean); override;
+    procedure setbasesize(const newx,newy,neww,newh,newo: float; animate: TAnimationStyle); override;
 end;
 
 type
@@ -57,7 +57,7 @@ type
     {the character being monitored}
     property Target: DActor read ftarget write settarget;
     constructor create(AOwner: TComponent); override;
-    procedure ArrangeChildren(animate: boolean); override;
+    procedure ArrangeChildren(animate: TAnimationStyle); override;
 end;
 
 type
@@ -75,7 +75,7 @@ type
     {the character being monitored}
     property Target: DActor read ftarget write settarget;
     constructor create(AOwner: TComponent); override;
-    procedure ArrangeChildren(animate: boolean); override;
+    procedure ArrangeChildren(animate: TAnimationStyle); override;
   end;
 
 type
@@ -108,7 +108,7 @@ type
     {integer to change}
     property Target: Pinteger read ftarget write settarget;
     constructor create(AOwner: TComponent); override;
-    procedure ArrangeChildren(animate: boolean); override;
+    procedure ArrangeChildren(animate: TAnimationStyle); override;
   end;
 
   {integer with "bonus" edit}
@@ -121,7 +121,7 @@ type DPerksContainer = class(DAbstractCompositeInterfaceElement)
   public
     property Target: DPlayerCharacter read ftarget write settarget;
     procedure MakePerksList;
-    procedure ArrangeChildren(animate: boolean); override;
+    procedure ArrangeChildren(animate: TAnimationStyle); override;
     //procedure UpdatePerksList;
   end;
 
@@ -223,13 +223,13 @@ end;
 
 {===========================================================================}
 
-procedure DAbstractCompositeInterfaceElement.setbasesize(const newx,newy,neww,newh,newo: float; animate: boolean);
+procedure DAbstractCompositeInterfaceElement.setbasesize(const newx,newy,neww,newh,newo: float; animate: TAnimationStyle);
 begin
   inherited setbasesize(newx,newy,neww,newh,newo,animate);
   ArrangeChildren(animate);
 end;
 
-procedure DAbstractCompositeInterfaceElement.ArrangeChildren(animate: boolean);
+procedure DAbstractCompositeInterfaceElement.ArrangeChildren(animate: TAnimationStyle);
 begin
   cnt_x := base.fx;
   cnt_y := base.fy;
@@ -311,7 +311,7 @@ end;
 
 {---------------------------------------------------------------------------}
 
-procedure DPlayerBars.ArrangeChildren(animate: boolean);
+procedure DPlayerBars.ArrangeChildren(animate: TAnimationStyle);
 var scalex: float;
 begin
   inherited ArrangeChildren(animate);
@@ -374,7 +374,7 @@ begin
   grab(NickName);
 end;
 
-Procedure DPlayerBarsFull.ArrangeChildren(animate:boolean);
+Procedure DPlayerBarsFull.ArrangeChildren(animate: TAnimationStyle);
 var labelspace: float;
 begin
   inherited ArrangeChildren(animate);
@@ -454,7 +454,7 @@ begin
   end;
 end;
 
-procedure DIntegerEdit.ArrangeChildren(animate: boolean);
+procedure DIntegerEdit.ArrangeChildren(animate: TAnimationStyle);
 begin
   inherited ArrangeChildren(animate);
   //todo ***
@@ -475,10 +475,10 @@ end;
 procedure DPerksContainer.MakePerksList;
 begin
   //todo ***
-  ArrangeChildren(true);
+  ArrangeChildren(asNone);
 end;
 
-procedure DPerksContainer.ArrangeChildren(animate: boolean);
+procedure DPerksContainer.ArrangeChildren(animate: TAnimationStyle);
 begin
   inherited ArrangeChildren(animate);
   //todo ***

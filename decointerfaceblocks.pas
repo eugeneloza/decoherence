@@ -35,7 +35,7 @@ type
   public
     PartyBars: array [0..maxparty] of DPlayerBarsFull;
     Portraits: array [0..maxparty] of DPortrait;
-    procedure ArrangeChildren(animate: boolean); override;
+    procedure ArrangeChildren(animate: TAnimationStyle); override;
     constructor create(AOwner: TComponent); override;
   end;
 
@@ -48,7 +48,7 @@ type
     frame2bottomleft,frame2bottomright,
     frame3bottom : DSingleInterfaceElement;
   public
-    procedure ArrangeChildren(animate: boolean); override;
+    procedure ArrangeChildren(animate: TAnimationStyle); override;
     constructor create(AOwner: TComponent); override;
   end;
 
@@ -57,7 +57,7 @@ type
 implementation
 //uses ;
 
-procedure DPartyView.ArrangeChildren(animate: boolean);
+procedure DPartyView.ArrangeChildren(animate: TAnimationStyle);
 var i: integer;
 begin
   //inherited ArrangeChildren(animate); //not needed here
@@ -101,7 +101,7 @@ begin
     Portraits[i].target := party[i];
     self.children.Add(Portraits[i]);
   end;
-  setbasesize(0,0,fullwidth,fullheight,1,false);
+  setbasesize(0,0,fullwidth,fullheight,1,asNone);
 //  ArrangeChildren(false); //automatically arranged on TCompositeElement.setbasesize
 end;
 
@@ -109,25 +109,25 @@ end;
 {============================= Decorations ===================================}
 {=============================================================================}
 
-procedure DDecorations.ArrangeChildren(animate: boolean);
+procedure DDecorations.ArrangeChildren(animate: TAnimationStyle);
 var yy1,yy2: float;
 begin
   // inherited ArrangeChildren(animate); //not needed here
   {********** INTERFACE DESIGN BY Saito00 ******************}
   yy1 := (20+45+180*(maxparty div 2+1)-22)/800; {todo: variable party size}
   yy2 := (20+45+180*(maxparty div 2+1)-22-27)/800;
-  frame1left.       setbasesize(       0, -yy1,  50/800,   yy1, 1, false);
-  frame2left.       setbasesize(       0,    0,   9/800, 1-yy2, 1, false);
+  frame1left.       setbasesize(       0, -yy1,  50/800,   yy1, 1, asNone);
+  frame2left.       setbasesize(       0,    0,   9/800, 1-yy2, 1, asNone);
 
   yy1 := (20+45+180*(maxparty div 2)-22)/800; {todo: variable party size}
   yy2 := (20+45+180*(maxparty div 2)-22-27)/800;
-  frame1right.      setbasesize( -50/800, -yy1,  50/800,   yy1, 1, false);
-  frame2right.      setbasesize(  -9/800,    0,   9/800, 1-yy2, 1, false);
+  frame1right.      setbasesize( -50/800, -yy1,  50/800,   yy1, 1, asNone);
+  frame2right.      setbasesize(  -9/800,    0,   9/800, 1-yy2, 1, asNone);
 
-  frame2bottomleft. setbasesize(   9/800,    0, 300/800,  9/800, 1, false);
-  frame2bottomright.setbasesize(-309/800,    0, 300/800,  9/800, 1, false);
+  frame2bottomleft. setbasesize(   9/800,    0, 300/800,  9/800, 1, asNone);
+  frame2bottomright.setbasesize(-309/800,    0, 300/800,  9/800, 1, asNone);
   //todo: make frame3 scaled by content // maybe put it into a separate block?
-  frame3bottom     .setbasesize( 280/800,    0, 300/800, 62/800, 1, false);
+  frame3bottom     .setbasesize( 280/800,    0, 300/800, 62/800, 1, asNone);
   frame3bottom     .base.backwardsetsize(frame2bottomright.base.x1-frame2bottomleft.base.x2+22*2,-1);
   rescale;
 end;
@@ -157,7 +157,7 @@ begin
   frame3bottom := DSingleInterfaceElement.create(self);
   frame3bottom.frame := decorationframe3_bottom;
   grab(frame3bottom);
-  setbasesize(0,0,fullwidth,fullheight,1,false);
+  setbasesize(0,0,fullwidth,fullheight,1,asNone);
 end;
 
 end.
