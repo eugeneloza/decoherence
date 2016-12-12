@@ -87,6 +87,7 @@ Type
     function restoreMPH(restoration: float; skill: float): boolean;
     procedure drainMPH(drain: float; skill: float);
   public
+    nickname: string;
     stats: DStats;
 end;
 
@@ -100,6 +101,7 @@ uses castleLog;
 constructor DActor.create(AOwner: TComponent);
 begin
   inherited create(AOwner);
+  nickname := 'abc';
   setmaxmaxHP(100);
   setmaxmaxSTA(100);
   setmaxmaxCNC(100);
@@ -212,9 +214,6 @@ Procedure DActor.hit(damage: float; skill: float);
 begin
   setHP(HP-damage);
   setmaxHP(maxHP-damage*skill); // todo
-  {SETTERS WILL DO EVERYTHING}
-{  If fHP < 0 then die; //K.D. state for player character
-  if fmaxHP < 0 then {clinical death}; //C.D. state}
 end;
 
 function DActor.heal(value: float; skill: float): boolean;

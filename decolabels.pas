@@ -34,6 +34,8 @@ Type
     Font: DFont;
     { shadow intensity. Shadow=0 is no shadow }
     Shadow: Float;
+    { whether the label final image is scaled or remains 1:1 for clear text}
+    ScaleLabel: boolean;
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure Rescale; override;
@@ -94,6 +96,7 @@ uses sysutils;
 constructor DLabel.create(AOwner : TComponent);
 begin
   inherited create(AOwner);
+  ScaleLabel := false;
   Shadow := 0;
 end;
 
@@ -128,8 +131,12 @@ end;
 procedure DLabel.Rescale;
 begin
   inherited;
-  base.w := RealWidth;           //make something as "keep scale"? or override dlabel.draw? (NO, animations!)
-  base.h := RealHeight;
+  if ScaleLabel then begin
+    //****
+  end else begin
+    base.w := RealWidth;           //make something as "keep scale"? or override dlabel.draw? (NO, animations!)
+    base.h := RealHeight;
+  end;
 end;
 
 {----------------------------------------------------------------------------}

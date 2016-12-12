@@ -25,7 +25,8 @@ interface
 
 uses classes,
   castleImages,
-  decointerface, decoactor, decoplayercharacter, decoperks,
+  decointerface,
+  decoactor, decoplayercharacter, decoperks,
   decoglobal;
 
 
@@ -34,8 +35,11 @@ type
     each child will define its own arrange method }
   DAbstractCompositeInterfaceElement = class(DInterfaceElement)
   public
-    { arranges children within base.w, base.h of this container }
-    procedure ArrangeChildren(animate: boolean); virtual; abstract;
+    { arranges children within base.w, base.h of this container
+      basically at this level it is abstract, it just substracts the frame
+      from base.w and base.h and does nothing more}
+    var cnt_x,cnt_y,cnt_fw,cnt_fh: float;
+    procedure ArrangeChildren(animate: boolean); virtual;
     { additionally calls ArrangeChildren }
     procedure setbasesize(const newx,newy,neww,newh,newo: float; animate: boolean); override;
 end;
@@ -55,6 +59,24 @@ type
     constructor create(AOwner: TComponent); override;
     procedure ArrangeChildren(animate: boolean); override;
 end;
+
+type
+  {Nickname + PlayerBars + NumericHP}
+  DPlayerBarsFull = class(DAbstractCompositeInterfaceElement) //not a child of DPlayerBars!
+  private
+    {these are links for easier access to the children}
+    PartyBars: DPlayerBars;
+    NumHealth: DSingleInterfaceElement;
+    NickName: DSingleInterfaceElement;
+    {target character}
+    ftarget: DActor;
+    procedure settarget(value: DActor);
+  public
+    {the character being monitored}
+    property Target: DActor read ftarget write settarget;
+    constructor create(AOwner: TComponent); override;
+    procedure ArrangeChildren(animate: boolean); override;
+  end;
 
 type
   { character portrait. Some day it might be replaced for TUIContainer of
@@ -109,9 +131,13 @@ type DPerksContainer = class(DAbstractCompositeInterfaceElement)
 var HealthBarImage: TCastleImage; //todo not freed automatically!!!
     PortraitIMG: TCastleImage; //todo!!!
 
+    characterbar_top, characterbar_mid, characterbar_bottom,
+    portraitframe_left, portraitframe_right,
     decorationframe1_left,decorationframe1_right,
     decorationframe2_left,decorationframe2_right,
-    decorationframe2_bottomleft,decorationframe2_bottomright: DFrame;
+    decorationframe2_bottomleft,decorationframe2_bottomright,
+    decorationframe3_bottom
+                                                           : DFrame;
 
 
 {reads some interface-related data, like loading health bars images}
@@ -125,39 +151,72 @@ uses CastleLog, CastleFilesUtils, castleVectors,
 
 procedure InitCompositeInterface;
 begin
-  HealthBarImage := LoadImage(ApplicationData(ProgressBar_folder+'verticalbar_by_Alexey.png'));
+  HealthBarImage := LoadImage(ApplicationData(ProgressBarFolder+'verticalbar_CC-BY-SA_by_Saito00.png'));
   PortraitIMG := LoadImage(ApplicationData(PortraitFolder+'portrait_tmp.jpg'));
+
+  {load artwork by Saito00}
+
+  portraitframe_left := DFrame.create(Window);
+  with portraitframe_left do begin
+    SourceImage := LoadImage(ApplicationData(FramesFolder+'frameborder_left_CC-BY-SA_by_Saito00.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
+    cornerTop := 4; CornerBottom := 4; cornerLeft := 3; CornerRight := 4;
+  end;
+  portraitframe_right := DFrame.create(Window);
+  with portraitframe_right do begin
+    SourceImage := LoadImage(ApplicationData(FramesFolder+'frameborder_right_CC-BY-SA_by_Saito00.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
+    cornerTop := 4; CornerBottom := 4; cornerLeft := 4; CornerRight := 3;
+  end;
 
   decorationframe1_left := DFrame.create(Window);
   with decorationframe1_left do begin
-    SourceImage := LoadImage(ApplicationData(DecorationsFolder+'frame_1_left_by_Alexey.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
+    SourceImage := LoadImage(ApplicationData(DecorationsFolder+'frame_1_left_CC-BY-SA_by_Saito00.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
     cornerTop := 3; CornerBottom := 23; cornerLeft := 2; CornerRight := 6;
   end;
   decorationframe1_right := DFrame.create(Window);
   with decorationframe1_right do begin
-    SourceImage := LoadImage(ApplicationData(DecorationsFolder+'frame_1_right_by_Alexey.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
+    SourceImage := LoadImage(ApplicationData(DecorationsFolder+'frame_1_right_CC-BY-SA_by_Saito00.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
     cornerTop := 3; CornerBottom := 23; cornerLeft := 6; CornerRight := 2;
   end;
   decorationframe2_left := DFrame.create(Window);
   with decorationframe2_left do begin
-    SourceImage := LoadImage(ApplicationData(DecorationsFolder+'frame_2_left_by_Alexey.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
+    SourceImage := LoadImage(ApplicationData(DecorationsFolder+'frame_2_left_CC-BY-SA_by_Saito00.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
     cornerTop := 6; CornerBottom := 9; cornerLeft := 2; CornerRight := 6;
-    //cornerTop := 0; CornerBottom := 0; cornerLeft := 0; CornerRight := 0;
   end;
   decorationframe2_right := DFrame.create(Window);
   with decorationframe2_right do begin
-    SourceImage := LoadImage(ApplicationData(DecorationsFolder+'frame_2_right_by_Alexey.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
+    SourceImage := LoadImage(ApplicationData(DecorationsFolder+'frame_2_right_CC-BY-SA_by_Saito00.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
     cornerTop := 6; CornerBottom := 9; cornerLeft := 6; CornerRight := 2;
   end;
   decorationframe2_bottomleft := DFrame.create(Window);
   with decorationframe2_bottomleft do begin
-    SourceImage := LoadImage(ApplicationData(DecorationsFolder+'frame_2_bottomleft_by_Alexey.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
+    SourceImage := LoadImage(ApplicationData(DecorationsFolder+'frame_2_bottomleft_CC-BY-SA_by_Saito00.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
     cornerTop := 6; CornerBottom := 2; cornerLeft := 0; CornerRight := 9;
   end;
   decorationframe2_bottomright := DFrame.create(Window);
   with decorationframe2_bottomright do begin
-    SourceImage := LoadImage(ApplicationData(DecorationsFolder+'frame_2_bottomright_by_Alexey.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
+    SourceImage := LoadImage(ApplicationData(DecorationsFolder+'frame_2_bottomright_CC-BY-SA_by_Saito00.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
     cornerTop := 6; CornerBottom := 2; cornerLeft := 9; CornerRight := 0;
+  end;
+  decorationframe3_bottom := DFrame.create(Window);
+  with decorationframe3_bottom do begin
+    SourceImage := LoadImage(ApplicationData(DecorationsFolder+'frame_3_bottom_CC-BY-SA_by_Saito00.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
+    cornerTop := 10; CornerBottom := 9; cornerLeft := 23; CornerRight := 23;
+  end;
+
+  characterbar_top := DFrame.create(Window);
+  with characterbar_top do begin
+    SourceImage := LoadImage(ApplicationData(FramesFolder+'character_bar_top_CC-BY-SA_by_Saito00.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
+    cornerTop := 5; CornerBottom := 5; cornerLeft := 4; CornerRight := 4;
+  end;
+  characterbar_mid := DFrame.create(Window);
+  with characterbar_mid do begin
+    SourceImage := LoadImage(ApplicationData(FramesFolder+'character_bar_mid_CC-BY-SA_by_Saito00.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
+    cornerTop := 0; CornerBottom := 0; cornerLeft := 4; CornerRight := 4;
+  end;
+  characterbar_bottom := DFrame.create(Window);
+  with characterbar_bottom do begin
+    SourceImage := LoadImage(ApplicationData(FramesFolder+'character_bar_bottom_CC-BY-SA_by_Saito00.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
+    cornerTop := 5; CornerBottom := 5; cornerLeft := 4; CornerRight := 4;
   end;
 
 end;
@@ -170,57 +229,70 @@ begin
   ArrangeChildren(animate);
 end;
 
+procedure DAbstractCompositeInterfaceElement.ArrangeChildren(animate: boolean);
+begin
+  cnt_x := base.fx;
+  cnt_y := base.fy;
+  cnt_fw := base.fw;
+  cnt_fh := base.fh;
+  if (frame <> nil) and (frame.Rectagonal) then begin
+    cnt_x += frame.cornerLeft/Window.Height;
+    cnt_y += frame.cornerBottom/Window.height;
+    cnt_fw -= (frame.cornerLeft+frame.cornerRight)/Window.Height;
+    cnt_fh -= (frame.cornerTop+frame.cornerBottom)/Window.Height;
+  end;
+
+
+
+end;
+
 {===========================================================================}
 {=================== player bars ===========================================}
 {===========================================================================}
 
 constructor DPlayerBars.create(AOwner: TComponent);
 var tmp_bar: DStatBarImage;
-    tmp_element: DSingleInterfaceElement;
+    //tmp_element: DSingleInterfaceElement;
 begin
   inherited create(AOwner);
   frame := BlackFrame;
 
   //or make parent nil? as they are freed by freeing children? Keep an eye out for troubles...
-  tmp_element := DSingleInterfaceElement.create(self);
-  tmp_bar := DStatBarImage.create(tmp_element);
+  HP_bar := DSingleInterfaceElement.create(self);
+  tmp_bar := DStatBarImage.create(HP_bar);
   tmp_bar.Load(HealthBarImage);
   tmp_bar.Style := sbHealth;
   tmp_bar.Kind := bsVertical;
-  tmp_element.Content := tmp_bar;
-  tmp_element.frame := SimpleFrame;
-  HP_bar := tmp_element;
-  grab(tmp_element);
+  HP_bar.Content := tmp_bar;
+  //HP_bar.frame := SimpleFrame;
+  grab(HP_bar);
 
-  tmp_element := DSingleInterfaceElement.create(self);
-  tmp_bar := DStatBarImage.create(tmp_element);
+  STA_bar := DSingleInterfaceElement.create(self);
+  tmp_bar := DStatBarImage.create(STA_bar);
   tmp_bar.Load(HealthBarImage);
   tmp_bar.Style := sbStamina;
   tmp_bar.Kind := bsVertical;
-  tmp_element.Content := tmp_bar;
-  tmp_element.frame := SimpleFrame;
-  STA_bar := tmp_element;
-  grab(tmp_element);
+  STA_bar.Content := tmp_bar;
+  //STA_bar.frame := SimpleFrame;
+  grab(STA_bar);
 
-  tmp_element := DSingleInterfaceElement.create(self);
-  tmp_bar := DStatBarImage.create(tmp_element);
+  CNC_bar := DSingleInterfaceElement.create(self);
+  tmp_bar := DStatBarImage.create(CNC_bar);
   tmp_bar.Load(HealthBarImage);
   tmp_bar.Style := sbConcentration;
   tmp_bar.Kind := bsVertical;
-  tmp_element.Content := tmp_bar;
-  tmp_element.frame := SimpleFrame;
-  CNC_bar := tmp_element;
-  grab(tmp_element);
+  CNC_bar.Content := tmp_bar;
+  //STA_bar.frame := SimpleFrame;
+  grab(CNC_bar);
 
-  tmp_element := DSingleInterfaceElement.create(self);
-  tmp_bar := DStatBarImage.create(tmp_element);
+  MPH_bar := DSingleInterfaceElement.create(self);
+  tmp_bar := DStatBarImage.create(MPH_bar);
   tmp_bar.Load(HealthBarImage);
   tmp_bar.Style := sbMetaphysics;
   tmp_bar.Kind := bsVertical;
-  tmp_element.Content := tmp_bar;
-  tmp_element.frame := SimpleFrame;
-  MPH_bar := tmp_element;
-  grab(tmp_element);
+  MPH_bar.Content := tmp_bar;
+  //MPH_bar.frame := SimpleFrame;
+  grab(MPH_bar);
 end;
 
 {-----------------------------------------------------------------------------}
@@ -237,25 +309,81 @@ begin
   end;
 end;
 
-{-----------------------------------------------------------------------------}
+{---------------------------------------------------------------------------}
 
 procedure DPlayerBars.ArrangeChildren(animate: boolean);
 var scalex: float;
 begin
+  inherited ArrangeChildren(animate);
+
   if not base.initialized then begin
     writeLnLog('DPlayerBars.ArrangeChildren','ERROR: Base is not initialized!');
     exit;
   end;
+
   {metaphysics bar is displayed only if the character is known to posess metaphysic skills}
-  if ftarget.maxmaxmph > 0 then scalex := base.fw/4 else scalex := base.fw/3;
-  HP_bar. setbasesize(base.fx         ,base.fy,scalex,base.fh,base.opacity,animate);
-  STA_bar.setbasesize(base.fx+  scalex,base.fy,scalex,base.fh,base.opacity,animate);
-  CNC_bar.setbasesize(base.fx+2*scalex,base.fy,scalex,base.fh,base.opacity,animate);
-  MPH_bar.setbasesize(base.fx+3*scalex,base.fy,scalex,base.fh,base.opacity,animate);
+  if ftarget.maxmaxmph > 0 then scalex := cnt_fw/4 else scalex := cnt_fw/3;
+  HP_bar. setbasesize(cnt_x         , cnt_y, scalex, cnt_fh, base.opacity, animate);
+  STA_bar.setbasesize(cnt_x+  scalex, cnt_y, scalex, cnt_fh, base.opacity, animate);
+  CNC_bar.setbasesize(cnt_x+2*scalex, cnt_y, scalex, cnt_fh, base.opacity, animate);
+  MPH_bar.setbasesize(cnt_x+3*scalex, cnt_y, scalex, cnt_fh, base.opacity, animate);
   if ftarget.maxmaxmph > 0 then
     MPH_bar.visible := true
   else
     MPH_bar.visible := false
+end;
+
+{=============================================================================}
+{================ Player bars with nickname and profession ===================}
+{=============================================================================}
+
+procedure DPlayerBarsFull.settarget(value: DActor);
+begin
+  if ftarget <> value then begin
+    ftarget := value;
+    //and copy the target to all children
+    PartyBars.Target := value;
+    (NumHealth.content as DFloatLabel).Value := @value.HP;
+    (NickName.content as DStringLabel).Value := @value.nickname;
+  end;
+end;
+
+constructor DPlayerBarsFull.create(AOwner:TComponent);
+var tmp_flt: DFloatLabel;
+    tmp_str: DStringLabel;
+begin
+  inherited create(AOwner);
+  PartyBars := DPlayerBars.create(self);
+  NumHealth := DSingleInterfaceElement.create(self);
+  NickName  := DSingleInterfaceElement.create(self);
+
+  PartyBars.frame := characterbar_mid;
+  NickName.frame  := characterbar_top;
+  NumHealth.frame := characterbar_bottom;
+
+  tmp_flt := DFloatLabel.create(NumHealth);
+  tmp_flt.Digits := 0;
+  tmp_flt.ScaleLabel := true;
+  NumHealth.Content := tmp_flt;
+  tmp_str := DStringLabel.create(NickName);
+  tmp_str.ScaleLabel := true;
+  NickName.content := tmp_str;
+
+  grab(PartyBars);
+  grab(NumHealth);
+  grab(NickName);
+end;
+
+Procedure DPlayerBarsFull.ArrangeChildren(animate:boolean);
+var labelspace: float;
+begin
+  inherited ArrangeChildren(animate);
+  {********** INTERFACE DESIGN BY Saito00 ******************}
+
+  labelspace := 23/800;
+  NickName. setbasesize(cnt_x, cnt_y+cnt_fh-labelspace, cnt_fw, labelspace, base.opacity, animate);
+  PartyBars.setbasesize(cnt_x, cnt_y+labelspace       , cnt_fw, cnt_fh-2*labelspace, base.opacity, animate);
+  NumHealth.setbasesize(cnt_x, cnt_y                  , cnt_fw, labelspace, base.opacity, animate);
 end;
 
 {=============================================================================}
@@ -276,7 +404,6 @@ constructor DPortrait.create(AOwner: TComponent);
 begin
   inherited create(AOwner);
   content := DStaticImage.create(self);
-  frame := BlackFrame;
 end;
 
 {=============================================================================}
@@ -329,6 +456,7 @@ end;
 
 procedure DIntegerEdit.ArrangeChildren(animate: boolean);
 begin
+  inherited ArrangeChildren(animate);
   //todo ***
 end;
 
@@ -352,6 +480,7 @@ end;
 
 procedure DPerksContainer.ArrangeChildren(animate: boolean);
 begin
+  inherited ArrangeChildren(animate);
   //todo ***
 end;
 

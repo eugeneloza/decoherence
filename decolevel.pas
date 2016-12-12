@@ -60,6 +60,7 @@ begin
   camera:=TWalkCamera.create(Window);//player.camera;
   camera.SetView(Vector3Single(0,0,1),Vector3Single(0,1,0),Vector3Single(0,0,1),Vector3Single(0,0,1),true);
   camera.MoveSpeed:=5;
+  camera.MouseDragMode := mdRotate{mdDrag};
   WritelnLog('load_test_level','Finished');
 
 end;
@@ -74,7 +75,7 @@ begin
      Window.SceneManager.Items.Add(Scene);
      Window.SceneManager.MainScene := Scene;
      Window.SceneManager.Camera:=camera;
-     Window.TouchInterface := tiCtlWalkDragRotate;
+     Window.TouchInterface := {$IFDEF Android}tiCtlWalkDragRotate{$ELSE}tiNone{$ENDIF};
      SetGameMode(gmTravel);
   end;
 end;

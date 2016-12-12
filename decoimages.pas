@@ -489,7 +489,7 @@ begin
                 max := Target.MaxMaxMph;
                 CurrentMax := Target.MaxMph;
                 Position := Target.Mph;
-                color := Vector4Single(1,0,1,1);  //purple
+                color := Vector4Single(1,0.5,1,1);  //purple
               end;
   end;
 end;

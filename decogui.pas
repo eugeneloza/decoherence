@@ -156,7 +156,7 @@ begin
   if background <> nil then background.rescale; //todo maybe just check show/hide
 
   { rescale burner image }
-  Init_burner_image;
+  //Init_burner_image;
 
   { rescale children }
   inherited;

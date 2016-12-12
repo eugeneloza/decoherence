@@ -24,7 +24,7 @@ unit Decoherence;
 
 interface
 
-const Version='interfa3-161207-64';
+const Version='interfa3-161211-69';
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
@@ -207,7 +207,7 @@ Initialization
   OnGetApplicationName  :=  @MyGetApplicationName;
   Window := TCastleWindowTouch.create(Application);
   {$IFNDEF AllowRescale}window.ResizeAllowed := raOnlyAtOpen;{$ENDIF}
-  window.width := 800;
+  window.width := 1024;
   window.height := 600;
   Application.MainWindow  :=  Window;
   Application.OnInitialize  :=  @ApplicationInitialize;

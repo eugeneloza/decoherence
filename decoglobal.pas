@@ -31,14 +31,13 @@ type Float = single;
      pFloat = ^float;
 
 { folders constants relative to ApplicationData path }
-const Interface_Foler    = 'interface/';
-      Frames_Folder      = Interface_Foler+'frames/';
-      LoadScreen_folder  = Interface_Foler+'loadscreen/';
-      ProgressBar_folder = Interface_Foler+'progressbar/';
-      LoadScreenFolder   = Interface_Foler+'loadscreen/';
-      BackgroundsFolder  = Interface_Foler+'background/';
-      WindFolder         = Interface_Foler+'wind/';
-      DecorationsFolder  = Interface_Foler+'decorations/';
+const InterfaceFolder     = 'interface/';
+      FramesFolder       = InterfaceFolder+'frames/';
+      LoadScreenFolder   = InterfaceFolder+'loadscreen/';
+      ProgressBarFolder  = InterfaceFolder+'progressbar/';
+      BackgroundsFolder  = InterfaceFolder+'background/';
+      WindFolder         = InterfaceFolder+'wind/';
+      DecorationsFolder  = InterfaceFolder+'decorations/';
       PortraitFolder     = 'portrait/';
 
 

@@ -46,6 +46,8 @@ Type
    {frame borders}
    cornerTop, cornerbottom, cornerLeft, cornerRight: integer;
    Rectagonal: boolean;
+   constructor create(AOwner: TComponent); override;
+   destructor destroy; override;
 end;
 
  { constants for special scaling cases }
@@ -208,7 +210,7 @@ Type
   public
     {assign given element as a child and sets its parent to self}
     procedure Grab(Child: DSingleInterfaceElement);
-    {returns self if IAmHere and runs all possible events}
+    {returns self if IAmHere and runs all possible events + scans all children}
     function ifMouseOver(xx,yy: integer; AllTree: boolean): DAbstractElement; override;
 
   end;
@@ -229,7 +231,7 @@ Var {simple outline around black box}
 
 {initializes "burner" image to bake some pattern over the interface images,
  mostly used for frames}
-procedure Init_burner_image;
+//procedure Init_burner_image;
 {reads some interface-related data, like loading frames images}
 procedure InitInterface;
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
@@ -240,13 +242,13 @@ uses sysutils, CastleLog, castleFilesUtils,
 
 {-------------------- BURNER IMAGE --------------------------------------------}
 
-var BURNER_IMAGE_UNSCALED,BURNER_IMAGE:TCastleImage;
+{var BURNER_IMAGE_UNSCALED,BURNER_IMAGE:TCastleImage;
 procedure Init_burner_image;
 begin
   {$IFNDEF AllowRescale}if BURNER_IMAGE<>nil then exit;{$ENDIF}
   WriteLnLog('Init_burner_image','started');
   if BURNER_IMAGE_UNSCALED = nil then
-    BURNER_IMAGE_UNSCALED := LoadImage(ApplicationData(Interface_Foler+'burner/burner_Pattern_203_CC0_by_Nobiax_diffuse.png'), [TRGBImage]) as TRGBImage;
+    BURNER_IMAGE_UNSCALED := LoadImage(ApplicationData(InterfaceFolder+'burner/burner_Pattern_203_CC0_by_Nobiax_diffuse.png'), [TRGBImage]) as TRGBImage;
   if (BURNER_IMAGE=nil) or (BURNER_IMAGE.height <> window.height) or (BURNER_IMAGE.width <> window.width) then begin
     FreeAndNil(BURNER_IMAGE);
     BURNER_IMAGE := BURNER_IMAGE_UNSCALED.MakeCopy;
@@ -255,30 +257,30 @@ begin
   {$IFNDEF AllowRescale}FreeAndNil(BURNER_IMAGE_UNSCALED);{$ENDIF}
 
   WriteLnLog('Init_burner_image','finished');
-end;
+end; }
 
 {-------------------- INIT INTERFACE ------------------------------------------}
 
 procedure InitInterface;
 begin
   WriteLnLog('InitInterface','started');
-  Init_burner_image;
+  //Init_burner_image;
 
   SimpleFrame := DFrame.create(Window);
   with SimpleFrame do begin
-    SourceImage := LoadImage(ApplicationData(Frames_Folder+'frame.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
+    SourceImage := LoadImage(ApplicationData(FramesFolder+'frame.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
     cornerTop := 1; CornerBottom := 1; cornerLeft := 1; CornerRight := 1;
   end;
 
   CaptionFrame := DFrame.create(Window);
   with CaptionFrame do begin
-    SourceImage := LoadImage(ApplicationData(Frames_Folder+'frame_caption.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
+    SourceImage := LoadImage(ApplicationData(FramesFolder+'frame_caption.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
     cornerTop := 19; CornerBottom := 1; cornerLeft := 1; CornerRight := 1;            //todo: variable top line!
   end;
 
   BlackFrame := DFrame.create(Window);
   with BlackFrame do begin
-    SourceImage := LoadImage(ApplicationData(Frames_Folder+'blackframe.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
+    SourceImage := LoadImage(ApplicationData(FramesFolder+'blackframe.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
     cornerTop := 0; CornerBottom := 0; cornerLeft := 0; CornerRight := 0;
   end;
 
@@ -287,6 +289,20 @@ begin
   //InterfaceList := DInterfaceElementsList.create(false);
 
   WriteLnLog('InitInterface','finished');
+end;
+
+{=============================================================================}
+
+constructor DFrame.create(AOwner: TComponent);
+begin
+  inherited create(AOwner);
+  rectagonal := true;
+end;
+
+destructor DFrame.destroy;
+begin
+  freeandnil(SourceImage);
+  inherited;
 end;
 
 {=============================================================================}
@@ -369,10 +385,20 @@ begin
   if neww>0 then begin
     w := neww;
     fw := neww/window.height;
+    if x1+w > Window.width then begin
+      x1 := Window.width - w;
+      fx := x1/Window.height;
+    end;
+    x2 := x1+w;
   end;
   if newh>0 then begin
     h := newh;
     fh := newh/window.height;
+    if y1+h > Window.height then begin
+      y1 := Window.height - h;
+      fy := y1/Window.height;
+    end;
+    y2 := y1+h;
   end;
 end;
 
@@ -478,9 +504,12 @@ procedure DSingleInterfaceElement.setbasesize(const newx,newy,neww,newh,newo: fl
 begin
   inherited setBaseSize(newx,newy,neww,newh,newo,animate);
   //frame should be automatically resized during "rescale"...
+  if (frame<>nil) and (frame.cornerleft = 3) then begin
+    writelnLog('i');
+  end;
   if content <> nil then begin
-    content.base.copyxywh(base);
-    content.base.SubstractFrame(frame,1);
+    content.base.copyxywh(self.base);
+    content.base.SubstractFrame(frame,0); //adjust to frame borders, no problem that frame may be unrescaled yet, because frame borders always the same
   end;
 
 end;
@@ -604,6 +633,7 @@ begin
   UnscaledWidth := FrameImage.width;
   UnscaledHeight := FrameImage.height;
 
+  {check if minimal frame size is larger than the requested frame size}
   if frame.cornerLeft+frame.cornerRight+1 > base.w then begin
     writeLnLog('DAbstractInterfaceElement.FrameResize3x3','Reset backwards base.w = '+inttostr(base.w)+' / cornerLeft+cornerRight = '+inttostr(frame.cornerLeft+frame.cornerRight));
     base.w := frame.cornerLeft+frame.cornerRight+1;
@@ -650,7 +680,7 @@ begin
     for iy := 0 to 2 do freeAndNil(ScaledImageParts[ix,iy]);
 
   //and burn the burner
-  FrameImage.DrawFrom(BURNER_IMAGE,0,0,base.x1,base.y1,base.w,base.h,dmMultiply);
+  //FrameImage.DrawFrom(BURNER_IMAGE,0,0,base.x1,base.y1,base.w,base.h,dmMultiply);
 
   initGLPending := true;
 end;

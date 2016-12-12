@@ -3,3 +3,6 @@ frame.png
 frame_caption.png
 CC0 by Eugene Loza
 made in GIMP
+
+frameborder_CC-BY-SA_by_Saito00.png
+CC-BY-SA 3.0 by Alexey Saito00

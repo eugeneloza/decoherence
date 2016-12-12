@@ -1,4 +1,6 @@
 horizontalbar.png
-verticalbar.png
 CC0 by EugeneLoza
 made in GIMP > color gradient
+
+verticalbar_CC-BY-SA_by_Saito00.png
+CC-BY-SA 3.0 by Alexey Saito00

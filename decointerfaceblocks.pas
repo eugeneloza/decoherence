@@ -33,7 +33,7 @@ type
   {presents 7 characters with health bars, portraits and characters control space }
   DPartyView = class (DAbstractCompositeInterfaceElement)
   public
-    PartyBars: array [0..maxparty] of DPlayerBars;
+    PartyBars: array [0..maxparty] of DPlayerBarsFull;
     Portraits: array [0..maxparty] of DPortrait;
     procedure ArrangeChildren(animate: boolean); override;
     constructor create(AOwner: TComponent); override;
@@ -45,7 +45,8 @@ type
   private
     frame1left,frame1right,
     frame2left,frame2right,
-    frame2bottomleft,frame2bottomright: DSingleInterfaceElement;
+    frame2bottomleft,frame2bottomright,
+    frame3bottom : DSingleInterfaceElement;
   public
     procedure ArrangeChildren(animate: boolean); override;
     constructor create(AOwner: TComponent); override;
@@ -59,7 +60,8 @@ implementation
 procedure DPartyView.ArrangeChildren(animate: boolean);
 var i: integer;
 begin
-  {********** INTERFACE DESIGN BY ALEXEY ******************}
+  //inherited ArrangeChildren(animate); //not needed here
+  {********** INTERFACE DESIGN BY Saito00 ******************}
 
   {rescale party stat bars}
   for i := 0 to maxparty do begin
@@ -73,7 +75,7 @@ begin
   {rescale party portraits}
   for i := 0 to maxparty do begin
     if not odd(i) then
-      portraits[i].setbasesize(46/800,-(40+155+180*(i div 2))/800,135/800,155/800,1,animate)
+      portraits[i].setbasesize(47/800,-(40+155+180*(i div 2))/800,135/800,155/800,1,animate)
     else
       portraits[i].setbasesize(-(46+135)/800,-(40+155+180*(i div 2))/800,135/800,155/800,1,animate);
     portraits[i].rescale;
@@ -88,12 +90,14 @@ begin
   inherited Create(AOwner);
   for i := 0 to maxparty do begin
     //create stat bars
-    PartyBars[i] := DPlayerBars.create(self);
+    PartyBars[i] := DPlayerBarsFull.create(self);
     PartyBars[i].target := party[i];
     self.children.Add(PartyBars[i]);
 
     //create portraits
     Portraits[i] := DPortrait.create(self);
+    if odd(i) then portraits[i].frame := portraitframe_right else
+                   portraits[i].frame := portraitframe_left;
     Portraits[i].target := party[i];
     self.children.Add(Portraits[i]);
   end;
@@ -108,16 +112,23 @@ end;
 procedure DDecorations.ArrangeChildren(animate: boolean);
 var yy1,yy2: float;
 begin
-  {********** INTERFACE DESIGN BY ALEXEY ******************}
-  yy1 := (20+45+180*4-22)/800; {todo}
-  //yy2 := yy1;//
-  yy2 := (20+45+180*4-22-27)/800;
+  // inherited ArrangeChildren(animate); //not needed here
+  {********** INTERFACE DESIGN BY Saito00 ******************}
+  yy1 := (20+45+180*(maxparty div 2+1)-22)/800; {todo: variable party size}
+  yy2 := (20+45+180*(maxparty div 2+1)-22-27)/800;
   frame1left.       setbasesize(       0, -yy1,  50/800,   yy1, 1, false);
-  frame1right.      setbasesize( -50/800, -yy1,  50/800,   yy1, 1, false);
   frame2left.       setbasesize(       0,    0,   9/800, 1-yy2, 1, false);
+
+  yy1 := (20+45+180*(maxparty div 2)-22)/800; {todo: variable party size}
+  yy2 := (20+45+180*(maxparty div 2)-22-27)/800;
+  frame1right.      setbasesize( -50/800, -yy1,  50/800,   yy1, 1, false);
   frame2right.      setbasesize(  -9/800,    0,   9/800, 1-yy2, 1, false);
-  frame2bottomleft. setbasesize(   9/800,    0, 300/800, 9/800, 1, false);
-  frame2bottomright.setbasesize(-309/800,    0, 300/800, 9/800, 1, false);
+
+  frame2bottomleft. setbasesize(   9/800,    0, 300/800,  9/800, 1, false);
+  frame2bottomright.setbasesize(-309/800,    0, 300/800,  9/800, 1, false);
+  //todo: make frame3 scaled by content // maybe put it into a separate block?
+  frame3bottom     .setbasesize( 280/800,    0, 300/800, 62/800, 1, false);
+  frame3bottom     .base.backwardsetsize(frame2bottomright.base.x1-frame2bottomleft.base.x2+22*2,-1);
   rescale;
 end;
 
@@ -143,6 +154,9 @@ begin
   frame2bottomright := DSingleInterfaceElement.create(self);
   frame2bottomright.frame := decorationframe2_bottomright;
   grab(frame2bottomright);
+  frame3bottom := DSingleInterfaceElement.create(self);
+  frame3bottom.frame := decorationframe3_bottom;
+  grab(frame3bottom);
   setbasesize(0,0,fullwidth,fullheight,1,false);
 end;
 
