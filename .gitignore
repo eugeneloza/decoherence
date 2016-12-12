@@ -12,6 +12,7 @@
 *.log
 *.lps
 *.bak
+*commit*
 decoherence_desktop
 decoherence_desktop.exe
 backup
