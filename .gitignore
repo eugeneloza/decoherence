@@ -19,3 +19,4 @@ backup
 library
 PROPRIETARY_*
 UNKNOWN_*
+heap.trc
