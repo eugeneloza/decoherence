@@ -24,12 +24,12 @@ unit Decoherence;
 
 interface
 
-const Version='interfa3-161213-71';
+const Version='interfa3-161213-72';
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
-uses Classes, SysUtils, {$IFDEF DEBUG}heaptrc,{$ENDIF}
+uses Classes, SysUtils,
      CastleLog, CastleTimeUtils,
      CastleWindow, CastleWindowTouch, CastleKeysMouse,
      decogui, decointerface, decomouse, decofont,
@@ -206,16 +206,6 @@ end;
 
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 Initialization
-  if FileExists('heap.trc') then
-    DeleteFile('heap.trc');
-  {$IFDEF DEBUG}
-    WriteLnLog('DebugMode','On');
-    // Set up -gh output for the Leakview package:
-    SetHeapTraceOutput('heap.trc');
-  {$ELSE}
-    WriteLnLog('DebugMode','Off');
-  {$ENDIF}
-
   OnGetApplicationName  :=  @MyGetApplicationName;
   Window := TCastleWindowTouch.create(Application);
   {$IFNDEF AllowRescale}window.ResizeAllowed := raOnlyAtOpen;{$ENDIF}
