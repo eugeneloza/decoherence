@@ -44,9 +44,11 @@ Const
 Type
   {A record representing the base stats array}
   DStats = class(TObject)
-    Value: array of float;
+  public
+    Value: array of integer;
     Count: integer;
     Constructor create(setfullstats: boolean);
+    Destructor destroy;
   End;
 
 implementation
@@ -58,8 +60,12 @@ Begin
   Else
     count := Maxbasestats+1;
   setlength(Value,Count);
-
 End;
+
+Destructor DStats.destroy;
+begin
+  setlength(Value,0);
+end;
 
 end.
 

@@ -23,7 +23,7 @@ unit decoplayercharacter;
 interface
 
 uses classes,
-  decoactor,
+  decoactor, decoraceprofession,
   decoglobal;
 
 const maxparty = 6; {7 characters}

@@ -113,6 +113,7 @@ End;
 Destructor DPassivePerk.destroy;
 Begin
   Inherited;
+
 End;
 
 end.
