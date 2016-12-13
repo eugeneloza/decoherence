@@ -39,6 +39,7 @@ Type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure Rescale; override;
+    //procedure draw; override;
   private
     procedure PrepareTextImage;
     procedure settext(const value: string);
@@ -57,7 +58,7 @@ Type
   public
     { pointer to the value it monitors }
     value: Pinteger;
-    procedure update; override;
+    procedure draw; override;
   end;
 
 Type
@@ -66,7 +67,7 @@ Type
   public
     { pointer to the value it monitors }
     value: Pstring;
-    procedure update; override;
+    procedure draw; override;
   end;
 
 Type
@@ -82,7 +83,7 @@ Type
       no more needed at the moment }
     Digits: integer;
     constructor Create(AOwner: TComponent); override;
-    procedure update; override;
+    procedure draw; override;
   end;
 
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
@@ -174,20 +175,20 @@ end;
 {========================= Integer label =====================================}
 {=============================================================================}
 
-procedure DIntegerLabel.update;
+procedure DIntegerLabel.draw;
 begin
-  inherited;
   Text := inttostr(value^);
+  inherited;
 end;
 
 {=============================================================================}
 {========================== String label =====================================}
 {=============================================================================}
 
-procedure DStringLabel.update;
+procedure DStringLabel.draw;
 begin
-  inherited;
   Text := value^;
+  inherited;
 end;
 
 {=============================================================================}
@@ -200,14 +201,14 @@ begin
   Digits := 0;
 end;
 
-procedure DFloatLabel.update;
+procedure DFloatLabel.draw;
 begin
-  inherited;
   case Digits of
     1: Text := inttostr(trunc(value^))+'.'+inttostr(round(frac(value^)*10));
     2: Text := inttostr(trunc(value^))+'.'+inttostr(round(frac(value^)*100));
     else Text := inttostr(round(value^));
   end;
+  inherited;
 end;
 
 end.

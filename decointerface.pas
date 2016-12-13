@@ -241,7 +241,7 @@ uses sysutils, CastleLog, castleFilesUtils,
 
 {-------------------- BURNER IMAGE --------------------------------------------}
 
-{var BURNER_IMAGE_UNSCALED,BURNER_IMAGE:TCastleImage;
+{var BURNER_IMAGE_UNSCALED,BURNER_IMAGE:TCastleImage;  //todo: not freed automatically!!!!
 procedure Init_burner_image;
 begin
   {$IFNDEF AllowRescale}if BURNER_IMAGE<>nil then exit;{$ENDIF}

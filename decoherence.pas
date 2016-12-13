@@ -85,10 +85,12 @@ begin
   // todo Joystick
   if Event.EventType = itMouseButton then begin
     doMousePress(Event);
-    {if interface didn't catch the click then}
-    if mbRight=event.MouseButton then camera.MouseLook := not Camera.MouseLook;
+    {todo: if interface didn't catch the click then}
+    if CurrentGameMode = gmTravel then
+      if mbRight=event.MouseButton then camera.MouseLook := not Camera.MouseLook;
+
   end else if Event.EventType = itKey then begin
-    if event.key = K_P{rintScreen} then
+    if event.key = K_P{rintScreen} then                //k_printscreen doesn't work in x-window system if assigned to some external program like scrot
        Window.SaveScreen('deco_'+NiceDate+'.jpg');
   end;
 //  SetGameMode(gmCharacterGeneration);
@@ -213,6 +215,7 @@ Initialization
   Application.OnInitialize  :=  @ApplicationInitialize;
 
 Finalization
+  DestroyCompositeInterface;
   WriteLnLog('Finalization','Bye...');
 end.
 

@@ -140,13 +140,14 @@ var HealthBarImage: TCastleImage; //todo not freed automatically!!!
                                                            : DFrame;
 
 
-{reads some interface-related data, like loading health bars images}
+{reads some interface-related data, like loading health bars images and decoration frames}
 procedure InitCompositeInterface;
+procedure DestroyCompositeInterface;
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 
 implementation
-uses CastleLog, CastleFilesUtils, castleVectors,
-  decogui, decoimages, decolabels;
+uses SysUtils, CastleLog, CastleFilesUtils, castleVectors,
+  decogui, decoimages, decolabels, decofont;
 
 
 procedure InitCompositeInterface;
@@ -219,6 +220,13 @@ begin
     cornerTop := 5; CornerBottom := 5; cornerLeft := 4; CornerRight := 4;
   end;
 
+end;
+
+procedure DestroyCompositeInterface;
+begin
+  writelnLog('DestroyCompositeInterface','(todo)');
+  freeAndNil(HealthBarImage);
+  freeAndNil(PortraitIMG);
 end;
 
 {===========================================================================}
@@ -364,9 +372,11 @@ begin
   tmp_flt := DFloatLabel.create(NumHealth);
   tmp_flt.Digits := 0;
   tmp_flt.ScaleLabel := true;
+  tmp_flt.Font := RegularFont16;
   NumHealth.Content := tmp_flt;
   tmp_str := DStringLabel.create(NickName);
   tmp_str.ScaleLabel := true;
+  tmp_str.Font := RegularFont16;
   NickName.content := tmp_str;
 
   grab(PartyBars);

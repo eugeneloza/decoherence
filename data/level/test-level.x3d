@@ -16,38 +16,27 @@
 		            skyColor="0.051 0.051 0.051"
 		            />
 		<Transform DEF="Lamp_002_TRANSFORM"
-		           translation="-0.646769 -6.488394 0.865980"
-		           scale="1.000000 1.000000 1.000000"
+		           translation="0.0000 0.0000 2.0000"
+		           scale="1.0000 1.0000 1.0000"
 		           rotation="0.205942 0.331517 0.920698 1.926274"
 		           >
 			<PointLight DEF="LA_Lamp_002"
-			            ambientIntensity="0.0000"
-			            color="1.0000 1.0000 1.0000"
-			            intensity="0.5714"
-			            radius="30.0000" 
-			            location="0.0000 0.0000 -0.0000"
-			            />
-		</Transform>
-		<Transform DEF="Lamp_001_TRANSFORM"
-		           translation="-5.600686 -3.066833 0.865980"
-		           scale="1.000000 1.000000 1.000000"
-		           rotation="0.205942 0.331517 0.920698 1.926274"
-		           >
-			<PointLight DEF="LA_Lamp_001"
-			            ambientIntensity="0.0000"
-			            color="1.0000 1.0000 1.0000"
-			            intensity="0.5714"
-			            radius="30.0000" 
-			            location="0.0000 0.0000 0.0000"
+				            ambientIntensity="0.0000"
+				            color="1.0000 0.9000 0.5000"
+				            intensity="10.0"
+				            radius="10.6000" 
+			      		    attenuation="1.000 1.000 1.000"
+				            location="0.0000 0.0000 0.0000"
+
 			            />
 		</Transform>
 		<Transform DEF="Plane_TRANSFORM"
-		           translation="-1.201618 -3.282568 0.006185"
-		           scale="5.470472 4.501073 4.501073"
+		           translation="-4.633196 -12.656914 -0.377121"
+		           scale="21.093031 17.355225 10.544197"
 		           rotation="1.000000 0.000000 0.000000 0.000000"
 		           >
 			<Transform DEF="Plane_ifs_TRANSFORM"
-			           translation="0.000000 -0.000000 0.000000"
+			           translation="0.000000 0.000000 0.000000"
 			           scale="1.000000 1.000000 1.000000"
 			           rotation="1.000000 0.000000 0.000000 0.000000"
 			           >
@@ -55,7 +44,7 @@
 					<Shape>
 						<Appearance>
 							<ImageTexture DEF="IM_Pattern_196_CC0_by_Nobiax_diffuse_dds"
-							              url='"Pattern_196_CC0_by_Nobiax_diffuse.dds" "/home/eugene/Pattern_196_CC0_by_Nobiax_diffuse.dds"'
+							              url='"Pattern_196_CC0_by_Nobiax_diffuse.dds" "/media/Photo/DECO/161212 testlevel/Pattern_196_CC0_by_Nobiax_diffuse.dds"'
 							              />
 							<TextureTransform 
 							                  translation="0.000000 0.000000"
@@ -86,12 +75,12 @@
 			</Transform>
 		</Transform>
 		<Transform DEF="Cube_TRANSFORM"
-		           translation="0.000000 0.000000 0.000000"
-		           scale="1.000000 1.000000 1.000000"
+		           translation="0.000000 0.000000 -0.391611"
+		           scale="3.855797 3.855797 2.342596"
 		           rotation="1.000000 0.000000 0.000000 0.000000"
 		           >
 			<Transform DEF="Cube_ifs_TRANSFORM"
-			           translation="0.000000 0.000000 0.000000"
+			           translation="0.000000 0.000000 -0.000000"
 			           scale="1.000000 1.000000 1.000000"
 			           rotation="1.000000 0.000000 0.000000 0.000000"
 			           >
@@ -99,7 +88,7 @@
 					<Shape>
 						<Appearance>
 							<ImageTexture DEF="IM_Pattern_069_CC0_by_Nobiax_diffuse_dds"
-							              url='"Pattern_069_CC0_by_Nobiax_diffuse.dds" "/home/eugene/Pattern_069_CC0_by_Nobiax_diffuse.dds"'
+							              url='"Pattern_069_CC0_by_Nobiax_diffuse.dds" "/media/Photo/DECO/161212 testlevel/Pattern_069_CC0_by_Nobiax_diffuse.dds"'
 							              />
 							<TextureTransform 
 							                  translation="0.000000 0.000000"
@@ -128,19 +117,6 @@
 					</Shape>
 				</Group>
 			</Transform>
-		</Transform>
-		<Transform DEF="Lamp_TRANSFORM"
-		           translation="2.711819 -0.736813 0.865980"
-		           scale="1.000000 1.000000 1.000000"
-		           rotation="0.205942 0.331517 0.920698 1.926274"
-		           >
-			<PointLight DEF="LA_Lamp"
-			            ambientIntensity="0.0000"
-			            color="1.0000 1.0000 1.0000"
-			            intensity="0.5714"
-			            radius="30.0000" 
-			            location="-0.0000 -0.0000 -0.0000"
-			            />
 		</Transform>
 	</Scene>
 </X3D>

@@ -47,6 +47,10 @@ begin
   Scene.Load(ApplicationData('level/test-level.x3d'));
   Scene.Spatial := [ssRendering, ssDynamicCollisions];
   Scene.ProcessEvents := true;
+  scene.ShadowMaps := true;
+  Window.ShadowVolumes := true;
+  window.ShadowVolumesRender := true;
+  window.AntiAliasing := aa8SamplesNicer;
   //Scene.Attributes.EnableTextures:=false;
   WritelnLog('load_test_level','Player');
 
