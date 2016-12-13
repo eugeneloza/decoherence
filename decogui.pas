@@ -270,11 +270,15 @@ end;
 
 {======================== Interface modes creation ===========================}
 
+var interfaceReady: boolean = false; //UGLY FIX THIS AT ONCE!!!!
 procedure DInterfaceContainer.MakeCharacterGenerationInterface;
 var i: integer;
   tmp: DPartyView;
   tmp2: DDecorations;
 begin
+  if interfaceReady then exit;
+  interfaceReady := true;
+
   for i := 0 to maxparty do begin
     Party[i] := DPlayerCharacter.create(Window);
     if i<4 then party[i].maxmaxMPH := 0;

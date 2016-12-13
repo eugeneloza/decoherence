@@ -51,9 +51,8 @@ begin
 
   case GM of
     {gmLoadScreen}//built automatically when game mode is enabled (?)
-    gmCharacterGeneration, gmTravel: GUI.MakeCharacterGenerationInterface;
+    gmTravel: GUI.MakeCharacterGenerationInterface;
   end;
-
 
   LastGameMode := CurrentGameMode;
   CurrentGameMode := GM;

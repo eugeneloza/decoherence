@@ -39,6 +39,7 @@ Type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure Rescale; override;
+    procedure RescaleLabel;
     //procedure draw; override;
   private
     procedure PrepareTextImage;
@@ -90,7 +91,8 @@ Type
 
 implementation
 
-uses sysutils;
+uses sysutils, CastleImages, CastleLog,
+  decointerface;
 
 {----------------------------------------------------------------------------}
 
@@ -135,8 +137,7 @@ begin
   if ScaleLabel then begin
     //****
   end else begin
-    base.w := RealWidth;           //make something as "keep scale"? or override dlabel.draw? (NO, animations!)
-    base.h := RealHeight;
+    base.backwardsetsize(RealWidth,RealHeight)
   end;
 end;
 
@@ -163,13 +164,37 @@ begin
 
   InitGLPending := true;
   ImageLoaded := true;     //not good...
-  //Rescale;
-  ScaledImage := SourceImage.MakeCopy;
-  {$IFNDEF AllowRescale}freeandnil(sourceImage);{$ENDIF}
-  base.backwardsetsize(RealWidth,RealHeight)
-{  base.w := ;
-  base.h := RealHeight;}
+  RescaleLabel;
 end;
+
+{----------------------------------------------------------------------------}
+
+procedure DLabel.RescaleLabel;
+begin
+  Rescale;        //UGLY
+  If self.ScaleLabel then begin
+    {THIS IS A COPY of DStaticImage.RescaleImage Maybe raise it up to
+     DAbstractImage and call only if label needs to have base rescaled}
+    {$IFNDEF AllowRescale}If sourceImage=nil then exit;{$ENDIF}
+    if ImageLoaded then begin
+      if base.initialized then
+       if (ScaledWidth <> base.w) or (ScaledHeight <> base.h) then begin
+         ImageReady:=false;
+         FreeAndNil(GLImage);
+         scaledImage := SourceImage.CreateCopy as TCastleImage;
+         {$IFNDEF AllowRescale}freeandnil(sourceImage);{$ENDIF}
+         scaledImage.Resize(base.w,base.h,InterfaceScalingMethod);
+         InitGLPending := true;
+       end
+      else
+        writeLnLog('DLabel.RescaleLabel','ERROR: base.initialized = false');
+    end;
+  end else begin
+    ScaledImage := SourceImage.MakeCopy;
+    {$IFNDEF AllowRescale}freeandnil(sourceImage);{$ENDIF}
+  end;
+end;
+
 
 {=============================================================================}
 {========================= Integer label =====================================}

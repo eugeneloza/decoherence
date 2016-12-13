@@ -610,7 +610,7 @@ begin
   //InterfaceList.Remove(self);
   FreeAndNil(GLFrame);
   //if owns content destroy it here;
-  //if OwnsContent then FreeAndNil(content);
+  //if OwnsContent then FreeAndNil(content);  //content usually has AOwner = self
   inherited;
 end;
 

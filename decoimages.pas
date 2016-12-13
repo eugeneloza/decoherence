@@ -40,9 +40,9 @@ type
     procedure InitGL;{ override;}
     { frees an image without freeing the whole instance }
     procedure FreeImage;
-  private
-    GLImage: TGLImage;
+//  private
   public
+    GLImage: TGLImage;
     ImageReady, ImageLoaded: boolean;
     { keeps from accidentally re-initializing GL }
     InitGLPending: boolean;
