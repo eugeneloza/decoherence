@@ -39,7 +39,7 @@ Type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure Rescale; override;
-    procedure RescaleLabel;
+    procedure RescaleImage; override;
     //procedure draw; override;
   private
     procedure PrepareTextImage;
@@ -134,11 +134,8 @@ end;
 procedure DLabel.Rescale;
 begin
   inherited;
-  if ScaleLabel then begin
-    //****
-  end else begin
-    base.backwardsetsize(RealWidth,RealHeight)
-  end;
+  {if not ScaleLabel then
+    base.backwardsetsize(RealWidth,RealHeight) }
 end;
 
 {----------------------------------------------------------------------------}
@@ -162,36 +159,28 @@ begin
   RealHeight := SourceImage.height;
   RealWidth := sourceImage.width;
 
-  InitGLPending := true;
   ImageLoaded := true;     //not good...
-  RescaleLabel;
+  RescaleImage;
 end;
 
 {----------------------------------------------------------------------------}
 
-procedure DLabel.RescaleLabel;
+procedure DLabel.RescaleImage;
 begin
-  Rescale;        //UGLY
-  If self.ScaleLabel then begin
-    {THIS IS A COPY of DStaticImage.RescaleImage Maybe raise it up to
-     DAbstractImage and call only if label needs to have base rescaled}
-    {$IFNDEF AllowRescale}If sourceImage=nil then exit;{$ENDIF}
-    if ImageLoaded then begin
-      if base.initialized then
-       if (ScaledWidth <> base.w) or (ScaledHeight <> base.h) then begin
-         ImageReady:=false;
-         FreeAndNil(GLImage);
-         scaledImage := SourceImage.CreateCopy as TCastleImage;
-         {$IFNDEF AllowRescale}freeandnil(sourceImage);{$ENDIF}
-         scaledImage.Resize(base.w,base.h,InterfaceScalingMethod);
-         InitGLPending := true;
-       end
-      else
-        writeLnLog('DLabel.RescaleLabel','ERROR: base.initialized = false');
-    end;
-  end else begin
-    ScaledImage := SourceImage.MakeCopy;
-    {$IFNDEF AllowRescale}freeandnil(sourceImage);{$ENDIF}
+  {$IFNDEF AllowRescale}If sourceImage=nil then exit;{$ENDIF}
+  If self.ScaleLabel then
+    inherited //rescale this label as a simple image to fit "base size"
+  else begin
+    //don't rescale this label to provide sharp font
+    if ImageLoaded then
+       if base.initialized then begin
+          ScaledImage := SourceImage.MakeCopy;
+          base.backwardsetsize(RealWidth,RealHeight);
+          InitGLPending := true;
+          {$IFNDEF AllowRescale}freeandnil(sourceImage);{$ENDIF}
+        end
+       else
+         writeLnLog('DLabel.RescaleImage/no scale label','ERROR: base.initialized = false');
   end;
 end;
 

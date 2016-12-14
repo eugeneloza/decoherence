@@ -50,6 +50,9 @@ type
     ScaledImage: TCastleImage;
     {due to a little bug I have to define these separately}
     ScaledWidth, ScaledHeight: integer;
+    { Thread-safe part of rescaling the image }
+    procedure rescale; override;
+    procedure RescaleImage; virtual;
   end;
 
 type
@@ -64,10 +67,6 @@ type
     procedure afterload; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
     { loads image in a thread }
     procedure LoadThread(const filename:string);
-    { Thread-safe part of rescaling the image }
-    procedure rescale; override;
-  private
-    procedure RescaleImage;
   end;
 
 type
@@ -255,6 +254,36 @@ begin
   inherited;
 end;
 
+{----------------------------------------------------------------------------}
+
+procedure DAbstractImage.rescale;
+begin
+  inherited;
+  base.fixProportions(RealWidth,Realheight);
+{  last.fixProportions(sourceImage.Width,sourceImage.height);
+  next.fixProportions(sourceImage.Width,sourceImage.height);}
+  RescaleImage;
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DAbstractImage.RescaleImage;
+begin
+ {$IFNDEF AllowRescale}If sourceImage=nil then exit;{$ENDIF}
+ if ImageLoaded then begin
+   if base.initialized then
+    if (ScaledWidth <> base.w) or (ScaledHeight <> base.h) then begin
+      ImageReady:=false;
+      FreeAndNil(GLImage);
+      scaledImage := SourceImage.CreateCopy as TCastleImage;
+      {$IFNDEF AllowRescale}freeandnil(sourceImage);{$ENDIF}
+      scaledImage.Resize(base.w,base.h,InterfaceScalingMethod);
+      InitGLPending := true;
+    end
+   else
+     writeLnLog('DStaticImage.RescaleImage','ERROR: base.initialized = false');
+ end;
+end;
 
 {----------------------------------------------------------------------------}
 
@@ -277,36 +306,6 @@ end;
 {========================= static image ========================================}
 {=============================================================================}
 
-{----------------------------------------------------------------------------}
-
-procedure DStaticImage.rescale;
-begin
-  inherited;
-  base.fixProportions(RealWidth,Realheight);
-{  last.fixProportions(sourceImage.Width,sourceImage.height);
-  next.fixProportions(sourceImage.Width,sourceImage.height);}
-  RescaleImage;
-end;
-
-{----------------------------------------------------------------------------}
-
-procedure DStaticImage.RescaleImage;
-begin
- {$IFNDEF AllowRescale}If sourceImage=nil then exit;{$ENDIF}
- if ImageLoaded then begin
-   if base.initialized then
-    if (ScaledWidth <> base.w) or (ScaledHeight <> base.h) then begin
-      ImageReady:=false;
-      FreeAndNil(GLImage);
-      scaledImage := SourceImage.CreateCopy as TCastleImage;
-      {$IFNDEF AllowRescale}freeandnil(sourceImage);{$ENDIF}
-      scaledImage.Resize(base.w,base.h,InterfaceScalingMethod);
-      InitGLPending := true;
-    end
-   else
-     writeLnLog('DStaticImage.RescaleImage','ERROR: base.initialized = false');
- end;
-end;
 
 {=============================================================================}
 {======================== phased image =======================================}

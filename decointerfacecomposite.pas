@@ -38,7 +38,7 @@ type
     { arranges children within base.w, base.h of this container
       basically at this level it is abstract, it just substracts the frame
       from base.w and base.h and does nothing more}
-    var cnt_x,cnt_y,cnt_fw,cnt_fh: float;
+    var cnt_x,cnt_y,cnt_w,cnt_h: float;
     procedure ArrangeChildren(animate: TAnimationStyle); virtual;
     { additionally calls ArrangeChildren }
     procedure setbasesize(const newx,newy,neww,newh,newo: float; animate: TAnimationStyle); override;
@@ -120,7 +120,7 @@ type DPerksContainer = class(DAbstractCompositeInterfaceElement)
     procedure settarget(value: DPlayerCharacter);
   public
     property Target: DPlayerCharacter read ftarget write settarget;
-    procedure MakePerksList;
+    procedure MakePerksList(animate: TAnimationStyle);
     procedure ArrangeChildren(animate: TAnimationStyle); override;
     //procedure UpdatePerksList;
   end;
@@ -241,13 +241,13 @@ procedure DAbstractCompositeInterfaceElement.ArrangeChildren(animate: TAnimation
 begin
   cnt_x := base.fx;
   cnt_y := base.fy;
-  cnt_fw := base.fw;
-  cnt_fh := base.fh;
+  cnt_w := base.fw;
+  cnt_h := base.fh;
   if (frame <> nil) and (frame.Rectagonal) then begin
     cnt_x += frame.cornerLeft/Window.Height;
     cnt_y += frame.cornerBottom/Window.height;
-    cnt_fw -= (frame.cornerLeft+frame.cornerRight)/Window.Height;
-    cnt_fh -= (frame.cornerTop+frame.cornerBottom)/Window.Height;
+    cnt_w -= (frame.cornerLeft+frame.cornerRight)/Window.Height;
+    cnt_h -= (frame.cornerTop+frame.cornerBottom)/Window.Height;
   end;
 
 
@@ -330,11 +330,11 @@ begin
   end;
 
   {metaphysics bar is displayed only if the character is known to posess metaphysic skills}
-  if ftarget.maxmaxmph > 0 then scalex := cnt_fw/4 else scalex := cnt_fw/3;
-  HP_bar. setbasesize(cnt_x         , cnt_y, scalex, cnt_fh, base.opacity, animate);
-  STA_bar.setbasesize(cnt_x+  scalex, cnt_y, scalex, cnt_fh, base.opacity, animate);
-  CNC_bar.setbasesize(cnt_x+2*scalex, cnt_y, scalex, cnt_fh, base.opacity, animate);
-  MPH_bar.setbasesize(cnt_x+3*scalex, cnt_y, scalex, cnt_fh, base.opacity, animate);
+  if ftarget.maxmaxmph > 0 then scalex := cnt_w/4 else scalex := cnt_w/3;
+  HP_bar. setbasesize(cnt_x         , cnt_y, scalex, cnt_h, base.opacity, animate);
+  STA_bar.setbasesize(cnt_x+  scalex, cnt_y, scalex, cnt_h, base.opacity, animate);
+  CNC_bar.setbasesize(cnt_x+2*scalex, cnt_y, scalex, cnt_h, base.opacity, animate);
+  MPH_bar.setbasesize(cnt_x+3*scalex, cnt_y, scalex, cnt_h, base.opacity, animate);
   if ftarget.maxmaxmph > 0 then
     MPH_bar.visible := true
   else
@@ -391,9 +391,9 @@ begin
   {********** INTERFACE DESIGN BY Saito00 ******************}
 
   labelspace := 23/800;
-  NickName. setbasesize(cnt_x, cnt_y+cnt_fh-labelspace, cnt_fw, labelspace, base.opacity, animate);
-  PartyBars.setbasesize(cnt_x, cnt_y+labelspace       , cnt_fw, cnt_fh-2*labelspace, base.opacity, animate);
-  NumHealth.setbasesize(cnt_x, cnt_y                  , cnt_fw, labelspace, base.opacity, animate);
+  NickName. setbasesize(cnt_x, cnt_y+cnt_h-labelspace , cnt_w, labelspace, base.opacity, animate);
+  PartyBars.setbasesize(cnt_x, cnt_y+labelspace       , cnt_w, cnt_h-2*labelspace, base.opacity, animate);
+  NumHealth.setbasesize(cnt_x, cnt_y                  , cnt_w, labelspace, base.opacity, animate);
 end;
 
 {=============================================================================}
@@ -420,6 +420,8 @@ end;
 {============================== Integer edit =================================}
 {=============================================================================}
 
+//range checking should be done externally by enabling/disabling the buttons.
+
 procedure incTarget(Sender: DAbstractElement; x,y: integer);
 begin
   {hmm... looks complex...}
@@ -427,6 +429,16 @@ begin
     if (sender as DSingleInterfaceElement).parent is DIntegerEdit then    //another fool's check :)
       inc(((sender as DSingleInterfaceElement).parent as DIntegerEdit).Target^); //todo!!!!!!!!!
 end;
+
+procedure decTarget(Sender: DAbstractElement; x,y: integer);
+begin
+  {hmm... looks complex...}
+  if sender is DSingleInterfaceElement then  //fool's check
+    if (sender as DSingleInterfaceElement).parent is DIntegerEdit then    //another fool's check :)
+      dec(((sender as DSingleInterfaceElement).parent as DIntegerEdit).Target^); //todo!!!!!!!!!
+end;
+
+{---------------------------------------------------------------------------}
 
 constructor DIntegerEdit.create(AOwner: TComponent);
 var tmp: DIntegerLabel;
@@ -449,6 +461,8 @@ begin
   grab(PlusButton);
 
   MinusButton := DSingleInterfaceElement.create(self);
+  MinusButton.CanMouseOver := true;
+  MinusButton.OnMousePress := @decTarget;
   tmpImg := DStaticImage.create(MinusButton);
   //tmpImg.LoadThread('');
   MinusButton.content := tmpImg;
@@ -468,6 +482,9 @@ procedure DIntegerEdit.ArrangeChildren(animate: TAnimationStyle);
 begin
   inherited ArrangeChildren(animate);
   //todo ***
+  PlusButton.setbasesize(cnt_x,cnt_y,cnt_h,cnt_h,1,animate);
+  MinusButton.setbasesize(cnt_x+cnt_w-cnt_h,cnt_y,cnt_h,cnt_h,1,animate);
+  iLabel.setbasesize(cnt_x+cnt_h,cnt_y,cnt_w-2*cnt_h,cnt_h,1,animate);
 end;
 
 {=============================================================================}
@@ -478,14 +495,14 @@ procedure DPerksContainer.settarget(value: DPlayerCharacter);
 begin
   if ftarget <> value then begin
     ftarget := value;
-    MakePerksList;
+    MakePerksList(asNone);
   end;
 end;
 
-procedure DPerksContainer.MakePerksList;
+procedure DPerksContainer.MakePerksList(animate: TAnimationStyle);
 begin
   //todo ***
-  ArrangeChildren(asNone);
+  ArrangeChildren(animate);
 end;
 
 procedure DPerksContainer.ArrangeChildren(animate: TAnimationStyle);
