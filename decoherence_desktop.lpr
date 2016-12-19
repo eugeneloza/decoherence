@@ -1,5 +1,11 @@
-{$INCLUDE compilerconfig.inc}
 program decoherence_desktop;
+
+{$INCLUDE compilerconfig.inc}
+
+{$IFDEF RELEASE}
+  {$DEFINE WriteLog}
+  {$IFDEF Windows}{$APPTYPE GUI}{$ENDIF}
+{$ENDIF}
 
 Uses {$IFDEF UNIX}cthreads,{$ENDIF}{$IFDEF DEBUG}SysUtils,{$ENDIF} decoglobal, decoherence;
 

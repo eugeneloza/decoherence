@@ -1,0 +1,1 @@
+gauss 128 px, circle select: feather=100, invert, delete

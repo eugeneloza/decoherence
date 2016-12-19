@@ -109,9 +109,13 @@ type
     property Target: Pinteger read ftarget write settarget;
     constructor create(AOwner: TComponent); override;
     procedure ArrangeChildren(animate: TAnimationStyle); override;
+    procedure incTarget(Sender: DAbstractElement; x,y: integer);
+    procedure decTarget(Sender: DAbstractElement; x,y: integer);
   end;
 
-  {integer with "bonus" edit}
+//  {integer with "bonus" edit}
+
+//type TPerkContainerStyle = (pcActions,pcActive,pcGlobal);
 
 type DPerksContainer = class(DAbstractCompositeInterfaceElement)
   {container for buffs-debuffs, perks and actions}
@@ -119,9 +123,12 @@ type DPerksContainer = class(DAbstractCompositeInterfaceElement)
     fTarget: DPlayerCharacter;
     procedure settarget(value: DPlayerCharacter);
   public
+    Lines: integer;
+    //ContainerStyle: TPerkContainerStyle;
     property Target: DPlayerCharacter read ftarget write settarget;
     procedure MakePerksList(animate: TAnimationStyle);
     procedure ArrangeChildren(animate: TAnimationStyle); override;
+    constructor create(AOwner: TComponent); override;
     //procedure UpdatePerksList;
   end;
 
@@ -138,6 +145,7 @@ var HealthBarImage: TCastleImage; //todo not freed automatically!!!
     decorationframe2_bottomleft,decorationframe2_bottomright,
     decorationframe3_bottom
                                                            : DFrame;
+    ActionFrame: DFrame;
 
 
 {reads some interface-related data, like loading health bars images and decoration frames}
@@ -220,6 +228,9 @@ begin
     cornerTop := 5; CornerBottom := 5; cornerLeft := 4; CornerRight := 4;
   end;
 
+  ActionFrame := DFrame.create(Window);
+  ActionFrame.Rectagonal := false;
+  ActionFrame.SourceImage := LoadImage(ApplicationData(FramesFolder+'action_frame_CC-BY-SA_by_Saito00.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
 end;
 
 procedure DestroyCompositeInterface;
@@ -422,16 +433,18 @@ end;
 
 //range checking should be done externally by enabling/disabling the buttons.
 
-procedure incTarget(Sender: DAbstractElement; x,y: integer);
+procedure DIntegerEdit.incTarget(Sender: DAbstractElement; x,y: integer);
 begin
+  //remake to self.ftarget! make min/max
   {hmm... looks complex...}
   if sender is DSingleInterfaceElement then  //fool's check
     if (sender as DSingleInterfaceElement).parent is DIntegerEdit then    //another fool's check :)
       inc(((sender as DSingleInterfaceElement).parent as DIntegerEdit).Target^); //todo!!!!!!!!!
 end;
 
-procedure decTarget(Sender: DAbstractElement; x,y: integer);
+procedure DIntegerEdit.decTarget(Sender: DAbstractElement; x,y: integer);
 begin
+  //remake to self.ftarget! make min/max
   {hmm... looks complex...}
   if sender is DSingleInterfaceElement then  //fool's check
     if (sender as DSingleInterfaceElement).parent is DIntegerEdit then    //another fool's check :)
@@ -499,18 +512,49 @@ begin
   end;
 end;
 
+{---------------------------------------------------------------------}
+
 procedure DPerksContainer.MakePerksList(animate: TAnimationStyle);
+var tmp: DSingleInterfaceElement;
+    i: integer;
 begin
-  //todo ***
-  ArrangeChildren(animate);
+  if fTarget<>nil then begin
+    if (fTarget.Actions<>nil) and (fTarget.Actions.count>0) then begin
+      children.Clear;
+      for i:= 0 to fTarget.Actions.count-1 do begin
+        tmp := DSingleInterfaceElement.create(self);
+        tmp.Content := DStaticImage.create(tmp);
+        (tmp.Content as DSTaticImage).Load(fTarget.Actions[0].Image.SourceImage);
+        grab(tmp);
+      end;
+      ArrangeChildren(animate);
+    end else
+      WriteLnLog('DPerksContainer.MakePerksList','ERROR: Target.Actions is empty!');
+  end else
+    WriteLnLog('DPerksContainer.MakePerksList','ERROR: Target is nil!');
 end;
+
+{---------------------------------------------------------------------}
 
 procedure DPerksContainer.ArrangeChildren(animate: TAnimationStyle);
+var scale: float;
+    i: integer;
 begin
   inherited ArrangeChildren(animate);
-  //todo ***
+  scale := cnt_h/lines;
+  for i := 0 to children.Count-1 do children[i].setbasesize(cnt_x+i*scale,cnt_y,scale,scale,1,animate);
+  //todo : auto scrollers
 end;
 
+{---------------------------------------------------------------------}
+
+constructor DPerksContainer.create(AOwner: TComponent);
+begin
+  inherited create(AOwner);
+  Lines := 1;
+end;
+
+{---------------------------------------------------------------------}
 
 end.
 

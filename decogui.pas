@@ -272,21 +272,13 @@ end;
 
 var interfaceReady: boolean = false; //UGLY FIX THIS AT ONCE!!!!
 procedure DInterfaceContainer.MakeCharacterGenerationInterface;
-var i: integer;
+var
   tmp: DPartyView;
   tmp2: DDecorations;
 begin
   if interfaceReady then exit;
   interfaceReady := true;
-
-  for i := 0 to maxparty do begin
-    Party[i] := DPlayerCharacter.create(Window);
-    if i<4 then party[i].maxmaxMPH := 0;
-    party[i].hit(rnd.Random(80),1);
-    party[i].drainCNC(rnd.Random(80),1);
-    party[i].drainMPH(rnd.Random(80),1);
-    party[i].drainSTA(rnd.Random(80),1);
-  end;
+  createTestParty;
   tmp := DPartyView.create(self);
   tmp2 := DDecorations.create(self);
   GUI.grab(tmp2);

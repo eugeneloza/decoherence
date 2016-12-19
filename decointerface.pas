@@ -31,7 +31,9 @@ const InterfaceScalingMethod: TResizeInterpolation = riBilinear;  //to quickly c
 
 const defaultanimationduration = 300 /1000/60/60/24; {in ms}
 
-Type TAnimationStyle = (asNone,
+{animation style of the object. asDefault means "animate from previous state",
+ presuming that there was some "previous state"}
+Type TAnimationStyle = (asNone, asDefault,
                         asFadeIn, asFadeOut, asFadeOutSuicide,
                         asZoomIn, asZoomOut, asZoomOutSuicide,
                         {asFlyInLeft, asFlyInRight, AsFlyInTop,}
@@ -112,6 +114,10 @@ Type
 //    Free_on_end: boolean;
     fvisible: boolean;
     procedure setvisible(value: boolean);
+    {animates the interface element from current state to base state,
+     Important: GetAnimationState must be called before setting basesize
+     of the element as AnimateTo uses currentAnimationState}
+    procedure AnimateTo(animate: TAnimationStyle);
   public
     { these values are "strict" and unaffected by animations. Usually determines
       the basic stage and implies image rescale and init GL. }
@@ -131,8 +137,8 @@ Type
   end;
 
 {Definition of simple procedures for (mouse) events}
-type TSimpleProcedure = procedure(sender: DAbstractElement);
-type TXYProcedure = procedure(sender: DAbstractElement; x,y: integer);
+type TSimpleProcedure = procedure(sender: DAbstractElement) of Object;
+type TXYProcedure = procedure(sender: DAbstractElement; x,y: integer) of Object;
 
 
 Type
@@ -412,6 +418,7 @@ begin
   fy := newy/window.height;
   fw := neww/window.height;
   fh := newh/window.height;
+  initialized := true;
 end;
 
 {----------------------------------------------------------------------------}
@@ -484,31 +491,35 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DAbstractElement.setbasesize(const newx,newy,neww,newh,newo: float; animate: TAnimationStyle);
+procedure DAbstractElement.AnimateTo(animate: TAnimationStyle);
 begin
-  base.setsize(newx,newy,neww,newh);
-  base.opacity := newo;
-  if animate<>asNone then begin
-    GetAnimationState;   //getanimationstate needs "last" so we can't freeannil it yet
-    freeandnil(last);
-    last := CurrentAnimationState;
+  if animate = asDefault then begin      {playing default animation}
+    last.copyxywh(CurrentAnimationState);
     next.copyxywh(base);
     animationstart := -1;
     animationduration := defaultanimationduration;
   end;
+end;
+
+procedure DAbstractElement.setbasesize(const newx,newy,neww,newh,newo: float; animate: TAnimationStyle);
+begin
+  GetAnimationState;
+  base.setsize(newx,newy,neww,newh);
+  base.opacity := newo;
+  animateTo(animate);
   //rescale; //????
 end;
 
 procedure DSingleInterfaceElement.setbasesize(const newx,newy,neww,newh,newo: float; animate: TAnimationStyle);
 begin
   inherited setBaseSize(newx,newy,neww,newh,newo,animate);
-  //frame should be automatically resized during "rescale"...
-  if (frame<>nil) and (frame.cornerleft = 3) then begin
-    writelnLog('i');
-  end;
+  //frame should be automatically resized during "rescale" and animated during draw...
   if content <> nil then begin
     content.base.copyxywh(self.base);
     content.base.SubstractFrame(frame,0); //adjust to frame borders, no problem that frame may be unrescaled yet, because frame borders always the same
+    content.CurrentAnimationState.copyxywh(self.currentAnimationState);
+    content.CurrentAnimationState.SubstractFrame(frame,0);
+    content.animateTo(animate);
   end;
 
 end;
@@ -532,7 +543,8 @@ begin
       CurrentAnimationState.y2 := last.y2+round((next.y2-last.y2)*phase);
       CurrentAnimationState.h := last.h+round((next.h-last.h)*phase);
       CurrentAnimationState.w := last.w+round((next.w-last.w)*phase);
-      CurrentAnimationState.opacity := last.opacity+round((next.opacity-last.opacity)*phase);
+      CurrentAnimationState.opacity := last.opacity+((next.opacity-last.opacity)*phase);
+      CurrentAnimationState.initialized := true;
     end else begin
       {should be "next" here}
       CurrentAnimationState.x1 := base.x1;
@@ -542,6 +554,7 @@ begin
       CurrentAnimationState.h := base.h;
       CurrentAnimationState.w := base.w;
       CurrentAnimationState.opacity := base.Opacity;
+      CurrentAnimationState.initialized := true;
     end;
   end;
 end;

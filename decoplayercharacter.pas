@@ -23,7 +23,7 @@ unit decoplayercharacter;
 interface
 
 uses classes,
-  decoactor, decoraceprofession,
+  decoactor, decoraceprofession, decoperks,
   decoglobal;
 
 const maxparty = 6; {7 characters}
@@ -32,17 +32,38 @@ Type
   {player character - the most complex actor available :)}
   DPlayerCharacter = class(DActor)
   public
+    Actions: DPerksList;
     Procedure die; override;
     constructor create(AOwner: Tcomponent); override;
 end;
 
 var Party: array[0..maxparty] of DPlayerCharacter;
 
+{creates a test party. Temporary}
+procedure CreateTestParty;
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
-
 implementation
+uses castleLog,
+  decogui{ugly, but temporarily needed for random};
 
-uses castleLog;
+procedure CreateTestParty;
+var i: integer;
+begin
+  for i := 0 to maxparty do begin
+    Party[i] := DPlayerCharacter.create(Window);
+    if i<4 then party[i].maxmaxMPH := 0;
+    party[i].hit(GUI.rnd.Random(80),1);
+    party[i].drainCNC(GUI.rnd.Random(80),1);
+    party[i].drainMPH(GUI.rnd.Random(80),1);
+    party[i].drainSTA(GUI.rnd.Random(80),1);
+    if (Perks=nil) or (Perks.count=0) then WriteLnLog('CreateTestParty','FATAL ERROR: Perks is empty!');
+    party[i].Actions := DPerksList.create(false);
+    Party[i].actions.Add(perks[0]);
+  end;
+
+end;
+
+{---------------------------------------------------------------------------}
 
 constructor DPlayerCharacter.create(AOwner: TComponent);
 begin

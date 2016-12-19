@@ -30,11 +30,28 @@ uses classes,
 
 
 type
+  {stores and displays every interface element related to current character}
+  DCharacterSpace = class(DAbstractCompositeInterfaceElement)
+  private
+    fTarget: DPlayerCharacter;
+    procedure settarget(value: DPlayerCharacter);
+    procedure SlideIn(Sender: DAbstractElement; x,y: integer);
+    procedure slideOut(Sender: DAbstractElement);
+  public
+    ID: integer;
+    slided: boolean;
+    StatBars: DPlayerBarsFull;
+    Portrait: DPortrait;
+    property Target: DPlayerCharacter read fTarget write settarget;
+    procedure ArrangeChildren(animate: TAnimationStyle); override;
+    constructor create(AOwner: TComponent); override;
+  end;
+
+type
   {presents 7 characters with health bars, portraits and characters control space }
   DPartyView = class (DAbstractCompositeInterfaceElement)
   public
-    PartyBars: array [0..maxparty] of DPlayerBarsFull;
-    Portraits: array [0..maxparty] of DPortrait;
+    CharacterSpace: array [0..maxparty] of DCharacterSpace;
     procedure ArrangeChildren(animate: TAnimationStyle); override;
     constructor create(AOwner: TComponent); override;
   end;
@@ -57,28 +74,107 @@ type
 implementation
 //uses ;
 
+{=============================================================================}
+{=========================== Character Space =================================}
+{=============================================================================}
+
+constructor DCharacterSpace.create(AOwner: TComponent);
+begin
+  inherited create(AOwner);
+
+  //create stat bars
+  StatBars := DPlayerBarsFull.create(self);
+  StatBars.OnMouseOver := @SlideIn;
+  StatBars.OnMouseLeave := @SlideOut;
+  grab(StatBars);
+
+  //create portraits
+  Portrait := DPortrait.create(self);
+  grab(Portrait);
+
+end;
+
+{---------------------------------------------------------------------------}
+
+procedure DCharacterSpace.ArrangeChildren(animate: TAnimationStyle);
+begin
+  //inherited ArrangeChildren(animate); //not needed here as this element doesn't have a frame
+  {********** INTERFACE DESIGN BY Saito00 ******************}
+  if odd(self.ID) then portrait.frame := portraitframe_right else
+                       portrait.frame := portraitframe_left;
+
+  if not odd(self.ID) then
+    StatBars.setbasesize(10/800,-(40+155+180*(self.ID div 2))/800,35/800,155/800,1,animate)
+  else
+    StatBars.setbasesize(-45/800,-(40+155+180*(self.ID div 2))/800,35/800,155/800,1,animate);
+  StatBars.rescale;
+
+  if not odd(self.ID) then
+    Portrait.setbasesize(47/800,-(40+155+180*(self.ID div 2))/800,135/800,155/800,1,animate)
+  else
+    Portrait.setbasesize(-(46+135)/800,-(40+155+180*(self.ID div 2))/800,135/800,155/800,1,animate);
+  //Portrait.rescale;
+  SlideOut(nil);
+
+end;
+
+{---------------------------------------------------------------------------}
+
+procedure DCharacterSpace.settarget(value: DPlayerCharacter);
+begin
+  if fTarget <> value then begin
+    self.fTarget := value;
+    StatBars.Target := self.fTarget;
+    Portrait.Target := self.fTarget;
+  end;
+end;
+
+{---------------------------------------------------------------------------}
+
+procedure DCharacterSpace.SlideIn(Sender: DAbstractElement; x,y: integer);
+var myx: float;
+begin
+  if slided = false then begin
+    slided := true;
+    if not odd(self.ID) then
+      myx := 47/800
+    else
+      myx := -(46)/800-Portrait.base.fw;
+    Portrait.setbasesize(myx,Portrait.base.fy,Portrait.base.fw,Portrait.base.fh,1,asDefault);
+    Portrait.rescale;
+  end;
+end;
+
+procedure DCharacterSpace.slideOut(Sender: DAbstractElement);
+var myx: float;
+begin
+  if slided = true then begin
+    slided := false;
+    if not odd(self.ID) then
+      myx := 0/800
+    else
+      myx := -135{portrait.base.fw}/800;
+    Portrait.setbasesize(myx,Portrait.base.fy,Portrait.base.fw,Portrait.base.fh,0,asDefault);
+    Portrait.rescale;
+  end;
+end;
+
+{---------------------------------------------------------------------------}
+
+{=============================================================================}
+{============================= Party  view ===================================}
+{=============================================================================}
+
 procedure DPartyView.ArrangeChildren(animate: TAnimationStyle);
 var i: integer;
 begin
-  //inherited ArrangeChildren(animate); //not needed here
+  //inherited ArrangeChildren(animate); //not needed here as this element doesn't have a frame
   {********** INTERFACE DESIGN BY Saito00 ******************}
 
-  {rescale party stat bars}
+  {rescale party}
   for i := 0 to maxparty do begin
-    if not odd(i) then
-      PartyBars[i].setbasesize(10/800,-(40+155+180*(i div 2))/800,35/800,155/800,1,animate)
-    else
-      PartyBars[i].setbasesize(-45/800,-(40+155+180*(i div 2))/800,35/800,155/800,1,animate);
-    PartyBars[i].rescale;
-  end;
-
-  {rescale party portraits}
-  for i := 0 to maxparty do begin
-    if not odd(i) then
-      portraits[i].setbasesize(47/800,-(40+155+180*(i div 2))/800,135/800,155/800,1,animate)
-    else
-      portraits[i].setbasesize(-(46+135)/800,-(40+155+180*(i div 2))/800,135/800,155/800,1,animate);
-    portraits[i].rescale;
+    CharacterSpace[i].setBaseSize(0,-(40+155+180*(i div 2))/800,35/800,155/800,1,animate);
+//      CharacterSpace[i].setBaseSize(0,0,fullwidth,fullheight,1,animate);
   end;
 end;
 
@@ -89,17 +185,10 @@ var i: integer;
 begin
   inherited Create(AOwner);
   for i := 0 to maxparty do begin
-    //create stat bars
-    PartyBars[i] := DPlayerBarsFull.create(self);
-    PartyBars[i].target := party[i];
-    self.children.Add(PartyBars[i]);
-
-    //create portraits
-    Portraits[i] := DPortrait.create(self);
-    if odd(i) then portraits[i].frame := portraitframe_right else
-                   portraits[i].frame := portraitframe_left;
-    Portraits[i].target := party[i];
-    self.children.Add(Portraits[i]);
+    CharacterSpace[i] := DCharacterSpace.create(self);
+    CharacterSpace[i].ID := i;
+    CharacterSpace[i].Target := party[i];
+    grab(CharacterSpace[i]);
   end;
   setbasesize(0,0,fullwidth,fullheight,1,asNone);
 //  ArrangeChildren(false); //automatically arranged on TCompositeElement.setbasesize
@@ -114,12 +203,12 @@ var yy1,yy2: float;
 begin
   // inherited ArrangeChildren(animate); //not needed here
   {********** INTERFACE DESIGN BY Saito00 ******************}
-  yy1 := (20+45+180*(maxparty div 2+1)-22)/800; {todo: variable party size}
+  yy1 := (20+45+180*(maxparty div 2+1)-22)/800;
   yy2 := (20+45+180*(maxparty div 2+1)-22-27)/800;
   frame1left.       setbasesize(       0, -yy1,  50/800,   yy1, 1, asNone);
   frame2left.       setbasesize(       0,    0,   9/800, 1-yy2, 1, asNone);
 
-  yy1 := (20+45+180*(maxparty div 2)-22)/800; {todo: variable party size}
+  yy1 := (20+45+180*(maxparty div 2)-22)/800;
   yy2 := (20+45+180*(maxparty div 2)-22-27)/800;
   frame1right.      setbasesize( -50/800, -yy1,  50/800,   yy1, 1, asNone);
   frame2right.      setbasesize(  -9/800,    0,   9/800, 1-yy2, 1, asNone);

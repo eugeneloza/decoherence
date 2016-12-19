@@ -37,10 +37,13 @@ var scene:TcastleScene;
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-uses DecoGameMode;
+uses DecoGameMode,
+  X3DNodes;
 
 var loadedlevel:boolean=false;
 procedure load_test_level;
+{var Nav:TKambiNavigationInfoNode; /// !!!
+    NavLight:TPointLightNode;}
 begin
   WritelnLog('load_test_level','Scene');
   Scene := TCastleScene.Create(Application);
@@ -48,19 +51,35 @@ begin
   Scene.Spatial := [ssRendering, ssDynamicCollisions];
   Scene.ProcessEvents := true;
   scene.ShadowMaps := true;
+
+{  //create light that follows the player
+  NavLight:= TPointLightNode.Create('', '');
+  NavLight.FdColor.Value := vector3single(1,0.1,0.1);
+  NavLight.FdAttenuation.value := Vector3Single(0,0,6);
+  NavLight.FdRadius.value:=1;
+  NavLight.FdIntensity.value:=30;
+  NavLight.FdOn.value:=true;
+  NavLight.FdShadows.value:=false;
+  //and create a respective navigation node
+  nav:=TKambiNavigationInfoNode.Create('', '');
+  nav.FdHeadLightNode.Value := NavLight;
+  nav.FdHeadlight.Value:=true;
+
+  scene.RootNode.FdChildren.Add(nav);  }
+
   Window.ShadowVolumes := true;
   window.ShadowVolumesRender := true;
   window.AntiAliasing := aa8SamplesNicer;
   //Scene.Attributes.EnableTextures:=false;
   WritelnLog('load_test_level','Player');
 
-  //Player := TPlayer.Create(Window.SceneManager);
-  //player.Camera.MouseLook:=false;
-  //Player.Camera.GravityUp:=Vector3Single(0,0,1);
-  //Player.Up:=Vector3Single(0,0,1);
-  //player.position:=Vector3Single(0,0,1);
-  //player.FallingEffect:=false;
-  //player.DefaultPreferredHeight:=1;
+{  Player := TPlayer.Create(Window.SceneManager);
+  player.Camera.MouseLook:=false;
+  Player.Camera.GravityUp:=Vector3Single(0,0,1);
+  Player.Up:=Vector3Single(0,0,1);
+  player.position:=Vector3Single(0,0,1);
+  player.FallingEffect:=false;
+  player.DefaultPreferredHeight:=1;}
   camera:=TWalkCamera.create(Window);//player.camera;
   camera.SetView(Vector3Single(0,0,1),Vector3Single(0,1,0),Vector3Single(0,0,1),Vector3Single(0,0,1),true);
   camera.MoveSpeed:=5;
@@ -74,8 +93,8 @@ begin
   if not loadedlevel then begin
      WritelnLog('InitTestLevel','Init');
      loadedlevel:=true;
-//     Window.SceneManager.Items.Add(Player);
-//     Window.SceneManager.Player := Player;
+{     Window.SceneManager.Items.Add(Player);
+     Window.SceneManager.Player := Player;}
      Window.SceneManager.Items.Add(Scene);
      Window.SceneManager.MainScene := Scene;
      Window.SceneManager.Camera:=camera;

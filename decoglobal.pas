@@ -38,8 +38,8 @@ const InterfaceFolder     = 'interface/';
       BackgroundsFolder  = InterfaceFolder+'background/';
       WindFolder         = InterfaceFolder+'wind/';
       DecorationsFolder  = InterfaceFolder+'decorations/';
-      PortraitFolder     = 'portrait/';
-
+      PortraitFolder     = InterfaceFolder+'portrait/';
+      PerksFolder        = InterfaceFolder+'perks/';
 
 var Window : TCastleWindowTouch;
     {$IFNDEF Android}

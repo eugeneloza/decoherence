@@ -8,13 +8,9 @@
 	<Scene>
 		<NavigationInfo headlight="false"
 		                visibilityLimit="0.0"
-		                type='"EXAMINE", "ANY"'
+		                type='"WALK", "ANY"'
 		                avatarSize="0.25, 1.75, 0.75"
 		                />
-		<Background DEF="WO_World"
-		            groundColor="0.051 0.051 0.051"
-		            skyColor="0.051 0.051 0.051"
-		            />
 		<Transform DEF="Lamp_002_TRANSFORM"
 		           translation="0.0000 0.0000 2.0000"
 		           scale="1.0000 1.0000 1.0000"

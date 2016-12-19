@@ -19,12 +19,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 unit Decoherence;
 
 {$INCLUDE compilerconfig.inc}
-//{$DEFINE WriteLog}{$IFDEF Windows}{$APPTYPE GUI}{$ENDIF}
-
 
 interface
 
-const Version='interfa3-161213-73';
+const Version='interfa3-161218-74';
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
@@ -34,7 +32,7 @@ uses Classes, SysUtils,
      CastleWindow, CastleWindowTouch, CastleKeysMouse,
      decogui, decointerface, decomouse, decofont,
      decolevel, decofacts, decoperks,
-     decoactor, decointerfacecomposite,
+     decointerfacecomposite,
      decoglobal, decogamemode;
 
 {==========================================================================}

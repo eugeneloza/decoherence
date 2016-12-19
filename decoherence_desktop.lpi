@@ -82,6 +82,9 @@
             </Debugging>
             <LinkSmart Value="True"/>
           </Linking>
+          <Other>
+            <CustomOptions Value="-dRELEASE"/>
+          </Other>
         </CompilerOptions>
       </Item3>
     </BuildModes>
@@ -190,6 +193,11 @@
       <IncludeFiles Value="$(ProjOutDir)"/>
       <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
+    <Other>
+      <OtherDefines Count="1">
+        <Define0 Value="Debug"/>
+      </OtherDefines>
+    </Other>
   </CompilerOptions>
   <Debugging>
     <Exceptions Count="3">

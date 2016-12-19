@@ -37,9 +37,13 @@ Type TPerkEffect = (peDamage, peHeal, peStat);   }
 
 type
   {Simplest perk is a passive perk that influences the character in some way}
-  DPassivePerk = class(TComponent)
+  DPerk = class(TComponent)
   public
-    {Stores the perk's image}
+    {Stores the perk's image. Generally we don't use perks directly as static images,
+     but static images provide a convenient routine to load the image in a thread
+     so let it be this way for now. Theoretically, it's better to make a separate
+     object that handles perks and items images and allows just rescaling them
+     correctly - to save memory. But it is not the issue for now.}
     Image: DStaticImage;
     //PerkKind: TPerkKind;
     //PerkType: TPerkType;
@@ -52,7 +56,7 @@ type
     Constructor create(AOwner: TComponent); override;
     Destructor destroy; override;
 end;
-
+{
 Type
   {Active perk must be chosen to take effect and it's availability depends
    on other chosen perks, actions first of all}
@@ -75,12 +79,12 @@ Type
   DActionPerk = class(DChapterPerk)
   Public
 
-  end;
+  end;            }
 
 
 
 {list of perks}
-Type DPerksList = specialize TFPGObjectList<DPassivePerk>;
+Type DPerksList = specialize TFPGObjectList<DPerk>;
 
     {lists all perks possible ingame}
 Var perks: DPerksList;
@@ -92,17 +96,17 @@ Implementation
 uses CastleWindow;
 
 Procedure InitPerks;
-Var TmpPerk: DActivePerk;
+Var TmpPerk: DPerk;
 Begin
   perks := DPerksList.create(true);
-  TmpPerk := DActivePerk.create(Application);
-  //TmpPerk.image.LoadThread('..');
+  TmpPerk := DPerk.create(Application);
+  TmpPerk.image.LoadThread(PerksFolder+'crossed-swords.png');
   Perks.add(TmpPerk);
 End;
 
 {---------------------------------------------------------------------------}
 
-Constructor DPassivePerk.create(AOwner: TComponent);
+Constructor DPerk.create(AOwner: TComponent);
 Begin
   Inherited create(AOwner);
   Image := DStaticImage.create(self);
@@ -110,7 +114,7 @@ End;
 
 {---------------------------------------------------------------------------}
 
-Destructor DPassivePerk.destroy;
+Destructor DPerk.destroy;
 Begin
   Inherited;
 
