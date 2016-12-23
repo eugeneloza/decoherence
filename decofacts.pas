@@ -31,9 +31,10 @@ procedure DestroyFacts;
 function GetRandomFact: string;
 function GetRandomFactImage: string;
 
+{+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
-uses decogui;
+uses decoglobal;
 
 var facts_text: array of string;
     image_text: array of string;
@@ -47,19 +48,21 @@ function GetRandomFact: string;
 var newFact: integer;
 begin
   repeat
-    NewFact:=GUI.rnd.random(N_facts-1);
-  until (NewFact <> LastFact) and (GUI.rnd.random < 1/factsFrequency[newFact]);
+    NewFact:=rnd.random(N_facts-1);
+  until (NewFact <> LastFact) and (rnd.random < 1/factsFrequency[newFact]);
   inc(FactsFrequency[newFact],7);                                     //todo balance facts frequency, now chance is 1,1/8,1/15,1/22...
   result := Facts_text[newFact];
   LastFact := newFact;
 end;
+
+{---------------------------------------------------------------------------------}
 
 var LoadImageOld: integer=-1;
 function GetRandomFactImage: string;
 var LoadImageNew: integer;
 begin
   repeat
-    LoadImageNew := GUI.rnd.random(N_Images);
+    LoadImageNew := rnd.random(N_Images);
   until LoadImageOld <> LoadImageNew;
   LoadImageOld := LoadImageNew;
   result := image_text[loadImageNew];
@@ -184,6 +187,8 @@ begin
   image_text[42] := 'Milky_Way_2005_CC0_by_NASA_[glow,crop].jpg';
   image_text[43] := 'Ocean_planet1_CC0_by_Merikanto_[gimp,gmic].jpg';
 end;
+
+{---------------------------------------------------------------------------------}
 
 procedure DestroyFacts;
 begin

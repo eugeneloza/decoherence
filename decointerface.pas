@@ -34,10 +34,13 @@ const defaultanimationduration = 300 /1000/60/60/24; {in ms}
 {animation style of the object. asDefault means "animate from previous state",
  presuming that there was some "previous state"}
 Type TAnimationStyle = (asNone, asDefault,
-                        asFadeIn, asFadeOut, asFadeOutSuicide,
-                        asZoomIn, asZoomOut, asZoomOutSuicide,
-                        {asFlyInLeft, asFlyInRight, AsFlyInTop,}
-                        asFlyInRandom, asFlyOutRandom, asFlyOutRandomSuicide);
+                        asFadeIn, asFadeOut,// asFadeOutSuicide,
+                        asZoomIn, asZoomOut,// asZoomOutSuicide,
+                        asFlyInRandom, asFlyOutRandom,// asFlyOutRandomSuicide,
+                        asFlyInTop,asFlyOutTop,
+                        asFlyInBottom,asFlyOutBottom,
+                        asFlyInLeft,asFlyOutLeft,
+                        asFlyInRight,asFlyOutRight);
 
 Type
  { Several types of frames, including with captions }
@@ -114,10 +117,6 @@ Type
 //    Free_on_end: boolean;
     fvisible: boolean;
     procedure setvisible(value: boolean);
-    {animates the interface element from current state to base state,
-     Important: GetAnimationState must be called before setting basesize
-     of the element as AnimateTo uses currentAnimationState}
-    procedure AnimateTo(animate: TAnimationStyle);
   public
     { these values are "strict" and unaffected by animations. Usually determines
       the basic stage and implies image rescale and init GL. }
@@ -134,6 +133,10 @@ Type
      composite parent element, its children WILL NOT do anything like this and
      will be frozen until visible=true. Maybe I'll fix this.}
     property visible: boolean read fvisible write setvisible;
+    {animates the interface element from current state to base state,
+     Important: GetAnimationState must be called before setting basesize
+     of the element as AnimateTo uses currentAnimationState}
+    procedure AnimateTo(animate: TAnimationStyle);
   end;
 
 {Definition of simple procedures for (mouse) events}
@@ -492,12 +495,67 @@ end;
 {----------------------------------------------------------------------------}
 
 procedure DAbstractElement.AnimateTo(animate: TAnimationStyle);
+var mx,my: float;
 begin
-  if animate = asDefault then begin      {playing default animation}
-    last.copyxywh(CurrentAnimationState);
-    next.copyxywh(base);
+  if animate = asNone then exit else begin
     animationstart := -1;
     animationduration := defaultanimationduration;
+    last.copyxywh(base); //todo: CurrentAnimationState
+    next.copyxywh(base);
+    case animate of
+      {just grabs some previous locations and animates the item from there to base
+       requires that CurrentAnimationState is initialized... TODO}
+      asDefault: last.copyxywh(CurrentAnimationState);
+      {fades in/out element}
+      asFadeIn:  last.opacity := 0;
+      asFadeOut: next.opacity := 0;
+      {asFadeOutSuicide}
+      {zooms in/out element}
+      asZoomIn:  begin
+                   Last.backwardsetsize(1,1);
+                   Last.opacity := 0;
+                 end;
+      asZoomOut: begin
+                   Next.backwardsetsize(1,1);
+                   Next.opacity := 0;
+                 end;
+      {asZoomOutSuicide}
+      asFlyInRandom,asFlyOutRandom: begin
+                       mx := rnd.random*window.width/window.height;  //mult by aspect ratio
+                       my := rnd.random;
+                       case rnd.Random(4) of
+                         0: mx :=  0.0001;
+                         1: mx := -0.0001;
+                         2: my :=  0.0001;
+                         3: my := -0.0001;
+                       end;
+                       if animate=asFlyInRandom then begin
+                         Last.fx := mx;
+                         Last.fy := my;
+                       end else begin
+                         Next.fx := mx;
+                         Next.fy := my;
+                       end;
+                     end;
+      asFlyInTop,asFlyOutTop,asFlyInBottom,asFlyOutBottom,asFlyInLeft,asFlyOutLeft,asFlyInRight,asFlyOutRight: begin
+                       mx := rnd.random*window.width/window.height;
+                       my := rnd.random;
+                       case animate of
+                         asFlyInLeft,asFlyOutLeft: mx :=  0.0001;
+                         asFlyInRight,asFlyOutRight: mx := -0.0001;
+                         asFlyInBottom,asFlyOutBottom: my := 0.0001;
+                         asFlyInTop,asFlyOutTop: my := -0.0001;
+                       end;
+                       if (animate=asFlyInLeft) or (animate=asFlyInRight) or (animate=asFlyInTop) or (animate=asFlyInBottom) then begin
+                         Last.fx := mx;
+                         Last.fy := my;
+                       end else begin
+                         Next.fx := mx;
+                         Next.fy := my;
+                       end;
+                     end;
+      {asFlyOutRandomSuicide}
+    end;
   end;
 end;
 

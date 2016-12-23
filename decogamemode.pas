@@ -22,7 +22,7 @@ unit decogamemode;
 
 interface
 
-type TGameMode = (gmNone,gmLoadScreen,gmCharacterGeneration,gmTravel);
+type TGameMode = (gmNone,gmLoadScreen,gmCharacterGeneration,gmTravel,gmBattle);
 
 var CurrentGameMode : TGameMode = gmNone;
     LastGameMode : TGameMode = gmNone;

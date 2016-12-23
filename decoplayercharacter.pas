@@ -43,8 +43,7 @@ var Party: array[0..maxparty] of DPlayerCharacter;
 procedure CreateTestParty;
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-uses castleLog,
-  decogui{ugly, but temporarily needed for random};
+uses castleLog;
 
 procedure CreateTestParty;
 var i: integer;
@@ -52,10 +51,10 @@ begin
   for i := 0 to maxparty do begin
     Party[i] := DPlayerCharacter.create(Window);
     if i<4 then party[i].maxmaxMPH := 0;
-    party[i].hit(GUI.rnd.Random(80),1);
-    party[i].drainCNC(GUI.rnd.Random(80),1);
-    party[i].drainMPH(GUI.rnd.Random(80),1);
-    party[i].drainSTA(GUI.rnd.Random(80),1);
+    party[i].hit(rnd.Random(80),1);
+    party[i].drainCNC(rnd.Random(80),1);
+    party[i].drainMPH(rnd.Random(80),1);
+    party[i].drainSTA(rnd.Random(80),1);
     if (Perks=nil) or (Perks.count=0) then WriteLnLog('CreateTestParty','FATAL ERROR: Perks is empty!');
     party[i].Actions := DPerksList.create(false);
     Party[i].actions.Add(perks[0]);

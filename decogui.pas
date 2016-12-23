@@ -22,7 +22,7 @@ unit decogui;
 
 interface
 
-uses classes, CastleRandom,
+uses classes,
   decointerface, decoimages, decolabels,
   decofont,
   decoglobal;
@@ -32,8 +32,6 @@ Type
   public
     { just = window.height, wihdow.width. Maybe I'll deprecate it later }
     width,height: integer;
-    { random generator used for all interface random events }
-    rnd: TCastleRandom;
 
     constructor create(AOwner:TComponent); override;
     destructor destroy; override;
@@ -82,7 +80,6 @@ constructor DInterfaceContainer.create(AOwner: TComponent);
 begin
   writeLnLog('DInterfaceContainer.create','Creating interface.');
   inherited create(AOwner);
-  rnd := TCastleRandom.Create;
 
   Last_render_time := now;
   FPS_count := 0;
@@ -119,7 +116,6 @@ end;
 destructor DInterfaceContainer.destroy;
 begin
   writeLnLog('DInterfaceContainer.destroy','Game over...');
-  freeandnil(rnd);
   DestroyFonts;
   inherited;
 end;

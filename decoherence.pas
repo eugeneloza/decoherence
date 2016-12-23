@@ -22,7 +22,7 @@ unit Decoherence;
 
 interface
 
-const Version='interfa3-161218-74';
+const Version='interfa3-161223-76';
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
@@ -64,6 +64,38 @@ end;
 
 {-------------------------------------------------------------------------}
 
+var InternalTime: TDateTime = 0;
+Procedure TimeFlow(DeltaTime: TDatetime);
+Begin
+  //Adjust time flow speed based on game situation
+  InternalTime += DeltaTime;
+  //Recalculate all actors for events   //IN A THREAD??? Just using internaltime for their own deltatimes
+  //If actor event fired, put it into sequence and if stop to act then put a softpause until % of the action animation has been played
+End;
+
+
+{-------------------------------------------------------------------------}
+
+var LastRender: TDateTime = -1;
+procedure ProcessTimeEvents;
+var TimePassed: TDateTime;
+begin
+  If LastRender = -1 then LastRender := now;
+  TimePassed := now-LastRender;
+  LastRender := now;
+  Case CurrentGameMode of
+    gmTravel: TimeFlow(TimePassed);
+    gmBattle: begin
+{                  If not pause then TimeFlow(TimePassed);
+                If not softPause then animations.freeze!}
+              end;
+    else {NOP};//no time flow;
+  end;
+end;
+
+{-------------------------------------------------------------------------}
+
+
 var RenderFinished: boolean = true;
 Procedure WindowRender(Container : TUIContainer);
 begin
@@ -71,6 +103,7 @@ begin
   if RenderFinished then begin
     RenderFinished := false;
     GUI.draw;
+    ProcessTimeEvents;
     RenderFinished := true;
   end else
     WriteLnLog('WindowRender','CRITICAL ERROR!!! Interface render frameskip!');
@@ -172,6 +205,7 @@ begin
 
   WritelnLog('ApplicationInitialize','Initialize fonts');
   InitializeFonts;
+  InitGlobal;
 
   //create GUI
   WritelnLog('ApplicationInitialize','Create interface');
@@ -214,6 +248,8 @@ Initialization
 
 Finalization
   DestroyCompositeInterface;
+  DestroyGlobal;
+  DestroyFacts;
   WriteLnLog('Finalization','Bye...');
 end.
 

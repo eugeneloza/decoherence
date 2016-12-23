@@ -24,7 +24,7 @@ unit decoglobal;
 interface
 
 uses
-  Classes, CastleWindowTouch;
+  Classes, CastleRandom, CastleWindowTouch;
 
 { for easy changing into double in case needed }
 type Float = single;
@@ -42,13 +42,30 @@ const InterfaceFolder     = 'interface/';
       PerksFolder        = InterfaceFolder+'perks/';
 
 var Window : TCastleWindowTouch;
+    { random generator used for all interface random events }
+    rnd: TCastleRandom;
     {$IFNDEF Android}
     LogStream : TFileStream;
     {$ENDIF}
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
+procedure InitGlobal;
+procedure DestroyGlobal;
 implementation
+uses SysUtils;
+
 // no implementation here needed. Maybe merge with GameMode?
+procedure InitGlobal;
+begin
+  rnd := TCastleRandom.Create;
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DestroyGlobal;
+begin
+  freeandnil(rnd);
+end;
 
 end.
 
