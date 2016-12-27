@@ -136,7 +136,7 @@ type DPerksContainer = class(DAbstractCompositeInterfaceElement)
 
 
 var HealthBarImage: TCastleImage; //todo not freed automatically!!!
-    PortraitIMG: TCastleImage; //todo!!!
+    Portrait_img: array of TCastleImage; //todo!!!
 
     characterbar_top, characterbar_mid, characterbar_bottom,
     portraitframe_left, portraitframe_right,
@@ -159,10 +159,17 @@ uses SysUtils, CastleLog, CastleFilesUtils, castleVectors,
 
 
 procedure InitCompositeInterface;
+var i: integer;
+    s: string;
 begin
   HealthBarImage := LoadImage(ApplicationData(ProgressBarFolder+'verticalbar_CC-BY-SA_by_Saito00.png'));
-  PortraitIMG := LoadImage(ApplicationData(PortraitFolder+'portrait_tmp.jpg'));
 
+  setlength(portrait_img,20);
+  for i := 0 to length(portrait_img)-1 do begin
+    s := inttostr(i+1);
+    if i+1<10 then s := '0'+s;
+    Portrait_img[i] := LoadImage(ApplicationData(PortraitFolder+'UNKNOWN_p'+s+'.jpg'));
+  end;
   {load artwork by Saito00}
 
   portraitframe_left := DFrame.create(Window);
@@ -234,10 +241,13 @@ begin
 end;
 
 procedure DestroyCompositeInterface;
+var i: integer;
 begin
   writelnLog('DestroyCompositeInterface','(todo)');
   freeAndNil(HealthBarImage);
-  freeAndNil(PortraitIMG);
+  for i := 0 to length(portrait_img)-1 do
+    freeAndNil(portrait_img[i]);
+  setlength(portrait_img,0);
 end;
 
 {===========================================================================}
@@ -417,7 +427,7 @@ begin
     ftarget := value;
     (content as DStaticImage).freeImage;
     WriteLnLog('DPortrait.settarget','Load from portrait');
-    (content as DStaticImage).Load(PortraitIMG);  //todo
+    (content as DStaticImage).Load(portrait_img[rnd.random(length(portrait_img))]);  //todo
   end;
 end;
 

@@ -37,7 +37,7 @@ type
     fTarget: DPlayerCharacter;
     procedure settarget(value: DPlayerCharacter);
     procedure SlideIn(Sender: DAbstractElement; x,y: integer);
-    procedure slideOut(Sender: DAbstractElement);
+    procedure slideOut(Sender: DAbstractElement; x,y: integer);
   public
     ID: integer;
     slided: boolean;
@@ -83,10 +83,11 @@ constructor DCharacterSpace.create(AOwner: TComponent);
 begin
   inherited create(AOwner);
 
+  self.OnMouseOver := @SlideIn;
+  self.OnMouseLeave := @SlideOut;
+
   //create stat bars
   StatBars := DPlayerBarsFull.create(self);
-  StatBars.OnMouseOver := @SlideIn;
-  StatBars.OnMouseLeave := @SlideOut;
   grab(StatBars);
 
   //create portraits
@@ -115,7 +116,7 @@ begin
   else
     Portrait.setbasesize(-(46+135)/800,-(40+155+180*(self.ID div 2))/800,135/800,155/800,1,animate);
   //Portrait.rescale;
-  SlideOut(nil);
+  SlideOut(nil,0,0);
 
 end;
 
@@ -134,22 +135,31 @@ end;
 
 procedure DCharacterSpace.SlideIn(Sender: DAbstractElement; x,y: integer);
 var myx: float;
+    tmp: DAbstractElement;
 begin
   if slided = false then begin
-    slided := true;
-    if not odd(self.ID) then
-      myx := 47/800
-    else
-      myx := -(46)/800-Portrait.base.fw;
-    Portrait.setbasesize(myx,Portrait.base.fy,Portrait.base.fw,Portrait.base.fh,1,asDefault);
-    Portrait.rescale;
+    //tmp := self.ifMouseOver(x,y,false); !!RAISES EVENT again and again, remake IAmHere? Or make bool "raiseEvents"
+
+    if (tmp <> nil) {and (tmp is DSingleInterfaceElement) and ((tmp as DSingleInterfaceElement).CanMouseOver)} then begin
+      slided := true;
+      if not odd(self.ID) then
+        myx := 47/800
+      else
+        myx := -(46)/800-Portrait.base.fw;
+      Portrait.setbasesize(myx,Portrait.base.fy,Portrait.base.fw,Portrait.base.fh,1,asDefault);
+      Portrait.rescale;
+    end;
   end;
 end;
 
-procedure DCharacterSpace.slideOut(Sender: DAbstractElement);
+procedure DCharacterSpace.slideOut(Sender: DAbstractElement; x,y: integer);
 var myx: float;
+    tmp: DAbstractElement;
 begin
   if slided = true then begin
+    //tmp := self.ifMouseOver(x,y,true);
+    //if (tmp <> nil) {and (tmp is DSingleInterfaceElement) and ((tmp as DSingleInterfaceElement).CanMouseOver) }then exit;
+
     slided := false;
     if not odd(self.ID) then
       myx := 0/800
@@ -174,7 +184,10 @@ begin
 
   {rescale party}
   for i := 0 to maxparty do begin
-    CharacterSpace[i].setBaseSize(0,-(40+155+180*(i div 2))/800,35/800,155/800,1,animate);
+    if not odd(i) then
+      CharacterSpace[i].setBaseSize(0,-(40+155+180*(i div 2))/800,35/800,155/800,1,animate)
+    else
+      CharacterSpace[i].setBaseSize(-35/800,-(40+155+180*(i div 2))/800,35/800,155/800,1,animate);
 //      CharacterSpace[i].setBaseSize(0,0,fullwidth,fullheight,1,animate);
   end;
 end;

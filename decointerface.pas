@@ -140,7 +140,7 @@ Type
   end;
 
 {Definition of simple procedures for (mouse) events}
-type TSimpleProcedure = procedure(sender: DAbstractElement) of Object;
+//type TSimpleProcedure = procedure(sender: DAbstractElement) of Object;
 type TXYProcedure = procedure(sender: DAbstractElement; x,y: integer) of Object;
 
 
@@ -190,8 +190,8 @@ Type
     isMouseOver: boolean;
   public
     {events}
-    OnMouseEnter: TSimpleProcedure;
-    OnMouseLeave: TSimpleProcedure;
+    OnMouseEnter: TXYProcedure;
+    OnMouseLeave: TXYProcedure;
     OnMouseOver: TXYProcedure;
     OnMousePress: TXYProcedure;
     OnMouseRelease: TXYProcedure;
@@ -815,7 +815,7 @@ begin
   result := nil;
   if IAmHere(xx,yy) then begin
     if isMouseOver = false then begin
-      if Assigned(onMouseEnter) then onMouseEnter(self);
+      if Assigned(onMouseEnter) then onMouseEnter(self,xx,yy);
       isMouseOver := true;
     end;
     if Assigned(onMouseOver) then onMouseOver(self,xx,yy);
@@ -823,7 +823,7 @@ begin
       result := self
   end else begin
     if isMouseOver then begin
-      if Assigned(onMouseLeave) then onMouseLeave(self);
+      if Assigned(onMouseLeave) then onMouseLeave(self,xx,yy);
       isMouseOver := false;
     end;
   end;
