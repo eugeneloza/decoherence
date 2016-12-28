@@ -22,7 +22,7 @@ unit Decoherence;
 
 interface
 
-const Version='interfa3-161227-79';
+const Version='interfa3-161229-80';
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation

@@ -85,6 +85,13 @@ begin
 
   self.OnMouseEnter := @SlideIn;
   self.OnMouseLeave := @SlideOut;
+  //self.canMouseOver := true;
+
+  //create portraits
+  Portrait := DPortrait.create(self);
+  Portrait.CanMouseOver := true;
+  Portrait.OnMouseLeave := @SlideOut;
+  grab(Portrait);
 
   //create stat bars
   StatBars := DPlayerBarsFull.create(self);
@@ -92,12 +99,6 @@ begin
   StatBars.OnMouseEnter := @SlideIn;
   StatBars.OnMouseLeave := @SlideOut;
   grab(StatBars);
-
-  //create portraits
-  Portrait := DPortrait.create(self);
-  Portrait.CanMouseOver := true;
-  Portrait.OnMouseLeave := @SlideOut;
-  grab(Portrait);
 
 end;
 
@@ -144,7 +145,8 @@ var myx: float;
 begin
   if slided = false then begin
     tmp := self.ifMouseOver(x,y,false,false);
-    if (tmp <> nil) and (tmp is DSingleInterfaceElement) and ((tmp as DSingleInterfaceElement).CanMouseOver) and (tmp.base.opacity>0) then begin
+    if (tmp <> nil) and (tmp is DSingleInterfaceElement) and ((tmp as DSingleInterfaceElement).CanMouseOver){ and (tmp.base.opacity>0)} then begin
+      //base.opacity breaks the algorithm, if transparent item is above (i.e. below) the opaque element
       slided := true;
       if not odd(self.ID) then
         myx := 47/800
@@ -162,7 +164,7 @@ var myx: float;
 begin
   if slided = true then begin
     tmp := self.ifMouseOver(x,y,false,false);
-    if (tmp <> nil) and (tmp is DSingleInterfaceElement) and ((tmp as DSingleInterfaceElement).CanMouseOver) and (tmp.base.opacity>0) then exit;
+    if (tmp <> nil) and (tmp is DSingleInterfaceElement) and ((tmp as DSingleInterfaceElement).CanMouseOver){ and (tmp.base.opacity>0)} then exit;
 
     slided := false;
     if not odd(self.ID) then
