@@ -22,7 +22,7 @@ unit Decoherence;
 
 interface
 
-const Version='interfa3-161227-77';
+const Version='interfa3-161227-79';
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
@@ -166,7 +166,7 @@ begin
   end;
   {mouse over / if no drag-n-drop}
   if not dragging then begin
-    tmpLink := GUI.IfMouseOver(round(event.Position[0]),round(event.Position[1]),true);
+    tmpLink := GUI.IfMouseOver(round(event.Position[0]),round(event.Position[1]),true,true);
     if tmpLink <> nil then
       writelnLog('doMotion','Motion caught '+tmpLink.ClassName);
   end;
@@ -191,8 +191,6 @@ begin
   WritelnLog('FullScreen mode',{$IFDEF Fullscreen}'ON'{$ELSE}'OFF'{$ENDIF});
   WritelnLog('Allow rescale',{$IFDEF AllowRescale}'ON'{$ELSE}'OFF'{$ENDIF});
   WritelnLog('ApplicationInitialize','Init');
-
-  {$IFDEF Fullscreen}window.fullscreen := true;{$ENDIF}
 
   //Assign window events
   window.OnPress := @doPress;
@@ -241,8 +239,12 @@ Initialization
   OnGetApplicationName  :=  @MyGetApplicationName;
   Window := TCastleWindowTouch.create(Application);
   {$IFNDEF AllowRescale}window.ResizeAllowed := raOnlyAtOpen;{$ENDIF}
-  window.width := 1024;
-  window.height := 600;
+  {$IFDEF Fullscreen}
+    window.fullscreen := true;
+  {$ELSE}
+    window.width := 1024;
+    window.height := 600;
+  {$ENDIF}
   Application.MainWindow  :=  Window;
   Application.OnInitialize  :=  @ApplicationInitialize;
 

@@ -83,15 +83,20 @@ constructor DCharacterSpace.create(AOwner: TComponent);
 begin
   inherited create(AOwner);
 
-  self.OnMouseOver := @SlideIn;
+  self.OnMouseEnter := @SlideIn;
   self.OnMouseLeave := @SlideOut;
 
   //create stat bars
   StatBars := DPlayerBarsFull.create(self);
+  StatBars.CanMouseOver := true;
+  StatBars.OnMouseEnter := @SlideIn;
+  StatBars.OnMouseLeave := @SlideOut;
   grab(StatBars);
 
   //create portraits
   Portrait := DPortrait.create(self);
+  Portrait.CanMouseOver := true;
+  Portrait.OnMouseLeave := @SlideOut;
   grab(Portrait);
 
 end;
@@ -138,9 +143,8 @@ var myx: float;
     tmp: DAbstractElement;
 begin
   if slided = false then begin
-    //tmp := self.ifMouseOver(x,y,false); !!RAISES EVENT again and again, remake IAmHere? Or make bool "raiseEvents"
-
-    if (tmp <> nil) {and (tmp is DSingleInterfaceElement) and ((tmp as DSingleInterfaceElement).CanMouseOver)} then begin
+    tmp := self.ifMouseOver(x,y,false,false);
+    if (tmp <> nil) and (tmp is DSingleInterfaceElement) and ((tmp as DSingleInterfaceElement).CanMouseOver) and (tmp.base.opacity>0) then begin
       slided := true;
       if not odd(self.ID) then
         myx := 47/800
@@ -157,8 +161,8 @@ var myx: float;
     tmp: DAbstractElement;
 begin
   if slided = true then begin
-    //tmp := self.ifMouseOver(x,y,true);
-    //if (tmp <> nil) {and (tmp is DSingleInterfaceElement) and ((tmp as DSingleInterfaceElement).CanMouseOver) }then exit;
+    tmp := self.ifMouseOver(x,y,false,false);
+    if (tmp <> nil) and (tmp is DSingleInterfaceElement) and ((tmp as DSingleInterfaceElement).CanMouseOver) and (tmp.base.opacity>0) then exit;
 
     slided := false;
     if not odd(self.ID) then
@@ -202,6 +206,7 @@ begin
     CharacterSpace[i] := DCharacterSpace.create(self);
     CharacterSpace[i].ID := i;
     CharacterSpace[i].Target := party[i];
+    CharacterSpace[i].ScaleToChildren := true;
     grab(CharacterSpace[i]);
   end;
   setbasesize(0,0,fullwidth,fullheight,1,appear_animation);
@@ -228,7 +233,7 @@ begin
   frame2right.      setbasesize(  -9/800,    0,   9/800, 1-yy2, 1, appear_animation);
 
   frame2bottomleft. setbasesize(   9/800,    0, 300/800,  9/800, 1, appear_animation);
-  frame2bottomright.setbasesize(-309/800,    0, 300/800,  9/800, 1, appear_animation);
+  frame2bottomright.setbasesize(-309/800,    0, 297/800,  9/800, 1, appear_animation);   //???? SCALING ?????
   //todo: make frame3 scaled by content // maybe put it into a separate block?
   frame3bottom     .setbasesize( 280/800,    0, 300/800, 62/800, 1, appear_animation);
   frame3bottom     .base.backwardsetsize(frame2bottomright.base.x1-frame2bottomleft.base.x2+22*2,-1);

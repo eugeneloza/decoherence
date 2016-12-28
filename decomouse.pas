@@ -114,7 +114,7 @@ begin
   NewEventTouch := DTouch.create(event.Position[0],event.Position[1],fingerindex);
 
   //catch the element which has been pressed
-  tmpLink := GUI.IfMouseOver(round(event.Position[0]),round(event.Position[1]),true);
+  tmpLink := GUI.IfMouseOver(round(event.Position[0]),round(event.Position[1]),true,true);
   if (tmpLink is DSingleInterfaceElement) then begin
     NewEventTouch.click_element := tmpLink as DSingleInterfaceElement;
     if assigned(NewEventTouch.click_element.OnMousePress) then

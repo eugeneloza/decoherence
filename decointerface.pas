@@ -127,6 +127,7 @@ Type
     {source width/height of the element. Used to preserve proportions while scaling}
     RealWidth, RealHeight: integer;
     procedure setbasesize(const newx,newy,neww,newh,newo: float; animate: TAnimationStyle); virtual;
+    procedure setIntSize(const x1,y1,x2,y2:integer; animate: TAnimationStyle); virtual;
     {if the element is visible, if false then draw will not be called.
      PAY ATTENTION: if assigned to a single interface element then the animations
      and initGL will occur as they would normally. BUT if assigned to a
@@ -165,6 +166,7 @@ Type
     destructor destroy; override;
     //also resizes content and frame
     procedure setbasesize(const newx,newy,neww,newh,newo: float; animate: TAnimationStyle); override;
+    procedure setIntSize(const x1,y1,x2,y2:integer; animate: TAnimationStyle); override;
   private
     {GL image of the frame}
     GLFrame: TGLImage;
@@ -177,6 +179,8 @@ Type
     procedure FrameResize3x3;
     { initialize GL image. NOT THREAD SAFE! / Almost a copy of AbstractImage.initGl}
     procedure InitGL;{ override;}
+    { resets parent and content size after rescale if needed}
+    procedure ResetContentSize(animate: TAnimationStyle);
   public
     {if this element is active (clickable)}
     CanMouseOver: boolean;
@@ -184,7 +188,7 @@ Type
     {are these coordinates in this element's box?}
     function IAmHere(xx,yy: integer): boolean;
     {returns self if IAmHere and runs all possible events}
-    function ifMouseOver(xx,yy: integer; AllTree: boolean): DAbstractElement; virtual;
+    function ifMouseOver(xx,yy: integer; RaiseEvents: boolean; AllTree: boolean): DAbstractElement; virtual;
   private
     {if mouse is over this element}
     isMouseOver: boolean;
@@ -209,6 +213,8 @@ Type
   {An interface element, that can contain "children"}
   DInterfaceElement = class(DSingleInterfaceElement)
   public
+    {if the interface element rescales each time children rescale}
+    ScaleToChildren: boolean;
     {list of the children of this interface element}
     children: DInterfaceElementsList;
     procedure draw; override;
@@ -218,8 +224,10 @@ Type
   public
     {assign given element as a child and sets its parent to self}
     procedure Grab(Child: DSingleInterfaceElement);
+    {}
+    procedure RescaleToChildren(animate: TAnimationStyle);
     {returns self if IAmHere and runs all possible events + scans all children}
-    function ifMouseOver(xx,yy: integer; AllTree: boolean): DAbstractElement; override;
+    function ifMouseOver(xx,yy: integer; RaiseEvents: boolean; AllTree: boolean): DAbstractElement; override;
 
   end;
 
@@ -559,6 +567,8 @@ begin
   end;
 end;
 
+{----------------------------------------------------------------------------}
+
 procedure DAbstractElement.setbasesize(const newx,newy,neww,newh,newo: float; animate: TAnimationStyle);
 begin
   GetAnimationState;
@@ -568,9 +578,38 @@ begin
   //rescale; //????
 end;
 
+{----------------------------------------------------------------------------}
+
+procedure DAbstractElement.setIntSize(const x1,y1,x2,y2:integer; animate: TAnimationStyle);
+begin
+  GetAnimationState;
+  base.backwardsetxywh(x1,y1,x2-x1,y2-y1);
+  animateTo(animate);
+  //rescale; //????
+end;
+
+{----------------------------------------------------------------------------}
+
 procedure DSingleInterfaceElement.setbasesize(const newx,newy,neww,newh,newo: float; animate: TAnimationStyle);
 begin
   inherited setBaseSize(newx,newy,neww,newh,newo,animate);
+  ResetContentSize(animate);
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DSingleInterfaceElement.setIntsize(const x1,y1,x2,y2:integer; animate: TAnimationStyle);
+begin
+  inherited setIntsize(x1,y1,x2,y2,animate);
+  ResetContentSize(animate);
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DSingleInterfaceElement.resetContentSize(animate: TAnimationStyle);
+begin
+  if (parent<>nil) and (parent is DInterfaceElement) and ((parent as DInterfaceElement).ScaleToChildren) then
+    (parent as DInterfaceElement).RescaleToChildren(animate);
   //frame should be automatically resized during "rescale" and animated during draw...
   if content <> nil then begin
     content.base.copyxywh(self.base);
@@ -581,7 +620,6 @@ begin
   end;
 
 end;
-
 
 {----------------------------------------------------------------------------}
 
@@ -810,37 +848,41 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-function DSingleInterfaceElement.ifMouseOver(xx,yy: integer; AllTree: boolean): DAbstractElement;
+function DSingleInterfaceElement.ifMouseOver(xx,yy: integer; RaiseEvents: boolean; AllTree: boolean): DAbstractElement;
 begin
   result := nil;
   if IAmHere(xx,yy) then begin
-    if isMouseOver = false then begin
-      if Assigned(onMouseEnter) then onMouseEnter(self,xx,yy);
-      isMouseOver := true;
+    if RaiseEvents then begin
+      if isMouseOver = false then begin
+        if Assigned(onMouseEnter) then onMouseEnter(self,xx,yy);
+        isMouseOver := true;
+      end;
+      if Assigned(onMouseOver) then onMouseOver(self,xx,yy);
     end;
-    if Assigned(onMouseOver) then onMouseOver(self,xx,yy);
     if CanMouseOver then  //todo
       result := self
   end else begin
-    if isMouseOver then begin
+    if isMouseOver and RaiseEvents then begin
       if Assigned(onMouseLeave) then onMouseLeave(self,xx,yy);
       isMouseOver := false;
     end;
   end;
 end;
 
-function DInterfaceElement.ifMouseOver(xx,yy: integer; AllTree: boolean): DAbstractElement;
+function DInterfaceElement.ifMouseOver(xx,yy: integer; RaiseEvents: boolean; AllTree: boolean): DAbstractElement;
 var i: integer;
     tmplink: DAbstractElement;
 begin
-  result := inherited ifMouseOver(xx,yy,AllTree);
+  result := inherited ifMouseOver(xx,yy,RaiseEvents,AllTree);
   //if rsult<>nil ... *or drag-n-drop should get the lowest child?
 
   // recoursively scan all children
   for i := 0 to children.count-1 do begin
-    tmpLink := children[i].ifMouseOver(xx,yy,true);
-    if tmpLink <> nil then result := tmpLink;
-    if not AllTree then break; // if drag-n-drop one is enough
+    tmpLink := children[i].ifMouseOver(xx,yy,RaiseEvents,AllTree);
+    if tmpLink <> nil then begin
+      result := tmpLink;
+      if not AllTree then break; // if drag-n-drop one is enough
+    end;
   end;
 end;
 
@@ -876,6 +918,7 @@ constructor DInterfaceElement.create(AOwner: TComponent);
 begin
   inherited create(AOwner);
   if AOwner is DSingleInterfaceElement then parent := AOwner as DSingleInterfaceElement;
+  ScaleToChildren := false;
   children := DInterfaceElementsList.Create(true);
 end;
 
@@ -896,6 +939,8 @@ begin
   for i := 0 to children.Count-1 do children[i].draw;
 end;
 
+{----------------------------------------------------------------------------}
+
 procedure DInterfaceElement.Grab(Child: DSingleInterfaceElement);
 begin
   children.Add(Child);
@@ -903,6 +948,27 @@ begin
   //{Child.ID := }InterfaceList.Add(Child); //global ID of the element
 end;
 
+{----------------------------------------------------------------------------}
+
+procedure DInterfaceElement.RescaleToChildren(animate: TAnimationStyle);
+var i: integer;
+    x1,y1,x2,y2: integer;
+begin
+  if children.count>0 then begin
+    x1 := window.width;
+    y1 := window.height;
+    x2 := 0;
+    y2 := 0;
+    for i := 1 to children.count-1 do begin
+      if x1>children[i].base.x1 then x1 := children[i].base.x1;
+      if y1>children[i].base.y1 then y1 := children[i].base.y1;
+      if x2>children[i].base.x2 then x2 := children[i].base.x2;
+      if y2>children[i].base.y2 then y2 := children[i].base.y2;
+    end;
+    self.setIntSize(x1,y1,x2,y2,animate);
+  end
+  else WriteLnLog('DInterfaceElement.RescaleToChildren','No children for resale to');
+end;
 
 end.
 
