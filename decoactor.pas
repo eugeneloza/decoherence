@@ -22,7 +22,7 @@ unit decoactor;
 
 interface
 
-uses classes,
+uses classes, CastleRandom,
   decostats,
   decoglobal;
 
@@ -49,6 +49,7 @@ Type
     Procedure setmaxMPH(value: float);
     Procedure setmaxmaxMPH(value: float);
   public
+    destructor destroy;
     constructor create(AOwner: TComponent); override;
     { getters and setters }
     Property HP: float read fHP write sethp;
@@ -89,6 +90,10 @@ Type
   public
     nickname: string;
     stats: DStats;
+    {these are randoms for the actor: defense gives his defense rolls,
+     Attack provides for attack rolls, and JustRandom determines actor's
+     behaviour}
+    DefenseRandom,AttackRandom,JustRandom: TCastleRandom;
 end;
 
 
@@ -96,7 +101,7 @@ end;
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
-uses castleLog;
+uses SysUtils,castleLog;
 
 constructor DActor.create(AOwner: TComponent);
 begin
@@ -106,10 +111,20 @@ begin
   setmaxmaxSTA(100);
   setmaxmaxCNC(100);
   setmaxmaxMPH(100);
+  DefenseRandom := TCastleRandom.create; //read seed from the savegame
+  AttackRandom := TCastleRAndom.create;
+  JustRandom := TCastleRandom.create;
   resetHP;
   resetSTA;
   resetCNC;
   resetMPH;
+end;
+
+destructor DActor.destroy;
+begin
+  freeandnil(DefenseRandom);
+  freeandnil(AttackRandom);
+  freeandnil(JustRandom);
 end;
 
 {----------------------------------------------------------------------------}

@@ -22,7 +22,7 @@ unit Decoherence;
 
 interface
 
-const Version='interfa3-161229-80';
+const Version='interfa3-161229-81';
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
@@ -196,7 +196,7 @@ begin
   window.OnPress := @doPress;
   window.onRelease := @doRelease;
   window.OnMotion := @doMotion;
-  application.LimitFPS := 60;
+  //application.LimitFPS := 60;
 
   WritelnLog('ApplicationInitialize','DTouchList.create');
   TouchArray := DTouchList.create;

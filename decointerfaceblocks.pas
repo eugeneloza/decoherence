@@ -122,6 +122,7 @@ begin
   else
     Portrait.setbasesize(-(46+135)/800,-(40+155+180*(self.ID div 2))/800,135/800,155/800,1,animate);
   //Portrait.rescale;
+  slided := true;
   SlideOut(nil,0,0);
 
 end;
@@ -163,8 +164,10 @@ var myx: float;
     tmp: DAbstractElement;
 begin
   if slided = true then begin
-    tmp := self.ifMouseOver(x,y,false,false);
-    if (tmp <> nil) and (tmp is DSingleInterfaceElement) and ((tmp as DSingleInterfaceElement).CanMouseOver){ and (tmp.base.opacity>0)} then exit;
+    if sender<>nil then begin
+      tmp := self.ifMouseOver(x,y,false,false);
+      if (tmp <> nil) and (tmp is DSingleInterfaceElement) and ((tmp as DSingleInterfaceElement).CanMouseOver){ and (tmp.base.opacity>0)} then exit;
+    end;
 
     slided := false;
     if not odd(self.ID) then
