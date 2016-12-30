@@ -135,7 +135,9 @@ type DPerksContainer = class(DAbstractCompositeInterfaceElement)
 
 
 
-var HealthBarImage: TCastleImage; //todo not freed automatically!!!
+var HpBarImage, StaBarImage, CncBarImage, MphBarImage: TCastleImage; //todo not freed automatically!!!
+    StatBarsFrame: DFrame;
+
     Portrait_img: array of TCastleImage; //todo!!!
 
     characterbar_top, characterbar_mid, characterbar_bottom,
@@ -162,7 +164,16 @@ procedure InitCompositeInterface;
 var i: integer;
     s: string;
 begin
-  HealthBarImage := LoadImage(ApplicationData(ProgressBarFolder+'verticalbar_CC-BY-SA_by_Saito00.png'));
+  HpBarImage := LoadImage(ApplicationData(ProgressBarFolder+'hp_bar_CC-BY-SA_by_Saito00.png'));
+  StaBarImage := LoadImage(ApplicationData(ProgressBarFolder+'en_bar_CC-BY-SA_by_Saito00.png'));
+  CncBarImage := LoadImage(ApplicationData(ProgressBarFolder+'m_bar_CC-BY-SA_by_Saito00.png'));
+  MphBarImage := LoadImage(ApplicationData(ProgressBarFolder+'mph_bar_CC-BY-SA_by_Saito00.png'));
+
+  StatBarsFrame := DFrame.create(Window);
+  with StatBarsFrame do begin
+    SourceImage := LoadImage(ApplicationData(FramesFolder+'blackframe.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
+    cornerTop := 0; CornerBottom := 0; cornerLeft := 0; CornerRight := 1;
+  end;
 
   setlength(portrait_img,20);
   for i := 0 to length(portrait_img)-1 do begin
@@ -244,7 +255,10 @@ procedure DestroyCompositeInterface;
 var i: integer;
 begin
   writelnLog('DestroyCompositeInterface','(todo)');
-  freeAndNil(HealthBarImage);
+  freeAndNil(HpBarImage);
+  freeAndNil(StaBarImage);
+  freeAndNil(CncBarImage);
+  freeAndNil(MphBarImage);
   for i := 0 to length(portrait_img)-1 do
     freeAndNil(portrait_img[i]);
   setlength(portrait_img,0);
@@ -289,36 +303,40 @@ begin
   //or make parent nil? as they are freed by freeing children? Keep an eye out for troubles...
   HP_bar := DSingleInterfaceElement.create(self);
   tmp_bar := DStatBarImage.create(HP_bar);
-  tmp_bar.Load(HealthBarImage);
+  tmp_bar.Load(HpBarImage);
   tmp_bar.Style := sbHealth;
   tmp_bar.Kind := bsVertical;
   HP_bar.Content := tmp_bar;
+  HP_bar.frame := StatBarsFrame;
   //HP_bar.frame := SimpleFrame;
   grab(HP_bar);
 
   STA_bar := DSingleInterfaceElement.create(self);
   tmp_bar := DStatBarImage.create(STA_bar);
-  tmp_bar.Load(HealthBarImage);
+  tmp_bar.Load(StaBarImage);
   tmp_bar.Style := sbStamina;
   tmp_bar.Kind := bsVertical;
+  STA_bar.frame := StatBarsFrame;
   STA_bar.Content := tmp_bar;
   //STA_bar.frame := SimpleFrame;
   grab(STA_bar);
 
   CNC_bar := DSingleInterfaceElement.create(self);
   tmp_bar := DStatBarImage.create(CNC_bar);
-  tmp_bar.Load(HealthBarImage);
+  tmp_bar.Load(CncBarImage);
   tmp_bar.Style := sbConcentration;
   tmp_bar.Kind := bsVertical;
+  CNC_bar.frame := StatBarsFrame;
   CNC_bar.Content := tmp_bar;
   //STA_bar.frame := SimpleFrame;
   grab(CNC_bar);
 
   MPH_bar := DSingleInterfaceElement.create(self);
   tmp_bar := DStatBarImage.create(MPH_bar);
-  tmp_bar.Load(HealthBarImage);
+  tmp_bar.Load(MphBarImage);
   tmp_bar.Style := sbMetaphysics;
   tmp_bar.Kind := bsVertical;
+  MPH_bar.frame := StatBarsFrame;
   MPH_bar.Content := tmp_bar;
   //MPH_bar.frame := SimpleFrame;
   grab(MPH_bar);
@@ -471,7 +489,7 @@ begin
   ilabel := DSingleInterfaceElement.create(self);
   tmp := DIntegerLabel.create(ilabel);
   ilabel.content := tmp;
-  ilabel.frame := simpleframe;
+  //ilabel.frame := simpleframe;
   grab(ilabel);
 
   PlusButton := DSingleInterfaceElement.create(self);

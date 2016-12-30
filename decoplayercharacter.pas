@@ -50,7 +50,7 @@ var i: integer;
 begin
   for i := 0 to maxparty do begin
     Party[i] := DPlayerCharacter.create(Window);
-    if i<4 then party[i].maxmaxMPH := 0;
+    {if i<4 then }party[i].maxmaxMPH := 0;
     party[i].hit(rnd.Random(80),1);
     party[i].drainCNC(rnd.Random(80),1);
     party[i].drainMPH(rnd.Random(80),1);

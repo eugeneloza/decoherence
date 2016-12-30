@@ -470,25 +470,25 @@ begin
                 max := Target.MaxMaxHp;
                 CurrentMax := Target.MaxHp;
                 Position := Target.Hp;
-                color := Vector4Single(1,0,0,1);  //red  ? maybe green->red?
+                //color := Vector4Single(1,0,0,1);  //red  ? maybe green->red?
               end;
     sbStamina: begin
                 max := Target.MaxMaxSta;
                 CurrentMax := Target.MaxSta;
                 Position := Target.Sta;
-                color := Vector4Single(1,1,0,1);  //yellow
+                //color := Vector4Single(1,1,0,1);  //yellow
               end;
     sbConcentration: begin
                 max := Target.MaxMaxCNC;
                 CurrentMax := Target.MaxCNC;
                 Position := Target.CNC;
-                color := Vector4Single(0,1,1,1);  //cyan
+                //color := Vector4Single(0,1,1,1);  //cyan
               end;
     sbMetaphysics: begin
                 max := Target.MaxMaxMph;
                 CurrentMax := Target.MaxMph;
                 Position := Target.Mph;
-                color := Vector4Single(1,0.5,1,1);  //purple
+                //color := Vector4Single(1,0.5,1,1);  //purple
               end;
   end;
 end;

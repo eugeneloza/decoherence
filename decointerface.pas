@@ -231,10 +231,10 @@ Type
 
   end;
 
-Var {simple outline around black box}
+Var {{simple outline around black box}
     SimpleFrame,
     {a frame with 19px header}
-    CaptionFrame,
+    CaptionFrame,}
     {Just black background with no frame}
     BlackFrame: DFrame;
 
@@ -282,7 +282,7 @@ begin
   WriteLnLog('InitInterface','started');
   //Init_burner_image;
 
-  SimpleFrame := DFrame.create(Window);
+{  SimpleFrame := DFrame.create(Window);
   with SimpleFrame do begin
     SourceImage := LoadImage(ApplicationData(FramesFolder+'frame.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
     cornerTop := 1; CornerBottom := 1; cornerLeft := 1; CornerRight := 1;
@@ -292,7 +292,7 @@ begin
   with CaptionFrame do begin
     SourceImage := LoadImage(ApplicationData(FramesFolder+'frame_caption.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
     cornerTop := 19; CornerBottom := 1; cornerLeft := 1; CornerRight := 1;            //todo: variable top line!
-  end;
+  end;    }
 
   BlackFrame := DFrame.create(Window);
   with BlackFrame do begin
