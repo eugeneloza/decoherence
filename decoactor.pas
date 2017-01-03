@@ -1,4 +1,4 @@
-{Copyright (C) 2012-2016 Yevhen Loza
+{Copyright (C) 2012-2017 Yevhen Loza
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -26,6 +26,9 @@ uses classes, CastleRandom,
   decostats,
   decoglobal;
 
+type TDamageType = (dtHealth);
+type TDamageProcedure = procedure (dam: float; damtype: TDamageType) of Object;
+
 {Maybe, add some basic actor (visible only, no collisions)}
 Type
   {basic actor. With hit-points and coordinates}
@@ -49,7 +52,7 @@ Type
     Procedure setmaxMPH(value: float);
     Procedure setmaxmaxMPH(value: float);
   public
-    destructor destroy;
+    destructor destroy; override;
     constructor create(AOwner: TComponent); override;
     { getters and setters }
     Property HP: float read fHP write sethp;
@@ -88,6 +91,9 @@ Type
     function restoreMPH(restoration: float; skill: float): boolean;
     procedure drainMPH(drain: float; skill: float);
   public
+    { events }
+    onHit: TDamageProcedure;
+  public
     nickname: string;
     stats: DStats;
     {these are randoms for the actor: defense gives his defense rolls,
@@ -125,6 +131,7 @@ begin
   freeandnil(DefenseRandom);
   freeandnil(AttackRandom);
   freeandnil(JustRandom);
+  inherited;
 end;
 
 {----------------------------------------------------------------------------}
@@ -229,6 +236,7 @@ Procedure DActor.hit(damage: float; skill: float);
 begin
   setHP(HP-damage);
   setmaxHP(maxHP-damage*skill); // todo
+  if Assigned(self.onHit) then self.onHit(damage, dtHealth);
 end;
 
 function DActor.heal(value: float; skill: float): boolean;

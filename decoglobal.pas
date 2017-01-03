@@ -1,4 +1,4 @@
-{Copyright (C) 2012-2016 Yevhen Loza
+{Copyright (C) 2012-2017 Yevhen Loza
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -23,15 +23,18 @@ unit decoglobal;
 
 interface
 
-uses
-  Classes, CastleRandom, CastleWindowTouch;
+uses {todo: temporary}SysUtils,
+  Classes, CastleWindowTouch,
+  CastleRandom, CastleTimeUtils;
 
 { for easy changing into double in case needed }
 type Float = single;
      pFloat = ^float;
+     DTime = TFloatTime;
 
-{ folders constants relative to ApplicationData path }
-const InterfaceFolder     = 'interface/';
+{ folders constants relative to ApplicationData path
+  should be "/", not pathdelim, because those are URLs }
+const InterfaceFolder    = 'interface/';
       FramesFolder       = InterfaceFolder+'frames/';
       LoadScreenFolder   = InterfaceFolder+'loadscreen/';
       ProgressBarFolder  = InterfaceFolder+'progressbar/';
@@ -40,6 +43,16 @@ const InterfaceFolder     = 'interface/';
       DecorationsFolder  = InterfaceFolder+'decorations/';
       PortraitFolder     = InterfaceFolder+'portrait/';
       PerksFolder        = InterfaceFolder+'perks/';
+      DamageFolder       = InterfaceFolder+'damage/';
+
+      //TODO: Android incompatible!!!
+      Models_folder       = 'data'+pathdelim+'models'+pathdelim;
+      Tiles_folder        = Models_folder + 'tiles'+pathdelim;
+      Placeholders_folder = Models_folder + 'placeholders'+pathdelim;
+
+const anisotropic_smoothing = 4;
+      Shadow_maps_enabled = false;
+      Shadow_volumes_enabled = false;
 
 var Window : TCastleWindowTouch;
     { random generator used for all interface random events }
@@ -52,7 +65,7 @@ var Window : TCastleWindowTouch;
 procedure InitGlobal;
 procedure DestroyGlobal;
 implementation
-uses SysUtils;
+//uses SysUtils;
 
 // no implementation here needed. Maybe merge with GameMode?
 procedure InitGlobal;

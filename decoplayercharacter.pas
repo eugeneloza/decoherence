@@ -1,4 +1,4 @@
-{Copyright (C) 2012-2016 Yevhen Loza
+{Copyright (C) 2012-2017 Yevhen Loza
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@ uses classes,
   decoactor, decoraceprofession, decoperks,
   decoglobal;
 
-const maxparty = 6; {7 characters}
+const maxparty = 6; {0..6 = 7 characters}
 
 Type
   {player character - the most complex actor available :)}

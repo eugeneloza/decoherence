@@ -1,8 +1,14 @@
+frameborder_left_CC-BY-SA_by_Saito00.png
+frameborder_right_CC-BY-SA_by_Saito00.png
+action_frame_CC-BY-SA_by_Saito00.png
+character_bar_bottom_CC-BY-SA_by_Saito00.png
+character_bar_mid_CC-BY-SA_by_Saito00.png
+character_bar_top_CC-BY-SA_by_Saito00.png
+CC-BY-SA 3.0 by Alexey Saito00
+
+
 blackframe.png
 frame.png
 frame_caption.png
 CC0 by Eugene Loza
 made in GIMP
-
-frameborder_CC-BY-SA_by_Saito00.png
-CC-BY-SA 3.0 by Alexey Saito00

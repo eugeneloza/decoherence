@@ -1,4 +1,4 @@
-{Copyright (C) 2012-2016 Yevhen Loza
+{Copyright (C) 2012-2017 Yevhen Loza
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -15,8 +15,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 
 {---------------------------------------------------------------------------}
 
-{ Contains groups of items containing several specific interface elements
-  used in different game situations }
+{ Describes groups of items containing several specific interface elements
+  used in different game situations. These interface elements usually preform
+  some specific function, i.e. describe specific data management elements
+  in cotrast to more abstract "interface elements" which describe how elements
+  are organized and displayed}
 unit decointerfacecomposite;
 
 {$INCLUDE compilerconfig.inc}
@@ -81,18 +84,21 @@ type
 type
   { character portrait. Some day it might be replaced for TUIContainer of
     the 3d character face :) Only 2D inanimated image for now... }
-  DPortrait = class(DSingleInterfaceElement)
+  DPortrait = class(DInterfaceElement)
   private
+    damageoverlay: DSingleInterfaceElement;
+    damagelabel: DSingleInterfaceElement;
     fTarget: DPlayerCharacter;
     procedure settarget(value: DPlayerCharacter);
   public
     {Player character which portrait is displayed}
     property Target: DPlayerCharacter read ftarget write settarget;
     constructor create(AOwner: TComponent); override;
+    procedure doHit(dam: float; damtype: TDamageType);
   end;
 
 
-//todo: float label is identical except pinteger -> pfloat
+//todo: float label is identical except pointeger -> pfloat
 type
   { a simple editor for an integer variable featuring plus and minus
     buttons }
@@ -115,20 +121,44 @@ type
 
 //  {integer with "bonus" edit}
 
+type
+  {A displayer for a single perk}
+  DPerkInterfaceItem =  class (DInterfaceElement)
+  private
+    PerkImage: DSingleInterfaceElement; {animated image}
+    fTarget: DPerk;
+    //fCharacter: DPlayerCharacter;
+    procedure settarget(value: DPerk);
+    //procedure setcharacter(value: DPlayerCharacter);
+  public
+    property Target: DPerk read ftarget write settarget;
+    //property Character: DPlayerCharacter read fCharacter write setcharacter;
+    {proedure getSelectedStatus -----> update}
+    constructor create(AOwner: TComponent); override;
+end;
+
+type
+ {sorts in n rows and m lines the list of interface elements within self.base. Without specific data management and sorting parameters it is abstract and should parent DPerkSorter and DItemSorter}
+ DAbstractSorter = class(DAbstractCompositeInterfaceElement)
+   private
+
+   public
+     lines{,rows}: integer;
+     procedure ArrangeChildren(animate: TAnimationStyle); override;
+     constructor create(AOwner: TComponent); override;
+   end;
+
 //type TPerkContainerStyle = (pcActions,pcActive,pcGlobal);
 
-type DPerksContainer = class(DAbstractCompositeInterfaceElement)
+type DPerksContainer = class(DAbstractSorter)
   {container for buffs-debuffs, perks and actions}
   private
     fTarget: DPlayerCharacter;
     procedure settarget(value: DPlayerCharacter);
   public
-    Lines: integer;
     //ContainerStyle: TPerkContainerStyle;
     property Target: DPlayerCharacter read ftarget write settarget;
     procedure MakePerksList(animate: TAnimationStyle);
-    procedure ArrangeChildren(animate: TAnimationStyle); override;
-    constructor create(AOwner: TComponent); override;
     //procedure UpdatePerksList;
   end;
 
@@ -139,6 +169,7 @@ var HpBarImage, StaBarImage, CncBarImage, MphBarImage: TCastleImage; //todo not 
     StatBarsFrame: DFrame;
 
     Portrait_img: array of TCastleImage; //todo!!!
+    damageOverlay_img: TCastleImage;
 
     characterbar_top, characterbar_mid, characterbar_bottom,
     portraitframe_left, portraitframe_right,
@@ -157,7 +188,8 @@ procedure DestroyCompositeInterface;
 
 implementation
 uses SysUtils, CastleLog, CastleFilesUtils, castleVectors,
-  decogui, decoimages, decolabels, decofont;
+   decofont, decoimages, decolabels,
+   decointerfaceblocks;
 
 
 procedure InitCompositeInterface;
@@ -168,6 +200,8 @@ begin
   StaBarImage := LoadImage(ApplicationData(ProgressBarFolder+'en_bar_CC-BY-SA_by_Saito00.png'));
   CncBarImage := LoadImage(ApplicationData(ProgressBarFolder+'m_bar_CC-BY-SA_by_Saito00.png'));
   MphBarImage := LoadImage(ApplicationData(ProgressBarFolder+'mph_bar_CC-BY-SA_by_Saito00.png'));
+
+  damageOverlay_img := LoadImage(ApplicationData(DamageFolder+'damageOverlay_CC0_by_EugeneLoza[GIMP].png'));
 
   StatBarsFrame := DFrame.create(Window);
   with StatBarsFrame do begin
@@ -446,13 +480,49 @@ begin
     (content as DStaticImage).freeImage;
     WriteLnLog('DPortrait.settarget','Load from portrait');
     (content as DStaticImage).Load(portrait_img[rnd.random(length(portrait_img))]);  //todo
+    fTarget.onHit := @self.doHit;
   end;
 end;
 
 constructor DPortrait.create(AOwner: TComponent);
+var tmp_staticimage: DStaticImage;
+    tmp_label: DLabel;
 begin
   inherited create(AOwner);
   content := DStaticImage.create(self);
+  DamageOverlay := DSingleInterfaceElement.create(self);
+  tmp_staticimage := DStaticImage.create(self);
+  DamageOverlay.content := tmp_staticimage;
+  grab(damageOverlay);
+  damageLabel := DSingleInterfaceElement.create(self);
+  tmp_label := DLabel.create(self);
+  tmp_label.ScaleLabel := false;
+  tmp_label.Font := RegularFont16;
+  damageLabel.content := tmp_label;
+  grab(damageLabel);
+end;
+
+procedure DPortrait.doHit(dam: float; damtype: TDamageType);
+begin
+  (parent as DCharacterSpace).slideIn(nil,0,0);
+  (damageOverlay.content as DStaticImage).FreeImage;
+  case damtype of
+    dtHealth: (damageOverlay.content as DStaticImage).Load(damageOverlay_img);
+  end;
+  damageOverlay.base.copyxywh(self.base);
+  //damageOverlay.resetContentSize?
+  damageOverlay.Content.base.copyxywh(self.base);
+  damageOverlay.Content.AnimateTo(asFadeIn);
+  damageOverlay.rescale;
+  damageOverlay.AnimateTo(asFadeIn);
+  if dam>0 then begin
+    damageLabel.base.copyxywh(self.base);
+    damageLabel.Content.base.copyxywh(self.base);
+    damageLabel.AnimateTo(asFadeIn);
+    damageLabel.Content.AnimateTo(asFadeIn);
+    (damageLabel.content as DLabel).text := inttostr(round(dam));
+    damageLabel.rescale;
+  end;
 end;
 
 {=============================================================================}
@@ -510,6 +580,8 @@ begin
   grab(MinusButton);
 end;
 
+{---------------------------------------------------------------------------}
+
 procedure DIntegerEdit.settarget(value: pinteger);
 begin
   if ftarget <> value then begin
@@ -518,6 +590,8 @@ begin
     //reset button activity
   end;
 end;
+
+{---------------------------------------------------------------------------}
 
 procedure DIntegerEdit.ArrangeChildren(animate: TAnimationStyle);
 begin
@@ -531,6 +605,53 @@ end;
 {=============================================================================}
 {=========================== Perks container =================================}
 {=============================================================================}
+
+procedure DPerkInterfaceItem.settarget(value: DPerk);
+begin
+  if value <> fTarget then begin
+    fTarget := value;
+    (PerkImage.content as DStaticImage).FreeImage;
+    (PerkImage.content as DStaticImage).load(fTarget.Image.SourceImage);
+    //add events?
+  end;
+end;
+
+constructor DPerkInterfaceItem.create(AOwner: TComponent);
+var tmp: DStaticImage;
+begin
+  inherited create(AOwner);
+  PerkImage := DSingleInterfaceElement.create(self);
+  tmp := DStaticImage.create(self);
+  PerkImage.Content := tmp;
+  grab(PerkImage);
+end;
+
+{=============================================================================}
+{=========================== Abstract sorter =================================}
+{=============================================================================}
+
+procedure DAbstractSorter.ArrangeChildren(animate: TAnimationStyle);
+var scale: float;
+    i: integer;
+begin
+  inherited ArrangeChildren(animate);
+  scale := cnt_h/lines;
+  for i := 0 to children.Count-1 do children[i].setbasesize(cnt_x+i*scale,cnt_y,scale,scale,1,animate);
+  //todo : auto scrollers
+end;
+
+{---------------------------------------------------------------------}
+
+constructor DAbstractSorter.create(AOwner: TComponent);
+begin
+  inherited create(AOwner);
+  Lines := 1;
+end;
+
+{=============================================================================}
+{=========================== Perks container =================================}
+{=============================================================================}
+
 
 procedure DPerksContainer.settarget(value: DPlayerCharacter);
 begin
@@ -560,26 +681,6 @@ begin
       WriteLnLog('DPerksContainer.MakePerksList','ERROR: Target.Actions is empty!');
   end else
     WriteLnLog('DPerksContainer.MakePerksList','ERROR: Target is nil!');
-end;
-
-{---------------------------------------------------------------------}
-
-procedure DPerksContainer.ArrangeChildren(animate: TAnimationStyle);
-var scale: float;
-    i: integer;
-begin
-  inherited ArrangeChildren(animate);
-  scale := cnt_h/lines;
-  for i := 0 to children.Count-1 do children[i].setbasesize(cnt_x+i*scale,cnt_y,scale,scale,1,animate);
-  //todo : auto scrollers
-end;
-
-{---------------------------------------------------------------------}
-
-constructor DPerksContainer.create(AOwner: TComponent);
-begin
-  inherited create(AOwner);
-  Lines := 1;
 end;
 
 {---------------------------------------------------------------------}

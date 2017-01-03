@@ -1,4 +1,4 @@
-{Copyright (C) 2012-2016 Yevhen Loza
+{Copyright (C) 2012-2017 Yevhen Loza
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -31,8 +31,10 @@ uses Classes, SysUtils,
      CastleLog, CastleTimeUtils,
      CastleWindow, CastleWindowTouch, CastleKeysMouse,
      decogui, decointerface, decomouse, decofont,
-     decolevel, decofacts, decoperks,
+     decolevel, decodungeontiles,
+     decofacts, decoperks,
      decointerfacecomposite,
+     decoplayercharacter,
      decoglobal, decogamemode;
 
 {==========================================================================}
@@ -64,8 +66,8 @@ end;
 
 {-------------------------------------------------------------------------}
 
-var InternalTime: TDateTime = 0;
-Procedure TimeFlow(DeltaTime: TDatetime);
+var InternalTime: DTime = 0;
+Procedure TimeFlow(DeltaTime: DTime);
 Begin
   //Adjust time flow speed based on game situation
   InternalTime += DeltaTime;
@@ -76,9 +78,9 @@ End;
 
 {-------------------------------------------------------------------------}
 
-var LastRender: TDateTime = -1;
+var LastRender: DTime = -1;
 procedure ProcessTimeEvents;
-var TimePassed: TDateTime;
+var TimePassed: DTime;
 begin
   If LastRender = -1 then LastRender := now;
   TimePassed := now-LastRender;
@@ -94,7 +96,6 @@ begin
 end;
 
 {-------------------------------------------------------------------------}
-
 
 var RenderFinished: boolean = true;
 Procedure WindowRender(Container : TUIContainer);
@@ -121,8 +122,11 @@ begin
       if mbRight=event.MouseButton then camera.MouseLook := not Camera.MouseLook;
 
   end else if Event.EventType = itKey then begin
-    if event.key = K_P{rintScreen} then                //k_printscreen doesn't work in x-window system if assigned to some external program like scrot
-       Window.SaveScreen('deco_'+NiceDate+'.jpg');
+    case event.key of
+       K_P,K_PrintScreen:                //k_printscreen doesn't work in x-window system if assigned to some external program like scrot
+                         Window.SaveScreen('deco_'+NiceDate+'.jpg');
+       K_r: party[0].hit(1,1);
+    end;
   end;
 //  SetGameMode(gmCharacterGeneration);
   SetGameMode(gmTravel);
@@ -198,12 +202,13 @@ begin
   window.OnMotion := @doMotion;
   application.LimitFPS := 60;
 
+  //init mouse events
   WritelnLog('ApplicationInitialize','DTouchList.create');
   TouchArray := DTouchList.create;
 
   WritelnLog('ApplicationInitialize','Initialize fonts');
-  InitializeFonts;
-  InitGlobal;
+  InitializeFonts;      //load fonts
+  InitGlobal;           //start random
 
   //create GUI
   WritelnLog('ApplicationInitialize','Create interface');
@@ -212,9 +217,8 @@ begin
 
   WritelnLog('ApplicationInitialize','Initialize interface');
   LoadFacts;
-  InitInterface;
-  InitPerks;
 
+  //finally (fonts, random and facts loaded), we're ready to show game loading screen
   {$IFDEF AllowRescale}window.OnResize := @WindowResize;{$ENDIF}
   window.OnRender := @WindowRender;
 
@@ -222,7 +226,8 @@ begin
 
   SetGameMode(gmLoadScreen);
 
-  //InitInterface;
+  InitInterface;
+  InitPerks;
   Load_test_level; //remake it
 
 end;
@@ -238,6 +243,9 @@ end;
 Initialization
   OnGetApplicationName  :=  @MyGetApplicationName;
   Window := TCastleWindowTouch.create(Application);
+
+  window.DoubleBuffer := false;//true;             //what's the difference? speed? memory?
+
   {$IFNDEF AllowRescale}window.ResizeAllowed := raOnlyAtOpen;{$ENDIF}
   {$IFDEF Fullscreen}
     window.fullscreen := true;
@@ -245,13 +253,16 @@ Initialization
     window.width := 1024;
     window.height := 600;
   {$ENDIF}
+
   Application.MainWindow  :=  Window;
   Application.OnInitialize  :=  @ApplicationInitialize;
 
 Finalization
+  { free all assigned memory }
   DestroyCompositeInterface;
   DestroyGlobal;
   DestroyFacts;
+  DestroyTiles;
   WriteLnLog('Finalization','Bye...');
 end.
 

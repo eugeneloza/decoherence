@@ -1,4 +1,4 @@
-{Copyright (C) 2012-2016 Yevhen Loza
+{Copyright (C) 2012-2017 Yevhen Loza
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -36,8 +36,6 @@ type
   private
     fTarget: DPlayerCharacter;
     procedure settarget(value: DPlayerCharacter);
-    procedure SlideIn(Sender: DAbstractElement; x,y: integer);
-    procedure slideOut(Sender: DAbstractElement; x,y: integer);
   public
     ID: integer;
     slided: boolean;
@@ -46,6 +44,8 @@ type
     property Target: DPlayerCharacter read fTarget write settarget;
     procedure ArrangeChildren(animate: TAnimationStyle); override;
     constructor create(AOwner: TComponent); override;
+    procedure SlideIn(Sender: DAbstractElement; x,y: integer);
+    procedure slideOut(Sender: DAbstractElement; x,y: integer);
   end;
 
 type
@@ -146,7 +146,7 @@ var myx: float;
 begin
   if slided = false then begin
     tmp := self.ifMouseOver(x,y,false,false);
-    if (tmp <> nil) and (tmp is DSingleInterfaceElement) and ((tmp as DSingleInterfaceElement).CanMouseOver){ and (tmp.base.opacity>0)} then begin
+    if (sender=nil) or (tmp <> nil) and (tmp is DSingleInterfaceElement) and ((tmp as DSingleInterfaceElement).CanMouseOver){ and (tmp.base.opacity>0)} then begin
       //base.opacity breaks the algorithm, if transparent item is above (i.e. below) the opaque element
       slided := true;
       if not odd(self.ID) then

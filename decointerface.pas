@@ -1,4 +1,4 @@
-{Copyright (C) 2012-2016 Yevhen Loza
+{Copyright (C) 2012-2017 Yevhen Loza
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -160,6 +160,8 @@ Type
     FrameOpacity: float;
     { frame behind the Interface element }
     frame: DFrame;
+    {specifices if the frame draws over content or vice versa}
+    FrameOnTop: boolean;
     procedure draw; override;
     procedure rescale; override;
     constructor create(AOwner:TComponent); override;
@@ -181,6 +183,9 @@ Type
     procedure InitGL;{ override;}
     { resets parent and content size after rescale if needed}
     procedure ResetContentSize(animate: TAnimationStyle);
+
+    procedure drawFrame;
+    procedure DrawContent;
   public
     {if this element is active (clickable)}
     CanMouseOver: boolean;
@@ -704,6 +709,7 @@ end;
 constructor DSingleInterfaceElement.create(AOwner: TComponent);
 begin
   inherited create(AOwner);
+  FrameOnTop := false;
   //ID := -1;
   //OwnsContent := false;
   FrameOpacity := 0.8;
@@ -811,12 +817,8 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DSingleInterfaceElement.draw;
+procedure DSingleInterfaceElement.DrawFrame; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
-  update;
-
-  if not visible then exit;
-
   if frame <> nil then begin
     if FrameReady then begin
       GLFrame.color := vector4single(1,1,1,currentAnimationState.Opacity * FrameOpacity);     //todo
@@ -825,11 +827,30 @@ begin
       if InitGLPending then InitGL;
     end;
   end;
+end;
+
+procedure DSingleInterfaceElement.DrawContent; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+begin
   //todo
   if content <> nil then begin
     //Content.base.copyxywh(currentAnimationState);
     Content.draw;
   end;
+end;
+
+procedure DSingleInterfaceElement.draw;
+begin
+  update;
+  if not visible then exit;
+
+  if FrameOnTop then begin
+    DrawContent;
+    DrawFrame;
+  end else begin
+    DrawFrame;
+    DrawContent;
+  end;
+
 end;
 
 {========== Abstract intarface element : Mouse handling =====================}

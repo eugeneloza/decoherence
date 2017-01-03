@@ -1,4 +1,4 @@
-{Copyright (C) 2012-2016 Yevhen Loza
+{Copyright (C) 2012-2017 Yevhen Loza
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@ uses
   CastleLog,
   CastleWindow, CastleWindowTouch, CastleSceneCore, CastleScene, CastleFilesUtils,
   castlePlayer, castleVectors, castleCameras,
+  deco3dload, decodungeontiles,
   decoglobal;
 
 procedure load_test_level;
@@ -43,47 +44,43 @@ uses DecoGameMode,
 var loadedlevel:boolean=false;
 procedure load_test_level;
 {var Nav:TKambiNavigationInfoNode; /// !!!
-    NavLight:TPointLightNode;}
+    NavLight:TPointLightNode;   }
 begin
+  LoadTiles;
+
   WritelnLog('load_test_level','Scene');
   Scene := TCastleScene.Create(Application);
-  Scene.Load(ApplicationData('level/test-level.x3d'));
+  Scene.Load(LoadBlenderX3D(ApplicationData('level/test-level.x3d')),true);
   Scene.Spatial := [ssRendering, ssDynamicCollisions];
   Scene.ProcessEvents := true;
-  scene.ShadowMaps := true;
+  scene.ShadowMaps := Shadow_maps_enabled;
 
-{  //create light that follows the player
+ { //create light that follows the player
   NavLight:= TPointLightNode.Create('', '');
   NavLight.FdColor.Value := vector3single(1,0.1,0.1);
   NavLight.FdAttenuation.value := Vector3Single(0,0,6);
-  NavLight.FdRadius.value:=1;
-  NavLight.FdIntensity.value:=30;
-  NavLight.FdOn.value:=true;
-  NavLight.FdShadows.value:=false;
+  NavLight.FdRadius.value := 1;
+  NavLight.FdIntensity.value := 30;
+  NavLight.FdOn.value := true;
+  NavLight.FdShadows.value := false;
   //and create a respective navigation node
   nav:=TKambiNavigationInfoNode.Create('', '');
   nav.FdHeadLightNode.Value := NavLight;
-  nav.FdHeadlight.Value:=true;
+  nav.FdHeadlight.Value := true;
 
   scene.RootNode.FdChildren.Add(nav);  }
 
-  Window.ShadowVolumes := true;
-  window.ShadowVolumesRender := true;
+  Window.ShadowVolumes := Shadow_volumes_enabled;
+  window.ShadowVolumesRender := Shadow_volumes_enabled;
   window.AntiAliasing := aa8SamplesNicer;
-  //Scene.Attributes.EnableTextures:=false;
+  //Scene.Attributes.EnableTextures := false;
   WritelnLog('load_test_level','Player');
 
-{  Player := TPlayer.Create(Window.SceneManager);
-  player.Camera.MouseLook:=false;
-  Player.Camera.GravityUp:=Vector3Single(0,0,1);
-  Player.Up:=Vector3Single(0,0,1);
-  player.position:=Vector3Single(0,0,1);
-  player.FallingEffect:=false;
-  player.DefaultPreferredHeight:=1;}
-  camera:=TWalkCamera.create(Window);//player.camera;
+  camera := TWalkCamera.create(Window);
+  {z-up orientation}
   camera.SetView(Vector3Single(0,0,1),Vector3Single(0,1,0),Vector3Single(0,0,1),Vector3Single(0,0,1),true);
-  camera.MoveSpeed:=5;
-  camera.MouseDragMode := mdRotate{mdDrag};
+  camera.MoveSpeed := 5;
+  camera.MouseDragMode := mdRotate;
   WritelnLog('load_test_level','Finished');
 
 end;
@@ -92,12 +89,10 @@ Procedure InitTestLevel;
 begin
   if not loadedlevel then begin
      WritelnLog('InitTestLevel','Init');
-     loadedlevel:=true;
-{     Window.SceneManager.Items.Add(Player);
-     Window.SceneManager.Player := Player;}
+     loadedlevel := true;
      Window.SceneManager.Items.Add(Scene);
      Window.SceneManager.MainScene := Scene;
-     Window.SceneManager.Camera:=camera;
+     Window.SceneManager.Camera := camera;
      Window.TouchInterface := {$IFDEF Android}tiCtlWalkDragRotate{$ELSE}tiNone{$ENDIF};
      SetGameMode(gmTravel);
   end;

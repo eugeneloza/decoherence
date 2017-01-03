@@ -1,4 +1,4 @@
-{Copyright (C) 2012-2016 Yevhen Loza
+{Copyright (C) 2012-2017 Yevhen Loza
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -159,10 +159,11 @@ begin
   Target.Load(Source);
   if Target=nil then begin
     WritelnLog('TLoadImageThread.execute','Image was destroyed before it was loaded!');
-    exit; //fix bug if the image didn't load completely but was already destroyed
+    exit; //fix bug if the image didn't load completely but was already destroyed (NOT WORKING! TODO)
+  end else begin
+    Target.rescale;
+    WritelnLog('TLoadImageThread.execute','Image thread finished.');
   end;
-  Target.rescale;
-  WritelnLog('TLoadImageThread.execute','Image thread finished.');
   target.ThreadWorking := false;
 end;
 
@@ -247,10 +248,11 @@ end;
 
 destructor DAbstractImage.destroy;
 begin
-  FreeAndNil(GLImage);
+  FreeImage;
+  //FreeAndNil(GLImage);//freeimage does it all
   //scaledImage is automatically freed by GlImage
   {freeandnil(ScaledImage);}
-  FreeAndNil(SourceImage);
+  //FreeAndNil(SourceImage);//freeimage does it all
   inherited;
 end;
 
