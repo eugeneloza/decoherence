@@ -100,7 +100,7 @@ begin
     end else
     //copy TAbstractLightNode, no recoursion, just add it
     if (source.FdChildren[i] is TAbstractLightNode) then begin
-      //TODO: add to a global list of lights
+      //TODO: add to a global list of lights, OR, search for lights realtime by FindNode
       //(source.FdChildren[i] as TAbstractLightNode).FdOn.value := true;
       target.FdChildren.add(source.FdChildren[i]);
     end;
