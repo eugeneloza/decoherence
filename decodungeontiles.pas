@@ -36,6 +36,12 @@ uses sysUtils,
   CastleLog;
 
 const CurrentMap_folder = 'library/'; //TODO: Can tiles be cross-tileset?
+{ Reads tile list for the current map.
+  At this moment it scans the predefined directory in desktop-way, so it's not
+  portable to Android.
+  TODO: need to create a special XML file with list of tiles in Map Manager
+  It'll also provide for different tiles reusing in different maps, e.g.
+  can use cave tiles in both normal caves, and caves section of other maps }
 procedure MakeTileList;   //TODO: depending on current map parameters
 var Rec: TSearchRec;
 begin
