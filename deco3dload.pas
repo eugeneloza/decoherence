@@ -67,9 +67,9 @@ begin
   for i:=0 to source.FdChildren.Count-1 do begin
     //copy TTransformNode
     if (source.FdChildren[i] is TTransformNode) then begin
-      if not AnsiContainsText(source.FdChildren[i].Name,'_ifs_TRANSFORM') then begin
+      if not AnsiContainsText(source.FdChildren[i].X3DName,'_ifs_TRANSFORM') then begin
         //TODO: not copy unit transforms!
-        tmpTransform:=TTransformNode.Create(source.FdChildren[i].Name,'');
+        tmpTransform:=TTransformNode.Create(source.FdChildren[i].X3DName,'');
         tmpTransform.Translation:=(source.FdChildren[i] as TTransformNode).Translation;
         tmpTransform.Rotation:=(source.FdChildren[i] as TTransformNode).Rotation;
         tmpTransform.scale:=(source.FdChildren[i] as TTransformNode).scale;
@@ -79,8 +79,8 @@ begin
     end else
     //copy TGroupNode... Is that needed? well...let's leave it here for now
     if (source.FdChildren[i] is TGroupNode) then begin
-      if not AnsiContainsText(source.FdChildren[i].Name,'group_ME_') then begin
-         tmpGroup:=TGroupNode.create(source.FdChildren[i].Name,'');
+      if not AnsiContainsText(source.FdChildren[i].X3DName,'group_ME_') then begin
+         tmpGroup:=TGroupNode.create(source.FdChildren[i].X3DName,'');
          AddChildRecoursive(tmpGroup,source.FdChildren[i] as TGroupNode);
          target.FdChildren.add(tmpGroup);
       end else AddChildRecoursive(target,source.FdChildren[i] as TGroupNode); // drop junk exporter node
