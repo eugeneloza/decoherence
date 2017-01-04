@@ -32,9 +32,10 @@ uses
 procedure load_test_level;
 Procedure InitTestLevel;
 
-var scene:TcastleScene;
+var scene: TcastleScene;
+  monster: TCastleScene;
   //player:TPlayer;
-  Camera:TWalkCamera;
+  Camera: TWalkCamera;
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
@@ -55,6 +56,13 @@ begin
   Scene.ProcessEvents := true;
   scene.ShadowMaps := Shadow_maps_enabled;
 
+  monster := TCastleScene.create(Application);
+  monster.Spatial := [ssRendering, ssDynamicCollisions];
+  monster.ProcessEvents := true;
+  monster.ShadowMaps := Shadow_maps_enabled;
+  //monster.Load(ApplicationData('creatures/forest-monster-final.castle-anim-frames'));
+  monster.Load(ApplicationData('creatures/walk.castle-anim-frames'));
+  //(monster.RootNode.FdChildren[4] as TTRansformNode).Rotation := vector4single(1,0,0,Pi/2);
  { //create light that follows the player
   NavLight:= TPointLightNode.Create('', '');
   NavLight.FdColor.Value := vector3single(1,0.1,0.1);
@@ -91,6 +99,10 @@ begin
      WritelnLog('InitTestLevel','Init');
      loadedlevel := true;
      Window.SceneManager.Items.Add(Scene);
+
+     monster.PlayAnimation('animation',paForceLooping);
+     Window.SceneManager.Items.Add(monster);
+
      Window.SceneManager.MainScene := Scene;
      Window.SceneManager.Camera := camera;
      Window.TouchInterface := {$IFDEF Android}tiCtlWalkDragRotate{$ELSE}tiNone{$ENDIF};

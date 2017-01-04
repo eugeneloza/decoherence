@@ -139,8 +139,8 @@ var LoadNewFloaterImage: boolean;
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
-uses SysUtils, CastleLog, CastleFilesUtils,
-     decogui;
+uses SysUtils, CastleLog, CastleFilesUtils{,
+     decogui};
 
 type TLoadImageThread = class(TThread)
   private

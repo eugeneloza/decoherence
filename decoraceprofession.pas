@@ -41,7 +41,7 @@ Type
     {Extended description of the race/profession}
     Description: string;
     Constructor create(AOwner: TComponent); override;
-    Destructor destroy;
+    Destructor destroy; override;
   End;
 
 Var races, professions: array of DRaceProfession;
@@ -97,7 +97,7 @@ Begin
 End;
 
 Function CheckCompatibiliyGeneration(const race, profession: DRaceProfession): Float;
-Var flg: boolean;
+Var //flg: boolean;
     i, diffbonus, diffstats: integer;
 Begin
   Diffbonus := 0;

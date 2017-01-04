@@ -22,8 +22,8 @@ unit decostats;
 {$INCLUDE compilerconfig.inc}
 
 interface
-uses
-  decoglobal;
+{uses
+  decoglobal; }
 
 Const
   {stats for actors}
@@ -48,7 +48,7 @@ Type
     Value: array of integer;
     Count: integer;
     Constructor create(setfullstats: boolean);
-    Destructor destroy;
+    Destructor destroy; override;
   End;
 
 implementation
