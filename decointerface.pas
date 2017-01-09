@@ -236,10 +236,10 @@ Type
 
   end;
 
-Var {{simple outline around black box}
-    SimpleFrame,
+Var {simple outline around black box}
+    //SimpleFrame,
     {a frame with 19px header}
-    CaptionFrame,}
+    //CaptionFrame,
     {Just black background with no frame}
     BlackFrame: DFrame;
 

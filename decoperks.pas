@@ -55,7 +55,7 @@ type
     Constructor create(AOwner: TComponent); override;
     Destructor destroy; override;
 end;
-{
+(*
 Type
   {Active perk must be chosen to take effect and it's availability depends
    on other chosen perks, actions first of all}
@@ -78,7 +78,7 @@ Type
   DActionPerk = class(DChapterPerk)
   Public
 
-  end;            }
+  end;            *)
 
 
 

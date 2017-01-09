@@ -39,12 +39,15 @@ var TextureProperties: TTexturePropertiesNode;
 
 procedure MakeDefaultTextureProperties;
 begin
-  if anisotropic_smoothing>0 then begin
-    textureProperties:=TTexturePropertiesNode.Create;
-    TextureProperties.AnisotropicDegree:=anisotropic_smoothing;
-    TextureProperties.FdMagnificationFilter.Value:='DEFAULT';
-    TextureProperties.FdMinificationFilter.Value:='DEFAULT';
-  end else TextureProperties:=nil;
+  {$PUSH}{$WARN 6018 OFF} //hide "unreachable code" warning, it's ok here
+  {freeandnil?}
+  if anisotropic_smoothing > 0 then begin
+    textureProperties := TTexturePropertiesNode.Create;
+    TextureProperties.AnisotropicDegree := anisotropic_smoothing;
+    TextureProperties.FdMagnificationFilter.Value := 'DEFAULT';
+    TextureProperties.FdMinificationFilter.Value := 'DEFAULT';
+  end else TextureProperties := nil;
+  {$POP}
 end;
 
 {-----------------------------------------------------------------------------}
@@ -64,15 +67,15 @@ begin
   at this moment it's:
   "*_ifs_TRANSFORM" which is a useless unit transform
   "group_ME_*" which is a useless group transform}
-  for i:=0 to source.FdChildren.Count-1 do begin
+  for i := 0 to source.FdChildren.Count-1 do begin
     //copy TTransformNode
     if (source.FdChildren[i] is TTransformNode) then begin
       if not AnsiContainsText(source.FdChildren[i].X3DName,'_ifs_TRANSFORM') then begin
         //TODO: not copy unit transforms!
-        tmpTransform:=TTransformNode.Create(source.FdChildren[i].X3DName,'');
-        tmpTransform.Translation:=(source.FdChildren[i] as TTransformNode).Translation;
-        tmpTransform.Rotation:=(source.FdChildren[i] as TTransformNode).Rotation;
-        tmpTransform.scale:=(source.FdChildren[i] as TTransformNode).scale;
+        tmpTransform := TTransformNode.Create(source.FdChildren[i].X3DName,'');
+        tmpTransform.Translation := (source.FdChildren[i] as TTransformNode).Translation;
+        tmpTransform.Rotation := (source.FdChildren[i] as TTransformNode).Rotation;
+        tmpTransform.scale := (source.FdChildren[i] as TTransformNode).scale;
         AddChildRecoursive(TmpTransform,source.FdChildren[i] as TTransformNode);
         target.FdChildren.add(TmpTransform);
       end else AddChildRecoursive(target,source.FdChildren[i] as TTransformNode); // drop junk exporter node
@@ -96,13 +99,13 @@ begin
       except
         writeLnLog('ScanRootRecoursive','try..except fired');
       end;
-      target.FdChildren.add(source.FdChildren[i]);
+      target.FdChildren.add(source.fdChildren.Extract(i));     //"Extracting" something means that the node is removed from the list, but it will not be freed
     end else
     //copy TAbstractLightNode, no recoursion, just add it
     if (source.FdChildren[i] is TAbstractLightNode) then begin
       //TODO: add to a global list of lights, OR, search for lights realtime by FindNode
       //(source.FdChildren[i] as TAbstractLightNode).FdOn.value := true;
-      target.FdChildren.add(source.FdChildren[i]);
+      target.FdChildren.add(source.fdChildren.Extract(i));
     end;
   end;
 end;
@@ -110,7 +113,7 @@ end;
 {---------------------------------------------------------------------------}
 
 function LoadBlenderX3D(URL: string): TX3DRootNode;
-var TmpRootNode:TX3DRootNode;
+var TmpRootNode: TX3DRootNode;
 begin
   MakeDefaultTextureProperties;
 
@@ -120,11 +123,9 @@ begin
   { scan the X3DRootNode and copy only nodes, we need
     we also scan temporary X3DRootNode for TImageTexture derivatives
     and update them as necessary (to include anisotropic smoothing)}
-  AddChildRecoursive(result,TmpRootNode);
+  AddChildRecoursive(result, TmpRootNode);
 
-  { hmm... that one does seem to memory leak?
-    because I don't copy (link to) all the fdChildren nodes
-    will they be freed automatically? }
+  { Looks like a memory leak does not appear here, but still some tests are needed }
   FreeAndNil(TmpRootNode);
 end;
 

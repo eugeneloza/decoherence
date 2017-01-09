@@ -35,7 +35,7 @@ implementation
 uses sysUtils,
   CastleLog;
 
-const CurrentMap_folder = 'librarytileset/'; //TODO: Can tiles be cross-tileset?
+const CurrentMap_folder = 'librarytileset/'; //TODO: tiles can be cross-tileset
 { Reads tile list for the current map.
   At this moment it scans the predefined directory in desktop-way, so it's not
   portable to Android.

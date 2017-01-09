@@ -94,15 +94,15 @@ begin
 end;
 
 Procedure InitTestLevel;
-var i: integer;
-  monsters: array[0..10] of TCastleScene;
+{var i: integer;
+  monsters: array[0..10] of TCastleScene; }
 begin
   if not loadedlevel then begin
      WritelnLog('InitTestLevel','Init');
      loadedlevel := true;
      Window.SceneManager.Items.Add(Scene);
 
-     monster.PlayAnimation('animation',paForceLooping);
+     //monster.PlayAnimation('animation',paForceLooping);
      Window.SceneManager.Items.Add(monster);
 {     for i := 0 to 10 do begin
        monsters[i] := monster.Clone(Application);
