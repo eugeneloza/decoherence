@@ -22,7 +22,7 @@ unit Decoherence;
 
 interface
 
-{$INCLUDE version.inc}
+const Version={$INCLUDE version.inc};
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation

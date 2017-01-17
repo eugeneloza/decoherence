@@ -115,7 +115,7 @@ end;
 function LoadBlenderX3D(URL: string): TX3DRootNode;
 var TmpRootNode: TX3DRootNode;
 begin
-  MakeDefaultTextureProperties;
+  MakeDefaultTextureProperties; //todo: should be only once per game!
 
   TmpRootNode := load3D(URL);
   result := TX3DRootNode.Create;

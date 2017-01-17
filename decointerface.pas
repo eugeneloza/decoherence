@@ -263,7 +263,7 @@ uses sysutils, CastleLog, castleFilesUtils,
 
 {-------------------- BURNER IMAGE --------------------------------------------}
 
-{var BURNER_IMAGE_UNSCALED,BURNER_IMAGE:TCastleImage;  //todo: not freed automatically!!!!
+(*var BURNER_IMAGE_UNSCALED,BURNER_IMAGE:TCastleImage;  //todo: not freed automatically!!!!
 procedure Init_burner_image;
 begin
   {$IFNDEF AllowRescale}if BURNER_IMAGE<>nil then exit;{$ENDIF}
@@ -278,7 +278,7 @@ begin
   {$IFNDEF AllowRescale}FreeAndNil(BURNER_IMAGE_UNSCALED);{$ENDIF}
 
   WriteLnLog('Init_burner_image','finished');
-end; }
+end; *)
 
 {-------------------- INIT INTERFACE ------------------------------------------}
 
@@ -342,15 +342,15 @@ end;
 procedure Txywh.setsize(const newx,newy,neww,newh:float);
 begin
   if (abs(newx) > 1) or (abs(newy) > 1) or
-     (((neww<0) or (neww>1)) and ((neww<>proportionalscale) and (neww<>fullwidth) and (neww<>fullheight))) or
-     (((newh<0) or (newh>1)) and ((neww<>proportionalscale) and (newh<>fullheight))) then
+     (((neww<0) or (neww>1)) and (not FloatsEqual(neww,proportionalscale) and not FloatsEqual(neww,fullwidth) and not FloatsEqual(neww,fullheight))) or
+     (((newh<0) or (newh>1)) and (not FloatsEqual(neww,proportionalscale) and not FloatsEqual(newh,fullheight))) then
   begin
     writeLnLog('Txywh.setsize','ERROR: Incorrect newx,newy,neww,newh!');
     exit;
   end;
 
   { stop if nothing was changed }
-  if (fx = newx) and (fy = newy) and (fw = neww) and (fh = newh) then exit;
+  if FloatsEqual(fx,newx) and FloatsEqual(fy,newy) and FloatsEqual(fw,neww) and FloatsEqual(fh,newh) then exit;
 
   fx := newx;
   fy := newy;
@@ -376,17 +376,17 @@ begin
   else
     y1 := Window.height + round(Window.height*fy);
 
-  if fw = fullwidth then begin
+  if FloatsEqual(fw,fullwidth) then begin
     w := Window.width;
     x1 := 0
   end
   else
-  if fw = fullheight then
+  if FloatsEqual(fw,fullheight) then
     w := Window.height
   else
     w := round(Window.height*fw);
 
-  if fh = fullheight then begin
+  if FloatsEqual(fh,fullheight) then begin
     h := Window.height;
     y1 := 0
   end else
@@ -464,10 +464,10 @@ End;
 
 procedure Txywh.FixProportions(ww,hh: integer);
 begin
-  if fw = proportionalscale then
+  if FloatsEqual(fw,proportionalscale) then
     w := round(h*ww/hh)
   else                                 //they can't be proportional both
-  if fh = proportionalscale then
+  if FloatsEqual(fh,proportionalscale) then
     h := round(w*hh/ww);
 end;
 
@@ -633,8 +633,8 @@ var phase: single;
 begin
   if true then begin //todo!!!!!!!!!!!!!!!!!!!!!!!
     if (last.initialized) and (next.initialized) and
-      ((animationstart = -1) or (now-animationstart < animationduration)) then begin
-      if animationstart = -1 then animationstart := now;
+      ((animationstart<0) or (now-animationstart < animationduration)) then begin
+      if animationstart<0 then animationstart := now;
       phase := (now-animationstart)/animationduration; //animationtime
       //make curve slower at ends and sharper at middle
       if phase<0.5 then phase := sqr(2*phase)/2 else phase := 1 - sqr(2*(1-phase))/2;
