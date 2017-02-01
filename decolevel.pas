@@ -27,6 +27,7 @@ uses
   CastleWindow, CastleWindowTouch, CastleSceneCore, CastleScene, CastleFilesUtils,
   castlePlayer, castleVectors, castleCameras,
   deco3dload, decodungeontiles,
+  x3dload, sysutils,
   decoglobal;
 
 procedure load_test_level;
@@ -46,12 +47,21 @@ var loadedlevel:boolean=false;
 procedure load_test_level;
 {var Nav:TKambiNavigationInfoNode; /// !!!
     NavLight:TPointLightNode;   }
+var ScreenEffect: TX3DRootNode;
+    //i: integer;
 begin
   LoadTiles;
 
   WritelnLog('load_test_level','Scene');
   Scene := TCastleScene.Create(Application);
   Scene.Load(LoadBlenderX3D(ApplicationData('level/test-level.x3d')),true);
+
+  {this is a temporary "addition" of a screen shader,
+   should be replaced for something more useful some time later}
+  ScreenEffect := load3D('shader.x3dv');
+  //for i := 0 to ScreenEffect.fdchildren.count-1 do writeLnLog(inttostr(i),ScreenEffect.fdchildren[i].n);
+  scene.RootNode.FdChildren.add(screenEffect.FdChildren[0]);
+
   Scene.Spatial := [ssRendering, ssDynamicCollisions];
   Scene.ProcessEvents := true;
   scene.ShadowMaps := Shadow_maps_enabled;

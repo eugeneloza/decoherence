@@ -1,0 +1,14 @@
+#X3D V3.2 utf8
+PROFILE Interchange
+
+ScreenEffect {
+  shaders ComposedShader {
+    language "GLSL"
+    parts ShaderPart { type "FRAGMENT" url "data:text/plain,
+ivec2 screen_position();
+vec4 screen_get_color(ivec2 position);
+void main (void)
+{
+  gl_FragColor = screen_get_color(screen_position());
+}
+" } } }

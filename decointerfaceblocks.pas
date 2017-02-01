@@ -24,6 +24,7 @@ unit decointerfaceblocks;
 interface
 
 uses classes,
+  castlecontrols,
   decointerface, decointerfacecomposite,
   decoplayercharacter,
   decoglobal;
@@ -40,6 +41,7 @@ type
     ID: integer;
     slided: boolean;
     StatBars: DPlayerBarsFull;
+    timer: TCastleTimer;
     Portrait: DPortrait;
     property Target: DPlayerCharacter read fTarget write settarget;
     procedure ArrangeChildren(animate: TAnimationStyle); override;
@@ -82,6 +84,16 @@ implementation
 constructor DCharacterSpace.create(AOwner: TComponent);
 begin
   inherited create(AOwner);
+
+  //!!!!!!!!!!!
+  timer := TCastleTimer.create(self);
+  Timer.IntervalSeconds := 1;
+  Timer.OnTimer := nil;
+  // emm... that one is ugly. I have to add/remove timers each time???
+  // MUST WRITE MY OWN IMPLEMENTATION!!!
+  {a - as a method of TCompositeInterfaceElement
+   b - as a child of TInterfaceElement (TInterfaceContainer)}
+  Window.Controls.InsertFront(Timer);
 
   self.OnMouseEnter := @SlideIn;
   self.OnMouseLeave := @SlideOut;

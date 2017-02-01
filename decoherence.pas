@@ -169,11 +169,12 @@ begin
 
   end;
   {mouse over / if no drag-n-drop}
-  if not dragging then begin
+  //this is not needed at the moment, we'll turn here a bit later when implementing drag-n-drop
+ { if not dragging then begin
     tmpLink := GUI.IfMouseOver(round(event.Position[0]),round(event.Position[1]),true,true);
     if tmpLink <> nil then
       writelnLog('doMotion','Motion caught '+tmpLink.ClassName);
-  end;
+  end;  }
 end;
 
 {======================= initialization routines ==============================}
