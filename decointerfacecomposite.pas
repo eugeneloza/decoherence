@@ -504,7 +504,8 @@ end;
 
 procedure DPortrait.doHit(dam: float; damtype: TDamageType);
 begin
-  (parent as DCharacterSpace).slideIn(nil,0,0);
+  (parent as DCharacterSpace).doSlideIn;
+  (parent as DCharacterSpace).timer.settimeout(1/24/60/60);
   (damageOverlay.content as DStaticImage).FreeImage;
   case damtype of
     dtHealth: (damageOverlay.content as DStaticImage).Load(damageOverlay_img);

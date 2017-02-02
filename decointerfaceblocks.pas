@@ -41,13 +41,16 @@ type
     ID: integer;
     slided: boolean;
     StatBars: DPlayerBarsFull;
-    timer: TCastleTimer;
     Portrait: DPortrait;
     property Target: DPlayerCharacter read fTarget write settarget;
     procedure ArrangeChildren(animate: TAnimationStyle); override;
     constructor create(AOwner: TComponent); override;
+  public
     procedure SlideIn(Sender: DAbstractElement; x,y: integer);
-    procedure slideOut(Sender: DAbstractElement; x,y: integer);
+    procedure SlideOut(Sender: DAbstractElement; x,y: integer);
+    procedure DoSlideIn;
+    procedure DoSlideOut;
+    procedure doTimeout;
   end;
 
 type
@@ -75,7 +78,7 @@ type
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-//uses ;
+uses castleLog;
 
 {=============================================================================}
 {=========================== Character Space =================================}
@@ -85,15 +88,7 @@ constructor DCharacterSpace.create(AOwner: TComponent);
 begin
   inherited create(AOwner);
 
-  //!!!!!!!!!!!
-  timer := TCastleTimer.create(self);
-  Timer.IntervalSeconds := 1;
-  Timer.OnTimer := nil;
-  // emm... that one is ugly. I have to add/remove timers each time???
-  // MUST WRITE MY OWN IMPLEMENTATION!!!
-  {a - as a method of TCompositeInterfaceElement
-   b - as a child of TInterfaceElement (TInterfaceContainer)}
-  Window.Controls.InsertFront(Timer);
+  timer.onTimer := @self.doTimeout;
 
   self.OnMouseEnter := @SlideIn;
   self.OnMouseLeave := @SlideOut;
@@ -135,7 +130,7 @@ begin
     Portrait.setbasesize(-(46+135)/800,-(40+155+180*(self.ID div 2))/800,135/800,155/800,1,animate);
   //Portrait.rescale;
   slided := true;
-  SlideOut(nil,0,0);
+  doSlideOut;
 
 end;
 
@@ -152,46 +147,58 @@ end;
 
 {---------------------------------------------------------------------------}
 
-procedure DCharacterSpace.SlideIn(Sender: DAbstractElement; x,y: integer);
+procedure DCharacterSpace.DoSlideIn;
 var myx: float;
-    tmp: DAbstractElement;
 begin
-  if slided = false then begin
-    tmp := self.ifMouseOver(x,y,false,false);
-    if (sender=nil) or (tmp <> nil) and (tmp is DSingleInterfaceElement) and ((tmp as DSingleInterfaceElement).CanMouseOver){ and (tmp.base.opacity>0)} then begin
-      //base.opacity breaks the algorithm, if transparent item is above (i.e. below) the opaque element
-      slided := true;
-      if not odd(self.ID) then
-        myx := 47/800
-      else
-        myx := -(46)/800-Portrait.base.fw;
-      Portrait.setbasesize(myx,Portrait.base.fy,Portrait.base.fw,Portrait.base.fh,1,asDefault);
-      Portrait.rescale;
-    end;
-  end;
-end;
-
-procedure DCharacterSpace.slideOut(Sender: DAbstractElement; x,y: integer);
-var myx: float;
-    tmp: DAbstractElement;
-begin
-  if slided = true then begin
-    if sender<>nil then begin
-      tmp := self.ifMouseOver(x,y,false,false);
-      if (tmp <> nil) and (tmp is DSingleInterfaceElement) and ((tmp as DSingleInterfaceElement).CanMouseOver){ and (tmp.base.opacity>0)} then exit;
-    end;
-
-    slided := false;
-    if not odd(self.ID) then
-      myx := 0/800
-    else
-      myx := -135{portrait.base.fw}/800;
-    Portrait.setbasesize(myx,Portrait.base.fy,Portrait.base.fw,Portrait.base.fh,0,asDefault);
-    Portrait.rescale;
-  end;
+  slided := true;
+  if not odd(self.ID) then
+    myx := 47/800
+  else
+    myx := -(46)/800-Portrait.base.fw;
+  Portrait.setbasesize(myx,Portrait.base.fy,Portrait.base.fw,Portrait.base.fh,1,asDefault);
+  Portrait.rescale;
 end;
 
 {---------------------------------------------------------------------------}
+
+procedure DCharacterSpace.DoSlideOut;
+var myx: float;
+begin
+  slided := false;
+  if not odd(self.ID) then
+    myx := 0/800
+  else
+    myx := -135{portrait.base.fw}/800;
+  Portrait.setbasesize(myx,Portrait.base.fy,Portrait.base.fw,Portrait.base.fh,0,asDefault);
+  Portrait.rescale;
+end;
+
+{---------------------------------------------------------------------------}
+
+procedure DCharacterSpace.SlideIn(Sender: DAbstractElement; x,y: integer);
+begin
+  if not slided then
+    if MouseOverTree(x,y) then doSlideIn;
+end;
+
+{---------------------------------------------------------------------------}
+
+procedure DCharacterSpace.slideOut(Sender: DAbstractElement; x,y: integer);
+begin
+  if slided then
+    if not MouseOverTree(x,y) then timer.settimeout(1/24/60/60){doSlideOut};
+  //if selected then timeout 10-30 seconds, else just doslideout
+end;
+
+{---------------------------------------------------------------------------}
+
+procedure DCharacterSpace.doTimeout;
+begin
+  if slided then begin
+    if not IsMouseOverTree then doSlideOut;
+    writelnlog('timer out');
+  end;
+end;
 
 {=============================================================================}
 {============================= Party  view ===================================}

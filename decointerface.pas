@@ -137,13 +137,13 @@ Type
     {animates the interface element from current state to base state,
      Important: GetAnimationState must be called before setting basesize
      of the element as AnimateTo uses currentAnimationState}
-    procedure AnimateTo(animate: TAnimationStyle);
+    procedure AnimateTo(animate: TAnimationStyle; duration: single = defaultanimationduration);
   end;
 
 {Definition of simple procedures for (mouse) events}
 //type TSimpleProcedure = procedure(sender: DAbstractElement) of Object;
+type TSimpleProcedure = procedure of Object;
 type TXYProcedure = procedure(sender: DAbstractElement; x,y: integer) of Object;
-
 
 Type
   {Element with a frame and content}
@@ -213,6 +213,27 @@ Type
 
 type DInterfaceElementsList = specialize TFPGObjectList<DSingleInterfaceElement>;
 
+Type
+  { a simple time-out mechanisms to preform some timed events on interface
+    elements /
+    maybe should be just a few additional routines at the parent class}
+  DTimer = class(TObject)
+    private
+      {set automatically, date of the timer count start}
+      StartDate: DTime;
+    public
+      {if the timer is running}
+      enabled: boolean;
+      {how long (in days) will it take the timer to fire}
+      Interval: DTime;
+      {action to preform}
+      onTimer: TSimpleProcedure;
+      constructor create;
+      {a simple way to set and run timer}
+      procedure settimeout(days: DTime);
+      {check if the timer finished and run onTimer if true}
+      procedure update;
+  end;
 
 Type
   {An interface element, that can contain "children"}
@@ -222,18 +243,25 @@ Type
     ScaleToChildren: boolean;
     {list of the children of this interface element}
     children: DInterfaceElementsList;
+    {a simple timer to fire some event on time-out}
+    Timer: DTimer;
     procedure draw; override;
     constructor create(AOwner: TComponent); override;
     destructor destroy; override;
     procedure Rescale; override;
+    procedure Update; override;
   public
     {assign given element as a child and sets its parent to self}
     procedure Grab(Child: DSingleInterfaceElement);
     {}
     procedure RescaleToChildren(animate: TAnimationStyle);
+  public
+    {returns last call to MouseOverTree result, may be buggy!}
+    isMouseOverTree: boolean;
     {returns self if IAmHere and runs all possible events + scans all children}
     function ifMouseOver(xx,yy: integer; RaiseEvents: boolean; AllTree: boolean): DAbstractElement; override;
-
+    {returns true if mouse is over any "canmouseover" child of this element}
+    function MouseOverTree(xx,yy: integer): boolean;
   end;
 
 Var {simple outline around black box}
@@ -507,12 +535,12 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DAbstractElement.AnimateTo(animate: TAnimationStyle);
+procedure DAbstractElement.AnimateTo(animate: TAnimationStyle; duration: single = defaultanimationduration);
 var mx,my: float;
 begin
   if animate = asNone then exit else begin
     animationstart := -1;
-    animationduration := defaultanimationduration;
+    animationduration := duration;
     last.copyxywh(base); //todo: CurrentAnimationState
     next.copyxywh(base);
     case animate of
@@ -926,11 +954,48 @@ end;
 {=========================== interface element ===============================}
 {=============================================================================}
 
+ constructor DTImer.create;
+ begin
+   inherited;
+   enabled := false;
+   StartDate := -1;
+ end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DTimer.update;
+begin
+  if StartDate<0 then StartDate := Now else
+  if (now-startDate) >= Interval then begin
+    enabled := false;
+    if assigned(onTimer) then onTimer;
+  end;
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DTimer.settimeout(days: DTime);
+begin
+  StartDate := -1;
+  enabled := true;
+  Interval := days;
+end;
+
+{-----------------------------------------------------------------------------}
+
 procedure DInterfaceElement.rescale;
 var i: integer;
 begin
   inherited;
   for i:=0 to children.Count-1 do children[i].rescale;
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DInterfaceElement.update;
+begin
+  inherited;
+  if timer.enabled then timer.update;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -941,6 +1006,7 @@ begin
   if AOwner is DSingleInterfaceElement then parent := AOwner as DSingleInterfaceElement;
   ScaleToChildren := false;
   children := DInterfaceElementsList.Create(true);
+  timer := DTimer.create;
 end;
 
 {----------------------------------------------------------------------------}
@@ -948,6 +1014,7 @@ end;
 destructor DInterfaceElement.destroy;
 begin
   freeandnil(children);   //this should fire as recoursive because children owns elements, which in turn will fire their destructors onfree
+  freeandnil(timer);
   inherited;
 end;
 
@@ -989,6 +1056,21 @@ begin
     self.setIntSize(x1,y1,x2,y2,animate);
   end
   else WriteLnLog('DInterfaceElement.RescaleToChildren','No children for resale to');
+end;
+
+{-----------------------------------------------------------------------}
+
+function DInterfaceElement.MouseOverTree(xx,yy: integer): boolean;
+var tmp: DAbstractElement;
+begin
+  // maybe rewrite it using isMouseOver - the idea is still a little different
+  tmp := self.ifMouseOver(xx,yy,false,false);
+  if (tmp <> nil) and (tmp is DSingleInterfaceElement) and ((tmp as DSingleInterfaceElement).CanMouseOver){ and (tmp.base.opacity>0)} then
+    isMouseOverTree := true
+  else
+    isMouseOverTree := false;
+  //base.opacity breaks the algorithm, if transparent item is above (i.e. below) the opaque element
+  result := isMouseOverTree;
 end;
 
 end.
