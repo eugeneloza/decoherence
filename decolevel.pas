@@ -71,7 +71,7 @@ begin
   monster.ProcessEvents := true;
   monster.ShadowMaps := Shadow_maps_enabled;
   //monster.Load(ApplicationData('creatures/forest-monster-final.castle-anim-frames'));
-  monster.Load(ApplicationData('creatures/walk.castle-anim-frames'));
+  monster.Load(ApplicationData('creatures/idle.castle-anim-frames'));
   //(monster.RootNode.FdChildren[4] as TTRansformNode).Rotation := vector4single(1,0,0,Pi/2);
  { //create light that follows the player
   NavLight:= TPointLightNode.Create('', '');
@@ -104,8 +104,8 @@ begin
 end;
 
 Procedure InitTestLevel;
-{var i: integer;
-  monsters: array[0..10] of TCastleScene; }
+var i: integer;
+  monsters: array[0..10] of TCastleScene;
 begin
   if not loadedlevel then begin
      WritelnLog('InitTestLevel','Init');
@@ -114,10 +114,19 @@ begin
 
      //monster.PlayAnimation('animation',paForceLooping);
      Window.SceneManager.Items.Add(monster);
-{     for i := 0 to 10 do begin
+     for i := 0 to 10 do begin
        monsters[i] := monster.Clone(Application);
+       //changes only the first node!
+       (monsters[i].RootNode.FindNodeByName(TTransformNode,'Knight_TRANSFORM',true) as TTransformNode).Translation := Vector3Single(i,0,1);
+       //monsters[i].Move(Vector3Single(0,0,0),false,false);//.Translate(Vector3Single(i,0,1));
+
+       {
+       monsters[i].ProcessEvents := true;
+       monsters[i].PlayAnimation('animation',paForceLooping);
+       }
+
        Window.SceneManager.Items.Add(monsters[i]);
-     end;}
+     end;
 
      Window.SceneManager.MainScene := Scene;
      Window.SceneManager.Camera := camera;

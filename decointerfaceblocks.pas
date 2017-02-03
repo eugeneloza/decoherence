@@ -232,6 +232,7 @@ begin
     CharacterSpace[i].Target := party[i];
     CharacterSpace[i].ScaleToChildren := true;
     grab(CharacterSpace[i]);
+    //at grab we set parent as DPartyView;
   end;
   setbasesize(0,0,fullwidth,fullheight,1,appear_animation);
 //  ArrangeChildren(false); //automatically arranged on TCompositeElement.setbasesize
