@@ -98,7 +98,7 @@ Type
     stats: DStats;
     {these are randoms for the actor: defense gives his defense rolls,
      Attack provides for attack rolls, and JustRandom determines actor's
-     behaviour}
+     behaviour and any other not too important random rolls}
     DefenseRandom,AttackRandom,JustRandom: TCastleRandom;
 end;
 

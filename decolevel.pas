@@ -38,10 +38,21 @@ var scene: TcastleScene;
   //player:TPlayer;
   Camera: TWalkCamera;
 
+
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 uses DecoGameMode,
   X3DNodes;
+
+var   root_creature: TX3DRootNode;
+
+
+procedure LoadCreature;
+var tmp: TX3DRootNode;
+begin
+  tmp := Load3D(ApplicationData('creatures/idle.castle-anim-frames'));
+
+end;
 
 var loadedlevel:boolean=false;
 procedure load_test_level;
@@ -73,6 +84,8 @@ begin
   //monster.Load(ApplicationData('creatures/forest-monster-final.castle-anim-frames'));
   monster.Load(ApplicationData('creatures/idle.castle-anim-frames'));
   //(monster.RootNode.FdChildren[4] as TTRansformNode).Rotation := vector4single(1,0,0,Pi/2);
+  //rrrr :=
+
  { //create light that follows the player
   NavLight:= TPointLightNode.Create('', '');
   NavLight.FdColor.Value := vector3single(1,0.1,0.1);
@@ -116,6 +129,7 @@ begin
      Window.SceneManager.Items.Add(monster);
      for i := 0 to 10 do begin
        monsters[i] := monster.Clone(Application);
+       //monsters[i].Move(Vector3Single(i,0,1),false,false);
        //changes only the first node!
        (monsters[i].RootNode.FindNodeByName(TTransformNode,'Knight_TRANSFORM',true) as TTransformNode).Translation := Vector3Single(i,0,1);
        //monsters[i].Move(Vector3Single(0,0,0),false,false);//.Translate(Vector3Single(i,0,1));
