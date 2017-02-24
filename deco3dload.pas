@@ -152,24 +152,24 @@ function CleanUp(Root: TX3DRootNode; CleanWorld: boolean = false; CleanUnitTrans
           but its name carries information. However, we can't
           automatically tell that. So this is a "risky" option. }
         if (CleanUnitTransform) and (child is TTransformNode) then
-          if ZeroVector((child as TTransformNode).Translation) and
-             UnitVector((child as TTransformNode).Scale) and
-             NoRotation((child as TTransformNode).rotation) then RemoveNodeOnly := true;
+          if ZeroVector(TTransformNode(child).Translation) and
+             UnitVector(TTransformNode(child).Scale) and
+             NoRotation(TTransformNode(child).rotation) then RemoveNodeOnly := true;
 
         //repeat...until because fdChildren.count can change during the runtime!
         i := 0;
-        if (child as TAbstractX3DGroupingNode).FdChildren.count>0 then
+        if TAbstractX3DGroupingNode(child).FdChildren.count>0 then
         repeat
-          if not CleanRecoursive((child as TAbstractX3DGroupingNode),(child as TAbstractX3DGroupingNode).FdChildren[i])
+          if not CleanRecoursive(TAbstractX3DGroupingNode(child),TAbstractX3DGroupingNode(child).FdChildren[i])
            then inc(i);
-          //if result was true then (child as TAbstractX3DGroupingNode).FdChildren[i] has just been removed
-        until i >= (child as TAbstractX3DGroupingNode).FdChildren.count;
+          //if result was true then TAbstractX3DGroupingNode(child).FdChildren[i] has just been removed
+        until i >= TAbstractX3DGroupingNode(child).FdChildren.count;
 
         if parent<> nil then
           if RemoveNodeOnly then begin
             //move this node's children up one level
-            for i := 0 to (child as TAbstractX3DGroupingNode).FdChildren.count-1 do
-              parent.FdChildren.add((child as TAbstractX3DGroupingNode).FdChildren[i]);
+            for i := 0 to TAbstractX3DGroupingNode(child).FdChildren.count-1 do
+              parent.FdChildren.add(TAbstractX3DGroupingNode(child).FdChildren[i]);
             //and delete the node;
             parent.FdChildren.Remove(child);
             result := true; //changed the fdChildren.count of parent

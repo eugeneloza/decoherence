@@ -641,8 +641,8 @@ end;
 
 procedure DSingleInterfaceElement.resetContentSize(animate: TAnimationStyle);
 begin
-  if (parent<>nil) and (parent is DInterfaceElement) and ((parent as DInterfaceElement).ScaleToChildren) then
-    (parent as DInterfaceElement).RescaleToChildren(animate);
+  if (parent<>nil) and (parent is DInterfaceElement) and (DInterfaceElement(parent).ScaleToChildren) then
+    DInterfaceElement(parent).RescaleToChildren(animate);
   //frame should be automatically resized during "rescale" and animated during draw...
   if content <> nil then begin
     content.base.copyxywh(self.base);
@@ -1003,7 +1003,7 @@ end;
 constructor DInterfaceElement.create(AOwner: TComponent);
 begin
   inherited create(AOwner);
-  if AOwner is DSingleInterfaceElement then parent := AOwner as DSingleInterfaceElement;
+  if AOwner is DSingleInterfaceElement then parent := DSingleInterfaceElement(AOwner);
   ScaleToChildren := false;
   children := DInterfaceElementsList.Create(true);
   timer := DTimer.create;
@@ -1032,7 +1032,7 @@ end;
 procedure DInterfaceElement.Grab(Child: DSingleInterfaceElement);
 begin
   children.Add(Child);
-  if (Child is DSingleInterfaceElement) then (Child as DSingleInterfaceElement).Parent := self; //not sure about this line
+  if (Child is DSingleInterfaceElement) then DSingleInterfaceElement(Child).Parent := self; //not sure about this line
   //{Child.ID := }InterfaceList.Add(Child); //global ID of the element
 end;
 
@@ -1065,7 +1065,7 @@ var tmp: DAbstractElement;
 begin
   // maybe rewrite it using isMouseOver - the idea is still a little different
   tmp := self.ifMouseOver(xx,yy,false,false);
-  if (tmp <> nil) and (tmp is DSingleInterfaceElement) and ((tmp as DSingleInterfaceElement).CanMouseOver){ and (tmp.base.opacity>0)} then
+  if (tmp <> nil) and (tmp is DSingleInterfaceElement) and (DSingleInterfaceElement(tmp).CanMouseOver){ and (tmp.base.opacity>0)} then
     isMouseOverTree := true
   else
     isMouseOverTree := false;

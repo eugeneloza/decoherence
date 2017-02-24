@@ -116,7 +116,7 @@ begin
   //catch the element which has been pressed
   tmpLink := GUI.IfMouseOver(round(event.Position[0]),round(event.Position[1]),true,true);
   if (tmpLink is DSingleInterfaceElement) then begin
-    NewEventTouch.click_element := tmpLink as DSingleInterfaceElement;
+    NewEventTouch.click_element := DSingleInterfaceElement(tmpLink);
     if assigned(NewEventTouch.click_element.OnMousePress) then
       NewEventTouch.click_element.OnMousePress(tmpLink,round(event.Position[0]),round(event.Position[1]));
     if NewEventTouch.click_element.CanDrag then NewEventTouch.click_element.startDrag(round(event.Position[0]),round(event.Position[1]));

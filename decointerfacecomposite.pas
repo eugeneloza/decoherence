@@ -383,10 +383,10 @@ begin
   if ftarget <> value then begin
     ftarget := value;
     //and copy the target to all children
-    (HP_bar.content as DStatBarImage).Target := ftarget;
-    (STA_bar.content as DStatBarImage).Target := ftarget;
-    (CNC_bar.content as DStatBarImage).Target := ftarget;
-    (MPH_bar.content as DStatBarImage).Target := ftarget;
+    DStatBarImage(HP_bar.content).Target := ftarget;
+    DStatBarImage(STA_bar.content).Target := ftarget;
+    DStatBarImage(CNC_bar.content).Target := ftarget;
+    DStatBarImage(MPH_bar.content).Target := ftarget;
   end;
 end;
 
@@ -424,8 +424,8 @@ begin
     ftarget := value;
     //and copy the target to all children
     PartyBars.Target := value;
-    (NumHealth.content as DFloatLabel).Value := @value.HP;
-    (NickName.content as DStringLabel).Value := @value.nickname;
+    DFloatLabel(NumHealth.content).Value := @value.HP;
+    DStringLabel(NickName.content).Value := @value.nickname;
   end;
 end;
 
@@ -477,9 +477,9 @@ procedure DPortrait.settarget(value: DPlayerCharacter);
 begin
   if ftarget <> value then begin
     ftarget := value;
-    (content as DStaticImage).freeImage;
+    DStaticImage(content).freeImage;
     WriteLnLog('DPortrait.settarget','Load from portrait');
-    (content as DStaticImage).Load(portrait_img[rnd.random(length(portrait_img))]);  //todo
+    DStaticImage(content).Load(portrait_img[rnd.random(length(portrait_img))]);  //todo
     fTarget.onHit := @self.doHit;
   end;
 end;
@@ -504,8 +504,8 @@ end;
 
 procedure DPortrait.doHit(dam: float; damtype: TDamageType);
 begin
-  (parent as DCharacterSpace).doSlideIn;
-  (parent as DCharacterSpace).timer.settimeout(1/24/60/60);
+  DCharacterSpace(parent).doSlideIn;
+  DCharacterSpace(parent).timer.settimeout(1/24/60/60);
   (damageOverlay.content as DStaticImage).FreeImage;
   case damtype of
     dtHealth: (damageOverlay.content as DStaticImage).Load(damageOverlay_img);
@@ -521,7 +521,7 @@ begin
     damageLabel.Content.base.copyxywh(self.base);
     damageLabel.AnimateTo(asFadeIn);
     damageLabel.Content.AnimateTo(asFadeIn);
-    (damageLabel.content as DLabel).text := inttostr(round(dam));
+    DLabel(damageLabel.content).text := inttostr(round(dam));
     damageLabel.rescale;
   end;
 end;
@@ -537,8 +537,8 @@ begin
   //remake to self.ftarget! make min/max
   {hmm... looks complex...}
   if sender is DSingleInterfaceElement then  //fool's check
-    if (sender as DSingleInterfaceElement).parent is DIntegerEdit then    //another fool's check :)
-      inc(((sender as DSingleInterfaceElement).parent as DIntegerEdit).Target^); //todo!!!!!!!!!
+    if DSingleInterfaceElement(sender).parent is DIntegerEdit then    //another fool's check :)
+      inc(DIntegerEdit(DSingleInterfaceElement(sender).parent).Target^); //todo!!!!!!!!!
 end;
 
 procedure DIntegerEdit.decTarget(Sender: DAbstractElement; x,y: integer);
@@ -546,8 +546,8 @@ begin
   //remake to self.ftarget! make min/max
   {hmm... looks complex...}
   if sender is DSingleInterfaceElement then  //fool's check
-    if (sender as DSingleInterfaceElement).parent is DIntegerEdit then    //another fool's check :)
-      dec(((sender as DSingleInterfaceElement).parent as DIntegerEdit).Target^); //todo!!!!!!!!!
+    if DSingleInterfaceElement(sender).parent is DIntegerEdit then    //another fool's check :)
+      dec(DIntegerEdit(DSingleInterfaceElement(sender).parent).Target^); //todo!!!!!!!!!
 end;
 
 {---------------------------------------------------------------------------}
@@ -587,7 +587,7 @@ procedure DIntegerEdit.settarget(value: pinteger);
 begin
   if ftarget <> value then begin
     ftarget := value;
-    (ilabel.content as DIntegerLabel).value := value;
+    DIntegerLabel(ilabel.content).value := value;
     //reset button activity
   end;
 end;
