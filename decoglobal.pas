@@ -62,8 +62,6 @@ var Window : TCastleWindowTouch;
     {$ENDIF}
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
-procedure InitGlobal;
-procedure DestroyGlobal;
 implementation
 //uses SysUtils;
 
@@ -79,6 +77,12 @@ procedure DestroyGlobal;
 begin
   freeandnil(rnd);
 end;
+
+initialization
+InitGlobal;
+
+finalization
+DestroyGlobal;
 
 end.
 

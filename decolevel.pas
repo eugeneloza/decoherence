@@ -28,15 +28,15 @@ uses
   castlePlayer, castleVectors, castleCameras,
   deco3dload, decodungeontiles,
   x3dload, sysutils,
+  castle3d,
   decoglobal;
 
 procedure load_test_level;
 Procedure InitTestLevel;
 
 var scene: TcastleScene;
-  monster: TCastleScene;
-  //player:TPlayer;
   Camera: TWalkCamera;
+  monsters: array[0..10] of T3DOrient;
 
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
@@ -44,100 +44,94 @@ implementation
 uses DecoGameMode,
   X3DNodes;
 
-var   root_creature: TX3DRootNode;
-
-
-procedure LoadCreature;
-var tmp: TX3DRootNode;
-begin
-  tmp := Load3D(ApplicationData('creatures/idle.castle-anim-frames'));
-
-end;
+var   monster: TX3DRootNode;
 
 var loadedlevel:boolean=false;
 procedure load_test_level;
-{var Nav:TKambiNavigationInfoNode; /// !!!
-    NavLight:TPointLightNode;   }
+var Nav:TKambiNavigationInfoNode; /// !!!
+    NavLight:TPointLightNode;
 var ScreenEffect: TX3DRootNode;
+    mRoot: TX3DRootNode;
     //i: integer;
 begin
   LoadTiles;
 
   WritelnLog('load_test_level','Scene');
-  Scene := TCastleScene.Create(Application);
-  Scene.Load(LoadBlenderX3D(ApplicationData('level/test-level.x3d')),true);
+
+  mRoot := LoadBlenderX3D(ApplicationData('level/test-level.x3d'));
+
+  //create light that follows the player
+   NavLight:= TPointLightNode.Create('', '');
+   NavLight.FdColor.Value := vector3single(1,0.3,0.1);
+   NavLight.FdAttenuation.value := Vector3Single(1,0,1);
+   NavLight.FdRadius.value := 10;
+   NavLight.FdIntensity.value := 20;
+   NavLight.FdOn.value := true;
+   NavLight.FdShadows.value := false;
+   //and create a respective navigation node
+   nav:=TKambiNavigationInfoNode.Create('', '');
+   nav.FdHeadLightNode.Value := NavLight;
+   nav.FdHeadlight.Value := true;
+
+  mRoot.FdChildren.Add(nav);
 
   {this is a temporary "addition" of a screen shader,
    should be replaced for something more useful some time later}
-  ScreenEffect := load3D('shader.x3dv');
-  //for i := 0 to ScreenEffect.fdchildren.count-1 do writeLnLog(inttostr(i),ScreenEffect.fdchildren[i].n);
-  scene.RootNode.FdChildren.add(screenEffect.FdChildren[0]);
+  ScreenEffect := load3D(ApplicationData('shaders/empty.x3dv'));
+  mRoot.FdChildren.add(screenEffect.FdChildren[0]);
+
+  Scene := TCastleScene.Create(Application);
+  Scene.Load(mRoot,true);
+  //Scene.Attributes.EnableTextures := false;
 
   Scene.Spatial := [ssRendering, ssDynamicCollisions];
   Scene.ProcessEvents := true;
   scene.ShadowMaps := Shadow_maps_enabled;
 
-  monster := TCastleScene.create(Application);
-  monster.Spatial := [ssRendering, ssDynamicCollisions];
-  monster.ProcessEvents := true;
-  monster.ShadowMaps := Shadow_maps_enabled;
-  //monster.Load(ApplicationData('creatures/forest-monster-final.castle-anim-frames'));
-  monster.Load(ApplicationData('creatures/idle.castle-anim-frames'));
-  //(monster.RootNode.FdChildren[4] as TTRansformNode).Rotation := vector4single(1,0,0,Pi/2);
-  //rrrr :=
-
- { //create light that follows the player
-  NavLight:= TPointLightNode.Create('', '');
-  NavLight.FdColor.Value := vector3single(1,0.1,0.1);
-  NavLight.FdAttenuation.value := Vector3Single(0,0,6);
-  NavLight.FdRadius.value := 1;
-  NavLight.FdIntensity.value := 30;
-  NavLight.FdOn.value := true;
-  NavLight.FdShadows.value := false;
-  //and create a respective navigation node
-  nav:=TKambiNavigationInfoNode.Create('', '');
-  nav.FdHeadLightNode.Value := NavLight;
-  nav.FdHeadlight.Value := true;
-
-  scene.RootNode.FdChildren.Add(nav);  }
+  monster := LoadBlenderX3D(ApplicationData('creatures/idle.castle-anim-frames'));
 
   Window.ShadowVolumes := Shadow_volumes_enabled;
   window.ShadowVolumesRender := Shadow_volumes_enabled;
   window.AntiAliasing := aa8SamplesNicer;
-  //Scene.Attributes.EnableTextures := false;
   WritelnLog('load_test_level','Player');
 
   camera := TWalkCamera.create(Window);
   {z-up orientation}
   camera.SetView(Vector3Single(0,0,1),Vector3Single(0,1,0),Vector3Single(0,0,1),Vector3Single(0,0,1),true);
-  camera.MoveSpeed := 5;
+  camera.MoveSpeed := 5; //set to zero to stop
   camera.MouseDragMode := mdRotate;
+  //camera.Input := [];  //-----  completely disable camera
   WritelnLog('load_test_level','Finished');
 
 end;
 
 Procedure InitTestLevel;
 var i: integer;
-  monsters: array[0..10] of TCastleScene;
+  monsterscene: array[0..10] of TCastleScene;
+  m: TCastleScene;
 begin
   if not loadedlevel then begin
      WritelnLog('InitTestLevel','Init');
      loadedlevel := true;
      Window.SceneManager.Items.Add(Scene);
 
-     //monster.PlayAnimation('animation',paForceLooping);
-     Window.SceneManager.Items.Add(monster);
+     m := TCastleScene.create(window);
+     m.load(monster,true,true);
      for i := 0 to 10 do begin
-       monsters[i] := monster.Clone(Application);
-       //monsters[i].Move(Vector3Single(i,0,1),false,false);
-       //changes only the first node!
-       (monsters[i].RootNode.FindNodeByName(TTransformNode,'Knight_TRANSFORM',true) as TTransformNode).Translation := Vector3Single(i,0,1);
-       //monsters[i].Move(Vector3Single(0,0,0),false,false);//.Translate(Vector3Single(i,0,1));
+{       monsterscene[i] := TCastleScene.create(window);
+       MonsterScene[i].load(monster,false,false);} //not working??? Switch node preserves its state, root must be cloned too... bad.
+       monsterscene[i] := m.clone(window);
+       monsterscene[i].ProcessEvents := true;
+       monsterscene[i].PlayAnimation('animation',paForceLooping);
+       monsterscene[i].increasetime(RND.random);
+       //monsterscene[i].Attributes.EnableTextures := false;
 
-       {
-       monsters[i].ProcessEvents := true;
-       monsters[i].PlayAnimation('animation',paForceLooping);
-       }
+       monsters[i] := T3DOrient.Create(window);
+       monsters[i].Orientation := otUpZDirectionMinusY;
+       monsters[i].Up := Vector3Single(0,0,1);
+       //monsters[i].UpPrefer(Vector3Single(0,0,1)); //not working?
+       monsters[i].add(monsterscene[i]);
+       monsters[i].translate(Vector3Single(i,0,1));
 
        Window.SceneManager.Items.Add(monsters[i]);
      end;
