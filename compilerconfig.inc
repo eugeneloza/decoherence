@@ -1,4 +1,5 @@
 {$mode objfpc}{$H+}
+
 {defines fullscreen mode}
 //{$DEFINE Fullscreen}
 
@@ -12,5 +13,8 @@
 {$define SUPPORTS_INLINE}
 
 {convenient global range-checking on/off}
+{$IFNDEF RELEASE}
 {$R+}{$Q+}
+{$ENDIF}
 
+{$interfaces corba}

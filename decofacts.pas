@@ -22,9 +22,22 @@ unit decofacts;
 
 interface
 
-{uses
-  Classes, SysUtils; }
+uses
+  fgl;
 
+type DFact = class
+  value: string;
+end;
+
+Type TFactList = specialize TFPGObjectList<DFact>;
+
+var facts_text: array of string;
+    image_text: array of string;
+
+var N_facts: integer;
+    N_images: integer;
+    LastFact: integer = -1;
+    FactsFrequency: array of integer;
 
 procedure LoadFacts;
 procedure DestroyFacts;
@@ -36,13 +49,7 @@ implementation
 
 uses decoglobal;
 
-var facts_text: array of string;
-    image_text: array of string;
 
-var N_facts: integer;
-    N_images: integer;
-    LastFact: integer = -1;
-    FactsFrequency: array of integer;
 
 function GetRandomFact: string;
 var newFact: integer;

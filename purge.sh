@@ -10,4 +10,3 @@ rm -r backup
 rm -r lib
 rm .fuse_hidden*
 rm heap.trc
-rm -r Release

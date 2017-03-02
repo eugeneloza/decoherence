@@ -1,0 +1,54 @@
+object MainForm: TMainForm
+  Left = 536
+  Height = 240
+  Top = 152
+  Width = 320
+  Caption = 'MainForm'
+  ClientHeight = 240
+  ClientWidth = 320
+  OnCreate = FormCreate
+  LCLVersion = '1.6.2.0'
+  object FactsEditorButton: TButton
+    Left = 208
+    Height = 25
+    Top = 40
+    Width = 99
+    Caption = 'Facts'
+    OnClick = FactsEditorButtonClick
+    TabOrder = 0
+  end
+  object LanguageSelect: TComboBox
+    Left = 208
+    Height = 21
+    Top = 8
+    Width = 100
+    ItemHeight = 0
+    ItemIndex = 0
+    Items.Strings = (
+      'Russian'
+      'English'
+    )
+    OnChange = LanguageSelectChange
+    Style = csDropDownList
+    TabOrder = 1
+    Text = 'Russian'
+  end
+  object CompileButton: TButton
+    Left = 220
+    Height = 25
+    Top = 212
+    Width = 75
+    Caption = 'Compile'
+    OnClick = CompileButtonClick
+    TabOrder = 2
+  end
+  object SaveButton: TButton
+    Left = 22
+    Height = 25
+    Top = 213
+    Width = 75
+    Caption = 'Save'
+    OnClick = SaveButtonClick
+    TabOrder = 3
+  end
+end
