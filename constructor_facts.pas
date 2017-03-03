@@ -61,7 +61,8 @@ uses DOM,
 {$PUSH}{$WARN 4105 OFF} // string conversion is ok here
 procedure TFactsEditor.LoadMe;
 var FactsDoc: TXMLDocument;
-    Base: TDOMElement;
+    BaseElement: TDOMElement;
+    ValueNode: TDOMElement;
     Iterator: TXMLElementIterator;
     f: DFact;
     //i: integer;
@@ -77,14 +78,15 @@ begin
 
   Facts[Language_Russian] := TFactList.create(true);
 
-  Base := FactsDoc.DocumentElement;
+  BaseElement := FactsDoc.DocumentElement;
 
-  Iterator := base.ChildrenIterator; //todo: sigsegv if no "fact" field found
+  Iterator := BaseElement.ChildrenIterator; //todo: sigsegv if no "fact" field found?
   try
     while Iterator.GetNext do
     begin
       F := DFact.create;
-      F.value := Iterator.current.TextData;
+      ValueNode := Iterator.current.ChildElement('Value', true);
+      F.value := ValueNode.TextData;
       Facts[Language_Russian].add(F);
     end;
   finally
@@ -114,7 +116,7 @@ end;
 {$PUSH}{$WARN 4104 OFF} // string conversion is ok here
 procedure TFactsEditor.WriteMe(ToGameFolder: boolean);
 var XMLdoc: TXMLDocument;
-    RootNode, ContainerNode, TextNode: TDOMNode;
+    RootNode, ContainerNode, valueNode, TextNode: TDOMNode;
     i: DFact;
 begin
   if Facts[Language_Russian] = nil then exit;
@@ -125,8 +127,11 @@ begin
 
   for i in Facts[Language_Russian] do begin
     ContainerNode := XMLdoc.CreateElement('Fact');
+    ValueNode := XMLdoc.CreateElement('Value');
     TextNode := XMLdoc.CreateTextNode(i.value);
-    ContainerNode.Appendchild(TextNode);
+    ValueNode.AppendChild(TextNode);
+    //compatibility
+    ContainerNode.AppendChild(ValueNode);
     RootNode.Appendchild(ContainerNode);
   end;
 

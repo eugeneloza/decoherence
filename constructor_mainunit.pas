@@ -121,7 +121,7 @@ begin
   for WF in AllForms do
     if not ToGameFolder then begin
       // if we're saving the constructor's own data, we save only changed data
-      if WF.isLoaded and WF.isChanged then
+      //if WF.isLoaded and WF.isChanged then
         WF.WriteMe(ToGameFolder);
     end
     else begin
