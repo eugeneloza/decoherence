@@ -19,13 +19,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 unit constructor_mainunit;
 
 {$INCLUDE compilerconfig.inc}
-
 interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
   fgl,
   castleLog,
+  decotranslation,
   constructor_global;
 
 type TFormList = specialize TFPGObjectList<TWriterForm>;
@@ -56,18 +56,19 @@ type
 var
   MainForm: TMainForm;
 
+{+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
 uses constructor_facts;
 
 {$R *.lfm}
 
-{ TMainForm }
-
 procedure TMainForm.FactsEditorButtonClick(Sender: TObject);
 begin
   FactsEditor.Show;
 end;
+
+{-----------------------------------------------------------------------------}
 
 procedure TMainForm.GetLanguage;
 begin
@@ -78,6 +79,8 @@ begin
   end;
 end;
 
+{-----------------------------------------------------------------------------}
+
 procedure TMainForm.FormCreate(Sender: TObject);
 begin
   //MakeFormsList;  //other forms are nil yet... so doesn't help
@@ -85,15 +88,21 @@ begin
   GetLanguage;
 end;
 
+{-----------------------------------------------------------------------------}
+
 procedure TMainForm.FormDestroy(Sender: TObject);
 begin
   FreeAndNil(AllForms);
 end;
 
+{-----------------------------------------------------------------------------}
+
 procedure TMainForm.LanguageSelectChange(Sender: TObject);
 begin
   GetLanguage;
 end;
+
+{-----------------------------------------------------------------------------}
 
 procedure TMainForm.MakeFormsList;
 begin
@@ -101,6 +110,8 @@ begin
   //add all future forms here
   AllForms.Add(FactsEditor);
 end;
+
+{-----------------------------------------------------------------------------}
 
 procedure TMainForm.WriteMe(ToGameFolder: boolean);
 var WF: TWriterForm;
@@ -119,18 +130,23 @@ begin
       WF.WriteMe(ToGameFolder);
     end
 
-  //FactsEditor.WriteMe(ToGameFolder);
 end;
+
+{-----------------------------------------------------------------------------}
 
 procedure TMainForm.SaveButtonClick(Sender: TObject);
 begin
   WriteMe(False);
 end;
 
+{-----------------------------------------------------------------------------}
+
 procedure TMainForm.CompileButtonClick(Sender: TObject);
 begin
   WriteMe(True);
 end;
+
+{-----------------------------------------------------------------------------}
 
 Initialization
 

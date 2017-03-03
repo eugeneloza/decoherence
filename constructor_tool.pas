@@ -8,7 +8,7 @@ uses
   {$ENDIF}{$ENDIF}
   Interfaces, // this includes the LCL widgetset
   Forms, castle_base, castle_window, constructor_mainunit, constructor_facts,
-  constructor_global;
+  constructor_global, decotranslation;
 
 {$R *.res}
 

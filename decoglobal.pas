@@ -50,6 +50,8 @@ const InterfaceFolder    = 'interface/';
       Tiles_folder        = Models_folder + 'tiles'+pathdelim;
       Placeholders_folder = Models_folder + 'placeholders'+pathdelim;
 
+      ScenarioFolder      = 'scenario/';
+
 const anisotropic_smoothing = 4;
       Shadow_maps_enabled = false;
       Shadow_volumes_enabled = false;

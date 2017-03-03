@@ -24,13 +24,6 @@ interface
 uses
   Classes, Forms, SysUtils;
 
-{type
-  IWriter = interface
-    ['{0A2E585A-7FEF-4169-B926-2B78E5343FDE}']
-    procedure WriteMe(ToGameFolder: boolean);
-    procedure LoadMe;
-  end;}
-
 type
   TWriterForm = class(TForm)
   private
@@ -43,37 +36,24 @@ type
     procedure WriteMe(ToGameFolder: boolean); virtual; abstract;
   end;
 
-type TLanguage = (Language_English,Language_Russian);
-
-var CurrentLanguage: TLanguage;
-
-{Provides a name for the current language directory without backslashes}
-function LanguageDir: string;
 {analogue to castleFilesUtils.ApplicationData (and made based on it)
  but points to ARCHITECT directory (true) or ApplicationData (false)}
 function ConstructorData(URL: string; ToGameFolder:boolean = true): string;
-
+{get file extension (archive/xml) based on save location}
 function FileExtension(zipped: boolean = true): string;
 
+{+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
 uses CastleFilesUtils, StrUtils;
-
-function LanguageDir: string;
-begin
-  case CurrentLanguage of
-    language_English: result := 'ENG/';
-    language_Russian: result := 'RUS/';
-    else raise Exception.Create('Unknown Language in global.LanguageDir!');
-  end;
-
-end;
 
 function ConstructorData(URL: string; ToGameFolder:boolean = true): string;
 begin
   Result := ApplicationData(URL);
   if not ToGameFolder then result := AnsiReplaceText(Result,'/data/','/architect/');
 end;
+
+{-----------------------------------------------------------------------------}
 
 function FileExtension(zipped: boolean = true): string;
 begin

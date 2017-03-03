@@ -19,13 +19,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 unit constructor_facts;
 
 {$INCLUDE compilerconfig.inc}
-
 interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
   CastleXMLUtils,
-  decofacts,
+  decofacts, decotranslation,
   constructor_global;
 
 type
@@ -38,7 +37,7 @@ type
     procedure FormShow(Sender: TObject);
   private
   public
-    Facts: TFactList;
+    Facts: array [TLanguage] of TFactList;
     FactsLanguage: TLanguage;
     procedure LoadMe; override;
     procedure WriteMe(ToGameFolder: boolean); override;
@@ -48,15 +47,16 @@ type
 var
   FactsEditor: TFactsEditor;
 
+{+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
 uses DOM,
-  CastleDownload, XMLWrite,
-  CastleLog;
+  CastleDownload,
+  CastleLog, decoglobal;
 
 {$R *.lfm}
 
-{ TFactsEditor }
+{-----------------------------------------------------------------------------}
 
 {$PUSH}{$WARN 4105 OFF} // string conversion is ok here
 procedure TFactsEditor.LoadMe;
@@ -75,7 +75,7 @@ begin
     exit;
   end;
 
-  Facts := TFactList.create(true);
+  Facts[Language_Russian] := TFactList.create(true);
 
   Base := FactsDoc.DocumentElement;
 
@@ -85,7 +85,7 @@ begin
     begin
       F := DFact.create;
       F.value := Iterator.current.TextData;
-      Facts.add(F);
+      Facts[Language_Russian].add(F);
     end;
   finally
     FreeAndNil(Iterator)
@@ -97,7 +97,7 @@ begin
   isChanged := false;
 
   FactsListbox.Clear;
-  for F in Facts do
+  for F in Facts[Language_Russian] do
     FactsListbox.Items.Add(F.value);
 
 {  LoadFacts;
@@ -109,19 +109,21 @@ begin
 end;
 {$POP}
 
+{-----------------------------------------------------------------------------}
+
 {$PUSH}{$WARN 4104 OFF} // string conversion is ok here
 procedure TFactsEditor.WriteMe(ToGameFolder: boolean);
 var XMLdoc: TXMLDocument;
     RootNode, ContainerNode, TextNode: TDOMNode;
     i: DFact;
 begin
-  if Facts = nil then exit;
+  if Facts[Language_Russian] = nil then exit;
 
   XMLdoc := TXMLDocument.Create;
   RootNode := XMLdoc.CreateElement('FactsList');
   XMLdoc.Appendchild(RootNode);
 
-  for i in Facts do begin
+  for i in Facts[Language_Russian] do begin
     ContainerNode := XMLdoc.CreateElement('Fact');
     TextNode := XMLdoc.CreateTextNode(i.value);
     ContainerNode.Appendchild(TextNode);
@@ -137,16 +139,21 @@ begin
 end;
 {$POP}
 
+{-----------------------------------------------------------------------------}
 
 function TFactsEditor.GetFileLink(ToGameFolder: boolean): string;
 begin
-  Result := ConstructorData('scenario/'+LanguageDir+'facts'+FileExtension(ToGameFolder),ToGameFolder);
+  Result := ConstructorData(ScenarioFolder+LanguageDir+'facts'+FileExtension(ToGameFolder),ToGameFolder);
 end;
+
+{-----------------------------------------------------------------------------}
 
 procedure TFactsEditor.FormShow(Sender: TObject);
 begin
   if (not isLoaded) or (FactsLanguage<>CurrentLanguage) then LoadMe;
 end;
+
+{-----------------------------------------------------------------------------}
 
 procedure TFactsEditor.FormDestroy(Sender: TObject);
 begin

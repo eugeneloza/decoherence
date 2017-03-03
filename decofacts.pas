@@ -19,11 +19,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 unit decofacts;
 
 {$INCLUDE compilerconfig.inc}
-
 interface
 
-uses
-  fgl;
+uses fgl,
+  decotranslation;
 
 type DFact = class
   value: string;
@@ -49,8 +48,6 @@ implementation
 
 uses decoglobal;
 
-
-
 function GetRandomFact: string;
 var newFact: integer;
 begin
@@ -62,7 +59,7 @@ begin
   LastFact := newFact;
 end;
 
-{---------------------------------------------------------------------------------}
+{-----------------------------------------------------------------------------}
 
 var LoadImageOld: integer=-1;
 function GetRandomFactImage: string;
