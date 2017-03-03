@@ -15,7 +15,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 
 {---------------------------------------------------------------------------}
 
-{ ******** Unit description here ****** }
+{ Editor for loadscreens: facts and images }
 unit constructor_facts;
 
 {$INCLUDE compilerconfig.inc}
@@ -33,7 +33,7 @@ type
   { TFactsEditor }
 
   TFactsEditor = class(TWriterForm)
-    ListBox1: TListBox;
+    FactsListbox: TListBox;
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
   private
@@ -51,65 +51,61 @@ var
 implementation
 
 uses DOM,
-  CastleDownload, XMLWrite;
+  CastleDownload, XMLWrite,
+  CastleLog;
 
 {$R *.lfm}
 
 { TFactsEditor }
 
-{hack temporary}
-procedure URLWriteXML(Doc: TXMLDocument; const URL: String; const Options: TStreamOptions = []);
-var
-  Stream: TStream;
-begin
-  Stream := URLSaveStream(URL, Options);
-  try
-    WriteXMLFile(Doc, Stream);
-  finally FreeAndNil(Stream) end;
-end;
-{/hack}
-
 {$PUSH}{$WARN 4105 OFF} // string conversion is ok here
 procedure TFactsEditor.LoadMe;
 var FactsDoc: TXMLDocument;
     Base: TDOMElement;
-    Iter: TXMLElementIterator;
+    Iterator: TXMLElementIterator;
     f: DFact;
-    i: integer;
+    //i: integer;
 begin
   freeandnil(Facts);
-  Facts := TFactList.create(true);
 
   try
+    WriteLnLog(GetFileLink(false));
     FactsDoc := URLReadXML(GetFileLink(false));
   except
-    //freeandnil(Facts);
     exit;
   end;
 
-{  Base := FactsDoc.DocumentElement;
+  Facts := TFactList.create(true);
 
-  Iter := Base.ChildElement('Fact', false).ChildrenIterator; //todo: sigsegv
+  Base := FactsDoc.DocumentElement;
+
+  Iterator := base.ChildrenIterator; //todo: sigsegv if no "fact" field found
   try
-    while Iter.GetNext do
+    while Iterator.GetNext do
     begin
       F := DFact.create;
-      F.value := Iter.current.TextData;
+      F.value := Iterator.current.TextData;
       Facts.add(F);
     end;
-  finally FreeAndNil(Iter) end; }
+  finally
+    FreeAndNil(Iterator)
+  end;
 
   freeandnil(FactsDoc);
   FactsLanguage := CurrentLanguage;
   isLoaded := true;
   isChanged := false;
 
-  LoadFacts;
+  FactsListbox.Clear;
+  for F in Facts do
+    FactsListbox.Items.Add(F.value);
+
+{  LoadFacts;
   for i := 0 to N_facts-1 do begin
     F := DFact.create;
     F.Value := Facts_text[i];
     Facts.add(F);
-  end;
+  end; }
 end;
 {$POP}
 
@@ -133,7 +129,7 @@ begin
   end;
 
   if ToGameFolder then
-    URLWriteXML(XMLdoc, GetFileLink(ToGameFolder),[soGzip])
+    URLWriteXML(XMLdoc, GetFileLink(ToGameFolder),[ssoGzip])
   else
     URLWriteXML(XMLdoc, GetFileLink(ToGameFolder));
 

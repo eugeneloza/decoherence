@@ -15,7 +15,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 
 {---------------------------------------------------------------------------}
 
-{ ******** Unit description here ****** }
+{ Main unit which launches all other editors. DESKTOP ONLY. }
 unit constructor_mainunit;
 
 {$INCLUDE compilerconfig.inc}
@@ -25,11 +25,15 @@ interface
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
   fgl,
+  castleLog,
   constructor_global;
 
 type TFormList = specialize TFPGObjectList<TWriterForm>;
 
 type
+
+  { TMainForm }
+
   TMainForm = class(TForm)
     SaveButton: TButton;
     CompileButton: TButton;
@@ -38,6 +42,7 @@ type
     procedure CompileButtonClick(Sender: TObject);
     procedure FactsEditorButtonClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
     procedure LanguageSelectChange(Sender: TObject);
     procedure SaveButtonClick(Sender: TObject);
   private
@@ -75,26 +80,34 @@ end;
 
 procedure TMainForm.FormCreate(Sender: TObject);
 begin
+  //MakeFormsList;  //other forms are nil yet... so doesn't help
+  AllForms := nil;
   GetLanguage;
+end;
+
+procedure TMainForm.FormDestroy(Sender: TObject);
+begin
+  FreeAndNil(AllForms);
 end;
 
 procedure TMainForm.LanguageSelectChange(Sender: TObject);
 begin
-  MakeFormsList;
   GetLanguage;
 end;
 
 procedure TMainForm.MakeFormsList;
 begin
   AllForms := TFormList.create(false);
-  //add all forms here
+  //add all future forms here
   AllForms.Add(FactsEditor);
 end;
 
 procedure TMainForm.WriteMe(ToGameFolder: boolean);
 var WF: TWriterForm;
 begin
-  {for WF in AllForms do begin
+  if AllForms = nil then MakeFormsList; //not optimal...
+
+  for WF in AllForms do
     if not ToGameFolder then begin
       // if we're saving the constructor's own data, we save only changed data
       if WF.isLoaded and WF.isChanged then
@@ -105,8 +118,8 @@ begin
       if not WF.isLoaded then WF.LoadMe;
       WF.WriteMe(ToGameFolder);
     end
-  end; }
-  FactsEditor.WriteMe(ToGameFolder);
+
+  //FactsEditor.WriteMe(ToGameFolder);
 end;
 
 procedure TMainForm.SaveButtonClick(Sender: TObject);
@@ -118,6 +131,10 @@ procedure TMainForm.CompileButtonClick(Sender: TObject);
 begin
   WriteMe(True);
 end;
+
+Initialization
+
+InitializeLog;
 
 
 end.

@@ -15,7 +15,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 
 {---------------------------------------------------------------------------}
 
-{ ******** Unit description here ****** }
+{ Global variables and definitions for Constructor }
 unit constructor_global;
 
 {$INCLUDE compilerconfig.inc}
@@ -50,16 +50,14 @@ var CurrentLanguage: TLanguage;
 {Provides a name for the current language directory without backslashes}
 function LanguageDir: string;
 {analogue to castleFilesUtils.ApplicationData (and made based on it)
- but points to ARCHITECT directory (true) or ApplicationData (false)
- TODO
- AT THIS MOMENT IT JUST POINTS TO ApplicationData RESULT}
+ but points to ARCHITECT directory (true) or ApplicationData (false)}
 function ConstructorData(URL: string; ToGameFolder:boolean = true): string;
 
 function FileExtension(zipped: boolean = true): string;
 
 implementation
 
-uses CastleFilesUtils;
+uses CastleFilesUtils, StrUtils;
 
 function LanguageDir: string;
 begin
@@ -74,7 +72,7 @@ end;
 function ConstructorData(URL: string; ToGameFolder:boolean = true): string;
 begin
   Result := ApplicationData(URL);
-  if not ToGameFolder then ;//todo: replace '/data/' for '/architect/'
+  if not ToGameFolder then result := AnsiReplaceText(Result,'/data/','/architect/');
 end;
 
 function FileExtension(zipped: boolean = true): string;
