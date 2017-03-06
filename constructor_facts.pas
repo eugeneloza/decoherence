@@ -27,9 +27,6 @@ uses
   constructor_global;
 
 type
-
-  { TFactsEditor }
-
   TFactsEditor = class(TWriterForm)
     DeselectAllButton: TButton;
     SelectAllButton: TButton;
@@ -44,11 +41,15 @@ type
     procedure SelectAllButtonClick(Sender: TObject);
   private
   public
+    {lists of facts in all available languages. If file not found then the value
+     is nil}
     Facts: array [TLanguage] of TFactList;
+    {list of all available image files in LoadScreen directory}
     LoadImages: TLoadImageList;
     procedure LoadMe; override;
     procedure FreeMe; override;
     procedure WriteMe(ToGameFolder: boolean); override;
+    {re-fills listboxes}
     procedure ReloadContent;
   end;
 
@@ -87,8 +88,8 @@ begin
     end;
   end;
 
-  {load directly from the game data folder and not save
-   maybe, this'll need "add an image from this computer"}
+  {load directly from the game data folder and not save anywhere intermediately.
+   Maybe, this'll need "add an image from this computer" button/feature}
   LoadScreensListBox.clear;
   LoadImages := TLoadImageList.create(true);
   if FindFirst (FakeApplicationData(LoadScreenFolder + '*.jpg'), faAnyFile - faDirectory, Rec) = 0 then begin
@@ -107,13 +108,13 @@ begin
     WriteLnLog('TFactsEditor.LoadMe','ERROR: Unable to load LoadScreen images');
 
 
-  for L in TLanguage do if Facts[L]<>nil then
+  {for L in TLanguage do if Facts[L]<>nil then
     for F in Facts[L] do
       For LI in LoadImages do begin
         LI2 := DLoadImage.Create;
         LI2.value := LI.value;
         F.compatibility.add(LI2);
-      end;
+      end;}
 
   MyLanguage := ConstructorLanguage;    (*not sure about it*)
   isLoaded := true;
@@ -121,6 +122,8 @@ begin
 
   ReloadContent;
 end;
+
+{-----------------------------------------------------------------------------}
 
 procedure TFactsEditor.ReloadContent;
 var F: DFact;
@@ -137,7 +140,6 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-//{$PUSH}{$WARN 4104 OFF} // string conversion is ok here
 procedure TFactsEditor.WriteMe(ToGameFolder: boolean);
 var XMLdoc: TXMLDocument;
     RootNode, ContainerNode, valueNode, value2node, TextNode: TDOMNode;
@@ -184,6 +186,8 @@ procedure TFactsEditor.FormShow(Sender: TObject);
 begin
   if (not isLoaded) or (MyLanguage<>ConstructorLanguage) then LoadMe;
 end;
+
+{-----------------------------------------------------------------------------}
 
 procedure TFactsEditor.SelectAllButtonClick(Sender: TObject);
 begin

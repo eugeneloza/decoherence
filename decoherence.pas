@@ -229,7 +229,7 @@ begin
   GUI.rescale;
 
   WritelnLog('ApplicationInitialize','Initialize interface');
-  LoadFacts;
+  InitLoadScreen;
 
   //finally (fonts, random and facts loaded), we're ready to show game loading screen
   {$IFDEF AllowRescale}window.OnResize := @WindowResize;{$ENDIF}
@@ -274,7 +274,7 @@ Finalization
   { free all assigned memory }
   DestroyCompositeInterface;
   //DestroyGlobal;
-  DestroyFacts;
+  FreeLoadScreen;
   DestroyTiles;
   WriteLnLog('Finalization','Bye...');
 end.

@@ -32,12 +32,18 @@ type
     fisChanged: boolean;
     fMyLanguage: TLanguage;
   public
+    {if the TWriterForm instance is loaded from the Architect?}
     property isLoaded: boolean read fisLoaded write fisLoaded default false;
+    {Was the TWriterForm changed since last save/load?}
     property isChanged: boolean read fisChanged write fisChanged default false;
-    property MyLanguage: TLanguage read fMyLanguage write fMyLanguage; //if applicable
+    {TWriterForm current displayed language (if appliccable / else just a dummy)}
+    property MyLanguage: TLanguage read fMyLanguage write fMyLanguage;
+    {TWriterForm abstract load procedure}
     procedure LoadMe; virtual; abstract;
-    procedure FreeMe; virtual; abstract;
+    {TWriterForm abstract save procedure}
     procedure WriteMe(ToGameFolder: boolean); virtual; abstract;
+    {TWriterForm abstract destructor}
+    procedure FreeMe; virtual; abstract;
   end;
 
 var ConstructorLanguage: TLanguage;
@@ -46,7 +52,8 @@ var ConstructorLanguage: TLanguage;
  but points to ARCHITECT directory (true) or ApplicationData (false)}
 function ConstructorData(URL: string; ToGameFolder:boolean): string;
 {Desktop-only ApplicationData analogue. Replacement for ApplicationData for
- native FPC functions that don't work with URLs}
+ native FPC functions that don't work with URLs
+ The result is relative to application folder!}
 function FakeApplicationData(URL: string): string;
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
@@ -64,13 +71,13 @@ begin
   end;
 end;
 
+{-----------------------------------------------------------------------------}
+
 function FakeApplicationData(URL: string): string;
 begin
   Result := 'data/'+URL;
   Result := AnsiReplaceText(Result,'/',pathdelim); //we're using native OS file access
 end;
-
-{-----------------------------------------------------------------------------}
 
 
 end.

@@ -23,9 +23,15 @@ interface
 
 //uses SysUtils;
 
-type TLanguage = (Language_English, Language_Russian);
+type
+  {enumerates all available languages. To add another language, first step
+   is to add it to this unit}
+  TLanguage = (Language_English, Language_Russian);
 
-var CurrentLanguage: TLanguage = Language_Russian;
+
+var
+  {current game language}
+  CurrentLanguage: TLanguage = Language_Russian;
 
 {Provides a name for the current language directory without backslashes}
 function LanguageDir(Lang: TLanguage): string;
@@ -45,6 +51,8 @@ begin
     else raise Exception.Create('Unknown Language in decotranslation.LanguageDir!');
   end;
 end;
+
+{-----------------------------------------------------------------------------}
 
 function SayLaugnage(Lang: TLanguage): string;
 begin
