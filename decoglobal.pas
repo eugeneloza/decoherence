@@ -50,7 +50,9 @@ const InterfaceFolder    = 'interface/';
       Tiles_folder        = Models_folder + 'tiles'+pathdelim;
       Placeholders_folder = Models_folder + 'placeholders'+pathdelim;
 
-      ScenarioFolder      = 'scenario/';
+      Scenario_Folder     = 'scenario/';
+
+const XML_extension = {$IFDEF gzipdata}'.gz'{$ELSE}'.xml'{$ENDIF};
 
 const anisotropic_smoothing = 4;
       Shadow_maps_enabled = false;

@@ -67,7 +67,7 @@ var GUI: DInterfaceContainer;
 implementation
 
 uses SysUtils, CastleLog,
-  decofacts,
+  decoloadscreen,
   decointerfacecomposite, decointerfaceblocks,
   decoplayercharacter,
   decogamemode;

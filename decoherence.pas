@@ -35,7 +35,7 @@ uses Classes, SysUtils,
 
      decogui, decointerface, decomouse, decofont,
      decolevel, decodungeontiles,
-     decofacts, decoperks,
+     decoloadscreen, decoperks,
      decointerfacecomposite,
      decoplayercharacter,
      decoglobal, decogamemode;

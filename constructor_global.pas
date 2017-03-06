@@ -22,43 +22,46 @@ unit constructor_global;
 interface
 
 uses
-  Classes, Forms, SysUtils;
+  Classes, Forms, SysUtils,
+  decotranslation;
 
 type
   TWriterForm = class(TForm)
   private
     fisLoaded: boolean;
     fisChanged: boolean;
+    fMyLanguage: TLanguage;
   public
     property isLoaded: boolean read fisLoaded write fisLoaded default false;
     property isChanged: boolean read fisChanged write fisChanged default false;
+    property MyLanguage: TLanguage read fMyLanguage write fMyLanguage; //if applicable
     procedure LoadMe; virtual; abstract;
+    procedure FreeMe; virtual; abstract;
     procedure WriteMe(ToGameFolder: boolean); virtual; abstract;
   end;
 
+var ConstructorLanguage: TLanguage;
+
 {analogue to castleFilesUtils.ApplicationData (and made based on it)
  but points to ARCHITECT directory (true) or ApplicationData (false)}
-function ConstructorData(URL: string; ToGameFolder:boolean = true): string;
-{get file extension (archive/xml) based on save location}
-function FileExtension(zipped: boolean = true): string;
+function ConstructorData(URL: string; ToGameFolder:boolean): string;
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
 uses CastleFilesUtils, StrUtils;
 
-function ConstructorData(URL: string; ToGameFolder:boolean = true): string;
+function ConstructorData(URL: string; ToGameFolder:boolean): string;
 begin
   Result := ApplicationData(URL);
-  if not ToGameFolder then result := AnsiReplaceText(Result,'/data/','/architect/');
+  if not ToGameFolder then begin
+    result := AnsiReplaceText(Result,'/data/','/architect/');
+    //invoke data compression
+    {$IFDEF gzipdata}result := AnsiReplaceText(Result,'.gz','.xml');{$ENDIF}
+  end;
 end;
 
 {-----------------------------------------------------------------------------}
-
-function FileExtension(zipped: boolean = true): string;
-begin
-  if zipped then result := '.gz' else result := '.xml';
-end;
 
 
 end.

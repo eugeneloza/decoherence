@@ -73,7 +73,7 @@ begin
   else if event.MouseButton = mbright then
     result := 100
   else if event.MouseButton = mbmiddle then
-    result := 200;
+    result := 200
   else raise Exception.Create('Unknown event.MouseButton in decomouse.GetFingerIndex!');
 end;
 

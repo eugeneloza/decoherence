@@ -73,8 +73,8 @@ end;
 procedure TMainForm.GetLanguage;
 begin
   case LanguageSelect.Items[LanguageSelect.ItemIndex] of
-    'English': CurrentLanguage := Language_English;
-    'Russian': CurrentLanguage := Language_Russian;
+    'English': ConstructorLanguage := Language_English;
+    'Russian': ConstructorLanguage := Language_Russian;
     else raise Exception.Create('Unknown Language in constructor_mainunit.LanguageSelect!');
   end;
 end;
@@ -91,7 +91,10 @@ end;
 {-----------------------------------------------------------------------------}
 
 procedure TMainForm.FormDestroy(Sender: TObject);
+{var WF: TWriterForm;}
 begin
+{  if (AllForms<>nil) then
+    for WF in AllForms do WF.FreeMe; //redundant?}
   FreeAndNil(AllForms);
 end;
 
@@ -121,7 +124,7 @@ begin
   for WF in AllForms do
     if not ToGameFolder then begin
       // if we're saving the constructor's own data, we save only changed data
-      //if WF.isLoaded and WF.isChanged then
+      if WF.isLoaded and WF.isChanged then
         WF.WriteMe(ToGameFolder);
     end
     else begin

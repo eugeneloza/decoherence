@@ -36,4 +36,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 {$R+}{$Q+}
 {$ENDIF}
 
+{gzip or not gzip}
+{$UNDEF gzipdata}
+
 {$interfaces corba}

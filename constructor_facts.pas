@@ -23,8 +23,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  CastleXMLUtils,
-  decofacts, decotranslation,
+  decoloadscreen, decotranslation,
   constructor_global;
 
 type
@@ -38,10 +37,9 @@ type
   private
   public
     Facts: array [TLanguage] of TFactList;
-    FactsLanguage: TLanguage;
     procedure LoadMe; override;
+    procedure FreeMe; override;
     procedure WriteMe(ToGameFolder: boolean); override;
-    function GetFileLink(ToGameFolder: boolean): string;
   end;
 
 var
@@ -50,76 +48,65 @@ var
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
-uses DOM,
-  CastleDownload,
+uses DOM, CastleDownload, CastleXMLUtils,
   CastleLog, decoglobal;
 
 {$R *.lfm}
 
 {-----------------------------------------------------------------------------}
 
-{$PUSH}{$WARN 4105 OFF} // string conversion is ok here
-procedure TFactsEditor.LoadMe;
-var FactsDoc: TXMLDocument;
-    BaseElement: TDOMElement;
-    ValueNode: TDOMElement;
-    Iterator: TXMLElementIterator;
-    f: DFact;
-    //i: integer;
+procedure TFactsEditor.FreeMe;
+var L: TLanguage;
 begin
-  freeandnil(Facts);
+  for L in TLanguage do
+    FreeAndNil(Facts[L]);
+end;
 
-  try
-    WriteLnLog(GetFileLink(false));
-    FactsDoc := URLReadXML(GetFileLink(false));
-  except
-    exit;
-  end;
+procedure TFactsEditor.LoadMe;
+var
+    CurrentFile: string;
+   // i: integer;
+    F: DFact;
+    L: TLanguage;
+begin
+  for L in TLanguage do {if L=Language_English then} begin
+    FreeAndNil(Facts[L]);
 
-  Facts[Language_Russian] := TFactList.create(true);
-
-  BaseElement := FactsDoc.DocumentElement;
-
-  Iterator := BaseElement.ChildrenIterator; //todo: sigsegv if no "fact" field found?
-  try
-    while Iterator.GetNext do
-    begin
-      F := DFact.create;
-      ValueNode := Iterator.current.ChildElement('Value', true);
-      F.value := ValueNode.TextData;
-      Facts[Language_Russian].add(F);
+    try
+      CurrentFile := ConstructorData(Scenario_Folder+LanguageDir(L)+'facts.xml',false);
+      LoadFacts(CurrentFile);
+      Facts[L] := decoloadscreen.Facts;
+      decoloadscreen.Facts := nil;
+    except
+      freeandnil(decoloadscreen.Facts);
+      writeLnLog('TFactsEditor.LoadMe','Exception reading '+CurrentFile);
     end;
-  finally
-    FreeAndNil(Iterator)
   end;
 
-  freeandnil(FactsDoc);
-  FactsLanguage := CurrentLanguage;
+  MyLanguage := ConstructorLanguage;    (*not sure about it*)
   isLoaded := true;
   isChanged := false;
 
   FactsListbox.Clear;
-  for F in Facts[Language_Russian] do
+  for f in Facts[MyLanguage] do
     FactsListbox.Items.Add(F.value);
 
-{  LoadFacts;
-  for i := 0 to N_facts-1 do begin
-    F := DFact.create;
-    F.Value := Facts_text[i];
-    Facts.add(F);
-  end; }
+{  for i := 0 to Facts[MyLanguage].count-1 do
+    FactsListbox.Items.Add(Facts[MyLanguage][i].value);}
 end;
-{$POP}
 
 {-----------------------------------------------------------------------------}
 
-{$PUSH}{$WARN 4104 OFF} // string conversion is ok here
+//{$PUSH}{$WARN 4104 OFF} // string conversion is ok here
 procedure TFactsEditor.WriteMe(ToGameFolder: boolean);
 var XMLdoc: TXMLDocument;
     RootNode, ContainerNode, valueNode, TextNode: TDOMNode;
     i: DFact;
 begin
-  if Facts[Language_Russian] = nil then exit;
+  if Facts[Language_Russian] = nil then begin
+    WriteLnLog('TFactsEditor.WriteMe','LANGUAGE IS NIL!');
+    exit;
+  end;
 
   XMLdoc := TXMLDocument.Create;
   RootNode := XMLdoc.CreateElement('FactsList');
@@ -128,7 +115,7 @@ begin
   for i in Facts[Language_Russian] do begin
     ContainerNode := XMLdoc.CreateElement('Fact');
     ValueNode := XMLdoc.CreateElement('Value');
-    TextNode := XMLdoc.CreateTextNode(i.value);
+    TextNode := XMLdoc.CreateTextNode(UTF8decode(i.value));
     ValueNode.AppendChild(TextNode);
     //compatibility
     ContainerNode.AppendChild(ValueNode);
@@ -136,33 +123,26 @@ begin
   end;
 
   if ToGameFolder then
-    URLWriteXML(XMLdoc, GetFileLink(ToGameFolder),[ssoGzip])
+    URLWriteXML(XMLdoc, ConstructorData(Scenario_Folder+LanguageDir(ConstructorLanguage)+'facts.xml',ToGameFolder){$IFDEF gzipdata},[ssoGzip]{$ENDIF})
   else
-    URLWriteXML(XMLdoc, GetFileLink(ToGameFolder));
+    URLWriteXML(XMLdoc, ConstructorData(Scenario_Folder+LanguageDir(ConstructorLanguage)+'facts.xml',ToGameFolder));
 
   FreeAndNil(XMLdoc);
 end;
-{$POP}
-
-{-----------------------------------------------------------------------------}
-
-function TFactsEditor.GetFileLink(ToGameFolder: boolean): string;
-begin
-  Result := ConstructorData(ScenarioFolder+LanguageDir+'facts'+FileExtension(ToGameFolder),ToGameFolder);
-end;
+//{$POP}
 
 {-----------------------------------------------------------------------------}
 
 procedure TFactsEditor.FormShow(Sender: TObject);
 begin
-  if (not isLoaded) or (FactsLanguage<>CurrentLanguage) then LoadMe;
+  if (not isLoaded) or (MyLanguage<>ConstructorLanguage) then LoadMe;
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure TFactsEditor.FormDestroy(Sender: TObject);
 begin
-  FreeAndNil(Facts);
+  FreeMe;
 end;
 
 end.

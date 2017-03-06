@@ -130,7 +130,7 @@
         <IsPartOfProject Value="True"/>
       </Unit3>
       <Unit4>
-        <Filename Value="decofacts.pas"/>
+        <Filename Value="decoloadscreen.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit4>
       <Unit5>

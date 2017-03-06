@@ -25,19 +25,19 @@ interface
 
 type TLanguage = (Language_English, Language_Russian);
 
-var CurrentLanguage: TLanguage;
+var CurrentLanguage: TLanguage = Language_Russian;
 
 {Provides a name for the current language directory without backslashes}
-function LanguageDir: string;
+function LanguageDir(Lang: TLanguage): string;
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
 uses SysUtils;
 
-function LanguageDir: string;
+function LanguageDir(Lang: TLanguage): string;
 begin
-  case CurrentLanguage of
+  case Lang of
     language_English: result := 'ENG/';
     language_Russian: result := 'RUS/';
     else raise Exception.Create('Unknown Language in global.LanguageDir!');

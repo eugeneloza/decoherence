@@ -8,7 +8,7 @@ object MainForm: TMainForm
   ClientWidth = 320
   OnCreate = FormCreate
   OnDestroy = FormDestroy
-  LCLVersion = '1.6.0.4'
+  LCLVersion = '1.6.2.0'
   object FactsEditorButton: TButton
     Left = 208
     Height = 25
@@ -23,7 +23,7 @@ object MainForm: TMainForm
     Height = 21
     Top = 8
     Width = 100
-    ItemHeight = 13
+    ItemHeight = 0
     ItemIndex = 0
     Items.Strings = (
       'Russian'
