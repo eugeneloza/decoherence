@@ -162,14 +162,6 @@ end;
 
 procedure DInterfaceContainer.DoLoadNewImage;
 begin
-  if floater = nil then floater := DFloatImage.create(self);
-  floater.FreeImage;
-  LoadNewFloaterImage := false;
-  floater.opacity := 0.8;
-  floater.phasespeed := 1/15;
-  floater.base.setsize(0,0,proportionalscale,fullheight);
-  floater.LoadThread(LoadScreenFolder+GetRandomFactImage);
-
   if LoadScreenLabel=nil then begin
     LoadScreenLabel := DLabel.create(self);
     LoadScreenLabel.setbasesize(1/17,-2/17,10/17,10/17,1,asNone);
@@ -185,6 +177,14 @@ begin
   end;
   floaterLabel.setbasesize(-11/17,1/17,10/17,10/17,0,asNone); //need to reset it each new fact, because w is reset to realwidth after text initialize
   floaterLabel.text := GetRandomFact;
+
+  if floater = nil then floater := DFloatImage.create(self);
+  floater.FreeImage;
+  LoadNewFloaterImage := false;
+  floater.opacity := 0.8;
+  floater.phasespeed := 1/15;
+  floater.base.setsize(0,0,proportionalscale,fullheight);
+  floater.LoadThread(LoadScreenFolder+GetRandomFactImage);
 end;
 
 {-----------------------------------------------------------------------------}

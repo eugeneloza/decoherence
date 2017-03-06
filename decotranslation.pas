@@ -29,6 +29,8 @@ var CurrentLanguage: TLanguage = Language_Russian;
 
 {Provides a name for the current language directory without backslashes}
 function LanguageDir(Lang: TLanguage): string;
+{Says the language name in English}
+function SayLaugnage(Lang: TLanguage): string;
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
@@ -40,7 +42,16 @@ begin
   case Lang of
     language_English: result := 'ENG/';
     language_Russian: result := 'RUS/';
-    else raise Exception.Create('Unknown Language in global.LanguageDir!');
+    else raise Exception.Create('Unknown Language in decotranslation.LanguageDir!');
+  end;
+end;
+
+function SayLaugnage(Lang: TLanguage): string;
+begin
+  case Lang of
+    language_English: Result := 'English';
+    language_Russian: Result := 'Russian';
+    else              Result := 'Unknown Language';
   end;
 end;
 

@@ -15,7 +15,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 
 {---------------------------------------------------------------------------}
 
-{ Temporary(?) unit "loads" facts and loadscreen images }
+{ This unit operates LoadScreens: loads and manages facts and loadscreen images }
 unit decoloadscreen;
 
 {$INCLUDE compilerconfig.inc}
@@ -24,16 +24,24 @@ interface
 uses fgl,
   decotranslation;
 
-type DLoadImage = class
-  value: string;
+type
+  {link to image file}
+  DLoadImage = class
+    value: string;
 end;
 
 TLoadImageList = specialize TFPGObjectList<DLoadImage>;
 
-type DFact = class
-  value: string;
-  frequency: integer; //TODO: not saved ATM
-  compatibility: TLoadImageList;
+type
+  {a fact with control of displayed frequency and a list of compatible images}
+  DFact = class
+    {fact text}
+    value: string;
+    {how many times the fact has been displayed}
+    frequency: integer; //TODO: not saved ATM
+    {list of compatible loadscreen images}
+    compatibility: TLoadImageList;
+    destructor destroy; override;
 end;
 
 Type TFactList = specialize TFPGObjectList<DFact>;
@@ -45,11 +53,16 @@ var Facts: TFactList;
 var //N_facts: integer;
     N_images: integer;
 
+{initialize LoadScreens}
 procedure LoadFacts;
+{load facts from a filename. Used both by game and constructor.}
 procedure LoadFacts(FileName: string);
 
+{free fact list memory}
 procedure DestroyFacts;
+{get a random fact}
 function GetRandomFact: string;
+{get a random fact image compatible with the last fact}
 function GetRandomFactImage: string;
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
@@ -60,8 +73,7 @@ uses SysUtils, CastleLog, CastleFilesUtils,
   decoglobal;
 
 var LastFact: integer = -1;
-
-
+    CurrentFact: DFact = nil;      //looks ugly! Maybe I should remake it?
 function GetRandomFact: string;
 var newFact: integer;
 begin
@@ -70,20 +82,27 @@ begin
   until (NewFact <> LastFact) and (rnd.random < 1/facts[newFact].frequency);
   inc(facts[newFact].frequency,7);      //todo balance facts frequency, now chance is 1,1/8,1/15,1/22...
   result := facts[newFact].value;
+  CurrentFact := Facts[newFact];
   LastFact := newFact;
 end;
 
 {-----------------------------------------------------------------------------}
 
-var LoadImageOld: integer=-1;
+var LoadImageOld: string = '';
 function GetRandomFactImage: string;
-var LoadImageNew: integer;
+var LoadImageNew: string;
 begin
-  repeat
-    LoadImageNew := rnd.random(N_Images);
-  until LoadImageOld <> LoadImageNew;
+  if currentFact = nil then
+    raise Exception.create('GetRandomFactImage ERROR: Get Fact before getting the image!');
+  if currentFact.compatibility.Count>0 then
+    repeat
+      LoadImageNew := currentFact.compatibility[rnd.random(currentFact.compatibility.Count)].value;
+    until (LoadImageOld <> LoadImageNew) or (currentFact.compatibility.Count=1)
+  else
+    raise Exception.create('GetRandomFactImage ERROR: No images to load!');
   LoadImageOld := LoadImageNew;
-  result := image_text[loadImageNew];
+  result := LoadImageNew;
+  CurrentFact := nil;
 end;
 
 {---------------------------------------------------------------------------------}
@@ -92,8 +111,9 @@ procedure LoadFacts(FileName: string);
 var FactsDoc: TXMLDocument;
     BaseElement: TDOMElement;
     ValueNode: TDOMElement;
-    Iterator: TXMLElementIterator;
+    Iterator,Iterator2: TXMLElementIterator;
     F: DFact;
+    LI: DLoadImage;
 begin
   if facts<>nil then begin
     freeandnil(Facts);
@@ -110,9 +130,22 @@ begin
     while Iterator.GetNext do
     begin
       F := DFact.create;
-      ValueNode := Iterator.current.ChildElement('Value', true);
-      F.value := UTF8encode(ValueNode.TextData);
       F.frequency := 1;
+      F.compatibility := TLoadImageList.create(true);
+      ValueNode := Iterator.current.ChildElement('Value', true);  //todo: false and catch nils
+      F.value := UTF8encode(ValueNode.TextData);
+      try
+        Iterator2 := Iterator.current.ChildElement('ImageList', true).ChildrenIterator;
+        while Iterator2.GetNext do
+        begin
+          LI := DLoadImage.create;
+          LI.value := UTF8encode(Iterator2.current.TextData);
+          F.compatibility.Add(LI);
+        end;
+      finally
+        freeAndNil(Iterator2);
+      end;
+
       Facts.add(F);
     end;
   finally
@@ -122,14 +155,24 @@ begin
   WriteLnLog('LoadFacts','Reading file finished.');
 end;
 
+{---------------------------------------------------------------------------}
+
+destructor DFact.destroy;
+begin
+  FreeAndNil(compatibility);
+  inherited;
+end;
+
+{---------------------------------------------------------------------------}
+
 procedure LoadFacts;
 begin
 
-  LoadFacts(ApplicationData(Scenario_Folder+LanguageDir(CurrentLanguage)+'facts'+xml_extension));
+  LoadFacts(ApplicationData(ScenarioFolder+LanguageDir(CurrentLanguage)+'facts'+xml_extension));
 
   {---}
 
-  N_images := 43+1;
+ { N_images := 43+1;
 
   setLength(image_text,N_images);
   image_text[00] := 'colour-of-nature-fractal_CC0_by_Sharon_Apted_[colorize].jpg';
@@ -175,7 +218,7 @@ begin
   image_text[40] := 'SunFlare_CC0_by-GIMP.jpg';
   image_text[41] := 'LensFlare_CC0_by-GIMP.jpg';
   image_text[42] := 'Milky_Way_2005_CC0_by_NASA_[glow,crop].jpg';
-  image_text[43] := 'Ocean_planet1_CC0_by_Merikanto_[gimp,gmic].jpg';
+  image_text[43] := 'Ocean_planet1_CC0_by_Merikanto_[gimp,gmic].jpg'; }
 end;
 
 {---------------------------------------------------------------------------------}
@@ -183,7 +226,6 @@ end;
 procedure DestroyFacts;
 begin
   FreeAndNil(Facts);
-  //
 end;
 
 end.

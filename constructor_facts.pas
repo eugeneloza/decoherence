@@ -69,14 +69,15 @@ procedure TFactsEditor.LoadMe;
 var
     CurrentFile: string;
     L: TLanguage;
-    LI: DLoadImage;
+    LI,LI2: DLoadImage;
     Rec: TSearchRec;
+    F: DFact;
 begin
   for L in TLanguage do begin
     FreeAndNil(Facts[L]);
 
     try
-      CurrentFile := ConstructorData(Scenario_Folder+LanguageDir(L)+'facts.xml',false);
+      CurrentFile := ConstructorData(ScenarioFolder+LanguageDir(L)+'facts.xml',false);
       LoadFacts(CurrentFile);
       Facts[L] := decoloadscreen.Facts;
       decoloadscreen.Facts := nil;
@@ -90,17 +91,29 @@ begin
    maybe, this'll need "add an image from this computer"}
   LoadScreensListBox.clear;
   LoadImages := TLoadImageList.create(true);
-  if FindFirst (FakeApplicationData(LoadScreenFolder + '*.jpg'), faAnyFile - faDirectory, Rec) = 0 then
-   try
-     repeat
-       LI := DLoadImage.create;
-       LI.value := Rec.Name;
-       LoadImages.Add(LI);
-     until FindNext(Rec) <> 0;
-   finally
-     FindClose(Rec);
-   end;
-  WriteLnLog('TFactsEditor.LoadMe','Images loaded = '+inttostr(LoadImages.count));
+  if FindFirst (FakeApplicationData(LoadScreenFolder + '*.jpg'), faAnyFile - faDirectory, Rec) = 0 then begin
+    try
+      repeat
+        LI := DLoadImage.create;
+        LI.value := Rec.Name;
+        LoadImages.Add(LI);
+      until FindNext(Rec) <> 0;
+    finally
+      FindClose(Rec);
+    end;
+    WriteLnLog('TFactsEditor.LoadMe','Images loaded = '+inttostr(LoadImages.count));
+  end
+  else
+    WriteLnLog('TFactsEditor.LoadMe','ERROR: Unable to load LoadScreen images');
+
+
+  for L in TLanguage do if Facts[L]<>nil then
+    for F in Facts[L] do
+      For LI in LoadImages do begin
+        LI2 := DLoadImage.Create;
+        LI2.value := LI.value;
+        F.compatibility.add(LI2);
+      end;
 
   MyLanguage := ConstructorLanguage;    (*not sure about it*)
   isLoaded := true;
@@ -127,17 +140,14 @@ end;
 //{$PUSH}{$WARN 4104 OFF} // string conversion is ok here
 procedure TFactsEditor.WriteMe(ToGameFolder: boolean);
 var XMLdoc: TXMLDocument;
-    RootNode, ContainerNode, valueNode, TextNode: TDOMNode;
+    RootNode, ContainerNode, valueNode, value2node, TextNode: TDOMNode;
     i: DFact;
     j: DLoadImage;
     L: TLanguage;
 begin
-  for L in TLanguage do begin
-    if Facts[L] = nil then begin
-      WriteLnLog('TFactsEditor.WriteMe','LANGUAGE IS NIL!');
-      break;
-    end;
-
+  for L in TLanguage do if Facts[L] = nil then
+    WriteLnLog('TFactsEditor.WriteMe','LANGUAGE IS NIL!')
+  else begin
     XMLdoc := TXMLDocument.Create;
     RootNode := XMLdoc.CreateElement('FactsList');
     XMLdoc.Appendchild(RootNode);
@@ -148,20 +158,21 @@ begin
       TextNode := XMLdoc.CreateTextNode(UTF8decode(i.value));
       ValueNode.AppendChild(TextNode);
       ContainerNode.AppendChild(ValueNode);
-      ValueNode := XMLdoc.CreateElement('Compatibility');
+      ValueNode := XMLdoc.CreateElement('ImageList');
       for j in i.compatibility do begin
+        Value2Node := XMLdoc.CreateElement('Image');
         TextNode := XMLdoc.CreateTextNode(UTF8decode(j.value));
-        ValueNode.AppendChild(TextNode);
+        Value2Node.AppendChild(TextNode);
+        ValueNode.AppendChild(Value2Node);
       end;
       ContainerNode.AppendChild(ValueNode);
-      //compatibility
       RootNode.Appendchild(ContainerNode);
     end;
 
     if ToGameFolder then
-      URLWriteXML(XMLdoc, ConstructorData(Scenario_Folder+LanguageDir(ConstructorLanguage)+'facts.xml',ToGameFolder){$IFDEF gzipdata},[ssoGzip]{$ENDIF})
+      URLWriteXML(XMLdoc, ConstructorData(ScenarioFolder+LanguageDir(ConstructorLanguage)+'facts.xml',ToGameFolder){$IFDEF gzipdata},[ssoGzip]{$ENDIF})
     else
-      URLWriteXML(XMLdoc, ConstructorData(Scenario_Folder+LanguageDir(ConstructorLanguage)+'facts.xml',ToGameFolder));
+      URLWriteXML(XMLdoc, ConstructorData(ScenarioFolder+LanguageDir(ConstructorLanguage)+'facts.xml',ToGameFolder));
 
     FreeAndNil(XMLdoc);
   end;

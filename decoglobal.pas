@@ -50,7 +50,7 @@ const InterfaceFolder    = 'interface/';
       Tiles_folder        = Models_folder + 'tiles'+pathdelim;
       Placeholders_folder = Models_folder + 'placeholders'+pathdelim;
 
-      Scenario_Folder     = 'scenario/';
+      ScenarioFolder      = 'scenario/';
 
 const XML_extension = {$IFDEF gzipdata}'.gz'{$ELSE}'.xml'{$ENDIF};
 
