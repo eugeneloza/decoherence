@@ -23,7 +23,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  decoloadscreen, decotranslation,
+  ExtCtrls, CheckLst, Buttons, decoloadscreen, decotranslation,
   constructor_global;
 
 type
@@ -31,15 +31,25 @@ type
   { TFactsEditor }
 
   TFactsEditor = class(TWriterForm)
+    DeselectAllButton: TButton;
+    SelectAllButton: TButton;
+    LoadScreensListBox: TCheckListBox;
     FactsListbox: TListBox;
+    Label1: TLabel;
+    Memo1: TMemo;
+    procedure DeselectAllButtonClick(Sender: TObject);
+    procedure FactsListboxSelectionChange(Sender: TObject; User: boolean);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure SelectAllButtonClick(Sender: TObject);
   private
   public
     Facts: array [TLanguage] of TFactList;
+    LoadImages: TLoadImageList;
     procedure LoadMe; override;
     procedure FreeMe; override;
     procedure WriteMe(ToGameFolder: boolean); override;
+    procedure ReloadContent;
   end;
 
 var
@@ -55,21 +65,14 @@ uses DOM, CastleDownload, CastleXMLUtils,
 
 {-----------------------------------------------------------------------------}
 
-procedure TFactsEditor.FreeMe;
-var L: TLanguage;
-begin
-  for L in TLanguage do
-    FreeAndNil(Facts[L]);
-end;
-
 procedure TFactsEditor.LoadMe;
 var
     CurrentFile: string;
-   // i: integer;
-    F: DFact;
     L: TLanguage;
+    LI: DLoadImage;
+    Rec: TSearchRec;
 begin
-  for L in TLanguage do {if L=Language_English then} begin
+  for L in TLanguage do begin
     FreeAndNil(Facts[L]);
 
     try
@@ -83,16 +86,40 @@ begin
     end;
   end;
 
+  {load directly from the game data folder and not save
+   maybe, this'll need "add an image from this computer"}
+  LoadScreensListBox.clear;
+  LoadImages := TLoadImageList.create(true);
+  if FindFirst (FakeApplicationData(LoadScreenFolder + '*.jpg'), faAnyFile - faDirectory, Rec) = 0 then
+   try
+     repeat
+       LI := DLoadImage.create;
+       LI.value := Rec.Name;
+       LoadImages.Add(LI);
+     until FindNext(Rec) <> 0;
+   finally
+     FindClose(Rec);
+   end;
+  WriteLnLog('TFactsEditor.LoadMe','Images loaded = '+inttostr(LoadImages.count));
+
   MyLanguage := ConstructorLanguage;    (*not sure about it*)
   isLoaded := true;
   isChanged := false;
 
+  ReloadContent;
+end;
+
+procedure TFactsEditor.ReloadContent;
+var F: DFact;
+    LI: DLoadImage;
+begin
+  memo1.clear;
   FactsListbox.Clear;
   for f in Facts[MyLanguage] do
     FactsListbox.Items.Add(F.value);
-
-{  for i := 0 to Facts[MyLanguage].count-1 do
-    FactsListbox.Items.Add(Facts[MyLanguage][i].value);}
+  LoadScreensListBox.Clear;
+  for LI in LoadImages do
+    LoadScreensListBox.Items.add(LI.value);
 end;
 
 {-----------------------------------------------------------------------------}
@@ -102,34 +129,43 @@ procedure TFactsEditor.WriteMe(ToGameFolder: boolean);
 var XMLdoc: TXMLDocument;
     RootNode, ContainerNode, valueNode, TextNode: TDOMNode;
     i: DFact;
+    j: DLoadImage;
+    L: TLanguage;
 begin
-  if Facts[Language_Russian] = nil then begin
-    WriteLnLog('TFactsEditor.WriteMe','LANGUAGE IS NIL!');
-    exit;
+  for L in TLanguage do begin
+    if Facts[L] = nil then begin
+      WriteLnLog('TFactsEditor.WriteMe','LANGUAGE IS NIL!');
+      break;
+    end;
+
+    XMLdoc := TXMLDocument.Create;
+    RootNode := XMLdoc.CreateElement('FactsList');
+    XMLdoc.Appendchild(RootNode);
+
+    for i in Facts[L] do begin
+      ContainerNode := XMLdoc.CreateElement('Fact');
+      ValueNode := XMLdoc.CreateElement('Value');
+      TextNode := XMLdoc.CreateTextNode(UTF8decode(i.value));
+      ValueNode.AppendChild(TextNode);
+      ContainerNode.AppendChild(ValueNode);
+      ValueNode := XMLdoc.CreateElement('Compatibility');
+      for j in i.compatibility do begin
+        TextNode := XMLdoc.CreateTextNode(UTF8decode(j.value));
+        ValueNode.AppendChild(TextNode);
+      end;
+      ContainerNode.AppendChild(ValueNode);
+      //compatibility
+      RootNode.Appendchild(ContainerNode);
+    end;
+
+    if ToGameFolder then
+      URLWriteXML(XMLdoc, ConstructorData(Scenario_Folder+LanguageDir(ConstructorLanguage)+'facts.xml',ToGameFolder){$IFDEF gzipdata},[ssoGzip]{$ENDIF})
+    else
+      URLWriteXML(XMLdoc, ConstructorData(Scenario_Folder+LanguageDir(ConstructorLanguage)+'facts.xml',ToGameFolder));
+
+    FreeAndNil(XMLdoc);
   end;
-
-  XMLdoc := TXMLDocument.Create;
-  RootNode := XMLdoc.CreateElement('FactsList');
-  XMLdoc.Appendchild(RootNode);
-
-  for i in Facts[Language_Russian] do begin
-    ContainerNode := XMLdoc.CreateElement('Fact');
-    ValueNode := XMLdoc.CreateElement('Value');
-    TextNode := XMLdoc.CreateTextNode(UTF8decode(i.value));
-    ValueNode.AppendChild(TextNode);
-    //compatibility
-    ContainerNode.AppendChild(ValueNode);
-    RootNode.Appendchild(ContainerNode);
-  end;
-
-  if ToGameFolder then
-    URLWriteXML(XMLdoc, ConstructorData(Scenario_Folder+LanguageDir(ConstructorLanguage)+'facts.xml',ToGameFolder){$IFDEF gzipdata},[ssoGzip]{$ENDIF})
-  else
-    URLWriteXML(XMLdoc, ConstructorData(Scenario_Folder+LanguageDir(ConstructorLanguage)+'facts.xml',ToGameFolder));
-
-  FreeAndNil(XMLdoc);
 end;
-//{$POP}
 
 {-----------------------------------------------------------------------------}
 
@@ -138,11 +174,40 @@ begin
   if (not isLoaded) or (MyLanguage<>ConstructorLanguage) then LoadMe;
 end;
 
+procedure TFactsEditor.SelectAllButtonClick(Sender: TObject);
+begin
+  LoadScreensListBox.CheckAll(cbChecked);
+end;
+procedure TFactsEditor.DeselectAllButtonClick(Sender: TObject);
+begin
+  LoadScreensListBox.CheckAll(cbUnchecked);
+end;
+
 {-----------------------------------------------------------------------------}
 
 procedure TFactsEditor.FormDestroy(Sender: TObject);
 begin
   FreeMe;
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure TFactsEditor.FreeMe;
+var L: TLanguage;
+begin
+  for L in TLanguage do
+    FreeAndNil(Facts[L]);
+  freeAndNil(LoadImages);
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure TFactsEditor.FactsListboxSelectionChange(Sender: TObject;
+  User: boolean);
+begin
+  memo1.clear;
+  memo1.Lines.add( FactsListbox.GetSelectedText ); //TODO: read-only atm.
+  //compatibility
 end;
 
 end.

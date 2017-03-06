@@ -45,6 +45,9 @@ var ConstructorLanguage: TLanguage;
 {analogue to castleFilesUtils.ApplicationData (and made based on it)
  but points to ARCHITECT directory (true) or ApplicationData (false)}
 function ConstructorData(URL: string; ToGameFolder:boolean): string;
+{Desktop-only ApplicationData analogue. Replacement for ApplicationData for
+ native FPC functions that don't work with URLs}
+function FakeApplicationData(URL: string): string;
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
@@ -59,6 +62,12 @@ begin
     //invoke data compression
     {$IFDEF gzipdata}result := AnsiReplaceText(Result,'.gz','.xml');{$ENDIF}
   end;
+end;
+
+function FakeApplicationData(URL: string): string;
+begin
+  Result := 'data/'+URL;
+  Result := AnsiReplaceText(Result,'/',pathdelim); //we're using native OS file access
 end;
 
 {-----------------------------------------------------------------------------}

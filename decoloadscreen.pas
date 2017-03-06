@@ -24,11 +24,16 @@ interface
 uses fgl,
   decotranslation;
 
+type DLoadImage = class
+  value: string;
+end;
+
+TLoadImageList = specialize TFPGObjectList<DLoadImage>;
+
 type DFact = class
   value: string;
-  frequency: integer;
-  //compatibility
-  //times displayed?
+  frequency: integer; //TODO: not saved ATM
+  compatibility: TLoadImageList;
 end;
 
 Type TFactList = specialize TFPGObjectList<DFact>;
@@ -106,9 +111,7 @@ begin
     begin
       F := DFact.create;
       ValueNode := Iterator.current.ChildElement('Value', true);
-      //{$PUSH}{$WARN 4105 OFF} // string conversion is ok here
       F.value := UTF8encode(ValueNode.TextData);
-      //{$POP}
       F.frequency := 1;
       Facts.add(F);
     end;

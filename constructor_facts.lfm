@@ -1,11 +1,11 @@
 object FactsEditor: TFactsEditor
   Left = 437
-  Height = 248
+  Height = 306
   Top = 321
-  Width = 320
+  Width = 650
   Caption = 'FactsEditor'
-  ClientHeight = 248
-  ClientWidth = 320
+  ClientHeight = 306
+  ClientWidth = 650
   OnDestroy = FormDestroy
   OnShow = FormShow
   LCLVersion = '1.6.2.0'
@@ -15,8 +15,54 @@ object FactsEditor: TFactsEditor
     Top = 8
     Width = 148
     ItemHeight = 0
+    OnSelectionChange = FactsListboxSelectionChange
     ScrollWidth = 144
     TabOrder = 0
     TopIndex = -1
+  end
+  object Memo1: TMemo
+    Left = 160
+    Height = 133
+    Top = 8
+    Width = 304
+    Lines.Strings = (
+      'Memo1'
+    )
+    TabOrder = 1
+  end
+  object Label1: TLabel
+    Left = 160
+    Height = 30
+    Top = 144
+    Width = 194
+    Caption = 'Fact length should not exceed'#10'150-200 characters'
+    ParentColor = False
+  end
+  object LoadScreensListBox: TCheckListBox
+    Left = 472
+    Height = 232
+    Top = 8
+    Width = 168
+    ItemHeight = 0
+    TabOrder = 2
+    TopIndex = -1
+  end
+  object SelectAllButton: TButton
+    Left = 472
+    Height = 25
+    Top = 249
+    Width = 75
+    Caption = 'SelectAll'
+    OnClick = SelectAllButtonClick
+    TabOrder = 3
+  end
+  object DeselectAllButton: TButton
+    Left = 555
+    Height = 25
+    Top = 248
+    Width = 85
+    Caption = 'DeselectAll'
+    OnClick = DeselectAllButtonClick
+    TabOrder = 4
   end
 end
