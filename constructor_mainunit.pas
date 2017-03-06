@@ -35,11 +35,13 @@ type
   { TMainForm }
 
   TMainForm = class(TForm)
+    DungeonTilesEditorButton: TButton;
     SaveButton: TButton;
     CompileButton: TButton;
     FactsEditorButton: TButton;
     LanguageSelect: TComboBox;
     procedure CompileButtonClick(Sender: TObject);
+    procedure DungeonTilesEditorButtonClick(Sender: TObject);
     procedure FactsEditorButtonClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -58,15 +60,9 @@ var
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-
-uses constructor_facts;
-
 {$R *.lfm}
 
-procedure TMainForm.FactsEditorButtonClick(Sender: TObject);
-begin
-  FactsEditor.Show;
-end;
+uses constructor_facts, constructor_dungeontiles;
 
 {-----------------------------------------------------------------------------}
 
@@ -75,7 +71,7 @@ begin
   case LanguageSelect.Items[LanguageSelect.ItemIndex] of
     'English': ConstructorLanguage := Language_English;
     'Russian': ConstructorLanguage := Language_Russian;
-    else raise Exception.Create('Unknown Language in constructor_mainunit.LanguageSelect!');
+    else raise Exception.Create('Unknown Language in constructor_mainunit.GetLanguage!');
   end;
 end;
 
@@ -84,17 +80,14 @@ end;
 procedure TMainForm.FormCreate(Sender: TObject);
 begin
   //MakeFormsList;  //other forms are nil yet... so doesn't help
-  AllForms := nil;
+  AllForms := nil;  //fool's check to be safe
   GetLanguage;
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure TMainForm.FormDestroy(Sender: TObject);
-{var WF: TWriterForm;}
 begin
-{  if (AllForms<>nil) then
-    for WF in AllForms do WF.FreeMe; //redundant?}
   FreeAndNil(AllForms);
 end;
 
@@ -112,6 +105,7 @@ begin
   AllForms := TFormList.create(false);
   //add all future forms here
   AllForms.Add(FactsEditor);
+  AllForms.Add(DungeonTilesEditor);
 end;
 
 {-----------------------------------------------------------------------------}
@@ -149,7 +143,20 @@ begin
   WriteMe(True);
 end;
 
-{-----------------------------------------------------------------------------}
+{----------------------------------------------------------------------------}
+{----------------------- show specific editor windows -----------------------}
+{----------------------------------------------------------------------------}
+
+procedure TMainForm.FactsEditorButtonClick(Sender: TObject);
+begin
+  FactsEditor.Show;
+end;
+procedure TMainForm.DungeonTilesEditorButtonClick(Sender: TObject);
+begin
+  DungeonTilesEditor.show;
+end;
+
+{===========================================================================}
 
 Initialization
 

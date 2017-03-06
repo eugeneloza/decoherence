@@ -23,23 +23,27 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  ExtCtrls, CheckLst, Buttons, decoloadscreen, decotranslation,
+  ExtCtrls, CheckLst, Buttons,
+  decoloadscreen, decotranslation,
   constructor_global;
 
 type
+
+  { TFactsEditor }
+
   TFactsEditor = class(TWriterForm)
     DeselectAllButton: TButton;
+    FactLengthLabel: TLabel;
     SelectAllButton: TButton;
     LoadScreensListBox: TCheckListBox;
     FactsListbox: TListBox;
-    Label1: TLabel;
     Memo1: TMemo;
     procedure DeselectAllButtonClick(Sender: TObject);
     procedure FactsListboxSelectionChange(Sender: TObject; User: boolean);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure Memo1Change(Sender: TObject);
     procedure SelectAllButtonClick(Sender: TObject);
-  private
   public
     {lists of facts in all available languages. If file not found then the value
      is nil}
@@ -58,11 +62,10 @@ var
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-
-uses DOM, CastleDownload, CastleXMLUtils,
-  CastleLog, decoglobal;
-
 {$R *.lfm}
+
+uses DOM, {$IFDEF gzipdata}CastleDownload,{$ENDIF} CastleXMLUtils,
+  CastleLog, decoglobal;
 
 {-----------------------------------------------------------------------------}
 
@@ -70,9 +73,10 @@ procedure TFactsEditor.LoadMe;
 var
     CurrentFile: string;
     L: TLanguage;
-    LI,LI2: DLoadImage;
+    LI: DLoadImage;
     Rec: TSearchRec;
-    F: DFact;
+    {LI2: DLoadImage;
+    F: DFact;}
 begin
   for L in TLanguage do begin
     FreeAndNil(Facts[L]);
@@ -184,7 +188,16 @@ end;
 
 procedure TFactsEditor.FormShow(Sender: TObject);
 begin
-  if (not isLoaded) or (MyLanguage<>ConstructorLanguage) then LoadMe;
+  if (not isLoaded) {or (MyLanguage<>ConstructorLanguage)} then LoadMe;
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure TFactsEditor.Memo1Change(Sender: TObject);
+begin
+  if length(memo1.Text)<=350 then FactLengthLabel.Color := clDefault
+  else FactLengthLabel.Color := clRed;
+  FactLengthLabel.caption := 'Total symbol: '+inttostr(length(memo1.Text));
 end;
 
 {-----------------------------------------------------------------------------}

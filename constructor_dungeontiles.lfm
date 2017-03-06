@@ -1,0 +1,28 @@
+object DungeonTilesEditor: TDungeonTilesEditor
+  Left = 234
+  Height = 492
+  Top = 160
+  Width = 737
+  Caption = 'DungeonTilesEditor'
+  ClientHeight = 492
+  ClientWidth = 737
+  OnDestroy = FormDestroy
+  OnShow = FormShow
+  LCLVersion = '1.6.2.0'
+  object TileDisplay: TCastleControl
+    Left = 6
+    Height = 476
+    Top = 3
+    Width = 468
+    TabOrder = 0
+  end
+  object TilesBox: TComboBox
+    Left = 480
+    Height = 25
+    Top = 3
+    Width = 100
+    ItemHeight = 0
+    Style = csDropDownList
+    TabOrder = 1
+  end
+end

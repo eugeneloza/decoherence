@@ -7,8 +7,9 @@ uses
   cthreads,
   {$ENDIF}{$ENDIF}
   Interfaces, // this includes the LCL widgetset
-  Forms, castle_base, castle_window, constructor_mainunit, constructor_facts,
-  constructor_global, decotranslation;
+  Forms, castle_base, castle_window, castle_components, constructor_mainunit,
+  constructor_facts, constructor_global, decotranslation,
+  constructor_dungeontiles;
 
 {$R *.res}
 
@@ -17,6 +18,7 @@ begin
   Application.Initialize;
   Application.CreateForm(TMainForm, MainForm);
   Application.CreateForm(TFactsEditor, FactsEditor);
+  Application.CreateForm(TDungeonTilesEditor, DungeonTilesEditor);
   Application.Run;
 end.
 

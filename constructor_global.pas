@@ -26,6 +26,8 @@ uses
   decotranslation;
 
 type
+  {a generic Form with abstract write/load and several other abstract
+   routines to simplify and automate constructor's data management}
   TWriterForm = class(TForm)
   private
     fisLoaded: boolean;
@@ -36,7 +38,7 @@ type
     property isLoaded: boolean read fisLoaded write fisLoaded default false;
     {Was the TWriterForm changed since last save/load?}
     property isChanged: boolean read fisChanged write fisChanged default false;
-    {TWriterForm current displayed language (if appliccable / else just a dummy)}
+    {TWriterForm current displayed language (if appliccable / else unused)}
     property MyLanguage: TLanguage read fMyLanguage write fMyLanguage;
     {TWriterForm abstract load procedure}
     procedure LoadMe; virtual; abstract;

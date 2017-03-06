@@ -28,15 +28,8 @@ object FactsEditor: TFactsEditor
     Lines.Strings = (
       'Memo1'
     )
+    OnChange = Memo1Change
     TabOrder = 1
-  end
-  object Label1: TLabel
-    Left = 160
-    Height = 30
-    Top = 144
-    Width = 194
-    Caption = 'Fact length should not exceed'#10'150-200 characters'
-    ParentColor = False
   end
   object LoadScreensListBox: TCheckListBox
     Left = 472
@@ -64,5 +57,16 @@ object FactsEditor: TFactsEditor
     Caption = 'DeselectAll'
     OnClick = DeselectAllButtonClick
     TabOrder = 4
+  end
+  object FactLengthLabel: TLabel
+    Left = 160
+    Height = 15
+    Hint = 'Fact length should not exceed 350 symbols (not strictly)'
+    Top = 145
+    Width = 105
+    Caption = 'FactLengthLabel'
+    ParentColor = False
+    ParentShowHint = False
+    ShowHint = True
   end
 end
