@@ -34,7 +34,6 @@ implementation
 uses sysUtils,
   CastleLog;
 
-const CurrentMap_folder = 'librarytileset/'; //TODO: tiles can be cross-tileset
 { Reads tile list for the current map.
   At this moment it scans the predefined directory in desktop-way, so it's not
   portable to Android.
@@ -42,7 +41,7 @@ const CurrentMap_folder = 'librarytileset/'; //TODO: tiles can be cross-tileset
   It'll also provide for different tiles reusing in different maps, e.g.
   can use cave tiles in both normal caves, and caves section of other maps }
 { TODO: All textures DDS }
-procedure MakeTileList;   //TODO: depending on current map parameters
+procedure MakeTileList; deprecated;   //TODO: depending on current map parameters
 var Rec: TSearchRec;
 begin
   DestroyTiles;
@@ -50,7 +49,7 @@ begin
   MaxTileTypes := 0;
   //TODO: Read XML list for the map!
   //TODO: Android incompatible!!!
-  if FindFirst (Tiles_folder + currentMap_folder + '*.x3d', faAnyFile - faDirectory, Rec) = 0 then
+  if FindFirst (Tiles_folder + '*.x3d', faAnyFile - faDirectory, Rec) = 0 then
    try
      repeat
        inc(MaxTileTypes);
@@ -60,7 +59,7 @@ begin
      FindClose(Rec);
    end;
  if MaxTileTypes = 0 then begin
-   writeLnLog('decodungeontiles>MakeTileList','FATAL: No tiles to load: '+ Tiles_folder + currentMap_folder);
+   writeLnLog('decodungeontiles>MakeTileList','FATAL: No tiles to load: '+ Tiles_folder);
    halt;
  end;
  WriteLnLog('decodungeontiles>MakeTileList','Max Tile Types = '+inttostr(MaxTileTypes)+' success');

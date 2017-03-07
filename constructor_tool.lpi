@@ -148,6 +148,7 @@
         <Filename Value="constructor_dungeontiles.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="DungeonTilesEditor"/>
+        <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
       </Unit7>
       <Unit8>

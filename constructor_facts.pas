@@ -50,11 +50,12 @@ type
     Facts: array [TLanguage] of TFactList;
     {list of all available image files in LoadScreen directory}
     LoadImages: TLoadImageList;
+    {re-fills listboxes}
+    procedure ReloadContent;
+  public
     procedure LoadMe; override;
     procedure FreeMe; override;
     procedure WriteMe(ToGameFolder: boolean); override;
-    {re-fills listboxes}
-    procedure ReloadContent;
   end;
 
 var
