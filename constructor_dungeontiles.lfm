@@ -20,9 +20,47 @@ object DungeonTilesEditor: TDungeonTilesEditor
     Left = 480
     Height = 25
     Top = 3
-    Width = 100
+    Width = 248
     ItemHeight = 0
     Style = csDropDownList
     TabOrder = 1
+  end
+  object ResetCameraButton: TButton
+    Left = 608
+    Height = 25
+    Top = 32
+    Width = 120
+    Caption = 'Reset Camera'
+    OnClick = ResetCameraButtonClick
+    TabOrder = 2
+  end
+  object LoadButton: TButton
+    Left = 480
+    Height = 25
+    Top = 32
+    Width = 128
+    Caption = 'Load'
+    OnClick = LoadButtonClick
+    TabOrder = 3
+  end
+  object TileMapPanel: TPanel
+    Left = 480
+    Height = 270
+    Top = 66
+    Width = 249
+    ClientHeight = 270
+    ClientWidth = 249
+    TabOrder = 4
+    object SymmetricEditCheckBox: TCheckBox
+      Left = 48
+      Height = 18
+      Top = 240
+      Width = 120
+      Caption = 'Symmetric Edit'
+      Checked = True
+      OnChange = SymmetricEditCheckBoxChange
+      State = cbChecked
+      TabOrder = 0
+    end
   end
 end

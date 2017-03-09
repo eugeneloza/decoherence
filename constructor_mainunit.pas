@@ -43,6 +43,7 @@ type
     procedure CompileButtonClick(Sender: TObject);
     procedure DungeonTilesEditorButtonClick(Sender: TObject);
     procedure FactsEditorButtonClick(Sender: TObject);
+    procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure LanguageSelectChange(Sender: TObject);
@@ -143,6 +144,18 @@ begin
   WriteMe(True);
 end;
 
+{---------------------------------------------------------------------------}
+
+
+procedure TMainForm.FormClose(Sender: TObject; var CloseAction: TCloseAction);
+begin
+  {  if unsaved_data then
+   if MessageDlg('There is unsaved data! Really exit?',mtCustom, [mbYes,mbNo], 0)=MrNo then begin
+     CloseAction:=canone;
+     exit;
+   end;}
+end;
+
 {----------------------------------------------------------------------------}
 {----------------------- show specific editor windows -----------------------}
 {----------------------------------------------------------------------------}
@@ -151,6 +164,9 @@ procedure TMainForm.FactsEditorButtonClick(Sender: TObject);
 begin
   FactsEditor.Show;
 end;
+
+{----------------------------------------------------------------------------}
+
 procedure TMainForm.DungeonTilesEditorButtonClick(Sender: TObject);
 begin
   DungeonTilesEditor.show;

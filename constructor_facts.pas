@@ -235,9 +235,11 @@ procedure TFactsEditor.FactsListboxSelectionChange(Sender: TObject;
   User: boolean);
 begin
   memo1.clear;
-  memo1.Lines.add( FactsListbox.GetSelectedText ); //TODO: read-only atm.
+  memo1.Lines.add( FactsListBox.Items[FactsListBox.ItemIndex] ); //TODO: read-only atm.
   //compatibility
 end;
+
+
 
 end.
 
