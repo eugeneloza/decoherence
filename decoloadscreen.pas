@@ -71,7 +71,7 @@ function GetRandomFactImage: string;
 implementation
 
 uses SysUtils, CastleLog, CastleFilesUtils,
-  DOM, {CastleDownload, }CastleXMLUtils,
+  DOM, CastleDownload, CastleXMLUtils,
   decoglobal;
 
 var LastFact: integer = -1;
@@ -126,7 +126,7 @@ begin
 
   WriteLnLog('LoadFacts','Reading file '+FileName);
 
-  FactsDoc := URLReadXML(FileName);
+  FactsDoc := URLReadXML(FileName{$IFDEF gzipdata}, [soGzip]{$ENDIF});
   BaseElement := FactsDoc.DocumentElement;
   Iterator := BaseElement.ChildrenIterator;
   try

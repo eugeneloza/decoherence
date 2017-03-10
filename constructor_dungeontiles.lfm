@@ -63,4 +63,13 @@ object DungeonTilesEditor: TDungeonTilesEditor
       TabOrder = 0
     end
   end
+  object ScreenShotButton: TButton
+    Left = 480
+    Height = 25
+    Top = 454
+    Width = 80
+    Caption = 'Screenshot'
+    OnClick = ScreenShotButtonClick
+    TabOrder = 5
+  end
 end

@@ -17,7 +17,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 
 { Compiler directives/options to include in every unit }
 
-{$mode objfpc}{$H+}
+{$mode objfpc}
+{$H+} //AnsiStrings
+{$J-} //non-writeable constants
 
 {defines fullscreen mode}
 //{$DEFINE Fullscreen}
@@ -31,12 +33,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 {generic variable to inline code. Just in case of bugs...}
 {$define SUPPORTS_INLINE}
 
-{convenient global range-checking on/off}
+{convenient global range-checking on/off. Redundand, as compiler mode already does that?}
 {$IFNDEF RELEASE}
 {$R+}{$Q+}
 {$ENDIF}
 
-{gzip or not gzip}
-{$UNDEF gzipdata}
+{gzip or not gzip, that is the answer. This one deprecated as it seems I've fixed gzip-input problem}
+{$DEFINE gzipdata}
 
+{Not using interfaces yet (and maybe will never use them). But let it be here for now}
 {$interfaces corba}

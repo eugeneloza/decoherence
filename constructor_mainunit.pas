@@ -31,9 +31,6 @@ uses
 type TFormList = specialize TFPGObjectList<TWriterForm>;
 
 type
-
-  { TMainForm }
-
   TMainForm = class(TForm)
     DungeonTilesEditorButton: TButton;
     SaveButton: TButton;
@@ -48,11 +45,14 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure LanguageSelectChange(Sender: TObject);
     procedure SaveButtonClick(Sender: TObject);
-  private
   public
+    { Generic list of all editor forms }
     AllForms: TFormList;
+    { Read the selected language from a ComboBox and gives it to CurrentLanguage }
     procedure GetLanguage;
+    { enumerates all the editor forms, fills AllForms }
     procedure MakeFormsList;
+    { write the data to Architect or Game folder }
     procedure WriteMe(ToGameFolder: boolean); //override;
   end;
 

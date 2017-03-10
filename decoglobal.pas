@@ -15,7 +15,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 
 {---------------------------------------------------------------------------}
 
-{ Defines some generic variables }
+{ Defines some generic variables,
+  also handles random initialzation and random for GUI and other minor purposes }
 
 unit decoglobal;
 
@@ -45,12 +46,13 @@ const InterfaceFolder    = 'interface/';
       PerksFolder        = InterfaceFolder+'perks/';
       DamageFolder       = InterfaceFolder+'damage/';
 
+      ScenarioFolder      = 'scenario/';
+
       //TODO: Android incompatible!!!
       Models_folder       = 'data'+pathdelim+'models'+pathdelim;
       Tiles_folder        = Models_folder + 'tiles'+pathdelim;
       Placeholders_folder = Models_folder + 'placeholders'+pathdelim;
 
-      ScenarioFolder      = 'scenario/';
 
 const XML_extension = {$IFDEF gzipdata}'.gz'{$ELSE}'.xml'{$ENDIF};
 
@@ -65,14 +67,44 @@ var Window : TCastleWindowTouch;
     LogStream : TFileStream;
     {$ENDIF}
 
+{$IFDEF LINUX}
+{$DEFINE USE_DEV_URANDOM}
+{$ENDIF}
+{a little modification of CastleRandom RandomSeed initialization algorithm
+ to use /dev/urandom on Linux. Actually /dev/urandom exists on all UNIX OS,
+ but I'm not exactly sure if it'll work as expected (test needed)}
+function GetRandomSeed: LongWord;
+
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 //uses SysUtils;
 
+function GetRandomSeed: LongWord;
+{$IFDEF USE_DEV_URANDOM}
+var dev_rnd: file of integer;
+begin
+  { algorithm according to http://wiki.freepascal.org/Dev_random
+   /dev/urandom is a native *nix very high-quality random number generator.
+   it's 1000 times slower than CastleRandom,
+   but provides a perfect seed initialization. }
+  AssignFile(dev_rnd, '/dev/urandom');
+  reset(dev_rnd);
+  repeat
+    read(dev_rnd,result);
+  until result <> 0; // xorshift can't accept 0 as a random seed so we just read /dev/urandom until its not zero
+  CloseFile(dev_rnd);
+end;
+{$ELSE}
+begin
+  {otherwise just let an internal algorithm's random initialization do the job}
+  GetRandomSeed := 0;
+end;
+{$ENDIF}
+
 // no implementation here needed. Maybe merge with GameMode?
 procedure InitGlobal;
 begin
-  rnd := TCastleRandom.Create;
+  rnd := TCastleRandom.Create(GetRandomSeed);
 end;
 
 {----------------------------------------------------------------------------}

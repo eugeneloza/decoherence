@@ -28,9 +28,7 @@ uses
   constructor_global;
 
 type
-
-  { TFactsEditor }
-
+  {Form to edit facts and corresponding loadscreen images}
   TFactsEditor = class(TWriterForm)
     DeselectAllButton: TButton;
     FactLengthLabel: TLabel;
@@ -45,8 +43,8 @@ type
     procedure Memo1Change(Sender: TObject);
     procedure SelectAllButtonClick(Sender: TObject);
   public
-    {lists of facts in all available languages. If file not found then the value
-     is nil}
+    {lists of facts in all available languages.
+     If file not found then the value is nil}
     Facts: array [TLanguage] of TFactList;
     {list of all available image files in LoadScreen directory}
     LoadImages: TLoadImageList;
@@ -177,7 +175,7 @@ begin
     end;
 
     if ToGameFolder then
-      URLWriteXML(XMLdoc, ConstructorData(ScenarioFolder+LanguageDir(ConstructorLanguage)+'facts.xml',ToGameFolder){$IFDEF gzipdata},[ssoGzip]{$ENDIF})
+      URLWriteXML(XMLdoc, ConstructorData(ScenarioFolder+LanguageDir(ConstructorLanguage)+'facts'+XML_extension,ToGameFolder){$IFDEF gzipdata},[ssoGzip]{$ENDIF})
     else
       URLWriteXML(XMLdoc, ConstructorData(ScenarioFolder+LanguageDir(ConstructorLanguage)+'facts.xml',ToGameFolder));
 
