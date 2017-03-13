@@ -27,6 +27,10 @@ uses
   decoloadscreen, decotranslation,
   constructor_global;
 
+type TLoadImageListHelper = class helper for TLoadImageList
+  function findByName(findname: string): boolean;
+end;
+
 type
   {Form to edit facts and corresponding loadscreen images}
   TFactsEditor = class(TWriterForm)
@@ -40,6 +44,7 @@ type
     procedure FactsListboxSelectionChange(Sender: TObject; User: boolean);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure LoadScreensListBoxClickCheck(Sender: TObject);
     procedure Memo1Change(Sender: TObject);
     procedure SelectAllButtonClick(Sender: TObject);
   public
@@ -179,8 +184,10 @@ begin
     else
       URLWriteXML(XMLdoc, ConstructorData(ScenarioFolder+LanguageDir(ConstructorLanguage)+'facts.xml',ToGameFolder));
 
-    FreeAndNil(XMLdoc);
+     FreeAndNil(XMLdoc);
   end;
+
+  if not ToGameFolder then  isChanged := false;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -204,10 +211,12 @@ end;
 procedure TFactsEditor.SelectAllButtonClick(Sender: TObject);
 begin
   LoadScreensListBox.CheckAll(cbChecked);
+  LoadScreensListBoxClickCheck(nil);
 end;
 procedure TFactsEditor.DeselectAllButtonClick(Sender: TObject);
 begin
   LoadScreensListBox.CheckAll(cbUnchecked);
+  LoadScreensListBoxClickCheck(nil);
 end;
 
 {-----------------------------------------------------------------------------}
@@ -229,12 +238,52 @@ end;
 
 {----------------------------------------------------------------------------}
 
+function TLoadImageListHelper.findByName(findname: string): boolean;
+var i: integer;
+begin
+  result := false;
+  for i := 0 to self.Count-1  do
+    if self.Items[i].value = findname then begin
+      result := true;
+      exit;
+    end;
+end;
+
+{----------------------------------------------------------------------------}
+
 procedure TFactsEditor.FactsListboxSelectionChange(Sender: TObject;
   User: boolean);
+var
+    i: integer;
 begin
   memo1.clear;
-  memo1.Lines.add( FactsListBox.Items[FactsListBox.ItemIndex] ); //TODO: read-only atm.
+  memo1.Lines.add( Facts[MyLanguage][FactsListBox.ItemIndex].value );
+  for i := 0 to LoadScreensListBox.Count-1 do
+    if Facts[MyLanguage][FactsListBox.ItemIndex].compatibility.findbyname(LoadScreensListBox.items[i]) then
+      LoadScreensListBox.Checked[i] := true
+    else
+      LoadScreensListBox.Checked[i] := false
   //compatibility
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure TFactsEditor.LoadScreensListBoxClickCheck(Sender: TObject);
+var i: integer;
+    LI: DLoadImage;
+begin
+  if FactsListBox.ItemIndex >=0 then begin
+    //very inefficient, but don't bother
+    FreeAndNil(Facts[MyLanguage][FactsListBox.ItemIndex].compatibility);
+    Facts[MyLanguage][FactsListBox.ItemIndex].compatibility := TLoadImageList.create(true);
+    for i := 0 to LoadScreensListBox.Count-1 do
+      if LoadScreensListBox.Checked[i] then begin
+        LI := DLoadImage.create;
+        LI.value := LoadScreensListBox.items[i];
+        Facts[MyLanguage][FactsListBox.ItemIndex].compatibility.add(LI);
+      end;
+    isChanged := true;
+  end;
 end;
 
 

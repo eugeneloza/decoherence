@@ -24,8 +24,87 @@ interface
 uses classes,
   decoglobal;
 
+type
+  { defines "what face is this"
+   tfNone is compatible to any tile
+   tfWall is compatible to any wall
+   >=tfFree is compatible only to exactly the same face id >=tfFree }
+  TTileFace = byte;//(tfNone, tfWall, tfFree);
+const tfNone = 0;
+      tfWall = 1;
+      tfFree = 2; //(used as >=)
+
+type
+  { This is a rectagonal grid with 4 angles
+   try to merge it with floor}
+  TAngle = (aTop,aRight,aBottom,aLeft,aUp,aDown);
+{  { Each tile has top and bottom floor }
+  TFloorType = (ftUp,ftDown);}
+
+type
+  {Kind of the tile base,
+   tkNone is not assigned tile (can be assigned by generator),
+   tkFree is a passable tile,
+   tkWall is unused yet,
+   tkUp/tkDown are stairs up-down tiles,
+   tkInacceptible is an internal type (acceptible error returned by some routines)}
+  TTileKind = (tkNone, tkFree, tkWall, tkUp, tkDown, tkInacceptible);
+
+  {well... 2-abundance is obsolete, really.
+   I was making it in order to protect the code from errors
+   when writing a lot of code without being able to visually test
+   if it produces a correct (intended) result, so I had to introduce
+   a lot of internal checks including 2-abundance...
+   Maybe, some day this should be simplified and rewritten to remove abundance.
+   But for now it works and that is all I want :)
+   WARNING, if someone who is not "me" will try to rewrite the 2-abundance,
+   be careful, because it is used not only to validate the tiles docking,
+   but for a lot of other purposes in the generation algorithm
+   (maybe in pathfinding and tile management too).
+   It can't be done as easy as I'd wanted :) Otherwise, I'd have done it long ago...
+   So change it only in case you're absolutely sure what you are doing. }
+type
+  { 1x1x1 tile with some base and free/blocked faces }
+  Basic_Tile_Type = {packed} record
+    base: TTileKind;
+    faces: array [TAngle] of TTileFace; //this is 2x redundant!
+  end;
+
+
+type
+  {A large tile used in dungeon generation. With a set of Basic_Tile_type
+   and additional parameters and procedures
+   todo: split DTile and DGenerationTile}
+  DTile = class
+    {size of this tile}
+    tilesizex,tilesizey,tilesizez: byte;
+    {internal map of this tile}
+    TileMap: array of array of array of Basic_Tile_Type;
+
+    {if this tile is a blocker?}
+    blocker: boolean;
+    {how many free faces are there}
+    FreeFaces: integer;
+    {does this tile has stairs down?}
+    Has_stairs_down: boolean;
+    {create the tile with given parameters}
+    constructor create(tx: integer = 1; ty: integer = 1; tz: integer = 1);
+    procedure CalculateFaces;
+end;
+
+{type Generator_tile = class(DTile)
+end;}
+
 var MaxTileTypes: integer;
     TilesList: TStringList;
+
+{ convert TTileKind to a string for saving }
+function TileKindToStr(value: TTileKind): string;
+{ convert a string to TTileKind for loading }
+function StrToTileKind(value: string): TTileKind;
+
+function isPassable(value: TTileFace): boolean; inline;
+function isPassable(value: TTileKind): boolean; inline;
 
 procedure LoadTiles;
 procedure destroyTiles;
@@ -34,6 +113,105 @@ implementation
 uses sysUtils,
   CastleLog;
 
+function TileKindToStr(value: TTileKind): string;
+begin
+  case Value of
+    tkNone: result := 'NA';
+    tkFree: result := 'FREE';
+    tkUP: result := 'UP';
+    tkDown: result := 'DOWN';
+    tkWall: result := 'WALL';
+    tkInacceptible: raise exception.Create('tkInacceptible in TileKindToStr');  //this one shouldn't appear in string
+    else raise exception.Create('Unknown TileKind in TileKindToStr');
+  end;
+end;
+
+{-------------------------------------------------------------------------}
+
+function StrToTileKind(value: string): TTileKind;
+begin
+  case value of
+    'NA': result := tkNone;
+    'FREE': result := tkFree;
+    'UP': result := tkUp;
+    'DOWN': result := tkDown;
+    'WALL': result := tkWall;
+    'ERROR':  raise exception.Create('tkInacceptible in StrToTileKind');  //this one shouldn't appear in string
+    else raise exception.Create('Unknown TileKind in StrToTileKind');
+  end;
+end;
+
+function isPassable(value: TTileFace): boolean; inline;
+begin
+  if value >= tfFree then result := true else result := false;
+end;
+function isPassable(value: TTileKind): boolean; inline;
+begin
+  if (value = tkFree) or (value=tkUp) or (value=tkDown) then
+    result := true
+  else
+    result := false;
+end;
+
+
+{======================== DTILE TYPE ==========================================}
+
+constructor DTile.create(tx: integer = 1; ty: integer = 1; tz: integer = 1);
+var ix,iy: integer;
+begin
+  tilesizex := tx;
+  tilesizey := ty;
+  tilesizez := tz;
+  //initialize the dynamic arrays
+  if (tilesizex<>0) and (tilesizey<>0) and (tilesizez<>0) then begin
+    //in case this is a normal tile...
+    setlength(TileMap,tilesizex);
+    for ix := 0 to tilesizex do begin
+      setlength(TileMap[ix],tilesizey);
+      for iy := 0 to tilesizey do
+        setlength(TileMap[ix,iy],tilesizez);
+    end;
+  end
+  else begin
+    //in case this is a "blocker" tile we still need a complete 1x1x1 base
+    raise exception.Create('Tilesize is zero!');
+  {  blocker := true;
+    setlength(tilemap,1);
+    setlength(tilemap[0],1);
+    setlength(tliemap[0,0],1);  }
+  end;
+end;
+
+procedure DTile.CalculateFaces;
+var ix,iy,iz: integer;
+begin
+  FreeFaces:=0;
+  for iz:=0 to tilesizez-1 do begin
+    //todo: this is not correct! Exits may be not only on border tiles
+    //correct way is to search for borders and face_na
+    ix:=0;
+    for iy:=0 to tilesizey-1 do if isPassable(TileMap[ix,iy,iz].faces[aLeft]) then inc(FreeFaces);
+    ix:=tilesizex-1;
+    for iy:=0 to tilesizey-1 do if isPassable(TileMap[ix,iy,iz].faces[aRight]) then inc(FreeFaces);
+    iy:=0;
+    for ix:=0 to tilesizex-1 do if isPassable(TileMap[ix,iy,iz].faces[aTop]) then inc(FreeFaces);
+    iy:=tilesizey;
+    for ix:=0 to tilesizex-1 do if isPassable(TileMap[ix,iy,iz].faces[aBottom]) then inc(FreeFaces);
+  end;
+  //check if it's a blocker tile
+  if (FreeFaces = 1) and (tilesizex+tilesizey+tilesizez = 3) and (TileMap[1,1,1].base = tkNone) then
+    blocker:=true
+  else
+    blocker:=false;
+  //check if it has stairs down for later generation
+  has_stairs_down := false;
+  for ix:=0 to tilesizex-1 do
+   for iy:=0 to tilesizey-1 do
+    for iz:=0 to tilesizez-1 do if TileMap[ix,iy,iz].base=tkDown then has_stairs_down := true;
+end;
+
+{=============================================================================}
+
 { Reads tile list for the current map.
   At this moment it scans the predefined directory in desktop-way, so it's not
   portable to Android.
@@ -41,7 +219,7 @@ uses sysUtils,
   It'll also provide for different tiles reusing in different maps, e.g.
   can use cave tiles in both normal caves, and caves section of other maps }
 { TODO: All textures DDS }
-procedure MakeTileList; deprecated;   //TODO: depending on current map parameters
+procedure MakeTileList; deprecated;
 var Rec: TSearchRec;
 begin
   DestroyTiles;
@@ -68,7 +246,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure LoadTiles;
+procedure LoadTiles; deprecated;
 begin
   WriteLnLog('decodungeontiles','Load tiles started...');
   MakeTileList;
@@ -77,7 +255,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DestroyTiles;
+procedure DestroyTiles; deprecated;
 begin
   FreeAndNil(TilesList);
 end;

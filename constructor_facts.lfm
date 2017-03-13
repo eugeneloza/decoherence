@@ -37,6 +37,7 @@ object FactsEditor: TFactsEditor
     Top = 8
     Width = 168
     ItemHeight = 0
+    OnClickCheck = LoadScreensListBoxClickCheck
     TabOrder = 2
     TopIndex = -1
   end

@@ -50,8 +50,9 @@ type
   public
     { list of tiles files in the game folder }
     TilesList: TStringList;
-
+    { name of current tile }
     TileName: string;
+    { current displayed tile }
     TileScene: TCastleScene;
     { Read tiles files from the HDD }
     procedure ReadTilesList;
@@ -133,6 +134,7 @@ begin
   ReadTilesList;
   FillTilesList;
   isLoaded := true;
+  isChanged := false;
 end;
 
 {--------------------------------------------------------------------------}
@@ -140,6 +142,7 @@ end;
 procedure TDungeonTilesEditor.WriteMe(ToGameFolder: boolean);
 begin
   writeLnLog('TDungeonTilesEditor.WriteMe','Working directly on game data, nothing to save.');
+  if not ToGameFolder then isChanged := false;
 end;
 
 {--------------------------------------------------------------------------}
@@ -157,7 +160,7 @@ procedure TDungeonTilesEditor.ResetCamera;
 begin
   if (TileDisplay.scenemanager.camera<>nil) then
   begin
-    if true{tile is loaded} then begin
+    if isLoaded {?} then begin
       //set upthe camera
       {TileDisplay.scenemanager.camera.setView(MyTile.Tile_Scene.BoundingBox.middle+Vector3Single(0,0,MyTile.Tile_Scene.BoundingBox.maxsize+1),Vector3Single(0,0,-1),Vector3Single(0,1,0));
       TileDisplay.scenemanager.camera.input:=TCamera.DefaultInput; }
@@ -179,19 +182,6 @@ procedure TDungeonTilesEditor.SymmetricEditCheckBoxChange(Sender: TObject);
 begin
   if not SymmetricEditCheckBox.checked then
     showmessage('It is highly recommended to leave Symmetric Edit on, unles you know what you are doing. The tile must be 2-abundantly consistent and Symmetric Edit tries to do as much as possible of that automatically.');
-  {well... 2-abundance is obsolete, really.
-   I was making it in order to protect the code from errors
-   when writing a lot of code without being able to visually test
-   if it produces a correct (intended) result, so I had to introduce
-   a lot of internal checks including 2-abundance...
-   Maybe, some day this should be simplified and rewritten to remove abundance.
-   But for now it works and that is all I want :)
-   WARNING, if someone who is not "me" will try to rewrite the 2-abundance,
-   be careful, because it is used not only to validate the tiles docking,
-   but for a lot of other purposes in the generation algorithm
-   (maybe in pathfinding and tile management too).
-   It can't be done as easy as I'd wanted :) Otherwise, I'd have done it long ago...
-   So change it only in case you're absolutely sure what you are doing. }
 end;
 
 {---------------------------------------------------------------------------}
