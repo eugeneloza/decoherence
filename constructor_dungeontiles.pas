@@ -47,6 +47,8 @@ type
     procedure LoadButtonClick(Sender: TObject);
     procedure ResetCameraButtonClick(Sender: TObject);
     procedure SymmetricEditCheckBoxChange(Sender: TObject);
+  private
+    fisTileLoaded: boolean;
   public
     { list of tiles files in the game folder }
     TilesList: TStringList;
@@ -54,6 +56,8 @@ type
     TileName: string;
     { current displayed tile }
     TileScene: TCastleScene;
+
+    property isTileLoaded: boolean read fisTileLoaded write fistileloaded default false;
     { Read tiles files from the HDD }
     procedure ReadTilesList;
     { Put tiles into a ComboBox }
@@ -149,7 +153,7 @@ end;
 
 procedure TDungeonTilesEditor.FormShow(Sender: TObject);
 begin
-  if (not isLoaded) then LoadMe;
+  if (not isTileLoaded) then LoadMe;
 end;
 
 {============================================================================}
@@ -160,10 +164,12 @@ procedure TDungeonTilesEditor.ResetCamera;
 begin
   if (TileDisplay.scenemanager.camera<>nil) then
   begin
-    if isLoaded {?} then begin
-      //set upthe camera
-      {TileDisplay.scenemanager.camera.setView(MyTile.Tile_Scene.BoundingBox.middle+Vector3Single(0,0,MyTile.Tile_Scene.BoundingBox.maxsize+1),Vector3Single(0,0,-1),Vector3Single(0,1,0));
-      TileDisplay.scenemanager.camera.input:=TCamera.DefaultInput; }
+    if isTileLoaded {?} then begin
+      //set up the camera
+      if TileDisplay.scenemanager.camera<>nil then begin
+        TileDisplay.scenemanager.camera.setView(TileScene.BoundingBox.center+Vector3Single(0,0,TileScene.BoundingBox.maxsize+1),Vector3Single(0,0,-1),Vector3Single(0,1,0));
+        TileDisplay.scenemanager.camera.input:=TCamera.DefaultInput;
+      end;
       TileDisplay.update;
     end else
       WriteLnLog('TDungeonTilesEditor.ResetCamera','No Tile Loaded.');
@@ -188,9 +194,9 @@ end;
 
 procedure TDungeonTilesEditor.LoadTile(FileName: string);
 begin
- { if unsavedChanges then begin
+  if isChanged then begin
     if MessageDlg('Unsaved changes?', 'Your changes are unsaved! Really load a new tile?', mtConfirmation, [mbYes, mbNo],0) = mrNo then exit;
-  end;}
+  end;
   //...
   ResetCamera;
 end;
