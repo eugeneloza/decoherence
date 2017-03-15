@@ -189,14 +189,13 @@ end;
 
 function LoadBlenderX3D(URL: string): TX3DRootNode;
 begin
+  if TextureProperties = nil then MakeDefaultTextureProperties;
   result := CleanUp(load3D(URL),true,true);
   AddMaterial(result);
 end;
 
-
-initialization
-  MakeDefaultTextureProperties;
-
+finalization
+  FreeAndNil(TextureProperties);
 
 end.
 

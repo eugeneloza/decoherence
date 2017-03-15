@@ -46,12 +46,16 @@ const InterfaceFolder    = 'interface/';
       PerksFolder        = InterfaceFolder+'perks/';
       DamageFolder       = InterfaceFolder+'damage/';
 
-      ScenarioFolder      = 'scenario/';
+      ScenarioFolder     = 'scenario/';
+
+      ModelsFolder      = 'models/';
+      TilesFolder       = ModelsFolder+'tiles/';
+      PlaceholdersFoldr = ModelsFolder+'placeholders/';
 
       //TODO: Android incompatible!!!
-      Models_folder       = 'data'+pathdelim+'models'+pathdelim;
-      Tiles_folder        = Models_folder + 'tiles'+pathdelim;
-      Placeholders_folder = Models_folder + 'placeholders'+pathdelim;
+      //Models_folder       = +'models'+pathdelim;
+      //Tiles_folder        = Models_folder + ;
+      //Placeholders_folder = Models_folder + 'placeholders'+pathdelim;
 
 
 const XML_extension = {$IFDEF gzipdata}'.gz'{$ELSE}'.xml'{$ENDIF};

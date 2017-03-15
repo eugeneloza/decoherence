@@ -27,7 +27,7 @@ interface
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
   ExtCtrls,
-  CastleControl, constructor_global, CastleScene, CastleImages,
+  CastleControl, constructor_global, CastleScene, CastleImages, X3DNodes,
   decodungeontiles;
 
 type
@@ -55,6 +55,7 @@ type
     { name of current tile }
     TileName: string;
     { current displayed tile }
+    TileRoot: TX3DRootNode;
     TileScene: TCastleScene;
 
     property isTileLoaded: boolean read fisTileLoaded write fistileloaded default false;
@@ -81,6 +82,7 @@ implementation
 {$R *.lfm}
 
 uses CastleVectors, CastleCameras, StrUtils, castleLog,
+     deco3dLoad,
      decoglobal;
 
 procedure TDungeonTilesEditor.FreeMe;
@@ -108,7 +110,9 @@ begin
   DestroyTiles;
   TilesList := TStringList.Create;
   MaxTileTypes := 0;
-  if FindFirst (Tiles_folder + '*.x3d', faAnyFile - faDirectory, Rec) = 0 then
+  {$Warning Fix folders!}
+  writelnLog('','data'+pathdelim+'models'+pathdelim+ 'tiles'+pathdelim + '*.x3d');
+  if FindFirst ('data'+pathdelim+'models'+pathdelim+ 'tiles'+pathdelim + '*.x3d', faAnyFile - faDirectory, Rec) = 0 then
    try
      repeat
        inc(MaxTileTypes);
@@ -166,11 +170,12 @@ begin
   begin
     if isTileLoaded {?} then begin
       //set up the camera
-      if TileDisplay.scenemanager.camera<>nil then begin
+      if (TileDisplay.scenemanager.camera<>nil) and (TileScene<>nil) then begin
         TileDisplay.scenemanager.camera.setView(TileScene.BoundingBox.center+Vector3Single(0,0,TileScene.BoundingBox.maxsize+1),Vector3Single(0,0,-1),Vector3Single(0,1,0));
         TileDisplay.scenemanager.camera.input:=TCamera.DefaultInput;
-      end;
-      TileDisplay.update;
+        TileDisplay.update;
+      end else
+        WriteLnLog('TDungeonTilesEditor.ResetCamera','Camera or TileScene is nil! Can''t reset camera');
     end else
       WriteLnLog('TDungeonTilesEditor.ResetCamera','No Tile Loaded.');
   end else
@@ -183,6 +188,8 @@ procedure TDungeonTilesEditor.ResetCameraButtonClick(Sender: TObject);
 begin
   ResetCamera;
 end;
+
+{---------------------------------------------------------------------------}
 
 procedure TDungeonTilesEditor.SymmetricEditCheckBoxChange(Sender: TObject);
 begin
@@ -197,7 +204,26 @@ begin
   if isChanged then begin
     if MessageDlg('Unsaved changes?', 'Your changes are unsaved! Really load a new tile?', mtConfirmation, [mbYes, mbNo],0) = mrNo then exit;
   end;
-  //...
+
+  isTileLoaded := false;
+  if FileName = '' then begin
+    showmessage('No tiles found!');
+    exit;
+  end;
+
+  if TileScene<>nil then
+    TileDisplay.SceneManager.Items.remove(TileScene);
+  FreeAndNil(TileRoot); //owned by TileScene
+  FreeAndNil(TileScene);
+
+  TileRoot := LoadBlenderX3D(ConstructorData(TilesFolder+Filename+'.x3d',true));
+  TileScene := TCastleScene.create(TileDisplay);
+  TileScene.Load(TileRoot,true);
+  TileDisplay.SceneManager.Items.Add(TileScene);
+  TileDisplay.SceneManager.MainScene:=TileScene;
+
+  isTileLoaded := true;
+
   ResetCamera;
 end;
 

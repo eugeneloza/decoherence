@@ -81,6 +81,8 @@ type
     {internal map of this tile}
     TileMap: array of array of array of Basic_Tile_Type;
 
+    //Tile3d: TX3DRootNode;
+
     {if this tile is a blocker?}
     blocker: boolean;
     {how many free faces are there}
@@ -89,6 +91,7 @@ type
     Has_stairs_down: boolean;
     {create the tile with given parameters}
     constructor create(tx: integer = 1; ty: integer = 1; tz: integer = 1);
+    procedure setsize(tx: integer = 1; ty: integer = 1; tz: integer = 1);
     procedure CalculateFaces;
 end;
 
@@ -157,6 +160,14 @@ end;
 {======================== DTILE TYPE ==========================================}
 
 constructor DTile.create(tx: integer = 1; ty: integer = 1; tz: integer = 1);
+begin
+  //inherited;
+  setsize(tx,ty,tz);
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DTile.setsize(tx: integer = 1; ty: integer = 1; tz: integer = 1);
 var ix,iy: integer;
 begin
   tilesizex := tx;
@@ -164,31 +175,37 @@ begin
   tilesizez := tz;
   //initialize the dynamic arrays
   if (tilesizex<>0) and (tilesizey<>0) and (tilesizez<>0) then begin
-    //in case this is a normal tile...
-    setlength(TileMap,tilesizex);
-    for ix := 0 to tilesizex do begin
-      setlength(TileMap[ix],tilesizey);
-      for iy := 0 to tilesizey do
-        setlength(TileMap[ix,iy],tilesizez);
-    end;
+  //in case this is a normal tile...
+  setlength(TileMap,tilesizex);
+  for ix := 0 to tilesizex do begin
+    setlength(TileMap[ix],tilesizey);
+    for iy := 0 to tilesizey do
+      setlength(TileMap[ix,iy],tilesizez);
+  end;
   end
   else begin
-    //in case this is a "blocker" tile we still need a complete 1x1x1 base
-    raise exception.Create('Tilesize is zero!');
-  {  blocker := true;
-    setlength(tilemap,1);
-    setlength(tilemap[0],1);
-    setlength(tliemap[0,0],1);  }
+  //in case this is a "blocker" tile we still need a complete 1x1x1 base
+  raise exception.Create('Tilesize is zero!');
+  {  blocker := true;         { TODO :  }
+  setlength(tilemap,1);
+  setlength(tilemap[0],1);
+  setlength(tliemap[0,0],1);  }
   end;
 end;
+
+{----------------------------------------------------------------------------}
 
 procedure DTile.CalculateFaces;
 var ix,iy,iz: integer;
 begin
   FreeFaces:=0;
   for iz:=0 to tilesizez-1 do begin
-    //todo: this is not correct! Exits may be not only on border tiles
-    //correct way is to search for borders and face_na
+    {$Warning A critical issue must be fixed in DTile.CalculateFaces}
+    {todo: this is not correct! Exits may be not only on border tiles
+     correct way is to search for borders and face_na
+     however, the issue is not as critical, just it'll make the
+     algorithm work in an incorrect way and might even lead to tile
+     not being used}
     ix:=0;
     for iy:=0 to tilesizey-1 do if isPassable(TileMap[ix,iy,iz].faces[aLeft]) then inc(FreeFaces);
     ix:=tilesizex-1;
@@ -227,7 +244,8 @@ begin
   MaxTileTypes := 0;
   //TODO: Read XML list for the map!
   //TODO: Android incompatible!!!
-  if FindFirst (Tiles_folder + '*.x3d', faAnyFile - faDirectory, Rec) = 0 then
+  {$Warning Fix folders!}
+  if FindFirst ('data'+pathdelim+'models'+pathdelim+ 'tiles'+pathdelim + '*.x3d', faAnyFile - faDirectory, Rec) = 0 then
    try
      repeat
        inc(MaxTileTypes);
@@ -237,7 +255,7 @@ begin
      FindClose(Rec);
    end;
  if MaxTileTypes = 0 then begin
-   writeLnLog('decodungeontiles>MakeTileList','FATAL: No tiles to load: '+ Tiles_folder);
+   writeLnLog('decodungeontiles>MakeTileList','FATAL: No tiles to load ');
    halt;
  end;
  WriteLnLog('decodungeontiles>MakeTileList','Max Tile Types = '+inttostr(MaxTileTypes)+' success');
