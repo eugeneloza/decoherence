@@ -47,6 +47,8 @@ begin
     TextureProperties.FdMagnificationFilter.Value := 'DEFAULT';
     TextureProperties.FdMinificationFilter.Value := 'DEFAULT';
   end else TextureProperties := nil;
+  {do not free this node automatically! Required for constructor}
+  TextureProperties.KeepExisting := 1;
   {$POP}
 end;
 
@@ -194,8 +196,12 @@ begin
   AddMaterial(result);
 end;
 
+{initialization
+  MakeDefaultTextureProperties;}
+
 finalization
   FreeAndNil(TextureProperties);
+
 
 end.
 

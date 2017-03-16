@@ -30,6 +30,13 @@ uses
   CastleControl, constructor_global, CastleScene, CastleImages, X3DNodes,
   decodungeontiles;
 
+Type
+  DTileAtlasRecord = record
+     FriendlyName: string;
+     color:integer;    //for display
+     //style:TBrushStyle;
+end;
+
 type
   {Edit tile map, generate tile minimap image}
   TDungeonTilesEditor = class(TWriterForm)
@@ -58,6 +65,12 @@ type
     TileRoot: TX3DRootNode;
     TileScene: TCastleScene;
 
+    //todo: generic list
+    {atlas for the faces types}
+    FaceAtlas: array [TTileFace] of DTileAtlasRecord;
+    {atlas for base of the tile}
+    BaseAtlas: array [TTileKind] of DTileAtlasRecord;
+
     property isTileLoaded: boolean read fisTileLoaded write fistileloaded default false;
     { Read tiles files from the HDD }
     procedure ReadTilesList;
@@ -68,6 +81,8 @@ type
     procedure ResetCamera;
     { Loads the selected tile }
     procedure LoadTile(FileName: string);
+    { Fills the Face and Base atlas; todo: load/save ini }
+    procedure FillAtlas;
   public
     procedure LoadMe; override;
     procedure FreeMe; override;
@@ -97,8 +112,11 @@ end;
 {--------------------------------------------------------------------------}
 
 procedure TDungeonTilesEditor.ScreenShotButtonClick(Sender: TObject);
+var tmpImg: TRGBImage;
 begin
-   SaveImage(TileDisplay.SaveScreen,TileName+'screen.png');
+  tmpImg := TileDisplay.SaveScreen;
+  SaveImage(tmpImg, TileName+'.scr.png');
+  FreeAndNil(tmpImg);
 end;
 
 {--------------------------------------------------------------------------}
@@ -139,6 +157,7 @@ end;
 
 procedure TDungeonTilesEditor.LoadMe;
 begin
+  FillAtlas;
   ReadTilesList;
   FillTilesList;
   isLoaded := true;
@@ -205,6 +224,7 @@ begin
     if MessageDlg('Unsaved changes?', 'Your changes are unsaved! Really load a new tile?', mtConfirmation, [mbYes, mbNo],0) = mrNo then exit;
   end;
 
+  TileName := FileName;
   isTileLoaded := false;
   if FileName = '' then begin
     showmessage('No tiles found!');
@@ -213,14 +233,14 @@ begin
 
   if TileScene<>nil then
     TileDisplay.SceneManager.Items.remove(TileScene);
-  FreeAndNil(TileRoot); //owned by TileScene
+  //FreeAndNil(TileRoot); //owned by TileScene
   FreeAndNil(TileScene);
 
-  TileRoot := LoadBlenderX3D(ConstructorData(TilesFolder+Filename+'.x3d',true));
+  TileRoot := LoadBlenderX3D( ConstructorData(TilesFolder+Filename+'.x3d',true) );
   TileScene := TCastleScene.create(TileDisplay);
-  TileScene.Load(TileRoot,true);
+  TileScene.Load(TileRoot, true);
   TileDisplay.SceneManager.Items.Add(TileScene);
-  TileDisplay.SceneManager.MainScene:=TileScene;
+  TileDisplay.SceneManager.MainScene := TileScene;
 
   isTileLoaded := true;
 
@@ -232,8 +252,57 @@ end;
 procedure TDungeonTilesEditor.LoadButtonClick(Sender: TObject);
 begin
   LoadTile( TilesBox.Items[TilesBox.ItemIndex] );
+  //Save3D(TileRoot,'home.x3d.gz');
 end;
 
+{============================================================================}
+{========================== map editing routines ============================}
+{============================================================================}
+
+//I think some day it should start from an ini file. But now that's more than enough
+procedure TDungeonTilesEditor.FillAtlas;
+var i: integer;
+begin
+ with FaceAtlas[tfNone] do begin
+  FriendlyName := 'n/a';
+  color := 0;
+ end;
+ with FaceAtlas[tfWall] do begin
+  FriendlyName := 'WALL';
+  color := $FFFFFF;
+ end;
+ for i := tfFree to high(TTileFace) do with FaceAtlas[i] do begin
+  FriendlyName := 'free #'+inttostr(i-1);
+  color := $990000*(high(FaceAtlas)-i) div (high(FaceAtlas))+$000099*i div (high(FaceAtlas))+$009900;
+ end;
+
+ with BaseAtlas[tkNone] do begin
+  FriendlyName := 'n/a';
+  color := 0;
+ end;
+ with BaseAtlas[tkWall] do begin  ///TileWall = unused???!!!!
+  FriendlyName := 'WALL (unused)';
+  color := $FFFFFF;
+ end;
+ with BaseAtlas[tkFree] do begin
+  FriendlyName := 'FREE';
+  color := $444444;
+ end;
+ with BaseAtlas[tkDown] do begin
+  FriendlyName := 'STAIRS DOWN';
+  color := $0000FF;
+ end;
+ with BaseAtlas[tkUp] do begin
+  FriendlyName := 'STAIRS UP';
+  color := $00FF00;
+ end;
+
+{ LastFaceAtlasIndex := 2;
+ LastBaseAtlasIndex := tkFree;
+
+ MakeFaceAtlasBox;
+ MakeBaseAtlasBox; }
+end;
 
 end.
 

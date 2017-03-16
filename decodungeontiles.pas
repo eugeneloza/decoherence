@@ -29,7 +29,7 @@ type
    tfNone is compatible to any tile
    tfWall is compatible to any wall
    >=tfFree is compatible only to exactly the same face id >=tfFree }
-  TTileFace = byte;//(tfNone, tfWall, tfFree);
+  TTileFace = 0..5;//byte;//(tfNone, tfWall, tfFree);
 const tfNone = 0;
       tfWall = 1;
       tfFree = 2; //(used as >=)
