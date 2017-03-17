@@ -40,7 +40,11 @@ end;
 type
   {Edit tile map, generate tile minimap image}
   TDungeonTilesEditor = class(TWriterForm)
+    FaceAtlasBox: TComboBox;
+    BaseAtlasBox: TComboBox;
+    ZLabel: TLabel;
     ScreenShotButton: TButton;
+    ZScroll: TScrollBar;
     SymmetricEditCheckBox: TCheckBox;
     LoadButton: TButton;
     TileMapPanel: TPanel;
@@ -53,6 +57,7 @@ type
     procedure FormShow(Sender: TObject);
     procedure LoadButtonClick(Sender: TObject);
     procedure ResetCameraButtonClick(Sender: TObject);
+    procedure ZScrollChange(Sender: TObject);
     procedure SymmetricEditCheckBoxChange(Sender: TObject);
   private
     fisTileLoaded: boolean;
@@ -71,6 +76,10 @@ type
     {atlas for base of the tile}
     BaseAtlas: array [TTileKind] of DTileAtlasRecord;
 
+    LastFaceAtlasIndex: TTileFace;
+    LastBaseAtlasIndex: TTileKind;
+    CurrentZ: integer;
+
     property isTileLoaded: boolean read fisTileLoaded write fistileloaded default false;
     { Read tiles files from the HDD }
     procedure ReadTilesList;
@@ -83,6 +92,13 @@ type
     procedure LoadTile(FileName: string);
     { Fills the Face and Base atlas; todo: load/save ini }
     procedure FillAtlas;
+    { fills Face and base boxes }
+    procedure MakeAtlasBoxes;
+    { conversion from combobox index to TTileFace }
+    function FaceByIndex(index: integer): TTileFace;
+    { conversion from combobox index to TTileKind }
+    function BaseByIndex(index: integer): TTileKind;
+    procedure DrawTileMap;
   public
     procedure LoadMe; override;
     procedure FreeMe; override;
@@ -244,7 +260,12 @@ begin
 
   isTileLoaded := true;
 
+  ZScroll.max := 1;
+  ZSCroll.min := 0;
+  ZScroll.position := 0;
+
   ResetCamera;
+  DrawTileMap;
 end;
 
 {--------------------------------------------------------------------------}
@@ -280,8 +301,8 @@ begin
   FriendlyName := 'n/a';
   color := 0;
  end;
- with BaseAtlas[tkWall] do begin  ///TileWall = unused???!!!!
-  FriendlyName := 'WALL (unused)';
+ with BaseAtlas[tkWall] do begin
+  FriendlyName := 'WALL';
   color := $FFFFFF;
  end;
  with BaseAtlas[tkFree] do begin
@@ -297,12 +318,76 @@ begin
   color := $00FF00;
  end;
 
-{ LastFaceAtlasIndex := 2;
+ LastFaceAtlasIndex := tfFree;
  LastBaseAtlasIndex := tkFree;
 
- MakeFaceAtlasBox;
- MakeBaseAtlasBox; }
+ MakeAtlasBoxes;
 end;
+
+{-------------------------------------------------------------------------}
+
+procedure TDungeonTilesEditor.MakeAtlasBoxes;
+var tf: TTileFace;
+    tk: TTileKind;
+begin
+  FaceAtlasBox.Clear;
+  BaseAtlasBox.Clear;
+  for tf in TTileFace do begin
+    FaceAtlasBox.Items.Add(FaceAtlas[tf].friendlyName);
+  end;
+  for tk in TTileKind do begin
+    BaseAtlasBox.Items.Add(BaseAtlas[tk].friendlyName);
+  end;
+  FaceAtlasBox.ItemIndex := 1; //set to wall
+  BaseAtlasBox.ItemIndex := 1; //set to free
+end;
+
+{-------------------------------------------------------------------------}
+
+function TDungeonTilesEditor.FaceByIndex(index: integer): TTileFace;
+var tf: TTileFace;
+begin
+  for tf in TTileFace do if FaceAtlasBox.Items[index]=FaceAtlas[tf].friendlyName then begin
+    Result := tf;
+    break;
+  end;
+  Result := tfNone;
+  writelnLog('TDungeonTilesEditor.FaceByIndex','ERROR: Face not found! for index '+ inttostr(index));
+end;
+
+{-------------------------------------------------------------------------}
+
+function TDungeonTilesEditor.BaseByIndex(index: integer): TTileKind;
+var tk: TTileKind;
+begin
+  for tk in TTileKind do if BaseAtlasBox.Items[index]=BaseAtlas[tk].friendlyName then begin
+    Result := tk;
+    break;
+  end;
+  Result := tkNone;
+  writelnLog('TDungeonTilesEditor.BaseByIndex','ERROR: Face not found! for index '+ inttostr(index));
+end;
+
+{-------------------------------------------------------------------------}
+
+procedure TDungeonTilesEditor.ZScrollChange(Sender: TObject);
+begin
+  if CurrentZ<>ZScroll.Position then begin
+    currentZ := ZScroll.Position;
+    DrawTileMap
+  end;
+end;
+
+{-------------------------------------------------------------------------}
+
+procedure TDungeonTilesEditor.DrawTileMap;
+begin
+  ZLabel.Caption := inttostr(currentZ);
+  //dummy
+end;
+
+{-------------------------------------------------------------------------}
+
 
 end.
 

@@ -126,7 +126,7 @@ begin
 
   WriteLnLog('LoadFacts','Reading file '+FileName);
 
-  FactsDoc := URLReadXML(FileName{$IFDEF gzipdata}, [soGzip]{$ENDIF});
+  FactsDoc := URLReadXML(FileName);
   BaseElement := FactsDoc.DocumentElement;
   Iterator := BaseElement.ChildrenIterator;
   try

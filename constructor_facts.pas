@@ -180,7 +180,7 @@ begin
     end;
 
     if ToGameFolder then
-      URLWriteXML(XMLdoc, ConstructorData(ScenarioFolder+LanguageDir(ConstructorLanguage)+'facts'+XML_extension,ToGameFolder){$IFDEF gzipdata},[ssoGzip]{$ENDIF})
+      URLWriteXML(XMLdoc, ConstructorData(ScenarioFolder+LanguageDir(ConstructorLanguage)+'facts'+XML_extension,ToGameFolder))
     else
       URLWriteXML(XMLdoc, ConstructorData(ScenarioFolder+LanguageDir(ConstructorLanguage)+'facts.xml',ToGameFolder));
 

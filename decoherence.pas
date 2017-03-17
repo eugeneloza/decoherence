@@ -37,7 +37,7 @@ uses Classes, SysUtils,
      decolevel, decodungeontiles,
      decoloadscreen, decoperks,
      decointerfacecomposite,
-     decoplayercharacter,
+     decoplayercharacter, deco3dLoad,
      decoglobal, decogamemode;
 
 {==========================================================================}
@@ -276,6 +276,7 @@ Finalization
   //DestroyGlobal;
   FreeLoadScreen;
   DestroyTiles;
+  //FreeTextureProperties;
   WriteLnLog('Finalization','Bye...');
 end.
 

@@ -29,17 +29,13 @@ type
    tfNone is compatible to any tile
    tfWall is compatible to any wall
    >=tfFree is compatible only to exactly the same face id >=tfFree }
-  TTileFace = 0..5;//byte;//(tfNone, tfWall, tfFree);
+  TTileFace = 0..5;//byte;//(tfNone, tfWall, tfFree1, tfFree2...);
 const tfNone = 0;
       tfWall = 1;
       tfFree = 2; //(used as >=)
 
-type
-  { This is a rectagonal grid with 4 angles
-   try to merge it with floor}
-  TAngle = (aTop,aRight,aBottom,aLeft,aUp,aDown);
 {  { Each tile has top and bottom floor }
-  TFloorType = (ftUp,ftDown);}
+   TFloorType = (ftUp,ftDown);}
 
 type
   {Kind of the tile base,
@@ -49,6 +45,12 @@ type
    tkUp/tkDown are stairs up-down tiles,
    tkInacceptible is an internal type (acceptible error returned by some routines)}
   TTileKind = (tkNone, tkFree, tkWall, tkUp, tkDown, tkInacceptible);
+
+type
+  { This is a rectagonal grid with 4 angles
+   try to merge it with floor.
+   Yes it's theoretically possible to make a hexagonal/other map}
+  TAngle = (aTop,aRight,aBottom,aLeft,aUp,aDown);
 
   {well... 2-abundance is obsolete, really.
    I was making it in order to protect the code from errors

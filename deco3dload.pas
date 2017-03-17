@@ -29,6 +29,7 @@ uses X3DNodes,
 { extension of Castle Game Engine Load3D, automatically clears garbage
   of blender x3d exporter and adds requested anisortopic filtering}
 function LoadBlenderX3D(URL: string): TX3DRootNode;
+//procedure FreeTextureProperties;
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
@@ -46,9 +47,10 @@ begin
     TextureProperties.AnisotropicDegree := anisotropic_smoothing;
     TextureProperties.FdMagnificationFilter.Value := 'DEFAULT';
     TextureProperties.FdMinificationFilter.Value := 'DEFAULT';
+
+    {do not free this node automatically! Required for constructor}
+    TextureProperties.KeepExisting := 1;
   end else TextureProperties := nil;
-  {do not free this node automatically! Required for constructor}
-  TextureProperties.KeepExisting := 1;
   {$POP}
 end;
 
@@ -68,7 +70,8 @@ procedure AddMaterial(Root: TX3DRootNode);
       if (source.FdChildren[i] is TShapeNode) then
         try
           // assign TextureProperties (anisotropic smoothing) for the imagetexture
-          (TShapeNode(source.FdChildren[i]).fdAppearance.Value.FindNode(TImageTextureNode,false) as TImageTextureNode).FdTextureProperties.Value := TextureProperties;
+          {$Warning WHY THE TextureProperties keeps automatically released????}
+          (TShapeNode(source.FdChildren[i]).fdAppearance.Value.FindNode(TImageTextureNode,false) as TImageTextureNode).FdTextureProperties.Value := TextureProperties.DeepCopy;
           // set material ambient intensity to zero for complete darkness :)
           // maybe, make a list of links to implement night vision
           (TShapeNode(source.FdChildren[i]).FdAppearance.Value.FindNode(TMaterialNode,false) as TMaterialNode).AmbientIntensity := 0;
@@ -196,11 +199,16 @@ begin
   AddMaterial(result);
 end;
 
+
+{procedure FreeTextureProperties;
+begin
+  FreeAndNil(TextureProperties);
+end; }
 {initialization
   MakeDefaultTextureProperties;}
 
 finalization
-  FreeAndNil(TextureProperties);
+  FreeAndNil(TextureProperties); //WATCH OUT FOR SIGSEGVS here!
 
 
 end.
