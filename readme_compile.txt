@@ -38,5 +38,5 @@ If you prefer command-line compilation, you may try lazbuild. See instructions a
 
 Once you have Castle Game Engine and all the libraries/dll correctly installed you should have no problems compiling for Desktop (Linux/Windows 32/64 bit).
 
-For set-up instructions for Android cross-compilation, please, see: *******
+For set-up instructions for Android cross-compilation, please, see: https://github.com/castle-engine/castle-engine/wiki/Android
 NOTE: I haven't tested Android cross-compilation for a very long time, it's not guaranteed to work at the moment.
