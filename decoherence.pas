@@ -137,6 +137,14 @@ begin
        K_P,K_PrintScreen:                //k_printscreen doesn't work in x-window system if assigned to some external program like scrot
                          Window.SaveScreen('deco_'+NiceDate+'.jpg');
        K_r: party[0].hit(1,1);
+       k_i: if AmbientIntensity.ambient = 0 then
+               AmbientIntensity.SetAmbientIntensity(1)
+            else
+               AmbientIntensity.SetAmbientIntensity(0);
+       {k_1: shaders.WhichChoice := 0;
+       k_2: shaders.WhichChoice := 1;
+       k_3: shaders.WhichChoice := 2;}
+
     end;
   end;
 //  SetGameMode(gmCharacterGeneration);

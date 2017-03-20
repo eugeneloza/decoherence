@@ -30,18 +30,45 @@ uses
   CastleControl, constructor_global, CastleScene, CastleImages, X3DNodes,
   decodungeontiles;
 
+{graphical preferences}
+const delta=0.2; //this is 'wall thickness' at wall editor
+      tile_image_scale=32;
+
 Type
+  {atlas record for faces and base}
   DTileAtlasRecord = record
      FriendlyName: string;
-     color:integer;    //for display
+     color: integer;    //for display
      //style:TBrushStyle;
+end;
+
+type
+  {these routines that should be used only in Constructor}
+  DTileMapHelper = class helper for DTileMap
+    {make the tile map an empty closed box}
+    procedure EmptyTile;
+    {guess the tile size based on model
+     BUG: sometimes fails (<1%)}
+    procedure GuessSize(Tile3D: TCastleScene);
+    {detect if this tile is a blocker
+     todo: WILL fail if blocker is ~0.5 dx}
+    procedure DetectBlocker;
+    {safe wrapper for Load}
+    constructor LoadSafe(URL: string);
 end;
 
 type
   {Edit tile map, generate tile minimap image}
   TDungeonTilesEditor = class(TWriterForm)
+    SaveTileMapButton: TButton;
+    EmptyMapButton: TButton;
+    BaseRadio: TRadioButton;
+    FloorRadio: TRadioButton;
+    CeilingRadio: TRadioButton;
+    SavePNGButton: TButton;
     FaceAtlasBox: TComboBox;
     BaseAtlasBox: TComboBox;
+    MapImage: TImage;
     ZLabel: TLabel;
     ScreenShotButton: TButton;
     ZScroll: TScrollBar;
@@ -52,6 +79,12 @@ type
     TileDisplay: TCastleControl;
     TilesBox: TComboBox;
     {take a screenshot of the current render. Yet not needed.}
+    procedure RadioChange(Sender: TObject);
+    procedure EmptyMapButtonClick(Sender: TObject);
+    procedure MapImageMouseDown(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
+    procedure SavePNGButtonClick(Sender: TObject);
+    procedure SaveTileMapButtonClick(Sender: TObject);
     procedure ScreenShotButtonClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -69,6 +102,7 @@ type
     { current displayed tile }
     TileRoot: TX3DRootNode;
     TileScene: TCastleScene;
+    TileM: DTileMap;
 
     //todo: generic list
     {atlas for the faces types}
@@ -78,8 +112,10 @@ type
 
     LastFaceAtlasIndex: TTileFace;
     LastBaseAtlasIndex: TTileKind;
+    {current z of the tile edited}
     CurrentZ: integer;
 
+    { was a tile loaded? }
     property isTileLoaded: boolean read fisTileLoaded write fistileloaded default false;
     { Read tiles files from the HDD }
     procedure ReadTilesList;
@@ -90,6 +126,12 @@ type
     procedure ResetCamera;
     { Loads the selected tile }
     procedure LoadTile(FileName: string);
+    { Save/compile all the tiles }
+    procedure SaveAllTiles;
+    { Save Tile map }
+    procedure SaveTileMap(FileName: string; toGameFolder: boolean);
+    { compile the tile to game folder }
+    procedure CompileTile(FileName: string);
     { Fills the Face and Base atlas; todo: load/save ini }
     procedure FillAtlas;
     { fills Face and base boxes }
@@ -98,7 +140,17 @@ type
     function FaceByIndex(index: integer): TTileFace;
     { conversion from combobox index to TTileKind }
     function BaseByIndex(index: integer): TTileKind;
+    { draws tile map to MapImage}
     procedure DrawTileMap;
+    { prepares controls for MapImage editing (reset sizes, enable/disable etc)}
+    procedure PrepareMapEditor;
+    { this procedure creates a tile png representation to use in minimap.
+      On one hand it should be a 'top-down' screenshot
+      however, at this moment I'm absolutely enough with this simple 'duplication' of the tile map.
+      based on caeles CC0 template from OpenGameArt }
+    procedure MakePNGMap;
+    { the actual editor of the tile map, responds to mouse x,y click }
+    procedure EditTileMap(x,y: integer);
   public
     procedure LoadMe; override;
     procedure FreeMe; override;
@@ -113,12 +165,14 @@ implementation
 {$R *.lfm}
 
 uses CastleVectors, CastleCameras, StrUtils, castleLog,
-     deco3dLoad,
+     DOM, CastleXMLUtils,
+     deco3dLoad, x3dLoad, CastleURIUtils, blendercleaner,
      decoglobal;
 
 procedure TDungeonTilesEditor.FreeMe;
 begin
-  freeandnil(TilesList);
+  FreeAndNil(TilesList);
+  FreeAndNil(TileM);
 end;
 procedure TDungeonTilesEditor.FormDestroy(Sender: TObject);
 begin
@@ -143,19 +197,16 @@ begin
   FreeAndNil(TilesList);
   DestroyTiles;
   TilesList := TStringList.Create;
-  MaxTileTypes := 0;
-  {$Warning Fix folders!}
-  writelnLog('','data'+pathdelim+'models'+pathdelim+ 'tiles'+pathdelim + '*.x3d');
-  if FindFirst ('data'+pathdelim+'models'+pathdelim+ 'tiles'+pathdelim + '*.x3d', faAnyFile - faDirectory, Rec) = 0 then
+  // Android incompatible
+  if FindFirst (FakeConstructorData('models/tiles/*.x3d',false), faAnyFile - faDirectory, Rec) = 0 then
    try
      repeat
-       inc(MaxTileTypes);
        TilesList.Add(AnsiReplaceText(Rec.Name,'.x3d',''));
      until FindNext(Rec) <> 0;
    finally
      FindClose(Rec);
    end;
-  WriteLnLog('TDungeonTilesEditor.ReadTilesList','Tiles found = '+inttostr(MaxTileTypes));
+  WriteLnLog('TDungeonTilesEditor.ReadTilesList','Tiles found = '+inttostr(TilesList.count));
 end;
 
 {--------------------------------------------------------------------------}
@@ -182,10 +233,78 @@ end;
 
 {--------------------------------------------------------------------------}
 
+procedure TDungeonTilesEditor.SaveTileMap(FileName: string; toGameFolder: boolean);
+var XMLdoc: TXMLDocument;
+    RootNode: TDOMNode;
+    WorkNode, ContainerNode: TDOMElement;
+    jx,jy,jz: integer;
+    j: TAngle;
+begin
+  XMLdoc := TXMLDocument.Create;
+  RootNode := XMLdoc.CreateElement('TileMap');
+  XMLdoc.Appendchild(RootNode);
+
+  WorkNode := XMLdoc.CreateElement('Size');
+  WorkNode.AttributeSet('size_x',TileM.tileSizeX);
+  WorkNode.AttributeSet('size_y',TileM.tileSizeY);
+  WorkNode.AttributeSet('size_z',TileM.tileSizeZ);
+  WorkNode.AttributeSet('blocker',TileM.blocker);
+  RootNode.AppendChild(WorkNode);
+
+  for jx := 0 to TileM.TileSizeX-1 do
+    for jy := 0 to TileM.TileSizeY-1 do
+      for jz := 0 to TileM.TileSizeZ-1 do begin
+        ContainerNode := XMLdoc.CreateElement('Tile');
+        ContainerNode.AttributeSet('x',jx);
+        ContainerNode.AttributeSet('y',jy);
+        ContainerNode.AttributeSet('z',jz);
+
+          WorkNode := XMLdoc.CreateElement('base');
+          WorkNode.AttributeSet('tile_kind',TileKindToStr(TileM.TileMap[jx,jy,jz].base));
+          ContainerNode.AppendChild(WorkNode);
+
+          WorkNode := XMLdoc.CreateElement('faces');
+          for j in TAngle do
+            WorkNode.AttributeSet(AngleToStr(j),TileFaceToStr(TileM.TileMap[jx,jy,jz].faces[j]));
+          ContainerNode.AppendChild(WorkNode);
+
+        RootNode.AppendChild(ContainerNode);
+      end;
+
+  if ToGameFolder then
+    URLWriteXML(XMLdoc, ConstructorData(TilesFolder+Filename+'.map'+gz_ext,ToGameFolder))
+  else
+    URLWriteXML(XMLdoc, ConstructorData(TilesFolder+Filename+'.map',ToGameFolder));
+
+  WriteLnLog(ConstructorData(TilesFolder+Filename+'.map',ToGameFolder));
+
+  FreeAndNil(XMLdoc);
+end;
+
+{--------------------------------------------------------------------------}
+
+procedure TDungeonTilesEditor.SaveAllTiles;
+var t: string;
+begin
+  for t in TilesList do begin
+    compileTile(t);
+    //copy tile image?
+    SaveTileMap(t,true);
+  end;
+end;
+
+{--------------------------------------------------------------------------}
+
 procedure TDungeonTilesEditor.WriteMe(ToGameFolder: boolean);
 begin
-  writeLnLog('TDungeonTilesEditor.WriteMe','Working directly on game data, nothing to save.');
-  if not ToGameFolder then isChanged := false;
+  //writeLnLog('TDungeonTilesEditor.WriteMe','Working directly on game data, nothing to save.');
+  if not ToGameFolder then begin
+    if isTileLoaded then begin
+      SaveTileMap(TileName,false);
+      isChanged := false;
+    end else writelnlog('TDungeonTilesEditor.WriteMe','No tile loaded to save...');
+  end else
+    SaveAllTiles;
 end;
 
 {--------------------------------------------------------------------------}
@@ -205,12 +324,12 @@ begin
   begin
     if isTileLoaded {?} then begin
       //set up the camera
-      if (TileDisplay.scenemanager.camera<>nil) and (TileScene<>nil) then begin
+      if (TileScene<>nil) then begin
         TileDisplay.scenemanager.camera.setView(TileScene.BoundingBox.center+Vector3Single(0,0,TileScene.BoundingBox.maxsize+1),Vector3Single(0,0,-1),Vector3Single(0,1,0));
         TileDisplay.scenemanager.camera.input:=TCamera.DefaultInput;
         TileDisplay.update;
       end else
-        WriteLnLog('TDungeonTilesEditor.ResetCamera','Camera or TileScene is nil! Can''t reset camera');
+        WriteLnLog('TDungeonTilesEditor.ResetCamera','ERROR: TileScene is nil! Can''t reset camera');
     end else
       WriteLnLog('TDungeonTilesEditor.ResetCamera','No Tile Loaded.');
   end else
@@ -252,7 +371,7 @@ begin
   //FreeAndNil(TileRoot); //owned by TileScene
   FreeAndNil(TileScene);
 
-  TileRoot := LoadBlenderX3D( ConstructorData(TilesFolder+Filename+'.x3d',true) );
+  TileRoot := CleanUp( Load3D( ConstructorData(TilesFolder+Filename+'.x3d',false) ) ,true,true);
   TileScene := TCastleScene.create(TileDisplay);
   TileScene.Load(TileRoot, true);
   TileDisplay.SceneManager.Items.Add(TileScene);
@@ -260,20 +379,75 @@ begin
 
   isTileLoaded := true;
 
-  ZScroll.max := 1;
-  ZSCroll.min := 0;
-  ZScroll.position := 0;
+  {load tile map}
+
+  FreeAndNil(TileM);
+  TileM := DTileMap.loadSafe( ConstructorData(TilesFolder+Filename+'.map',false) );
+  if not TileM.Ready then TileM.GuessSize(TileScene);
 
   ResetCamera;
+  PrepareMapEditor;
   DrawTileMap;
+end;
+
+{---------------------------------------------------------------------------}
+
+procedure FixTextures(root: TX3DRootNode);
+{maybe, a better name would be nice.
+ attaches texture properties (anisotropic smoothing) to the texture of the object.
+ TODO: Normal map still doesn't work. I should fix it one day...}
+  procedure ScanNodesRecoursive(source: TAbstractX3DGroupingNode);
+  var i: integer;
+      tex: TImageTextureNode;
+      s: string;
+  begin
+    for i := 0 to source.FdChildren.Count-1 do
+    if source.FdChildren[i] is TAbstractX3DGroupingNode then
+      ScanNodesRecoursive(TAbstractX3DGroupingNode(source.FdChildren[i]))
+    else
+      if (source.FdChildren[i] is TShapeNode) then
+        try
+          tex := (TShapeNode(source.FdChildren[i]).fdAppearance.Value.FindNode(TImageTextureNode,false) as TImageTextureNode);
+          //blender only! Using only the first texture file link
+          s := tex.FdUrl.ItemsSafe[0];
+          s := ChangeURIExt(s,'.dds');
+          s := '../textures/'+ExtractURIName(s);
+          tex.FdUrl.Items.Clear;
+          tex.FdUrl.Items.Add(s);
+          //check URIFileExists
+        except
+          writeLnLog('FixTextures.ScanNodesRecoursive','try..except fired (texture node not found)');
+        end;
+  end;
+begin
+  ScanNodesRecoursive(Root);
+end;
+
+{--------------------------------------------------------------------------}
+
+procedure TDungeonTilesEditor.CompileTile(FileName: string);
+begin
+  //dummy
+  writeLnLog('TDungeonTilesEditor.CompileTile','Compile: '+FileName);
+
+  //load tile from Architect folder
+  TileRoot := CleanUp( Load3D(ConstructorData(TilesFolder+Filename+'.x3d',false)) ,true,true);
+  FixTextures(TileRoot);
+  //todo: check for used/unused textures and delete/add them
+
+  //save tile to game folder
+  save3D(TileRoot, ConstructorData(TilesFolder+Filename+'.x3d'+GZ_ext,true));
+  FreeAndNil(TileRoot);
 end;
 
 {--------------------------------------------------------------------------}
 
 procedure TDungeonTilesEditor.LoadButtonClick(Sender: TObject);
 begin
-  LoadTile( TilesBox.Items[TilesBox.ItemIndex] );
-  //Save3D(TileRoot,'home.x3d.gz');
+  if (TilesBox.ItemIndex>=0) and (TilesBox.Items[TilesBox.ItemIndex]<>'') then
+    LoadTile( TilesBox.Items[TilesBox.ItemIndex] )
+  else
+    WriteLnLog('TDungeonTilesEditor.LoadButtonClick','ERROR: Tile List is empty');
 end;
 
 {============================================================================}
@@ -284,45 +458,49 @@ end;
 procedure TDungeonTilesEditor.FillAtlas;
 var i: integer;
 begin
- with FaceAtlas[tfNone] do begin
-  FriendlyName := 'n/a';
-  color := 0;
- end;
- with FaceAtlas[tfWall] do begin
-  FriendlyName := 'WALL';
-  color := $FFFFFF;
- end;
- for i := tfFree to high(TTileFace) do with FaceAtlas[i] do begin
-  FriendlyName := 'free #'+inttostr(i-1);
-  color := $990000*(high(FaceAtlas)-i) div (high(FaceAtlas))+$000099*i div (high(FaceAtlas))+$009900;
- end;
+   {make faces}
 
- with BaseAtlas[tkNone] do begin
-  FriendlyName := 'n/a';
-  color := 0;
- end;
- with BaseAtlas[tkWall] do begin
-  FriendlyName := 'WALL';
-  color := $FFFFFF;
- end;
- with BaseAtlas[tkFree] do begin
-  FriendlyName := 'FREE';
-  color := $444444;
- end;
- with BaseAtlas[tkDown] do begin
-  FriendlyName := 'STAIRS DOWN';
-  color := $0000FF;
- end;
- with BaseAtlas[tkUp] do begin
-  FriendlyName := 'STAIRS UP';
-  color := $00FF00;
- end;
+   with FaceAtlas[tfNone] do begin
+    FriendlyName := 'n/a';
+    color := 0;
+   end;
+   with FaceAtlas[tfWall] do begin
+    FriendlyName := 'WALL';
+    color := $FFFFFF;
+   end;
+   for i := tfFree to high(TTileFace) do with FaceAtlas[i] do begin
+    FriendlyName := 'free #'+inttostr(i-1);
+    color := $990000*(high(FaceAtlas)-i) div (high(FaceAtlas))+$000099*i div (high(FaceAtlas))+$009900;
+   end;
 
- LastFaceAtlasIndex := tfFree;
- LastBaseAtlasIndex := tkFree;
+   {make base}
 
- MakeAtlasBoxes;
-end;
+   with BaseAtlas[tkNone] do begin
+    FriendlyName := 'n/a';
+    color := 0;
+   end;
+   with BaseAtlas[tkWall] do begin
+    FriendlyName := 'WALL';
+    color := $FFFFFF;
+   end;
+   with BaseAtlas[tkFree] do begin
+    FriendlyName := 'FREE';
+    color := $444444;
+   end;
+   with BaseAtlas[tkDown] do begin
+    FriendlyName := 'STAIRS DOWN';
+    color := $0000FF;
+   end;
+   with BaseAtlas[tkUp] do begin
+    FriendlyName := 'STAIRS UP';
+    color := $00FF00;
+   end;
+
+   LastFaceAtlasIndex := tfFree;
+   LastBaseAtlasIndex := tkFree;
+
+   MakeAtlasBoxes;
+  end;
 
 {-------------------------------------------------------------------------}
 
@@ -338,7 +516,7 @@ begin
   for tk in TTileKind do begin
     BaseAtlasBox.Items.Add(BaseAtlas[tk].friendlyName);
   end;
-  FaceAtlasBox.ItemIndex := 1; //set to wall
+  FaceAtlasBox.ItemIndex := 3; //set to wall
   BaseAtlasBox.ItemIndex := 1; //set to free
 end;
 
@@ -349,7 +527,7 @@ var tf: TTileFace;
 begin
   for tf in TTileFace do if FaceAtlasBox.Items[index]=FaceAtlas[tf].friendlyName then begin
     Result := tf;
-    break;
+    exit;
   end;
   Result := tfNone;
   writelnLog('TDungeonTilesEditor.FaceByIndex','ERROR: Face not found! for index '+ inttostr(index));
@@ -362,10 +540,10 @@ var tk: TTileKind;
 begin
   for tk in TTileKind do if BaseAtlasBox.Items[index]=BaseAtlas[tk].friendlyName then begin
     Result := tk;
-    break;
+    exit;
   end;
   Result := tkNone;
-  writelnLog('TDungeonTilesEditor.BaseByIndex','ERROR: Face not found! for index '+ inttostr(index));
+  writelnLog('TDungeonTilesEditor.BaseByIndex','ERROR: Base not found! for index '+ inttostr(index));
 end;
 
 {-------------------------------------------------------------------------}
@@ -381,13 +559,372 @@ end;
 {-------------------------------------------------------------------------}
 
 procedure TDungeonTilesEditor.DrawTileMap;
+var ix,iy,iz: integer;
+    x1,y1,x2,y2,x3,y3,x4,y4: integer;
+    scalex,scaley: float;
 begin
-  ZLabel.Caption := inttostr(currentZ);
-  //dummy
+  if (isTileLoaded) and (TileM <> nil) and (TileM.Ready) then begin
+    if BaseRadio.checked then
+      BaseAtlasBox.visible := true
+    else
+      BaseAtlasBox.visible := false;
+
+    //currentZ:=scrollbar1.position;
+    ZLabel.Caption := inttostr(currentZ);
+    with MapImage.canvas do begin
+      //clear current image
+      brush.color := clSilver;
+      fillrect(0,0,MapImage.width,MapImage.height);
+      //working with currentZ
+      iz := currentZ;
+      //determine draw scale
+      scalex := MapImage.width/TileM.TileSizex;
+      scaley := MapImage.height/TileM.TileSizey;
+      //draw a tile element
+      for ix := 0 to TileM.TileSizex-1 do
+       for iy := 0 to TileM.TileSizey-1 do with TileM.TileMap[ix,iy,iz] do begin
+         //determine basic coordinates inside the tile
+         { x1,y1 - x3 ------ x4 - x2,y1
+               |   |          |   |
+           x1,y3 - + -------- + - x2,y3
+               |   |          |   |
+               |   |          |   |
+               |   |          |   |
+           x1,y4 - + -------- + - x2,y4
+               |   |          |   |
+           x1,y2 - x3 ------ x4 - x2,y2 }
+         x1 := round( (ix)        *scalex );
+         y1 := round( (iy)        *scaley );
+         x2 := round( (ix+1)      *scalex );
+         y2 := round( (iy+1)      *scaley );
+         x3 := round( (ix+delta)  *scalex );
+         y3 := round( (iy+delta)  *scaley );
+         x4 := round( (ix+1-delta)*scalex );
+         y4 := round( (iy+1-delta)*scaley );
+
+         {draw central spot base. As bsCross and onther styles are transparent
+          we always have to draw a bsSolid base first}
+         brush.style := bsSolid;
+         brush.color := BaseAtlas[base].color;
+         fillrect(x3,y3,x4,y4);
+
+         //draw floor/ceiling if selected
+         if CeilingRadio.checked then begin
+           brush.style := bsCross;
+           brush.color := FaceAtlas[faces[aUp]].color;
+           fillrect(x3,y3,x4,y4);
+         end else
+         if FloorRadio.checked then begin
+           brush.style := bsDiagCross;
+           brush.color := FaceAtlas[faces[aDown]].color;
+           fillrect(x3,y3,x4,y4);
+         end;
+
+         //draw tile faces
+         brush.style := bsSolid;
+
+         brush.color := FaceAtlas[faces[aTop]].color;
+         fillrect(x3,y1,x4,y3); //top
+
+         brush.color := FaceAtlas[faces[aLeft]].color;
+         fillrect(x1,y3,x3,y4); //left
+
+         brush.color := FaceAtlas[faces[aBottom]].color;
+         fillrect(x3,y4,x4,y2); //bottom
+
+         brush.color := FaceAtlas[faces[aRight]].color;
+         fillrect(x4,y3,x2,y4); //right
+       end;
+    end;
+
+
+  end else writeLnLog('TDungeonTilesEditor.DrawTileMap','TileMap is not ready to draw');
 end;
 
 {-------------------------------------------------------------------------}
 
+procedure TDungeonTilesEditor.PrepareMapEditor;
+begin
+  {actualize vertical scrollbar}
+  ZScroll.Min := 0;
+  ZScroll.Max := TileM.tilesizez-1;
+  ZScroll.position := ZScroll.max;
+  if TileM.tilesizez = 1 then begin
+    ZScroll.enabled := false;
+    ZLabel.visible := false;
+  end else begin
+    ZScroll.enabled := true;
+    ZLabel.visible := true;
+  end;
+  CurrentZ := ZScroll.position;
+
+  {prepare image size}
+  {$Warning Will exceed the screen size for very large tiles}
+  MapImage.width := tile_image_scale*TileM.TileSizex;
+  MapImage.height := tile_image_scale*TileM.TileSizey;
+  { fix Lazarus [BUG]:
+    Bitmap.Resize should be done automatically on OnResize but it isn't
+    They've said it's a feature not a bug. Ой, всё :) }
+  MapImage.Picture.Bitmap.SetSize(MapImage.Width,MapImage.height);
+
+  //set height and width of controls based on tile map size
+  ZScroll.height := MapImage.height{-zLabel.height};
+end;
+
+{----------------------------------------------------------------------------}
+
+
+procedure TDungeonTilesEditor.SavePNGButtonClick(Sender: TObject);
+begin
+  MakePNGMap;
+end;
+
+procedure TDungeonTilesEditor.SaveTileMapButtonClick(Sender: TObject);
+begin
+  WriteMe(false);
+end;
+
+{$INCLUDE constructor_make_png_map.inc}
+
+{---------------------------------------------------------------------------}
+
+procedure TDungeonTilesEditor.EmptyMapButtonClick(Sender: TObject);
+begin
+  if isTileLoaded and (TileM <> nil) then begin
+    if MessageDlg('Clear tile?', 'Clear tile map?', mtConfirmation, [mbYes, mbNo],0) = mrYes then begin
+      TileM.EmptyTile;
+      DrawTileMap;
+      isChanged := false;
+    end;
+  end else WriteLnLog('TDungeonTilesEditor.EmptyMapButtonClick','Tile is not ready!');
+end;
+
+{--------------------------------------------------------------------------}
+
+procedure TDungeonTilesEditor.RadioChange(Sender: TObject);
+begin
+  DrawTileMap;
+end;
+
+{---------------------------------------------------------------------------}
+
+procedure TDungeonTilesEditor.MapImageMouseDown(Sender: TObject;
+  Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+begin
+  EditTileMap(x,y);
+end;
+
+procedure TDungeonTilesEditor.EditTileMap(x,y: integer);
+var scalex,scaley: float;
+    dx,dy: float;
+    x1,y1,z1,ax,ay: integer;
+    angle1: TAngle;
+    face_value: TTileFace;
+    base_value: TTileKind;
+begin
+  //working with rectagonal grid only (for now, maybe forever :))
+ if (isTileLoaded) and (TileM<>nil) then begin
+   currentZ := ZScroll.Position;  //fool's check
+
+   scalex := MapImage.width/ TileM.tileSizex;
+   scaley := MapImage.height/TileM.tileSizey;
+
+   z1 := currentZ;
+   x1 := trunc(X / scalex);
+   y1 := trunc(Y / scaley);
+
+   //a fool's check, just in case...
+   if x1 < 0 then x1 := 0;
+   if y1 < 0 then y1 := 0;
+   if z1 < 0 then z1 := 0;
+   if x1 >= TileM.tilesizex then x1 := TileM.tilesizex-1;
+   if y1 >= TileM.tilesizey then y1 := TileM.tilesizey-1;
+   if z1 >= TileM.tilesizez then z1 := TileM.tilesizez-1;
+
+   dx := X/scalex-x1;
+   dy := Y/scaley-y1;
+
+   if dx < delta then ax := -1 else begin
+     if dx > 1-delta then ax := 1 else ax := 0;
+   end;
+   if dy < delta then ay := -1 else begin
+     if dy > 1-delta then ay := 1 else ay := 0;
+   end;
+
+   {yeah, ugly, but I don't want to take care of it later
+   and don't want to work with diagonals, maybe later}
+   if abs(ax)+abs(ay) > 1 then exit;
+
+   //grab current palette values from the ComboBoxes
+   base_value := BaseByIndex(BaseAtlasBox.ItemIndex);
+   face_value := FaceByIndex(FaceAtlasBox.ItemIndex);
+
+   if (ax = 0) and (ay = 0) then begin
+     {edit central spot}
+
+     if CeilingRadio.checked then begin
+       //edit ceiling
+       if  TileM.TileMap[x1,y1,z1].faces[aUp] = tfWall
+       then
+           TileM.TileMap[x1,y1,z1].faces[aUp] := face_value
+       else
+           TileM.TileMap[x1,y1,z1].faces[aUp] := tfWall;
+       if (SymmetricEditCheckBox.checked) and (z1>0) then
+           TileM.TileMap[x1,y1,z1-1].faces[aDown] := TileM.TileMap[x1,y1,z1].faces[aUp];
+     end
+
+     else
+     if FloorRadio.checked then begin
+       //edit floor
+       if  TileM.TileMap[x1,y1,z1].faces[aDown] = tfWall
+       then
+           TileM.TileMap[x1,y1,z1].faces[aDown] := face_value
+       else
+           TileM.TileMap[x1,y1,z1].faces[aDown] := tfWall;
+
+       if (SymmetricEditCheckBox.checked) and (z1<TileM.tileSizeZ-1) then
+           TileM.TileMap[x1,y1,z1+1].faces[aUp] := TileM.TileMap[x1,y1,z1].faces[aDown];
+     end
+
+     else begin
+       //edit base tile
+       if TileM.TileMap[x1,y1,z1].base = base_value then begin
+         //clear the tile to n/a
+         TileM.TileMap[x1,y1,z1].base := tkNone;
+         if SymmetricEditCheckBox.checked then
+           //and reset all the walls around it
+           for angle1 in TAngle do TileM.TileMap[x1,y1,z1].faces[angle1] := tfNone;
+       end else begin
+         //assign values and create walls around it if face=face_na;
+         TileM.TileMap[x1,y1,z1].base := base_value;
+         if SymmetricEditCheckBox.checked then begin
+           //reset all faces to 'face-free' here because it's meant to be inside the tile map, so no external links will be necessary, just to point that there is a passage here
+           if TileM.TileMap[x1,y1,z1].faces[aTop] = tfNone then begin
+             if y1=0 then TileM.TileMap[x1,y1,z1].faces[aTop] := tfWall else
+                          TileM.TileMap[x1,y1,z1].faces[aTop] := tfFree;
+           end;
+           if TileM.TileMap[x1,y1,z1].faces[aBottom] = tfNone then begin
+             if y1=TileM.TileSizeY-1 then TileM.TileMap[x1,y1,z1].faces[aBottom] := tfWall else
+                                          TileM.TileMap[x1,y1,z1].faces[aBottom] := tfFree;
+           end;
+           if TileM.TileMap[x1,y1,z1].faces[aLeft] = tfNone then begin
+             if x1=0 then TileM.TileMap[x1,y1,z1].faces[aLeft] := tfWall else
+                          TileM.TileMap[x1,y1,z1].faces[aLeft] := tfFree;
+           end;
+           if TileM.TileMap[x1,y1,z1].faces[aRight] = tfNone then begin
+             if x1=TileM.TileSizeX-1 then TileM.TileMap[x1,y1,z1].faces[aRight] := tfWall else
+                                          TileM.TileMap[x1,y1,z1].faces[aRight] := tfFree;
+           end;
+           if TileM.TileMap[x1,y1,z1].faces[aUp] = tfNone then begin
+             if z1=0 then TileM.TileMap[x1,y1,z1].faces[aUp] := tfWall else
+                          TileM.TileMap[x1,y1,z1].faces[aUp] := tfFree;
+           end;
+           if TileM.TileMap[x1,y1,z1].faces[aDown] = tfNone then begin
+             if z1 = TileM.TileSizeZ-1 then TileM.TileMap[x1,y1,z1].faces[aDown] := tfWall else
+                                            TileM.TileMap[x1,y1,z1].faces[aDown] := tfFree;
+           end;
+           //moreover, we have to check if this is a stairs-up-down and if the tile is correct
+           if (TileM.TileMap[x1,y1,z1].base = tkUp) then begin
+             if z1>0 then
+               TileM.TileMap[x1,y1,z1-1].base := tkDown
+             else showmessage('The ladder goes UP beyond the tile border!');
+           end;
+           if (TileM.TileMap[x1,y1,z1].base = tkDown) then begin
+             if z1<TileM.TileSizeZ-1 then
+               TileM.TileMap[x1,y1,z1+1].base := tkUp
+             else showmessage('The ladder goes DOWN beyond the tile border!');
+           end;
+         end;
+       end;
+     end;
+   end else begin
+     {edit walls}
+     //get angle from ax,ay
+     angle1 := GetAngle(ax,ay);
+
+     if TileM.TileMap[x1,y1,z1].faces[angle1] = tfWall
+     then
+        TileM.TileMap[x1,y1,z1].faces[angle1] := face_value
+     else
+        TileM.TileMap[x1,y1,z1].faces[angle1] := tfWall;
+
+     {preform symmetric edit}
+     if SymmetricEditCheckBox.Checked then begin
+       if (TileM.TileMap[x1,y1,z1].base <> tkNone) and
+          (TileM.TileMapSafeBase(x1+a_dx(angle1),y1+a_dy(angle1),z1) <> tkInacceptible) and
+          (TileM.TileMapSafeBase(x1+a_dx(angle1),y1+a_dy(angle1),z1) <> tkNone)
+       then
+          TileM.TileMap[x1+a_dx(angle1),y1+a_dy(angle1),z1].faces[InvertAngle(angle1)] := TileM.TileMap[x1,y1,z1].faces[angle1];
+     end;
+   end;
+   isChanged := true;
+   DrawTileMap;
+ end;
+end;
+
+{========================= DTileMap Helper ==================================}
+
+procedure DTileMapHelper.EmptyTile;
+var jx,jy,jz: integer;
+    a: TAngle;
+begin
+  if not blocker then
+    {this is a normal tile}
+    for jx := 0 to TileSizeX-1 do
+      for jy := 0 to TileSizeY-1 do
+        for jz := 0 to TileSizeZ-1 do with TileMap[jx,jy,jz] do begin
+          base := tkFree;
+          for a in TAngle do faces[a] := tfFree;
+          {if this tile is at border then make corresponding walls around it}
+          if jx = 0           then faces[aLeft]   := tfWall;
+          if jy = 0           then faces[aTop]    := tfWall;
+          if jx = TileSizeX-1 then faces[aRight]  := tfWall;
+          if jy = TileSizeY-1 then faces[aBottom] := tfWall;
+          if jz = 0           then faces[aUp]     := tfWall;
+          if jz = TileSizeZ-1 then faces[aDown]   := tfWall;
+        end
+  else
+    {this is a blocker tile}
+    with TileMap[0,0,0] do begin
+      base := tkNone;
+      for a in TAngle do faces[a] := tfNone;
+    end;
+end;
+
+{-----------------------------------------------------------------------}
+
+procedure DTileMapHelper.DetectBlocker;
+begin
+  if (tilesizex=0) or (tilesizey=0) or (tilesizez=0) then begin
+    blocker := true;
+    {a hack to allow for 1x2x0 stlye blockers, maybe will never be used
+     as it's unsafe to do something "large and ugly" like that}
+    if tilesizex = 0 then tilesizex := 1;
+    if tilesizey = 0 then tilesizey := 1;
+    if tilesizez = 0 then tilesizez := 1;
+  end else
+    blocker := false;
+end;
+
+{-----------------------------------------------------------------------}
+
+procedure DTileMapHelper.GuessSize(Tile3D: TCastleScene);
+begin
+  TileSizex := round(Tile3D.BoundingBox.sizex/TileScale);
+  TileSizey := round(Tile3D.BoundingBox.sizey/TileScale{*(1+0.5)}); //whhyyyyyyyy it falied at 1 of ~150 tiles ?????
+  TileSizez := round(Tile3D.BoundingBox.sizez/TileScale);
+  DetectBlocker;
+  GetMapMemory;
+  EmptyTile;
+  Ready := true;
+end;
+
+{-----------------------------------------------------------------------}
+
+constructor DTileMapHelper.LoadSafe(URL: string);
+begin
+  Load(URL);
+end;
 
 end.
 

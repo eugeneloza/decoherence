@@ -25,7 +25,7 @@ interface
 uses
   CastleLog,
   CastleWindow, CastleWindowTouch, CastleSceneCore, CastleScene, CastleFilesUtils,
-  castlePlayer, castleVectors, castleCameras,
+  castlePlayer, castleVectors, castleCameras, X3DNodes,
   deco3dload, decodungeontiles,
   x3dload, sysutils,
   castle3d,
@@ -37,12 +37,11 @@ Procedure InitTestLevel;
 var scene: TcastleScene;
   Camera: TWalkCamera;
   monsters: array[0..10] of T3DOrient;
-
+  //shaders: TSwitchNode;
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-uses DecoGameMode,
-  X3DNodes;
+uses DecoGameMode  ;
 
 var   monster: TX3DRootNode;
 
@@ -77,8 +76,15 @@ begin
 
   {this is a temporary "addition" of a screen shader,
    should be replaced for something more useful some time later}
+  {Shaders := TSwitchNode.create;}
   ScreenEffect := load3D(ApplicationData('shaders/empty.x3dv'));
-  mRoot.FdChildren.add(screenEffect.FdChildren[0]);
+  {Shaders.fdChildren.add(screenEffect.FdChildren[0]);
+  ScreenEffect := load3D(ApplicationData('shaders/edgedetect.x3dv'));
+  Shaders.fdChildren.add(screenEffect.FdChildren[0]);
+  ScreenEffect := load3D(ApplicationData('shaders/blur.x3dv'));
+  Shaders.fdChildren.add(screenEffect.FdChildren[0]);}
+
+  mRoot.FdChildren.add(ScreenEffect);
 
   Scene := TCastleScene.Create(Application);
   Scene.Load(mRoot,true);
@@ -88,7 +94,7 @@ begin
   Scene.ProcessEvents := true;
   scene.ShadowMaps := Shadow_maps_enabled;
 
-  monster := LoadBlenderX3D(ApplicationData('creatures/idle.castle-anim-frames'));
+  monster := LoadBlenderX3D(ApplicationData('models/creatures/idle.castle-anim-frames'));
 
   Window.ShadowVolumes := Shadow_volumes_enabled;
   window.ShadowVolumesRender := Shadow_volumes_enabled;

@@ -25,6 +25,10 @@ uses
   Classes, Forms, SysUtils,
   decotranslation;
 
+const
+  {all data that will remain in Architect folder and used only in Constructor}
+  LocalFolder = 'local/';
+
 type
   {a generic Form with abstract write/load and several other abstract
    routines to simplify and automate constructor's data management}
@@ -56,7 +60,7 @@ function ConstructorData(URL: string; ToGameFolder:boolean): string;
 {Desktop-only ApplicationData analogue. Replacement for ApplicationData for
  native FPC functions that don't work with URLs
  The result is relative to application folder!}
-function FakeApplicationData(URL: string): string;
+function FakeConstructorData(URL: string; ToGameFolder:boolean): string;
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
@@ -75,9 +79,12 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-function FakeApplicationData(URL: string): string;
+function FakeConstructorData(URL: string; ToGameFolder:boolean): string;
 begin
-  Result := 'data/'+URL;
+  if ToGameFolder then
+    Result := 'data/'+URL
+  else
+    Result := 'architect/'+URL;
   Result := AnsiReplaceText(Result,'/',pathdelim); //we're using native OS file access
 end;
 

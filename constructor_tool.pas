@@ -1,6 +1,6 @@
 program constructor_tool;
 
-{$mode objfpc}{$H+}
+{$INCLUDE compilerconfig.inc}
 
 uses
   {$IFDEF UNIX}{$IFDEF UseCThreads}

@@ -15,7 +15,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 
 {---------------------------------------------------------------------------}
 
-{ Main unit which launches all other editors. DESKTOP ONLY. }
+{ Main unit which launches all other editors. DESKTOP ONLY.
+
+  While Constructor works on internationalized data, the tool itself is
+  ENGLISH ONLY. I'm not going to add any multilingual support in any future,
+  Because it's a specific tool to solve specific tasks that
+  while trying to keep everything simple, is a very complex thing to do
+  - it's not for "all and everybody" to use. It requires knowledge of English anyway.
+  If you want it - this is a FOSS project - do it yourself. But it won't be easy.}
 unit constructor_mainunit;
 
 {$INCLUDE compilerconfig.inc}
@@ -82,7 +89,6 @@ end;
 procedure TMainForm.FormCreate(Sender: TObject);
 begin
   //MakeFormsList;  //other forms are nil yet... so doesn't help
-  AllForms := nil;  //fool's check to be safe
   GetLanguage;
 end;
 

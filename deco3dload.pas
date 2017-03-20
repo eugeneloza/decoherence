@@ -23,8 +23,30 @@ unit deco3dload;
 
 interface
 
-uses X3DNodes,
+uses X3DNodes, fgl,
   decoglobal;
+
+Type
+  TMaterialList = specialize TFPGObjectList<TMaterialNode>;
+
+Type
+  { a link for easy acessing the material of EACH model loaded
+    at the moment it operates only AmbientIntensity }
+  DMaterialContainer = class
+    private
+      fAmbient: float;
+    public
+      { a list of materials }
+      Value: TMaterialList;
+      { used only to "Get" value}
+      property Ambient: float read fAmbient;
+      { set Ambient Intensity for all models }
+      procedure SetAmbientIntensity(v: float);
+      constructor create;
+      destructor destroy; override;
+  end;
+
+var AmbientIntensity: DMaterialContainer;
 
 { extension of Castle Game Engine Load3D, automatically clears garbage
   of blender x3d exporter and adds requested anisortopic filtering}
@@ -62,6 +84,7 @@ end;
 procedure AddMaterial(Root: TX3DRootNode);
   procedure ScanNodesRecoursive(source: TAbstractX3DGroupingNode);
   var i: integer;
+      material: TMaterialNode;
   begin
     for i := 0 to source.FdChildren.Count-1 do
     if source.FdChildren[i] is TAbstractX3DGroupingNode then
@@ -72,11 +95,13 @@ procedure AddMaterial(Root: TX3DRootNode);
           // assign TextureProperties (anisotropic smoothing) for the imagetexture
           {$Warning WHY THE TextureProperties keeps automatically released????}
           (TShapeNode(source.FdChildren[i]).fdAppearance.Value.FindNode(TImageTextureNode,false) as TImageTextureNode).FdTextureProperties.Value := TextureProperties.DeepCopy;
+          {create a link to each and every material loaded}
+          Material := (TShapeNode(source.FdChildren[i]).FdAppearance.Value.FindNode(TMaterialNode,false) as TMaterialNode);
           // set material ambient intensity to zero for complete darkness :)
-          // maybe, make a list of links to implement night vision
-          (TShapeNode(source.FdChildren[i]).FdAppearance.Value.FindNode(TMaterialNode,false) as TMaterialNode).AmbientIntensity := 0;
+          Material.AmbientIntensity := 0;
+          AmbientIntensity.value.add(Material);
         except
-          writeLnLog('ScanRootRecoursive','try..except fired');
+          writeLnLog('AddMaterial.ScanNodesRecoursive','try..except fired');
         end;
   end;
 begin
@@ -85,130 +110,38 @@ end;
 
 {---------------------------------------------------------------------------}
 
-{ Cleans up blender exporter garbage
-  Use CleanWorld = true to delete camera, navigation and background
-  Use CleanUnitTransform = true to delete unit TransformNodes
-  (use the last option it only if you know what you're doing!)
-  total gain after cleaning up is ~ 0.5% less RAM consumption
-  + the same order speed gain
-
-  Warning: this is a destructive operation! It will overwrite the Root node.
-
-  can be used both as a function and as a procedure:
-  Root := CleanUp(Load3D(filename));
-  or
-  Root := Load3D(filename); CleanUp(Root);}
-function CleanUp(Root: TX3DRootNode; CleanWorld: boolean = false; CleanUnitTransform: boolean = false): TX3DRootNode;
-  //recoursively clean the given node
-  function CleanRecoursive(parent: TAbstractX3DGroupingNode; child: TX3DNode): boolean;
-  var i: integer;
-      RemoveNodeOnly, RemoveAll: boolean;
-
-    //if given vector is zero translation
-    function ZeroVector(a: TVector3Single): boolean;
-    begin
-      result := (Abs(a[0]  ) < SingleEqualityEpsilon) and
-                (Abs(a[1]  ) < SingleEqualityEpsilon) and
-                (Abs(a[2]  ) < SingleEqualityEpsilon)
-    end;
-    //if given vector is unit scale
-    function UnitVector(a: TVector3Single): boolean;
-    begin
-      result := (Abs(a[0]-1) < SingleEqualityEpsilon) and
-                (Abs(a[1]-1) < SingleEqualityEpsilon) and
-                (Abs(a[2]-1) < SingleEqualityEpsilon)
-    end;
-    //if given vector is zero rotation
-    function NoRotation(a: TVector4Single): boolean;
-    begin
-      //zero rotation angle is absolutely enough.
-      result := Abs(a[3]) < SingleEqualityEpsilon
-    end;
-  begin
-    result := false;
-
-    RemoveNodeOnly := false;
-    RemoveAll := false;
-
-    //clean Background, Navigation and Camera if needed.
-    if CleanWorld then
-      if (child is TBackgroundNode) or
-         (child is TNavigationInfoNode) or
-         ((child is TTransformNode) and (AnsiContainsText(child.x3dName,'Camera_'))) then RemoveAll := true;
-
-    if RemoveAll then begin
-      //remove the node completely
-      if parent<>nil then begin
-        parent.FdChildren.remove(child);
-        result := true; //changed the fdChildren.count of parent
-        //freeandnil(child); //????
-      end;
-    end
-    else
-      if child is TAbstractX3DGroupingNode then begin
-
-        {blender exporter garbage these two nodes are absolutely useless}
-        if AnsiContainsText(child.x3dName,'group_ME_') or
-           AnsiContainsText(child.x3dName,'_ifs_TRANSFORM') then
-             RemoveNodeOnly := true else RemoveNodeOnly := false;
-
-        { There is a problem when removing unit TransformNode.
-          The node itself might be a placeholder and not its transform
-          but its name carries information. However, we can't
-          automatically tell that. So this is a "risky" option. }
-        if (CleanUnitTransform) and (child is TTransformNode) then
-          if ZeroVector(TTransformNode(child).Translation) and
-             UnitVector(TTransformNode(child).Scale) and
-             NoRotation(TTransformNode(child).rotation) then RemoveNodeOnly := true;
-
-        //repeat...until because fdChildren.count can change during the runtime!
-        i := 0;
-        if TAbstractX3DGroupingNode(child).FdChildren.count>0 then
-        repeat
-          if not CleanRecoursive(TAbstractX3DGroupingNode(child),TAbstractX3DGroupingNode(child).FdChildren[i])
-           then inc(i);
-          //if result was true then TAbstractX3DGroupingNode(child).FdChildren[i] has just been removed
-        until i >= TAbstractX3DGroupingNode(child).FdChildren.count;
-
-        if parent<> nil then
-          if RemoveNodeOnly then begin
-            //move this node's children up one level
-            for i := 0 to TAbstractX3DGroupingNode(child).FdChildren.count-1 do
-              parent.FdChildren.add(TAbstractX3DGroupingNode(child).FdChildren[i]);
-            //and delete the node;
-            parent.FdChildren.Remove(child);
-            result := true; //changed the fdChildren.count of parent
-            //freeandnil(child); //????
-          end
-
-      end;
-
-  end;
-begin
-  // recoursively scan the node and remove garbage
-  CleanRecoursive(nil,root);
-  Result := root;
-end;
-
-{---------------------------------------------------------------------------}
-
 function LoadBlenderX3D(URL: string): TX3DRootNode;
 begin
   if TextureProperties = nil then MakeDefaultTextureProperties;
-  result := CleanUp(load3D(URL),true,true);
+  result := load3D(URL);
   AddMaterial(result);
 end;
 
+{=================== Ambient Intensity List ==========================}
 
-{procedure FreeTextureProperties;
+constructor DMaterialContainer.create;
 begin
-  FreeAndNil(TextureProperties);
-end; }
-{initialization
-  MakeDefaultTextureProperties;}
+  Value := TMaterialList.create(false);
+  fAmbient := 0;
+end;
+destructor DMaterialContainer.destroy;
+begin
+  FreeAndNil(Value);
+  inherited;
+end;
+procedure DMaterialContainer.SetAmbientIntensity(v: float);
+var i: TMaterialNode;
+begin
+  fAmbient := v;
+  for i in Value do i.AmbientIntensity := v;
+end;
+
+initialization
+  AmbientIntensity := DMaterialContainer.create;
 
 finalization
   FreeAndNil(TextureProperties); //WATCH OUT FOR SIGSEGVS here!
+  FreeAndNil(AmbientIntensity);
 
 
 end.

@@ -68,7 +68,7 @@ var
 implementation
 {$R *.lfm}
 
-uses DOM, {$IFDEF gzipdata}CastleDownload,{$ENDIF} CastleXMLUtils,
+uses DOM, CastleXMLUtils,
   CastleLog, decoglobal;
 
 {-----------------------------------------------------------------------------}
@@ -100,7 +100,7 @@ begin
    Maybe, this'll need "add an image from this computer" button/feature}
   LoadScreensListBox.clear;
   LoadImages := TLoadImageList.create(true);
-  if FindFirst (FakeApplicationData(LoadScreenFolder + '*.jpg'), faAnyFile - faDirectory, Rec) = 0 then begin
+  if FindFirst (FakeConstructorData(LoadScreenFolder + '*.jpg',true), faAnyFile - faDirectory, Rec) = 0 then begin
     try
       repeat
         LI := DLoadImage.create;
@@ -180,7 +180,7 @@ begin
     end;
 
     if ToGameFolder then
-      URLWriteXML(XMLdoc, ConstructorData(ScenarioFolder+LanguageDir(ConstructorLanguage)+'facts'+XML_extension,ToGameFolder))
+      URLWriteXML(XMLdoc, ConstructorData(ScenarioFolder+LanguageDir(ConstructorLanguage)+'facts.xml'+gz_ext,ToGameFolder))
     else
       URLWriteXML(XMLdoc, ConstructorData(ScenarioFolder+LanguageDir(ConstructorLanguage)+'facts.xml',ToGameFolder));
 

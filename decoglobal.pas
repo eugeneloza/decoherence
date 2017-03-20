@@ -58,7 +58,7 @@ const InterfaceFolder    = 'interface/';
       //Placeholders_folder = Models_folder + 'placeholders'+pathdelim;
 
 
-const XML_extension = {$IFDEF gzipdata}'.gz'{$ELSE}'.xml'{$ENDIF};
+const GZ_ext = {$IFDEF gzipdata}'.gz'{$ELSE}''{$ENDIF};
 
 const anisotropic_smoothing = 4;
       Shadow_maps_enabled = false;
@@ -75,8 +75,9 @@ var Window : TCastleWindowTouch;
 {$DEFINE USE_DEV_URANDOM}
 {$ENDIF}
 {a little modification of CastleRandom RandomSeed initialization algorithm
- to use /dev/urandom on Linux. Actually /dev/urandom exists on all UNIX OS,
- but I'm not exactly sure if it'll work as expected (test needed)}
+ to use /dev/urandom on Linux. Actually /dev/urandom exists on all *NIX OS,
+ but I'm not exactly sure if it'll work as expected (test needed)
+ We're not pursing cryptographic purposes, so /dev/urandom is perfectly enough}
 function GetRandomSeed: LongWord;
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
