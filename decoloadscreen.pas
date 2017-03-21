@@ -71,7 +71,7 @@ function GetRandomFactImage: string;
 implementation
 
 uses SysUtils, CastleLog, CastleFilesUtils,
-  DOM, CastleDownload, CastleXMLUtils,
+  DOM, CastleXMLUtils,
   decoglobal;
 
 var LastFact: integer = -1;

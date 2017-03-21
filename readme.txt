@@ -47,5 +47,5 @@ libgtkglext1
 # Links
 
 (Almost) Daily development blog: https://decoherencestudio.wordpress.com
-Russian-speaking fan community: ************
-English-speaking fan community: ************
+Russian-speaking Wizardry 8 community: ************ 
+English-speaking Wizardry 8 community (It's not the only one): ************
