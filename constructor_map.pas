@@ -23,7 +23,8 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs,
-  CastleControl, constructor_global;
+  CastleControl, constructor_global,
+  decodungeongenerator;
 
 type
   TMapEditor = class(TWriterForm)

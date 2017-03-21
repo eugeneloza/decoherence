@@ -46,6 +46,6 @@ libgtkglext1
 
 # Links
 
-(Almost) Daily development blog: ***********
+(Almost) Daily development blog: https://decoherencestudio.wordpress.com
 Russian-speaking fan community: ************
 English-speaking fan community: ************

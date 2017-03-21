@@ -106,7 +106,8 @@ begin
 end;
 {$ENDIF}
 
-// no implementation here needed. Maybe merge with GameMode?
+{---------------------------------------------------------------------------}
+
 procedure InitGlobal;
 begin
   rnd := TCastleRandom.Create(GetRandomSeed);
