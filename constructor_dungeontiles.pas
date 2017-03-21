@@ -27,20 +27,22 @@ interface
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
   ExtCtrls,
-  CastleControl, constructor_global, CastleScene, CastleImages, X3DNodes,
+  constructor_global,
+  CastleControl, CastleScene, CastleImages, X3DNodes,
   decodungeontiles;
 
 {graphical preferences}
-const delta=0.2; //this is 'wall thickness' at wall editor
-      tile_image_scale=32;
+const delta = 0.2; //this is 'wall thickness' at wall editor
+      tile_image_scale = 32;
 
 Type
   {atlas record for faces and base}
   DTileAtlasRecord = record
+     {name displayed in the editor}
      FriendlyName: string;
-     color: integer;    //for display
-     //style:TBrushStyle;
-end;
+     {color the atlas element is displayed on the image}
+     color: integer;
+  end;
 
 type
   {these routines that should be used only in Constructor}
@@ -53,8 +55,10 @@ type
     {detect if this tile is a blocker
      todo: WILL fail if blocker is ~0.5 dx}
     procedure DetectBlocker;
-    {safe wrapper for Load}
+    {safe wrapper for Load. Just catches exception in case the file is not found}
     constructor LoadSafe(URL: string);
+    {save procedure}
+    procedure Save(TName: string; ToGameFolder: boolean);
 end;
 
 type
@@ -78,11 +82,11 @@ type
     ResetCameraButton: TButton;
     TileDisplay: TCastleControl;
     TilesBox: TComboBox;
-    {take a screenshot of the current render. Yet not needed.}
     procedure RadioChange(Sender: TObject);
     procedure EmptyMapButtonClick(Sender: TObject);
     procedure MapImageMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
+    {take a screenshot of the current render. Yet not needed.}
     procedure SavePNGButtonClick(Sender: TObject);
     procedure SaveTileMapButtonClick(Sender: TObject);
     procedure ScreenShotButtonClick(Sender: TObject);
@@ -101,7 +105,9 @@ type
     TileName: string;
     { current displayed tile }
     TileRoot: TX3DRootNode;
+    { Scene of the tile }
     TileScene: TCastleScene;
+    { map of the tile. The main goal of this module is to edit it }
     TileM: DTileMap;
 
     //todo: generic list
@@ -110,8 +116,6 @@ type
     {atlas for base of the tile}
     BaseAtlas: array [TTileKind] of DTileAtlasRecord;
 
-    LastFaceAtlasIndex: TTileFace;
-    LastBaseAtlasIndex: TTileKind;
     {current z of the tile edited}
     CurrentZ: integer;
 
@@ -234,51 +238,8 @@ end;
 {--------------------------------------------------------------------------}
 
 procedure TDungeonTilesEditor.SaveTileMap(FileName: string; toGameFolder: boolean);
-var XMLdoc: TXMLDocument;
-    RootNode: TDOMNode;
-    WorkNode, ContainerNode: TDOMElement;
-    jx,jy,jz: integer;
-    j: TAngle;
 begin
-  XMLdoc := TXMLDocument.Create;
-  RootNode := XMLdoc.CreateElement('TileMap');
-  XMLdoc.Appendchild(RootNode);
-
-  WorkNode := XMLdoc.CreateElement('Size');
-  WorkNode.AttributeSet('size_x',TileM.tileSizeX);
-  WorkNode.AttributeSet('size_y',TileM.tileSizeY);
-  WorkNode.AttributeSet('size_z',TileM.tileSizeZ);
-  WorkNode.AttributeSet('blocker',TileM.blocker);
-  RootNode.AppendChild(WorkNode);
-
-  for jx := 0 to TileM.TileSizeX-1 do
-    for jy := 0 to TileM.TileSizeY-1 do
-      for jz := 0 to TileM.TileSizeZ-1 do begin
-        ContainerNode := XMLdoc.CreateElement('Tile');
-        ContainerNode.AttributeSet('x',jx);
-        ContainerNode.AttributeSet('y',jy);
-        ContainerNode.AttributeSet('z',jz);
-
-          WorkNode := XMLdoc.CreateElement('base');
-          WorkNode.AttributeSet('tile_kind',TileKindToStr(TileM.TileMap[jx,jy,jz].base));
-          ContainerNode.AppendChild(WorkNode);
-
-          WorkNode := XMLdoc.CreateElement('faces');
-          for j in TAngle do
-            WorkNode.AttributeSet(AngleToStr(j),TileFaceToStr(TileM.TileMap[jx,jy,jz].faces[j]));
-          ContainerNode.AppendChild(WorkNode);
-
-        RootNode.AppendChild(ContainerNode);
-      end;
-
-  if ToGameFolder then
-    URLWriteXML(XMLdoc, ConstructorData(TilesFolder+Filename+'.map'+gz_ext,ToGameFolder))
-  else
-    URLWriteXML(XMLdoc, ConstructorData(TilesFolder+Filename+'.map',ToGameFolder));
-
-  WriteLnLog(ConstructorData(TilesFolder+Filename+'.map',ToGameFolder));
-
-  FreeAndNil(XMLdoc);
+  TileM.Save(FileName,ToGameFolder);
 end;
 
 {--------------------------------------------------------------------------}
@@ -289,7 +250,7 @@ begin
   for t in TilesList do begin
     compileTile(t);
     //copy tile image?
-    SaveTileMap(t,true);
+    //SaveTileMap(t,true);
   end;
 end;
 
@@ -426,18 +387,24 @@ end;
 {--------------------------------------------------------------------------}
 
 procedure TDungeonTilesEditor.CompileTile(FileName: string);
+var TmpRoot: TX3DRootNode;
+    tmpMap: DTileMap;
 begin
-  //dummy
   writeLnLog('TDungeonTilesEditor.CompileTile','Compile: '+FileName);
 
   //load tile from Architect folder
-  TileRoot := CleanUp( Load3D(ConstructorData(TilesFolder+Filename+'.x3d',false)) ,true,true);
-  FixTextures(TileRoot);
+  TmpRoot := CleanUp( Load3D(ConstructorData(TilesFolder+Filename+'.x3d',false)) ,true,true);
+  FixTextures(TmpRoot);
   //todo: check for used/unused textures and delete/add them
-
   //save tile to game folder
-  save3D(TileRoot, ConstructorData(TilesFolder+Filename+'.x3d'+GZ_ext,true));
-  FreeAndNil(TileRoot);
+  save3D(TmpRoot, ConstructorData(TilesFolder+Filename+'.x3d'+GZ_ext,true));
+  FreeAndNil(TmpRoot);
+
+  //compile tile map
+  tmpMap := DTileMap.LoadSafe( ConstructorData(TilesFolder+FileName+'.map',false) );
+  if tmpMap.Ready then
+    tmpMap.Save(FileName, true);
+  FreeAndNil(tmpMap);
 end;
 
 {--------------------------------------------------------------------------}
@@ -496,9 +463,6 @@ begin
     color := $00FF00;
    end;
 
-   LastFaceAtlasIndex := tfFree;
-   LastBaseAtlasIndex := tkFree;
-
    MakeAtlasBoxes;
   end;
 
@@ -530,7 +494,7 @@ begin
     exit;
   end;
   Result := tfNone;
-  writelnLog('TDungeonTilesEditor.FaceByIndex','ERROR: Face not found! for index '+ inttostr(index));
+  writelnLog('TDungeonTilesEditor.FaceByIndex','ERROR: Face not found! For index '+ inttostr(index));
 end;
 
 {-------------------------------------------------------------------------}
@@ -543,7 +507,7 @@ begin
     exit;
   end;
   Result := tkNone;
-  writelnLog('TDungeonTilesEditor.BaseByIndex','ERROR: Base not found! for index '+ inttostr(index));
+  writelnLog('TDungeonTilesEditor.BaseByIndex','ERROR: Base not found! For index '+ inttostr(index));
 end;
 
 {-------------------------------------------------------------------------}
@@ -678,7 +642,6 @@ procedure TDungeonTilesEditor.SavePNGButtonClick(Sender: TObject);
 begin
   MakePNGMap;
 end;
-
 procedure TDungeonTilesEditor.SaveTileMapButtonClick(Sender: TObject);
 begin
   WriteMe(false);
@@ -752,7 +715,7 @@ begin
    end;
 
    {yeah, ugly, but I don't want to take care of it later
-   and don't want to work with diagonals, maybe later}
+   and I don't want to work with diagonals, maybe later}
    if abs(ax)+abs(ay) > 1 then exit;
 
    //grab current palette values from the ComboBoxes
@@ -923,7 +886,61 @@ end;
 
 constructor DTileMapHelper.LoadSafe(URL: string);
 begin
-  Load(URL);
+  try
+    Load(URL);
+  except
+    WriteLnLog('DTileMapHelper.LoadSafe','Exception caught. Usually it''s ok.');
+  end;
+end;
+
+{--------------------------------------------------------------------------}
+
+Procedure DTileMapHelper.Save(TName: string; ToGameFolder: boolean);
+var TileDOC: TXMLDocument;
+    RootNode: TDOMNode;
+    WorkNode, ContainerNode: TDOMElement;
+    jx,jy,jz: integer;
+    j: TAngle;
+begin
+  TileDOC := TXMLDocument.Create;
+  RootNode := TileDOC.CreateElement('TileMap');
+  TileDOC.Appendchild(RootNode);
+
+  WorkNode := TileDOC.CreateElement('Size');
+  WorkNode.AttributeSet('size_x',tileSizeX);
+  WorkNode.AttributeSet('size_y',tileSizeY);
+  WorkNode.AttributeSet('size_z',tileSizeZ);
+  WorkNode.AttributeSet('blocker',blocker);
+  RootNode.AppendChild(WorkNode);
+
+  for jx := 0 to TileSizeX-1 do
+    for jy := 0 to TileSizeY-1 do
+      for jz := 0 to TileSizeZ-1 do begin
+        ContainerNode := TileDOC.CreateElement('Tile');
+        ContainerNode.AttributeSet('x',jx);
+        ContainerNode.AttributeSet('y',jy);
+        ContainerNode.AttributeSet('z',jz);
+
+          WorkNode := TileDOC.CreateElement('base');
+          WorkNode.AttributeSet('tile_kind',TileKindToStr(TileMap[jx,jy,jz].base));
+          ContainerNode.AppendChild(WorkNode);
+
+          WorkNode := TileDOC.CreateElement('faces');
+          for j in TAngle do
+            WorkNode.AttributeSet(AngleToStr(j),TileFaceToStr(TileMap[jx,jy,jz].faces[j]));
+          ContainerNode.AppendChild(WorkNode);
+
+        RootNode.AppendChild(ContainerNode);
+      end;
+
+  if ToGameFolder then
+    URLWriteXML(TileDOC, ConstructorData(TilesFolder+TName+'.map'+gz_ext,ToGameFolder))
+  else
+    URLWriteXML(TileDOC, ConstructorData(TilesFolder+TName+'.map',ToGameFolder));
+
+  WriteLnLog(ConstructorData(TilesFolder+TName+'.map',ToGameFolder));
+
+  FreeAndNil(TileDOC);
 end;
 
 end.

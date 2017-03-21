@@ -77,4 +77,13 @@ object MainForm: TMainForm
     ShowHint = True
     TabOrder = 4
   end
+  object MapEditorButton: TButton
+    Left = 8
+    Height = 25
+    Top = 72
+    Width = 112
+    Caption = 'Map'
+    OnClick = MapEditorButtonClick
+    TabOrder = 5
+  end
 end

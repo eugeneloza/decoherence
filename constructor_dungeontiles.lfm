@@ -117,6 +117,7 @@ object DungeonTilesEditor: TDungeonTilesEditor
       Checked = True
       OnChange = RadioChange
       TabOrder = 4
+      TabStop = True
     end
     object FloorRadio: TRadioButton
       Left = 3

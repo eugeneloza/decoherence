@@ -1,0 +1,18 @@
+object MapEditor: TMapEditor
+  Left = 288
+  Height = 370
+  Top = 170
+  Width = 628
+  Caption = 'MapEditor'
+  ClientHeight = 370
+  ClientWidth = 628
+  OnDestroy = FormDestroy
+  LCLVersion = '1.6.2.0'
+  object MapDisplay: TCastleControl
+    Left = 7
+    Height = 357
+    Top = 6
+    Width = 376
+    TabOrder = 0
+  end
+end

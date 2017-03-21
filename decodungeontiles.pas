@@ -164,7 +164,8 @@ procedure LoadTiles;
 procedure destroyTiles;
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-uses sysUtils, CastleURIUtils, CastleLog;
+uses sysUtils, CastleURIUtils, CastleLog,
+  DOM, CastleXMLUtils;
 
 function TileKindToStr(value: TTileKind): string;
 begin
@@ -297,14 +298,58 @@ end;
 {======================== DTILE TYPE ==========================================}
 
 constructor DTileMap.Load(URL: string);
+var TileDOC: TXMLDocument;
+    RootNode,WorkNode,ValueNode: TDOMElement;
+    Iterator: TXMLElementIterator;
+    jx,jy,jz: integer;
+    j: TAngle;
 begin
   //inherited;
-  fReady := false;
   TileName := DeleteURIExt(ExtractURIName(URL));
-  //dummy
-  if Ready then
-    setsize(tilesizex,tilesizey,tilesizez)
-  else ;//exception!
+  WriteLnLog('DTileMap.Load',URL);
+
+  {todo: clear the tile with base = tkInacceptible
+   and check that all tile elements are loaded and give an error otherwise
+   Unexpected errors might occur on damaged game data }
+
+  TileDoc := nil;
+  try
+    TileDOC := URLReadXML(URL);
+    RootNode := TileDOC.DocumentElement;
+    WorkNode := RootNode.ChildElement('Size');
+    TileSizeX := WorkNode.AttributeInteger('size_x');
+    TileSizeY := WorkNode.AttributeInteger('size_y');
+    TileSizeZ := WorkNode.AttributeInteger('size_z');
+    SetSize(TileSizex,TileSizeY,TileSizeZ);
+    blocker := WorkNode.AttributeBoolean('blocker');
+
+    Iterator := RootNode.ChildrenIterator;
+    try
+      while Iterator.GetNext do if Iterator.current.NodeName = UTF8decode('Tile') then
+      begin
+        ValueNode := Iterator.current;
+        jx := ValueNode.AttributeInteger('x');
+        jy := ValueNode.AttributeInteger('y');
+        jz := ValueNode.AttributeInteger('z');
+        WorkNode := ValueNode.ChildElement('base', true);
+        TileMap[jx,jy,jz].base := StrToTileKind(WorkNode.AttributeString('tile_kind'));
+        WorkNode := ValueNode.ChildElement('faces', true);
+        for j in TAngle do
+           TileMap[jx,jy,jz].faces[j] := StrToTileFace(WorkNode.AttributeString(AngleToStr(j)));
+      end;
+    finally
+      FreeAndNil(Iterator);
+    end;
+    fReady := true;
+  except
+    fReady := false;
+  end;
+  FreeAndNil(TileDOC);
+
+  CalculateFaces;
+
+  if not Ready then
+    raise Exception.create('Fatal Error in DTileMap.Load! Unable to open file '+TileName);
 end;
 
 {----------------------------------------------------------------------------}
@@ -370,6 +415,8 @@ begin
    for iy:=0 to tilesizey-1 do
     for iz:=0 to tilesizez-1 do if TileMap[ix,iy,iz].base=tkDown then has_stairs_down := true;
 end;
+
+{-------------------------------------------------------------------------}
 
 function DTileMap.IsSafe(tx,ty,tz: integer): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
