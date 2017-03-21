@@ -47,5 +47,5 @@ libgtkglext1
 # Links
 
 (Almost) Daily development blog: https://decoherencestudio.wordpress.com
-Russian-speaking Wizardry 8 community: ************ 
-English-speaking Wizardry 8 community (It's not the only one): ************
+Russian-speaking Wizardry 8 community: https://vk.com/wizardry_8
+English-speaking Wizardry 8 community (It's not the only one): http://www.postcount.net/forum/forumdisplay.php?47-Wizardry-Series
