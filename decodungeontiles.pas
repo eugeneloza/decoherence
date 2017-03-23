@@ -98,6 +98,8 @@ type
     procedure setsize(tx: integer = 1; ty: integer = 1; tz: integer = 1);
     {distribute memory according to tilesizex,tilesizey,tilesizez}
     procedure GetMapMemory;
+    {empties the map with walls at borders}
+    procedure EmptyMap;
     {checks if tx,ty,tz are correct for this tile}
     function IsSafe(tx,ty,tz: integer): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
     function IsSafe(tx,ty: integer): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
@@ -385,6 +387,27 @@ begin
     for iy := 0 to sizey-1 do
       setlength(Map[ix,iy],sizez);
   end;
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DMap.EmptyMap;
+var jx,jy,jz: integer;
+    a: TAngle;
+begin
+  for jx := 0 to SizeX-1 do
+    for jy := 0 to SizeY-1 do
+      for jz := 0 to SizeZ-1 do with Map[jx,jy,jz] do begin
+        base := tkFree;
+        for a in TAngle do faces[a] := tfFree;
+        {if this tile is at border then make corresponding walls around it}
+        if jx = 0       then faces[aLeft]   := tfWall;
+        if jy = 0       then faces[aTop]    := tfWall;
+        if jx = SizeX-1 then faces[aRight]  := tfWall;
+        if jy = SizeY-1 then faces[aBottom] := tfWall;
+        if jz = 0       then faces[aUp]     := tfWall;
+        if jz = SizeZ-1 then faces[aDown]   := tfWall;
+      end
 end;
 
 {----------------------------------------------------------------------------}

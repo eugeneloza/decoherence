@@ -15,4 +15,13 @@ object MapEditor: TMapEditor
     Width = 376
     TabOrder = 0
   end
+  object GenerateButton: TButton
+    Left = 392
+    Height = 25
+    Top = 336
+    Width = 75
+    Caption = 'Test'
+    OnClick = GenerateButtonClick
+    TabOrder = 1
+  end
 end

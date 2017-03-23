@@ -22,14 +22,16 @@ unit constructor_map;
 interface
 
 uses
-  Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs,
+  Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
   CastleControl, constructor_global,
   decodungeongenerator;
 
 type
   TMapEditor = class(TWriterForm)
+    GenerateButton: TButton;
     MapDisplay: TCastleControl;
     procedure FormDestroy(Sender: TObject);
+    procedure GenerateButtonClick(Sender: TObject);
   public
     //my routines here
   public
@@ -63,6 +65,18 @@ end;
 procedure TMapEditor.FormDestroy(Sender: TObject);
 begin
   FreeMe;
+end;
+
+{-------------------------------------------------------------------------}
+
+procedure TMapEditor.GenerateButtonClick(Sender: TObject);
+var GEN: DDungeonGenerator;
+begin
+  GEN := DDungeonGenerator.Create;
+  //GEN.mapx := 10;
+  GEN.Generate;
+  //somethinguseful := GEN.GetMap;
+  FreeAndNil(GEN);
 end;
 
 {-------------------------------------------------------------------------}

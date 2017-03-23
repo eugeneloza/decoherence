@@ -21,8 +21,8 @@ unit decodungeongenerator;
 {$INCLUDE compilerconfig.inc}
 interface
 
-uses Classes, CastleRandom
-  ;
+uses Classes, CastleRandom,
+  decodungeontiles;
 
 type
   { Preforms all generation routines from reading the parameters and tiles
@@ -32,13 +32,23 @@ type
     fSeed: LongWord;
     { xorshift random generator, fast and thread-safe }
     RNDM: TCastleRandom;
+    {the main operating item - map of the resulting dungeon}
+    Map: DMap;
   public
+
+    {map sizes}
+    mapx,mapy,mapz: integer;
+
+    {copy the "internal" map to external request}
+    function GetMap: DMap;
+    //maybe better saveTo when finished?: DMap;
+
     { Specific SEED of the random number for this algorithm }
     property Seed: LongWord read fSeed write fSeed default 0;
-    { the main procedure to generate a dungeon }
+    { the main procedure to generate a dungeon, may be launched not-in-a-thread }
     procedure Generate;
 
-    //constructor Create; override;
+    constructor Create;// override;
     destructor Destroy; override;
   protected
     { here we launch Generate in a Thread }
@@ -63,10 +73,14 @@ begin
   if fSeed = 0 then fSeed := GetRandomSeed;
   RNDM := TCastleRandom.Create(fSeed);
 
-  //dummy
-
   // read/parse parameters?
-  // empty map
+  mapx := 10;
+  mapy := 10;
+  mapz := 3;
+
+  Map.SetSize(mapx,mapy,mapz);
+  Map.EmptyMap;
+
   // main cycle
   // finalize
 
@@ -75,9 +89,31 @@ end;
 
 {-----------------------------------------------------------------------------}
 
+function DDungeonGenerator.GetMap: DMap;
+var ix,iy,iz: integer;
+begin
+  Result := DMap.create;
+  Result.setsize(Map.sizex,Map.sizey,Map.sizez);
+  for ix := 0 to Map.sizex-1 do
+    for iy := 0 to Map.sizey-1 do
+      for iz := 0 to Map.sizez-1 do
+        Result.map[ix,iy,iz] := Map.Map[ix,iy,iz];
+end;
+
+{-----------------------------------------------------------------------------}
+
+constructor DDungeonGenerator.create;
+begin
+  inherited;
+  Map := DMap.create;
+end;
+
+{-----------------------------------------------------------------------------}
+
 destructor DDungeonGenerator.Destroy;
 begin
   FreeAndNil(RNDM);
+  FreeAndNil(Map);
   inherited;
 end;
 

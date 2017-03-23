@@ -828,24 +828,11 @@ end;
 {========================= DTileMap Helper ==================================}
 
 procedure DTileMapHelper.EmptyTile;
-var jx,jy,jz: integer;
-    a: TAngle;
+var a: TAngle;
 begin
   if not blocker then
     {this is a normal tile}
-    for jx := 0 to SizeX-1 do
-      for jy := 0 to SizeY-1 do
-        for jz := 0 to SizeZ-1 do with Map[jx,jy,jz] do begin
-          base := tkFree;
-          for a in TAngle do faces[a] := tfFree;
-          {if this tile is at border then make corresponding walls around it}
-          if jx = 0       then faces[aLeft]   := tfWall;
-          if jy = 0       then faces[aTop]    := tfWall;
-          if jx = SizeX-1 then faces[aRight]  := tfWall;
-          if jy = SizeY-1 then faces[aBottom] := tfWall;
-          if jz = 0       then faces[aUp]     := tfWall;
-          if jz = SizeZ-1 then faces[aDown]   := tfWall;
-        end
+    emptyMap
   else
     {this is a blocker tile}
     with Map[0,0,0] do begin
