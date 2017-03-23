@@ -29,6 +29,7 @@ type
     to raycast and chunk-n-slice the dungeon into parts }
   DDungeonGenerator = class(TThread)
   private
+    fisWorking: boolean;
     fSeed: LongWord;
     { xorshift random generator, fast and thread-safe }
     RNDM: TCastleRandom;
@@ -36,7 +37,8 @@ type
     Map: DMap;
   public
 
-    {map sizes}
+    {map parameters}
+  //  seed: longword;
     mapx,mapy,mapz: integer;
 
     {copy the "internal" map to external request}
@@ -44,12 +46,17 @@ type
     //maybe better saveTo when finished?: DMap;
 
     { Specific SEED of the random number for this algorithm }
-    property Seed: LongWord read fSeed write fSeed default 0;
+    //property Seed: LongWord read fSeed write fSeed default 0;
+    procedure InitSeed(newseed: longword = 0);
+    
+    property isWorking: boolean read fisWorking;
     { the main procedure to generate a dungeon, may be launched not-in-a-thread }
     procedure Generate;
 
     constructor Create;// override;
     destructor Destroy; override;
+    
+    //save temp state to file
   protected
     { here we launch Generate in a Thread }
       procedure Execute; override;
@@ -70,14 +77,17 @@ end;
 
 procedure DDungeonGenerator.Generate;
 begin
-  if fSeed = 0 then fSeed := GetRandomSeed;
-  RNDM := TCastleRandom.Create(fSeed);
-
-  // read/parse parameters?
+  fisWorking := true;
+  {initialize generator parameters}
+  
+  {initialize random seed}
+  InitSeed(0);
+  
   mapx := 10;
   mapy := 10;
   mapz := 3;
-
+  
+  {initialize map size}
   Map.SetSize(mapx,mapy,mapz);
   Map.EmptyMap;
 
@@ -85,6 +95,7 @@ begin
   // finalize
 
   FreeAndNil(RNDM);
+  fisWorking := false;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -102,10 +113,20 @@ end;
 
 {-----------------------------------------------------------------------------}
 
+procedure DDungeonGenerator.InitSeed(newseed: longword = 0);
+begin
+  if newseed=0 then fseed := GetRandomSeed else fseed := newseed;
+  RNDM.initialize(fseed); 
+end;
+
 constructor DDungeonGenerator.create;
 begin
   inherited;
+  fisWorking := false;
   Map := DMap.create;
+  {$warning check non-initialized version}
+  RNDM := TCastleRandom.Create;
+  // InitSeed(GetRandomSeed); // maybe this is not optimal as operation takes some time and not required when manually initializing the seed;
 end;
 
 {-----------------------------------------------------------------------------}
