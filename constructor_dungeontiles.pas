@@ -542,11 +542,11 @@ begin
       //working with currentZ
       iz := currentZ;
       //determine draw scale
-      scalex := MapImage.width/TileM.TileSizex;
-      scaley := MapImage.height/TileM.TileSizey;
+      scalex := MapImage.width/TileM.Sizex;
+      scaley := MapImage.height/TileM.Sizey;
       //draw a tile element
-      for ix := 0 to TileM.TileSizex-1 do
-       for iy := 0 to TileM.TileSizey-1 do with TileM.TileMap[ix,iy,iz] do begin
+      for ix := 0 to TileM.Sizex-1 do
+       for iy := 0 to TileM.Sizey-1 do with TileM.Map[ix,iy,iz] do begin
          //determine basic coordinates inside the tile
          { x1,y1 - x3 ------ x4 - x2,y1
                |   |          |   |
@@ -611,9 +611,9 @@ procedure TDungeonTilesEditor.PrepareMapEditor;
 begin
   {actualize vertical scrollbar}
   ZScroll.Min := 0;
-  ZScroll.Max := TileM.tilesizez-1;
+  ZScroll.Max := TileM.sizez-1;
   ZScroll.position := ZScroll.max;
-  if TileM.tilesizez = 1 then begin
+  if TileM.sizez = 1 then begin
     ZScroll.enabled := false;
     ZLabel.visible := false;
   end else begin
@@ -624,8 +624,8 @@ begin
 
   {prepare image size}
   {$Warning Will exceed the screen size for very large tiles}
-  MapImage.width := tile_image_scale*TileM.TileSizex;
-  MapImage.height := tile_image_scale*TileM.TileSizey;
+  MapImage.width := tile_image_scale*TileM.Sizex;
+  MapImage.height := tile_image_scale*TileM.Sizey;
   { fix Lazarus [BUG]:
     Bitmap.Resize should be done automatically on OnResize but it isn't
     They've said it's a feature not a bug. Ой, всё :) }
@@ -689,8 +689,8 @@ begin
  if (isTileLoaded) and (TileM<>nil) then begin
    currentZ := ZScroll.Position;  //fool's check
 
-   scalex := MapImage.width/ TileM.tileSizex;
-   scaley := MapImage.height/TileM.tileSizey;
+   scalex := MapImage.width/ TileM.Sizex;
+   scaley := MapImage.height/TileM.Sizey;
 
    z1 := currentZ;
    x1 := trunc(X / scalex);
@@ -700,9 +700,9 @@ begin
    if x1 < 0 then x1 := 0;
    if y1 < 0 then y1 := 0;
    if z1 < 0 then z1 := 0;
-   if x1 >= TileM.tilesizex then x1 := TileM.tilesizex-1;
-   if y1 >= TileM.tilesizey then y1 := TileM.tilesizey-1;
-   if z1 >= TileM.tilesizez then z1 := TileM.tilesizez-1;
+   if x1 >= TileM.sizex then x1 := TileM.sizex-1;
+   if y1 >= TileM.sizey then y1 := TileM.sizey-1;
+   if z1 >= TileM.sizez then z1 := TileM.sizez-1;
 
    dx := X/scalex-x1;
    dy := Y/scaley-y1;
@@ -727,74 +727,74 @@ begin
 
      if CeilingRadio.checked then begin
        //edit ceiling
-       if  TileM.TileMap[x1,y1,z1].faces[aUp] = tfWall
+       if  TileM.Map[x1,y1,z1].faces[aUp] = tfWall
        then
-           TileM.TileMap[x1,y1,z1].faces[aUp] := face_value
+           TileM.Map[x1,y1,z1].faces[aUp] := face_value
        else
-           TileM.TileMap[x1,y1,z1].faces[aUp] := tfWall;
+           TileM.Map[x1,y1,z1].faces[aUp] := tfWall;
        if (SymmetricEditCheckBox.checked) and (z1>0) then
-           TileM.TileMap[x1,y1,z1-1].faces[aDown] := TileM.TileMap[x1,y1,z1].faces[aUp];
+           TileM.Map[x1,y1,z1-1].faces[aDown] := TileM.Map[x1,y1,z1].faces[aUp];
      end
 
      else
      if FloorRadio.checked then begin
        //edit floor
-       if  TileM.TileMap[x1,y1,z1].faces[aDown] = tfWall
+       if  TileM.Map[x1,y1,z1].faces[aDown] = tfWall
        then
-           TileM.TileMap[x1,y1,z1].faces[aDown] := face_value
+           TileM.Map[x1,y1,z1].faces[aDown] := face_value
        else
-           TileM.TileMap[x1,y1,z1].faces[aDown] := tfWall;
+           TileM.Map[x1,y1,z1].faces[aDown] := tfWall;
 
-       if (SymmetricEditCheckBox.checked) and (z1<TileM.tileSizeZ-1) then
-           TileM.TileMap[x1,y1,z1+1].faces[aUp] := TileM.TileMap[x1,y1,z1].faces[aDown];
+       if (SymmetricEditCheckBox.checked) and (z1<TileM.SizeZ-1) then
+           TileM.Map[x1,y1,z1+1].faces[aUp] := TileM.Map[x1,y1,z1].faces[aDown];
      end
 
      else begin
        //edit base tile
-       if TileM.TileMap[x1,y1,z1].base = base_value then begin
+       if TileM.Map[x1,y1,z1].base = base_value then begin
          //clear the tile to n/a
-         TileM.TileMap[x1,y1,z1].base := tkNone;
+         TileM.Map[x1,y1,z1].base := tkNone;
          if SymmetricEditCheckBox.checked then
            //and reset all the walls around it
-           for angle1 in TAngle do TileM.TileMap[x1,y1,z1].faces[angle1] := tfNone;
+           for angle1 in TAngle do TileM.Map[x1,y1,z1].faces[angle1] := tfNone;
        end else begin
          //assign values and create walls around it if face=face_na;
-         TileM.TileMap[x1,y1,z1].base := base_value;
+         TileM.Map[x1,y1,z1].base := base_value;
          if SymmetricEditCheckBox.checked then begin
            //reset all faces to 'face-free' here because it's meant to be inside the tile map, so no external links will be necessary, just to point that there is a passage here
-           if TileM.TileMap[x1,y1,z1].faces[aTop] = tfNone then begin
-             if y1=0 then TileM.TileMap[x1,y1,z1].faces[aTop] := tfWall else
-                          TileM.TileMap[x1,y1,z1].faces[aTop] := tfFree;
+           if TileM.Map[x1,y1,z1].faces[aTop] = tfNone then begin
+             if y1=0 then TileM.Map[x1,y1,z1].faces[aTop] := tfWall else
+                          TileM.Map[x1,y1,z1].faces[aTop] := tfFree;
            end;
-           if TileM.TileMap[x1,y1,z1].faces[aBottom] = tfNone then begin
-             if y1=TileM.TileSizeY-1 then TileM.TileMap[x1,y1,z1].faces[aBottom] := tfWall else
-                                          TileM.TileMap[x1,y1,z1].faces[aBottom] := tfFree;
+           if TileM.Map[x1,y1,z1].faces[aBottom] = tfNone then begin
+             if y1=TileM.SizeY-1 then TileM.Map[x1,y1,z1].faces[aBottom] := tfWall else
+                                      TileM.Map[x1,y1,z1].faces[aBottom] := tfFree;
            end;
-           if TileM.TileMap[x1,y1,z1].faces[aLeft] = tfNone then begin
-             if x1=0 then TileM.TileMap[x1,y1,z1].faces[aLeft] := tfWall else
-                          TileM.TileMap[x1,y1,z1].faces[aLeft] := tfFree;
+           if TileM.Map[x1,y1,z1].faces[aLeft] = tfNone then begin
+             if x1=0 then TileM.Map[x1,y1,z1].faces[aLeft] := tfWall else
+                          TileM.Map[x1,y1,z1].faces[aLeft] := tfFree;
            end;
-           if TileM.TileMap[x1,y1,z1].faces[aRight] = tfNone then begin
-             if x1=TileM.TileSizeX-1 then TileM.TileMap[x1,y1,z1].faces[aRight] := tfWall else
-                                          TileM.TileMap[x1,y1,z1].faces[aRight] := tfFree;
+           if TileM.Map[x1,y1,z1].faces[aRight] = tfNone then begin
+             if x1=TileM.SizeX-1 then TileM.Map[x1,y1,z1].faces[aRight] := tfWall else
+                                      TileM.Map[x1,y1,z1].faces[aRight] := tfFree;
            end;
-           if TileM.TileMap[x1,y1,z1].faces[aUp] = tfNone then begin
-             if z1=0 then TileM.TileMap[x1,y1,z1].faces[aUp] := tfWall else
-                          TileM.TileMap[x1,y1,z1].faces[aUp] := tfFree;
+           if TileM.Map[x1,y1,z1].faces[aUp] = tfNone then begin
+             if z1=0 then TileM.Map[x1,y1,z1].faces[aUp] := tfWall else
+                          TileM.Map[x1,y1,z1].faces[aUp] := tfFree;
            end;
-           if TileM.TileMap[x1,y1,z1].faces[aDown] = tfNone then begin
-             if z1 = TileM.TileSizeZ-1 then TileM.TileMap[x1,y1,z1].faces[aDown] := tfWall else
-                                            TileM.TileMap[x1,y1,z1].faces[aDown] := tfFree;
+           if TileM.Map[x1,y1,z1].faces[aDown] = tfNone then begin
+             if z1 = TileM.SizeZ-1 then TileM.Map[x1,y1,z1].faces[aDown] := tfWall else
+                                        TileM.Map[x1,y1,z1].faces[aDown] := tfFree;
            end;
            //moreover, we have to check if this is a stairs-up-down and if the tile is correct
-           if (TileM.TileMap[x1,y1,z1].base = tkUp) then begin
+           if (TileM.Map[x1,y1,z1].base = tkUp) then begin
              if z1>0 then
-               TileM.TileMap[x1,y1,z1-1].base := tkDown
+               TileM.Map[x1,y1,z1-1].base := tkDown
              else showmessage('The ladder goes UP beyond the tile border!');
            end;
-           if (TileM.TileMap[x1,y1,z1].base = tkDown) then begin
-             if z1<TileM.TileSizeZ-1 then
-               TileM.TileMap[x1,y1,z1+1].base := tkUp
+           if (TileM.Map[x1,y1,z1].base = tkDown) then begin
+             if z1<TileM.SizeZ-1 then
+               TileM.Map[x1,y1,z1+1].base := tkUp
              else showmessage('The ladder goes DOWN beyond the tile border!');
            end;
          end;
@@ -805,19 +805,19 @@ begin
      //get angle from ax,ay
      angle1 := GetAngle(ax,ay);
 
-     if TileM.TileMap[x1,y1,z1].faces[angle1] = tfWall
+     if TileM.Map[x1,y1,z1].faces[angle1] = tfWall
      then
-        TileM.TileMap[x1,y1,z1].faces[angle1] := face_value
+        TileM.Map[x1,y1,z1].faces[angle1] := face_value
      else
-        TileM.TileMap[x1,y1,z1].faces[angle1] := tfWall;
+        TileM.Map[x1,y1,z1].faces[angle1] := tfWall;
 
      {preform symmetric edit}
      if SymmetricEditCheckBox.Checked then begin
-       if (TileM.TileMap[x1,y1,z1].base <> tkNone) and
-          (TileM.TileMapSafeBase(x1+a_dx(angle1),y1+a_dy(angle1),z1) <> tkInacceptible) and
-          (TileM.TileMapSafeBase(x1+a_dx(angle1),y1+a_dy(angle1),z1) <> tkNone)
+       if (TileM.Map[x1,y1,z1].base <> tkNone) and
+          (TileM.MapSafeBase(x1+a_dx(angle1),y1+a_dy(angle1),z1) <> tkInacceptible) and
+          (TileM.MapSafeBase(x1+a_dx(angle1),y1+a_dy(angle1),z1) <> tkNone)
        then
-          TileM.TileMap[x1+a_dx(angle1),y1+a_dy(angle1),z1].faces[InvertAngle(angle1)] := TileM.TileMap[x1,y1,z1].faces[angle1];
+          TileM.Map[x1+a_dx(angle1),y1+a_dy(angle1),z1].faces[InvertAngle(angle1)] := TileM.Map[x1,y1,z1].faces[angle1];
      end;
    end;
    isChanged := true;
@@ -833,22 +833,22 @@ var jx,jy,jz: integer;
 begin
   if not blocker then
     {this is a normal tile}
-    for jx := 0 to TileSizeX-1 do
-      for jy := 0 to TileSizeY-1 do
-        for jz := 0 to TileSizeZ-1 do with TileMap[jx,jy,jz] do begin
+    for jx := 0 to SizeX-1 do
+      for jy := 0 to SizeY-1 do
+        for jz := 0 to SizeZ-1 do with Map[jx,jy,jz] do begin
           base := tkFree;
           for a in TAngle do faces[a] := tfFree;
           {if this tile is at border then make corresponding walls around it}
-          if jx = 0           then faces[aLeft]   := tfWall;
-          if jy = 0           then faces[aTop]    := tfWall;
-          if jx = TileSizeX-1 then faces[aRight]  := tfWall;
-          if jy = TileSizeY-1 then faces[aBottom] := tfWall;
-          if jz = 0           then faces[aUp]     := tfWall;
-          if jz = TileSizeZ-1 then faces[aDown]   := tfWall;
+          if jx = 0       then faces[aLeft]   := tfWall;
+          if jy = 0       then faces[aTop]    := tfWall;
+          if jx = SizeX-1 then faces[aRight]  := tfWall;
+          if jy = SizeY-1 then faces[aBottom] := tfWall;
+          if jz = 0       then faces[aUp]     := tfWall;
+          if jz = SizeZ-1 then faces[aDown]   := tfWall;
         end
   else
     {this is a blocker tile}
-    with TileMap[0,0,0] do begin
+    with Map[0,0,0] do begin
       base := tkNone;
       for a in TAngle do faces[a] := tfNone;
     end;
@@ -858,13 +858,13 @@ end;
 
 procedure DTileMapHelper.DetectBlocker;
 begin
-  if (tilesizex=0) or (tilesizey=0) or (tilesizez=0) then begin
+  if (sizex=0) or (sizey=0) or (sizez=0) then begin
     blocker := true;
     {a hack to allow for 1x2x0 stlye blockers, maybe will never be used
      as it's unsafe to do something "large and ugly" like that}
-    if tilesizex = 0 then tilesizex := 1;
-    if tilesizey = 0 then tilesizey := 1;
-    if tilesizez = 0 then tilesizez := 1;
+    if sizex = 0 then sizex := 1;
+    if sizey = 0 then sizey := 1;
+    if sizez = 0 then sizez := 1;
   end else
     blocker := false;
 end;
@@ -873,9 +873,9 @@ end;
 
 procedure DTileMapHelper.GuessSize(Tile3D: TCastleScene);
 begin
-  TileSizex := round(Tile3D.BoundingBox.sizex/TileScale);
-  TileSizey := round(Tile3D.BoundingBox.sizey/TileScale{*(1+0.5)}); //whhyyyyyyyy it falied at 1 of ~150 tiles ?????
-  TileSizez := round(Tile3D.BoundingBox.sizez/TileScale);
+  Sizex := round(Tile3D.BoundingBox.sizex/TileScale);
+  Sizey := round(Tile3D.BoundingBox.sizey/TileScale{*(1+0.5)}); //whhyyyyyyyy it falied at 1 of ~150 tiles ?????
+  Sizez := round(Tile3D.BoundingBox.sizez/TileScale);
   DetectBlocker;
   GetMapMemory;
   EmptyTile;
@@ -907,27 +907,27 @@ begin
   TileDOC.Appendchild(RootNode);
 
   WorkNode := TileDOC.CreateElement('Size');
-  WorkNode.AttributeSet('size_x',tileSizeX);
-  WorkNode.AttributeSet('size_y',tileSizeY);
-  WorkNode.AttributeSet('size_z',tileSizeZ);
+  WorkNode.AttributeSet('size_x',SizeX);
+  WorkNode.AttributeSet('size_y',SizeY);
+  WorkNode.AttributeSet('size_z',SizeZ);
   WorkNode.AttributeSet('blocker',blocker);
   RootNode.AppendChild(WorkNode);
 
-  for jx := 0 to TileSizeX-1 do
-    for jy := 0 to TileSizeY-1 do
-      for jz := 0 to TileSizeZ-1 do begin
+  for jx := 0 to SizeX-1 do
+    for jy := 0 to SizeY-1 do
+      for jz := 0 to SizeZ-1 do begin
         ContainerNode := TileDOC.CreateElement('Tile');
         ContainerNode.AttributeSet('x',jx);
         ContainerNode.AttributeSet('y',jy);
         ContainerNode.AttributeSet('z',jz);
 
           WorkNode := TileDOC.CreateElement('base');
-          WorkNode.AttributeSet('tile_kind',TileKindToStr(TileMap[jx,jy,jz].base));
+          WorkNode.AttributeSet('tile_kind',TileKindToStr(Map[jx,jy,jz].base));
           ContainerNode.AppendChild(WorkNode);
 
           WorkNode := TileDOC.CreateElement('faces');
           for j in TAngle do
-            WorkNode.AttributeSet(AngleToStr(j),TileFaceToStr(TileMap[jx,jy,jz].faces[j]));
+            WorkNode.AttributeSet(AngleToStr(j),TileFaceToStr(Map[jx,jy,jz].faces[j]));
           ContainerNode.AppendChild(WorkNode);
 
         RootNode.AppendChild(ContainerNode);

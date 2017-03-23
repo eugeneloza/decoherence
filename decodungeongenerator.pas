@@ -21,8 +21,8 @@ unit decodungeongenerator;
 {$INCLUDE compilerconfig.inc}
 interface
 
-uses
-  Classes, CastleRandom;
+uses Classes, CastleRandom
+  ;
 
 type
   { Preforms all generation routines from reading the parameters and tiles
@@ -48,7 +48,7 @@ end;
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
-uses SysUtils,
+uses SysUtils, CastleLog,
   decoglobal;
 
 procedure DDungeonGenerator.execute;

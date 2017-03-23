@@ -14,9 +14,9 @@ var PNG_tileset, PNG_up, PNG_down, PNG_updown, PNG_map: TRGBAlphaImage;
         begin
          GetCornerFace := false;
          if TileM.IsSafe(cox,coy) then begin
-           if TileM.TileMapSafeFace(cox,coy,coz,MyFace) = tfWall
+           if TileM.MapSafeFace(cox,coy,coz,MyFace) = tfWall
            then GetCornerFace := true else
-           if TileM.TileMapSafeFace(cox+a_dx(MyFace),coy+a_dy(MyFace),coz,invertAngle(MyFace)) = tfWall
+           if TileM.MapSafeFace(cox+a_dx(MyFace),coy+a_dy(MyFace),coz,invertAngle(MyFace)) = tfWall
            then GetCornerFace := true;
          end
          else   GetCornerFace := true;  //not sure about this line
@@ -39,12 +39,12 @@ begin
    PNG_Down    := LoadImage(ConstructorData(LocalFolder+'template_CC0_by_caeles_down.png',false),   [TRGBAlphaImage]) as TRGBAlphaImage;
    PNG_UpDown  := LoadImage(ConstructorData(LocalFolder+'template_CC0_by_caeles_updown.png',false), [TRGBAlphaImage]) as TRGBAlphaImage;
    //create map image.
-   for iz:=0 to TileSizez-1 do begin
+   for iz:=0 to Sizez-1 do begin
     PNG_map:=LoadImage(ConstructorData(LocalFolder+'0.png',false), [TRGBAlphaImage]) as TRGBAlphaImage;
-    PNG_map.setsize((TileSizeX)*16,(TileSizeY)*16,1);
+    PNG_map.setsize((SizeX)*16,(SizeY)*16,1);
     PNG_map.Clear(Vector4Byte(0,0,0,0));
-    for ix:=0 to TileSizeX-1 do
-     for iy:=0 to TileSizeY-1 do with TileMap[ix,iy,iz] do begin
+    for ix:=0 to SizeX-1 do
+     for iy:=0 to SizeY-1 do with Map[ix,iy,iz] do begin
        if base <> tkNone then begin
        //No-corner tiles
        if (faces[aTop] = tfWall) and (faces[aBottom] = tfWall) then begin
@@ -233,21 +233,21 @@ begin
      if base = tkUp then arrowup:=true;
      if base = tkDown then arrowdown:=true;
 
-     if isPassable(TileMap[ix,iy,iz].faces[aLeft]) then begin
-       if TileMapSafeBase(ix-1,iy,iz) = tkUp then arrowup := true;
-       if TileMapSafeBase(ix-1,iy,iz) = tkDown then arrowdown := true;
+     if isPassable(Map[ix,iy,iz].faces[aLeft]) then begin
+       if MapSafeBase(ix-1,iy,iz) = tkUp then arrowup := true;
+       if MapSafeBase(ix-1,iy,iz) = tkDown then arrowdown := true;
      end;
-     if isPassable(TileMap[ix,iy,iz].faces[aRight]) then begin
-       if TileMapSafeBase(ix+1,iy,iz) = tkUp then arrowup := true;
-       if TileMapSafeBase(ix+1,iy,iz) = tkDown then arrowdown := true;
+     if isPassable(Map[ix,iy,iz].faces[aRight]) then begin
+       if MapSafeBase(ix+1,iy,iz) = tkUp then arrowup := true;
+       if MapSafeBase(ix+1,iy,iz) = tkDown then arrowdown := true;
      end;
-     if isPassable(TileMap[ix,iy,iz].faces[aTop]) then begin
-       if TileMapSafeBase(ix,iy-1,iz) = tkUp then arrowup := true;
-       if TileMapSafeBase(ix,iy-1,iz) = tkDown then arrowdown := true;
+     if isPassable(Map[ix,iy,iz].faces[aTop]) then begin
+       if MapSafeBase(ix,iy-1,iz) = tkUp then arrowup := true;
+       if MapSafeBase(ix,iy-1,iz) = tkDown then arrowdown := true;
      end;
-     if isPassable(TileMap[ix,iy,iz].faces[aBottom]) then begin
-       if TileMapSafeBase(ix,iy+1,iz) = tkUp then arrowup := true;
-       if TileMapSafeBase(ix,iy+1,iz) = tkDown then arrowdown := true;
+     if isPassable(Map[ix,iy,iz].faces[aBottom]) then begin
+       if MapSafeBase(ix,iy+1,iz) = tkUp then arrowup := true;
+       if MapSafeBase(ix,iy+1,iz) = tkDown then arrowdown := true;
      end;
 
      //place the tile at tx,ty to the resulting image;
@@ -270,7 +270,7 @@ begin
    FreeAndNil(PNG_down);
    FreeAndNil(PNG_updown);
 
- end else with TileM.TileMap[0,0,0] do begin
+ end else with TileM.Map[0,0,0] do begin
    if IsPassable(faces[aTop]) then
      PNG_map:=LoadImage(LocalFolder+'blocker_bottom.png', [TRGBAlphaImage]) as TRGBAlphaImage
    else

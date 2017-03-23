@@ -88,17 +88,38 @@ type
      faces: (tfNone,tfNone,tfNone,tfNone,tfNone,tfNone));}
 
 type
+  {common routines shared by TileMap and DungeonMap}
+  DMap = class (TObject)
+    {size of this map}
+    sizex,sizey,sizez: byte;
+    {internal map of this tile}
+    Map: array of array of array of BasicTile;
+    {sets the size of the tile and adjusts memory}
+    procedure setsize(tx: integer = 1; ty: integer = 1; tz: integer = 1);
+    {distribute memory according to tilesizex,tilesizey,tilesizez}
+    procedure GetMapMemory;
+    {checks if tx,ty,tz are correct for this tile}
+    function IsSafe(tx,ty,tz: integer): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+    function IsSafe(tx,ty: integer): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+    {safe way to get BasicTile
+     (checks if tx,ty,tz are within the Tile size and returns tkInacceptible otherwise) }
+    function MapSafe(tx,ty,tz: integer): BasicTile; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+    { safe way to get Tile base
+     (checks if tx,ty,tz are within the Tile size and returns tkInacceptible otherwise) }
+    function MapSafeBase(tx,ty,tz: integer): TTileKind; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+    { safe way to get Tile Face
+      (checks if tx,ty,tz are within the Tile size and returns tfInacceptible otherwise) }
+    function MapSafeFace(tx,ty,tz: integer; face: TAngle): TTileFace; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+end;
+
+type
   {A large tile used in dungeon generation. With a set of Basic_Tile_type
    and additional parameters and procedures
    todo: split DTile and DGenerationTile}
-  DTileMap = class
+  DTileMap = class (DMap)
     private
       fReady: boolean;
     public
-      {size of this tile}
-      tilesizex,tilesizey,tilesizez: byte;
-      {internal map of this tile}
-      TileMap: array of array of array of BasicTile;
       {name of this tile for debugging}
       TileName: string;
 
@@ -111,24 +132,8 @@ type
       {is the tile ready to work (loaded and parsed correctly)?}
       property Ready: boolean read fReady write fReady;
       constructor Load(URL: string);
-      {unused}
-      procedure setsize(tx: integer = 1; ty: integer = 1; tz: integer = 1);
-      {distribute memory according to tilesizex,tilesizey,tilesizez}
-      procedure GetMapMemory;
       {calculates faces of the tile and prepares it for work}
       procedure CalculateFaces;
-      {checks if tx,ty,tz are correct for this tile}
-      function IsSafe(tx,ty,tz: integer): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
-      function IsSafe(tx,ty: integer): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
-      {safe way to get BasicTile
-       (checks if tx,ty,tz are within the Tile size and returns tkInacceptible otherwise) }
-      function TileMapSafe(tx,ty,tz: integer): BasicTile; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
-      { safe way to get Tile base
-       (checks if tx,ty,tz are within the Tile size and returns tkInacceptible otherwise) }
-      function TileMapSafeBase(tx,ty,tz: integer): TTileKind; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
-      { safe way to get Tile Face
-        (checks if tx,ty,tz are within the Tile size and returns tfInacceptible otherwise) }
-      function TileMapSafeFace(tx,ty,tz: integer; face: TAngle): TTileFace; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 end;
 
 {type Generator_tile = class(DTile)
@@ -317,10 +322,10 @@ begin
     TileDOC := URLReadXML(URL);
     RootNode := TileDOC.DocumentElement;
     WorkNode := RootNode.ChildElement('Size');
-    TileSizeX := WorkNode.AttributeInteger('size_x');
-    TileSizeY := WorkNode.AttributeInteger('size_y');
-    TileSizeZ := WorkNode.AttributeInteger('size_z');
-    SetSize(TileSizex,TileSizeY,TileSizeZ);
+    SizeX := WorkNode.AttributeInteger('size_x');
+    SizeY := WorkNode.AttributeInteger('size_y');
+    SizeZ := WorkNode.AttributeInteger('size_z');
+    SetSize(Sizex,SizeY,SizeZ);
     blocker := WorkNode.AttributeBoolean('blocker');
 
     Iterator := RootNode.ChildrenIterator;
@@ -332,10 +337,10 @@ begin
         jy := ValueNode.AttributeInteger('y');
         jz := ValueNode.AttributeInteger('z');
         WorkNode := ValueNode.ChildElement('base', true);
-        TileMap[jx,jy,jz].base := StrToTileKind(WorkNode.AttributeString('tile_kind'));
+        Map[jx,jy,jz].base := StrToTileKind(WorkNode.AttributeString('tile_kind'));
         WorkNode := ValueNode.ChildElement('faces', true);
         for j in TAngle do
-           TileMap[jx,jy,jz].faces[j] := StrToTileFace(WorkNode.AttributeString(AngleToStr(j)));
+           Map[jx,jy,jz].faces[j] := StrToTileFace(WorkNode.AttributeString(AngleToStr(j)));
       end;
     finally
       FreeAndNil(Iterator);
@@ -354,31 +359,31 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DTileMap.setsize(tx: integer = 1; ty: integer = 1; tz: integer = 1);
+procedure DMap.setsize(tx: integer = 1; ty: integer = 1; tz: integer = 1);
 begin
-  tilesizex := tx;
-  tilesizey := ty;
-  tilesizez := tz;
+  sizex := tx;
+  sizey := ty;
+  sizez := tz;
   //initialize the dynamic arrays
-  if (tilesizex<>0) and (tilesizey<>0) and (tilesizez<>0) then
+  if (sizex<>0) and (sizey<>0) and (sizez<>0) then
     //in case this is a normal tile...
     GetMapMemory
   else
     //in case this is a "blocker" tile we still need a complete 1x1x1 base
-    raise exception.Create('DTileMap.setsize: Tilesize is zero!');
+    raise exception.Create('DMap.setsize: Tilesize is zero!');
 end;
 
 {----------------------------------------------------------------------------}
 
-procedure DTileMap.GetMapMemory;
+procedure DMap.GetMapMemory;
 var ix,iy: integer;
 begin
   {set length of 3d dynamic array}
-  setlength(TileMap,tilesizex);
-  for ix := 0 to tilesizex-1 do begin
-    setlength(TileMap[ix],tilesizey);
-    for iy := 0 to tilesizey-1 do
-      setlength(TileMap[ix,iy],tilesizez);
+  setlength(Map,sizex);
+  for ix := 0 to sizex-1 do begin
+    setlength(Map[ix],sizey);
+    for iy := 0 to sizey-1 do
+      setlength(Map[ix,iy],sizez);
   end;
 end;
 
@@ -387,50 +392,50 @@ end;
 procedure DTileMap.CalculateFaces;
 var ix,iy,iz: integer;
 begin
-  FreeFaces:=0;
-  for iz:=0 to tilesizez-1 do begin
+  FreeFaces := 0;
+  for iz := 0 to sizez-1 do begin
     {$Warning A critical issue must be fixed in DTile.CalculateFaces}
     {todo: this is not correct! Exits may be not only on border tiles
      correct way is to search for borders and face_na
      however, the issue is not as critical, just it'll make the
      algorithm work in an incorrect way and might even lead to tile
      not being used}
-    ix:=0;
-    for iy:=0 to tilesizey-1 do if isPassable(TileMap[ix,iy,iz].faces[aLeft]) then inc(FreeFaces);
-    ix:=tilesizex-1;
-    for iy:=0 to tilesizey-1 do if isPassable(TileMap[ix,iy,iz].faces[aRight]) then inc(FreeFaces);
-    iy:=0;
-    for ix:=0 to tilesizex-1 do if isPassable(TileMap[ix,iy,iz].faces[aTop]) then inc(FreeFaces);
-    iy:=tilesizey-1;
-    for ix:=0 to tilesizex-1 do if isPassable(TileMap[ix,iy,iz].faces[aBottom]) then inc(FreeFaces);
+    ix := 0;
+    for iy := 0 to sizey-1 do if isPassable(Map[ix,iy,iz].faces[aLeft]) then inc(FreeFaces);
+    ix := sizex-1;
+    for iy := 0 to sizey-1 do if isPassable(Map[ix,iy,iz].faces[aRight]) then inc(FreeFaces);
+    iy := 0;
+    for ix := 0 to sizex-1 do if isPassable(Map[ix,iy,iz].faces[aTop]) then inc(FreeFaces);
+    iy := sizey-1;
+    for ix := 0 to sizex-1 do if isPassable(Map[ix,iy,iz].faces[aBottom]) then inc(FreeFaces);
   end;
   //check if it's a blocker tile
-  if (FreeFaces = 1) and (tilesizex+tilesizey+tilesizez = 3) and (TileMap[0,0,0].base = tkNone) then
-    blocker:=true
+  if (FreeFaces = 1) and (sizex+sizey+sizez = 3) and (Map[0,0,0].base = tkNone) then
+    blocker := true
   else
-    blocker:=false;
+    blocker := false;
   //check if it has stairs down for later generation
   has_stairs_down := false;
-  for ix:=0 to tilesizex-1 do
-   for iy:=0 to tilesizey-1 do
-    for iz:=0 to tilesizez-1 do if TileMap[ix,iy,iz].base=tkDown then has_stairs_down := true;
+  for ix := 0 to sizex-1 do
+   for iy := 0 to sizey-1 do
+    for iz := 0 to sizez-1 do if Map[ix,iy,iz].base=tkDown then has_stairs_down := true;
 end;
 
 {-------------------------------------------------------------------------}
 
-function DTileMap.IsSafe(tx,ty,tz: integer): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+function DMap.IsSafe(tx,ty,tz: integer): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
-  if (tx>=0)        and (ty>=0)        and (tz>=0)        and
-     (tx<TileSizex) and (ty<TileSizeY) and (tz<TileSizeZ)
+  if (tx >= 0)    and (ty >= 0)    and (tz >= 0)        and
+     (tx < Sizex) and (ty < SizeY) and (tz < SizeZ)
   then
     result := true
   else
     result := false;
 end;
-function DTileMap.IsSafe(tx,ty: integer): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+function DMap.IsSafe(tx,ty: integer): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
-  if (tx>=0)        and (ty>=0)        and
-     (tx<TileSizex) and (ty<TileSizeY)
+  if (tx >= 0)    and (ty >= 0)        and
+     (tx < Sizex) and (ty < SizeY)
   then
     result := true
   else
@@ -439,25 +444,25 @@ end;
 
 {--------------------------------------------------------------------}
 
-Function DTileMap.TileMapSafe(tx,ty,tz: integer): BasicTile; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+Function DMap.MapSafe(tx,ty,tz: integer): BasicTile; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
   if IsSafe(tx,ty,tz) then
-    result := TileMap[tx,ty,tz]
+    result := Map[tx,ty,tz]
   else
     result.base := tkInacceptible;
   //maybe Result := InacceptibleTile?
 end;
-Function DTileMap.TileMapSafeBase(tx,ty,tz: integer): TTileKind; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+Function DMap.MapSafeBase(tx,ty,tz: integer): TTileKind; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
   if IsSafe(tx,ty,tz) then
-    result := TileMap[tx,ty,tz].base
+    result := Map[tx,ty,tz].base
   else
     result := tkInacceptible;
 end;
-Function DTileMap.TileMapSafeFace(tx,ty,tz: integer; face: TAngle): TTileFace; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+Function DMap.MapSafeFace(tx,ty,tz: integer; face: TAngle): TTileFace; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
   if IsSafe(tx,ty,tz) then
-    result := TileMap[tx,ty,tz].faces[face]
+    result := Map[tx,ty,tz].faces[face]
   else
     result := tfInacceptible;
 end;
