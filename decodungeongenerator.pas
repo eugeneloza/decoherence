@@ -23,6 +23,16 @@ interface
 
 uses Classes, CastleRandom,
   decodungeontiles;
+  
+type
+  {this is a basic "add a tile" generator step. We can build a map by followig these
+   we can also use preset generatoe steps to make some tiles already available at map}
+  TGeneratorStep = record
+    tile: integer;
+    x,y,z: integer;
+end;
+
+type GeneratorStepsArray = array of TGeneratorStep;
 
 type
   { Preforms all generation routines from reading the parameters and tiles
@@ -35,6 +45,24 @@ type
     RNDM: TCastleRandom;
     {the main operating item - map of the resulting dungeon}
     Map: DMap;
+    {this stores a sequence of generator steps}
+    Gen: GeneratorStepsArray;
+    {minSteps: minimal steps before undo, this corresponds to the pre-generated tiles which may not be cancelled}
+    minsteps: integer;
+    {current size of the dynamic array}
+    maxsteps: integer;
+    {current (the last used) step of the generator}
+    currentStep: integer;
+    
+    {if currentstep+1>maxsteps then setlength(..., maxsteps+100)}
+    
+    {checks if the selected tile is compatible to the already-generated map
+      usually should not be added manually, but is used inline in "AddTile"}
+    {function CheckTile(tile, x,y,z: integer): boolean; inline;}
+    {checks tile compatibility to the map and adds it if its possible}
+    {procedure AddTile(tile, x,y,z: integer)}
+    {When we're sure what we are doing, we're not making any checks, just add the tile as fast as it is possible}
+    {procedure AddTileUnsafe(tile, x,y,z: integer)}
   public
 
     {map parameters}
@@ -55,6 +83,9 @@ type
 
     constructor Create;// override;
     destructor Destroy; override;
+    
+    {loads and applies the map parameters}
+    {procedure LoadMap(filename: string);}
     
     //save temp state to file
   protected
@@ -90,7 +121,9 @@ begin
   {initialize map size}
   Map.SetSize(mapx,mapy,mapz);
   Map.EmptyMap;
-
+  
+  //add prgenerated or undo tiles
+  
   // main cycle
   // finalize
 
