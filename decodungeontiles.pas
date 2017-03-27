@@ -21,7 +21,7 @@ unit decodungeontiles;
 {$INCLUDE compilerconfig.inc}
 interface
 
-uses classes, fgl,
+uses classes, {fgl,}
   decoglobal;
 
 const TileScale = 2;
@@ -42,10 +42,6 @@ const tfNone = 0;
       tfInacceptible = -1;
 {should be only 3/4 varians + kind (TFGPlist)}
 
-
-{  { Each tile has top and bottom floor }
-   TFloorType = (ftUp,ftDown);}
-
 type
   {Kind of the tile base,
    tkNone is not assigned tile (can be assigned by generator),
@@ -59,7 +55,8 @@ type
   { This is a rectagonal grid with 4 angles + floor + ceiling
    Yes it's theoretically possible to make a hexagonal/other map}
   TAngle = (aTop,aRight,aBottom,aLeft,aUp,aDown);
-
+const
+  THorizontalAngle: set of TAngle = [aTop,aRight,aBottom,aLeft];
   {well... 2-abundance is obsolete, really.
    I was making it in order to protect the code from errors
    when writing a lot of code without being able to visually test
@@ -81,37 +78,39 @@ type
     faces: array [TAngle] of TTileFace; //this is 2x redundant!
   end;
 
-//unused yet;
-{const
+//inacceptible tile, used as "return"
+const
   InacceptibleTile: BasicTile =
     (base: tkInacceptible;
-     faces: (tfNone,tfNone,tfNone,tfNone,tfNone,tfNone));}
+     faces: (tfInacceptible,tfInacceptible,tfInacceptible,tfInacceptible,tfInacceptible,tfInacceptible));
 
 type
   {common routines shared by TileMap and DungeonMap}
   DMap = class (TObject)
-    {size of this map}
-    sizex,sizey,sizez: byte;
-    {internal map of this tile}
-    Map: array of array of array of BasicTile;
-    {sets the size of the tile and adjusts memory}
-    procedure setsize(tx: integer = 1; ty: integer = 1; tz: integer = 1);
-    {distribute memory according to tilesizex,tilesizey,tilesizez}
-    procedure GetMapMemory;
-    {empties the map with walls at borders}
-    procedure EmptyMap;
-    {checks if tx,ty,tz are correct for this tile}
-    function IsSafe(tx,ty,tz: integer): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
-    function IsSafe(tx,ty: integer): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
-    {safe way to get BasicTile
-     (checks if tx,ty,tz are within the Tile size and returns tkInacceptible otherwise) }
-    function MapSafe(tx,ty,tz: integer): BasicTile; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
-    { safe way to get Tile base
-     (checks if tx,ty,tz are within the Tile size and returns tkInacceptible otherwise) }
-    function MapSafeBase(tx,ty,tz: integer): TTileKind; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
-    { safe way to get Tile Face
-      (checks if tx,ty,tz are within the Tile size and returns tfInacceptible otherwise) }
-    function MapSafeFace(tx,ty,tz: integer; face: TAngle): TTileFace; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+    public
+      {size of this map}
+      sizex,sizey,sizez: byte;
+      {internal map of this tile}
+      Map: array of array of array of BasicTile;
+
+      {sets the size of the tile and adjusts memory}
+      procedure setsize(tx: integer = 1; ty: integer = 1; tz: integer = 1);
+      {distribute memory according to tilesizex,tilesizey,tilesizez}
+      procedure GetMapMemory;
+      {empties the map with walls at borders}
+      procedure EmptyMap(initToFree: boolean);
+      {checks if tx,ty,tz are correct for this tile}
+      function IsSafe(tx,ty,tz: integer): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+      function IsSafe(tx,ty: integer): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+      {safe way to get BasicTile
+       (checks if tx,ty,tz are within the Tile size and returns tkInacceptible otherwise) }
+      function MapSafe(tx,ty,tz: integer): BasicTile; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+      { safe way to get Tile base
+       (checks if tx,ty,tz are within the Tile size and returns tkInacceptible otherwise) }
+      function MapSafeBase(tx,ty,tz: integer): TTileKind; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+      { safe way to get Tile Face
+        (checks if tx,ty,tz are within the Tile size and returns tfInacceptible otherwise) }
+      function MapSafeFace(tx,ty,tz: integer; face: TAngle): TTileFace; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 end;
 
 type
@@ -124,24 +123,13 @@ type
     public
       {name of this tile for debugging}
       TileName: string;
-
       {if this tile is a blocker?}
       blocker: boolean;
-      {how many free faces are there}
-      FreeFaces: integer;
-      {does this tile has stairs down?}
-      Has_stairs_down: boolean;
+
       {is the tile ready to work (loaded and parsed correctly)?}
       property Ready: boolean read fReady write fReady;
       constructor Load(URL: string);
-      {calculates faces of the tile and prepares it for work}
-      procedure CalculateFaces;
 end;
-
-{type Generator_tile = class(DTile)
-end;}
-
-type TTileMapList = specialize TFPGObjectList<DTileMap>;
 
 //var MaxTileTypes: integer;
     //TilesList: TStringList;
@@ -162,6 +150,7 @@ function isPassable(value: TTileKind): boolean; {$IFDEF SUPPORTS_INLINE}inline;{
 {determine x/y shifts introduced by current Angle}
 function a_dx(Angle: TAngle): integer; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 function a_dy(Angle: Tangle): integer; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+function a_dz(Angle: Tangle): integer; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 {inverse function - calculate angle based on dx,dy}
 function getAngle(ddx,ddy: integer): TAngle; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 {inverts Angle to the opposite of the pair}
@@ -265,7 +254,7 @@ begin
   case Angle of
     aLeft:  Result := -1;
     aRight: Result := +1;
-    else Result := 0;
+    else    Result := 0;
   end;
 end;
 function a_dy(Angle: Tangle): integer; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
@@ -273,7 +262,15 @@ begin
   case Angle of
     aTop:    Result := -1;
     aBottom: Result := +1;
-    else Result := 0;
+    else     Result := 0;
+  end;
+end;
+function a_dz(Angle: Tangle): integer; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+begin
+  case Angle of
+    aDown: Result := -1;
+    aUp:   Result := +1;
+    else   Result := 0;
   end;
 end;
 
@@ -353,8 +350,6 @@ begin
   end;
   FreeAndNil(TileDOC);
 
-  CalculateFaces;
-
   if not Ready then
     raise Exception.create('Fatal Error in DTileMap.Load! Unable to open file '+TileName);
 end;
@@ -391,15 +386,20 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DMap.EmptyMap;
+procedure DMap.EmptyMap(initToFree: boolean);
 var jx,jy,jz: integer;
     a: TAngle;
 begin
   for jx := 0 to SizeX-1 do
     for jy := 0 to SizeY-1 do
       for jz := 0 to SizeZ-1 do with Map[jx,jy,jz] do begin
-        base := tkFree;
-        for a in TAngle do faces[a] := tfFree;
+        if initToFree then begin
+          base := tkFree;
+          for a in TAngle do faces[a] := tfFree;
+        end else begin
+          base := tkNone;
+          for a in TAngle do faces[a] := tfNone;
+        end;
         {if this tile is at border then make corresponding walls around it}
         if jx = 0       then faces[aLeft]   := tfWall;
         if jy = 0       then faces[aTop]    := tfWall;
@@ -408,40 +408,6 @@ begin
         if jz = 0       then faces[aUp]     := tfWall;
         if jz = SizeZ-1 then faces[aDown]   := tfWall;
       end
-end;
-
-{----------------------------------------------------------------------------}
-
-procedure DTileMap.CalculateFaces;
-var ix,iy,iz: integer;
-begin
-  FreeFaces := 0;
-  for iz := 0 to sizez-1 do begin
-    {$Warning A critical issue must be fixed in DTile.CalculateFaces}
-    {todo: this is not correct! Exits may be not only on border tiles
-     correct way is to search for borders and face_na
-     however, the issue is not as critical, just it'll make the
-     algorithm work in an incorrect way and might even lead to tile
-     not being used}
-    ix := 0;
-    for iy := 0 to sizey-1 do if isPassable(Map[ix,iy,iz].faces[aLeft]) then inc(FreeFaces);
-    ix := sizex-1;
-    for iy := 0 to sizey-1 do if isPassable(Map[ix,iy,iz].faces[aRight]) then inc(FreeFaces);
-    iy := 0;
-    for ix := 0 to sizex-1 do if isPassable(Map[ix,iy,iz].faces[aTop]) then inc(FreeFaces);
-    iy := sizey-1;
-    for ix := 0 to sizex-1 do if isPassable(Map[ix,iy,iz].faces[aBottom]) then inc(FreeFaces);
-  end;
-  //check if it's a blocker tile
-  if (FreeFaces = 1) and (sizex+sizey+sizez = 3) and (Map[0,0,0].base = tkNone) then
-    blocker := true
-  else
-    blocker := false;
-  //check if it has stairs down for later generation
-  has_stairs_down := false;
-  for ix := 0 to sizex-1 do
-   for iy := 0 to sizey-1 do
-    for iz := 0 to sizez-1 do if Map[ix,iy,iz].base=tkDown then has_stairs_down := true;
 end;
 
 {-------------------------------------------------------------------------}
@@ -472,8 +438,7 @@ begin
   if IsSafe(tx,ty,tz) then
     result := Map[tx,ty,tz]
   else
-    result.base := tkInacceptible;
-  //maybe Result := InacceptibleTile?
+    result := InacceptibleTile; //this is a bit slower, but more bug-proof
 end;
 Function DMap.MapSafeBase(tx,ty,tz: integer): TTileKind; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
@@ -489,6 +454,7 @@ begin
   else
     result := tfInacceptible;
 end;
+
 
 {=============================================================================}
 

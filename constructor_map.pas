@@ -23,17 +23,21 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  CastleControl, constructor_global,
+  ExtCtrls, CheckLst, CastleControl, constructor_global,
   decodungeongenerator;
 
 type
   TMapEditor = class(TWriterForm)
+    CheckListBox1: TCheckListBox;
     GenerateButton: TButton;
     MapDisplay: TCastleControl;
     procedure FormDestroy(Sender: TObject);
     procedure GenerateButtonClick(Sender: TObject);
   public
-    //my routines here
+    TilesList: TStringList;
+
+
+    procedure GetTileList;
   public
     procedure LoadMe; override;
     procedure FreeMe; override;
@@ -47,7 +51,7 @@ var
 implementation
 {$R *.lfm}
 
-//uses
+uses StrUtils, CastleLog;
 
 procedure TMapEditor.LoadMe;
 begin
@@ -70,13 +74,26 @@ end;
 {-------------------------------------------------------------------------}
 
 procedure TMapEditor.GenerateButtonClick(Sender: TObject);
-var GEN: DDungeonGenerator;
+var GENERATOR: DDungeonGenerator;
 begin
-  GEN := DDungeonGenerator.Create;
-  //GEN.mapx := 10;
-  GEN.Generate;
+  GENERATOR := DDungeonGenerator.Create;
+  {$warning set up parameters here}
+  //GENERATOR.load('');
+  with GENERATOR.parameters do begin
+    maxx := 10;
+    maxy := 10;
+    maxz := 3;
+
+    minx := 9;
+    miny := 9;
+    minz := 3;
+
+    seed := 0;
+  end;
+  GENERATOR.ForceReady;
+  GENERATOR.Generate;
   //somethinguseful := GEN.GetMap;
-  FreeAndNil(GEN);
+  FreeAndNil(GENERATOR);
 end;
 
 {-------------------------------------------------------------------------}
@@ -87,6 +104,26 @@ begin
   if not ToGameFolder then isChanged := false;
 end;
 
+{------------------------------------------------------------------------------}
+
+procedure TMapEditor.GetTileList;
+var Rec: TSearchRec;
+begin
+  FreeAndNil(TilesList);
+  TilesList := TStringList.Create;
+  // Android incompatible
+  if FindFirst (FakeConstructorData('models/tiles/*.x3d',false), faAnyFile - faDirectory, Rec) = 0 then
+   try
+     repeat
+       TilesList.Add(AnsiReplaceText(Rec.Name,'.x3d',''));
+     until FindNext(Rec) <> 0;
+   finally
+     FindClose(Rec);
+   end;
+  WriteLnLog('TMapEditor.GetTileList','Tiles found = '+inttostr(TilesList.count));
+
+
+end;
 
 end.
 

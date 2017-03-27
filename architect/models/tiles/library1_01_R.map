@@ -27,18 +27,18 @@
   </Tile>
   <Tile x="1" y="0" z="0">
     <base tile_kind="FREE"/>
-    <faces up="wall" top="wall" down="2" left="wall" right="wall" bottom="2"/>
+    <faces up="wall" top="2" down="2" left="wall" right="wall" bottom="2"/>
   </Tile>
   <Tile x="1" y="0" z="1">
     <base tile_kind="FREE"/>
     <faces up="2" top="wall" down="wall" left="2" right="2" bottom="wall"/>
   </Tile>
   <Tile x="1" y="1" z="0">
-    <base tile_kind="FREE"/>
+    <base tile_kind="DOWN"/>
     <faces up="wall" top="2" down="2" left="wall" right="wall" bottom="2"/>
   </Tile>
   <Tile x="1" y="1" z="1">
-    <base tile_kind="FREE"/>
+    <base tile_kind="UP"/>
     <faces up="2" top="wall" down="wall" left="wall" right="wall" bottom="2"/>
   </Tile>
   <Tile x="1" y="2" z="0">

@@ -73,7 +73,7 @@ var
 implementation
 {$R *.lfm}
 
-uses constructor_facts, constructor_dungeontiles, constructor_map;
+uses constructor_facts, constructor_tiles, constructor_map;
 
 {-----------------------------------------------------------------------------}
 

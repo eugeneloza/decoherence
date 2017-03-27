@@ -24,4 +24,13 @@ object MapEditor: TMapEditor
     OnClick = GenerateButtonClick
     TabOrder = 1
   end
+  object CheckListBox1: TCheckListBox
+    Left = 520
+    Height = 80
+    Top = 8
+    Width = 100
+    ItemHeight = 0
+    TabOrder = 2
+    TopIndex = -1
+  end
 end
