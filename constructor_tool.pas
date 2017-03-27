@@ -1,5 +1,6 @@
 program constructor_tool;
 
+{$IFDEF Windows}{$APPTYPE Console}{$ENDIF}
 {$INCLUDE compilerconfig.inc}
 
 uses
