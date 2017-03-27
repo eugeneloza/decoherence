@@ -21,7 +21,7 @@ unit decodungeontiles;
 {$INCLUDE compilerconfig.inc}
 interface
 
-uses classes, {fgl,}
+uses classes, castleImages,
   decoglobal;
 
 const TileScale = 2;
@@ -93,6 +93,9 @@ type
       {internal map of this tile}
       Map: array of array of array of BasicTile;
 
+      {images of this tile/map 0..sizez-1}
+      img: array of TRGBAlphaImage;
+
       {sets the size of the tile and adjusts memory}
       procedure setsize(tx: integer = 1; ty: integer = 1; tz: integer = 1);
       {distribute memory according to tilesizex,tilesizey,tilesizez}
@@ -111,6 +114,10 @@ type
       { safe way to get Tile Face
         (checks if tx,ty,tz are within the Tile size and returns tfInacceptible otherwise) }
       function MapSafeFace(tx,ty,tz: integer; face: TAngle): TTileFace; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+
+      destructor destroy; override;
+      {frees the minimap memory (careful)}
+      procedure FreeMinimap;
 end;
 
 type
@@ -128,7 +135,7 @@ type
 
       {is the tile ready to work (loaded and parsed correctly)?}
       property Ready: boolean read fReady write fReady;
-      constructor Load(URL: string);
+      constructor Load(URL: string);// override;
 end;
 
 //var MaxTileTypes: integer;
@@ -268,8 +275,8 @@ end;
 function a_dz(Angle: Tangle): integer; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
   case Angle of
-    aDown: Result := -1;
-    aUp:   Result := +1;
+    aUp:   Result := -1;
+    aDown: Result := +1;
     else   Result := 0;
   end;
 end;
@@ -352,6 +359,26 @@ begin
 
   if not Ready then
     raise Exception.create('Fatal Error in DTileMap.Load! Unable to open file '+TileName);
+
+  setLength(img,sizez);
+  for jz := 0 to sizez-1 do
+    img[jz] := LoadImage(ChangeURIExt(URL,'_'+inttostr(jz)+'.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DMap.FreeMinimap;
+var jz: integer;
+begin
+  if length(img)>0 then
+  for jz := 0 to length(img)-1 do
+    FreeAndNil(img[jz]);
+end;
+
+destructor DMap.destroy;
+begin
+  FreeMinimap;
+  inherited;
 end;
 
 {----------------------------------------------------------------------------}

@@ -136,14 +136,13 @@ begin
       F.frequency := 1;
       F.compatibility := TLoadImageList.create(true);
       ValueNode := Iterator.current.ChildElement('Value', true);  //todo: required=false and catch nil value
-      F.value := UTF8Encode(ValueNode.TextData);
-      writeLnLog(F.value);
+      F.value := ValueNode.TextData;
       try
         Iterator2 := Iterator.current.ChildElement('ImageList', true).ChildrenIterator;
         while Iterator2.GetNext do
         begin
           LI := DLoadImage.create;
-          LI.value := UTF8encode(Iterator2.current.TextData);
+          LI.value := Iterator2.current.TextData;
           F.compatibility.Add(LI);
         end;
       finally

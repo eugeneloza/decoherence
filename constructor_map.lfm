@@ -34,4 +34,9 @@ object MapEditor: TMapEditor
     TabOrder = 2
     TopIndex = -1
   end
+  object CastleImageControl1: TCastleImageControl
+    TUIControlPos_RealLeft = 26
+    TUIControlPos_Design_Left = 24
+    TUIControlPos_Design_Top = 16
+  end
 end

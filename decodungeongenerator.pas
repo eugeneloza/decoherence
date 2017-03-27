@@ -32,6 +32,7 @@ type
 type DDockPoint = record
   x,y,z: TIntCoordinate;
   face: TAngle;
+  facetype: TTileFace;
 end;
 type TDockPointList = specialize TGenericStructList<DDockPoint>;
 
@@ -167,6 +168,8 @@ type
     procedure InitSeed(newseed: longword = 0);
     {initialize parameters and load pre-generated tiles}
     procedure InitParameters;
+
+    procedure MakeMinimap;
   public
 
     {map parameters}
@@ -216,7 +219,7 @@ type
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
-uses SysUtils, CastleLog, CastleFilesUtils,
+uses SysUtils, CastleLog, CastleFilesUtils, CastleImages, CastleVectors,
   decoglobal;
 
 {========================= GENERATION ALGORITHM ==============================}
@@ -263,6 +266,8 @@ end;
 
 procedure DDungeonGenerator.Generate;
 var i: integer;
+
+    d,t,td: integer;
 begin
   if not isReady then
     raise exception.create('DDungeonGenerator.Generate FATAL - parameters are not initialized!');
@@ -277,10 +282,29 @@ begin
   repeat
     Map.EmptyMap(false);
     //add prgenerated or undo tiles
-    for i := 0 to currentStep-1 do AddTileUnsafe(Gen[i]);
+    currentStep := minSteps-1;
+    for i := 0 to currentStep do AddTileUnsafe(Gen[i]);
 
     while Map.CalculateFaces<>0 do begin
+      {writeLnLog(inttostr(Map.dock.count));}
       //add a tile
+      d := RNDM.Random(Map.Dock.Count);
+      repeat
+        t := RNDM.Random(Tiles.Count);
+        td := RNDM.Random(Tiles[t].Dock.count);
+      until (InvertAngle(Tiles[t].Dock[td].face) = Map.Dock[d].face) and
+            (Tiles[t].Dock[td].facetype = Map.Dock[d].facetype);
+      AddTile(t, Map.Dock[d].x - Tiles[t].Dock[td].x + a_dx(Map.Dock[d].face),
+                 Map.Dock[d].y - Tiles[t].Dock[td].y + a_dy(Map.Dock[d].face),
+                 Map.Dock[d].z - Tiles[t].Dock[td].z + a_dz(Map.Dock[d].face));
+      {writeLnLog('dock point',
+        inttostr(Map.Dock[d].x)+' '+
+        inttostr(Map.Dock[d].y)+' '+
+        inttostr(Map.Dock[d].z));
+      writeLnLog(inttostr(t),
+        inttostr(Map.Dock[d].x - Tiles[t].Dock[td].x + a_dx(Map.Dock[d].face))+' '+
+        inttostr(Map.Dock[d].y - Tiles[t].Dock[td].y + a_dy(Map.Dock[d].face))+' '+
+        inttostr(Map.Dock[d].z - Tiles[t].Dock[td].z + a_dz(Map.Dock[d].face)));}
     end;
     {if map doesn't meet the paramters then undo}
 
@@ -304,6 +328,7 @@ begin
     end;  }
   until true; {until map meets the paramters}
   // finalize
+  MakeMinimap;
 
   fisWorking := false;
 end;
@@ -319,6 +344,9 @@ begin
     for iy := 0 to Map.sizey-1 do
       for iz := 0 to Map.sizez-1 do
         Result.map[ix,iy,iz] := Map.Map[ix,iy,iz];
+  setLength(Result.img,length(Map.img));
+  for iz := 0 to Map.sizez-1 do
+    Result.img[iz] := Map.img[iz].MakeCopy as TRGBAlphaImage;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -376,9 +404,10 @@ begin
   for jx := 0 to tile.sizex-1 do
    for jy := 0 to tile.sizey-1 do
     for jz := 0 to tile.sizez-1 do begin
-      if Tile.Map[jx,jy,jz].base <> tkNone then Map.Map[x+jx,y+jy,z+jz].base := Tile.Map[jx,jy,jz].base;
+      if Tile.Map[jx,jy,jz].base <> tkNone then
+        Map.Map[x+jx,y+jy,z+jz].base := Tile.Map[jx,jy,jz].base;
       for a in TAngle do if Tile.Map[jx,jy,jz].faces[a] <> tfNone then
-        Map.Map[jx,jy,jz].faces[a] := Tile.Map[jx,jy,jz].faces[a];
+        Map.Map[x+jx,y+jy,z+jz].faces[a] := Tile.Map[jx,jy,jz].faces[a];
     end;
 end;
 procedure DDungeonGenerator.AddTileUnsafe(step: DGeneratorStep);
@@ -421,6 +450,33 @@ begin
 end;
 
 {----------------------------------------------------------------------------}
+
+procedure DDungeonGenerator.MakeMinimap;
+var i,j: integer;
+    a: TAngle;
+begin
+  Map.FreeMinimap;
+  setLength(Map.img,Map.sizez);
+  for i := 0 to Map.SizeZ-1 do begin
+    Map.img[i] := TRGBAlphaImage.create;
+    Map.img[i].setsize((map.sizex)*16,(map.sizey)*16,1);
+    Map.img[i].Clear(Vector4Byte(0,0,0,0));
+  end;
+  for i := 0 to currentStep do
+    for j := 0 to tiles[Gen[i].tile].sizez-1 do begin
+      if not tiles[Gen[i].tile].blocker then begin
+        tiles[Gen[i].tile].img[j].DrawTo(Map.img[j+Gen[i].z], Gen[i].x*16,
+             (Map.sizey-Gen[i].y-tiles[Gen[i].tile].sizey)*16, dmBlendSmart);
+      end else begin
+        for a in THorizontalAngle do
+          if isPassable(tiles[Gen[i].tile].Map[0,0,0].faces[a]) then
+            tiles[Gen[i].tile].img[j].DrawTo(Map.img[j+Gen[i].z], (Gen[i].x+a_dx(a))*16,
+                 (Map.sizey-(Gen[i].y+a_dy(a))-tiles[Gen[i].tile].sizey)*16, dmBlendSmart);
+
+      end;
+    end;
+  writeLnLog('DDungeonGenerator.MakeMinimap',inttostr(length(Map.img)));
+end;
 
 {================== 3D DUNGEON GENERATOR ROUTINES ===========================}
 

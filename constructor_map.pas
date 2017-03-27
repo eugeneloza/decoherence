@@ -23,11 +23,12 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  ExtCtrls, CheckLst, CastleControl, constructor_global,
+  ExtCtrls, CheckLst, CastleControl, CastleControls, constructor_global,
   decodungeongenerator;
 
 type
   TMapEditor = class(TWriterForm)
+    CastleImageControl1: TCastleImageControl;
     TilesBox: TCheckListBox;
     GenerateButton: TButton;
     MapDisplay: TCastleControl;
@@ -71,9 +72,9 @@ begin
   GENERATOR := DDungeonGenerator.Create;
   //GENERATOR.load('');
   with GENERATOR.parameters do begin
-    maxx := 10;
-    maxy := 10;
-    maxz := 3;
+    maxx := 20;
+    maxy := 20;
+    maxz := 5;
 
     minx := 9;
     miny := 9;
@@ -85,14 +86,17 @@ begin
     for i := 0 to TilesBox.Items.count-1 do
       if TilesBox.Checked[i] then TilesList.Add(ConstructorData(TilesFolder+TilesBox.Items[i],false));
 
-    fs.tile := 'library10';
+    fs.tile := 'library4_01_D';
     fs.x := maxx div 2;
     fs.y := maxy div 2;
     fs.z := 0;
+    FirstSteps.Add(fs);
   end;
   GENERATOR.ForceReady;
   GENERATOR.Generate;
   //somethinguseful := GEN.GetMap;
+  CastleImageControl1.Image := GENERATOR.GetMap.img[0];
+  MapDisplay.SceneManager.InsertFront(CastleImageControl1);
   FreeAndNil(GENERATOR);
 end;
 

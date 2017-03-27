@@ -3,7 +3,6 @@ var ix,iy,iz: integer;
     f: TTileFace;
     tmpDock: DDockPoint;
 begin
-  {$WARNING Optimize for different variants}
   if Dock = nil then Dock := TDockPointList.Create else Dock.Clear;
   fFreeFaces := 0;
   fVolume := 0;
@@ -14,11 +13,13 @@ begin
       for iz := 0 to sizez-1 do begin
         if isPassable(Map[ix,iy,iz].base) then inc(fVolume);
         {$IFDEF CompleteGen}if Map[ix,iy,iz].base = tkDown then fHasStairsDown := true;{$ENDIF}
-        for a in TAngle do
+        {$Warning floor/ceiling not working!}
+        for a in THorizontalAngle do
           if isPassable(Map[ix,iy,iz].faces[a]) then begin
-            f := self.MapSafeFace(ix+a_dx(a),iy+a_dy(a),iz+a_dz(a),invertAngle(a));
+            f := MapSafeFace(ix+a_dx(a),iy+a_dy(a),iz+a_dz(a),invertAngle(a));
             if (f = tfNone) or (f = tfInacceptible) then begin
               tmpDock.face := a;
+              tmpDock.facetype := Map[ix,iy,iz].faces[a];
               tmpDock.x := ix;
               tmpDock.y := iy;
               tmpDock.z := iz;
@@ -37,6 +38,5 @@ begin
   else
     blocker := false;
   {$ENDIF}
-  Result := fFreeFaces;
-  writeLnLog(inttostr(result));
+  Result := FreeFaces;
 end;
