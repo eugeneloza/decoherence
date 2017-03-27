@@ -58,7 +58,8 @@ var
 implementation
 {$R *.lfm}
 
-uses StrUtils, CastleLog,
+uses StrUtils, CastleLog, castleimages, castlevectors,
+  decodungeontiles,
   decoglobal;
 
 
@@ -68,17 +69,22 @@ procedure TMapEditor.GenerateButtonClick(Sender: TObject);
 var GENERATOR: DDungeonGenerator;
   i: integer;
   fs: DFirstStep;
+  tmpmap: DMap;
 begin
   GENERATOR := DDungeonGenerator.Create;
   //GENERATOR.load('');
   with GENERATOR.parameters do begin
-    maxx := 20;
-    maxy := 20;
-    maxz := 5;
+    maxx := 25;
+    maxy := 25;
+    maxz := 9;
+
+    Volume := maxx*maxy*maxz div 5;
+    MaxFaces := 9;
+    MinFaces := 4;
 
     minx := 9;
     miny := 9;
-    minz := 3;
+    minz := 9;
 
     seed := 0;
 
@@ -86,7 +92,7 @@ begin
     for i := 0 to TilesBox.Items.count-1 do
       if TilesBox.Checked[i] then TilesList.Add(ConstructorData(TilesFolder+TilesBox.Items[i],false));
 
-    fs.tile := 'library4_01_D';
+    fs.tile := 'library1_16_P';
     fs.x := maxx div 2;
     fs.y := maxy div 2;
     fs.z := 0;
@@ -95,8 +101,10 @@ begin
   GENERATOR.ForceReady;
   GENERATOR.Generate;
   //somethinguseful := GEN.GetMap;
-  CastleImageControl1.Image := GENERATOR.GetMap.img[0];
-  MapDisplay.SceneManager.InsertFront(CastleImageControl1);
+  {$Warning memory leaks here!}
+  tmpMap := GENERATOR.GetMap;
+  CastleImageControl1.Image := tmpMap.img[0].MakeCopy;
+  freeAndNil(tmpMap);
   FreeAndNil(GENERATOR);
 end;
 
@@ -137,6 +145,8 @@ end;
 
 procedure TMapEditor.FormShow(Sender: TObject);
 begin
+  {$Warning should be on create, not on show!}
+  MapDisplay.SceneManager.InsertFront(CastleImageControl1);
   if (not isLoaded) then LoadMe;
 end;
 

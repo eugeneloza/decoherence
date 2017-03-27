@@ -29,11 +29,19 @@ type
   TTileType = word;
   TIntCoordinate = integer;
 
-type DDockPoint = record
-  x,y,z: TIntCoordinate;
-  face: TAngle;
-  facetype: TTileFace;
-end;
+type
+  {a "dock point" of a tile or a map. This is a xyz coordinate of an open face
+   we use it to dock the tile to the map -
+   i.e. we "dock" two dock points together if they fit each other like in puzzles}
+  DDockPoint = record
+    {coordinates of the dock point (relative to parent)}
+    x,y,z: TIntCoordinate;
+    {face where dock point is open. Each dock point contains one face.
+     if there are two (or more) exits from a tile element - it spawns two (or more) dock points}
+    face: TAngle;
+    {the face type of the dock point. For faster checking}
+    facetype: TTileFace;
+  end;
 type TDockPointList = specialize TGenericStructList<DDockPoint>;
 
 type
@@ -76,7 +84,9 @@ type
   {this is a basic "add a tile" generator step. We can build a map by followig these
    we can also use preset generatoe steps to make some tiles already available at map}
   DGeneratorStep = record
+    {id of the tile}
     tile: TTileType;
+    {coordinates to place the tile}
     x,y,z: TIntCoordinate;
   end;
 
@@ -93,7 +103,9 @@ type
 type
   {this is almost equal to TGeneratorStep except it refers to tiles by their names}
   DFirstStep = record
+    {name of the tile}
     tile: string;
+    {coordinates to place the tile}
     x,y,z: TIntCoordinate;
   end;
   TFirstStepsArray = specialize TGenericStructList<DFirstStep>;
@@ -105,6 +117,15 @@ type
     maxx,maxy,maxz: integer;
     {the map cannot be smaller than these}
     minx,miny,minz: integer;
+    {target map volume. The map will be regenerated until it's met
+     Usually the algorithm can handle up to ~50% packaging of maxx*maxy*maxz}
+    Volume: integer;
+    {when the map has FreeFaces>MaxFaces it will try to "Shrink" the amount
+     of free faces by using poor tiles}
+    MaxFaces: integer;
+    {when the map has FreeFaces<MinFaces it will try to "extend" the amount
+     of free faces by using rich tiles (in case the Volume is not yet met)}
+    MinFaces: integer;
     {random generation seed}
     Seed: LongWord;
     {are links in TilesList absolute URL or just a tile name}
@@ -115,6 +136,7 @@ type
     FirstSteps: TFirstStepsArray
   end;
 
+type TIndexList = specialize TFPGList<TTileType>;
 
 type
   { Preforms all map generation routines
@@ -126,11 +148,50 @@ type
   private
     {list of tiles used in current map}
     Tiles: TTileList;
+    {a list of "normal" tiles used in generation}
+    NormalTiles: TIndexList;
+    {how many dock points are there in the normal tileset?
+     this is a constant used in the algorithm:
+     We try to get a random tile NormalTilesTotalDocks tries
+     and if we fail where we just use sequential selection
+     if sequential selection fails, we use a blocker as a last resource
+     The logic behind such approach is the following:
+     it's regularly "normal" to add a random tile and it's very fast
+     However, in some cases (e.g. if only one specific tile can dock here
+     or no tile at all can dock at this map dock point) we need to try
+     all the tiles sequentially and see which ones fit. This is a CPU-heavy
+     procedure, but it improves the overall map quality.
+     NormalTilesTotalDocks is a limit where we give up "quick" random and start
+     sequential search
+     SEQUENTIAL search is predictable! It'll just pick up the first tile that
+     fits the current dock point and will stop.}
+    NormalTilesTotalDocks: integer;
+    {a list of blockers}
+    BlockerTiles: TIndexList;
+    {a list of down-going tiles}
+    DownTiles: TIndexList;
+    {a list of tiles with 3 and more free faces}
+    RichTiles: TIndexList;
+    {a list of tiles with 1 or 2 free faces}
+    PoorTiles: TindexList;
     {searches Tiles for a specific tile name and returns it
      used to make first steps of the generation as they are bound to
      a specific tile name, not to a tile ID which can change}
     //function GetTileByName(TileName: string): DGeneratorMap;
     function GetTileByName(TileName: string): TTileType;
+
+    {gets a "normal" tile, not a blocker}
+    function GetNormalTile: TTileType; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+    {gets a "blocker" not a normal tile}
+    function GetBlockerTile: TTileType; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+    {gets a tile with stairs down}
+    function GetDownTile: TTileType; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+    {gets a tile with 3 and more free faces
+     in case we need to "broaden" the map}
+    function GetRichTile: TTileType; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+    {gets a tile with 1 or 2 free faces
+     in case we need to "narrow" the map}
+    function GetPoorTile: TTileType; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
   private
     { xorshift random generator, fast and thread-safe }
     RNDM: TCastleRandom;
@@ -156,6 +217,8 @@ type
      Returns false if tile mismatches Map
      Returns True if tile matches Map and can be placed }
     function CheckCompatibility(Tile: BasicTile; x,y,z: TIntCoordinate): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+    {Core of the algorithm : Tries to add a random tile to the map}
+    procedure AddRandomTile; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
     {checks tile compatibility to the map and adds it if its possible
      returns true if tile is put successfully
      and false if the tile cannot be placed at these coordinates  }
@@ -168,7 +231,7 @@ type
     procedure InitSeed(newseed: longword = 0);
     {initialize parameters and load pre-generated tiles}
     procedure InitParameters;
-
+    {creates a minimap as Map.img}
     procedure MakeMinimap;
   public
 
@@ -227,8 +290,9 @@ uses SysUtils, CastleLog, CastleFilesUtils, CastleImages, CastleVectors,
 procedure DDungeonGenerator.InitParameters;
 var s: string;
     tmp: DGeneratorTile;
-    i : integer;//: DFirstStep;
+    i : integer;
 begin
+  {load tiles}
   tiles.clear;
   For s in parameters.TilesList do begin
     if parameters.AbsoluteURL then
@@ -238,6 +302,23 @@ begin
     tmp.CalculateFaces;
     tiles.Add(tmp);
   end;
+  {prepare different optimized lists}
+  for i := 0 to Tiles.Count-1 do begin
+    if Tiles[i].blocker then
+      BlockerTiles.Add(i)
+    else
+      NormalTiles.add(i);
+    if Tiles[i].HasStairsDown then
+      DownTiles.add(i);
+    if Tiles[i].FreeFaces>=3 then
+      RichTiles.add(i)
+    else
+      PoorTiles.add(i);
+  end;
+
+  NormalTilesTotalDocks := 0;
+  for i := 0 to NormalTiles.Count-1 do
+    inc(NormalTilesTotalDocks,Tiles[NormalTiles[i]].FreeFaces);
 
   {initialize random seed}
   InitSeed(parameters.seed);
@@ -264,10 +345,108 @@ end;
 
 {-----------------------------------------------------------------------------}
 
+function DDungeonGenerator.GetNormalTile: TTileType; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+begin
+  Result := NormalTiles[RNDM.Random(NormalTiles.Count)];
+end;
+function DDungeonGenerator.GetBlockerTile: TTileType; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+begin
+  {$Warning tiles count might be zero!}
+  Result := BlockerTiles[RNDM.Random(BlockerTiles.Count)];
+end;
+function DDungeonGenerator.GetDownTile: TTileType; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+begin
+  {$Warning tiles count might be zero!}
+  Result := DownTiles[RNDM.Random(DownTiles.Count)];
+end;
+function DDungeonGenerator.GetRichTile: TTileType; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+begin
+  {$Warning tiles count might be zero!}
+  Result := RichTiles[RNDM.Random(RichTiles.Count)];
+end;
+function DDungeonGenerator.GetPoorTile: TTileType; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+begin
+  Result := PoorTiles[RNDM.Random(PoorTiles.Count)];
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DDungeonGenerator.AddRandomTile; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+var d,t,td: integer;
+    tt: integer;
+    Success: boolean;
+    TriesCount: integer;
+
+  function CanDock: boolean;
+  begin
+    Result := (InvertAngle(Tiles[t].Dock[td].face) = Map.Dock[d].face) and
+               (Tiles[t].Dock[td].facetype = Map.Dock[d].facetype)
+  end;
+  function TryAdd: boolean;
+  begin
+    Result :=
+      AddTile(t, Map.Dock[d].x - Tiles[t].Dock[td].x + a_dx(Map.Dock[d].face),
+                 Map.Dock[d].y - Tiles[t].Dock[td].y + a_dy(Map.Dock[d].face),
+                 Map.Dock[d].z - Tiles[t].Dock[td].z + a_dz(Map.Dock[d].face))
+  end;
+
+begin
+  {select a map dock point
+   we shall work with this dock point all the time and will finally
+   either dock a tile to it or block it out}
+  d := RNDM.Random(Map.Dock.Count);
+  TriesCount := 0;
+  repeat
+    {try add a random normal tile}
+    repeat
+      if (Map.FreeFaces > parameters.MaxFaces) or (Map.Volume>Parameters.Volume) then
+        t := getPoorTile
+      else
+      if (Map.FreeFaces < parameters.MinFaces) and (Map.Volume<Parameters.Volume) then
+        t := getRichTile
+      else
+        t := GetNormalTile;
+
+      td := RNDM.Random(Tiles[t].Dock.count);
+    until CanDock;
+    Success := TryAdd;
+    inc(TriesCount);
+  until Success or (TriesCount>NormalTilesTotalDocks);
+
+  if not Success then begin
+    {if we've failed random search next we try sequential search}
+    for tt := 0 to NormalTiles.count-1 do begin
+      t := NormalTiles[tt];
+      for td := 0 to Tiles[t].Dock.count-1 do
+        if canDock then
+          if TryAdd then exit;
+    end;
+    {if we haven't "exited" yet, then there is no tile that fits this
+     map's dock point. We have to block it out}
+    for tt := 0 to BlockerTiles.count-1 do begin
+      t := BlockerTiles[tt];
+      for td := 0 to Tiles[t].dock.count-1 do //actually it should be always just one
+        if canDock then
+          if TryAdd then exit;
+    end;
+    {finally, if we can't even block the face out... it's horrible :(
+     The only alternative to just hanging forever up is...}
+    writelnLog(inttostr(BlockerTiles.count));
+    writelnLog('x='+inttostr(Map.Dock[d].x));
+    writelnLog('y='+inttostr(Map.Dock[d].y));
+    writelnLog('z='+inttostr(Map.Dock[d].z));
+    writeLnLog('face='+inttostr(Map.Dock[d].facetype));
+    WriteLnLog('at '+AngleToStr(Map.Dock[d].face));
+    raise Exception.create('DDungeonGenerator.AddRandomTile: FATAL! Unable to block the map element.')
+  end;
+end;
+
+{-----------------------------------------------------------------------------}
+
+
 procedure DDungeonGenerator.Generate;
 var i: integer;
-
-    d,t,td: integer;
+    t1,t2: TDateTime;
 begin
   if not isReady then
     raise exception.create('DDungeonGenerator.Generate FATAL - parameters are not initialized!');
@@ -279,32 +458,20 @@ begin
 
   InitParameters;
 
+  t1 := now;
   repeat
+    t2 := now;
     Map.EmptyMap(false);
     //add prgenerated or undo tiles
-    currentStep := minSteps-1;
+    CurrentStep := RNDM.random(currentStep);
+    if CurrentStep < MinSteps-1 then CurrentStep := MinSteps-1;
+    WriteLnLog('DDungeonGenerator.Generate','Starting from '+inttostr(currentstep));
     for i := 0 to currentStep do AddTileUnsafe(Gen[i]);
 
     while Map.CalculateFaces<>0 do begin
       {writeLnLog(inttostr(Map.dock.count));}
       //add a tile
-      d := RNDM.Random(Map.Dock.Count);
-      repeat
-        t := RNDM.Random(Tiles.Count);
-        td := RNDM.Random(Tiles[t].Dock.count);
-      until (InvertAngle(Tiles[t].Dock[td].face) = Map.Dock[d].face) and
-            (Tiles[t].Dock[td].facetype = Map.Dock[d].facetype);
-      AddTile(t, Map.Dock[d].x - Tiles[t].Dock[td].x + a_dx(Map.Dock[d].face),
-                 Map.Dock[d].y - Tiles[t].Dock[td].y + a_dy(Map.Dock[d].face),
-                 Map.Dock[d].z - Tiles[t].Dock[td].z + a_dz(Map.Dock[d].face));
-      {writeLnLog('dock point',
-        inttostr(Map.Dock[d].x)+' '+
-        inttostr(Map.Dock[d].y)+' '+
-        inttostr(Map.Dock[d].z));
-      writeLnLog(inttostr(t),
-        inttostr(Map.Dock[d].x - Tiles[t].Dock[td].x + a_dx(Map.Dock[d].face))+' '+
-        inttostr(Map.Dock[d].y - Tiles[t].Dock[td].y + a_dy(Map.Dock[d].face))+' '+
-        inttostr(Map.Dock[d].z - Tiles[t].Dock[td].z + a_dz(Map.Dock[d].face)));}
+      AddRandomTile;
     end;
     {if map doesn't meet the paramters then undo}
 
@@ -326,7 +493,10 @@ begin
 
       end;
     end;  }
-  until true; {until map meets the paramters}
+    WriteLnLog('DDungeonGenerator.Generate','Done in = '+inttostr(round((now-t2)*24*60*60*1000))+'ms');
+    WriteLnLog('DDungeonGenerator.Generate','Map volume = '+inttostr(map.Volume) +'/'+inttostr(parameters.volume));
+  until map.Volume>parameters.Volume; {until map meets the paramters}
+  WriteLnLog('DDungeonGenerator.Generate','Job finished in = '+inttostr(round((now-t1)*24*60*60*1000))+'ms');
   // finalize
   MakeMinimap;
 
@@ -368,31 +538,24 @@ end;
 
 function DDungeonGenerator.AddTile(tile: TTileType; x,y,z: TIntCoordinate): boolean;
 var jx,jy,jz:integer;
-    TileCanBePlaced:boolean;
 begin
-  TileCanBePlaced := true;
+  Result := false;
   //check all tiles against map area they are placed to
   for jx := 0 to tiles[tile].sizex-1 do
    for jy := 0 to tiles[tile].sizey-1 do
     for jz := 0 to tiles[tile].sizez-1 do
-      TileCanBePlaced := TileCanBePlaced and
-                         CheckCompatibility(tiles[tile].Map[jx,jy,jz],x+jx,y+jy,z+jz);
+      if not CheckCompatibility(tiles[tile].Map[jx,jy,jz],x+jx,y+jy,z+jz)
+      then exit;
 
-  if TileCanBePlaced then begin
-    // if tile can be placed - then place it
-    AddTileUnsafe(Tiles[tile],x,y,z);
-    {add current step to GEN}
-    incCurrentStep;
-    Gen[CurrentStep].tile := tile;
-    Gen[CurrentStep].x := x;
-    Gen[CurrentStep].y := y;
-    Gen[CurrentStep].z := z;
+  AddTileUnsafe(Tiles[tile],x,y,z);
+  {add current step to GEN}
+  incCurrentStep;
+  Gen[CurrentStep].tile := tile;
+  Gen[CurrentStep].x := x;
+  Gen[CurrentStep].y := y;
+  Gen[CurrentStep].z := z;
 
-    Result := true;
-  end else
-    Result := false;
-
-
+  Result := true;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -407,7 +570,12 @@ begin
       if Tile.Map[jx,jy,jz].base <> tkNone then
         Map.Map[x+jx,y+jy,z+jz].base := Tile.Map[jx,jy,jz].base;
       for a in TAngle do if Tile.Map[jx,jy,jz].faces[a] <> tfNone then
-        Map.Map[x+jx,y+jy,z+jz].faces[a] := Tile.Map[jx,jy,jz].faces[a];
+        if Tile.blocker then begin
+          Map.Map[x+jx,y+jy,z+jz].faces[a] := tfWall;
+          Map.Map[x+jx+a_dx(a),y+jy+a_dy(a),z+jz+a_dz(a)].faces[InvertAngle(a)] := tfWall;
+        end
+        else
+          Map.Map[x+jx,y+jy,z+jz].faces[a] := Tile.Map[jx,jy,jz].faces[a];
     end;
 end;
 procedure DDungeonGenerator.AddTileUnsafe(step: DGeneratorStep);
@@ -581,6 +749,12 @@ begin
   Tiles := TTileList.Create(true);
   parameters.TilesList := TStringList.create;
   parameters.FirstSteps := TFirstStepsArray.create;
+
+  NormalTiles := TIndexList.create;
+  BlockerTiles := TIndexList.create;
+  DownTiles := TIndexList.create;
+  RichTiles := TIndexList.create;
+  PoorTiles := TIndexList.create;
 end;
 
 {-----------------------------------------------------------------------------}
