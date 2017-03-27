@@ -74,11 +74,11 @@ begin
   GENERATOR := DDungeonGenerator.Create;
   //GENERATOR.load('');
   with GENERATOR.parameters do begin
-    maxx := 25;
-    maxy := 25;
+    maxx := 9;
+    maxy := 9;
     maxz := 9;
 
-    Volume := maxx*maxy*maxz div 5;
+    Volume := maxx*maxy*maxz div 3;
     MaxFaces := 9;
     MinFaces := 4;
 

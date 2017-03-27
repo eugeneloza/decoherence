@@ -53,6 +53,7 @@ type
     private
       fFreeFaces: integer;
       fVolume: integer;
+      fMaxDepth: integer;
     public
       {what TTileFaces do leave from this tile?}
       //FacesList: TTileFace;
@@ -62,13 +63,17 @@ type
       property FreeFaces: integer read fFreeFaces;
       {total passable volume of the map/tile}
       property Volume: integer read fVolume;
+      {deepest level of the map (0..maxz-1)}
+      property MaxDepth: integer read fMaxDepth;
       {calculates faces&volume of the tile/map and prepares it for work
        optimized for DGeneratorMap}
       function CalculateFaces: integer; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 
       destructor destroy; override;
   end;
-type DGeneratorTile = class(DGeneratorMap)
+type
+  {DGeneratorMap extended with some tile-related parameters}
+  DGeneratorTile = class(DGeneratorMap)
   private
     fHasStairsDown: boolean;
   public
@@ -118,7 +123,7 @@ type
     {the map cannot be smaller than these}
     minx,miny,minz: integer;
     {target map volume. The map will be regenerated until it's met
-     Usually the algorithm can handle up to ~50% packaging of maxx*maxy*maxz}
+     Usually the algorithm can handle up to ~30% packaging of maxx*maxy*maxz}
     Volume: integer;
     {when the map has FreeFaces>MaxFaces it will try to "Shrink" the amount
      of free faces by using poor tiles}
@@ -399,12 +404,18 @@ begin
   repeat
     {try add a random normal tile}
     repeat
-      if (Map.FreeFaces > parameters.MaxFaces) or (Map.Volume>Parameters.Volume) then
-        t := getPoorTile
-      else
-      if (Map.FreeFaces < parameters.MinFaces) and (Map.Volume<Parameters.Volume) then
-        t := getRichTile
-      else
+      if RNDM.Random<0.9 then begin
+        if (Map.FreeFaces > parameters.MaxFaces) or (Map.Volume>Parameters.Volume) then
+          t := GetPoorTile
+        else
+        if (Map.FreeFaces < parameters.MinFaces) and (Map.Volume<Parameters.Volume) then
+          t := GetRichTile
+        else
+        if (Map.MaxDepth < parameters.minz*(Map.Volume/Parameters.Volume)) then
+          t := GetDownTile
+        else
+          t := GetNormalTile;
+      end else
         t := GetNormalTile;
 
       td := RNDM.Random(Tiles[t].Dock.count);
@@ -495,7 +506,8 @@ begin
     end;  }
     WriteLnLog('DDungeonGenerator.Generate','Done in = '+inttostr(round((now-t2)*24*60*60*1000))+'ms');
     WriteLnLog('DDungeonGenerator.Generate','Map volume = '+inttostr(map.Volume) +'/'+inttostr(parameters.volume));
-  until map.Volume>parameters.Volume; {until map meets the paramters}
+    WriteLnLog('DDungeonGenerator.Generate','Map volume = '+inttostr(map.MaxDepth+1)+'/'+inttostr(parameters.minz));
+  until (map.Volume>=parameters.Volume) and (map.MaxDepth+1>=parameters.minz); {until map meets the paramters}
   WriteLnLog('DDungeonGenerator.Generate','Job finished in = '+inttostr(round((now-t1)*24*60*60*1000))+'ms');
   // finalize
   MakeMinimap;

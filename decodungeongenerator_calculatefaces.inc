@@ -6,12 +6,16 @@ begin
   if Dock = nil then Dock := TDockPointList.Create else Dock.Clear;
   fFreeFaces := 0;
   fVolume := 0;
+  {$IFNDEF CompleteGen}fMaxDepth := 0;{$ENDIF}
   {$IFDEF CompleteGen}fHasStairsDown := false;{$ENDIF}
   //FacesList := [];
   for ix := 0 to sizex-1 do
     for iy := 0 to sizey-1 do
       for iz := 0 to sizez-1 do begin
-        if isPassable(Map[ix,iy,iz].base) then inc(fVolume);
+        if isPassable(Map[ix,iy,iz].base) then begin
+          inc(fVolume);
+          {$IFNDEF CompleteGen}if fMaxDepth<iz then fMaxDepth := iz;{$ENDIF}
+        end;
         {$IFDEF CompleteGen}if Map[ix,iy,iz].base = tkDown then fHasStairsDown := true;{$ENDIF}
         {$Warning floor/ceiling not working!}
         for a in THorizontalAngle do
