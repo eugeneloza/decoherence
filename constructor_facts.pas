@@ -154,38 +154,42 @@ var XMLdoc: TXMLDocument;
     i: DFact;
     j: DLoadImage;
     L: TLanguage;
+    f: string;
 begin
-  for L in TLanguage do if Facts[L] = nil then
-    WriteLnLog('TFactsEditor.WriteMe','LANGUAGE IS NIL!')
-  else begin
-    XMLdoc := TXMLDocument.Create;
-    RootNode := XMLdoc.CreateElement('FactsList');
-    XMLdoc.Appendchild(RootNode);
+  for L in TLanguage do
+    if Facts[L] = nil then
+      WriteLnLog('TFactsEditor.WriteMe','LANGUAGE IS NIL!')
+    else begin
+      XMLdoc := TXMLDocument.Create;
+      RootNode := XMLdoc.CreateElement('FactsList');
+      XMLdoc.Appendchild(RootNode);
 
-    for i in Facts[L] do begin
-      ContainerNode := XMLdoc.CreateElement('Fact');
-      ValueNode := XMLdoc.CreateElement('Value');
-      TextNode := XMLdoc.CreateTextNode(UTF8decode(i.value));
-      ValueNode.AppendChild(TextNode);
-      ContainerNode.AppendChild(ValueNode);
-      ValueNode := XMLdoc.CreateElement('ImageList');
-      for j in i.compatibility do begin
-        Value2Node := XMLdoc.CreateElement('Image');
-        TextNode := XMLdoc.CreateTextNode(UTF8decode(j.value));
-        Value2Node.AppendChild(TextNode);
-        ValueNode.AppendChild(Value2Node);
+      for i in Facts[L] do begin
+        ContainerNode := XMLdoc.CreateElement('Fact');
+        ValueNode := XMLdoc.CreateElement('Value');
+        TextNode := XMLdoc.CreateTextNode(UTF8decode(i.value));
+        ValueNode.AppendChild(TextNode);
+        ContainerNode.AppendChild(ValueNode);
+        ValueNode := XMLdoc.CreateElement('ImageList');
+        for j in i.compatibility do begin
+          Value2Node := XMLdoc.CreateElement('Image');
+          TextNode := XMLdoc.CreateTextNode(UTF8decode(j.value));
+          Value2Node.AppendChild(TextNode);
+          ValueNode.AppendChild(Value2Node);
+        end;
+        ContainerNode.AppendChild(ValueNode);
+        RootNode.Appendchild(ContainerNode);
       end;
-      ContainerNode.AppendChild(ValueNode);
-      RootNode.Appendchild(ContainerNode);
+
+      if ToGameFolder then
+        f := ConstructorData(ScenarioFolder+LanguageDir(L)+'facts.xml'+gz_ext,ToGameFolder)
+      else
+        f := ConstructorData(ScenarioFolder+LanguageDir(L)+'facts.xml',ToGameFolder);
+      URLWriteXML(XMLdoc, f);
+      WriteLnLog('TFactsEditor.WriteMe','File Written: '+f);
+
+      FreeAndNil(XMLdoc);
     end;
-
-    if ToGameFolder then
-      URLWriteXML(XMLdoc, ConstructorData(ScenarioFolder+LanguageDir(ConstructorLanguage)+'facts.xml'+gz_ext,ToGameFolder))
-    else
-      URLWriteXML(XMLdoc, ConstructorData(ScenarioFolder+LanguageDir(ConstructorLanguage)+'facts.xml',ToGameFolder));
-
-     FreeAndNil(XMLdoc);
-  end;
 
   if not ToGameFolder then  isChanged := false;
 end;
@@ -194,7 +198,7 @@ end;
 
 procedure TFactsEditor.FormShow(Sender: TObject);
 begin
-  if (not isLoaded) {or (MyLanguage<>ConstructorLanguage)} then LoadMe;
+  if (not isLoaded) then LoadMe;
 end;
 
 {-----------------------------------------------------------------------------}

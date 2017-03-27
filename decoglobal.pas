@@ -24,7 +24,7 @@ unit decoglobal;
 
 interface
 
-uses {todo: temporary}SysUtils,
+uses {todo: temporary}//SysUtils,
   Classes, CastleWindowTouch,
   CastleRandom, CastleTimeUtils;
 
@@ -82,7 +82,7 @@ function GetRandomSeed: LongWord;
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-//uses SysUtils;
+uses SysUtils;
 
 function GetRandomSeed: LongWord;
 {$IFDEF USE_DEV_URANDOM}

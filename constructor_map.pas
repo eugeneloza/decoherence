@@ -28,15 +28,21 @@ uses
 
 type
   TMapEditor = class(TWriterForm)
-    CheckListBox1: TCheckListBox;
+    TilesBox: TCheckListBox;
     GenerateButton: TButton;
     MapDisplay: TCastleControl;
     procedure FormDestroy(Sender: TObject);
+    procedure FormShow(Sender: TObject);
     procedure GenerateButtonClick(Sender: TObject);
   public
+    {List of tiles names}
     TilesList: TStringList;
+    {list of actual tiles}
+    Tiles: TTileList;
 
-
+    {fills the checklistbox with tiles names and checks them all}
+    procedure FillBox;
+    {reads tiles list from the folder}
     procedure GetTileList;
   public
     procedure LoadMe; override;
@@ -51,33 +57,18 @@ var
 implementation
 {$R *.lfm}
 
-uses StrUtils, CastleLog;
+uses StrUtils, CastleLog,
+  decoglobal;
 
-procedure TMapEditor.LoadMe;
-begin
-  //dummy
-  isChanged := false;
-  isLoaded := true;
-end;
-
-{-------------------------------------------------------------------------}
-
-procedure TMapEditor.FreeMe;
-begin
-  //dummy
-end;
-procedure TMapEditor.FormDestroy(Sender: TObject);
-begin
-  FreeMe;
-end;
 
 {-------------------------------------------------------------------------}
 
 procedure TMapEditor.GenerateButtonClick(Sender: TObject);
 var GENERATOR: DDungeonGenerator;
+  i: integer;
+  fs: DFirstStep;
 begin
   GENERATOR := DDungeonGenerator.Create;
-  {$warning set up parameters here}
   //GENERATOR.load('');
   with GENERATOR.parameters do begin
     maxx := 10;
@@ -89,11 +80,60 @@ begin
     minz := 3;
 
     seed := 0;
+
+    AbsoluteURL := true;
+    for i := 0 to TilesBox.Items.count-1 do
+      if TilesBox.Checked[i] then TilesList.Add(ConstructorData(TilesFolder+TilesBox.Items[i],false));
+
+    fs.tile := 'library10';
+    fs.x := maxx div 2;
+    fs.y := maxy div 2;
+    fs.z := 0;
   end;
   GENERATOR.ForceReady;
   GENERATOR.Generate;
   //somethinguseful := GEN.GetMap;
   FreeAndNil(GENERATOR);
+end;
+
+{------------------------------------------------------------------------}
+
+procedure TMapEditor.FillBox;
+var s: string;
+begin
+  TilesBox.Clear;
+  for s in TilesList do
+    TilesBox.Items.add(s);
+  TilesBox.CheckAll(cbChecked);
+end;
+
+
+{------------------------------------------------------------------------}
+
+procedure TMapEditor.LoadMe;
+begin
+  GetTileList;
+  FillBox;
+  isChanged := false;
+  isLoaded := true;
+end;
+
+{-------------------------------------------------------------------------}
+
+procedure TMapEditor.FreeMe;
+begin
+  FreeAndNil(TilesList);
+end;
+procedure TMapEditor.FormDestroy(Sender: TObject);
+begin
+  FreeMe;
+end;
+
+{--------------------------------------------------------------------------}
+
+procedure TMapEditor.FormShow(Sender: TObject);
+begin
+  if (not isLoaded) then LoadMe;
 end;
 
 {-------------------------------------------------------------------------}
@@ -112,17 +152,15 @@ begin
   FreeAndNil(TilesList);
   TilesList := TStringList.Create;
   // Android incompatible
-  if FindFirst (FakeConstructorData('models/tiles/*.x3d',false), faAnyFile - faDirectory, Rec) = 0 then
+  if FindFirst (FakeConstructorData(TilesFolder+'*.map',false), faAnyFile - faDirectory, Rec) = 0 then
    try
      repeat
-       TilesList.Add(AnsiReplaceText(Rec.Name,'.x3d',''));
+       TilesList.Add(AnsiReplaceText(Rec.Name,'.map',''));
      until FindNext(Rec) <> 0;
    finally
      FindClose(Rec);
    end;
   WriteLnLog('TMapEditor.GetTileList','Tiles found = '+inttostr(TilesList.count));
-
-
 end;
 
 end.

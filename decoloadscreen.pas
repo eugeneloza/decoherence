@@ -136,7 +136,8 @@ begin
       F.frequency := 1;
       F.compatibility := TLoadImageList.create(true);
       ValueNode := Iterator.current.ChildElement('Value', true);  //todo: required=false and catch nil value
-      F.value := UTF8encode(ValueNode.TextData);
+      F.value := UTF8Encode(ValueNode.TextData);
+      writeLnLog(F.value);
       try
         Iterator2 := Iterator.current.ChildElement('ImageList', true).ChildrenIterator;
         while Iterator2.GetNext do

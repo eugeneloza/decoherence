@@ -36,29 +36,40 @@ end;
 type TDockPointList = specialize TGenericStructList<DDockPoint>;
 
 type
-  {extended functionality for DTileMap;}
+  {extended functionality for DTileMap;
+   we have some "excess" functionality from DTileMap left here like load,
+   blocker, etc. But excluding it will be a bit messy, because for DGeneratorTile
+   we need both DTileMap functionality and DGeneratorMap functionality}
   DGeneratorMap = class(DTileMap)
     private
       fFreeFaces: integer;
       fVolume: integer;
-      fHasStairsDown: boolean;
     public
       {what TTileFaces do leave from this tile?}
       //FacesList: TTileFace;
       {list of dock point to this tile}
       Dock: TDockPointList;
-      {does this tile/map has stairs down?}
-      property HasStairsDown: boolean read fHasStairsDown;
       {total free Faces of the map/tile}
       property FreeFaces: integer read fFreeFaces;
       {total passable volume of the map/tile}
       property Volume: integer read fVolume;
-      {calculates faces&volume of the tile/map and prepares it for work}
+      {calculates faces&volume of the tile/map and prepares it for work
+       optimized for DGeneratorMap}
       function CalculateFaces: integer; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 
       destructor destroy; override;
   end;
-type TTileMapList = specialize TFPGObjectList<DGeneratorMap>;
+type DGeneratorTile = class(DGeneratorMap)
+  private
+    fHasStairsDown: boolean;
+  public
+    {does this tile/map has stairs down?}
+    property HasStairsDown: boolean read fHasStairsDown;
+    {calculates faces&volume of the tile/map and prepares it for work
+     full version}
+    function CalculateFaces: integer; reintroduce; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+end;
+type TTileList = specialize TFPGObjectList<DGeneratorTile>;
 
 type
   {this is a basic "add a tile" generator step. We can build a map by followig these
@@ -95,8 +106,12 @@ type
     minx,miny,minz: integer;
     {random generation seed}
     Seed: LongWord;
+    {are links in TilesList absolute URL or just a tile name}
+    absoluteURL: boolean;
     {list of tiles}
     TilesList: TStringList;
+    {list of first generation steps}
+    FirstSteps: TFirstStepsArray
   end;
 
 
@@ -109,11 +124,12 @@ type
     fisReady: boolean;
   private
     {list of tiles used in current map}
-    Tiles: TTileMapList;
+    Tiles: TTileList;
     {searches Tiles for a specific tile name and returns it
      used to make first steps of the generation as they are bound to
      a specific tile name, not to a tile ID which can change}
-    function GetTileByName(TileName: string): DGeneratorMap;
+    //function GetTileByName(TileName: string): DGeneratorMap;
+    function GetTileByName(TileName: string): TTileType;
   private
     { xorshift random generator, fast and thread-safe }
     RNDM: TCastleRandom;
@@ -126,8 +142,11 @@ type
     minsteps: integer;
     {current size of the dynamic array}
     maxsteps: integer;
-    {current (the last used) step of the generator}
-    currentStep: integer;
+    {current (the last used) step of the generator;
+     careful, currentStep starts from -1, while corresponding min/max steps start from 0}
+    CurrentStep: integer;
+    {adds +1 to CurrentStep and resizes the array if necessary}
+    procedure incCurrentStep; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
     {resizes the dynamic array - adds 100 steps if needed}
     procedure ResizeSteps; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 
@@ -141,11 +160,13 @@ type
      and false if the tile cannot be placed at these coordinates  }
     function AddTile(tile: TTileType; x,y,z: TIntCoordinate): boolean;
     {When we're sure what we are doing, we're not making any checks, just add the tile as fast as it is possible}
-    procedure AddTileUnsafe(Tile: DGeneratorMap; x,y,z: TIntCoordinate); {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+    procedure AddTileUnsafe(Tile: DGeneratorTile; x,y,z: TIntCoordinate); {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
     {overloaded version that accepts a DGeneratorStep;}
     procedure AddTileUnsafe(step: DGeneratorStep);
-    { Specific SEED of the random number for this algorithm }
+    {Specific SEED of the random number for this algorithm }
     procedure InitSeed(newseed: longword = 0);
+    {initialize parameters and load pre-generated tiles}
+    procedure InitParameters;
   public
 
     {map parameters}
@@ -155,9 +176,13 @@ type
     function GetMap: DMap;
     //maybe better saveTo when finished?: DMap;
 
-
+    {is the generator ready to wrok?
+     Generatie will raise an exception if it isn't}
     property isReady: boolean read fisReady default false;
+    {is the generator currently working?}
     property isWorking: boolean read fisWorking default false;
+    {this forces isReady to true. Must be used only in constructor which skips
+     loading of the map}
     procedure ForceReady;
     { the main procedure to generate a dungeon,
       may be launched in main thread (for testing or other purposes) }
@@ -180,23 +205,59 @@ type
    and linked stuff like raycast and chunk-n-slice the dungeon into parts}
   D3DDungeonGenerator = class(DDungeonGenerator)
   public
+    {launches DDungeonGenerator.Generate and builds 3D world afterwards
+     can be launched directly for debugging}
     procedure Generate3D;
   protected
+    {launches Generate3D in a thread}
     procedure  Execute; override;
   end;
 
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
-uses SysUtils, CastleLog,
+uses SysUtils, CastleLog, CastleFilesUtils,
   decoglobal;
 
-procedure DDungeonGenerator.execute;
-begin
-  Generate;
-end;
-
 {========================= GENERATION ALGORITHM ==============================}
+
+procedure DDungeonGenerator.InitParameters;
+var s: string;
+    tmp: DGeneratorTile;
+    i : integer;//: DFirstStep;
+begin
+  tiles.clear;
+  For s in parameters.TilesList do begin
+    if parameters.AbsoluteURL then
+      tmp := DGeneratorTile.Load(s+'.map')
+    else
+      tmp := DGeneratorTile.Load(ApplicationData(s+'.map'+GZ_ext));
+    tmp.CalculateFaces;
+    tiles.Add(tmp);
+  end;
+
+  {initialize random seed}
+  InitSeed(parameters.seed);
+
+  {initialize map size}
+  Map.SetSize(parameters.maxx,parameters.maxy,parameters.maxz); //we don't care about RAM now, we'll shrink the map later
+
+  {load pregenerated tiles}
+  maxSteps := 0;
+  setlength(Gen, maxSteps);
+  CurrentStep := -1;
+
+  for i := 0 to parameters.FirstSteps.Count-1 do begin
+    incCurrentStep;
+    Gen[CurrentStep].tile := GetTileByName(parameters.FirstSteps[i].tile);
+    Gen[CurrentStep].x := parameters.FirstSteps[i].x;
+    Gen[CurrentStep].y := parameters.FirstSteps[i].y;
+    Gen[CurrentStep].z := parameters.FirstSteps[i].z;
+  end;
+
+  minSteps := currentStep+1;
+
+end;
 
 {-----------------------------------------------------------------------------}
 
@@ -209,31 +270,38 @@ begin
     WriteLnLog('DDungeonGenerator.Generate','Generation thread is buisy! Aborting...');
     exit;
   end;
-
   fisWorking := true;
 
-  //load pregenerated tiles
-  maxSteps := 0;
-  setlength(Gen, maxSteps);
-
-  {initialize random seed}
-  InitSeed(parameters.seed);
-
-  {initialize map size}
-  Map.SetSize(parameters.maxx,parameters.maxy,parameters.maxz); //we don't care about RAM now, we'll shrink the map later
-
-  minSteps := 0;
-  CurrentStep := minSteps;
+  InitParameters;
 
   repeat
     Map.EmptyMap(false);
+    //add prgenerated or undo tiles
     for i := 0 to currentStep-1 do AddTileUnsafe(Gen[i]);
 
-    //add prgenerated or undo tiles
     while Map.CalculateFaces<>0 do begin
       //add a tile
     end;
     {if map doesn't meet the paramters then undo}
+
+    //if failed then try to undo and regenerate the map again
+    {if false then begin
+      if CurrentStep > MinSteps then begin
+        CurrentStep := MinSteps + RNDM.random(currentStep-MinSteps);
+        MaxSteps := CurrentStep;
+        setLength(Gen,MaxSteps);
+
+        LastUndo := min;
+        ...
+        if LastMax<current then
+          LastMax := current;
+          LastUndo := LastMax;
+        end;
+        goto 10% behind LastUndo>min;
+        or %random to avoid some no-way-out cases
+
+      end;
+    end;  }
   until true; {until map meets the paramters}
   // finalize
 
@@ -257,10 +325,15 @@ end;
 
 procedure DDungeonGenerator.ResizeSteps; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
-  if currentstep>maxsteps then begin
+  if currentstep+1>=maxsteps then begin
     inc(maxsteps,GeneratorShift);
     setlength(Gen, maxsteps);
   end
+end;
+procedure DDungeonGenerator.incCurrentStep; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+begin
+  inc(currentStep);
+  ResizeSteps;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -281,8 +354,7 @@ begin
     // if tile can be placed - then place it
     AddTileUnsafe(Tiles[tile],x,y,z);
     {add current step to GEN}
-    inc(currentStep);
-    ResizeSteps;
+    incCurrentStep;
     Gen[CurrentStep].tile := tile;
     Gen[CurrentStep].x := x;
     Gen[CurrentStep].y := y;
@@ -297,7 +369,7 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-procedure DDungeonGenerator.AddTileUnsafe(tile: DGeneratorMap; x,y,z: TIntCoordinate); {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+procedure DDungeonGenerator.AddTileUnsafe(tile: DGeneratorTile; x,y,z: TIntCoordinate); {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 var jx,jy,jz: integer;
     a: TAngle;
 begin
@@ -367,50 +439,17 @@ end;
 
 {========================== DGENERATOR TILE ================================}
 
-{$DEFINE CompleteGen}//this (maybe) will separate implementations for Map and Tile
+{we're making two almost identical copies of the procedure to
+ optimize things for DGenerationMap}
+{$DEFINE CompleteGen} //this will separate implementations for Map and Tile
+function DGeneratorTile.CalculateFaces: integer; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+{$INCLUDE decodungeongenerator_calculatefaces.inc}
+
+{$UNDEF CompleteGen}
 function DGeneratorMap.CalculateFaces: integer; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
-var ix,iy,iz: integer;
-    a: TAngle;
-    f: TTileFace;
-    tmpDock: DDockPoint;
-begin
-  {$WARNING Optimize for different variants}
-  if Dock = nil then Dock := TDockPointList.Create else Dock.Clear;
-  fFreeFaces := 0;
-  fVolume := 0;
-  {$IFDEF CompleteGen}fHasStairsDown := false;{$ENDIF}
-  //FacesList := [];
-  for ix := 0 to sizex-1 do
-    for iy := 0 to sizey-1 do
-      for iz := 0 to sizez-1 do begin
-        if isPassable(Map[ix,iy,iz].base) then inc(fVolume);
-        {$IFDEF CompleteGen}if Map[ix,iy,iz].base = tkDown then fHasStairsDown := true;{$ENDIF}
-        for a in TAngle do
-          if isPassable(Map[ix,iy,iz].faces[a]) then begin
-            f := self.MapSafeFace(ix+a_dx(a),iy+a_dy(a),iz+a_dz(a),invertAngle(a));
-            if (f = tfNone) or (f = tfInacceptible) then begin
-              tmpDock.face := a;
-              tmpDock.x := ix;
-              tmpDock.y := iy;
-              tmpDock.z := iz;
-              Dock.Add(tmpDock);
-              {$IFDEF CompleteGen}
-              //Include(FacesList,Map[ix,iy,iz].faces[a]);
-              {$ENDIF}
-              inc(fFreeFaces);
-            end;
-          end;
-      end;
-  {$IFDEF CompleteGen}
-  //check if it's a blocker tile
-  if (FreeFaces = 1) and (sizex+sizey+sizez = 3) and (Map[0,0,0].base = tkNone) then
-    blocker := true
-  else
-    blocker := false;
-  {$ENDIF}
-  Result := fFreeFaces;
-  writeLnLog(inttostr(result));
-end;
+{$INCLUDE decodungeongenerator_calculatefaces.inc}
+
+{--------------------------------------------------------------------------}
 
 destructor DGeneratorMap.destroy;
 begin
@@ -439,12 +478,21 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-Function DDungeonGenerator.GetTileByName(TileName: string): DGeneratorMap;
+{Function DDungeonGenerator.GetTileByName(TileName: string): DGeneratorMap;
 var I: DGeneratorMap;
 begin
   Result := nil;
   for I in Tiles do if I.TileName = TileName then begin
     Result := I;
+    exit;
+  end;
+  raise Exception.create('DDungeonGenerator.GetTileByName: FATAL! Tile cannot be found!');
+end;}
+Function DDungeonGenerator.GetTileByName(TileName: string): TTileType;
+var i: integer;
+begin
+  for i := 0 to Tiles.count do if tiles[i].TileName = TileName then begin
+    Result := i;
     exit;
   end;
   raise Exception.create('DDungeonGenerator.GetTileByName: FATAL! Tile cannot be found!');
@@ -459,14 +507,24 @@ begin
 end;
 {-----------------------------------------------------------------------------}
 
+procedure DDungeonGenerator.execute;
+begin
+  Generate;
+end;
+
+{-----------------------------------------------------------------------------}
 
 constructor DDungeonGenerator.create;
 begin
   inherited;
-  Map := DGeneratorMap.create;
   {we create an non-initialized random (i.e. initialized by a stupid constant integer)
   Just to make sure we don't waste any time (<1ms) on initialization now}
   RNDM := TCastleRandom.Create(1);
+
+  Map := DGeneratorMap.create;
+  Tiles := TTileList.Create(true);
+  parameters.TilesList := TStringList.create;
+  parameters.FirstSteps := TFirstStepsArray.create;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -475,7 +533,9 @@ destructor DDungeonGenerator.Destroy;
 begin
   FreeAndNil(RNDM);
   FreeAndNil(Map);
+  FreeAndNil(tiles);
   FreeAndNil(parameters.TilesList);
+  FreeAndNil(parameters.FirstSteps);
   inherited;
 end;
 

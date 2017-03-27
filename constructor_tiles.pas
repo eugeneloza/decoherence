@@ -202,7 +202,7 @@ begin
   FreeAndNil(TilesList);
   TilesList := TStringList.Create;
   // Android incompatible
-  if FindFirst (FakeConstructorData('models/tiles/*.x3d',false), faAnyFile - faDirectory, Rec) = 0 then
+  if FindFirst (FakeConstructorData(TilesFolder + '*.x3d',false), faAnyFile - faDirectory, Rec) = 0 then
    try
      repeat
        TilesList.Add(AnsiReplaceText(Rec.Name,'.x3d',''));
