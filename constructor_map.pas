@@ -24,27 +24,54 @@ interface
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
   ExtCtrls, CheckLst, CastleControl, CastleControls, constructor_global,
-  decodungeongenerator;
+  decodungeontiles, decodungeongenerator;
 
 type
   TMapEditor = class(TWriterForm)
     CastleImageControl1: TCastleImageControl;
+    Label10: TLabel;
+    VolumeEdit: TEdit;
+    EditSizeX1: TEdit;
+    EditMaxF: TEdit;
+    EditMinF: TEdit;
+    EditSizeY1: TEdit;
+    EditSizeZ: TEdit;
+    EditSizeX: TEdit;
+    EditSizeY: TEdit;
+    EditSizeZ1: TEdit;
+    Label1: TLabel;
+    Label2: TLabel;
+    Label3: TLabel;
+    Label4: TLabel;
+    Label5: TLabel;
+    Label6: TLabel;
+    Label7: TLabel;
+    Label8: TLabel;
+    Label9: TLabel;
+    ZLabel: TLabel;
+    ZScroll: TScrollBar;
     TilesBox: TCheckListBox;
     GenerateButton: TButton;
     MapDisplay: TCastleControl;
+    procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure GenerateButtonClick(Sender: TObject);
+    procedure ZScrollChange(Sender: TObject);
   public
     {List of tiles names}
     TilesList: TStringList;
     {list of actual tiles}
     Tiles: TTileList;
 
+    DungeonMap: DMap;
+
     {fills the checklistbox with tiles names and checks them all}
     procedure FillBox;
     {reads tiles list from the folder}
     procedure GetTileList;
+    {if map is ready then draws the map}
+    procedure DrawMap;
   public
     procedure LoadMe; override;
     procedure FreeMe; override;
@@ -59,7 +86,6 @@ implementation
 {$R *.lfm}
 
 uses StrUtils, CastleLog, castleimages, castlevectors,
-  decodungeontiles,
   decoglobal;
 
 
@@ -69,22 +95,22 @@ procedure TMapEditor.GenerateButtonClick(Sender: TObject);
 var GENERATOR: DDungeonGenerator;
   i: integer;
   fs: DFirstStep;
-  tmpmap: DMap;
 begin
+  FreeAndNil(DungeonMap);
   GENERATOR := DDungeonGenerator.Create;
   //GENERATOR.load('');
   with GENERATOR.parameters do begin
-    maxx := 9;
-    maxy := 9;
-    maxz := 9;
+    maxx := strToInt(EditSizeX.text);
+    maxy := strToInt(EditSizeY.text);
+    maxz := strToInt(EditSizeZ.text);
 
-    Volume := maxx*maxy*maxz div 3;
-    MaxFaces := 9;
-    MinFaces := 4;
+    Volume := round(maxx*maxy*maxz * strToFloat(VolumeEdit.Text)/100);
+    MaxFaces := strToInt(EditMaxF.text);
+    MinFaces := strToInt(EditMinF.text);
 
-    minx := 9;
-    miny := 9;
-    minz := 9;
+    minx := strToInt(EditSizeX1.text);
+    miny := strToInt(EditSizeY1.text);
+    minz := strToInt(EditSizeZ1.text);
 
     seed := 0;
 
@@ -101,11 +127,32 @@ begin
   GENERATOR.ForceReady;
   GENERATOR.Generate;
   //somethinguseful := GEN.GetMap;
-  {$Warning memory leaks here!}
-  tmpMap := GENERATOR.GetMap;
-  CastleImageControl1.Image := tmpMap.img[0].MakeCopy;
-  freeAndNil(tmpMap);
+  DungeonMap := GENERATOR.GetMap;
   FreeAndNil(GENERATOR);
+
+  ZScroll.Min := 0;
+  ZScroll.Max := DungeonMap.sizez-1;
+  DrawMap;
+end;
+
+procedure TMapEditor.ZScrollChange(Sender: TObject);
+begin
+  DrawMap;
+end;
+
+{------------------------------------------------------------------------}
+
+Procedure TMapEditor.DrawMap;
+var currentZ: integer;
+begin
+  if DungeonMap<>nil then begin
+    currentZ := ZScroll.Position;
+    ZLabel.Caption := inttostr(currentz);
+    //CastleImageControl1.Image.FreeInstance;
+    //FreeAndNil(CastleImageControl1.Image);
+    CastleImagecontrol1.OwnsImage := false;
+    CastleImageControl1.Image := DungeonMap.img[CurrentZ];//.MakeCopy;
+  end;
 end;
 
 {------------------------------------------------------------------------}
@@ -141,12 +188,15 @@ begin
   FreeMe;
 end;
 
+procedure TMapEditor.FormCreate(Sender: TObject);
+begin
+  MapDisplay.SceneManager.InsertFront(CastleImageControl1);
+end;
+
 {--------------------------------------------------------------------------}
 
 procedure TMapEditor.FormShow(Sender: TObject);
 begin
-  {$Warning should be on create, not on show!}
-  MapDisplay.SceneManager.InsertFront(CastleImageControl1);
   if (not isLoaded) then LoadMe;
 end;
 

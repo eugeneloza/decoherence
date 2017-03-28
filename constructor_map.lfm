@@ -6,14 +6,15 @@ object MapEditor: TMapEditor
   Caption = 'MapEditor'
   ClientHeight = 370
   ClientWidth = 628
+  OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnShow = FormShow
   LCLVersion = '1.6.2.0'
   object MapDisplay: TCastleControl
-    Left = 7
+    Left = 24
     Height = 357
     Top = 6
-    Width = 376
+    Width = 359
     TabOrder = 0
   end
   object GenerateButton: TButton
@@ -28,15 +29,185 @@ object MapEditor: TMapEditor
   object TilesBox: TCheckListBox
     Left = 480
     Height = 216
-    Top = 8
+    Top = 147
     Width = 140
     ItemHeight = 0
     TabOrder = 2
     TopIndex = -1
   end
+  object EditSizeZ: TEdit
+    Left = 592
+    Height = 25
+    Top = 24
+    Width = 24
+    TabOrder = 3
+    Text = '9'
+  end
+  object EditSizeY: TEdit
+    Left = 536
+    Height = 25
+    Top = 24
+    Width = 26
+    TabOrder = 4
+    Text = '9'
+  end
+  object EditSizeX: TEdit
+    Left = 480
+    Height = 25
+    Top = 24
+    Width = 24
+    TabOrder = 5
+    Text = '9'
+  end
+  object Label1: TLabel
+    Left = 392
+    Height = 15
+    Top = 34
+    Width = 86
+    Caption = 'MAX size: x='
+    ParentColor = False
+  end
+  object Label2: TLabel
+    Left = 511
+    Height = 15
+    Top = 34
+    Width = 19
+    Caption = 'y='
+    ParentColor = False
+  end
+  object Label3: TLabel
+    Left = 568
+    Height = 15
+    Top = 34
+    Width = 18
+    Caption = 'z='
+    ParentColor = False
+  end
+  object ZScroll: TScrollBar
+    Left = 3
+    Height = 337
+    Top = 24
+    Width = 15
+    Kind = sbVertical
+    PageSize = 0
+    TabOrder = 6
+    OnChange = ZScrollChange
+  end
+  object ZLabel: TLabel
+    Left = 8
+    Height = 15
+    Top = 8
+    Width = 9
+    Caption = 'Z'
+    ParentColor = False
+  end
+  object EditSizeZ1: TEdit
+    Left = 592
+    Height = 25
+    Top = 52
+    Width = 24
+    TabOrder = 7
+    Text = '9'
+  end
+  object EditSizeY1: TEdit
+    Left = 536
+    Height = 25
+    Top = 52
+    Width = 26
+    TabOrder = 8
+    Text = '9'
+  end
+  object EditSizeX1: TEdit
+    Left = 480
+    Height = 25
+    Top = 52
+    Width = 24
+    TabOrder = 9
+    Text = '9'
+  end
+  object Label4: TLabel
+    Left = 392
+    Height = 15
+    Top = 62
+    Width = 82
+    Caption = 'MIN size: x='
+    ParentColor = False
+  end
+  object Label5: TLabel
+    Left = 511
+    Height = 15
+    Top = 62
+    Width = 19
+    Caption = 'y='
+    ParentColor = False
+  end
+  object Label6: TLabel
+    Left = 568
+    Height = 15
+    Top = 62
+    Width = 18
+    Caption = 'z='
+    ParentColor = False
+  end
+  object EditMaxF: TEdit
+    Left = 592
+    Height = 25
+    Top = 80
+    Width = 24
+    TabOrder = 10
+    Text = '9'
+  end
+  object EditMinF: TEdit
+    Left = 480
+    Height = 25
+    Top = 80
+    Width = 24
+    TabOrder = 11
+    Text = '4'
+  end
+  object Label7: TLabel
+    Left = 392
+    Height = 15
+    Top = 90
+    Width = 67
+    Caption = 'Min Faces:'
+    ParentColor = False
+  end
+  object Label8: TLabel
+    Left = 511
+    Height = 15
+    Top = 90
+    Width = 73
+    Caption = 'max Faces:'
+    ParentColor = False
+  end
+  object VolumeEdit: TEdit
+    Left = 504
+    Height = 25
+    Top = 112
+    Width = 48
+    TabOrder = 12
+    Text = '30'
+  end
+  object Label9: TLabel
+    Left = 392
+    Height = 15
+    Top = 122
+    Width = 108
+    Caption = 'Demand volume'
+    ParentColor = False
+  end
+  object Label10: TLabel
+    Left = 560
+    Height = 15
+    Top = 122
+    Width = 12
+    Caption = '%'
+    ParentColor = False
+  end
   object CastleImageControl1: TCastleImageControl
     TUIControlPos_RealLeft = 26
-    TUIControlPos_Design_Left = 24
-    TUIControlPos_Design_Top = 16
+    TUIControlPos_Design_Left = 192
+    TUIControlPos_Design_Top = 176
   end
 end
