@@ -126,8 +126,9 @@ begin
   end;
   GENERATOR.ForceReady;
   GENERATOR.Generate;
-  //somethinguseful := GEN.GetMap;
+
   DungeonMap := GENERATOR.GetMap;
+
   FreeAndNil(GENERATOR);
 
   ZScroll.Min := 0;
@@ -152,6 +153,8 @@ begin
     //FreeAndNil(CastleImageControl1.Image);
     CastleImagecontrol1.OwnsImage := false;
     CastleImageControl1.Image := DungeonMap.img[CurrentZ];//.MakeCopy;
+    MapDisplay.Width :=  CastleImageControl1.Image.width;
+    MapDisplay.height :=  CastleImageControl1.Image.height;
   end;
 end;
 
@@ -182,6 +185,7 @@ end;
 procedure TMapEditor.FreeMe;
 begin
   FreeAndNil(TilesList);
+  FreeAndNil(DungeonMap);
 end;
 procedure TMapEditor.FormDestroy(Sender: TObject);
 begin
@@ -191,6 +195,8 @@ end;
 procedure TMapEditor.FormCreate(Sender: TObject);
 begin
   MapDisplay.SceneManager.InsertFront(CastleImageControl1);
+  CastleImageControl1.Left := 0;
+  CastleImageControl1.Bottom := 0;
 end;
 
 {--------------------------------------------------------------------------}

@@ -312,13 +312,15 @@ begin
     if Tiles[i].blocker then
       BlockerTiles.Add(i)
     else
+    begin
       NormalTiles.add(i);
-    if Tiles[i].HasStairsDown then
-      DownTiles.add(i);
-    if Tiles[i].FreeFaces>=3 then
-      RichTiles.add(i)
-    else
-      PoorTiles.add(i);
+      if Tiles[i].HasStairsDown then
+        DownTiles.add(i);
+      if Tiles[i].FreeFaces>=3 then
+        RichTiles.add(i)
+      else
+        PoorTiles.add(i);
+    end;
   end;
 
   NormalTilesTotalDocks := 0;
@@ -778,6 +780,11 @@ begin
   FreeAndNil(tiles);
   FreeAndNil(parameters.TilesList);
   FreeAndNil(parameters.FirstSteps);
+  FreeAndNil(NormalTiles);
+  FreeAndNil(PoorTiles);
+  FreeAndNil(BlockerTiles);
+  FreeAndNil(RichTiles);
+  FreeAndNil(DownTiles);
   inherited;
 end;
 
