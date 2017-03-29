@@ -18,70 +18,13 @@ object MapEditor: TMapEditor
     TabOrder = 0
   end
   object GenerateButton: TButton
-    Left = 392
+    Left = 384
     Height = 25
-    Top = 336
-    Width = 75
+    Top = 338
+    Width = 99
     Caption = 'Test'
     OnClick = GenerateButtonClick
     TabOrder = 1
-  end
-  object TilesBox: TCheckListBox
-    Left = 480
-    Height = 216
-    Top = 147
-    Width = 140
-    ItemHeight = 0
-    TabOrder = 2
-    TopIndex = -1
-  end
-  object EditSizeZ: TEdit
-    Left = 592
-    Height = 25
-    Top = 24
-    Width = 24
-    TabOrder = 3
-    Text = '9'
-  end
-  object EditSizeY: TEdit
-    Left = 536
-    Height = 25
-    Top = 24
-    Width = 26
-    TabOrder = 4
-    Text = '9'
-  end
-  object EditSizeX: TEdit
-    Left = 480
-    Height = 25
-    Top = 24
-    Width = 24
-    TabOrder = 5
-    Text = '9'
-  end
-  object Label1: TLabel
-    Left = 392
-    Height = 15
-    Top = 34
-    Width = 86
-    Caption = 'MAX size: x='
-    ParentColor = False
-  end
-  object Label2: TLabel
-    Left = 511
-    Height = 15
-    Top = 34
-    Width = 19
-    Caption = 'y='
-    ParentColor = False
-  end
-  object Label3: TLabel
-    Left = 568
-    Height = 15
-    Top = 34
-    Width = 18
-    Caption = 'z='
-    ParentColor = False
   end
   object ZScroll: TScrollBar
     Left = 3
@@ -90,122 +33,209 @@ object MapEditor: TMapEditor
     Width = 15
     Kind = sbVertical
     PageSize = 0
-    TabOrder = 6
+    TabOrder = 2
     OnChange = ZScrollChange
   end
   object ZLabel: TLabel
-    Left = 8
+    Left = 5
     Height = 15
     Top = 8
     Width = 9
     Caption = 'Z'
     ParentColor = False
   end
-  object EditSizeZ1: TEdit
-    Left = 592
-    Height = 25
-    Top = 52
-    Width = 24
-    TabOrder = 7
-    Text = '9'
+  object PageControl1: TPageControl
+    Left = 384
+    Height = 304
+    Top = 32
+    Width = 240
+    ActivePage = TabSheet1
+    TabIndex = 0
+    TabOrder = 3
+    object TabSheet1: TTabSheet
+      Caption = 'Parameters'
+      ClientHeight = 279
+      ClientWidth = 238
+      object EditSizeZ: TEdit
+        Left = 208
+        Height = 25
+        Top = 6
+        Width = 24
+        OnChange = EditSizeZChange
+        TabOrder = 0
+        Text = '9'
+      end
+      object EditSizeY: TEdit
+        Left = 150
+        Height = 25
+        Top = 8
+        Width = 26
+        OnChange = EditSizeYChange
+        TabOrder = 1
+        Text = '9'
+      end
+      object EditSizeX: TEdit
+        Left = 96
+        Height = 25
+        Top = 8
+        Width = 24
+        OnChange = EditSizeXChange
+        TabOrder = 2
+        Text = '9'
+      end
+      object Label1: TLabel
+        Left = 8
+        Height = 15
+        Top = 16
+        Width = 86
+        Caption = 'MAX size: x='
+        ParentColor = False
+      end
+      object Label2: TLabel
+        Left = 128
+        Height = 15
+        Top = 16
+        Width = 19
+        Caption = 'y='
+        ParentColor = False
+      end
+      object Label3: TLabel
+        Left = 184
+        Height = 15
+        Top = 16
+        Width = 18
+        Caption = 'z='
+        ParentColor = False
+      end
+      object EditSizeZ1: TEdit
+        Left = 208
+        Height = 25
+        Top = 34
+        Width = 24
+        OnChange = EditSizeZ1Change
+        TabOrder = 3
+        Text = '9'
+      end
+      object EditSizeY1: TEdit
+        Left = 150
+        Height = 25
+        Top = 34
+        Width = 26
+        Enabled = False
+        OnChange = EditSizeY1Change
+        TabOrder = 4
+        Text = '9'
+      end
+      object EditSizeX1: TEdit
+        Left = 96
+        Height = 25
+        Top = 34
+        Width = 24
+        Enabled = False
+        OnChange = EditSizeX1Change
+        TabOrder = 5
+        Text = '9'
+      end
+      object Label4: TLabel
+        Left = 8
+        Height = 15
+        Top = 44
+        Width = 82
+        Caption = 'MIN size: x='
+        ParentColor = False
+      end
+      object Label5: TLabel
+        Left = 128
+        Height = 15
+        Top = 44
+        Width = 19
+        Caption = 'y='
+        ParentColor = False
+      end
+      object Label6: TLabel
+        Left = 184
+        Height = 15
+        Top = 44
+        Width = 18
+        Caption = 'z='
+        ParentColor = False
+      end
+      object EditMaxF: TEdit
+        Left = 208
+        Height = 25
+        Top = 62
+        Width = 24
+        OnChange = EditMaxFChange
+        TabOrder = 6
+        Text = '9'
+      end
+      object EditMinF: TEdit
+        Left = 96
+        Height = 25
+        Top = 64
+        Width = 24
+        OnChange = EditMinFChange
+        TabOrder = 7
+        Text = '4'
+      end
+      object Label7: TLabel
+        Left = 131
+        Height = 15
+        Top = 72
+        Width = 67
+        Caption = 'Min Faces:'
+        ParentColor = False
+      end
+      object Label8: TLabel
+        Left = 8
+        Height = 15
+        Top = 72
+        Width = 73
+        Caption = 'max Faces:'
+        ParentColor = False
+      end
+      object VolumeEdit: TEdit
+        Left = 128
+        Height = 25
+        Top = 96
+        Width = 48
+        OnChange = VolumeEditChange
+        TabOrder = 8
+        Text = '30'
+      end
+      object Label9: TLabel
+        Left = 8
+        Height = 15
+        Top = 104
+        Width = 108
+        Caption = 'Demand volume'
+        ParentColor = False
+      end
+      object Label10: TLabel
+        Left = 184
+        Height = 15
+        Top = 104
+        Width = 12
+        Caption = '%'
+        ParentColor = False
+      end
+    end
+    object TabSheet2: TTabSheet
+      Caption = 'Tiles'
+      ClientHeight = 279
+      ClientWidth = 238
+      object TilesBox: TCheckListBox
+        Left = 8
+        Height = 192
+        Top = 8
+        Width = 220
+        ItemHeight = 0
+        TabOrder = 0
+        TopIndex = -1
+      end
+    end
   end
-  object EditSizeY1: TEdit
-    Left = 536
-    Height = 25
-    Top = 52
-    Width = 26
-    TabOrder = 8
-    Text = '9'
-  end
-  object EditSizeX1: TEdit
-    Left = 480
-    Height = 25
-    Top = 52
-    Width = 24
-    TabOrder = 9
-    Text = '9'
-  end
-  object Label4: TLabel
-    Left = 392
-    Height = 15
-    Top = 62
-    Width = 82
-    Caption = 'MIN size: x='
-    ParentColor = False
-  end
-  object Label5: TLabel
-    Left = 511
-    Height = 15
-    Top = 62
-    Width = 19
-    Caption = 'y='
-    ParentColor = False
-  end
-  object Label6: TLabel
-    Left = 568
-    Height = 15
-    Top = 62
-    Width = 18
-    Caption = 'z='
-    ParentColor = False
-  end
-  object EditMaxF: TEdit
-    Left = 592
-    Height = 25
-    Top = 80
-    Width = 24
-    TabOrder = 10
-    Text = '9'
-  end
-  object EditMinF: TEdit
-    Left = 480
-    Height = 25
-    Top = 80
-    Width = 24
-    TabOrder = 11
-    Text = '4'
-  end
-  object Label7: TLabel
-    Left = 392
-    Height = 15
-    Top = 90
-    Width = 67
-    Caption = 'Min Faces:'
-    ParentColor = False
-  end
-  object Label8: TLabel
-    Left = 511
-    Height = 15
-    Top = 90
-    Width = 73
-    Caption = 'max Faces:'
-    ParentColor = False
-  end
-  object VolumeEdit: TEdit
-    Left = 504
-    Height = 25
-    Top = 112
-    Width = 48
-    TabOrder = 12
-    Text = '30'
-  end
-  object Label9: TLabel
-    Left = 392
-    Height = 15
-    Top = 122
-    Width = 108
-    Caption = 'Demand volume'
-    ParentColor = False
-  end
-  object Label10: TLabel
-    Left = 560
-    Height = 15
-    Top = 122
-    Width = 12
-    Caption = '%'
-    ParentColor = False
-  end
-  object CastleImageControl1: TCastleImageControl
+  object TileImage: TCastleImageControl
     TUIControlPos_RealLeft = 26
     TUIControlPos_Design_Left = 192
     TUIControlPos_Design_Top = 176

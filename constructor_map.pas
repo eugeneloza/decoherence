@@ -23,23 +23,22 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  ExtCtrls, CheckLst, CastleControl, CastleControls, constructor_global,
-  decodungeontiles, decodungeongenerator;
+  ExtCtrls, CheckLst, ComCtrls, CastleControl, CastleControls,
+  constructor_global, decodungeontiles, decodungeongenerator;
 
 type
   TMapEditor = class(TWriterForm)
-    CastleImageControl1: TCastleImageControl;
-    Label10: TLabel;
-    VolumeEdit: TEdit;
-    EditSizeX1: TEdit;
+    TileImage: TCastleImageControl;
     EditMaxF: TEdit;
     EditMinF: TEdit;
+    EditSizeX: TEdit;
+    EditSizeX1: TEdit;
+    EditSizeY: TEdit;
     EditSizeY1: TEdit;
     EditSizeZ: TEdit;
-    EditSizeX: TEdit;
-    EditSizeY: TEdit;
     EditSizeZ1: TEdit;
     Label1: TLabel;
+    Label10: TLabel;
     Label2: TLabel;
     Label3: TLabel;
     Label4: TLabel;
@@ -48,15 +47,28 @@ type
     Label7: TLabel;
     Label8: TLabel;
     Label9: TLabel;
+    PageControl1: TPageControl;
+    TabSheet1: TTabSheet;
+    TabSheet2: TTabSheet;
+    TilesBox: TCheckListBox;
+    VolumeEdit: TEdit;
     ZLabel: TLabel;
     ZScroll: TScrollBar;
-    TilesBox: TCheckListBox;
     GenerateButton: TButton;
     MapDisplay: TCastleControl;
+    procedure EditMaxFChange(Sender: TObject);
+    procedure EditMinFChange(Sender: TObject);
+    procedure EditSizeX1Change(Sender: TObject);
+    procedure EditSizeXChange(Sender: TObject);
+    procedure EditSizeY1Change(Sender: TObject);
+    procedure EditSizeYChange(Sender: TObject);
+    procedure EditSizeZ1Change(Sender: TObject);
+    procedure EditSizeZChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure GenerateButtonClick(Sender: TObject);
+    procedure VolumeEditChange(Sender: TObject);
     procedure ZScrollChange(Sender: TObject);
   public
     {List of tiles names}
@@ -125,6 +137,7 @@ begin
     FirstSteps.Add(fs);
   end;
   GENERATOR.ForceReady;
+  GENERATOR.InitParameters;
   GENERATOR.Generate;
 
   DungeonMap := GENERATOR.GetMap;
@@ -149,12 +162,12 @@ begin
   if DungeonMap<>nil then begin
     currentZ := ZScroll.Position;
     ZLabel.Caption := inttostr(currentz);
-    //CastleImageControl1.Image.FreeInstance;
-    //FreeAndNil(CastleImageControl1.Image);
-    CastleImagecontrol1.OwnsImage := false;
-    CastleImageControl1.Image := DungeonMap.img[CurrentZ];//.MakeCopy;
-    MapDisplay.Width :=  CastleImageControl1.Image.width;
-    MapDisplay.height :=  CastleImageControl1.Image.height;
+    //TileImage.Image.FreeInstance;
+    //FreeAndNil(TileImage.Image);
+    TileImage.OwnsImage := false;
+    TileImage.Image := DungeonMap.img[CurrentZ];//.MakeCopy;
+    MapDisplay.Width :=  TileImage.Image.width;
+    MapDisplay.height :=  TileImage.Image.height;
   end;
 end;
 
@@ -192,11 +205,111 @@ begin
   FreeMe;
 end;
 
+{--------------------------------------------------------------------------}
+
 procedure TMapEditor.FormCreate(Sender: TObject);
 begin
-  MapDisplay.SceneManager.InsertFront(CastleImageControl1);
-  CastleImageControl1.Left := 0;
-  CastleImageControl1.Bottom := 0;
+  MapDisplay.SceneManager.InsertFront(TileImage);
+  TileImage.Left := 0;
+  TileImage.Bottom := 0;
+end;
+
+{--------------------------------------------------------------------------}
+
+procedure TMapEditor.EditSizeZChange(Sender: TObject);
+var maxz,minz,k1,k2: integer;
+begin
+  val(EditSizeZ.Text,maxz,k1);
+  val(EditSizeZ1.Text,minz,k2);
+  if (k1=0) and (k2=0) then begin
+    if minz>maxz then EditSizeZ1.Text := inttostr(maxz);
+  end;
+end;
+
+procedure TMapEditor.EditSizeZ1Change(Sender: TObject);
+var maxz,minz,k1,k2: integer;
+begin
+  val(EditSizeZ.Text,maxz,k1);
+  val(EditSizeZ1.Text,minz,k2);
+  if (k1=0) and (k2=0) then begin
+    if minz>maxz then EditSizeZ.Text := inttostr(minz);
+    //if (maxz>(maxx+maxy) div 2) then EditSizeZ.Color := clRed else EditMinF.Color := clDefault;
+  end;
+end;
+
+procedure TMapEditor.EditSizeYChange(Sender: TObject);
+var maxy,miny,k1,k2: integer;
+begin
+  val(EditSizeY.Text,maxy,k1);
+  val(EditSizeY1.Text,miny,k2);
+  if (k1=0) and (k2=0) then begin
+    if miny>maxy then EditSizeY1.Text := inttostr(maxy);
+    //if (maxz>(maxx+maxy) div 2) then EditSizeZ.Color := clRed else EditMinF.Color := clDefault;
+  end;
+end;
+
+procedure TMapEditor.EditSizeY1Change(Sender: TObject);
+var maxy,miny,k1,k2: integer;
+begin
+  val(EditSizeY.Text,maxy,k1);
+  val(EditSizeY1.Text,miny,k2);
+  if (k1=0) and (k2=0) then begin
+    if miny>maxy then EditSizeY.Text := inttostr(miny);
+    //if (maxz>(maxx+maxy) div 2) then EditSizeZ.Color := clRed else EditMinF.Color := clDefault;
+  end;
+end;
+
+procedure TMapEditor.EditSizeXChange(Sender: TObject);
+var maxx,minx,k1,k2: integer;
+begin
+  val(EditSizeX.Text,maxx,k1);
+  val(EditSizeX1.Text,minx,k2);
+  if (k1=0) and (k2=0) then begin
+    if minx>maxx then EditSizeX1.Text := inttostr(maxx);
+    //if (maxz>(maxx+maxy) div 2) then EditSizeZ.Color := clRed else EditMinF.Color := clDefault;
+  end;
+end;
+
+procedure TMapEditor.EditSizeX1Change(Sender: TObject);
+var maxx,minx,k1,k2: integer;
+begin
+  val(EditSizeX.Text,maxx,k1);
+  val(EditSizeX1.Text,minx,k2);
+  if (k1=0) and (k2=0) then begin
+    if minx>maxx then EditSizeX1.Text := inttostr(maxx);
+    //if (maxz>(maxx+maxy) div 2) then EditSizeZ.Color := clRed else EditMinF.Color := clDefault;
+  end;
+end;
+
+procedure TMapEditor.EditMaxFChange(Sender: TObject);
+var maxf,minf,k1,k2: integer;
+begin
+  val(EditMaxF.Text,maxf,k1);
+  val(EditMinF.Text,minf,k2);
+  if (k1=0) and (k2=0) then begin
+    if minf>maxf then EditMinF.Text := inttostr(maxf);
+    if (maxF<5) then EditMaxF.Color := clRed else EditMinF.Color := clDefault;
+  end;
+end;
+
+procedure TMapEditor.EditMinFChange(Sender: TObject);
+var maxf,minf,k1,k2: integer;
+begin
+  val(EditMaxF.Text,maxf,k1);
+  val(EditMinF.Text,minf,k2);
+  if (k1=0) and (k2=0) then begin
+    if minf>maxf then EditMaxF.Text := inttostr(minf);
+    if (minF<3) then EditMinF.Color := clRed else EditMinF.Color := clDefault;
+  end;
+end;
+
+procedure TMapEditor.VolumeEditChange(Sender: TObject);
+var vol,k: integer;
+begin
+  VolumeEdit.Color := clDefault;
+  val(VolumeEdit.Text,vol,k);
+  if k=0 then
+    if (vol<2) or (vol>50) then VolumeEdit.Color := clRed;
 end;
 
 {--------------------------------------------------------------------------}

@@ -150,6 +150,7 @@ type
   private
     fisWorking: boolean;
     fisReady: boolean;
+    fisInitialized: boolean;
   private
     {list of tiles used in current map}
     Tiles: TTileList;
@@ -234,10 +235,10 @@ type
     procedure AddTileUnsafe(step: DGeneratorStep);
     {Specific SEED of the random number for this algorithm }
     procedure InitSeed(newseed: longword = 0);
-    {initialize parameters and load pre-generated tiles}
-    procedure InitParameters;
     {creates a minimap as Map.img}
     procedure MakeMinimap;
+    {resizes the generated map for its real size}
+    procedure ShrinkMap;
   public
 
     {map parameters}
@@ -250,11 +251,19 @@ type
     {is the generator ready to wrok?
      Generatie will raise an exception if it isn't}
     property isReady: boolean read fisReady default false;
+    {are the parameters initialized? If no, they'll be init
+     automatically, but its best to do it manually outside the thread}
+    property isInitialized: boolean read fisInitialized default false;
     {is the generator currently working?}
     property isWorking: boolean read fisWorking default false;
     {this forces isReady to true. Must be used only in constructor which skips
      loading of the map}
     procedure ForceReady;
+    {MUST BE MANUALLY RUN BEFORE GENERATION (best if outside the thread)
+     initialize parameters and load pre-generated tiles
+     Will raise exception if parameters are not loaded
+     Use ForceReady to define parameters manually}
+    procedure InitParameters;
     { the main procedure to generate a dungeon,
       may be launched in main thread (for testing or other purposes) }
     procedure Generate;
@@ -297,6 +306,8 @@ var s: string;
     tmp: DGeneratorTile;
     i : integer;
 begin
+  if not isReady then
+    raise exception.create('DDungeonGenerator.Generate FATAL - parameters are not loaded!');
   {load tiles}
   tiles.clear;
   For s in parameters.TilesList do begin
@@ -347,7 +358,7 @@ begin
   end;
 
   minSteps := currentStep+1;
-
+  fisInitialized := true;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -462,14 +473,16 @@ var i: integer;
     t1,t2: TDateTime;
 begin
   if not isReady then
-    raise exception.create('DDungeonGenerator.Generate FATAL - parameters are not initialized!');
+    raise exception.create('DDungeonGenerator.Generate FATAL - parameters are not loaded!');
+  if not isInitialized then begin
+    WriteLnLog('DDungeonGenerator.Generate','Warning: parameters were automatically initialized! It''s best to initialize parameters manually outside the thread.');
+    InitParameters;
+  end;
   if isWorking then begin
     WriteLnLog('DDungeonGenerator.Generate','Generation thread is buisy! Aborting...');
     exit;
   end;
   fisWorking := true;
-
-  InitParameters;
 
   t1 := now;
   repeat
@@ -512,6 +525,7 @@ begin
   until (map.Volume>=parameters.Volume) and (map.MaxDepth+1>=parameters.minz); {until map meets the paramters}
   WriteLnLog('DDungeonGenerator.Generate','Job finished in = '+inttostr(round((now-t1)*24*60*60*1000))+'ms');
   // finalize
+  ShrinkMap;
   MakeMinimap;
 
   fisWorking := false;
@@ -658,6 +672,21 @@ begin
       end;
     end;
   writeLnLog('DDungeonGenerator.MakeMinimap',inttostr(length(Map.img)));
+end;
+
+{-------------------------------------------------------------------------}
+
+procedure DDungeonGenerator.ShrinkMap;
+{var ix,iy,iz: integer;
+    maxx,maxy,maxz: integer;
+    minx,miny,minz: integer;}
+begin
+  {only z-resize. Maybe I won't make xy-resizes
+   due to possible blockers problems}
+  if map.maxDepth+1<map.sizez then begin
+    map.sizez := map.maxDepth+1;
+    map.setsize(map.sizex,map.sizey,map.sizez);
+  end;
 end;
 
 {================== 3D DUNGEON GENERATOR ROUTINES ===========================}
