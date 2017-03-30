@@ -145,6 +145,7 @@ begin
   FreeAndNil(GENERATOR);
 
   ZScroll.Min := 0;
+  ZScroll.Position := 0;
   ZScroll.Max := DungeonMap.sizez-1;
   DrawMap;
 end;

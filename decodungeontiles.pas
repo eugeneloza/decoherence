@@ -153,6 +153,7 @@ function StrToAngle(value: string): TAngle;
 
 {check if this tile is Passable - in a safe way}
 function isPassable(value: TTileFace): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+function isLookable(value: TTileFace): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 function isPassable(value: TTileKind): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 {determine x/y shifts introduced by current Angle}
 function a_dx(Angle: TAngle): integer; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
@@ -243,6 +244,10 @@ end;
 {---------------------------------------------------------------------------}
 
 function isPassable(value: TTileFace): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+begin
+  if value >= tfFree then result := true else result := false;
+end;
+function isLookable(value: TTileFace): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
   if value >= tfFree then result := true else result := false;
 end;

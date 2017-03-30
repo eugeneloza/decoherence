@@ -119,9 +119,9 @@ type
   {a set of map generation parameters}
   DGeneratorParameters = record
     {the map cannot be larger than these}
-    maxx,maxy,maxz: integer;
+    maxx,maxy,maxz: TIntCoordinate;
     {the map cannot be smaller than these}
-    minx,miny,minz: integer;
+    minx,miny,minz: TIntCoordinate;
     {target map volume. The map will be regenerated until it's met
      Usually the algorithm can handle up to ~30% packaging of maxx*maxy*maxz}
     Volume: integer;
@@ -211,7 +211,8 @@ type
     {current size of the dynamic array}
     maxsteps: integer;
     {current (the last used) step of the generator;
-     careful, currentStep starts from -1, while corresponding min/max steps start from 0}
+     careful, currentStep starts from -1, while corresponding min/max steps start from 0
+     so conversion is min/maxStep = currentStep+1}
     CurrentStep: integer;
     {adds +1 to CurrentStep and resizes the array if necessary}
     procedure incCurrentStep; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
@@ -261,7 +262,7 @@ type
     procedure ForceReady;
     {MUST BE MANUALLY RUN BEFORE GENERATION (best if outside the thread)
      initialize parameters and load pre-generated tiles
-     Will raise exception if parameters are not loaded
+     Will attempt automatic initialization if possible
      Use ForceReady to define parameters manually}
     procedure InitParameters;
     { the main procedure to generate a dungeon,
@@ -274,16 +275,39 @@ type
     {loads and applies the map parameters}
     procedure Load(filename: string);
     
-    //save temp state to file
+    //save temp state to file ---- unneeded for now
   protected
     { here we simply launch "Generate" in a Thread }
       procedure Execute; override;
 end;
 
+type TIntMapArray = array of array of array of integer;
+type
+  {coordinate of a raycast_to candidate}
+  Txyz = record
+    x,y,z: TIntCoordinate;
+  end;
+type TRaycastList = specialize TGenericStructList<Txyz>;
+
 type
   {this is a Dungeon Generator with additional 3D world generation,
    and linked stuff like raycast and chunk-n-slice the dungeon into parts}
   D3DDungeonGenerator = class(DDungeonGenerator)
+  private
+    const MaxNeighboursIndex = 1000;
+    const FailedIndex = -1000;
+    const CandidateIndex = -1;
+  private
+    TileIndexMap: TIntMapArray;
+    {resizes and zeroes the given map}
+    procedure PrepareIntegerMap(var inMap: TIntMapArray);
+    {puts tile # markers on a map to detect which tile is here}
+    procedure MakeTileIndexMap;
+    {this procedure raycasts from each and every map base element
+     and returns Neighbours array}
+    procedure Raycast;
+
+    procedure RaycastTile(mx,my,mz: TIntCoordinate); {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
   public
     {launches DDungeonGenerator.Generate and builds 3D world afterwards
      can be launched directly for debugging}
@@ -467,7 +491,6 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-
 procedure DDungeonGenerator.Generate;
 var i: integer;
     t1,t2: TDateTime;
@@ -523,6 +546,9 @@ begin
     WriteLnLog('DDungeonGenerator.Generate','Map volume = '+inttostr(map.Volume) +'/'+inttostr(parameters.volume));
     WriteLnLog('DDungeonGenerator.Generate','Map volume = '+inttostr(map.MaxDepth+1)+'/'+inttostr(parameters.minz));
   until (map.Volume>=parameters.Volume) and (map.MaxDepth+1>=parameters.minz); {until map meets the paramters}
+  //finally resize the dynamic array
+  MaxSteps := CurrentStep+1;
+  SetLength(Gen,MaxSteps);
   WriteLnLog('DDungeonGenerator.Generate','Job finished in = '+inttostr(round((now-t1)*24*60*60*1000))+'ms');
   // finalize
   ShrinkMap;
@@ -534,7 +560,7 @@ end;
 {-----------------------------------------------------------------------------}
 
 function DDungeonGenerator.GetMap: DMap;
-var ix,iy,iz: integer;
+var ix,iy,iz: TIntCoordinate;
 begin
   Result := DMap.create;
   Result.setsize(Map.sizex,Map.sizey,Map.sizez);
@@ -565,7 +591,7 @@ end;
 {-----------------------------------------------------------------------------}
 
 function DDungeonGenerator.AddTile(tile: TTileType; x,y,z: TIntCoordinate): boolean;
-var jx,jy,jz:integer;
+var jx,jy,jz: TIntCoordinate;
 begin
   Result := false;
   //check all tiles against map area they are placed to
@@ -589,7 +615,7 @@ end;
 {-----------------------------------------------------------------------------}
 
 procedure DDungeonGenerator.AddTileUnsafe(tile: DGeneratorTile; x,y,z: TIntCoordinate); {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
-var jx,jy,jz: integer;
+var jx,jy,jz: TIntCoordinate;
     a: TAngle;
 begin
   for jx := 0 to tile.sizex-1 do
@@ -648,7 +674,8 @@ end;
 {----------------------------------------------------------------------------}
 
 procedure DDungeonGenerator.MakeMinimap;
-var i,j: integer;
+var i: integer;
+    iz: TIntCoordinate;
     a: TAngle;
 begin
   Map.FreeMinimap;
@@ -659,14 +686,14 @@ begin
     Map.img[i].Clear(Vector4Byte(0,0,0,0));
   end;
   for i := 0 to currentStep do
-    for j := 0 to tiles[Gen[i].tile].sizez-1 do begin
+    for iz := 0 to tiles[Gen[i].tile].sizez-1 do begin
       if not tiles[Gen[i].tile].blocker then begin
-        tiles[Gen[i].tile].img[j].DrawTo(Map.img[j+Gen[i].z], Gen[i].x*16,
+        tiles[Gen[i].tile].img[iz].DrawTo(Map.img[iz+Gen[i].z], Gen[i].x*16,
              (Map.sizey-Gen[i].y-tiles[Gen[i].tile].sizey)*16, dmBlendSmart);
       end else begin
         for a in THorizontalAngle do
           if isPassable(tiles[Gen[i].tile].Map[0,0,0].faces[a]) then
-            tiles[Gen[i].tile].img[j].DrawTo(Map.img[j+Gen[i].z], (Gen[i].x+a_dx(a))*16,
+            tiles[Gen[i].tile].img[iz].DrawTo(Map.img[iz+Gen[i].z], (Gen[i].x+a_dx(a))*16,
                  (Map.sizey-(Gen[i].y+a_dy(a))-tiles[Gen[i].tile].sizey)*16, dmBlendSmart);
 
       end;
@@ -677,11 +704,11 @@ end;
 {-------------------------------------------------------------------------}
 
 procedure DDungeonGenerator.ShrinkMap;
-{var ix,iy,iz: integer;
-    maxx,maxy,maxz: integer;
-    minx,miny,minz: integer;}
+{var ix,iy,iz: TIntCoordinate;
+    maxx,maxy,maxz: TIntCoordinate;
+    minx,miny,minz: TIntCoordinate;}
 begin
-  {only z-resize. Maybe I won't make xy-resizes
+  {only z-resize now. Maybe I won't make xy-resizes
    due to possible blockers problems}
   if map.maxDepth+1<map.sizez then begin
     map.sizez := map.maxDepth+1;
@@ -691,9 +718,120 @@ end;
 
 {================== 3D DUNGEON GENERATOR ROUTINES ===========================}
 
-procedure D3DDungeonGenerator.Generate3D;
+procedure D3DDungeonGenerator.PrepareIntegerMap(var inMap: TIntMapArray);
+var ix,iy,iz: TIntCoordinate;
 begin
+  setLength(inMap,Map.sizex);
+  for ix := 0 to map.sizex-1 do begin
+    setLength(inMap[ix],map.sizey);
+    for iy := 0 to map.sizey-1 do begin
+      setLength(inMap[ix,iy],map.sizez);
+      for iz := 0 to map.sizez-1 do
+        inMap[ix,iy,iz] := 0;
+    end;
+  end;
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure D3DDungeonGenerator.MakeTileIndexMap;
+var i: integer;
+    ix,iy,iz: TIntCoordinate;
+begin
+  PrepareIntegerMap(TileIndexMap);
+  for i := 0 to maxsteps-1 do with Tiles[Gen[i].tile] do if not blocker then // we don't count blockers here, they are not normal tiles :) We'll have to add them later
+    for ix := 0 to sizex-1 do
+      for iy := 0 to sizey-1 do
+        for iz := 0 to sizez-1 do
+           TileIndexMap[ix+gen[i].x,iy+gen[i].y,iz+gen[i].z] := i;
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure D3DDungeonGenerator.RaycastTile(mx,my,mz: TIntCoordinate); {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+var
+    HelperMap: TIntMapArray;
+    raycastList,OldList: TRaycastList;
+    procedure SetCandidate(x,y,z: TIntCoordinate); {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+    var NewCandidate: Txyz;
+    begin
+      {looks redundant but let it be here for now}
+      if (x>=0) and (y>=0) and (z>=0) and
+         (x<Map.Sizex) and (y<Map.Sizey) and (z<Map.SizeZ) and
+         (HelperMap[x,y,z]=0) then
+      begin
+        HelperMap[x,y,z] := CandidateIndex;
+        NewCandidate.x := x;
+        NewCandidate.y := y;
+        NewCandidate.z := z;
+        raycastList.Add(NewCandidate);
+      end;
+    end;
+    procedure GrowHelperMap; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+    var {jx,jy,jz: TIntCoordinate;}
+        i: integer;
+        a: TAngle;
+    begin
+      {for jx := 0 to Map.sizex-1 do
+        for jy := 0 to Map.sizey-1 do
+          for jz := 0 to Map.sizez-1 do if HelperMap[jx,jy,jz]>0 then begin
+            //if Map.Map[jx,jy,jz]
+          end; }
+      {$Warning z-pass has problems? Keep your eye on it!}
+      for i := 0 to OldList.Count-1 do
+        for a in TAngle do
+          if isLookable(Map.Map[OldList[i].x,OldList[i].y,OldList[i].z].faces[a]) then
+            SetCandidate(OldList[i].x+a_dx(a),OldList[i].y+a_dy(a),OldList[i].z+a_dz(a));
+
+    end;
+begin
+  //init HelperMap and raycast list
+  RaycastList := TRaycastList.Create;
+  OldList := nil;
+  PrepareIntegerMap(HelperMap);
+  SetCandidate(mx,my,mz); //seed for the grow of the map
+  HelperMap[mx,my,mz] := MaxNeighboursIndex; //and already define it.
+
+  repeat
+    //re-init all the variables, grow the map
+    FreeAndNil(OldList);
+    OldList := RaycastList;
+    RaycastList := TRaycastList.create;
+    GrowHelperMap;
+    //raycast candidates
+    //raycast mx,my,mz -> RaycastList[i]
+  until RaycastList.Count=0;
+
+  FreeAndNil(OldList);
+  FreeAndNil(RaycastList);
+end;
+
+{-----------------------------------------------------------------------}
+
+{just a scaling coefficient to avoid float numbers}
+procedure D3DDungeonGenerator.Raycast;
+var ix,iy,iz: TIntCoordinate;
+begin
+ for ix := 0 to Map.sizex-1 do
+   for iy := 0 to Map.sizey-1 do
+     for iz := 0 to Map.sizez-1 do if TileIndexMap[ix,iy,iz]>0 then
+       RaycastTile(ix,iy,iz);
+end;
+
+{------------------------------------------------------------------------}
+
+procedure D3DDungeonGenerator.Generate3D;
+var t: TDateTime;
+begin
+  //make the logic map
   Generate;
+  //raycast
+  writeLnLog('D3DDungeonGenerator.Generate3D','Raycasting started...');
+  t := now;
+  MakeTileIndexMap;
+  Raycast;
+  writeLnLog('D3DDungeonGenerator.Generate3D','Raycasting finished in '+inttostr(round(now-t)*24*60*60*1000)+'ms...');
+  //chunk-n-slice
   //make 3D world
 end;
 
