@@ -22,7 +22,8 @@ unit decodungeongenerator;
 interface
 
 uses Classes, CastleRandom, fgl, CastleGenericLists,
-  decodungeontiles;
+  decodungeontiles,
+  decoglobal;
 
 type
   {maybe I'll change it later}
@@ -294,20 +295,24 @@ type
    and linked stuff like raycast and chunk-n-slice the dungeon into parts}
   D3DDungeonGenerator = class(DDungeonGenerator)
   private
-    const MaxNeighboursIndex = 1000;
+    const MaxNeighboursIndex = 100;
     const FailedIndex = -1000;
-    const CandidateIndex = -1;
+    //const CandidateIndex = -1;
+    const CornerCount = 8*8;
   private
     TileIndexMap: TIntMapArray;
-    {resizes and zeroes the given map}
-    procedure PrepareIntegerMap(var inMap: TIntMapArray);
+    {returns an integer array of (map.sizex,map.sizey,map.sizez) size}
+    function ZeroIntegerMap: TIntMapArray;
     {puts tile # markers on a map to detect which tile is here}
     procedure MakeTileIndexMap;
     {this procedure raycasts from each and every map base element
      and returns Neighbours array}
     procedure Raycast;
-
+    {preforms all possible raycasting from a given tile}
     procedure RaycastTile(mx,my,mz: TIntCoordinate); {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+    {raycasts a single ray from x1y1z1 to x2y2z2
+     returns true if ray can pass, false otherwise}
+    function Ray(x1,y1,z1,x2,y2,z2: float): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
   public
     {launches DDungeonGenerator.Generate and builds 3D world afterwards
      can be launched directly for debugging}
@@ -320,8 +325,7 @@ type
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
-uses SysUtils, CastleLog, CastleFilesUtils, CastleImages, CastleVectors,
-  decoglobal;
+uses SysUtils, CastleLog, CastleFilesUtils, CastleImages, CastleVectors;
 
 {========================= GENERATION ALGORITHM ==============================}
 
@@ -718,16 +722,16 @@ end;
 
 {================== 3D DUNGEON GENERATOR ROUTINES ===========================}
 
-procedure D3DDungeonGenerator.PrepareIntegerMap(var inMap: TIntMapArray);
+function D3DDungeonGenerator.ZeroIntegerMap: TIntMapArray;
 var ix,iy,iz: TIntCoordinate;
 begin
-  setLength(inMap,Map.sizex);
+  setLength(Result,Map.sizex);
   for ix := 0 to map.sizex-1 do begin
-    setLength(inMap[ix],map.sizey);
+    setLength(Result[ix],map.sizey);
     for iy := 0 to map.sizey-1 do begin
-      setLength(inMap[ix,iy],map.sizez);
+      setLength(Result[ix,iy],map.sizez);
       for iz := 0 to map.sizez-1 do
-        inMap[ix,iy,iz] := 0;
+        Result[ix,iy,iz] := 0;
     end;
   end;
 end;
@@ -738,7 +742,7 @@ procedure D3DDungeonGenerator.MakeTileIndexMap;
 var i: integer;
     ix,iy,iz: TIntCoordinate;
 begin
-  PrepareIntegerMap(TileIndexMap);
+  TileIndexMap := ZeroIntegerMap;
   for i := 0 to maxsteps-1 do with Tiles[Gen[i].tile] do if not blocker then // we don't count blockers here, they are not normal tiles :) We'll have to add them later
     for ix := 0 to sizex-1 do
       for iy := 0 to sizey-1 do
@@ -748,47 +752,127 @@ end;
 
 {----------------------------------------------------------------------------}
 
+function D3DDungeonGenerator.Ray(x1,y1,z1,x2,y2,z2: float): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+var //anglex,angley,anglez: TAngle;
+    vx,vy,vz,a: float;
+    ix,iy,iz: integer;
+begin
+  Result := false;
+
+  {sorry for my horrible discrete math :(
+   But this was the only way I could do the raycasting efficiently
+   anybody is welcome to improve!}
+
+  {define the parametric vector}
+  vx := x2-x1;
+  vy := y2-y1;
+  vz := z2-z1;
+
+  {define the faces affected / non-needed:inlined}
+  {if x2>x1 then anglex := aRight else anglex := aLeft;
+  if y2>y1 then angley := aBottom else angley := aTop;
+  if z2>z1 then anglez := aDown else anglez := aUp;}
+
+  {raycat all the faces can be affected
+   we don't care about checking faces sequentially.
+   The "longest" the algorithm will work for all-open faces
+   and will give up as soon as it encounters at least one blocker faces
+   with result "false"}
+
+  if x2>x1 then
+    for ix := trunc(x1) to trunc(x2)-1 do begin
+      a := (ix-x1+1)/vx;
+      iy := trunc(y1+a*vy);
+      iz := trunc(z1+a*vz);
+      if not IsLookable(Map.map[ix,iy,iz].faces[aRight]) then exit;
+    end
+  else
+    for ix := trunc(x2) to trunc(x1)-1 do begin
+      a := (ix-x1+1)/vx;
+      iy := trunc(y1+a*vy);
+      iz := trunc(z1+a*vz);
+      if not IsLookable(Map.map[ix,iy,iz].faces[aLeft]) then exit;
+    end;
+  if y2>y1 then
+    for iy := trunc(y1) to trunc(y2)-1 do begin
+      a := (iy-y1+1)/vy;
+      ix := trunc(x1+a*vx);
+      iz := trunc(z1+a*vz);
+      if not IsLookable(Map.map[ix,iy,iz].faces[aTop]) then exit;
+    end
+  else
+    for iy := trunc(y2) to trunc(y1)-1 do begin
+      a := (iy-y1+1)/vy;
+      ix := trunc(x1+a*vx);
+      iz := trunc(z1+a*vz);
+      if not IsLookable(Map.map[ix,iy,iz].faces[aBottom]) then exit;
+    end;
+  if z2>z1 then
+    for iz := trunc(z1) to trunc(z2)-1 do begin
+      a := (iz-z1+1)/vz;
+      ix := trunc(x1+a*vx);
+      iy := trunc(y1+a*vy);
+      if not IsLookable(Map.map[ix,iy,iz].faces[aDown]) then exit;
+    end
+  else
+    for iz := trunc(z2) to trunc(z1)-1 do begin
+      a := (iz-z1+1)/vz;
+      ix := trunc(x1+a*vx);
+      iy := trunc(y1+a*vy);
+      if not IsLookable(Map.map[ix,iy,iz].faces[aUp]) then exit;
+    end;
+
+  Result := true;
+end;
+
+{----------------------------------------------------------------------------}
+
 procedure D3DDungeonGenerator.RaycastTile(mx,my,mz: TIntCoordinate); {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 var
     HelperMap: TIntMapArray;
     raycastList,OldList: TRaycastList;
+    j: integer;
+    raycount,raytrue: integer;
+
+    {safely set a tile candidate}
     procedure SetCandidate(x,y,z: TIntCoordinate); {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
     var NewCandidate: Txyz;
     begin
-      {looks redundant but let it be here for now}
+      {looks redundant as "open face" can't go into void
+       but let it be here for now}
       if (x>=0) and (y>=0) and (z>=0) and
          (x<Map.Sizex) and (y<Map.Sizey) and (z<Map.SizeZ) and
          (HelperMap[x,y,z]=0) then
       begin
-        HelperMap[x,y,z] := CandidateIndex;
+        //HelperMap[x,y,z] := CandidateIndex;
         NewCandidate.x := x;
         NewCandidate.y := y;
         NewCandidate.z := z;
         raycastList.Add(NewCandidate);
       end;
     end;
+    {advance a next step of candidate tiles}
     procedure GrowHelperMap; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
-    var {jx,jy,jz: TIntCoordinate;}
-        i: integer;
+    var i: integer;
         a: TAngle;
     begin
-      {for jx := 0 to Map.sizex-1 do
-        for jy := 0 to Map.sizey-1 do
-          for jz := 0 to Map.sizez-1 do if HelperMap[jx,jy,jz]>0 then begin
-            //if Map.Map[jx,jy,jz]
-          end; }
-      {$Warning z-pass has problems? Keep your eye on it!}
+      {$Hint floor/ceiling problems? Keep your eye on it!}
       for i := 0 to OldList.Count-1 do
-        for a in TAngle do
-          if isLookable(Map.Map[OldList[i].x,OldList[i].y,OldList[i].z].faces[a]) then
-            SetCandidate(OldList[i].x+a_dx(a),OldList[i].y+a_dy(a),OldList[i].z+a_dz(a));
-
+        if HelperMap[OldList[i].x,OldList[i].y,OldList[i].z]>0 then
+          for a in TAngle do
+            if isLookable(Map.Map[OldList[i].x,OldList[i].y,OldList[i].z].faces[a]) then
+              SetCandidate(OldList[i].x+a_dx(a),OldList[i].y+a_dy(a),OldList[i].z+a_dz(a));
+    end;
+    {raycast 8 corners of one tile to another}
+    procedure RayCastCorners(cand: integer);
+    begin
+      {not available yet!}
     end;
 begin
   //init HelperMap and raycast list
   RaycastList := TRaycastList.Create;
   OldList := nil;
-  PrepareIntegerMap(HelperMap);
+  HelperMap := ZeroIntegerMap;
   SetCandidate(mx,my,mz); //seed for the grow of the map
   HelperMap[mx,my,mz] := MaxNeighboursIndex; //and already define it.
 
@@ -797,9 +881,31 @@ begin
     FreeAndNil(OldList);
     OldList := RaycastList;
     RaycastList := TRaycastList.create;
+    //get candidates
     GrowHelperMap;
-    //raycast candidates
-    //raycast mx,my,mz -> RaycastList[i]
+
+    //raycast mx,my,mz -> RaycastList[i] (candidates)
+    for j := 0 to RaycastList.count-1 do begin
+      RayCount := 0;
+      RayTrue := 0;
+      //raycast 8 corners (an optimization trick) 8*8=64=CornerCount
+      //not done yet
+      //RayCastCorners(j);
+      //Monte-Carlo raycast;
+      repeat
+        inc(RayCount);
+        if Ray(mx              +RNDM.Random,my              +RNDM.Random,mz              +RNDM.Random,
+               RayCastList[j].x+RNDM.Random,RayCastList[j].y+RNDM.Random,RayCastList[j].z+RNDM.Random)
+        then inc(RayTrue);
+      until ((RayTrue >= RayCount div 2) or (RayCount >= MaxNeighboursIndex)) and (rayCount>CornerCount);
+
+      if RayTrue>0 then
+        HelperMap[RayCastList[j].x,RayCastList[j].y,RayCastList[j].z] := MaxNeighboursIndex * RayTrue div RayCount
+      else
+        HelperMap[RayCastList[j].x,RayCastList[j].y,RayCastList[j].z] := FailedIndex;
+
+      //if RayTrue>0 then writeLnLog(inttostr(mx)+','+inttostr(my)+','+inttostr(mz)+' - '+inttostr(round(100*RayTrue/RayCount)));
+    end;
   until RaycastList.Count=0;
 
   FreeAndNil(OldList);
@@ -830,7 +936,7 @@ begin
   t := now;
   MakeTileIndexMap;
   Raycast;
-  writeLnLog('D3DDungeonGenerator.Generate3D','Raycasting finished in '+inttostr(round(now-t)*24*60*60*1000)+'ms...');
+  writeLnLog('D3DDungeonGenerator.Generate3D','Raycasting finished in '+inttostr(round((now-t)*24*60*60*1000))+'ms...');
   //chunk-n-slice
   //make 3D world
 end;

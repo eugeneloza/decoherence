@@ -104,12 +104,12 @@ uses StrUtils, CastleLog, castleimages, castlevectors,
 {-------------------------------------------------------------------------}
 
 procedure TMapEditor.GenerateButtonClick(Sender: TObject);
-var GENERATOR: DDungeonGenerator;
+var GENERATOR: D3dDungeonGenerator;
   i: integer;
   fs: DFirstStep;
 begin
   FreeAndNil(DungeonMap);
-  GENERATOR := DDungeonGenerator.Create;
+  GENERATOR := D3dDungeonGenerator.Create;
   //GENERATOR.load('');
   with GENERATOR.parameters do begin
     maxx := strToInt(EditSizeX.text);
@@ -138,7 +138,7 @@ begin
   end;
   GENERATOR.ForceReady;
   GENERATOR.InitParameters;
-  GENERATOR.Generate;
+  GENERATOR.Generate3d;
 
   DungeonMap := GENERATOR.GetMap;
 
