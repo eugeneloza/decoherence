@@ -290,12 +290,16 @@ type
   end;
 type TRaycastList = specialize TGenericStructList<Txyz>;
 
+type TNeighboursMapArray = array of array of array of TIndexList;
+
 type
   {this is a Dungeon Generator with additional 3D world generation,
    and linked stuff like raycast and chunk-n-slice the dungeon into parts}
   D3DDungeonGenerator = class(DDungeonGenerator)
   private
-    const MaxNeighboursIndex = 100;
+    {how accurate will be determination of the "visible tile or not"
+     64 is the basic number (cornerCount), actually 128 should be enough}
+    const MaxNeighboursIndex = 128;
     const FailedIndex = -1000;
     //const CandidateIndex = -1;
     const CornerCount = 8*8;
@@ -305,6 +309,12 @@ type
     function ZeroIntegerMap: TIntMapArray;
     {puts tile # markers on a map to detect which tile is here}
     procedure MakeTileIndexMap;
+  private
+    {temporary map for first-order neighbours lists}
+    TmpNeighboursMap: TNeighboursMapArray;
+    {initializes a neighbours map with nils}
+    function NilIndexMap: TNeighboursMapArray;
+  private
     {this procedure raycasts from each and every map base element
      and returns Neighbours array}
     procedure Raycast;
@@ -313,6 +323,8 @@ type
     {raycasts a single ray from x1y1z1 to x2y2z2
      returns true if ray can pass, false otherwise}
     function Ray(x1,y1,z1,x2,y2,z2: float): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+    {chunks the map according to the visibility of the tiles}
+    procedure Chunk_N_Slice;
   public
     {launches DDungeonGenerator.Generate and builds 3D world afterwards
      can be launched directly for debugging}
@@ -735,6 +747,19 @@ begin
     end;
   end;
 end;
+function D3DDungeonGenerator.NilIndexMap: TNeighboursMapArray;
+var ix,iy,iz: TIntCoordinate;
+begin
+  setLength(Result,Map.sizex);
+  for ix := 0 to map.sizex-1 do begin
+    setLength(Result[ix],map.sizey);
+    for iy := 0 to map.sizey-1 do begin
+      setLength(Result[ix,iy],map.sizez);
+      for iz := 0 to map.sizez-1 do
+        Result[ix,iy,iz] := nil;    //might be redundant, but let it be
+    end;
+  end;
+end;
 
 {----------------------------------------------------------------------------}
 
@@ -864,10 +889,17 @@ var
               SetCandidate(OldList[i].x+a_dx(a),OldList[i].y+a_dy(a),OldList[i].z+a_dz(a));
     end;
     {raycast 8 corners of one tile to another}
-    procedure RayCastCorners(cand: integer);
+    {procedure RayCastCorners(cand: integer);
     begin
-      {not available yet!}
-    end;
+      //not available yet!
+      for dx:=0 to 1 do
+       for dy:=0 to 1 do
+        for dz:=0 to 1 do begin
+          if dx=0 then x0:=ix+raycast_corner_accuracy*(random+0.1) else x0:=ix+1-raycast_corner_accuracy*(random+0.1);
+          if dy=0 then y0:=iy+raycast_corner_accuracy*(random+0.1) else y0:=iy+1-raycast_corner_accuracy*(random+0.1);
+          if dz=0 then z0:=iz+raycast_corner_accuracy*(random+0.1) else z0:=iz+1-raycast_corner_accuracy*(random+0.1);
+        end;
+    end;}
 begin
   //init HelperMap and raycast list
   RaycastList := TRaycastList.Create;
@@ -888,9 +920,11 @@ begin
     for j := 0 to RaycastList.count-1 do begin
       RayCount := 0;
       RayTrue := 0;
+
       //raycast 8 corners (an optimization trick) 8*8=64=CornerCount
       //not done yet
       //RayCastCorners(j);
+
       //Monte-Carlo raycast;
       repeat
         inc(RayCount);
@@ -908,6 +942,10 @@ begin
     end;
   until RaycastList.Count=0;
 
+  //convert HelperMap to NeighbourList
+
+  TmpNeighboursMap[mx,my,mz] := TIndexList.create;
+
   FreeAndNil(OldList);
   FreeAndNil(RaycastList);
 end;
@@ -918,10 +956,31 @@ end;
 procedure D3DDungeonGenerator.Raycast;
 var ix,iy,iz: TIntCoordinate;
 begin
+ TmpNeighboursMap := NilIndexMap; //create a nil-initialized neighbours lists of all accessible map tiles
+
  for ix := 0 to Map.sizex-1 do
    for iy := 0 to Map.sizey-1 do
-     for iz := 0 to Map.sizez-1 do if TileIndexMap[ix,iy,iz]>0 then
+     for iz := 0 to Map.sizez-1 do if TileIndexMap[ix,iy,iz]>0 {and is accessible} then
        RaycastTile(ix,iy,iz);
+
+ for ix := 0 to Map.sizex-1 do
+   for iy := 0 to Map.sizey-1 do
+     for iz := 0 to Map.sizez-1 do if TmpNeighboursMap[ix,iy,iz]<>nil then begin
+       //process neighbours
+     end;
+
+ //and free temporary map
+ for ix := 0 to Map.sizex-1 do
+   for iy := 0 to Map.sizey-1 do
+     for iz := 0 to Map.sizez-1 do
+       freeAndNil(TmpNeighboursMap[ix,iy,iz]);
+end;
+
+{------------------------------------------------------------------------}
+
+procedure D3DDungeonGenerator.Chunk_N_Slice;
+begin
+
 end;
 
 {------------------------------------------------------------------------}
