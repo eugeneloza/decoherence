@@ -290,7 +290,17 @@ type
   end;
 type TRaycastList = specialize TGenericStructList<Txyz>;
 
-type TNeighboursMapArray = array of array of array of TIndexList;
+type
+  {a two-value description of a "neighbour" tile}
+  DNehighbour = record
+    {index of current tile}
+    tile: TTileType;
+    {visiblity of the tile ~spatial angle}
+    visible: integer;
+  end;
+
+type TNeighboursList = specialize TGenericStructList<DNeighbour>;
+type TNeighboursMapArray = array of array of array of TNeighboursList;
 
 type
   {this is a Dungeon Generator with additional 3D world generation,
@@ -304,6 +314,9 @@ type
     //const CandidateIndex = -1;
     const CornerCount = 8*8;
   private
+    {a map that stores tiles markers for quick access...
+     maybe not needed?
+     TODO: must be freed!!!!}
     TileIndexMap: TIntMapArray;
     {returns an integer array of (map.sizex,map.sizey,map.sizez) size}
     function ZeroIntegerMap: TIntMapArray;
@@ -857,6 +870,7 @@ var
     HelperMap: TIntMapArray;
     raycastList,OldList: TRaycastList;
     j: integer;
+    nx,ny,nz: integer;
     raycount,raytrue: integer;
 
     {safely set a tile candidate}
@@ -945,6 +959,15 @@ begin
   //convert HelperMap to NeighbourList
 
   TmpNeighboursMap[mx,my,mz] := TIndexList.create;
+  //make a list of neighbours
+  for nx := 0 to Map.sizex-1 do
+    for ny := 0 to map.sizey-1 do
+      for nz := 0 to map.sizez-1 do if HelperMap[nx,ny,nz]<>0 then begin
+        TmpNeighboursMap[mx,my,mz].add(TileIndexMap[nx,ny,nz]);
+        //add blockers!!!
+      end;
+
+  //RemoveDuplicates(TmpNeighboursMap[mx,my,mz]);
 
   FreeAndNil(OldList);
   FreeAndNil(RaycastList);
