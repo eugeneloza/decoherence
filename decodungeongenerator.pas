@@ -272,6 +272,7 @@ type
 
     constructor Create;// override;
     destructor Destroy; override;
+    procedure FreeLists;
     
     {loads and applies the map parameters}
     procedure Load(filename: string);
@@ -292,7 +293,7 @@ type TRaycastList = specialize TGenericStructList<Txyz>;
 
 type
   {a two-value description of a "neighbour" tile}
-  DNehighbour = record
+  DNeighbour = record
     {index of current tile}
     tile: TTileType;
     {visiblity of the tile ~spatial angle}
@@ -322,6 +323,8 @@ type
     function ZeroIntegerMap: TIntMapArray;
     {puts tile # markers on a map to detect which tile is here}
     procedure MakeTileIndexMap;
+    {ugly fix not to store a dynamic TileIndexMap array for all the lifetime of the generator}
+    procedure FreeTileIndexMap;
   private
     {temporary map for first-order neighbours lists}
     TmpNeighboursMap: TNeighboursMapArray;
@@ -575,11 +578,15 @@ begin
     WriteLnLog('DDungeonGenerator.Generate','Map volume = '+inttostr(map.Volume) +'/'+inttostr(parameters.volume));
     WriteLnLog('DDungeonGenerator.Generate','Map volume = '+inttostr(map.MaxDepth+1)+'/'+inttostr(parameters.minz));
   until (map.Volume>=parameters.Volume) and (map.MaxDepth+1>=parameters.minz); {until map meets the paramters}
+
   //finally resize the dynamic array
   MaxSteps := CurrentStep+1;
   SetLength(Gen,MaxSteps);
   WriteLnLog('DDungeonGenerator.Generate','Job finished in = '+inttostr(round((now-t1)*24*60*60*1000))+'ms');
+
   // finalize
+  FreeLists; //we no longer need them
+
   ShrinkMap;
   MakeMinimap;
 
@@ -788,6 +795,17 @@ begin
            TileIndexMap[ix+gen[i].x,iy+gen[i].y,iz+gen[i].z] := i;
 end;
 
+procedure D3DDungeonGenerator.FreeTileIndexMap;
+var ix,iy,iz: TIntCoordinate;
+begin
+  for ix := 0 to map.sizex-1 do begin
+    for iy := 0 to map.sizey-1 do
+      setLength(Result[ix,iy],0);
+    setLength(Result[ix],0);
+  end;
+  setLength(Result,0);
+end;
+
 {----------------------------------------------------------------------------}
 
 function D3DDungeonGenerator.Ray(x1,y1,z1,x2,y2,z2: float): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
@@ -872,6 +890,7 @@ var
     j: integer;
     nx,ny,nz: integer;
     raycount,raytrue: integer;
+    Neighbour: DNeighbour;
 
     {safely set a tile candidate}
     procedure SetCandidate(x,y,z: TIntCoordinate); {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
@@ -958,13 +977,24 @@ begin
 
   //convert HelperMap to NeighbourList
 
-  TmpNeighboursMap[mx,my,mz] := TIndexList.create;
+  TmpNeighboursMap[mx,my,mz] := TNeighboursList.create;
   //make a list of neighbours
   for nx := 0 to Map.sizex-1 do
     for ny := 0 to map.sizey-1 do
-      for nz := 0 to map.sizez-1 do if HelperMap[nx,ny,nz]<>0 then begin
-        TmpNeighboursMap[mx,my,mz].add(TileIndexMap[nx,ny,nz]);
-        //add blockers!!!
+      for nz := 0 to map.sizez-1 do if HelperMap[nx,ny,nz]>0 then begin
+        Neighbour.tile := TileIndexMap[nx,ny,nz];
+        Neighbour.visible := HelperMap[nx,ny,nz];
+        TmpNeighboursMap[mx,my,mz].add(Neighbour);
+
+        //Add blockers
+        //THIS IS UGLY AND INEFFICIENT both on CPU and RAM!!!
+        for j := 0 to maxsteps do if Tiles[Gen[j].tile].blocker then
+          if (gen[j].x=nx) and (gen[j].y=ny) and (gen[j].z=nz) then begin
+            {$Warning blockers might work wrong! maybe +a_dx(angle) is required!}
+            Neighbour.tile := j;
+            Neighbour.visible := HelperMap[nx,ny,nz];
+            TmpNeighboursMap[mx,my,mz].add(Neighbour);
+          end;
       end;
 
   //RemoveDuplicates(TmpNeighboursMap[mx,my,mz]);
@@ -1003,7 +1033,7 @@ end;
 
 procedure D3DDungeonGenerator.Chunk_N_Slice;
 begin
-
+  {$Warning critical todo}
 end;
 
 {------------------------------------------------------------------------}
@@ -1018,8 +1048,9 @@ begin
   t := now;
   MakeTileIndexMap;
   Raycast;
+  FreeTileIndexMap;
   writeLnLog('D3DDungeonGenerator.Generate3D','Raycasting finished in '+inttostr(round((now-t)*24*60*60*1000))+'ms...');
-  //chunk-n-slice
+  Chunk_N_Slice;
   //make 3D world
 end;
 
@@ -1128,6 +1159,15 @@ end;
 
 {-----------------------------------------------------------------------------}
 
+procedure DDungeonGenerator.FreeLists;
+begin
+  FreeAndNil(NormalTiles);
+  FreeAndNil(PoorTiles);
+  FreeAndNil(BlockerTiles);
+  FreeAndNil(RichTiles);
+  FreeAndNil(DownTiles);
+end;
+
 destructor DDungeonGenerator.Destroy;
 begin
   FreeAndNil(RNDM);
@@ -1135,11 +1175,7 @@ begin
   FreeAndNil(tiles);
   FreeAndNil(parameters.TilesList);
   FreeAndNil(parameters.FirstSteps);
-  FreeAndNil(NormalTiles);
-  FreeAndNil(PoorTiles);
-  FreeAndNil(BlockerTiles);
-  FreeAndNil(RichTiles);
-  FreeAndNil(DownTiles);
+  FreeLists;
   inherited;
 end;
 
