@@ -330,6 +330,9 @@ type
     TmpNeighboursMap: TNeighboursMapArray;
     {initializes a neighbours map with nils}
     function NilIndexMap: TNeighboursMapArray;
+    {remove duplicates in the sorted tiles list
+     this operation is performed twice during the generation, so efficiency is not of concern}
+    procedure RemoveDuplicatesNeighbours(var List: TNeighboursList);
   private
     {this procedure raycasts from each and every map base element
      and returns Neighbours array}
@@ -800,10 +803,10 @@ var ix,iy,iz: TIntCoordinate;
 begin
   for ix := 0 to map.sizex-1 do begin
     for iy := 0 to map.sizey-1 do
-      setLength(Result[ix,iy],0);
-    setLength(Result[ix],0);
+      setLength(TileIndexMap[ix,iy],0);
+    setLength(TileIndexMap[ix],0);
   end;
-  setLength(Result,0);
+  setLength(TileIndexMap,0);
 end;
 
 {----------------------------------------------------------------------------}
@@ -988,7 +991,7 @@ begin
 
         //Add blockers
         //THIS IS UGLY AND INEFFICIENT both on CPU and RAM!!!
-        for j := 0 to maxsteps do if Tiles[Gen[j].tile].blocker then
+        for j := 0 to maxsteps-1 do if Tiles[Gen[j].tile].blocker then
           if (gen[j].x=nx) and (gen[j].y=ny) and (gen[j].z=nz) then begin
             {$Warning blockers might work wrong! maybe +a_dx(angle) is required!}
             Neighbour.tile := j;
@@ -997,10 +1000,30 @@ begin
           end;
       end;
 
-  //RemoveDuplicates(TmpNeighboursMap[mx,my,mz]);
+  RemoveDuplicatesNeighbours(TmpNeighboursMap[mx,my,mz]);
 
   FreeAndNil(OldList);
   FreeAndNil(RaycastList);
+end;
+
+{-----------------------------------------------------------------------}
+
+procedure D3DDungeonGenerator.RemoveDuplicatesNeighbours(var List: TNeighboursList);
+var i: integer;
+begin
+  if list.count<= 1 then exit;
+  i := 0;
+  repeat
+    if List[i].tile = List[i+1].tile then begin
+      {duplicate found, choose the largest value and go delete one duplicate}
+      if List[i].visible < list[i+1].visible then
+        list.Delete(i)
+      else
+        List.Delete(i+1);
+      //"The argument cannot be assigned to" - are you joking???
+    end
+    else inc(i);
+  until i >= List.count-1;
 end;
 
 {-----------------------------------------------------------------------}
@@ -1011,6 +1034,7 @@ var ix,iy,iz: TIntCoordinate;
 begin
  TmpNeighboursMap := NilIndexMap; //create a nil-initialized neighbours lists of all accessible map tiles
 
+ {here we fill in the neighbours}
  for ix := 0 to Map.sizex-1 do
    for iy := 0 to Map.sizey-1 do
      for iz := 0 to Map.sizez-1 do if TileIndexMap[ix,iy,iz]>0 {and is accessible} then
