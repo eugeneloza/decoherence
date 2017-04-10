@@ -330,7 +330,7 @@ type
     TmpNeighboursMap: TNeighboursMapArray;
     {initializes a neighbours map with nils}
     function NilIndexMap: TNeighboursMapArray;
-    {remove duplicates in the sorted tiles list
+    {remove duplicates in the sorted tiles list and (!!!) sorts the array
      this operation is performed twice during the generation, so efficiency is not of concern}
     procedure RemoveDuplicatesNeighbours(var List: TNeighboursList);
   private
@@ -886,6 +886,13 @@ end;
 
 {----------------------------------------------------------------------------}
 
+function CompareNeighbours(i1,i2: DNeighbour): integer;
+begin
+  result := i1.tile - i2.tile;
+end;
+
+{----------------------------------------------------------------------------}
+
 procedure D3DDungeonGenerator.RaycastTile(mx,my,mz: TIntCoordinate); {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 var
     HelperMap: TIntMapArray;
@@ -980,14 +987,14 @@ begin
 
   //convert HelperMap to NeighbourList
 
-  TmpNeighboursMap[mx,my,mz] := TNeighboursList.create;
+  NeighboursMap[mx,my,mz] := TNeighboursList.create;
   //make a list of neighbours
   for nx := 0 to Map.sizex-1 do
     for ny := 0 to map.sizey-1 do
       for nz := 0 to map.sizez-1 do if HelperMap[nx,ny,nz]>0 then begin
         Neighbour.tile := TileIndexMap[nx,ny,nz];
         Neighbour.visible := HelperMap[nx,ny,nz];
-        TmpNeighboursMap[mx,my,mz].add(Neighbour);
+        NeighboursMap[mx,my,mz].add(Neighbour);
 
         //Add blockers
         //THIS IS UGLY AND INEFFICIENT both on CPU and RAM!!!
@@ -996,11 +1003,11 @@ begin
             {$Warning blockers might work wrong! maybe +a_dx(angle) is required!}
             Neighbour.tile := j;
             Neighbour.visible := HelperMap[nx,ny,nz];
-            TmpNeighboursMap[mx,my,mz].add(Neighbour);
+            NeighboursMap[mx,my,mz].add(Neighbour);
           end;
       end;
 
-  RemoveDuplicatesNeighbours(TmpNeighboursMap[mx,my,mz]);
+  RemoveDuplicatesNeighbours(NeighboursMap[mx,my,mz]);
 
   FreeAndNil(OldList);
   FreeAndNil(RaycastList);
@@ -1011,7 +1018,8 @@ end;
 procedure D3DDungeonGenerator.RemoveDuplicatesNeighbours(var List: TNeighboursList);
 var i: integer;
 begin
-  if list.count<= 1 then exit;
+  if list.count <= 1 then exit;
+  List.sort(@CompareNeighbours);
   i := 0;
   repeat
     if List[i].tile = List[i+1].tile then begin
@@ -1020,7 +1028,11 @@ begin
         list.Delete(i)
       else
         List.Delete(i+1);
-      //"The argument cannot be assigned to" - are you joking???
+      {"The argument cannot be assigned to" - are you joking???
+      Really nasty thing about those generic lists! Should keep that in mind
+      P.S. My bad. use List.L[I].Value. See:
+      https://github.com/castle-engine/castle-engine/issues/63#issuecomment-292794723,
+      Thanks, Michalis!}
     end
     else inc(i);
   until i >= List.count-1;
@@ -1032,7 +1044,7 @@ end;
 procedure D3DDungeonGenerator.Raycast;
 var ix,iy,iz: TIntCoordinate;
 begin
- TmpNeighboursMap := NilIndexMap; //create a nil-initialized neighbours lists of all accessible map tiles
+ NeighboursMap := NilIndexMap; //create a nil-initialized neighbours lists of all accessible map tiles
 
  {here we fill in the neighbours}
  for ix := 0 to Map.sizex-1 do
@@ -1040,17 +1052,21 @@ begin
      for iz := 0 to Map.sizez-1 do if TileIndexMap[ix,iy,iz]>0 {and is accessible} then
        RaycastTile(ix,iy,iz);
 
+ {merge the neighbours of neighbours in order for the light to work smoothly}
+ writelnLog('D3DDungeonGenerator.Raycast','Merging neighbours of neighbours...');
  for ix := 0 to Map.sizex-1 do
    for iy := 0 to Map.sizey-1 do
-     for iz := 0 to Map.sizez-1 do if TmpNeighboursMap[ix,iy,iz]<>nil then begin
+     for iz := 0 to Map.sizez-1 do if NeighboursMap[ix,iy,iz]<>nil then begin
+       //writeLnLog('neighbours',inttostr(NeighboursMap[ix,iy,iz].count));
        //process neighbours
+       RemoveDuplicatesNeighbours(NeighboursMap[ix,iy,iz])
      end;
 
  //and free temporary map
  for ix := 0 to Map.sizex-1 do
    for iy := 0 to Map.sizey-1 do
      for iz := 0 to Map.sizez-1 do
-       freeAndNil(TmpNeighboursMap[ix,iy,iz]);
+       freeAndNil(NeighboursMap[ix,iy,iz]);
 end;
 
 {------------------------------------------------------------------------}
