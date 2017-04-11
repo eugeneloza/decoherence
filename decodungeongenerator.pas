@@ -22,13 +22,8 @@ unit decodungeongenerator;
 interface
 
 uses Classes, CastleRandom, fgl, CastleGenericLists,
-  decodungeontiles,
+  decoabstractgenerator, decodungeontiles,
   decoglobal;
-
-type
-  {maybe I'll change it later}
-  TTileType = word;
-  TIntCoordinate = integer;
 
 type
   {a "dock point" of a tile or a map. This is a xyz coordinate of an open face
@@ -147,11 +142,7 @@ type TIndexList = specialize TFPGList<TTileType>;
 type
   { Preforms all map generation routines
     This is a relatively CPU-intensive work therefore must be heavily optimized }
-  DDungeonGenerator = class(TThread)
-  private
-    fisWorking: boolean;
-    fisReady: boolean;
-    fisInitialized: boolean;
+  DDungeonGenerator = class(DAbstractGenerator)
   private
     {list of tiles used in current map}
     Tiles: TTileList;
@@ -200,8 +191,6 @@ type
      in case we need to "narrow" the map}
     function GetPoorTile: TTileType; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
   private
-    { xorshift random generator, fast and thread-safe }
-    RNDM: TCastleRandom;
     {the main operating item - map of the resulting dungeon}
     Map: DGeneratorMap;
 
@@ -250,27 +239,12 @@ type
     function GetMap: DMap;
     //maybe better saveTo when finished?: DMap;
 
-    {is the generator ready to wrok?
-     Generatie will raise an exception if it isn't}
-    property isReady: boolean read fisReady default false;
-    {are the parameters initialized? If no, they'll be init
-     automatically, but its best to do it manually outside the thread}
-    property isInitialized: boolean read fisInitialized default false;
-    {is the generator currently working?}
-    property isWorking: boolean read fisWorking default false;
-    {this forces isReady to true. Must be used only in constructor which skips
-     loading of the map}
-    procedure ForceReady;
-    {MUST BE MANUALLY RUN BEFORE GENERATION (best if outside the thread)
-     initialize parameters and load pre-generated tiles
-     Will attempt automatic initialization if possible
-     Use ForceReady to define parameters manually}
-    procedure InitParameters;
+    procedure InitParameters; override;
     { the main procedure to generate a dungeon,
       may be launched in main thread (for testing or other purposes) }
-    procedure Generate;
+    procedure Generate; override;
 
-    constructor Create;// override;
+    constructor Create; override;
     destructor Destroy; override;
     procedure FreeLists;
     
@@ -327,7 +301,7 @@ type
     procedure FreeTileIndexMap;
   private
     {temporary map for first-order neighbours lists}
-    TmpNeighboursMap: TNeighboursMapArray;
+    NeighboursMap: TNeighboursMapArray;
     {initializes a neighbours map with nils}
     function NilIndexMap: TNeighboursMapArray;
     {remove duplicates in the sorted tiles list and (!!!) sorts the array
@@ -347,7 +321,7 @@ type
   public
     {launches DDungeonGenerator.Generate and builds 3D world afterwards
      can be launched directly for debugging}
-    procedure Generate3D;
+    procedure Generate3D; override;
   protected
     {launches Generate3D in a thread}
     procedure  Execute; override;
@@ -886,7 +860,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-function CompareNeighbours(i1,i2: DNeighbour): integer;
+function CompareNeighbours(const i1,i2: DNeighbour): integer;
 begin
   result := i1.tile - i2.tile;
 end;
@@ -1043,6 +1017,7 @@ end;
 {just a scaling coefficient to avoid float numbers}
 procedure D3DDungeonGenerator.Raycast;
 var ix,iy,iz: TIntCoordinate;
+    dx,dy,dz: TIntCoordinate;
 begin
  NeighboursMap := NilIndexMap; //create a nil-initialized neighbours lists of all accessible map tiles
 
@@ -1059,6 +1034,10 @@ begin
      for iz := 0 to Map.sizez-1 do if NeighboursMap[ix,iy,iz]<>nil then begin
        //writeLnLog('neighbours',inttostr(NeighboursMap[ix,iy,iz].count));
        //process neighbours
+{       for dx := 0 to tiles[NeighboursMap[ix,iy,iz].tile].sizex do
+         for dy := 0 to tiles[NeighboursMap[ix,iy,iz].tile].sizex do
+           for dz := 0 to tiles[NeighboursMap[ix,iy,iz].tile].sizex do {***};
+}
        RemoveDuplicatesNeighbours(NeighboursMap[ix,iy,iz])
      end;
 
@@ -1162,13 +1141,7 @@ begin
   raise Exception.create('DDungeonGenerator.GetTileByName: FATAL! Tile cannot be found!');
 end;
 
-{-----------------------------------------------------------------------------}
 
-procedure DDungeonGenerator.ForceReady;
-begin
-  fisReady := true;
-  WriteLnLog('DDungeonGenerator.ForceReady','Be careful, parameters might not be initialized correctly.');
-end;
 {-----------------------------------------------------------------------------}
 
 procedure DDungeonGenerator.execute;
@@ -1181,10 +1154,6 @@ end;
 constructor DDungeonGenerator.create;
 begin
   inherited;
-  {we create an non-initialized random (i.e. initialized by a stupid constant integer)
-  Just to make sure we don't waste any time (<1ms) on initialization now}
-  RNDM := TCastleRandom.Create(1);
-
   Map := DGeneratorMap.create;
   Tiles := TTileList.Create(true);
   parameters.TilesList := TStringList.create;
@@ -1210,7 +1179,6 @@ end;
 
 destructor DDungeonGenerator.Destroy;
 begin
-  FreeAndNil(RNDM);
   FreeAndNil(Map);
   FreeAndNil(tiles);
   FreeAndNil(parameters.TilesList);
