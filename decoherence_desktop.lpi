@@ -104,7 +104,7 @@
         <PackageName Value="castle_base"/>
       </Item2>
     </RequiredPackages>
-    <Units Count="21">
+    <Units Count="26">
       <Unit0>
         <Filename Value="decoherence_desktop.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -190,6 +190,26 @@
         <Filename Value="decodungeontiles.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit20>
+      <Unit21>
+        <Filename Value="decoabstractworld.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit21>
+      <Unit22>
+        <Filename Value="decodungeongenerator.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit22>
+      <Unit23>
+        <Filename Value="decodungeongenerator_calculatefaces.inc"/>
+        <IsPartOfProject Value="True"/>
+      </Unit23>
+      <Unit24>
+        <Filename Value="decodungeonworld.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit24>
+      <Unit25>
+        <Filename Value="decoabstractgenerator.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit25>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

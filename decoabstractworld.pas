@@ -42,6 +42,7 @@ Type
     fSeed: LongWord;
     { xorshift random generator, fast and thread-safe }
     RNDM: TCastleRandom;
+    LastRender: TDateTime;
   public
     {Seed used to "build" the world if it requires random}
     property Seed: LongWord read fSeed write fSeed;
@@ -63,6 +64,8 @@ Type
     destructor destroy; override;
   End;
 
+var CurrentWorld: DAbstractWorld;
+
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
@@ -74,6 +77,7 @@ begin
   {we create an non-initialized random (i.e. initialized by a stupid constant integer)
   Just to make sure we don't waste any time (<1ms) on initialization now}
   RNDM := TCastleRandom.Create(1);
+  LastRender := -1;
 end;
 
 {------------------------------------------------------------------------------}

@@ -34,7 +34,7 @@ uses Classes, SysUtils,
      CastleVectors, CastleScene,
 
      decogui, decointerface, decomouse, decofont,
-     decolevel, decodungeontiles,
+     decolevel, decodungeontiles, decoabstractworld,
      decoloadscreen, decoperks,
      decointerfacecomposite,
      decoplayercharacter, deco3dLoad,
@@ -104,6 +104,13 @@ begin
               end;
     else {NOP};//no time flow;
   end;
+end;
+
+{-------------------------------------------------------------------------}
+
+procedure WindowManage(Container : TUIContainer);
+begin
+  if CurrentWorld <> nil then CurrentWorld.manage;
 end;
 
 {-------------------------------------------------------------------------}
@@ -238,6 +245,7 @@ begin
   //finally (fonts, random and facts loaded), we're ready to show game loading screen
   {$IFDEF AllowRescale}window.OnResize := @WindowResize;{$ENDIF}
   window.OnRender := @WindowRender;
+  window.OnBeforeRender := @WindowManage;
 
   WritelnLog('ApplicationInitialize','Init finished');
 
