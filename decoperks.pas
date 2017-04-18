@@ -90,9 +90,10 @@ Var perks: DPerksList;
 
 {loads perks data and images}
 Procedure InitPerks;
+procedure FreePerks;
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 Implementation
-uses CastleWindow;
+uses SysUtils, CastleWindow;
 
 Procedure InitPerks;
 Var TmpPerk: DPerk;
@@ -118,6 +119,13 @@ Begin
   Inherited;
 
 End;
+
+{---------------------------------------------------------------------------}
+
+procedure FreePerks;
+begin
+  FreeAndNil(perks);
+end;
 
 end.
 

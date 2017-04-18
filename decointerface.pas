@@ -724,6 +724,7 @@ end;
 
 procedure DSingleInterfaceElement.rescale;
 begin
+  //{$WARNING Memory Leak here}
   if frame <> nil then FrameResize3x3;
   if content <> nil then begin
     //content.base.copyxywh(base);
@@ -752,6 +753,13 @@ destructor DSingleInterfaceElement.destroy;
 begin
   //InterfaceList.Remove(self);
   FreeAndNil(GLFrame);
+  //scaledImage is automatically freed by GlImage
+  {$WARNING BUG: why Scaled image is not freed automatically?????}
+  {BUG: I still need to free ScaledImage - while it's owned by GLImage
+   DAMN IT. The link may be obsolete after freeandnil(GLImage)!
+   Looks like I always set ScaledImage := nil after sucessfuly assigning it,
+   but should keep an eye on it!}
+  FreeAndNil(FrameImage);
   //if owns content destroy it here;
   //if OwnsContent then FreeAndNil(content);  //content usually has AOwner = self
   inherited;
@@ -770,6 +778,7 @@ begin
     writeLnLog('DAbstractInterfaceElement.FrameResize3x3','ERROR: Base is not initialized!');
   end;
 
+  //FreeAndNil(FrameImage);
   FrameImage := frame.SourceImage.CreateCopy as TRGBAlphaImage;
 
   UnscaledWidth := FrameImage.width;
@@ -987,6 +996,7 @@ procedure DInterfaceElement.rescale;
 var i: integer;
 begin
   inherited;
+  //{$WARNING Memory Leak here}
   for i:=0 to children.Count-1 do children[i].rescale;
 end;
 

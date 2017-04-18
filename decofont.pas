@@ -84,9 +84,12 @@ begin
    WritelnLog('DecoFont : InitializeFonts','Fonts loaded successfully.');
 end;
 
+{----------------------------------------------------------------------------}
+
 procedure DestroyFonts;
 begin
   freeAndNil(RegularFont16);
+  FreeAndNil(MyCharSet);
 end;
 
 {-----------------------------------------------------------------------------}

@@ -223,10 +223,6 @@ begin
   window.OnMotion := @doMotion;
   application.LimitFPS := 60;
 
-  //init mouse events
-  WritelnLog('ApplicationInitialize','DTouchList.create');
-  TouchArray := DTouchList.create;
-
   WritelnLog('ApplicationInitialize','Initialize fonts');
   InitializeFonts;      //load fonts
   //InitGlobal;           //start random
@@ -284,6 +280,8 @@ Finalization
   //DestroyGlobal;
   FreeLoadScreen;
   DestroyTiles;
+  FreePerks;
+  DestroyFonts;
   //FreeTextureProperties;
   WriteLnLog('Finalization','Bye...');
 end.

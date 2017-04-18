@@ -293,6 +293,7 @@ begin
   freeAndNil(StaBarImage);
   freeAndNil(CncBarImage);
   freeAndNil(MphBarImage);
+  FreeAndNil(damageOverlay_img);
   for i := 0 to length(portrait_img)-1 do
     freeAndNil(portrait_img[i]);
   setlength(portrait_img,0);
@@ -303,6 +304,7 @@ end;
 procedure DAbstractCompositeInterfaceElement.setbasesize(const newx,newy,neww,newh,newo: float; animate: TAnimationStyle);
 begin
   inherited setbasesize(newx,newy,neww,newh,newo,animate);
+  //{$WARNING Memory Leak here}
   ArrangeChildren(animate);
 end;
 

@@ -324,7 +324,7 @@ type
     procedure Generate3D; override;
   protected
     {launches Generate3D in a thread}
-    procedure  Execute; override;
+    procedure Execute; override;
   end;
 
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}

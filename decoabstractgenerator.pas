@@ -28,7 +28,7 @@ type
   TTileType = word;
   TIntCoordinate = integer;
 
-Type
+type
   {Most abstract generation routine to parent all the generation algorithms
    Required for abstract calls to different implementation of generators}
   DAbstractGenerator = class(TThread)
@@ -83,7 +83,7 @@ uses SysUtils, CastleLog;
 procedure DAbstractGenerator.ForceReady;
 begin
   fisReady := true;
-  WriteLnLog('DAbstractGenerator.ForceReady','Be careful, parameters might not be initialized correctly.');
+  WriteLnLog('DAbstractGenerator.ForceReady','Warning: Be careful, parameters might not be initialized correctly.');
 end;
 
 constructor DAbstractGenerator.create;

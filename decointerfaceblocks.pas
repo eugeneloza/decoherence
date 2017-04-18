@@ -169,6 +169,7 @@ begin
     myx := 0/800
   else
     myx := -135{portrait.base.fw}/800;
+  //{$WARNING Memory Leak here}
   Portrait.setbasesize(myx,Portrait.base.fy,Portrait.base.fw,Portrait.base.fh,0,asDefault);
   Portrait.rescale;
 end;
@@ -211,6 +212,7 @@ begin
   {********** INTERFACE DESIGN BY Saito00 ******************}
 
   {rescale party}
+  //{$WARNING Memory Leak here}
   for i := 0 to maxparty do begin
     if not odd(i) then
       CharacterSpace[i].setBaseSize(0,-(40+155+180*(i div 2))/800,35/800,155/800,1,animate)

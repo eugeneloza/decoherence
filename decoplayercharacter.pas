@@ -35,6 +35,7 @@ Type
     Actions: DPerksList;
     Procedure die; override;
     constructor create(AOwner: Tcomponent); override;
+    destructor destroy; override;
 end;
 
 var Party: array[0..maxparty] of DPlayerCharacter;
@@ -43,7 +44,7 @@ var Party: array[0..maxparty] of DPlayerCharacter;
 procedure CreateTestParty;
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-uses castleLog;
+uses SysUtils, castleLog;
 
 procedure CreateTestParty;
 var i: integer;
@@ -74,6 +75,14 @@ end;
 Procedure DPlayerCharacter.die;
 begin
   WriteLnLog('DPlayerCharacter.die','Character has died');
+end;
+
+{----------------------------------------------------------------------------}
+
+destructor DPlayerCharacter.destroy;
+begin
+  FreeAndNil(Actions);
+  Inherited;
 end;
 
 

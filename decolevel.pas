@@ -29,6 +29,7 @@ uses
   deco3dload, decodungeontiles,
   x3dload, sysutils,
   castle3d,
+  decodungeonworld,
   decoglobal;
 
 procedure load_test_level;

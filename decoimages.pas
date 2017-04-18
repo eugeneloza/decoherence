@@ -211,6 +211,15 @@ procedure DAbstractImage.FreeImage;
 begin
   freeandnil(GLImage);
   freeandnil(SourceImage);
+
+  //scaledImage is automatically freed by GlImage
+  {$WARNING BUG: why Scaled image is not freed automatically?????}
+  {BUG: I still need to free ScaledImage - while it's owned by GLImage
+   DAMN IT. The link may be obsolete after freeandnil(GLImage)!
+   Looks like I always set ScaledImage := nil after sucessfuly assigning it,
+   but should keep an eye on it!}
+  freeandnil(ScaledImage);
+
   ImageReady := false;
   ImageLoaded := false;
   InitGLPending:=false;
@@ -249,10 +258,6 @@ end;
 destructor DAbstractImage.destroy;
 begin
   FreeImage;
-  //FreeAndNil(GLImage);//freeimage does it all
-  //scaledImage is automatically freed by GlImage
-  {freeandnil(ScaledImage);}
-  //FreeAndNil(SourceImage);//freeimage does it all
   inherited;
 end;
 

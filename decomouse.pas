@@ -47,8 +47,7 @@ var TouchArray: DTouchList;
 procedure doMousePress(const Event: TInputPressRelease);
 procedure doMouseRelease(const Event: TInputPressRelease);
 
-{============================================================================}
-
+{+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
 constructor DTouch.create(const xx,yy:single; const finger:integer);
@@ -126,6 +125,14 @@ begin
   TouchArray.Add(NewEventTouch);
   WritelnLog('doMousePress','Caught mouse press finger='+inttostr(FingerIndex));
 end;
+
+{----------------------------------------------------------------------------}
+
+Initialization
+  TouchArray := DTouchList.create;
+
+Finalization
+  FreeAndNil(TouchArray);
 
 end.
 

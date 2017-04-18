@@ -21,6 +21,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 {$H+} //AnsiStrings
 {$J-} //non-writeable constants
 
+{write heap trace to file or to log?}
+//{$DEFINE HEAP_FILE}
+
 {defines fullscreen mode}
 //{$DEFINE Fullscreen}
 

@@ -35,7 +35,7 @@ uses decogui;
 
 procedure SetGameMode(GM : TGameMode);
 begin
-  if GM=LastGameMode then exit;
+  if GM = LastGameMode then exit;
 
   {release interface elements used by previous game mode}
 
