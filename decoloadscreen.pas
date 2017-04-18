@@ -80,8 +80,8 @@ function GetRandomFact: string;
 var newFact: integer;
 begin
   repeat
-    NewFact:=rnd.random(facts.Count);
-  until (NewFact <> LastFact) and (rnd.random < 1/facts[newFact].frequency);
+    NewFact := drnd.random(facts.Count);
+  until (NewFact <> LastFact) and (drnd.random < 1/facts[newFact].frequency);
   inc(facts[newFact].frequency,7);      //todo balance facts frequency, now chance is 1,1/8,1/15,1/22...
   result := facts[newFact].value;
   CurrentFact := Facts[newFact];
@@ -99,7 +99,7 @@ begin
   if currentFact.compatibility.Count>0 then
     repeat
       //as ugly as it might ever be...
-      LoadImageNew := currentFact.compatibility[rnd.random(currentFact.compatibility.Count)].value;
+      LoadImageNew := currentFact.compatibility[drnd.random(currentFact.compatibility.Count)].value;
     until (LoadImageOld <> LoadImageNew) or (currentFact.compatibility.Count=1)
   else
     raise Exception.create('GetRandomFactImage ERROR: No images to load!');

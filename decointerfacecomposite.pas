@@ -481,7 +481,7 @@ begin
     ftarget := value;
     DStaticImage(content).freeImage;
     WriteLnLog('DPortrait.settarget','Load from portrait');
-    DStaticImage(content).Load(portrait_img[rnd.random(length(portrait_img))]);  //todo
+    DStaticImage(content).Load(portrait_img[drnd.random(length(portrait_img))]);  //todo
     fTarget.onHit := @self.doHit;
   end;
 end;

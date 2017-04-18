@@ -66,7 +66,7 @@ const anisotropic_smoothing = 4;
 
 var Window : TCastleWindowTouch;
     { random generator used for all interface random events }
-    rnd: TCastleRandom;
+    drnd: TCastleRandom;
     {$IFNDEF Android}
     LogStream : TFileStream;
     {$ENDIF}
@@ -110,14 +110,14 @@ end;
 
 procedure InitGlobal;
 begin
-  rnd := TCastleRandom.Create(GetRandomSeed);
+  drnd := TCastleRandom.Create(GetRandomSeed);
 end;
 
 {----------------------------------------------------------------------------}
 
 procedure DestroyGlobal;
 begin
-  freeandnil(rnd);
+  freeandnil(drnd);
 end;
 
 initialization

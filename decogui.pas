@@ -98,13 +98,13 @@ end;
 procedure DInterfaceContainer.LoadWind;
 begin
   Wind1 := DWindImage.create(self);
-  Wind1.phasespeed := 1/(15+rnd.Random);
+  Wind1.phasespeed := 1/(15+drnd.Random);
   Wind1.Load(WindFolder+'WindClouds1_GIMP.jpg');
   Wind1.Opacity:=0.1;
   wind1.base.setsize(0,0,fullwidth,fullheight);
   Wind1.rescale;
   Wind2 := DWindImage.create(self);
-  Wind2.phasespeed := 1/(10+rnd.Random);
+  Wind2.phasespeed := 1/(10+drnd.Random);
   Wind2.Load(WindFolder+'WindClouds2_GIMP.jpg');
   wind2.base.setsize(0,0,fullwidth,fullheight);
   Wind2.Opacity := 0.1;

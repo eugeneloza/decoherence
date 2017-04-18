@@ -52,10 +52,10 @@ begin
   for i := 0 to maxparty do begin
     Party[i] := DPlayerCharacter.create(Window);
     {if i<4 then }party[i].maxmaxMPH := 0;
-    party[i].hit(rnd.Random(80),1);
-    party[i].drainCNC(rnd.Random(80),1);
-    party[i].drainMPH(rnd.Random(80),1);
-    party[i].drainSTA(rnd.Random(80),1);
+    party[i].hit(drnd.Random(80),1);
+    party[i].drainCNC(drnd.Random(80),1);
+    party[i].drainMPH(drnd.Random(80),1);
+    party[i].drainSTA(drnd.Random(80),1);
     if (Perks=nil) or (Perks.count=0) then WriteLnLog('CreateTestParty','FATAL ERROR: Perks is empty!');
     party[i].Actions := DPerksList.create(false);
     Party[i].actions.Add(perks[0]);

@@ -130,7 +130,7 @@ begin
        monsterscene[i] := m.clone(window);
        monsterscene[i].ProcessEvents := true;
        monsterscene[i].PlayAnimation('animation',paForceLooping);
-       monsterscene[i].increasetime(RND.random);
+       monsterscene[i].increasetime(drnd.random);
        //monsterscene[i].Attributes.EnableTextures := false;
 
        monsters[i] := T3DOrient.Create(window);

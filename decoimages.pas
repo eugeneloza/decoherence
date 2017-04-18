@@ -341,14 +341,14 @@ begin
   if lasttime=-1 then lasttime:=now;
   phaseshift:=(now-lasttime)*24*60*60*phaseSpeed;
   if phaseshift<0.5 then begin
-    phase -= phaseshift*(1+0.1*rnd.Random);
+    phase -= phaseshift*(1+0.1*drnd.Random);
     if phase<0 then phase += 1;
-    opacityphase -= phaseshift/2*(1+0.2*rnd.Random);
+    opacityphase -= phaseshift/2*(1+0.2*drnd.Random);
     if opacityphase<0 then opacityphase += 1;
   end else begin
     //if pause was too long reinitialize with random phases.
-    phase := rnd.Random;
-    opacityphase := rnd.Random;
+    phase := drnd.Random;
+    opacityphase := drnd.Random;
   end;
   lasttime:=now;
 end;
@@ -395,7 +395,7 @@ begin
     phase := 0;
   end;
   phaseshift := (now-lasttime)*24*60*60*phaseSpeed;
-  phase += phaseshift*(1+0.1*rnd.Random);
+  phase += phaseshift*(1+0.1*drnd.Random);
   if phase>1 then begin
     phase:=1;
     LoadNewFloaterImage:=true;

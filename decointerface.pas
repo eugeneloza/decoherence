@@ -562,9 +562,9 @@ begin
                  end;
       {asZoomOutSuicide}
       asFlyInRandom,asFlyOutRandom: begin
-                       mx := rnd.random*window.width/window.height;  //mult by aspect ratio
-                       my := rnd.random;
-                       case rnd.Random(4) of
+                       mx := drnd.random*window.width/window.height;  //mult by aspect ratio
+                       my := drnd.random;
+                       case drnd.Random(4) of
                          0: mx :=  0.0001;
                          1: mx := -0.0001;
                          2: my :=  0.0001;
@@ -579,8 +579,8 @@ begin
                        end;
                      end;
       asFlyInTop,asFlyOutTop,asFlyInBottom,asFlyOutBottom,asFlyInLeft,asFlyOutLeft,asFlyInRight,asFlyOutRight: begin
-                       mx := rnd.random*window.width/window.height;
-                       my := rnd.random;
+                       mx := drnd.random*window.width/window.height;
+                       my := drnd.random;
                        case animate of
                          asFlyInLeft,asFlyOutLeft: mx :=  0.0001;
                          asFlyInRight,asFlyOutRight: mx := -0.0001;
