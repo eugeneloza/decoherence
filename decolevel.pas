@@ -29,7 +29,7 @@ uses
   deco3dload, decodungeontiles,
   x3dload, sysutils,
   castle3d,
-  decodungeonworld,
+  decodungeonworld, decodungeongenerator,
   decoglobal;
 
 procedure load_test_level;
@@ -44,7 +44,46 @@ var scene: TcastleScene;
 implementation
 uses DecoGameMode  ;
 
-var   monster: TX3DRootNode;
+procedure Generate3DWorld;
+var GENERATOR: D3dDungeonGenerator;
+  i: integer;
+  fs: DFirstStep;
+begin
+  GENERATOR := D3dDungeonGenerator.Create;
+  //GENERATOR.load('');
+  with GENERATOR.parameters do begin
+    maxx := 9;
+    maxy := 9;
+    maxz := 5;
+
+    Volume := round(maxx*maxy*maxz * 35/100);
+    MaxFaces := 9;
+    MinFaces := 4;
+
+    minx := 9;
+    miny := 9;
+    minz := 5;
+
+    seed := 0;
+
+    AbsoluteURL := true;
+ {   for i := 0 to TilesBox.Items.count-1 do
+      if TilesBox.Checked[i] then TilesList.Add(ConstructorData(TilesFolder+TilesBox.Items[i],false));}
+
+    fs.tile := 'library1_16_P';
+    fs.x := maxx div 2;
+    fs.y := maxy div 2;
+    fs.z := 0;
+    FirstSteps.Add(fs);
+  end;
+  GENERATOR.ForceReady;
+  //GENERATOR.InitParameters;
+  //GENERATOR.Generate3d;
+
+  FreeAndNil(GENERATOR);
+end;
+
+var monster: TX3DRootNode;
 
 var loadedlevel:boolean=false;
 procedure load_test_level;
@@ -54,7 +93,7 @@ var ScreenEffect: TX3DRootNode;
     mRoot: TX3DRootNode;
     //i: integer;
 begin
-  LoadTiles;
+  Generate3DWorld;
 
   WritelnLog('load_test_level','Scene');
 

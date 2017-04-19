@@ -301,9 +301,15 @@ type
     procedure FreeTileIndexMap;
   private
     {temporary map for first-order neighbours lists}
+    tmpNeighboursMap: TNeighboursMapArray;
+    {final neighbours map}
     NeighboursMap: TNeighboursMapArray;
+    {merge the neighbours of neighbours in order for the light to work smoothly}
+    procedure Neighbours_of_neighbours;
     {initializes a neighbours map with nils}
     function NilIndexMap: TNeighboursMapArray;
+
+    procedure FreeNeighboursMap(var nmap: TNeighboursMapArray);
     {remove duplicates in the sorted tiles list and (!!!) sorts the array
      this operation is performed twice during the generation, so efficiency is not of concern}
     procedure RemoveDuplicatesNeighbours(var List: TNeighboursList);
@@ -322,6 +328,8 @@ type
     {launches DDungeonGenerator.Generate and builds 3D world afterwards
      can be launched directly for debugging}
     procedure Generate3D; override;
+
+    destructor destroy; override;
   protected
     {launches Generate3D in a thread}
     procedure Execute; override;
@@ -961,14 +969,14 @@ begin
 
   //convert HelperMap to NeighbourList
 
-  NeighboursMap[mx,my,mz] := TNeighboursList.create;
+  tmpNeighboursMap[mx,my,mz] := TNeighboursList.create;
   //make a list of neighbours
   for nx := 0 to Map.sizex-1 do
     for ny := 0 to map.sizey-1 do
       for nz := 0 to map.sizez-1 do if HelperMap[nx,ny,nz]>0 then begin
         Neighbour.tile := TileIndexMap[nx,ny,nz];
         Neighbour.visible := HelperMap[nx,ny,nz];
-        NeighboursMap[mx,my,mz].add(Neighbour);
+        tmpNeighboursMap[mx,my,mz].add(Neighbour);
 
         //Add blockers
         //THIS IS UGLY AND INEFFICIENT both on CPU and RAM!!!
@@ -977,11 +985,11 @@ begin
             {$Warning blockers might work wrong! maybe +a_dx(angle) is required!}
             Neighbour.tile := j;
             Neighbour.visible := HelperMap[nx,ny,nz];
-            NeighboursMap[mx,my,mz].add(Neighbour);
+            tmpNeighboursMap[mx,my,mz].add(Neighbour);
           end;
       end;
 
-  RemoveDuplicatesNeighbours(NeighboursMap[mx,my,mz]);
+  RemoveDuplicatesNeighbours(tmpNeighboursMap[mx,my,mz]);
 
   FreeAndNil(OldList);
   FreeAndNil(RaycastList);
@@ -1012,14 +1020,38 @@ begin
   until i >= List.count-1;
 end;
 
+
+procedure D3DDungeonGenerator.Neighbours_of_neighbours;
+var i: integer;
+    ix,iy,iz: TIntCoordinate;
+    dx,dy,dz: TIntCoordinate;
+begin
+  NeighboursMap := NilIndexMap;
+
+  writelnLog('D3DDungeonGenerator.Neighbours_of_neighbours','Merging neighbours of neighbours...');
+  for ix := 0 to Map.sizex-1 do
+    for iy := 0 to Map.sizey-1 do
+      for iz := 0 to Map.sizez-1 do if tmpNeighboursMap[ix,iy,iz]<>nil then begin
+        //writeLnLog('neighbours',inttostr(tmpNeighboursMap[ix,iy,iz].count));
+        //process neighbours
+ {       for dx := 0 to tiles[tmpNeighboursMap[ix,iy,iz].tile].sizex do
+          for dy := 0 to tiles[tmpNeighboursMap[ix,iy,iz].tile].sizex do
+            for dz := 0 to tiles[tmpNeighboursMap[ix,iy,iz].tile].sizex do {***};
+ }
+        NeighboursMap[ix,iy,iz] := TNeighboursList.create;
+        for i := 0 to tmpNeighboursMap[ix,iy,iz].count-1 do
+          NeighboursMap[ix,iy,iz].add(tmpNeighboursMap[ix,iy,iz].L[i]);
+        RemoveDuplicatesNeighbours(tmpNeighboursMap[ix,iy,iz])
+      end;
+end;
+
 {-----------------------------------------------------------------------}
 
 {just a scaling coefficient to avoid float numbers}
 procedure D3DDungeonGenerator.Raycast;
 var ix,iy,iz: TIntCoordinate;
-    dx,dy,dz: TIntCoordinate;
 begin
- NeighboursMap := NilIndexMap; //create a nil-initialized neighbours lists of all accessible map tiles
+ tmpNeighboursMap := NilIndexMap; //create a nil-initialized neighbours lists of all accessible map tiles
 
  {here we fill in the neighbours}
  for ix := 0 to Map.sizex-1 do
@@ -1027,25 +1059,21 @@ begin
      for iz := 0 to Map.sizez-1 do if TileIndexMap[ix,iy,iz]>0 {and is accessible} then
        RaycastTile(ix,iy,iz);
 
- {merge the neighbours of neighbours in order for the light to work smoothly}
- writelnLog('D3DDungeonGenerator.Raycast','Merging neighbours of neighbours...');
- for ix := 0 to Map.sizex-1 do
-   for iy := 0 to Map.sizey-1 do
-     for iz := 0 to Map.sizez-1 do if NeighboursMap[ix,iy,iz]<>nil then begin
-       //writeLnLog('neighbours',inttostr(NeighboursMap[ix,iy,iz].count));
-       //process neighbours
-{       for dx := 0 to tiles[NeighboursMap[ix,iy,iz].tile].sizex do
-         for dy := 0 to tiles[NeighboursMap[ix,iy,iz].tile].sizex do
-           for dz := 0 to tiles[NeighboursMap[ix,iy,iz].tile].sizex do {***};
-}
-       RemoveDuplicatesNeighbours(NeighboursMap[ix,iy,iz])
-     end;
+ Neighbours_of_neighbours;
 
  //and free temporary map
- for ix := 0 to Map.sizex-1 do
-   for iy := 0 to Map.sizey-1 do
-     for iz := 0 to Map.sizez-1 do
-       freeAndNil(NeighboursMap[ix,iy,iz]);
+ FreeNeighboursMap(tmpNeighboursMap);
+end;
+
+{------------------------------------------------------------------------}
+
+procedure D3DDungeonGenerator.FreeNeighboursMap(var nmap: TNeighboursMapArray);
+var ix,iy,iz: TIntCoordinate;
+begin
+  for ix := 0 to Map.sizex-1 do
+    for iy := 0 to Map.sizey-1 do
+      for iz := 0 to Map.sizez-1 do
+        freeAndNil(nmap[ix,iy,iz]);
 end;
 
 {------------------------------------------------------------------------}
@@ -1177,6 +1205,8 @@ begin
   FreeAndNil(DownTiles);
 end;
 
+{-----------------------------------------------------------------------------}
+
 destructor DDungeonGenerator.Destroy;
 begin
   FreeAndNil(Map);
@@ -1184,6 +1214,15 @@ begin
   FreeAndNil(parameters.TilesList);
   FreeAndNil(parameters.FirstSteps);
   FreeLists;
+  inherited;
+end;
+
+{-----------------------------------------------------------------------------}
+
+destructor D3DDungeonGenerator.Destroy;
+begin
+  FreeNeighboursMap(tmpNeighboursMap);
+  FreeNeighboursMap(NeighboursMap);
   inherited;
 end;
 

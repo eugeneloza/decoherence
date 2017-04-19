@@ -23,7 +23,7 @@ unit decodungeonworld;
 interface
 
 uses
-  decoabstractworld;
+  decodungeongenerator, decoabstractgenerator, decoabstractworld;
 
 type
   {Dungeon world manages any indoor tiled location}
@@ -36,7 +36,8 @@ type
     Procedure manage; override;
     {Sorts tiles into chunks}
     //Procedure chunk_n_slice; override;
-
+    procedure Load(Generator: DAbstractGenerator);
+    procedure build; override;
   end;
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
@@ -76,10 +77,29 @@ begin
 
 end;
 
+{----------------------------------------------------------------------------}
+
 procedure DDungeonWorld.manage;
 begin
   //if tilechanged then
   manage_tiles;
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DDungeonWorld.build;
+begin
+  inherited build;
+  {$Warning dummy}
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DDungeonWorld.Load(Generator: DAbstractGenerator);
+var DG: DDungeonGenerator;
+begin
+  DG := Generator as DDungeonGenerator;
+
 end;
 
 end.
