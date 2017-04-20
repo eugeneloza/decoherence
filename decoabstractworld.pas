@@ -66,6 +66,8 @@ Type
 
 var CurrentWorld: DAbstractWorld;
 
+
+procedure FreeWorld;
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
@@ -94,6 +96,13 @@ procedure DAbstractWorld.Build;
 begin
   if fSeed = 0 then raise exception.create('DAbstractWorld.Build: World random must be predefined!');
   RNDM.Initialize(fSeed);
+end;
+
+{------------------------------------------------------------------------------}
+
+procedure FreeWorld;
+begin
+  FreeAndNil(CurrentWorld);
 end;
 
 end.

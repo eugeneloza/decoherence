@@ -145,7 +145,7 @@ begin
                          Window.SaveScreen('deco_'+NiceDate+'.jpg');
        K_r: party[0].hit(1,1);
        k_i: if AmbientIntensity.ambient = 0 then
-               AmbientIntensity.SetAmbientIntensity(1)
+               AmbientIntensity.SetAmbientIntensity(3)
             else
                AmbientIntensity.SetAmbientIntensity(0);
        {k_1: shaders.WhichChoice := 0;
@@ -290,6 +290,7 @@ Finalization
   DestroyTiles;
   FreePerks;
   DestroyFonts;
+  FreeWorld;
   //FreeTextureProperties;
   WriteLnLog('Finalization','Bye...');
 end.

@@ -29,7 +29,7 @@ uses
   deco3dload, decodungeontiles,
   x3dload, sysutils,
   castle3d,
-  decodungeonworld, decodungeongenerator,
+  decoabstractworld, decodungeonworld, decodungeongenerator,
   decoglobal;
 
 procedure load_test_level;
@@ -50,35 +50,12 @@ var GENERATOR: D3dDungeonGenerator;
   fs: DFirstStep;
 begin
   GENERATOR := D3dDungeonGenerator.Create;
-  //GENERATOR.load('');
-  with GENERATOR.parameters do begin
-    maxx := 9;
-    maxy := 9;
-    maxz := 5;
-
-    Volume := round(maxx*maxy*maxz * 35/100);
-    MaxFaces := 9;
-    MinFaces := 4;
-
-    minx := 9;
-    miny := 9;
-    minz := 5;
-
-    seed := 0;
-
-    AbsoluteURL := true;
- {   for i := 0 to TilesBox.Items.count-1 do
-      if TilesBox.Checked[i] then TilesList.Add(ConstructorData(TilesFolder+TilesBox.Items[i],false));}
-
-    fs.tile := 'library1_16_P';
-    fs.x := maxx div 2;
-    fs.y := maxy div 2;
-    fs.z := 0;
-    FirstSteps.Add(fs);
-  end;
+  GENERATOR.load('');
   GENERATOR.ForceReady;
   //GENERATOR.InitParameters;
-  //GENERATOR.Generate3d;
+  //GENERATOR.Generate;
+  CurrentWorld := DDungeonWorld.create;
+  CurrentWorld.Load(Generator);
 
   FreeAndNil(GENERATOR);
 end;

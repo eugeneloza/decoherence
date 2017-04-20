@@ -39,6 +39,8 @@ type
   protected
     { xorshift random generator, fast and thread-safe }
     RNDM: TCastleRandom;
+    {Specific SEED of the random number for this algorithm }
+    procedure InitSeed(newseed: longword = 0);
   public
     {is the generator ready to wrok?
      Generatie will raise an exception if it isn't}
@@ -61,15 +63,15 @@ type
 
     //Property Seed: LongWord;
     {Abstract call to generation procedure
-     It has different implementation in different generators}
+     It has different implementation in different generators
+     Will launch a 3D routines also in specific children classes}
     procedure Generate; virtual; abstract;
-    {Abstract call to 3d world generation
-     Will remain abstract in simple generators
-     But will get unique implementation in 3d world generators}
-    procedure Generate3D; virtual; abstract;
 
     constructor create; virtual;//override;
     destructor destroy; override;
+  protected
+    { here we simply launch "Generate" in a Thread }
+    procedure Execute; override;
   End;
 
 
@@ -86,6 +88,8 @@ begin
   WriteLnLog('DAbstractGenerator.ForceReady','Warning: Be careful, parameters might not be initialized correctly.');
 end;
 
+{-----------------------------------------------------------------------------}
+
 constructor DAbstractGenerator.create;
 begin
   inherited;
@@ -94,11 +98,29 @@ begin
   RNDM := TCastleRandom.Create(1);
 end;
 
+{-----------------------------------------------------------------------------}
+
 destructor DAbstractGenerator.destroy;
 begin
   FreeAndNil(RNDM);
   inherited;
 end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DAbstractGenerator.InitSeed(newseed: longword = 0);
+begin
+  RNDM.initialize(newseed);
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DAbstractGenerator.execute;
+begin
+  Generate;
+end;
+
+
 
 end.
 

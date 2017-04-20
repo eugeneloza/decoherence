@@ -138,7 +138,7 @@ begin
   end;
   GENERATOR.ForceReady;
   GENERATOR.InitParameters;
-  GENERATOR.Generate3d;
+  GENERATOR.Generate;
 
   DungeonMap := GENERATOR.GetMap;
 

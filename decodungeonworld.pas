@@ -36,7 +36,7 @@ type
     Procedure manage; override;
     {Sorts tiles into chunks}
     //Procedure chunk_n_slice; override;
-    procedure Load(Generator: DAbstractGenerator);
+    procedure Load(Generator: DAbstractGenerator); override;
     procedure build; override;
   end;
 
@@ -99,7 +99,7 @@ procedure DDungeonWorld.Load(Generator: DAbstractGenerator);
 var DG: DDungeonGenerator;
 begin
   DG := Generator as DDungeonGenerator;
-
+  {$Warning dummy}
 end;
 
 end.

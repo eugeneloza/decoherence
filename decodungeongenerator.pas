@@ -180,7 +180,7 @@ type
 
     {gets a "normal" tile, not a blocker}
     function GetNormalTile: TTileType; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
-    {gets a "blocker" not a normal tile}
+    {gets a "blocker", not a normal tile}
     function GetBlockerTile: TTileType; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
     {gets a tile with stairs down}
     function GetDownTile: TTileType; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
@@ -224,20 +224,15 @@ type
     procedure AddTileUnsafe(Tile: DGeneratorTile; x,y,z: TIntCoordinate); {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
     {overloaded version that accepts a DGeneratorStep;}
     procedure AddTileUnsafe(step: DGeneratorStep);
-    {Specific SEED of the random number for this algorithm }
-    procedure InitSeed(newseed: longword = 0);
     {creates a minimap as Map.img}
     procedure MakeMinimap;
     {resizes the generated map for its real size}
     procedure ShrinkMap;
   public
-
     {map parameters}
     Parameters: DGeneratorParameters;
-
     {copy the "internal" map to external request}
-    function GetMap: DMap;
-    //maybe better saveTo when finished?: DMap;
+    function GetMap: DMap; //maybe better saveTo when finished?: DMap;
 
     procedure InitParameters; override;
     { the main procedure to generate a dungeon,
@@ -252,9 +247,6 @@ type
     procedure Load(filename: string);
     
     //save temp state to file ---- unneeded for now
-  protected
-    { here we simply launch "Generate" in a Thread }
-      procedure Execute; override;
 end;
 
 type TIntMapArray = array of array of array of integer;
@@ -290,8 +282,7 @@ type
     const CornerCount = 8*8;
   private
     {a map that stores tiles markers for quick access...
-     maybe not needed?
-     TODO: must be freed!!!!}
+     maybe not needed?}
     TileIndexMap: TIntMapArray;
     {returns an integer array of (map.sizex,map.sizey,map.sizez) size}
     function ZeroIntegerMap: TIntMapArray;
@@ -308,7 +299,7 @@ type
     procedure Neighbours_of_neighbours;
     {initializes a neighbours map with nils}
     function NilIndexMap: TNeighboursMapArray;
-
+    {free every element of a Neigobours map}
     procedure FreeNeighboursMap(var nmap: TNeighboursMapArray);
     {remove duplicates in the sorted tiles list and (!!!) sorts the array
      this operation is performed twice during the generation, so efficiency is not of concern}
@@ -327,12 +318,9 @@ type
   public
     {launches DDungeonGenerator.Generate and builds 3D world afterwards
      can be launched directly for debugging}
-    procedure Generate3D; override;
+    procedure Generate; override;
 
     destructor destroy; override;
-  protected
-    {launches Generate3D in a thread}
-    procedure Execute; override;
   end;
 
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
@@ -730,7 +718,8 @@ procedure DDungeonGenerator.ShrinkMap;
     minx,miny,minz: TIntCoordinate;}
 begin
   {only z-resize now. Maybe I won't make xy-resizes
-   due to possible blockers problems}
+   due to possible blockers problems
+   (actually not a problem, but requires some work)}
   if map.maxDepth+1<map.sizez then begin
     map.sizez := map.maxDepth+1;
     map.setsize(map.sizex,map.sizey,map.sizez);
@@ -752,16 +741,19 @@ begin
     end;
   end;
 end;
+
+{----------------------------------------------------------------------------}
+
 function D3DDungeonGenerator.NilIndexMap: TNeighboursMapArray;
-var ix,iy,iz: TIntCoordinate;
+var ix,iy{,iz}: TIntCoordinate;
 begin
   setLength(Result,Map.sizex);
   for ix := 0 to map.sizex-1 do begin
     setLength(Result[ix],map.sizey);
     for iy := 0 to map.sizey-1 do begin
       setLength(Result[ix,iy],map.sizez);
-      for iz := 0 to map.sizez-1 do
-        Result[ix,iy,iz] := nil;    //might be redundant, but let it be
+      {for iz := 0 to map.sizez-1 do
+        Result[ix,iy,iz] := nil;    //might be redundant, but let it be}
     end;
   end;
 end;
@@ -780,11 +772,13 @@ begin
            TileIndexMap[ix+gen[i].x,iy+gen[i].y,iz+gen[i].z] := i;
 end;
 
+{--------------------------------------------------------------------------}
+
 procedure D3DDungeonGenerator.FreeTileIndexMap;
-var ix,iy,iz: TIntCoordinate;
+var ix,iy: TIntCoordinate;
 begin
-  for ix := 0 to map.sizex-1 do begin
-    for iy := 0 to map.sizey-1 do
+  for ix := 0 to length(TileIndexMap)-1 do begin
+    for iy := 0 to length(TileIndexMap[ix])-1 do
       setLength(TileIndexMap[ix,iy],0);
     setLength(TileIndexMap[ix],0);
   end;
@@ -864,13 +858,6 @@ begin
     end;
 
   Result := true;
-end;
-
-{----------------------------------------------------------------------------}
-
-function CompareNeighbours(const i1,i2: DNeighbour): integer;
-begin
-  result := i1.tile - i2.tile;
 end;
 
 {----------------------------------------------------------------------------}
@@ -995,7 +982,14 @@ begin
   FreeAndNil(RaycastList);
 end;
 
-{-----------------------------------------------------------------------}
+{----------------------------------------------------------------------------}
+
+function CompareNeighbours(const i1,i2: DNeighbour): integer;
+begin
+  result := i1.tile - i2.tile;
+end;
+
+{----------------------------------------------------------------------------}
 
 procedure D3DDungeonGenerator.RemoveDuplicatesNeighbours(var List: TNeighboursList);
 var i: integer;
@@ -1011,15 +1005,16 @@ begin
       else
         List.Delete(i+1);
       {"The argument cannot be assigned to" - are you joking???
-      Really nasty thing about those generic lists! Should keep that in mind
-      P.S. My bad. use List.L[I].Value. See:
-      https://github.com/castle-engine/castle-engine/issues/63#issuecomment-292794723,
-      Thanks, Michalis!}
+       Really nasty thing about those generic lists! Should keep that in mind
+       P.S. My bad. use List.L[I].Value. See:
+       https://github.com/castle-engine/castle-engine/issues/63#issuecomment-292794723,
+       Thanks, Michalis!}
     end
     else inc(i);
   until i >= List.count-1;
 end;
 
+{-----------------------------------------------------------------------------}
 
 procedure D3DDungeonGenerator.Neighbours_of_neighbours;
 var i: integer;
@@ -1038,6 +1033,7 @@ begin
           for dy := 0 to tiles[tmpNeighboursMap[ix,iy,iz].tile].sizex do
             for dz := 0 to tiles[tmpNeighboursMap[ix,iy,iz].tile].sizex do {***};
  }
+        {$warning not working yet}
         NeighboursMap[ix,iy,iz] := TNeighboursList.create;
         for i := 0 to tmpNeighboursMap[ix,iy,iz].count-1 do
           NeighboursMap[ix,iy,iz].add(tmpNeighboursMap[ix,iy,iz].L[i]);
@@ -1070,10 +1066,23 @@ end;
 procedure D3DDungeonGenerator.FreeNeighboursMap(var nmap: TNeighboursMapArray);
 var ix,iy,iz: TIntCoordinate;
 begin
-  for ix := 0 to Map.sizex-1 do
-    for iy := 0 to Map.sizey-1 do
-      for iz := 0 to Map.sizez-1 do
+  //(ugly) check if the map was already freed
+  { THIS IS NOT SAFE in destructor, as destructor might
+   fire earlier than the previous FreeNeighboursMap has finished
+   so half-destroyed variable might be accessed }
+  if length(nmap) = 0 then exit;
+  //free and nil all the elements
+  for ix := 0 to length(nmap)-1 do
+    for iy := 0 to length(nmap[ix])-1 do
+      for iz := 0 to length(nmap[ix,iy])-1 do
         freeAndNil(nmap[ix,iy,iz]);
+  //set array size to zero
+  for ix := 0 to length(nmap)-1 do begin
+    for iy := 0 to length(nmap[ix])-1 do
+      setLength(nmap[ix,iy],0);
+    setLength(nmap[ix],0);
+  end;
+  setLength(nmap,0);
 end;
 
 {------------------------------------------------------------------------}
@@ -1085,27 +1094,20 @@ end;
 
 {------------------------------------------------------------------------}
 
-procedure D3DDungeonGenerator.Generate3D;
+procedure D3DDungeonGenerator.Generate;
 var t: TDateTime;
 begin
   //make the logic map
-  Generate;
+  inherited Generate;
   //raycast
-  writeLnLog('D3DDungeonGenerator.Generate3D','Raycasting started...');
+  writeLnLog('D3DDungeonGenerator.Generate','Raycasting started...');
   t := now;
   MakeTileIndexMap;
   Raycast;
   FreeTileIndexMap;
-  writeLnLog('D3DDungeonGenerator.Generate3D','Raycasting finished in '+inttostr(round((now-t)*24*60*60*1000))+'ms...');
+  writeLnLog('D3DDungeonGenerator.Generate','Raycasting finished in '+inttostr(round((now-t)*24*60*60*1000))+'ms...');
   Chunk_N_Slice;
   //make 3D world
-end;
-
-{----------------------------------------------------------------------------}
-
-procedure D3DDungeonGenerator.Execute;
-begin
-  Generate3D;
 end;
 
 {========================== DGENERATOR TILE ================================}
@@ -1129,15 +1131,6 @@ begin
 end;
 
 {========================= OTHER ROUTINES ===================================}
-
-
-procedure DDungeonGenerator.InitSeed(newseed: longword = 0);
-begin
-  RNDM.initialize(newseed);
-end;
-
-{-----------------------------------------------------------------------------}
-
 
 procedure DDungeonGenerator.Load(filename: string);
 begin
@@ -1167,14 +1160,6 @@ begin
     exit;
   end;
   raise Exception.create('DDungeonGenerator.GetTileByName: FATAL! Tile cannot be found!');
-end;
-
-
-{-----------------------------------------------------------------------------}
-
-procedure DDungeonGenerator.execute;
-begin
-  Generate;
 end;
 
 {-----------------------------------------------------------------------------}
