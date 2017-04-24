@@ -47,7 +47,7 @@ type
     {TWriterForm abstract load procedure}
     procedure LoadMe; virtual; abstract;
     {TWriterForm abstract save procedure}
-    procedure WriteMe(ToGameFolder: boolean); virtual; abstract;
+    procedure WriteMe(ToGameFolder: boolean); virtual;
     {TWriterForm abstract destructor}
     procedure FreeMe; virtual; abstract;
   end;
@@ -86,6 +86,13 @@ begin
   else
     Result := 'architect/'+URL;
   Result := AnsiReplaceText(Result,'/',pathdelim); //we're using native OS file access
+end;
+
+{============================================================================}
+
+procedure TWriterForm.WriteMe(ToGameFolder: boolean);
+begin
+  if not ToGameFolder then isChanged := false;
 end;
 
 

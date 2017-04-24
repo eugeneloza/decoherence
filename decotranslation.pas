@@ -41,7 +41,7 @@ function SayLaugnage(Lang: TLanguage): string;
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
-uses SysUtils;
+uses SysUtils, decoglobal;
 
 function LanguageDir(Lang: TLanguage): string;
 begin
@@ -50,6 +50,7 @@ begin
     language_Russian: result := 'RUS/';
     else raise Exception.Create('Unknown Language in decotranslation.LanguageDir!');
   end;
+  result := GetScenarioFolder + TextFolder + result;
 end;
 
 {-----------------------------------------------------------------------------}

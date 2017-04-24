@@ -1,7 +1,7 @@
 object MapEditor: TMapEditor
-  Left = 288
+  Left = 105
   Height = 370
-  Top = 170
+  Top = 108
   Width = 628
   Caption = 'MapEditor'
   ClientHeight = 370
@@ -234,6 +234,15 @@ object MapEditor: TMapEditor
         TopIndex = -1
       end
     end
+  end
+  object MapSelector: TComboBox
+    Left = 384
+    Height = 25
+    Top = 6
+    Width = 241
+    ItemHeight = 0
+    TabOrder = 4
+    Text = 'MapSelector'
   end
   object TileImage: TCastleImageControl
     TUIControlPos_RealLeft = 26

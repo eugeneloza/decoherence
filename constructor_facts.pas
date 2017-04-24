@@ -55,6 +55,7 @@ type
     LoadImages: TLoadImageList;
     {re-fills listboxes}
     procedure ReloadContent;
+    procedure SaveFacts(ToGameFolder: boolean);
   public
     procedure LoadMe; override;
     procedure FreeMe; override;
@@ -86,7 +87,7 @@ begin
     FreeAndNil(Facts[L]);
 
     try
-      CurrentFile := ConstructorData(ScenarioFolder+LanguageDir(L)+'facts.xml',false);
+      CurrentFile := ConstructorData(LanguageDir(L)+'facts.xml',false);
       LoadFacts(CurrentFile);
       Facts[L] := decoloadscreen.Facts;
       decoloadscreen.Facts := nil;
@@ -149,6 +150,14 @@ end;
 {-----------------------------------------------------------------------------}
 
 procedure TFactsEditor.WriteMe(ToGameFolder: boolean);
+begin
+  SaveFacts(ToGameFolder);
+  inherited WriteMe(ToGameFolder);
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure TFactsEditor.SaveFacts(ToGameFolder: boolean);
 var XMLdoc: TXMLDocument;
     RootNode, ContainerNode, valueNode, value2node, TextNode: TDOMNode;
     i: DFact;
@@ -182,16 +191,15 @@ begin
       end;
 
       if ToGameFolder then
-        f := ConstructorData(ScenarioFolder+LanguageDir(L)+'facts.xml'+gz_ext,ToGameFolder)
+        f := ConstructorData(LanguageDir(L)+'facts.xml'+gz_ext,ToGameFolder)
       else
-        f := ConstructorData(ScenarioFolder+LanguageDir(L)+'facts.xml',ToGameFolder);
+        f := ConstructorData(LanguageDir(L)+'facts.xml',ToGameFolder);
       URLWriteXML(XMLdoc, f);
       WriteLnLog('TFactsEditor.WriteMe','File Written: '+f);
 
       FreeAndNil(XMLdoc);
     end;
 
-  if not ToGameFolder then  isChanged := false;
 end;
 
 {-----------------------------------------------------------------------------}

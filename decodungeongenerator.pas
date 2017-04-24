@@ -113,7 +113,7 @@ type
 
 type
   {a set of map generation parameters}
-  DGeneratorParameters = record
+  DGeneratorParameters = class
     {the map cannot be larger than these}
     maxx,maxy,maxz: TIntCoordinate;
     {the map cannot be smaller than these}
@@ -134,7 +134,10 @@ type
     {list of tiles}
     TilesList: TStringList;
     {list of first generation steps}
-    FirstSteps: TFirstStepsArray
+    FirstSteps: TFirstStepsArray;
+
+    constructor create;
+    destructor destroy; override;
   end;
 
 type TIndexList = specialize TFPGList<TTileType>;
@@ -1164,13 +1167,21 @@ end;
 
 {-----------------------------------------------------------------------------}
 
+constructor DGeneratorParameters.create;
+begin
+  inherited;
+  TilesList := TStringList.create;
+  FirstSteps := TFirstStepsArray.create;
+end;
+
+{-----------------------------------------------------------------------------}
+
 constructor DDungeonGenerator.create;
 begin
   inherited;
   Map := DGeneratorMap.create;
   Tiles := TTileList.Create(true);
-  parameters.TilesList := TStringList.create;
-  parameters.FirstSteps := TFirstStepsArray.create;
+  //parameters := DGeneratorParameters.create;
 
   NormalTiles := TIndexList.create;
   BlockerTiles := TIndexList.create;
@@ -1196,9 +1207,18 @@ destructor DDungeonGenerator.Destroy;
 begin
   FreeAndNil(Map);
   FreeAndNil(tiles);
-  FreeAndNil(parameters.TilesList);
-  FreeAndNil(parameters.FirstSteps);
+  FreeAndNil(parameters);
   FreeLists;
+  inherited;
+end;
+
+{-----------------------------------------------------------------------------}
+
+destructor DGeneratorParameters.destroy;
+begin
+  FreeAndNil(TilesList);
+  FreeAndNil(FirstSteps);
+
   inherited;
 end;
 

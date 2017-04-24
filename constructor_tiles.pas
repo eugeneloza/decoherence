@@ -263,10 +263,10 @@ begin
   if not ToGameFolder then begin
     if isTileLoaded then begin
       SaveTileMap(TileName,false);
-      isChanged := false;
     end else writelnlog('TDungeonTilesEditor.WriteMe','No tile loaded to save...');
   end else
     SaveAllTiles;
+  inherited WriteMe(ToGameFolder);
 end;
 
 {--------------------------------------------------------------------------}

@@ -46,7 +46,10 @@ const InterfaceFolder    = 'interface/';
       PerksFolder        = InterfaceFolder+'perks/';
       DamageFolder       = InterfaceFolder+'damage/';
 
-      ScenarioFolder     = 'scenario/';
+      ScenarioBaseFolder = 'scenario/';
+      {because there can be several scenario subfolders, these are only for "addition"}
+      TextFolder         = 'text/';
+      MapsFolder         = 'maps/';
 
       ModelsFolder      = 'models/';
       TilesFolder       = ModelsFolder+'tiles/';
@@ -64,7 +67,10 @@ const anisotropic_smoothing = 4;
       Shadow_maps_enabled = false;
       Shadow_volumes_enabled = false;
 
-var Window : TCastleWindowTouch;
+var {global window of the game}
+    Window : TCastleWindowTouch;
+    {todo: current scenario}
+    CurrentScenarioFolder: string='test/';
     { random generator used for all interface random events }
     drnd: TCastleRandom;
     {$IFNDEF Android}
@@ -79,6 +85,8 @@ var Window : TCastleWindowTouch;
  but I'm not exactly sure if it'll work as expected (test needed)
  We're not pursing cryptographic purposes, so /dev/urandom is perfectly enough}
 function GetRandomSeed: LongWord;
+
+function GetScenarioFolder: string;
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
@@ -118,6 +126,13 @@ end;
 procedure DestroyGlobal;
 begin
   freeandnil(drnd);
+end;
+
+{----------------------------------------------------------------------------}
+
+function GetScenarioFolder: string;
+begin
+  result := ScenarioBaseFolder + CurrentScenarioFolder;
 end;
 
 initialization

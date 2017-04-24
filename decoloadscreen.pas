@@ -171,7 +171,7 @@ end;
 procedure InitLoadScreen;
 begin
   //LoadFacts does everything, jsut providing it a correct filename.
-  LoadFacts(ApplicationData(ScenarioFolder+LanguageDir(CurrentLanguage)+'facts.xml'+gz_ext));
+  LoadFacts(ApplicationData(LanguageDir(CurrentLanguage)+'facts.xml'+gz_ext));
 end;
 
 {---------------------------------------------------------------------------------}
