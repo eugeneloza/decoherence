@@ -147,6 +147,7 @@ end;
 procedure TMapEditor.GenerateButtonClick(Sender: TObject);
 var GENERATOR: D3dDungeonGenerator;
 begin
+  GenerateButton.Enabled := false;
   FreeAndNil(DungeonMap);
   GENERATOR := D3dDungeonGenerator.Create;
   //GENERATOR.load('');
@@ -154,6 +155,7 @@ begin
 
   GENERATOR.ForceReady;
   GENERATOR.InitParameters;
+  //todo: in a thread + stop
   GENERATOR.Generate;
 
   DungeonMap := GENERATOR.GetMap;
@@ -164,6 +166,8 @@ begin
   ZScroll.Position := 0;
   ZScroll.Max := DungeonMap.sizez-1;
   DrawMap;
+
+  GenerateButton.Enabled := true;
 end;
 
 procedure TMapEditor.ZScrollChange(Sender: TObject);

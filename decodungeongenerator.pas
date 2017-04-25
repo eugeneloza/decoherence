@@ -291,14 +291,15 @@ type
     function ZeroIntegerMap: TIntMapArray;
     {puts tile # markers on a map to detect which tile is here}
     procedure MakeTileIndexMap;
-    {ugly fix not to store a dynamic TileIndexMap array for all the lifetime of the generator}
-    procedure FreeTileIndexMap;
   private
     {temporary map for first-order neighbours lists}
     tmpNeighboursMap: TNeighboursMapArray;
     {final neighbours map}
     NeighboursMap: TNeighboursMapArray;
-    {merge the neighbours of neighbours in order for the light to work smoothly}
+
+    Groups: array of TIndexList;
+    {merge the neighbours of neighbours in order for the light to work smoothly
+     todo!!!}
     procedure Neighbours_of_neighbours;
     {initializes a neighbours map with nils}
     function NilIndexMap: TNeighboursMapArray;
@@ -755,8 +756,6 @@ begin
     setLength(Result[ix],map.sizey);
     for iy := 0 to map.sizey-1 do begin
       setLength(Result[ix,iy],map.sizez);
-      {for iz := 0 to map.sizez-1 do
-        Result[ix,iy,iz] := nil;    //might be redundant, but let it be}
     end;
   end;
 end;
@@ -773,19 +772,6 @@ begin
       for iy := 0 to sizey-1 do
         for iz := 0 to sizez-1 do
            TileIndexMap[ix+gen[i].x,iy+gen[i].y,iz+gen[i].z] := i;
-end;
-
-{--------------------------------------------------------------------------}
-
-procedure D3DDungeonGenerator.FreeTileIndexMap;
-var ix,iy: TIntCoordinate;
-begin
-  for ix := 0 to length(TileIndexMap)-1 do begin
-    for iy := 0 to length(TileIndexMap[ix])-1 do
-      setLength(TileIndexMap[ix,iy],0);
-    setLength(TileIndexMap[ix],0);
-  end;
-  setLength(TileIndexMap,0);
 end;
 
 {----------------------------------------------------------------------------}
@@ -805,11 +791,6 @@ begin
   vx := x2-x1;
   vy := y2-y1;
   vz := z2-z1;
-
-  {define the faces affected / non-needed:inlined}
-  {if x2>x1 then anglex := aRight else anglex := aLeft;
-  if y2>y1 then angley := aBottom else angley := aTop;
-  if z2>z1 then anglez := aDown else anglez := aUp;}
 
   {raycat all the faces can be affected
    we don't care about checking faces sequentially.
@@ -1069,30 +1050,93 @@ end;
 procedure D3DDungeonGenerator.FreeNeighboursMap(var nmap: TNeighboursMapArray);
 var ix,iy,iz: TIntCoordinate;
 begin
-  //(ugly) check if the map was already freed
-  { THIS IS NOT SAFE in destructor, as destructor might
-   fire earlier than the previous FreeNeighboursMap has finished
-   so half-destroyed variable might be accessed }
+  if nmap = nil then exit;
+  //just to be safe (in case the nmap was not initialized completely)
   if length(nmap) = 0 then exit;
+
   //free and nil all the elements
   for ix := 0 to length(nmap)-1 do
     for iy := 0 to length(nmap[ix])-1 do
       for iz := 0 to length(nmap[ix,iy])-1 do
         freeAndNil(nmap[ix,iy,iz]);
-  //set array size to zero
-  for ix := 0 to length(nmap)-1 do begin
-    for iy := 0 to length(nmap[ix])-1 do
-      setLength(nmap[ix,iy],0);
-    setLength(nmap[ix],0);
-  end;
-  setLength(nmap,0);
+
+  nmap := nil; //this will automatically free the array
 end;
 
 {------------------------------------------------------------------------}
 
-procedure D3DDungeonGenerator.Chunk_N_Slice;
+{can't make it nested because TCompareFunction cannot accept "is nested"}
+type DIndexRec = record
+  index: integer;
+  hits: integer;
+end;
+type HitList = specialize TGenericStructList<DIndexRec>;
+function CompareHits(const i1,i2: DIndexRec): integer;
 begin
+  result := i1.hits - i2.hits;
+end;
+procedure D3DDungeonGenerator.Chunk_N_Slice;
+var i,j,g: integer;
+    ix,iy,iz: integer;
+    hit_count: HitList;
+    tIndex: DIndexRec;
+    tilesused: array of boolean;
+begin
+  {this part of the code will combine tiles in larger groups to boost FPS
+  also this will provide for LOD of the whole group generation and far land support for overworld later
+  I'm not yet sure how textures will behave... but let's leave this question for later}
+
+  //prepare to count hits
+  hit_count := HitList.create;
+  for i := 0 to high(Gen) do begin
+    tIndex.index := i;
+    tIndex.hits := 0;
+    hit_count.Add(tIndex);
+  end;
+  {first we just count how much time a tile is 'hit' by neighbours
+  Therefore we find "more popular" tiles which will be 'seeds' for groups}
+  for ix := 0 to Map.sizex-1 do
+    for iy := 0 to Map.sizey-1 do
+      for iz := 0 to Map.sizez-1 do if NeighboursMap[ix,iy,iz]<>nil then
+        for i := 0 to NeighboursMap[ix,iy,iz].count-1 do
+          inc(Hit_count.L[NeighboursMap[ix,iy,iz].L[i].Tile].hits);
+  Hit_count.Sort(@CompareHits);
+
+  {now let's start the main algorithm}
+  g := 0;
+  setlength(tilesUsed,length(Gen));
+  for j := 0 to high(tilesused) do tilesUsed[i] := false;
+  i := 0;
+  repeat
+    setLength(Groups,g+1);
+    Groups[g] := TIndexList.create;
+    {here we find the tile with minimal amount (>0) of currently visible neighbours,
+    it produces smoother amount of members in a group
+    versus less groups in case maximum is used
+    Roughly, amount of groups will be ~sqrt(tiles) However, it's not as simple as it might seem}
+
+    //skip sorted list to first unused tile
+    while (i <= high(tilesUsed)) and (tilesUsed[Hit_count[i].index]) do inc(i);
+
+    if (i <= high(tilesUsed)){ and (not tilesUsed[Hit_count[i].index]) } then begin
+      {we don't actually need to scan the whole tile, only top-left element,
+       if we'll miss something, we'll just add missed tiles to other groups later}
+      ix := Gen[i].x;
+      iy := Gen[i].y;
+      iz := Gen[i].z;
+      {we're sure neighbours list is not nil!}
+      {$Warning error here!}
+      if NeighboursMap[ix,iy,iz]=nil then raise exception.create('NeighboursMap is nil!');
+      for j := 0 to NeighboursMap[ix,iy,iz].count do
+        if not tilesUsed[NeighboursMap[ix,iy,iz].L[i].tile] then begin
+          tilesUsed[NeighboursMap[ix,iy,iz].L[i].tile] := true;
+          Groups[g].add(NeighboursMap[ix,iy,iz].L[i].tile);
+        end;
+    end;
+  until i >= high(tilesUsed);
+  writeLnLog('D3DDungeonGenerator.Chunk_N_Slice','N groups = '+inttostr(length(groups)));
   {$Warning critical todo}
+  freeAndNil(Hit_count);
 end;
 
 {------------------------------------------------------------------------}
@@ -1102,15 +1146,17 @@ var t: TDateTime;
 begin
   //make the logic map
   inherited Generate;
+
   //raycast
   writeLnLog('D3DDungeonGenerator.Generate','Raycasting started...');
   t := now;
+
   MakeTileIndexMap;
   Raycast;
-  FreeTileIndexMap;
+  //TileIndexMap := nil;  //this will free the array -- I'll need it later for debugging?!
+
   writeLnLog('D3DDungeonGenerator.Generate','Raycasting finished in '+inttostr(round((now-t)*24*60*60*1000))+'ms...');
   Chunk_N_Slice;
-  //make 3D world
 end;
 
 {========================== DGENERATOR TILE ================================}
@@ -1225,9 +1271,13 @@ end;
 {-----------------------------------------------------------------------------}
 
 destructor D3DDungeonGenerator.Destroy;
+var i: integer;
 begin
   FreeNeighboursMap(tmpNeighboursMap);
   FreeNeighboursMap(NeighboursMap);
+  if groups<>nil then
+    for i := 0 to high(groups) do
+      FreeAndNil(Groups[i]);
   inherited;
 end;
 
