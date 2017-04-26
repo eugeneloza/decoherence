@@ -15,6 +15,7 @@ Constructor is a Desktop-only tool, it is not compatible with Android. Other sys
 * Testing algorithms to detect some obvious errors.
 * Compilation of data to game
 * Multilingual data editing
+* Support for multiple scenarios
 
 # Guides and tutorials
 
