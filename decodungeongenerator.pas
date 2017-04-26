@@ -51,6 +51,14 @@ type
       fVolume: integer;
       fMaxDepth: integer;
     public
+      {shift that blocker makes. *Physically* blocker is placed in the NEXT tile
+       but *logically* it is related to the PREVIOUS tile. These coordinate shifts
+       allow to switch from one logic to another}
+      b_x,b_y,b_z: integer;
+      {calculates b_x,b_y,b_z for 1x1x1 blockers with only ONE face
+       horizontal angles only (for now) - todo}
+      procedure ProcessBlockers;
+    public
       {what TTileFaces do leave from this tile?}
       //FacesList: TTileFace;
       {list of dock point to this tile}
@@ -349,6 +357,7 @@ begin
     else
       tmp := DGeneratorTile.Load(ApplicationData(s+'.map'+GZ_ext));
     tmp.CalculateFaces;
+    tmp.ProcessBlockers;
     tiles.Add(tmp);
   end;
   {prepare different optimized lists}
@@ -689,7 +698,6 @@ end;
 procedure DDungeonGenerator.MakeMinimap;
 var i: integer;
     iz: TIntCoordinate;
-    a: TAngle;
 begin
   Map.FreeMinimap;
   setLength(Map.img,Map.sizez);
@@ -704,11 +712,8 @@ begin
         tiles[Gen[i].tile].img[iz].DrawTo(Map.img[iz+Gen[i].z], Gen[i].x*16,
              (Map.sizey-Gen[i].y-tiles[Gen[i].tile].sizey)*16, dmBlendSmart);
       end else begin
-        for a in THorizontalAngle do
-          if isPassable(tiles[Gen[i].tile].Map[0,0,0].faces[a]) then
-            tiles[Gen[i].tile].img[iz].DrawTo(Map.img[iz+Gen[i].z], (Gen[i].x+a_dx(a))*16,
-                 (Map.sizey-(Gen[i].y+a_dy(a))-tiles[Gen[i].tile].sizey)*16, dmBlendSmart);
-
+        tiles[Gen[i].tile].img[iz].DrawTo(Map.img[iz+Gen[i].z], (Gen[i].x+Tiles[Gen[i].tile].b_x)*16,
+             (Map.sizey-(Gen[i].y+Tiles[Gen[i].tile].b_y)-tiles[Gen[i].tile].sizey)*16, dmBlendSmart);
       end;
     end;
   writeLnLog('DDungeonGenerator.MakeMinimap',inttostr(length(Map.img)));
@@ -741,7 +746,7 @@ begin
     for iy := 0 to map.sizey-1 do begin
       setLength(Result[ix,iy],map.sizez);
       for iz := 0 to map.sizez-1 do
-        Result[ix,iy,iz] := 0;
+        Result[ix,iy,iz] := -1;
     end;
   end;
 end;
@@ -767,11 +772,13 @@ var i: integer;
     ix,iy,iz: TIntCoordinate;
 begin
   TileIndexMap := ZeroIntegerMap;
-  for i := 0 to maxsteps-1 do with Tiles[Gen[i].tile] do if not blocker then // we don't count blockers here, they are not normal tiles :) We'll have to add them later
+  for i := 0 to maxsteps-1 do with Tiles[Gen[i].tile] do
+    if not blocker then // we don't count blockers here, they are not normal tiles :) We'll have to add them later
     for ix := 0 to sizex-1 do
       for iy := 0 to sizey-1 do
         for iz := 0 to sizez-1 do
-           TileIndexMap[ix+gen[i].x,iy+gen[i].y,iz+gen[i].z] := i;
+          if map[ix,iy,iz].base <> tkNone then
+            TileIndexMap[ix+gen[i].x,iy+gen[i].y,iz+gen[i].z] := i;
 end;
 
 {----------------------------------------------------------------------------}
@@ -897,6 +904,8 @@ var
         end;
     end;}
 begin
+  WriteLnLog(inttostr(mx)+inttostr(my)+inttostr(mz),'xxx');
+
   //init HelperMap and raycast list
   RaycastList := TRaycastList.Create;
   OldList := nil;
@@ -952,8 +961,8 @@ begin
         //Add blockers
         //THIS IS UGLY AND INEFFICIENT both on CPU and RAM!!!
         for j := 0 to maxsteps-1 do if Tiles[Gen[j].tile].blocker then
-          if (gen[j].x=nx) and (gen[j].y=ny) and (gen[j].z=nz) then begin
-            {$Warning blockers might work wrong! maybe +a_dx(angle) is required!}
+          {warning! This works only for 1x1x1 blockers with only ONE open face}
+          if (gen[j].x+Tiles[Gen[j].tile].b_x=nx) and (gen[j].y+Tiles[Gen[j].tile].b_y=ny) and (gen[j].z+Tiles[Gen[j].tile].b_z=nz) then begin
             Neighbour.tile := j;
             Neighbour.visible := HelperMap[nx,ny,nz];
             tmpNeighboursMap[mx,my,mz].add(Neighbour);
@@ -1021,7 +1030,7 @@ begin
         NeighboursMap[ix,iy,iz] := TNeighboursList.create;
         for i := 0 to tmpNeighboursMap[ix,iy,iz].count-1 do
           NeighboursMap[ix,iy,iz].add(tmpNeighboursMap[ix,iy,iz].L[i]);
-        RemoveDuplicatesNeighbours(tmpNeighboursMap[ix,iy,iz])
+        RemoveDuplicatesNeighbours(NeighboursMap[ix,iy,iz]);
       end;
 end;
 
@@ -1036,7 +1045,7 @@ begin
  {here we fill in the neighbours}
  for ix := 0 to Map.sizex-1 do
    for iy := 0 to Map.sizey-1 do
-     for iz := 0 to Map.sizez-1 do if TileIndexMap[ix,iy,iz]>0 {and is accessible} then
+     for iz := 0 to Map.sizez-1 do if TileIndexMap[ix,iy,iz]>=0 {and is accessible} then
        RaycastTile(ix,iy,iz);
 
  Neighbours_of_neighbours;
@@ -1121,21 +1130,26 @@ begin
     if (i <= high(tilesUsed)){ and (not tilesUsed[Hit_count[i].index]) } then begin
       {we don't actually need to scan the whole tile, only top-left element,
        if we'll miss something, we'll just add missed tiles to other groups later}
-      ix := Gen[i].x;
-      iy := Gen[i].y;
-      iz := Gen[i].z;
+      ix := Gen[Hit_count[i].index].x;
+      iy := Gen[Hit_count[i].index].y;
+      iz := Gen[Hit_count[i].index].z;
+      //blockers behave a bit differently
+      if Tiles[Gen[Hit_count[i].index].tile].blocker then begin
+        ix += Tiles[Gen[Hit_count[i].index].tile].b_x;
+        iy += Tiles[Gen[Hit_count[i].index].tile].b_y;
+        iz += Tiles[Gen[Hit_count[i].index].tile].b_z;
+      end;
       {we're sure neighbours list is not nil!}
-      {$Warning error here!}
       if NeighboursMap[ix,iy,iz]=nil then raise exception.create('NeighboursMap is nil!');
       for j := 0 to NeighboursMap[ix,iy,iz].count do
-        if not tilesUsed[NeighboursMap[ix,iy,iz].L[i].tile] then begin
-          tilesUsed[NeighboursMap[ix,iy,iz].L[i].tile] := true;
-          Groups[g].add(NeighboursMap[ix,iy,iz].L[i].tile);
+        if not tilesUsed[Hit_count[i].index] then begin
+          tilesUsed[Hit_count[i].index] := true;
+          Groups[g].add(Hit_count[i].index);
         end;
     end;
+    inc(g);
   until i >= high(tilesUsed);
   writeLnLog('D3DDungeonGenerator.Chunk_N_Slice','N groups = '+inttostr(length(groups)));
-  {$Warning critical todo}
   freeAndNil(Hit_count);
 end;
 
@@ -1170,6 +1184,21 @@ function DGeneratorTile.CalculateFaces: integer; {$IFDEF SUPPORTS_INLINE}inline;
 {$UNDEF CompleteGen}
 function DGeneratorMap.CalculateFaces: integer; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 {$INCLUDE decodungeongenerator_calculatefaces.inc}
+
+{--------------------------------------------------------------------------}
+
+procedure DGeneratorMap.ProcessBlockers;
+var a: TAngle;
+begin
+  if blocker then begin
+    {this works only for 1x1x1 blockers with only ONE face and only HORIZONTAL!}
+    for a in THorizontalAngle do
+      if isPassable(Map[0,0,0].faces[a]) then begin
+        b_x := a_dx(a);
+        b_y := a_dy(a);
+      end;
+  end;
+end;
 
 {--------------------------------------------------------------------------}
 
