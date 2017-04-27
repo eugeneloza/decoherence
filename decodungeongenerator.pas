@@ -242,9 +242,7 @@ type
   public
     {map parameters}
     Parameters: DGeneratorParameters;
-    {copy the "internal" map to external request}
-    function GetMap: DMap; //maybe better saveTo when finished?: DMap;
-
+    {initializes generation parameters and loads everything}
     procedure InitParameters; override;
     { the main procedure to generate a dungeon,
       may be launched in main thread (for testing or other purposes) }
@@ -258,6 +256,24 @@ type
     procedure Load(filename: string);
     
     //save temp state to file ---- unneeded for now
+
+  public
+
+    {EXPORT routines. They create a *copy* of internal generator data
+     to respond to external request.
+     This is made to keep the generator clean and self-contained.
+     HOWEVER, this is not optimal, as requires nearly *double* RAM during the
+     export procedures.
+     todo: Maybe not copying but passing a link and setting reference to nil is a better approach!?
+     Anyway, it'll still be done by these procedures.
+
+     UPD: WARNING, exporting an issue WILL stop the Generator from freeing it
+          and will NIL the corresponding link. Don't try to access it twice!}
+
+    {makes a *copy* of the "internal" map to external request
+     it's "lower-level" than used DGenerationMap so useful :)}
+    function ExportMap: DMap; //maybe better saveTo when finished?: DMap;
+    //function ExportTiles //not needed as it is in GenerationParameters
 end;
 
 type TIntMapArray = array of array of array of integer;
@@ -289,7 +305,7 @@ type
      64 is the basic number (cornerCount), actually 128 should be enough}
     const MaxNeighboursIndex = 128;
     const FailedIndex = -1000;
-    //const CandidateIndex = -1;
+    //const CandidateIndex = -10;
     const CornerCount = 8*8;
   private
     {a map that stores tiles markers for quick access...
@@ -333,6 +349,8 @@ type
     procedure Generate; override;
 
     destructor destroy; override;
+  public
+    //function ExportGroups:
   end;
 
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
@@ -562,7 +580,7 @@ begin
     end;  }
     WriteLnLog('DDungeonGenerator.Generate','Done in = '+inttostr(round((now-t2)*24*60*60*1000))+'ms');
     WriteLnLog('DDungeonGenerator.Generate','Map volume = '+inttostr(map.Volume) +'/'+inttostr(parameters.volume));
-    WriteLnLog('DDungeonGenerator.Generate','Map volume = '+inttostr(map.MaxDepth+1)+'/'+inttostr(parameters.minz));
+    WriteLnLog('DDungeonGenerator.Generate','Max depth = '+inttostr(map.MaxDepth+1)+'/'+inttostr(parameters.minz));
   until (map.Volume>=parameters.Volume) and (map.MaxDepth+1>=parameters.minz); {until map meets the paramters}
 
   //finally resize the dynamic array
@@ -581,9 +599,11 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-function DDungeonGenerator.GetMap: DMap;
+function DDungeonGenerator.ExportMap: DMap;
 var ix,iy,iz: TIntCoordinate;
 begin
+  {Result := Map;
+  Map := nil;}
   Result := DMap.create;
   Result.setsize(Map.sizex,Map.sizey,Map.sizez);
   for ix := 0 to Map.sizex-1 do
@@ -866,11 +886,12 @@ var
     procedure SetCandidate(x,y,z: TIntCoordinate); {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
     var NewCandidate: Txyz;
     begin
+      //writeLnLog(inttostr(HelperMap[x,y,z]));
       {looks redundant as "open face" can't go into void
        but let it be here for now}
-      if (x>=0) and (y>=0) and (z>=0) and
-         (x<Map.Sizex) and (y<Map.Sizey) and (z<Map.SizeZ) and
-         (HelperMap[x,y,z]=0) then
+      if {(x>=0) and (y>=0) and (z>=0) and
+         (x<Map.Sizex) and (y<Map.Sizey) and (z<Map.SizeZ) and }
+         (HelperMap[x,y,z] = -1) then
       begin
         //HelperMap[x,y,z] := CandidateIndex;
         NewCandidate.x := x;
@@ -904,13 +925,11 @@ var
         end;
     end;}
 begin
-  WriteLnLog(inttostr(mx)+inttostr(my)+inttostr(mz),'xxx');
-
   //init HelperMap and raycast list
   RaycastList := TRaycastList.Create;
   OldList := nil;
   HelperMap := ZeroIntegerMap;
-  SetCandidate(mx,my,mz); //seed for the grow of the map
+  SetCandidate(mx,my,mz); //seed for the growth of the map
   HelperMap[mx,my,mz] := MaxNeighboursIndex; //and already define it.
 
   repeat
@@ -946,6 +965,8 @@ begin
       //if RayTrue>0 then writeLnLog(inttostr(mx)+','+inttostr(my)+','+inttostr(mz)+' - '+inttostr(round(100*RayTrue/RayCount)));
     end;
   until RaycastList.Count=0;
+  FreeAndNil(OldList);
+  FreeAndNil(RaycastList);
 
   //convert HelperMap to NeighbourList
 
@@ -969,10 +990,9 @@ begin
           end;
       end;
 
+  //WriteLnLog(inttostr(mx)+inttostr(my)+inttostr(mz),inttostr(tmpNeighboursMap[mx,my,mz].count));
   RemoveDuplicatesNeighbours(tmpNeighboursMap[mx,my,mz]);
-
-  FreeAndNil(OldList);
-  FreeAndNil(RaycastList);
+  //WriteLnLog(inttostr(mx)+inttostr(my)+inttostr(mz),inttostr(tmpNeighboursMap[mx,my,mz].count));
 end;
 
 {----------------------------------------------------------------------------}
@@ -1064,9 +1084,9 @@ begin
   if length(nmap) = 0 then exit;
 
   //free and nil all the elements
-  for ix := 0 to length(nmap)-1 do
-    for iy := 0 to length(nmap[ix])-1 do
-      for iz := 0 to length(nmap[ix,iy])-1 do
+  for ix := 0 to high(nmap) do
+    for iy := 0 to high(nmap[ix]) do
+      for iz := 0 to high(nmap[ix,iy]) do
         freeAndNil(nmap[ix,iy,iz]);
 
   nmap := nil; //this will automatically free the array
@@ -1080,9 +1100,14 @@ type DIndexRec = record
   hits: integer;
 end;
 type HitList = specialize TGenericStructList<DIndexRec>;
+//{$DEFINE InverseSort}
 function CompareHits(const i1,i2: DIndexRec): integer;
 begin
+  {$IFNDEF InverseSort}
   result := i1.hits - i2.hits;
+  {$ELSE}
+  result := i2.hits - i1.hits;
+  {$ENDIF}
 end;
 procedure D3DDungeonGenerator.Chunk_N_Slice;
 var i,j,g: integer;
@@ -1106,15 +1131,17 @@ begin
   Therefore we find "more popular" tiles which will be 'seeds' for groups}
   for ix := 0 to Map.sizex-1 do
     for iy := 0 to Map.sizey-1 do
-      for iz := 0 to Map.sizez-1 do if NeighboursMap[ix,iy,iz]<>nil then
-        for i := 0 to NeighboursMap[ix,iy,iz].count-1 do
-          inc(Hit_count.L[NeighboursMap[ix,iy,iz].L[i].Tile].hits);
+      for iz := 0 to Map.sizez-1 do if NeighboursMap[ix,iy,iz]<>nil then {begin}
+        //writeLnLog(inttostr(ix)+inttostr(iy)+inttostr(iz),inttostr(NeighboursMap[ix,iy,iz].count));
+        for j := 0 to NeighboursMap[ix,iy,iz].count-1 do
+          inc(Hit_count.L[NeighboursMap[ix,iy,iz].L[j].Tile].hits);
+      {end;}
   Hit_count.Sort(@CompareHits);
 
   {now let's start the main algorithm}
   g := 0;
   setlength(tilesUsed,length(Gen));
-  for j := 0 to high(tilesused) do tilesUsed[i] := false;
+  for j := 0 to high(tilesused) do tilesUsed[j] := false;
   i := 0;
   repeat
     setLength(Groups,g+1);
@@ -1125,11 +1152,11 @@ begin
     Roughly, amount of groups will be ~sqrt(tiles) However, it's not as simple as it might seem}
 
     //skip sorted list to first unused tile
-    while (i <= high(tilesUsed)) and (tilesUsed[Hit_count[i].index]) do inc(i);
 
-    if (i <= high(tilesUsed)){ and (not tilesUsed[Hit_count[i].index]) } then begin
-      {we don't actually need to scan the whole tile, only top-left element,
-       if we'll miss something, we'll just add missed tiles to other groups later}
+    {if (i <= high(tilesUsed)){ and (not tilesUsed[Hit_count[i].index]) } then} begin
+
+      {we don't actually need to scan the whole tile(sizex,sizey,sizez), only top-left element,
+       if we'll miss something, we'll just add missed tiles to *other* groups later}
       ix := Gen[Hit_count[i].index].x;
       iy := Gen[Hit_count[i].index].y;
       iz := Gen[Hit_count[i].index].z;
@@ -1139,17 +1166,25 @@ begin
         iy += Tiles[Gen[Hit_count[i].index].tile].b_y;
         iz += Tiles[Gen[Hit_count[i].index].tile].b_z;
       end;
+
       {we're sure neighbours list is not nil!}
       if NeighboursMap[ix,iy,iz]=nil then raise exception.create('NeighboursMap is nil!');
-      for j := 0 to NeighboursMap[ix,iy,iz].count do
-        if not tilesUsed[Hit_count[i].index] then begin
-          tilesUsed[Hit_count[i].index] := true;
-          Groups[g].add(Hit_count[i].index);
+      for j := 0 to NeighboursMap[ix,iy,iz].count-1 do
+        if not tilesUsed[NeighboursMap[ix,iy,iz].L[j].tile] then begin
+          tilesUsed[NeighboursMap[ix,iy,iz].L[j].tile] := true;
+          Groups[g].add(NeighboursMap[ix,iy,iz].L[j].tile);
         end;
+
     end;
+
+    while (i <= high(tilesUsed)) and (tilesUsed[Hit_count[i].index]) do inc(i);
     inc(g);
-  until i >= high(tilesUsed);
+
+  until i >= high(Gen);
+
   writeLnLog('D3DDungeonGenerator.Chunk_N_Slice','N groups = '+inttostr(length(groups)));
+  for i := 0 to high(groups) do writeLnLog('group '+inttostr(i),inttostr(groups[i].Count));
+
   freeAndNil(Hit_count);
 end;
 
@@ -1160,6 +1195,7 @@ var t: TDateTime;
 begin
   //make the logic map
   inherited Generate;
+  fisWorking := true;
 
   //raycast
   writeLnLog('D3DDungeonGenerator.Generate','Raycasting started...');
@@ -1171,6 +1207,7 @@ begin
 
   writeLnLog('D3DDungeonGenerator.Generate','Raycasting finished in '+inttostr(round((now-t)*24*60*60*1000))+'ms...');
   Chunk_N_Slice;
+  fisWorking := false;
 end;
 
 {========================== DGENERATOR TILE ================================}
