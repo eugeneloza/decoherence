@@ -89,7 +89,7 @@ type
      Result must be assigned to the generator (or freed)}
     function GetMapParameters: DGeneratorParameters;
 
-    procedure SaveMap(filename: string);
+    procedure SaveMap(filename: string; togamefolder: boolean);
     procedure SaveAll;
   public
     procedure LoadMe; override;
@@ -358,13 +358,13 @@ begin
   if ToGameFolder then
     SaveAll
   else
-    SaveMap('');   //empty string is "current file"
+    SaveMap('',ToGameFolder);   //empty string is "current file"
   inherited WriteMe(ToGameFolder);
 end;
 
 {------------------------------------------------------------------------------}
 
-procedure TMapEditor.SaveMap(filename: string);
+procedure TMapEditor.SaveMap(filename: string; togamefolder: boolean);
 var GParam: DGeneratorParameters;
     XMLdoc: TXMLDocument;
     RootNode, LargeContainer, SmallContainer, TextNode: TDOMNode;
@@ -409,14 +409,14 @@ begin
   for j in FirstSteps do
     ...
   end;
-  RootNode.AppendChild(LargeContainer);
+  RootNode.AppendChild(LargeContainer); }
 
   //write the file
   if ToGameFolder then
     f := ConstructorData(GetScenarioFolder+MapsFolder+filename+'.xml'+gz_ext,ToGameFolder)
   else
     f := ConstructorData(GetScenarioFolder+MapsFolder+filename+'.xml',ToGameFolder);
-  URLWriteXML(XMLdoc, f);}
+  {URLWriteXML(XMLdoc, f);}
 
   WriteLnLog('***','File Written: '+f);
 
@@ -429,7 +429,7 @@ end;
 procedure TMapEditor.SaveAll;
 var s: string;
 begin
-  for s in MapSelector.Items do SaveMap(s);
+  for s in MapSelector.Items do SaveMap(s,true);
 end;
 
 {------------------------------------------------------------------------------}

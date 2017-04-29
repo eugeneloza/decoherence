@@ -68,7 +68,8 @@ implementation
 
 uses CastleFilesUtils, StrUtils;
 
-procedure MyReplaceStringReverse(var s: string; const searchstring,replacestring: string);
+{case-sensitive replace the last occurence of searchstring to replacestring}
+procedure ReplaceStringReverse(var s: string; const searchstring,replacestring: string);
 var i: integer;
 begin
   for i := length(s)-length(searchstring) downto 0 do
@@ -78,11 +79,13 @@ begin
     end;
 end;
 
+{-----------------------------------------------------------------------------}
+
 function ConstructorData(URL: string; ToGameFolder:boolean): string;
 begin
   Result := ApplicationData(URL);
   if not ToGameFolder then begin
-    MyReplaceStringReverse(Result,'/data/','/architect/');
+    ReplaceStringReverse(Result,'/data/','/architect/');
     //{$Warning folder names cannot contain /data/ folder!}
     //result := AnsiReplaceText(Result,'/data/','/architect/');
     //invoke data compression
