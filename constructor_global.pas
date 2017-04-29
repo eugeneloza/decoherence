@@ -55,7 +55,8 @@ type
 var ConstructorLanguage: TLanguage;
 
 {analogue to castleFilesUtils.ApplicationData (and made based on it)
- but points to ARCHITECT directory (true) or ApplicationData (false)}
+ but points to ARCHITECT directory (true) or ApplicationData (false)
+ WARNING! This is a buggy procedure. No folder can be named "data" in the game files!!!}
 function ConstructorData(URL: string; ToGameFolder:boolean): string;
 {Desktop-only ApplicationData analogue. Replacement for ApplicationData for
  native FPC functions that don't work with URLs
@@ -67,11 +68,23 @@ implementation
 
 uses CastleFilesUtils, StrUtils;
 
+procedure MyReplaceStringReverse(var s: string; const searchstring,replacestring: string);
+var i: integer;
+begin
+  for i := length(s)-length(searchstring) downto 0 do
+    if copy(s,i,length(searchstring)) = searchstring then begin
+      s := copy(s,0,i-1) + replacestring + copy(s,i+length(searchstring),length(s));
+      break;
+    end;
+end;
+
 function ConstructorData(URL: string; ToGameFolder:boolean): string;
 begin
   Result := ApplicationData(URL);
   if not ToGameFolder then begin
-    result := AnsiReplaceText(Result,'/data/','/architect/');
+    MyReplaceStringReverse(Result,'/data/','/architect/');
+    //{$Warning folder names cannot contain /data/ folder!}
+    //result := AnsiReplaceText(Result,'/data/','/architect/');
     //invoke data compression
     {$IFDEF gzipdata}result := AnsiReplaceText(Result,'.gz','.xml');{$ENDIF}
   end;
