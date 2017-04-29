@@ -105,6 +105,7 @@ implementation
 {$R *.lfm}
 
 uses StrUtils, CastleLog, castleimages, castlevectors,
+  DOM, CastleXMLUtils,
   decoglobal;
 
 
@@ -158,7 +159,7 @@ begin
   //todo: in a thread + stop
   GENERATOR.Generate;
 
-  DungeonMap := GENERATOR.GetMap;
+  DungeonMap := GENERATOR.ExportMap;
 
   FreeAndNil(GENERATOR);
 
@@ -365,23 +366,29 @@ end;
 
 procedure TMapEditor.SaveMap(filename: string);
 var GParam: DGeneratorParameters;
-    {XMLdoc: TXMLDocument;
+    XMLdoc: TXMLDocument;
     RootNode, LargeContainer, SmallContainer, TextNode: TDOMNode;
-    i: ...;}
+    f: string;
+    {i: ...;}
 begin
   if filename='' then begin
     GParam := self.GetMapParameters;
-    filename := '****';
+    filename := MapSelector.text;
+    if filename='' then begin
+      showmessage('Please, specify a map name!');
+      MapEditor.SetFocusedControl(MapSelector);
+      exit;
+    end;
   end else begin
     GParam := DGeneratorParameters.create;
-    //GParam.Load(filename);
+    GParam.Load(filename);
   end;
 
   {$warning dummy}
-  {XMLdoc := TXMLDocument.Create;
-  RootNode := XMLdoc.CreateElement('Dungeon');
+  XMLdoc := TXMLDocument.Create;
+  RootNode := XMLdoc.CreateElement('Interior');
   XMLdoc.Appendchild(RootNode);
-
+  {
   //write generation parameters
   LargeContainer := XMLdoc.CreateElement('Parameters');
   //ContainerNode.AttributeSet('maxx',GParam.maxx);
@@ -409,11 +416,12 @@ begin
     f := ConstructorData(GetScenarioFolder+MapsFolder+filename+'.xml'+gz_ext,ToGameFolder)
   else
     f := ConstructorData(GetScenarioFolder+MapsFolder+filename+'.xml',ToGameFolder);
-  URLWriteXML(XMLdoc, f);
+  URLWriteXML(XMLdoc, f);}
+
   WriteLnLog('***','File Written: '+f);
 
-  FreeAndNil(XMLdoc); }
-
+  FreeAndNil(XMLdoc);
+  freeandnil(GParam);
 end;
 
 {------------------------------------------------------------------------------}

@@ -242,7 +242,6 @@ object MapEditor: TMapEditor
     Width = 241
     ItemHeight = 0
     TabOrder = 4
-    Text = 'MapSelector'
   end
   object TileImage: TCastleImageControl
     TUIControlPos_RealLeft = 26

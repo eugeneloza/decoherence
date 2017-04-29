@@ -122,30 +122,39 @@ type
 type
   {a set of map generation parameters}
   DGeneratorParameters = class
-    {the map cannot be larger than these}
-    maxx,maxy,maxz: TIntCoordinate;
-    {the map cannot be smaller than these}
-    minx,miny,minz: TIntCoordinate;
-    {target map volume. The map will be regenerated until it's met
-     Usually the algorithm can handle up to ~30% packaging of maxx*maxy*maxz}
-    Volume: integer;
-    {when the map has FreeFaces>MaxFaces it will try to "Shrink" the amount
-     of free faces by using poor tiles}
-    MaxFaces: integer;
-    {when the map has FreeFaces<MinFaces it will try to "extend" the amount
-     of free faces by using rich tiles (in case the Volume is not yet met)}
-    MinFaces: integer;
-    {random generation seed}
-    Seed: LongWord;
-    {are links in TilesList absolute URL or just a tile name}
-    absoluteURL: boolean;
-    {list of tiles}
-    TilesList: TStringList;
-    {list of first generation steps}
-    FirstSteps: TFirstStepsArray;
+    protected
+      fisReady: boolean;
+    public
+      {the map cannot be larger than these}
+      maxx,maxy,maxz: TIntCoordinate;
+      {the map cannot be smaller than these}
+      minx,miny,minz: TIntCoordinate;
+      {target map volume. The map will be regenerated until it's met
+       Usually the algorithm can handle up to ~30% packaging of maxx*maxy*maxz}
+      Volume: integer;
+      {when the map has FreeFaces>MaxFaces it will try to "Shrink" the amount
+       of free faces by using poor tiles}
+      MaxFaces: integer;
+      {when the map has FreeFaces<MinFaces it will try to "extend" the amount
+       of free faces by using rich tiles (in case the Volume is not yet met)}
+      MinFaces: integer;
+      {random generation seed}
+      Seed: LongWord;
+      {are links in TilesList absolute URL or just a tile name}
+      absoluteURL: boolean;
+      {list of tiles}
+      TilesList: TStringList;
+      {list of first generation steps}
+      FirstSteps: TFirstStepsArray;
 
-    constructor create;
-    destructor destroy; override;
+      {loads and applies the map parameters}
+      procedure Load(filename: string);
+      {is the generator ready to wrok?
+       Generatie will raise an exception if it isn't}
+      property isReady: boolean read fisReady default false;
+
+      constructor create;
+      destructor destroy; override;
   end;
 
 type TIndexList = specialize TFPGList<TTileType>;
@@ -242,35 +251,35 @@ type
   public
     {map parameters}
     Parameters: DGeneratorParameters;
+    {this forces isReady to true. Must be used only in constructor which skips
+     loading of the map}
+    procedure ForceReady;
     {initializes generation parameters and loads everything}
     procedure InitParameters; override;
     { the main procedure to generate a dungeon,
-      may be launched in main thread (for testing or other purposes) }
+      may be directly launched in main thread (for testing or other purposes),
+      automaticlaly called on thread.execute
+      WARNING: if map parameters are not valid the Generate procedure
+      might and *will* hang forever.
+      We need to do something about this,
+      however I'm not sure how exactly this issue may be solved without
+      *ruining* the game by producing an non-complete map (e.g. lacking a critical area)
+      other than always rpoviding valid initialization parameters
+      (i.e. such map parameters that the map *can* be generated)
+      So, for now: ALWAYS test the map a few times in the map editor}
     procedure Generate; override;
 
     constructor Create; override;
     destructor Destroy; override;
     procedure FreeLists;
-    
-    {loads and applies the map parameters}
-    procedure Load(filename: string);
-    
     //save temp state to file ---- unneeded for now
-
   public
-
     {EXPORT routines. They create a *copy* of internal generator data
      to respond to external request.
      This is made to keep the generator clean and self-contained.
      HOWEVER, this is not optimal, as requires nearly *double* RAM during the
      export procedures.
-     todo: Maybe not copying but passing a link and setting reference to nil is a better approach!?
-     Anyway, it'll still be done by these procedures.
-
-     UPD: WARNING, exporting an issue WILL stop the Generator from freeing it
-          and will NIL the corresponding link. Don't try to access it twice!}
-
-    {makes a *copy* of the "internal" map to external request
+     makes a *copy* of the "internal" map to external request
      it's "lower-level" than used DGenerationMap so useful :)}
     function ExportMap: DMap; //maybe better saveTo when finished?: DMap;
     //function ExportTiles //not needed as it is in GenerationParameters
@@ -295,6 +304,7 @@ type
 
 type TNeighboursList = specialize TGenericStructList<DNeighbour>;
 type TNeighboursMapArray = array of array of array of TNeighboursList;
+type TGroupsArray = array of TIndexList;
 
 type
   {this is a Dungeon Generator with additional 3D world generation,
@@ -320,8 +330,8 @@ type
     tmpNeighboursMap: TNeighboursMapArray;
     {final neighbours map}
     NeighboursMap: TNeighboursMapArray;
-
-    Groups: array of TIndexList;
+    {groups of tiles (used to chunk the dungeon)}
+    Groups: TGroupsArray;
     {merge the neighbours of neighbours in order for the light to work smoothly
      todo!!!}
     procedure Neighbours_of_neighbours;
@@ -350,7 +360,12 @@ type
 
     destructor destroy; override;
   public
-    //function ExportGroups:
+    {WARNING, exporting these WILL stop the Generator from freeing it
+     and will NIL the corresponding links. Don't try to access it twice!}
+    {exports groups of tiles and nils the link}
+    function ExportGroups: TGroupsArray;
+    {exports neighbours map and nils the link}
+    function ExportNeighbours: TNeighboursMapArray;
   end;
 
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
@@ -360,12 +375,20 @@ uses SysUtils, CastleLog, CastleFilesUtils, CastleImages, CastleVectors;
 
 {========================= GENERATION ALGORITHM ==============================}
 
+procedure DDungeonGenerator.ForceReady;
+begin
+  Parameters.fisReady := true;
+  WriteLnLog('DDungeonGenerator.ForceReady','Warning: Be careful, parameters might not be initialized correctly.');
+end;
+
+{----------------------------------------------------------------------------}
+
 procedure DDungeonGenerator.InitParameters;
 var s: string;
     tmp: DGeneratorTile;
     i : integer;
 begin
-  if not isReady then
+  if not parameters.isReady then
     raise exception.create('DDungeonGenerator.Generate FATAL - parameters are not loaded!');
   {load tiles}
   tiles.clear;
@@ -531,7 +554,7 @@ procedure DDungeonGenerator.Generate;
 var i: integer;
     t1,t2: TDateTime;
 begin
-  if not isReady then
+  if not parameters.isReady then
     raise exception.create('DDungeonGenerator.Generate FATAL - parameters are not loaded!');
   if not isInitialized then begin
     WriteLnLog('DDungeonGenerator.Generate','Warning: parameters were automatically initialized! It''s best to initialize parameters manually outside the thread.');
@@ -595,6 +618,7 @@ begin
   MakeMinimap;
 
   fisWorking := false;
+  fisFinished := true;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -602,6 +626,7 @@ end;
 function DDungeonGenerator.ExportMap: DMap;
 var ix,iy,iz: TIntCoordinate;
 begin
+  if not isFinished then raise Exception.create('DDungeonGenerator.ExportMap: ERROR! Trying to access an unfinished Generator');
   {Result := Map;
   Map := nil;}
   Result := DMap.create;
@@ -1191,10 +1216,12 @@ end;
 {------------------------------------------------------------------------}
 
 procedure D3DDungeonGenerator.Generate;
-var t: TDateTime;
+var t,t0: TDateTime;
 begin
+  t0 := now;
   //make the logic map
   inherited Generate;
+  fisFinished := false;
   fisWorking := true;
 
   //raycast
@@ -1205,9 +1232,31 @@ begin
   Raycast;
   //TileIndexMap := nil;  //this will free the array -- I'll need it later for debugging?!
 
-  writeLnLog('D3DDungeonGenerator.Generate','Raycasting finished in '+inttostr(round((now-t)*24*60*60*1000))+'ms...');
+  writeLnLog('D3DDungeonGenerator.Generate','Raycasting finished in '+inttostr(round((now-t)*24*60*60*1000))+'ms.');
   Chunk_N_Slice;
+
   fisWorking := false;
+  fisFinished := true;
+
+  writeLnLog('D3DDungeonGenerator.Generate','Finished. Everything done in '+inttostr(round((now-t0)*24*60*60*1000))+'ms.');
+end;
+
+{------------------------------------------------------------------------}
+
+function D3DDungeonGenerator.ExportGroups: TGroupsArray;
+begin
+  if not isFinished then raise Exception.create('D3DDungeonGenerator.ExportGroups: ERROR! Trying to access an unfinished Generator');
+  Result := Groups;
+  Groups := nil;
+end;
+
+{------------------------------------------------------------------------}
+
+function D3DDungeonGenerator.ExportNeighbours: TNeighboursMapArray;
+begin
+  if not isFinished then raise Exception.create('Generator.ExportNeighbours: ERROR! Trying to access an unfinished Generator');
+  Result := NeighboursMap;
+  NeighboursMap := nil;
 end;
 
 {========================== DGENERATOR TILE ================================}
@@ -1247,11 +1296,10 @@ end;
 
 {========================= OTHER ROUTINES ===================================}
 
-procedure DDungeonGenerator.Load(filename: string);
+procedure DGeneratorParameters.Load(filename: string);
 begin
-  {$warning critical todo in DDungeonGenerator.Load}
+  {$warning critical todo in DGeneratorParameters.Load}
   {initialize generator parameters}
-
   fisReady := true;
 end;
 

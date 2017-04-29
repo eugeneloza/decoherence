@@ -34,25 +34,22 @@ type
   DAbstractGenerator = class(TThread)
   protected
     fisWorking: boolean;
-    fisReady: boolean;
     fisInitialized: boolean;
+    fisFinished: boolean;
   protected
     { xorshift random generator, fast and thread-safe }
     RNDM: TCastleRandom;
     {Specific SEED of the random number for this algorithm }
     procedure InitSeed(newseed: longword = 0);
   public
-    {is the generator ready to wrok?
-     Generatie will raise an exception if it isn't}
-    property isReady: boolean read fisReady default false;
     {are the parameters initialized? If no, they'll be init
-     automatically, but its best to do it manually outside the thread}
+     automatically, but its best to do it manually outside the thread
+     due to possible HDD reading issues}
     property isInitialized: boolean read fisInitialized default false;
     {is the generator currently working?}
     property isWorking: boolean read fisWorking default false;
-    {this forces isReady to true. Must be used only in constructor which skips
-     loading of the map}
-    procedure ForceReady;
+    {if the generation finished successfully?}
+    property isFinished: boolean read fisFinished default false;
 
     {MUST BE MANUALLY RUN BEFORE GENERATION (best if outside the thread)
      initialize parameters and load pre-generated tiles
@@ -79,14 +76,6 @@ type
 implementation
 
 uses SysUtils, CastleLog;
-
-{-----------------------------------------------------------------------------}
-
-procedure DAbstractGenerator.ForceReady;
-begin
-  fisReady := true;
-  WriteLnLog('DAbstractGenerator.ForceReady','Warning: Be careful, parameters might not be initialized correctly.');
-end;
 
 {-----------------------------------------------------------------------------}
 
