@@ -87,7 +87,7 @@ type
      full version}
     function CalculateFaces: integer; reintroduce; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 end;
-type TTileList = specialize TFPGObjectList<DGeneratorTile>;
+type TGeneratorTileList = specialize TFPGObjectList<DGeneratorTile>;
 
 type
   {this is a basic "add a tile" generator step. We can build a map by followig these
@@ -148,7 +148,7 @@ type
       FirstSteps: TFirstStepsArray;
 
       {loads and applies the map parameters}
-      procedure Load(filename: string);
+      procedure Load(URL: string);
       {is the generator ready to wrok?
        Generatie will raise an exception if it isn't}
       property isReady: boolean read fisReady default false;
@@ -165,7 +165,7 @@ type
   DDungeonGenerator = class(DAbstractGenerator)
   private
     {list of tiles used in current map}
-    Tiles: TTileList;
+    Tiles: TGeneratorTileList;
     {a list of "normal" tiles used in generation}
     NormalTiles: TIndexList;
     {how many dock points are there in the normal tileset?
@@ -282,7 +282,9 @@ type
      makes a *copy* of the "internal" map to external request
      it's "lower-level" than used DGenerationMap so useful :)}
     function ExportMap: DMap; //maybe better saveTo when finished?: DMap;
-    //function ExportTiles //not needed as it is in GenerationParameters
+    function ExportTiles: TStringList;
+    {nils GEN link!}
+    function ExportSteps: TGeneratorStepsArray;
 end;
 
 type TIntMapArray = array of array of array of integer;
@@ -337,8 +339,6 @@ type
     procedure Neighbours_of_neighbours;
     {initializes a neighbours map with nils}
     function NilIndexMap: TNeighboursMapArray;
-    {free every element of a Neigobours map}
-    procedure FreeNeighboursMap(var nmap: TNeighboursMapArray);
     {remove duplicates in the sorted tiles list and (!!!) sorts the array
      this operation is performed twice during the generation, so efficiency is not of concern}
     procedure RemoveDuplicatesNeighbours(var List: TNeighboursList);
@@ -368,10 +368,15 @@ type
     function ExportNeighbours: TNeighboursMapArray;
   end;
 
+{free every element of a Neigobours map}
+procedure FreeNeighboursMap(var nmap: TNeighboursMapArray);
+{free every element of a groups array}
+procedure FreeGroups(ngroups: TGroupsArray);
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
-uses SysUtils, CastleLog, CastleFilesUtils, CastleImages, CastleVectors;
+uses SysUtils, CastleLog, CastleFilesUtils, CastleImages, CastleVectors,
+  DOM, CastleXMLUtils;
 
 {========================= GENERATION ALGORITHM ==============================}
 
@@ -394,9 +399,9 @@ begin
   tiles.clear;
   For s in parameters.TilesList do begin
     if parameters.AbsoluteURL then
-      tmp := DGeneratorTile.Load(s+'.map')
+      tmp := DGeneratorTile.Load(s,false)
     else
-      tmp := DGeneratorTile.Load(ApplicationData(s+'.map'+GZ_ext));
+      tmp := DGeneratorTile.Load(ApplicationData(TilesFolder+s),true);
     tmp.CalculateFaces;
     tmp.ProcessBlockers;
     tiles.Add(tmp);
@@ -638,6 +643,24 @@ begin
   setLength(Result.img,length(Map.img));
   for iz := 0 to Map.sizez-1 do
     Result.img[iz] := Map.img[iz].MakeCopy as TRGBAlphaImage;
+end;
+
+{-----------------------------------------------------------------------------}
+
+function DDungeonGenerator.ExportTiles: TStringList;
+var s: string;
+begin
+  Result := TStringList.create;
+  for s in self.Parameters.TilesList do
+    Result.add(s);
+end;
+
+{-----------------------------------------------------------------------------}
+
+function DDungeonGenerator.ExportSteps: TGeneratorStepsArray;
+begin
+  Result := Gen;
+  Gen := nil;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -1101,24 +1124,6 @@ end;
 
 {------------------------------------------------------------------------}
 
-procedure D3DDungeonGenerator.FreeNeighboursMap(var nmap: TNeighboursMapArray);
-var ix,iy,iz: TIntCoordinate;
-begin
-  if nmap = nil then exit;
-  //just to be safe (in case the nmap was not initialized completely)
-  if length(nmap) = 0 then exit;
-
-  //free and nil all the elements
-  for ix := 0 to high(nmap) do
-    for iy := 0 to high(nmap[ix]) do
-      for iz := 0 to high(nmap[ix,iy]) do
-        freeAndNil(nmap[ix,iy,iz]);
-
-  nmap := nil; //this will automatically free the array
-end;
-
-{------------------------------------------------------------------------}
-
 {can't make it nested because TCompareFunction cannot accept "is nested"}
 type DIndexRec = record
   index: integer;
@@ -1296,9 +1301,72 @@ end;
 
 {========================= OTHER ROUTINES ===================================}
 
-procedure DGeneratorParameters.Load(filename: string);
+procedure DGeneratorParameters.Load(URL: string);
+var XMLdoc: TXMLDocument;
+    RootNode, LargeContainer,SmallContainer: TDOMElement;
+    Iterator: TXMLElementIterator;
+    FS: DFirstStep;
 begin
-  {$warning critical todo in DGeneratorParameters.Load}
+  WriteLnLog('DGeneratorParameters.Load',URL);
+
+  if self=nil then raise Exception.create('DGeneratorParameters is nil!'); // HELLO, my best bug thing :)
+
+  try
+    XMLdoc := URLReadXML(URL);
+    RootNode := XMLdoc.DocumentElement;
+    LargeContainer := RootNode.ChildElement('Parameters');
+    SmallContainer := LargeContainer.ChildElement('Size');
+    maxx := SmallContainer.AttributeInteger('maxx');
+    maxy := SmallContainer.AttributeInteger('maxy');
+    maxz := SmallContainer.AttributeInteger('maxz');
+    minx := SmallContainer.AttributeInteger('minx');
+    miny := SmallContainer.AttributeInteger('miny');
+    minz := SmallContainer.AttributeInteger('minz');
+
+    SmallContainer := LargeContainer.ChildElement('Volume');
+    volume := SmallContainer.AttributeInteger('value');
+
+    SmallContainer := LargeContainer.ChildElement('Faces');
+    maxFaces := SmallContainer.AttributeInteger('max');
+    minFaces := SmallContainer.AttributeInteger('min');
+
+    SmallContainer := LargeContainer.ChildElement('Seed');
+    seed := SmallContainer.AttributeInteger('value');
+
+    absoluteURL := false;
+    LargeContainer := RootNode.ChildElement('TilesList');
+    Iterator := LargeContainer.ChildrenIterator;
+    try
+      while Iterator.GetNext do if Iterator.current.NodeName = UTF8decode('Tile') then
+      begin
+        SmallContainer := Iterator.current;
+        TilesList.add(SmallContainer.TextData);
+      end;
+    finally
+      FreeAndNil(Iterator);
+    end;
+
+    LargeContainer := RootNode.ChildElement('FirstSteps');
+    Iterator := LargeContainer.ChildrenIterator;
+    try
+      while Iterator.GetNext do if Iterator.current.NodeName = UTF8decode('Tile') then
+      begin
+        SmallContainer := Iterator.current;
+        FS.tile := SmallContainer.TextData;
+        FS.x := SmallContainer.AttributeInteger('x');
+        FS.y := SmallContainer.AttributeInteger('y');
+        FS.z := SmallContainer.AttributeInteger('z');
+        FirstSteps.add(FS);
+      end;
+    finally
+      FreeAndNil(Iterator);
+    end;
+
+  except
+    writeLnLog('DGeneratorParameters.Load','ERROR: Exception in GeneratorParameters load');
+  end;
+  FreeAndNil(XMLdoc);
+
   {initialize generator parameters}
   fisReady := true;
 end;
@@ -1340,8 +1408,8 @@ constructor DDungeonGenerator.create;
 begin
   inherited;
   Map := DGeneratorMap.create;
-  Tiles := TTileList.Create(true);
-  //parameters := DGeneratorParameters.create;
+  Tiles := TGeneratorTileList.Create(true);
+  parameters := DGeneratorParameters.create;
 
   NormalTiles := TIndexList.create;
   BlockerTiles := TIndexList.create;
@@ -1385,14 +1453,39 @@ end;
 {-----------------------------------------------------------------------------}
 
 destructor D3DDungeonGenerator.Destroy;
-var i: integer;
 begin
   FreeNeighboursMap(tmpNeighboursMap);
   FreeNeighboursMap(NeighboursMap);
-  if groups<>nil then
-    for i := 0 to high(groups) do
-      FreeAndNil(Groups[i]);
+  FreeGroups(groups);
   inherited;
+end;
+
+{============================ FREEING ROUTINES ==============================}
+
+procedure FreeGroups(ngroups: TGroupsArray);
+var i: integer;
+begin
+  if ngroups<>nil then
+    for i := 0 to high(ngroups) do
+      FreeAndNil(ngroups[i]);
+end;
+
+{------------------------------------------------------------------------}
+
+procedure FreeNeighboursMap(var nmap: TNeighboursMapArray);
+var ix,iy,iz: TIntCoordinate;
+begin
+  if nmap = nil then exit;
+  //just to be safe (in case the nmap was not initialized completely)
+  if length(nmap) = 0 then exit;
+
+  //free and nil all the elements
+  for ix := 0 to high(nmap) do
+    for iy := 0 to high(nmap[ix]) do
+      for iz := 0 to high(nmap[ix,iy]) do
+        freeAndNil(nmap[ix,iy,iz]);
+
+  nmap := nil; //this will automatically free the array
 end;
 
 end.

@@ -243,6 +243,15 @@ object MapEditor: TMapEditor
     ItemHeight = 0
     TabOrder = 4
   end
+  object SaveButton: TButton
+    Left = 549
+    Height = 25
+    Top = 338
+    Width = 75
+    Caption = 'Save'
+    OnClick = SaveButtonClick
+    TabOrder = 5
+  end
   object TileImage: TCastleImageControl
     TUIControlPos_RealLeft = 26
     TUIControlPos_Design_Left = 192

@@ -28,6 +28,7 @@ uses
 
 type
   TMapEditor = class(TWriterForm)
+    SaveButton: TButton;
     MapSelector: TComboBox;
     TileImage: TCastleImageControl;
     EditMaxF: TEdit;
@@ -69,28 +70,35 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure GenerateButtonClick(Sender: TObject);
+    procedure SaveButtonClick(Sender: TObject);
     procedure VolumeEditChange(Sender: TObject);
     procedure ZScrollChange(Sender: TObject);
   public
     {List of tiles names}
+    MapsList: TStringList;
+    {List of tiles names}
     TilesList: TStringList;
-    {list of actual tiles}
-    Tiles: TTileList;
 
     DungeonMap: DMap;
 
-    {fills the checklistbox with tiles names and checks them all}
-    procedure FillBox;
-    {reads tiles list from the folder}
-    procedure GetTileList;
     {if map is ready then draws the map}
     procedure DrawMap;
     {fills a DGeneratorParameters from the form elements
      Result must be assigned to the generator (or freed)}
     function GetMapParameters: DGeneratorParameters;
-
+    {saves current map parameters to a file}
     procedure SaveMap(filename: string; togamefolder: boolean);
+    {compile all the maps to game folder}
     procedure SaveAll;
+
+    {read list of maps available in the scenario}
+    procedure ReadMapsList;
+    {copies the map list into TComboBox}
+    procedure FillMapsList;
+    {fills the checklistbox with tiles names and checks them all}
+    procedure FillTilesList;
+    {reads tiles list from the folder}
+    procedure ReadTilesList;
   public
     procedure LoadMe; override;
     procedure FreeMe; override;
@@ -104,7 +112,7 @@ var
 implementation
 {$R *.lfm}
 
-uses StrUtils, CastleLog, castleimages, castlevectors,
+uses {StrUtils, }CastleLog, castleimages, castlevectors,
   DOM, CastleXMLUtils,
   decoglobal;
 
@@ -152,6 +160,7 @@ begin
   FreeAndNil(DungeonMap);
   GENERATOR := D3dDungeonGenerator.Create;
   //GENERATOR.load('');
+  FreeAndNil(Generator.parameters); //purge autocreated parameters
   GENERATOR.parameters := GetMapParameters;  //will be autofreed by GENERATOR destructor
 
   GENERATOR.ForceReady;
@@ -169,6 +178,11 @@ begin
   DrawMap;
 
   GenerateButton.Enabled := true;
+end;
+
+procedure TMapEditor.SaveButtonClick(Sender: TObject);
+begin
+  SaveMap('',false);
 end;
 
 procedure TMapEditor.ZScrollChange(Sender: TObject);
@@ -195,22 +209,12 @@ end;
 
 {------------------------------------------------------------------------}
 
-procedure TMapEditor.FillBox;
-var s: string;
-begin
-  TilesBox.Clear;
-  for s in TilesList do
-    TilesBox.Items.add(s);
-  TilesBox.CheckAll(cbChecked);
-end;
-
-
-{------------------------------------------------------------------------}
-
 procedure TMapEditor.LoadMe;
 begin
-  GetTileList;
-  FillBox;
+  ReadTilesList;
+  FillTilesList;
+  ReadMapsList;
+  FillMapsList;
   isChanged := false;
   isLoaded := true;
 end;
@@ -219,6 +223,7 @@ end;
 
 procedure TMapEditor.FreeMe;
 begin
+  FreeAndNil(MapsList);
   FreeAndNil(TilesList);
   FreeAndNil(DungeonMap);
 end;
@@ -367,58 +372,111 @@ end;
 procedure TMapEditor.SaveMap(filename: string; togamefolder: boolean);
 var GParam: DGeneratorParameters;
     XMLdoc: TXMLDocument;
-    RootNode, LargeContainer, SmallContainer, TextNode: TDOMNode;
-    f: string;
-    {i: ...;}
+    RootNode: TDOMNode;
+    LargeContainer, SmallContainer: TDOMElement;
+    TextNode: TDOMNode;
+    {s,}f: string;
+    //j: DFirstStep;
+    i: integer;
+    //flg: boolean;
 begin
   if filename='' then begin
-    GParam := self.GetMapParameters;
     filename := MapSelector.text;
     if filename='' then begin
       showmessage('Please, specify a map name!');
       MapEditor.SetFocusedControl(MapSelector);
       exit;
     end;
+    {for s in MapSelector.Items do if s=filename then begin
+      if MessageDlg('File exists',filename+' exists, overwrite',mtConfirmation,[mbYes,mbNo],0) = mrNo then exit;
+      break;
+    end; }
+    //if not duplicate
+    MapSelector.Items.Add(filename);
+    GParam := self.GetMapParameters;
   end else begin
     GParam := DGeneratorParameters.create;
-    GParam.Load(filename);
+    GParam.Load(ConstructorData(GetScenarioFolder+MapsFolder+filename+'.xml',false));
   end;
 
-  {$warning dummy}
   XMLdoc := TXMLDocument.Create;
-  RootNode := XMLdoc.CreateElement('Interior');
+  RootNode := XMLdoc.CreateElement('InteriorMap');
   XMLdoc.Appendchild(RootNode);
-  {
+
   //write generation parameters
   LargeContainer := XMLdoc.CreateElement('Parameters');
-  //ContainerNode.AttributeSet('maxx',GParam.maxx);
+  SmallContainer := XMLdoc.createElement('Size');
+  SmallContainer.AttributeSet('maxx',GParam.maxx);
+  SmallContainer.AttributeSet('maxy',GParam.maxy);
+  SmallContainer.AttributeSet('maxz',GParam.maxz);
+  SmallContainer.AttributeSet('minx',GParam.minx);
+  SmallContainer.AttributeSet('miny',GParam.miny);
+  SmallContainer.AttributeSet('minz',GParam.minz);
+  LargeContainer.AppendChild(SmallContainer);
+
+  SmallContainer := XMLdoc.createElement('Volume');
+  SmallContainer.AttributeSet('value',GParam.volume);
+  LargeContainer.AppendChild(SmallContainer);
+
+  LargeContainer.AppendChild(SmallContainer);
+  SmallContainer := XMLdoc.createElement('Faces');
+  SmallContainer.AttributeSet('max',GParam.MaxFaces);
+  SmallContainer.AttributeSet('min',GParam.MinFaces);
+  LargeContainer.AppendChild(SmallContainer);
+
+  LargeContainer.AppendChild(SmallContainer);
+  SmallContainer := XMLdoc.createElement('Seed');
+  SmallContainer.AttributeSet('value',GParam.seed);
+  LargeContainer.AppendChild(SmallContainer);
+
   RootNode.AppendChild(LargeContainer);
 
   //write tiles list
   LargeContainer := XMLdoc.CreateElement('TilesList');
-  for i in Tiles[L] do begin
-    SmallContainer := XMLdoc.CreateElement('Tile');
-    TextNode := XMLdoc.CreateTextNode(UTF8decode(...));
-    SmallContainer.AppendChild(TextNode);
-    LargeContainer.AppendChild(SmallContainer);
-  end;
+  {If we're saving a current map:
+   using a copy of the algorithm to make non-absolute URLs
+   it is guaranteed to produce exactly the same result
+   (as long as self.GetMapParameters is not changed)}
+  if not ToGameFolder then begin
+    for i := 0 to TilesBox.Items.count-1 do if TilesBox.Checked[i] then begin
+      SmallContainer := XMLdoc.CreateElement('Tile');
+      TextNode := XMLdoc.CreateTextNode(UTF8decode(TilesBox.Items[i]));
+      SmallContainer.AppendChild(TextNode);
+      LargeContainer.AppendChild(SmallContainer);
+    end
+  end
+  else
+  {else use "normal" way
+   because "load" will load non-absolute URLs}
+    for i := 0 to GParam.TilesList.count-1 {s in GParam.TilesList} do begin
+      SmallContainer := XMLdoc.CreateElement('Tile');
+      TextNode := XMLdoc.CreateTextNode(UTF8decode(GParam.TilesList[i]));
+      SmallContainer.AppendChild(TextNode);
+      LargeContainer.AppendChild(SmallContainer);
+    end;
   RootNode.AppendChild(LargeContainer);
 
   //write first steps
   LargeContainer := XMLdoc.CreateElement('FirstSteps');
-  for j in FirstSteps do
-    ...
+  for i := 0 to GParam.FirstSteps.Count-1{j in GParam.FirstSteps} do begin
+    SmallContainer := XMLdoc.CreateElement('Tile');
+    SmallContainer.AttributeSet('x',GParam.FirstSteps.L[i].x);
+    SmallContainer.AttributeSet('y',GParam.FirstSteps.L[i].y);
+    SmallContainer.AttributeSet('z',GParam.FirstSteps.L[i].z);
+    TextNode := XMLdoc.CreateTextNode(UTF8decode(GParam.FirstSteps.L[i].tile));
+    SmallContainer.AppendChild(TextNode);
+    LargeContainer.AppendChild(SmallContainer);
   end;
-  RootNode.AppendChild(LargeContainer); }
+  RootNode.AppendChild(LargeContainer);
 
   //write the file
   if ToGameFolder then
     f := ConstructorData(GetScenarioFolder+MapsFolder+filename+'.xml'+gz_ext,ToGameFolder)
   else
     f := ConstructorData(GetScenarioFolder+MapsFolder+filename+'.xml',ToGameFolder);
-  {URLWriteXML(XMLdoc, f);}
+  URLWriteXML(XMLdoc, f);
 
-  WriteLnLog('***','File Written: '+f);
+  WriteLnLog('TMapEditor.SaveMap','File Written: '+f);
 
   FreeAndNil(XMLdoc);
   freeandnil(GParam);
@@ -429,26 +487,46 @@ end;
 procedure TMapEditor.SaveAll;
 var s: string;
 begin
-  for s in MapSelector.Items do SaveMap(s,true);
+  for s in MapSelector.Items do if s<>'' then SaveMap(s,true);
 end;
 
 {------------------------------------------------------------------------------}
 
-procedure TMapEditor.GetTileList;
-var Rec: TSearchRec;
+procedure TMapEditor.ReadMapsList;
+begin
+  FreeAndNil(MapsList);
+  MapsList := GetFilesList(GetScenarioFolder+MapsFolder,'xml');
+  WriteLnLog('TMapEditor.ReadTilesList','Maps found = '+inttostr(MapsList.count));
+end;
+
+{------------------------------------------------------------------------------}
+
+procedure TMapEditor.ReadTilesList;
 begin
   FreeAndNil(TilesList);
-  TilesList := TStringList.Create;
-  // Android incompatible
-  if FindFirst (FakeConstructorData(TilesFolder+'*.map',false), faAnyFile - faDirectory, Rec) = 0 then
-   try
-     repeat
-       TilesList.Add(AnsiReplaceText(Rec.Name,'.map',''));
-     until FindNext(Rec) <> 0;
-   finally
-     FindClose(Rec);
-   end;
+  TilesList := GetFilesList(TilesFolder,'map');
   WriteLnLog('TMapEditor.GetTileList','Tiles found = '+inttostr(TilesList.count));
+end;
+
+{------------------------------------------------------------------------}
+
+procedure TMapEditor.FillTilesList;
+var s: string;
+begin
+  TilesBox.Clear;
+  for s in TilesList do
+    TilesBox.Items.add(s);
+  TilesBox.CheckAll(cbChecked);
+end;
+
+{------------------------------------------------------------------------}
+
+procedure TMapEditor.FillMapsList;
+var s: string;
+begin
+  MapSelector.clear;
+  for s in MapsList do
+    MapSelector.Items.add(s);
 end;
 
 end.

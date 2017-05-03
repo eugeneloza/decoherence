@@ -197,19 +197,9 @@ end;
 {--------------------------------------------------------------------------}
 
 procedure TDungeonTilesEditor.ReadTilesList;
-var Rec: TSearchRec;
 begin
   FreeAndNil(TilesList);
-  TilesList := TStringList.Create;
-  // Android incompatible
-  if FindFirst (FakeConstructorData(TilesFolder + '*.x3d',false), faAnyFile - faDirectory, Rec) = 0 then
-   try
-     repeat
-       TilesList.Add(AnsiReplaceText(Rec.Name,'.x3d',''));
-     until FindNext(Rec) <> 0;
-   finally
-     FindClose(Rec);
-   end;
+  TilesList := GetFilesList(TilesFolder,'x3d');
   WriteLnLog('TDungeonTilesEditor.ReadTilesList','Tiles found = '+inttostr(TilesList.count));
 end;
 
@@ -344,7 +334,7 @@ begin
   {load tile map}
 
   FreeAndNil(TileM);
-  TileM := DTileMap.loadSafe( ConstructorData(TilesFolder+Filename+'.map',false) );
+  TileM := DTileMap.loadSafe( ConstructorData(TilesFolder+Filename,false) );
   if not TileM.Ready then TileM.GuessSize(TileScene);
 
   ResetCamera;
@@ -404,12 +394,12 @@ begin
   FreeAndNil(TmpRoot);
 
   //compile tile map
-  tmpMap := DTileMap.LoadSafe( ConstructorData(TilesFolder+FileName+'.map',false) );
+  tmpMap := DTileMap.LoadSafe( ConstructorData(TilesFolder+FileName,false) );
   if tmpMap.Ready then begin
     tmpMap.Save(FileName, true);
 
     //copy map image/images
-    for iz := 0 to tmpMap.sizez-1 do
+    for iz := 0 to tmpMap.sizez-1 do begin
       f := TilesFolder+FileName+'_'+inttostr(iz)+'.png';
       if URIFileExists(ConstructorData(f,false)) then begin
         if not copyFile(FakeConstructorData(f,false), FakeConstructorData(f,true),[cffOverwriteFile],false) then
@@ -417,7 +407,7 @@ begin
 
       end else
         writeLnLog('TDungeonTilesEditor.CompileTile','ERROR: Map image not found: '+f);
-
+    end;
 
   end;
   FreeAndNil(tmpMap);
@@ -654,11 +644,13 @@ end;
 
 {----------------------------------------------------------------------------}
 
-
 procedure TDungeonTilesEditor.SavePNGButtonClick(Sender: TObject);
 begin
   MakePNGMap;
 end;
+
+{----------------------------------------------------------------------------}
+
 procedure TDungeonTilesEditor.SaveTileMapButtonClick(Sender: TObject);
 begin
   WriteMe(false);
@@ -893,7 +885,7 @@ end;
 constructor DTileMapHelper.LoadSafe(URL: string);
 begin
   try
-    Load(URL);
+    Load(URL,false);
   except
     WriteLnLog('DTileMapHelper.LoadSafe','Exception caught. Usually it''s ok.');
   end;

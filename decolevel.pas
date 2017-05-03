@@ -46,18 +46,15 @@ uses DecoGameMode  ;
 
 procedure Generate3DWorld;
 var GENERATOR: D3dDungeonGenerator;
-  i: integer;
-  fs: DFirstStep;
 begin
   GENERATOR := D3dDungeonGenerator.Create;
-  GENERATOR.load('');
-  GENERATOR.ForceReady;
-  //GENERATOR.InitParameters;
-  //GENERATOR.Generate;
+  GENERATOR.parameters.load(ApplicationData(GetScenarioFolder+MapsFolder+'1'+'.xml'+GZ_ext));
+  GENERATOR.InitParameters;
+  GENERATOR.Generate;
   CurrentWorld := DDungeonWorld.create;
   CurrentWorld.Load(Generator);
-
   FreeAndNil(GENERATOR);
+  CurrentWorld.Build;
 end;
 
 var monster: TX3DRootNode;

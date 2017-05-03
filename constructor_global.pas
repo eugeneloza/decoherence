@@ -63,10 +63,18 @@ function ConstructorData(URL: string; ToGameFolder:boolean): string;
  The result is relative to application folder!}
 function FakeConstructorData(URL: string; ToGameFolder:boolean): string;
 
+{searches a StringList for the specific element}
+function StringListContains(SL: TStringList; search: string): boolean;
+
+{reads a specific file extensions from a specific path
+ Creates a TStringList, don't forget to free manually
+ !Android incompatible}
+function GetFilesList(path,ext: string): TStringList;
+
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
-uses CastleFilesUtils, StrUtils;
+uses CastleFilesUtils, StrUtils, CastleLog;
 
 {case-sensitive replace the last occurence of searchstring to replacestring}
 procedure ReplaceStringReverse(var s: string; const searchstring,replacestring: string);
@@ -102,6 +110,39 @@ begin
   else
     Result := 'architect/'+URL;
   Result := AnsiReplaceText(Result,'/',pathdelim); //we're using native OS file access
+end;
+
+{-----------------------------------------------------------------------------}
+
+function StringListContains(SL: TStringList; search: string): boolean;
+var s: string;
+begin
+  Result := false;
+  if SL=nil then begin
+    WriteLnLog('StringListContains','ERROR: String List is nil!');
+    exit;
+  end;
+  for s in SL do if s=search then begin
+    Result := true;
+    break;
+  end;
+end;
+
+{-----------------------------------------------------------------------------}
+
+function GetFilesList(path,ext: string): TStringList;
+var Rec: TSearchRec;
+begin
+  Result := TStringList.create;
+  // Android incompatible
+  if FindFirst (FakeConstructorData(path + '*.'+ext,false), faAnyFile - faDirectory, Rec) = 0 then
+   try
+     repeat
+       Result.Add(AnsiReplaceText(Rec.Name,'.'+ext,''));
+     until FindNext(Rec) <> 0;
+   finally
+     FindClose(Rec);
+   end;
 end;
 
 {============================================================================}

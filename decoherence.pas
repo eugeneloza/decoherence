@@ -110,7 +110,7 @@ end;
 
 procedure WindowManage(Container : TUIContainer);
 begin
-  if CurrentWorld <> nil then CurrentWorld.manage;
+  if CurrentWorld <> nil then CurrentWorld.manage(camera.Position);
 end;
 
 {-------------------------------------------------------------------------}
@@ -121,7 +121,9 @@ begin
   //todo if renderfinished to make frameskip, but this might conflict with 3D world render
   if RenderFinished then begin
     RenderFinished := false;
+
     GUI.draw;
+
     ProcessTimeEvents;
     RenderFinished := true;
   end else

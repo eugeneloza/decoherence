@@ -22,8 +22,12 @@ unit decoabstractworld;
 {$INCLUDE compilerconfig.inc}
 interface
 
-uses CastleRandom,
-  decoabstractgenerator;
+uses CastleRandom, fgl, castleVectors,
+  X3DNodes,
+  decoabstractgenerator,
+  decoglobal;
+
+type TRootList = specialize TFPGObjectList<TX3DRootNode>;
 
 {Type PathElement = record
   {Absolute Coordinates of pathPoint}
@@ -38,18 +42,20 @@ Type
   {The most abstract world implementation to merge independent world routines
    Like manage and pathfind}
   DAbstractWorld = class
-  private
+  protected
     fSeed: LongWord;
     { xorshift random generator, fast and thread-safe }
     RNDM: TCastleRandom;
     LastRender: TDateTime;
+    FirstRender: boolean;
   public
     {Seed used to "build" the world if it requires random}
     property Seed: LongWord read fSeed write fSeed;
     {World management routine. Called every frame;
      Most important thing it does is managing LODs of tiles/landscape
-     And hiding/LODding world chunks}
-    Procedure manage; virtual; abstract;
+     And hiding/LODding world chunks
+     x,y,z are current world coordinates of render camera}
+    Procedure manage(position: TVector3Single); virtual; abstract;
     {Builds a PathTree for the world}
     //Function pathfind: DPathTree;
     {load the World from a file}
@@ -60,7 +66,7 @@ Type
     procedure Build; virtual;
     {Splits the World into chunks}
     //Procedure chunk_n_slice; virtual; abstract;
-    constructor create;
+    constructor create; virtual;
     destructor destroy; override;
   End;
 
@@ -68,10 +74,17 @@ var CurrentWorld: DAbstractWorld;
 
 
 procedure FreeWorld;
+
+{temporary?
+ if this node is a placeholder}
+function IsPlaceholder(node: TX3DNode): boolean;
+
+{procedure FreeRootList(List: TRootList);} //unneeded as list "owns" children
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
-uses SysUtils, classes;
+uses SysUtils, classes
+  ;
 
 constructor DAbstractWorld.create;
 begin
@@ -80,6 +93,7 @@ begin
   Just to make sure we don't waste any time (<1ms) on initialization now}
   RNDM := TCastleRandom.Create(1);
   LastRender := -1;
+  FirstRender := true;
 end;
 
 {------------------------------------------------------------------------------}
@@ -96,6 +110,25 @@ procedure DAbstractWorld.Build;
 begin
   if fSeed = 0 then raise exception.create('DAbstractWorld.Build: World random must be predefined!');
   RNDM.Initialize(fSeed);
+end;
+
+{------------------------------------------------------------------------------}
+
+{procedure FreeRootList(List: TRootList);
+var i: integer;
+begin
+  for i := 0 to List.count do FreeAndNil(List[i]);
+end;}
+
+{------------------------------------------------------------------------------}
+
+function IsPlaceholder(node: TX3DNode): boolean;
+begin
+  {$warning this is obsolete, and will interfere with collisions node}
+  if copy(node.NodeName,1,1) = '(' then
+    result := true
+  else
+    result := false;
 end;
 
 {------------------------------------------------------------------------------}

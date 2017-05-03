@@ -48,8 +48,7 @@ Type
 
 var AmbientIntensity: DMaterialContainer;
 
-{ extension of Castle Game Engine Load3D, automatically clears garbage
-  of blender x3d exporter and adds requested anisortopic filtering}
+{ adds requested TTexturePropertiesNode and creates corresponding lists}
 function LoadBlenderX3D(URL: string): TX3DRootNode;
 //procedure FreeTextureProperties;
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}

@@ -724,7 +724,7 @@ end;
 
 procedure DSingleInterfaceElement.rescale;
 begin
-  //{$WARNING Memory Leak here}
+  {$WARNING Memory Leak here}
   if frame <> nil then FrameResize3x3;
   if content <> nil then begin
     //content.base.copyxywh(base);

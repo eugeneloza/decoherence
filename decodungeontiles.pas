@@ -135,7 +135,7 @@ type
 
       {is the tile ready to work (loaded and parsed correctly)?}
       property Ready: boolean read fReady write fReady;
-      constructor Load(URL: string);// override;
+      constructor Load(URL: string; gzipped: boolean);// override;
 end;
 
 //var MaxTileTypes: integer;
@@ -313,12 +313,13 @@ end;
 
 {======================== DTILE TYPE ==========================================}
 
-constructor DTileMap.Load(URL: string);
+constructor DTileMap.Load(URL: string; gzipped: boolean);
 var TileDOC: TXMLDocument;
     RootNode,WorkNode,ValueNode: TDOMElement;
     Iterator: TXMLElementIterator;
     jx,jy,jz: integer;
     j: TAngle;
+    FullURL: string;
 begin
   //inherited;
   TileName := DeleteURIExt(ExtractURIName(URL));
@@ -328,9 +329,11 @@ begin
    and check that all tile elements are loaded and give an error otherwise
    Unexpected errors might occur on damaged game data }
 
-  TileDoc := nil;
+  //TileDoc := nil;
   try
-    TileDOC := URLReadXML(URL);
+    FullURL := URL+'.map';
+    if gzipped then FullURL += GZ_ext;
+    TileDOC := URLReadXML(FullURL);
     RootNode := TileDOC.DocumentElement;
     WorkNode := RootNode.ChildElement('Size');
     SizeX := WorkNode.AttributeInteger('size_x');
