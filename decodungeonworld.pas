@@ -30,14 +30,17 @@ uses classes, fgl, castleVectors,
 
 {$DEFINE UseSwitches}
 
+{list of "normal" tiles}
 type TTilesList = specialize TFPGObjectList<DTileMap>;
 
 //type TContainer = TTransformNode;//{$IFDEF UseSwitches}TSwitchNode{$ELSE}TTransformNode{$ENDIF}
+{list of ttransform nodes, reperesenting each tile in the dungeon}
 type TTransformList = specialize TFPGObjectList<TTransformNode>;
+{list of switch nodes wrapping each element of TTransformList}
 {$IFDEF UseSwitches}type TSwitchList = specialize TFPGObjectList<TSwitchNode>;{$ENDIF}
 
 type
-  {Dungeon world manages any indoor tiled location}
+  {Dungeon world builds and manages any indoor tiled location}
   DDungeonWorld = class(DAbstractWorld)
   private
     {some ugly fix for coordinate uninitialized at the beginning of the world}
@@ -50,16 +53,31 @@ type
     {Manages tiles (show/hide/trigger events) *time-critical procedure}
     Procedure manage_tiles; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
   private
-    {builds the whole 3d world ready to be managed}
+    {a list of transforms representing each generator step}
+    MapTiles: TTransformList;
+    {wrapper around transform node used for optimization}
+    {$IFDEF UseSwitches}MapSwitches: TSwitchList;{$ENDIF}
+    {list of root nodes, representing each neighbour group}
+    MapRoots: TRootList;
+    {list of scenes, representing each neighbour group}
+    MapScenes: TSceneList;
+    {assembles MapTiles from Tiles 3d, adding transforms nodes according to generator steps}
     procedure BuildTransforms;
+    {wraps transforms into switches if enabled}
     {$IFDEF UseSwitches}procedure BuildSwitches;{$ENDIF}
+    {assembles transforms/switches into a list of root nodes according to neighbours groups}
     procedure BuildRoots;
+    {loads root nodes into scenes (according to neighbours groups)}
     procedure BuildScenes;
+    {loads word scenes into scene manager}
     Procedure ActivateScenes;
-    procedure LoadTiles;
   private
+    {scale used to define a tile size. Usually 1 is man-height.
+      CAUTION this scale must correspond to tiles model scale, otherwise it'll mess everything up}
     WorldScale: float;
+    {list of tiles in neighbours groups}
     Groups: TGroupsArray;
+    {neighbours array}
     Neighbours: TNeighboursMapArray;
     {List of tile names.
      MAY be freed after loading?}
@@ -69,21 +87,24 @@ type
     {root nodes of the each tile
      MUST go synchronous with groups/neighbours!}
     Tiles3d: TRootList;
+    {sequential set of tiles, to be added to the world during "build"}
     Steps: TGeneratorStepsArray;
-    MapTiles: TTransformList;
-    {$IFDEF UseSwitches}MapSwitches: TSwitchList;{$ENDIF}
-    MapRoots: TRootList;
-    MapScenes: TSceneList;
+    {loads tiles from HDD}
+    procedure LoadTiles;    
   public
+    {all-purpose map of the current world, also contains minimap image}
     Map: DMap;
 
     {Detects if the current tile has been changed and launches manage_tiles}
     Procedure manage(position: TVector3Single); override;
     {Sorts tiles into chunks}
     //Procedure chunk_n_slice; override;
+    {loads the world from a running generator}
     procedure Load(Generator: DAbstractGenerator); override;
+    {loads the world from a saved file}
     procedure Load(URL: string); override;
 
+    {builds current 3d world}
     procedure build; override;
 
     constructor create; override;
@@ -264,6 +285,7 @@ begin
   BuildRoots;
   BuildScenes;
   ActivateScenes;
+  firstRended := true;
 end;
 
 {----------------------------------------------------------------------------}
@@ -330,17 +352,20 @@ end;
 destructor DDungeonWorld.destroy;
 begin
   {$warning freeandnil(window.scenemanager)?}
-
+  
+  //free basic map parameters
   freeandnil(map);
   FreeGroups(groups);
   FreeNeighboursMap(Neighbours);
   FreeAndNil(TilesList);
-
+  
+  //free 3d-related lists
   FreeAndNil(MapScenes);
   FreeAndNil(MapRoots);
   {$IFDEF UseSwitches}FreeAndNil(MapSwitches);{$ENDIF}
   FreeAndNil(MapTiles);
 
+  //free loaded tiles
   FreeAndNil(Tiles);   //owns children, so will free them automatically
   FreeAndNil(Tiles3d); //owns children, so will free them automatically
 
