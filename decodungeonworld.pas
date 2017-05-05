@@ -23,11 +23,18 @@ unit decodungeonworld;
 interface
 
 uses classes, fgl, castleVectors,
+  X3DNodes, CastleScene,
   decodungeongenerator, decoabstractgenerator, decoabstractworld,
   decodungeontiles,
   decoglobal;
 
+{$DEFINE UseSwitches}
+
 type TTilesList = specialize TFPGObjectList<DTileMap>;
+
+//type TContainer = TTransformNode;//{$IFDEF UseSwitches}TSwitchNode{$ELSE}TTransformNode{$ENDIF}
+type TTransformList = specialize TFPGObjectList<TTransformNode>;
+{$IFDEF UseSwitches}type TSwitchList = specialize TFPGObjectList<TSwitchNode>;{$ENDIF}
 
 type
   {Dungeon world manages any indoor tiled location}
@@ -44,12 +51,16 @@ type
     Procedure manage_tiles; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
   private
     {builds the whole 3d world ready to be managed}
-    procedure BuildRoot;
-  public
+    procedure BuildTransforms;
+    {$IFDEF UseSwitches}procedure BuildSwitches;{$ENDIF}
+    procedure BuildRoots;
+    procedure BuildScenes;
+    Procedure ActivateScenes;
+    procedure LoadTiles;
+  private
     WorldScale: float;
     Groups: TGroupsArray;
     Neighbours: TNeighboursMapArray;
-    Map: DMap;
     {List of tile names.
      MAY be freed after loading?}
     TilesList: TStringList;
@@ -58,9 +69,13 @@ type
     {root nodes of the each tile
      MUST go synchronous with groups/neighbours!}
     Tiles3d: TRootList;
-
     Steps: TGeneratorStepsArray;
-    MapTiles: TRootList;
+    MapTiles: TTransformList;
+    {$IFDEF UseSwitches}MapSwitches: TSwitchList;{$ENDIF}
+    MapRoots: TRootList;
+    MapScenes: TSceneList;
+  public
+    Map: DMap;
 
     {Detects if the current tile has been changed and launches manage_tiles}
     Procedure manage(position: TVector3Single); override;
@@ -69,7 +84,6 @@ type
     procedure Load(Generator: DAbstractGenerator); override;
     procedure Load(URL: string); override;
 
-    procedure LoadTiles;
     procedure build; override;
 
     constructor create; override;
@@ -80,7 +94,7 @@ type
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 uses sysutils, CastleFilesUtils,
-  X3DNodes,
+  CastleSceneCore,
   deco3dload;
 
 procedure DDungeonWorld.manage_tiles; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
@@ -163,13 +177,80 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DDungeonWorld.buildRoot;
+procedure DDungeonWorld.buildTransforms;
+var i: integer;
+  Transform: TTransformNode;
+begin
+  MapTiles := TTransformList.create(false); //scene will take care of freeing
+  for i := 0 to high(steps) do begin
+    Transform := TTransformNode.create;
+    //put current tile into the world. Pay attention to y and z coordinate inversion.
+    Transform.translation := Vector3Single(WorldScale*(steps[i].x),-WorldScale*(steps[i].y),-WorldScale*(steps[i].z));
+    //Transform.scale := Vector3Single(myscale,myscale,myscale);
+    {$Warning placeholders here + scan root}
+    Transform.FdChildren.Add(Tiles3d[steps[i].tile]);
+    MapTiles.Add(Transform);
+  end;
+end;
+
+
+{----------------------------------------------------------------------------}
+
+procedure DDungeonWorld.buildSwitches;
+var i: integer;
+  Switch: TSwitchNode;
+begin
+  MapSwitches := TSwitchList.create(false); //scene will take care of freeing
+  for i := 0 to high(steps) do begin
+    Switch := TSwitchNode.create;
+    Switch.FdChildren.add(MapTiles[i]);
+    Switch.WhichChoice := 0;
+    MapSwitches.add(Switch);
+  end;
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DDungeonWorld.buildRoots;
+var i,j: integer;
+  Root: TX3DRootNode;
+begin
+  MapRoots := TRootList.create(false); //scene will take care of freeing, owns root
+  for i := 0 to high(groups) do begin
+    Root := TX3DRootNode.create;
+    for j := 0 to groups[i].Count-1 do
+      Root.FdChildren.Add({$IFDEF UseSwitches}MapSwitches[groups[i].Items[j]]{$ELSE}MapTiles[groups[i].Items[j]]{$ENDIF});
+    MapRoots.Add(Root);
+  end;
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DDungeonWorld.buildScenes;
+var i: integer;
+  Scene: TCastleScene;
+begin
+  MapScenes := TSceneList.create(true); //list owns the scenes and will free them accordingly
+  for i := 0 to MapRoots.count-1 do begin
+    Scene := TCastleScene.create(nil); //List will free the scenes, not freeing them automatically
+    Scene.ShadowMaps:=Shadow_maps_enabled;  {?????}
+    Scene.Spatial := [ssRendering, ssDynamicCollisions];
+    Scene.ProcessEvents := true;
+    Scene.Load(MapRoots[i],true);
+    MapScenes.add(scene);
+  end;
+end;
+
+
+{----------------------------------------------------------------------------}
+
+procedure DDungeonWorld.ActivateScenes;
 var i: integer;
 begin
-  MapTiles := TRootList.create(true);
-  for i := 0 to high(steps) do begin
-
-  end;
+  for i := 0 to MapScenes.count-1 do
+    Window.sceneManager.Items.add(MapScenes[i]);
+  {$warning THE OTHER WAY}
+  window.SceneManager.MainScene := MapScenes[0];
 end;
 
 {----------------------------------------------------------------------------}
@@ -178,8 +259,11 @@ procedure DDungeonWorld.build;
 begin
   inherited build;
   LoadTiles;
-  BuildRoot;
-  {$Warning dummy}
+  BuildTransforms;
+  {$IFDEF UseSwitches}BuildSwitches;{$ENDIF}
+  BuildRoots;
+  BuildScenes;
+  ActivateScenes;
 end;
 
 {----------------------------------------------------------------------------}
@@ -245,12 +329,21 @@ end;
 
 destructor DDungeonWorld.destroy;
 begin
+  {$warning freeandnil(window.scenemanager)?}
+
   freeandnil(map);
   FreeGroups(groups);
   FreeNeighboursMap(Neighbours);
   FreeAndNil(TilesList);
+
+  FreeAndNil(MapScenes);
+  FreeAndNil(MapRoots);
+  {$IFDEF UseSwitches}FreeAndNil(MapSwitches);{$ENDIF}
+  FreeAndNil(MapTiles);
+
   FreeAndNil(Tiles);   //owns children, so will free them automatically
   FreeAndNil(Tiles3d); //owns children, so will free them automatically
+
   inherited;
 end;
 

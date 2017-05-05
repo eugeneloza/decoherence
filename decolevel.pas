@@ -57,21 +57,21 @@ begin
   CurrentWorld.Build;
 end;
 
-var monster: TX3DRootNode;
+//var monster: TX3DRootNode;
 
 var loadedlevel:boolean=false;
 procedure load_test_level;
-var Nav:TKambiNavigationInfoNode; /// !!!
+{var Nav:TKambiNavigationInfoNode; /// !!!
     NavLight:TPointLightNode;
 var ScreenEffect: TX3DRootNode;
     mRoot: TX3DRootNode;
-    //i: integer;
+    //i: integer; }
 begin
   Generate3DWorld;
 
   WritelnLog('load_test_level','Scene');
 
-  mRoot := LoadBlenderX3D(ApplicationData('level/test-level.x3d'));
+ { mRoot := LoadBlenderX3D(ApplicationData('level/test-level.x3d'));
 
   //create light that follows the player
    NavLight:= TPointLightNode.Create('', '');
@@ -106,9 +106,9 @@ begin
 
   Scene.Spatial := [ssRendering, ssDynamicCollisions];
   Scene.ProcessEvents := true;
-  scene.ShadowMaps := Shadow_maps_enabled;
+  scene.ShadowMaps := Shadow_maps_enabled;  }
 
-  monster := LoadBlenderX3D(ApplicationData('models/creatures/idle.castle-anim-frames'));
+  //monster := LoadBlenderX3D(ApplicationData('models/creatures/idle.castle-anim-frames'));
 
   Window.ShadowVolumes := Shadow_volumes_enabled;
   window.ShadowVolumesRender := Shadow_volumes_enabled;
@@ -118,8 +118,10 @@ begin
   camera := TWalkCamera.create(Window);
   {z-up orientation}
   camera.SetView(Vector3Single(0,0,1),Vector3Single(0,1,0),Vector3Single(0,0,1),Vector3Single(0,0,1),true);
+  camera.Position := vector3single(4*2,-4*2,-4*2);
   camera.MoveSpeed := 5; //set to zero to stop
   camera.MouseDragMode := mdRotate;
+  Window.SceneManager.Camera := camera;
   //camera.Input := [];  //-----  completely disable camera
   WritelnLog('load_test_level','Finished');
 
@@ -127,15 +129,15 @@ end;
 
 Procedure InitTestLevel;
 var i: integer;
-  monsterscene: array[0..10] of TCastleScene;
-  m: TCastleScene;
+ { monsterscene: array[0..10] of TCastleScene;
+  m: TCastleScene;}
 begin
   if not loadedlevel then begin
      WritelnLog('InitTestLevel','Init');
      loadedlevel := true;
-     Window.SceneManager.Items.Add(Scene);
+    // Window.SceneManager.Items.Add(Scene);
 
-     m := TCastleScene.create(window);
+    { m := TCastleScene.create(window);
      m.load(monster,true,true);
      for i := 0 to 10 do begin
 {       monsterscene[i] := TCastleScene.create(window);
@@ -156,8 +158,7 @@ begin
        Window.SceneManager.Items.Add(monsters[i]);
      end;
 
-     Window.SceneManager.MainScene := Scene;
-     Window.SceneManager.Camera := camera;
+     //Window.SceneManager.MainScene := Scene; }
      Window.TouchInterface := {$IFDEF Android}tiCtlWalkDragRotate{$ELSE}tiNone{$ENDIF};
      SetGameMode(gmTravel);
   end;

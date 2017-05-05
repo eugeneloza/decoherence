@@ -63,7 +63,9 @@ function ConstructorData(URL: string; ToGameFolder:boolean): string;
  The result is relative to application folder!}
 function FakeConstructorData(URL: string; ToGameFolder:boolean): string;
 
-{searches a StringList for the specific element}
+{searches a StringList for the specific element
+ This is an inoptimal algorithm
+ and MAYBE there is already a ready algorithm in strutils! I didn't look too well}
 function StringListContains(SL: TStringList; search: string): boolean;
 
 {reads a specific file extensions from a specific path

@@ -23,11 +23,12 @@ unit decoabstractworld;
 interface
 
 uses CastleRandom, fgl, castleVectors,
-  X3DNodes,
+  X3DNodes, CastleScene,
   decoabstractgenerator,
   decoglobal;
 
 type TRootList = specialize TFPGObjectList<TX3DRootNode>;
+type TSceneList = specialize TFPGObjectList<TCastleScene>;
 
 {Type PathElement = record
   {Absolute Coordinates of pathPoint}
