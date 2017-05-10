@@ -25,24 +25,24 @@ interface
 uses
   CastleLog,
   CastleWindow, CastleWindowTouch, CastleSceneCore, CastleScene, CastleFilesUtils,
-  castlePlayer, castleVectors, castleCameras, X3DNodes,
-  deco3dload, decodungeontiles,
-  x3dload, sysutils,
-  castle3d,
+  castleVectors,  X3DNodes,
+  deco3dload, {decodungeontiles,}
+  {x3dload,} sysutils,
+  {castle3d,}
   decoabstractworld, decodungeonworld, decodungeongenerator,
-  decoglobal;
+  deconavigation, decoglobal;
 
 procedure load_test_level;
 Procedure InitTestLevel;
 
 var scene: TcastleScene;
-  Camera: TWalkCamera;
   //monsters: array[0..10] of T3DOrient;
   //shaders: TSwitchNode;
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-uses DecoGameMode  ;
+uses DecoGameMode
+  ;
 
 procedure Generate3DWorld;
 var GENERATOR: D3dDungeonGenerator;
@@ -61,8 +61,8 @@ end;
 
 var loadedlevel:boolean=false;
 procedure load_test_level;
-{var Nav:TKambiNavigationInfoNode; /// !!!
-    NavLight:TPointLightNode;
+{var Nav:; /// !!!
+
 var ScreenEffect: TX3DRootNode;
     mRoot: TX3DRootNode;
     //i: integer; }
@@ -71,72 +71,27 @@ begin
 
   WritelnLog('load_test_level','Scene');
 
- { mRoot := LoadBlenderX3D(ApplicationData('level/test-level.x3d'));
-
-  //create light that follows the player
-   NavLight:= TPointLightNode.Create('', '');
-   NavLight.FdColor.Value := vector3single(1,0.3,0.1);
-   NavLight.FdAttenuation.value := Vector3Single(1,0,1);
-   NavLight.FdRadius.value := 10;
-   NavLight.FdIntensity.value := 20;
-   NavLight.FdOn.value := true;
-   NavLight.FdShadows.value := false;
-   //and create a respective navigation node
-   nav:=TKambiNavigationInfoNode.Create('', '');
-   nav.FdHeadLightNode.Value := NavLight;
-   nav.FdHeadlight.Value := true;
-
-  mRoot.FdChildren.Add(nav);
-
-  {this is a temporary "addition" of a screen shader,
-   should be replaced for something more useful some time later}
-  {Shaders := TSwitchNode.create;}
-  ScreenEffect := load3D(ApplicationData('shaders/empty.x3dv'));
-  {Shaders.fdChildren.add(screenEffect.FdChildren[0]);
-  ScreenEffect := load3D(ApplicationData('shaders/edgedetect.x3dv'));
-  Shaders.fdChildren.add(screenEffect.FdChildren[0]);
-  ScreenEffect := load3D(ApplicationData('shaders/blur.x3dv'));
-  Shaders.fdChildren.add(screenEffect.FdChildren[0]);}
-
-  mRoot.FdChildren.add(ScreenEffect);
-
-  Scene := TCastleScene.Create(Application);
-  Scene.Load(mRoot,true);
-  //Scene.Attributes.EnableTextures := false;
-
-  Scene.Spatial := [ssRendering, ssDynamicCollisions];
-  Scene.ProcessEvents := true;
-  scene.ShadowMaps := Shadow_maps_enabled;  }
 
   //monster := LoadBlenderX3D(ApplicationData('models/creatures/idle.castle-anim-frames'));
 
   Window.ShadowVolumes := Shadow_volumes_enabled;
   window.ShadowVolumesRender := Shadow_volumes_enabled;
   window.AntiAliasing := aa8SamplesNicer;
-  WritelnLog('load_test_level','Player');
 
-  camera := TWalkCamera.create(Window);
-  {z-up orientation}
-  camera.SetView(Vector3Single(0,0,1),Vector3Single(0,1,0),Vector3Single(0,0,1),Vector3Single(0,0,1),true);
-  camera.Position := vector3single((4+0.5)*2-1,-(4+0.5)*2,(0+0.3)*2);
-  camera.Gravity := true;
-  camera.PreferredHeight := (0+0.3)*2;
-  camera.MoveSpeed := 5; //set to zero to stop
-  camera.MouseDragMode := mdRotate;
-  Window.SceneManager.Camera := camera;
-  //camera.Input := [];  //-----  completely disable camera
+  InitNavigation;
+
   WritelnLog('load_test_level','Finished');
-
 end;
 
 Procedure InitTestLevel;
-var i: integer;
+//var i: integer;
  { monsterscene: array[0..10] of TCastleScene;
   m: TCastleScene;}
 begin
   if not loadedlevel then begin
      WritelnLog('InitTestLevel','Init');
      loadedlevel := true;
+     CurrentWorld.activate;
     // Window.SceneManager.Items.Add(Scene);
 
     { m := TCastleScene.create(window);

@@ -21,7 +21,8 @@ unit decoabstractgenerator;
 {$INCLUDE compilerconfig.inc}
 interface
 
-uses Classes, CastleRandom;
+uses {Classes,} CastleRandom,
+  decothread;
 
 type
   {maybe I'll change it later}
@@ -31,7 +32,7 @@ type
 type
   {Most abstract generation routine to parent all the generation algorithms
    Required for abstract calls to different implementation of generators}
-  DAbstractGenerator = class(TThread)
+  DAbstractGenerator = class(TAbstractThread)
   protected
     fisWorking: boolean;
     fisInitialized: boolean;

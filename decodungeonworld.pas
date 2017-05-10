@@ -26,7 +26,7 @@ uses classes, fgl, castleVectors,
   X3DNodes, CastleScene,
   decodungeongenerator, decoabstractgenerator, decoabstractworld,
   decodungeontiles,
-  decoglobal;
+  {deconavigation, }decoglobal;
 
 {$DEFINE UseSwitches}
 
@@ -53,7 +53,8 @@ type
     {Manages tiles (show/hide/trigger events) *time-critical procedure}
     Procedure manage_tiles; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
   private
-    {a list of transforms representing each generator step}
+    {a list of transforms representing each generator step
+     todo: unneeded after build and can be freed?}
     MapTiles: TTransformList;
     {wrapper around transform node used for optimization}
     {$IFDEF UseSwitches}MapSwitches: TSwitchList;{$ENDIF}
@@ -70,7 +71,7 @@ type
     {loads root nodes into scenes (according to neighbours groups)}
     procedure BuildScenes;
     {loads word scenes into scene manager}
-    Procedure ActivateScenes;
+    Procedure Activate; override;
   private
     {scale used to define a tile size. Usually 1 is man-height.
       CAUTION this scale must correspond to tiles model scale, otherwise it'll mess everything up}
@@ -208,8 +209,7 @@ begin
     //put current tile into the world. Pay attention to y and z coordinate inversion.
     Transform.translation := Vector3Single(WorldScale*(steps[i].x),-WorldScale*(steps[i].y),-WorldScale*(steps[i].z));
     //Transform.scale := Vector3Single(myscale,myscale,myscale);
-    {$Warning placeholders here + scan root}
-    Transform.FdChildren.Add(Tiles3d[steps[i].tile]);
+    AddRecoursive(Transform,Tiles3d[steps[i].tile]);
     MapTiles.Add(Transform);
   end;
 end;
@@ -265,13 +265,13 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DDungeonWorld.ActivateScenes;
+procedure DDungeonWorld.Activate;
 var i: integer;
 begin
+  inherited;
+
   for i := 0 to MapScenes.count-1 do
     Window.sceneManager.Items.add(MapScenes[i]);
-  {$warning THE OTHER WAY}
-  window.SceneManager.MainScene := MapScenes[0];
 end;
 
 {----------------------------------------------------------------------------}
@@ -284,8 +284,6 @@ begin
   {$IFDEF UseSwitches}BuildSwitches;{$ENDIF}
   BuildRoots;
   BuildScenes;
-  ActivateScenes;
-  firstRender := true;
 end;
 
 {----------------------------------------------------------------------------}

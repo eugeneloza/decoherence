@@ -38,7 +38,7 @@ uses Classes, SysUtils,
      decoloadscreen, decoperks,
      decointerfacecomposite,
      decoplayercharacter, deco3dLoad,
-     decoglobal, decogamemode;
+     deconavigation, decoglobal, decogamemode;
 
 {==========================================================================}
 {==========================================================================}

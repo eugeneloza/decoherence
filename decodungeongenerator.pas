@@ -23,7 +23,7 @@ interface
 
 uses Classes, CastleRandom, fgl, CastleGenericLists,
   decoabstractgenerator, decodungeontiles,
-  decoglobal;
+  decothread, decoglobal;
 
 type
   {a "dock point" of a tile or a map. This is a xyz coordinate of an open face
@@ -328,6 +328,7 @@ type
     {puts tile # markers on a map to detect which tile is here}
     procedure MakeTileIndexMap;
   private
+    raycastcount: integer;
     {temporary map for first-order neighbours lists}
     tmpNeighboursMap: TNeighboursMapArray;
     {final neighbours map}
@@ -397,15 +398,22 @@ begin
     raise exception.create('DDungeonGenerator.Generate FATAL - parameters are not loaded!');
   {load tiles}
   tiles.clear;
-  For s in parameters.TilesList do begin
+
+  UpdateProgress('Loading tiles',0);
+
+  For i := 0 to parameters.TilesList.Count-1 do begin
     if parameters.AbsoluteURL then
-      tmp := DGeneratorTile.Load(s,false)
+      tmp := DGeneratorTile.Load(parameters.TilesList[i],false)
     else
-      tmp := DGeneratorTile.Load(ApplicationData(TilesFolder+s),true);
+      tmp := DGeneratorTile.Load(ApplicationData(TilesFolder+parameters.TilesList[i]),true);
     tmp.CalculateFaces;
     tmp.ProcessBlockers;
     tiles.Add(tmp);
+    UpdateProgress('Loading tiles',0.3*i/(parameters.TilesList.Count-1));
   end;
+
+  UpdateProgress('Processing tiles',0.3);
+
   {prepare different optimized lists}
   for i := 0 to Tiles.Count-1 do begin
     if Tiles[i].blocker then
@@ -559,6 +567,10 @@ procedure DDungeonGenerator.Generate;
 var i: integer;
     t1,t2: TDateTime;
 begin
+  if self is DDungeonGenerator then fmult := 1 else fmult := 2;
+  fprogress := 0;
+  updateprogress('Initialize',0);
+
   if not parameters.isReady then
     raise exception.create('DDungeonGenerator.Generate FATAL - parameters are not loaded!');
   if not isInitialized then begin
@@ -585,6 +597,7 @@ begin
       {writeLnLog(inttostr(Map.dock.count));}
       //add a tile
       AddRandomTile;
+      UpdateProgress('Generating',minimum(map.Volume/parameters.Volume,0.90));
     end;
     {if map doesn't meet the paramters then undo}
 
@@ -611,6 +624,7 @@ begin
     WriteLnLog('DDungeonGenerator.Generate','Max depth = '+inttostr(map.MaxDepth+1)+'/'+inttostr(parameters.minz));
   until (map.Volume>=parameters.Volume) and (map.MaxDepth+1>=parameters.minz); {until map meets the paramters}
 
+  UpdateProgress('Finalizing',0.95);
   //finally resize the dynamic array
   MaxSteps := CurrentStep+1;
   SetLength(Gen,MaxSteps);
@@ -624,6 +638,7 @@ begin
 
   fisWorking := false;
   fisFinished := true;
+  if self is DDungeonGenerator then UpdateProgress('Done',1);
 end;
 
 {-----------------------------------------------------------------------------}
@@ -1041,6 +1056,9 @@ begin
   //WriteLnLog(inttostr(mx)+inttostr(my)+inttostr(mz),inttostr(tmpNeighboursMap[mx,my,mz].count));
   RemoveDuplicatesNeighbours(tmpNeighboursMap[mx,my,mz]);
   //WriteLnLog(inttostr(mx)+inttostr(my)+inttostr(mz),inttostr(tmpNeighboursMap[mx,my,mz].count));
+
+  inc(raycastcount);
+  UpdateProgress('Raycasting',1+(raycastcount/map.Volume)*0.8);
 end;
 
 {----------------------------------------------------------------------------}
@@ -1108,6 +1126,7 @@ end;
 procedure D3DDungeonGenerator.Raycast;
 var ix,iy,iz: TIntCoordinate;
 begin
+ raycastcount := 0;
  tmpNeighboursMap := NilIndexMap; //create a nil-initialized neighbours lists of all accessible map tiles
 
  {here we fill in the neighbours}
@@ -1116,10 +1135,14 @@ begin
      for iz := 0 to Map.sizez-1 do if TileIndexMap[ix,iy,iz]>=0 {and is accessible} then
        RaycastTile(ix,iy,iz);
 
+ UpdateProgress('Processing',0.8);
+
  Neighbours_of_neighbours;
 
  //and free temporary map
  FreeNeighboursMap(tmpNeighboursMap);
+
+ UpdateProgress('Finishing',0.9);
 end;
 
 {------------------------------------------------------------------------}
@@ -1229,13 +1252,19 @@ begin
   fisFinished := false;
   fisWorking := true;
 
+  UpdateProgress('Raycasting',1);
+
   //raycast
   writeLnLog('D3DDungeonGenerator.Generate','Raycasting started...');
   t := now;
 
   MakeTileIndexMap;
+
   Raycast;
+
   //TileIndexMap := nil;  //this will free the array -- I'll need it later for debugging?!
+
+  UpdateProgress('Chunking',0.95);
 
   writeLnLog('D3DDungeonGenerator.Generate','Raycasting finished in '+inttostr(round((now-t)*24*60*60*1000))+'ms.');
   Chunk_N_Slice;
@@ -1244,6 +1273,7 @@ begin
   fisFinished := true;
 
   writeLnLog('D3DDungeonGenerator.Generate','Finished. Everything done in '+inttostr(round((now-t0)*24*60*60*1000))+'ms.');
+  UpdateProgress('Done',2);
 end;
 
 {------------------------------------------------------------------------}
