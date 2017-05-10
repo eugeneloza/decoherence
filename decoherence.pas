@@ -33,12 +33,30 @@ uses Classes, SysUtils,
 
      CastleVectors, CastleScene,
 
+     decothread,
+
      decogui, decointerface, decomouse, decofont,
      decolevel, decodungeontiles, decoabstractworld,
      decoloadscreen, decoperks,
      decointerfacecomposite,
      decoplayercharacter, deco3dLoad,
      deconavigation, decoglobal, decogamemode;
+
+type
+  DLoadThread = class(TAbstractThread)
+  protected
+    procedure Execute; override;
+  end;
+  TDummy = class
+    procedure ReleaseInterface(Sender: TObject);
+  end;
+
+procedure TDummy.ReleaseInterface(Sender: TObject);
+begin
+  LoadCompleted := true;
+end;
+
+var LoadThread: DLoadThread;
 
 {==========================================================================}
 {==========================================================================}
@@ -209,6 +227,17 @@ end;
 
 {======================= initialization routines ==============================}
 
+procedure DLoadThread.execute;
+begin
+  SetGameMode(gmLoadScreen);
+
+  InitInterface;
+  InitPerks;
+
+  Load_test_level; //remake it
+  window.OnBeforeRender := @WindowManage;
+end;
+
 procedure ApplicationInitialize;
 begin
   //initialize the log
@@ -248,16 +277,13 @@ begin
   //finally (fonts, random and facts loaded), we're ready to show game loading screen
   {$IFDEF AllowRescale}window.OnResize := @WindowResize;{$ENDIF}
   window.OnRender := @WindowRender;
-  window.OnBeforeRender := @WindowManage;
 
   WritelnLog('ApplicationInitialize','Init finished');
 
-  SetGameMode(gmLoadScreen);
-
-  InitInterface;
-  InitPerks;
-  Load_test_level; //remake it
-
+  LoadThread := DLoadThread.create(false);
+  LoadThread.Priority := tpNormal;
+  LoadThread.FreeOnTerminate := true;
+  LoadThread.OnTerminate := @TDummy(nil).ReleaseInterface;
 end;
 
 {==========================================================================}

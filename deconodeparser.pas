@@ -167,7 +167,7 @@ begin
     //parse parameters
     if AnsiContainsText(node.X3DName,ParameterMarker) then begin
       if GetMarker(RandomMarker)<>'' then
-        rand := StrToInt(GetMarker(RandomMarker))/100;
+        rand := StrToInt(GetMarker(RandomMarker))/100
       else
         rand := 1;
       Symmetry := StrToInt(GetMarker(SymmetryMarker));

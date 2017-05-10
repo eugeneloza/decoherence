@@ -15,7 +15,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 
 {---------------------------------------------------------------------------}
 
-{ contains definitions for 3d World entity }
+{ contains definitions for 3d World entity
+  WARNING: it is abstract. Use DungeonWorld or Overworld.}
 
 unit decoabstractworld3d;
 
@@ -44,10 +45,8 @@ end;}
 
 type
   {World using 3D management and definitions,
-   shared by interior and exterior worlds
-   WARNING: it is abstract. Use DungeonWorld or Overworld.}
+   shared by interior and exterior worlds}
   DAbstractWorld3d = class(DAbstractWorld)
-
   (*build*)
   protected
     {root nodes of the each tile
@@ -69,7 +68,9 @@ type
     WorldRoots: TRootList;
     {list of scenes, representing each neighbour group}
     WorldScenes: TSceneList;
-    //WorldCHUNKs here
+
+    //!!!WorldCHUNKs here
+
     {loads world objects from HDD}
     procedure LoadWorldObjects;
     {assembles MapTiles from Tiles 3d, adding transforms nodes according to generator steps}
@@ -99,6 +100,49 @@ type
     destructor destroy; override;
   end;
 
+type
+  {}
+  DAbstractWorldRendered = class(DAbstractWorld3d)
+  (*render something into sprite*)
+  //protected
+
+  end;
+
+
+type
+  {
+  will have access to protected fields as it is in the same unit}
+  DAppearVanishManagerThread = class(TThread)
+  public
+    {}
+    //parent: DAbstractWorldManaged;
+    {
+     read-only, pass only links, doesn't free them even with destructor}
+
+    {output
+     warning! Internally managed, don't free manually}
+    ObjectsAppear, ObjectsVanish,
+    GroupsAppear, GroupsVanish: TIndexList;
+
+    constructor create; {override;}
+    destructor destroy; override;
+  protected
+    {}
+    procedure execute; override;
+  end;
+
+  {}
+  DAbstractWorldManaged = class(DAbstractWorldRendered)
+  (*manage*)
+  protected
+    {}
+    AppearVanishManager: DAppearVanishManagerThread;  //note, recoursive link
+    {}
+    procedure StartAppearVanishManagerThread;
+  public
+    constructor create; override;
+    destructor destroy; override;
+  end;
 
 {creates a fresh empty copy of TTransformNode,
  WARNING: the result must be freed manually
@@ -111,6 +155,102 @@ implementation
 uses sysutils, deco3dload, CastleLog,
   castlescenecore;
 
+{============================ DAbstractWorld3D =============================}
+{================================ MANAGE ===================================}
+
+constructor DAppearVanishManagerThread.create;
+begin
+  inherited;
+  ObjectsAppear := TIndexList.create;
+  ObjectsVanish := TIndexList.create;
+  GroupsAppear := TIndexList.create;
+  GroupsVanish := TIndexList.create;
+end;
+
+{--------------------------------------------------------------------------}
+
+destructor DAppearVanishManagerThread.destroy;
+begin
+  freeandnil(ObjectsAppear);
+  freeandnil(ObjectsVanish);
+  freeandnil(GroupsAppear);
+  freeandnil(GroupsVanish);
+  inherited;
+end;
+
+{--------------------------------------------------------------------------}
+
+procedure DAppearVanishManagerThread.execute;
+begin
+  ObjectsAppear.clear;
+  ObjectsVanish.clear;
+  GroupsAppear.clear;
+  GroupsVanish.clear;
+
+  {prepare visibe lists,
+   we can't assign the values directly, because groups can contain multiple tiles
+   and the effect might be overlapping
+   there should be no performance/memory issues with two additional local arrays, I hope
+   however, some optimization here might come in handy some day}
+
+  //*** IF PX0<0 then...
+
+  //appear list
+  //vanish list
+
+  {
+  repeat
+  {  if old[i].tile = new[i].tile then ;
+    else}
+    if old[i].tile > new[j].tile then begin
+      {there's a new tile to turn on}
+      tile[new[j]] := true
+      inc(j);
+    end else
+    if new[i].tile>old[j].tile then begin
+    {there's an old tile to turn off}
+      tile[old[i].tile] := false;
+      inc(i);
+    end else begin
+      {the tile exists in both new and old neighbours lists, change nothing and advance to the next tile}
+      inc(i);
+      inc(j);
+    end;
+  until i>= old.count-1 and j>= new.count-1; {$warning check here}
+  {now we actually put the calculated arrays into current 3d world}
+  for i := 0 to group.count-1 do group[i] := false;
+  for i := 0 to new.count-1 do group...
+  }
+end;
+
+{--------------------------------------------------------------------------}
+
+procedure DAbstractWorldManaged.StartAppearVanishManagerThread;
+begin
+
+end;
+
+{--------------------------------------------------------------------------}
+
+constructor DAbstractWorldManaged.create;
+begin
+  inherited;
+  AppearVanishManager := DAppearVanishManagerThread.create;
+  AppearVanishManager.Priority := tpNormal;  {$HINT maybe use tpLower}
+end;
+
+{--------------------------------------------------------------------------}
+
+destructor DAbstractWorldManaged.destroy;
+begin
+  freeandnil(AppearVanishManager);
+  inherited;
+end;
+
+
+{============================ DAbstractWorld3D =============================}
+{================================ BUILD ====================================}
+
 function CopyTransform(const Source: TTransformNode): TTransformNode;
 begin
   Result := TTransformNode.create;
@@ -119,7 +259,7 @@ begin
   Result.Rotation := Source.Rotation;
 end;
 
-{============================ DAbstractWorld3D =============================}
+{---------------------------------------------------------------------------}
 
 procedure DAbstractWorld3d.Activate;
 var  i: integer;
@@ -167,11 +307,16 @@ procedure DAbstractWorld3d.LoadWorldObjects;
 var s: string;
   tmpRoot: TX3DRootNode;
 begin
-  WorldElements3d := TRootList.create(true);
-  For s in WorldElementsURL do begin
-    tmpRoot := LoadBlenderX3D(s);
-    tmpRoot.KeepExisting := 1;   //List owns the nodes, so don't free them manually/automatically
-    WorldElements3d.add(tmpRoot);
+  Lock.Acquire;
+  try
+    WorldElements3d := TRootList.create(true);
+    For s in WorldElementsURL do begin
+      tmpRoot := LoadBlenderX3D(s);
+      tmpRoot.KeepExisting := 1;   //List owns the nodes, so don't free them manually/automatically
+      WorldElements3d.add(tmpRoot);
+    end;
+  finally
+    Lock.Release;
   end;
 end;
 

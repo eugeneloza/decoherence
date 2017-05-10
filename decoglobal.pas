@@ -25,7 +25,7 @@ unit decoglobal;
 interface
 
 uses {todo: temporary}//SysUtils,
-  Classes, CastleWindowTouch,
+  Classes, CastleWindowTouch,  SyncObjs,
   CastleRandom, CastleTimeUtils;
 
 { for easy changing into double in case needed }
@@ -76,6 +76,7 @@ var {global window of the game}
     {$IFNDEF Android}
     LogStream : TFileStream;
     {$ENDIF}
+    Lock: TCriticalSection;
 
 {$IFDEF LINUX}
 {$DEFINE USE_DEV_URANDOM}
@@ -119,6 +120,7 @@ end;
 procedure InitGlobal;
 begin
   drnd := TCastleRandom.Create(GetRandomSeed);
+  Lock := TCriticalSection.create;
 end;
 
 {----------------------------------------------------------------------------}
@@ -126,6 +128,7 @@ end;
 procedure DestroyGlobal;
 begin
   freeandnil(drnd);
+  freeAndNil(Lock);
 end;
 
 {----------------------------------------------------------------------------}

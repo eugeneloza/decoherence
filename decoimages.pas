@@ -187,7 +187,12 @@ end;
 procedure DStaticImage.Load(const filename: string);
 begin
   WritelnLog('DStaticImage.LoadImage',filename);
-  SourceImage := LoadImage(ApplicationData(filename));
+  Lock.Acquire;
+  try
+    SourceImage := LoadImage(ApplicationData(filename));
+  finally
+    Lock.Release;
+  end;
   afterload;
 end;
 procedure DStaticImage.Load(const CopyImage: TCastleImage);

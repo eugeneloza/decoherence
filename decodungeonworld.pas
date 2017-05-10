@@ -36,7 +36,7 @@ type TTilesList = specialize TFPGObjectList<DTileMap>;
 
 type
   {Dungeon world builds and manages any indoor tiled location}
-  DDungeonWorld = class(DAbstractWorld3d)
+  DDungeonWorld = class(DAbstractWorldManaged)
   private
     {some ugly fix for coordinate uninitialized at the beginning of the world}
     const UninitializedCoordinate = -1000000;
@@ -85,41 +85,7 @@ uses sysutils, CastleFilesUtils,
 
 procedure DDungeonWorld.manage_tiles; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
-  {prepare visibe lists,
-   we can't assign the values directly, because groups can contain multiple tiles
-   and the effect might be overlapping
-   there should be no performance/memory issues with two additional local arrays, I hope
-   however, some optimization here might come in handy some day}
-
-  //*** IF PX0<0 then...
-
-  //appear list
-  //vanish list
-
-  {
-  repeat
-  {  if old[i].tile = new[i].tile then ;
-    else}
-    if old[i].tile > new[j].tile then begin
-      {there's a new tile to turn on}
-      tile[new[j]] := true
-      inc(j);
-    end else
-    if new[i].tile>old[j].tile then begin
-    {there's an old tile to turn off}
-      tile[old[i].tile] := false;
-      inc(i);
-    end else begin
-      {the tile exists in both new and old neighbours lists, change nothing and advance to the next tile}
-      inc(i);
-      inc(j);
-    end;
-  until i>= old.count-1 and j>= new.count-1; {$warning check here}
-  {now we actually put the calculated arrays into current 3d world}
-  for i := 0 to group.count-1 do group[i] := false;
-  for i := 0 to new.count-1 do group...
-  }
-
+  {$WARNING dummy}
 end;
 
 {----------------------------------------------------------------------------}

@@ -36,6 +36,7 @@ procedure load_test_level;
 Procedure InitTestLevel;
 
 var scene: TcastleScene;
+    LoadCompleted: boolean = false;
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
@@ -74,6 +75,7 @@ end;
 
 Procedure InitTestLevel;
 begin
+  if not LoadCompleted then exit;
   if not loadedlevel then begin
      WritelnLog('InitTestLevel','Init');
      loadedlevel := true;
