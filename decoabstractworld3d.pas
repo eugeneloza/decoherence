@@ -25,7 +25,7 @@ interface
 uses classes, fgl, castleVectors,
   X3DNodes, CastleScene,
   decoabstractworld, decoabstractgenerator, deconodeparser,
-  deconavigation, decoglobal, decoinputoutput;
+  deconavigation, decoglobal;
 
 type TRootList = specialize TFPGObjectList<TX3DRootNode>;
 type TSceneList = specialize TFPGObjectList<TCastleScene>;
@@ -309,7 +309,7 @@ var s: string;
 begin
   WorldElements3d := TRootList.create(true);
   For s in WorldElementsURL do begin
-    tmpRoot := LoadBlenderX3DSafe(s);
+    tmpRoot := LoadBlenderX3D(s);
     tmpRoot.KeepExisting := 1;   //List owns the nodes, so don't free them manually/automatically
     WorldElements3d.add(tmpRoot);
   end;

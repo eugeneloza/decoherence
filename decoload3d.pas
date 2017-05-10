@@ -55,7 +55,7 @@ function LoadBlenderX3D(URL: string): TX3DRootNode;
 implementation
 
 uses SysUtils, {StrUtils,}
-  x3dload, castleLog, castlevectors;
+  castleLog, castlevectors, decoinputoutput;
 
 var TextureProperties: TTexturePropertiesNode;
 
@@ -113,7 +113,7 @@ function LoadBlenderX3D(URL: string): TX3DRootNode;
 begin
   writeLnLog('LoadBlenderX3D','Reading file '+URL);
   if TextureProperties = nil then MakeDefaultTextureProperties;
-  result := load3D(URL);
+  result := load3DSafe(URL);
   AddMaterial(result);
 end;
 

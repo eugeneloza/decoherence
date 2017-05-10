@@ -8,7 +8,7 @@ object DungeonTilesEditor: TDungeonTilesEditor
   ClientWidth = 737
   OnDestroy = FormDestroy
   OnShow = FormShow
-  LCLVersion = '1.6.2.0'
+  LCLVersion = '1.6.4.0'
   object TileDisplay: TCastleControl
     Left = 6
     Height = 476
@@ -18,10 +18,10 @@ object DungeonTilesEditor: TDungeonTilesEditor
   end
   object TilesBox: TComboBox
     Left = 480
-    Height = 25
+    Height = 21
     Top = 3
     Width = 248
-    ItemHeight = 0
+    ItemHeight = 13
     Style = csDropDownList
     TabOrder = 1
   end
@@ -53,9 +53,9 @@ object DungeonTilesEditor: TDungeonTilesEditor
     TabOrder = 4
     object SymmetricEditCheckBox: TCheckBox
       Left = 120
-      Height = 18
+      Height = 17
       Top = 240
-      Width = 120
+      Width = 90
       Caption = 'Symmetric Edit'
       Checked = True
       OnChange = SymmetricEditCheckBoxChange
@@ -64,19 +64,19 @@ object DungeonTilesEditor: TDungeonTilesEditor
     end
     object FaceAtlasBox: TComboBox
       Left = 68
-      Height = 25
+      Height = 21
       Top = 8
       Width = 172
-      ItemHeight = 0
+      ItemHeight = 13
       Style = csDropDownList
       TabOrder = 1
     end
     object BaseAtlasBox: TComboBox
       Left = 72
-      Height = 25
+      Height = 21
       Top = 209
       Width = 168
-      ItemHeight = 0
+      ItemHeight = 13
       Style = csDropDownList
       TabOrder = 2
     end
@@ -94,9 +94,9 @@ object DungeonTilesEditor: TDungeonTilesEditor
     end
     object ZLabel: TLabel
       Left = 8
-      Height = 15
+      Height = 13
       Top = 18
-      Width = 9
+      Width = 6
       Caption = 'Z'
       ParentColor = False
       Visible = False
@@ -110,9 +110,9 @@ object DungeonTilesEditor: TDungeonTilesEditor
     end
     object BaseRadio: TRadioButton
       Left = 3
-      Height = 18
+      Height = 17
       Top = 216
-      Width = 51
+      Width = 43
       Caption = 'base'
       Checked = True
       OnChange = RadioChange
@@ -121,18 +121,18 @@ object DungeonTilesEditor: TDungeonTilesEditor
     end
     object FloorRadio: TRadioButton
       Left = 3
-      Height = 18
+      Height = 17
       Top = 232
-      Width = 49
+      Width = 42
       Caption = 'floor'
       OnChange = RadioChange
       TabOrder = 5
     end
     object CeilingRadio: TRadioButton
       Left = 3
-      Height = 18
+      Height = 17
       Top = 200
-      Width = 63
+      Width = 49
       Caption = 'ceiling'
       OnChange = RadioChange
       TabOrder = 6

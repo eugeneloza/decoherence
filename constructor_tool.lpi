@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
   <ProjectOptions>
-    <Version Value="9"/>
+    <Version Value="10"/>
     <General>
       <Flags>
         <MainUnitHasUsesSectionForAllUnits Value="False"/>
@@ -159,38 +159,38 @@
         <IsPartOfProject Value="True"/>
       </Unit8>
       <Unit9>
-        <Filename Value="deco3dload.pas"/>
+        <Filename Value="blendercleaner.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit9>
       <Unit10>
-        <Filename Value="blendercleaner.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit10>
-      <Unit11>
         <Filename Value="constructor_map.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="MapEditor"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+      </Unit10>
+      <Unit11>
+        <Filename Value="decodungeongenerator.pas"/>
+        <IsPartOfProject Value="True"/>
       </Unit11>
       <Unit12>
-        <Filename Value="decodungeongenerator.pas"/>
+        <Filename Value="constructor_tiles_png_map.inc"/>
         <IsPartOfProject Value="True"/>
       </Unit12>
       <Unit13>
-        <Filename Value="constructor_tiles_png_map.inc"/>
+        <Filename Value="decoabstractworld.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit13>
       <Unit14>
-        <Filename Value="decoabstractworld.pas"/>
+        <Filename Value="decoabstractgenerator.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit14>
       <Unit15>
-        <Filename Value="decoabstractgenerator.pas"/>
+        <Filename Value="decodungeonworld.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit15>
       <Unit16>
-        <Filename Value="decodungeonworld.pas"/>
+        <Filename Value="decoload3d.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit16>
     </Units>

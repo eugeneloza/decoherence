@@ -168,9 +168,9 @@ var
 implementation
 {$R *.lfm}
 
-uses CastleVectors, CastleCameras, StrUtils, castleLog,
+uses CastleVectors, CastleCameras, castleLog,
      DOM, CastleXMLUtils,
-     deco3dLoad, x3dLoad, CastleURIUtils, blendercleaner,
+     decoLoad3d, x3dLoad, CastleURIUtils, blendercleaner,
      castleFilesUtils,
      decoglobal;
 

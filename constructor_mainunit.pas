@@ -73,7 +73,8 @@ var
 implementation
 {$R *.lfm}
 
-uses constructor_facts, constructor_tiles, constructor_map;
+uses
+  constructor_facts, constructor_tiles, constructor_map;
 
 {-----------------------------------------------------------------------------}
 
@@ -124,6 +125,7 @@ end;
 procedure TMainForm.WriteMe(ToGameFolder: boolean);
 var WF: TWriterForm;
 begin
+  WriteLnLog('TMainForm.WriteMe','Started.');
   if AllForms = nil then MakeFormsList; //not optimal...
 
   for WF in AllForms do
@@ -136,8 +138,8 @@ begin
       // when compiling we have to save everything
       if not WF.isLoaded then WF.LoadMe;
       WF.WriteMe(ToGameFolder);
-    end
-
+    end;
+  WriteLnLog('TMainForm.WriteMe','Finished.');
 end;
 
 {-----------------------------------------------------------------------------}

@@ -48,6 +48,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 {If we attach additional Switch Nodes to 3d world management}
 {$DEFINE UseSwitches}
 
+{$IFDEF Windows}{$DEFINE UTF8Encode}{$ENDIF}
+
 {======================== GAME-SPECIFIC DIRECTIVES =========================}
 
 {defines fullscreen mode}

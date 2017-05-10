@@ -185,8 +185,8 @@ begin
   i_break := i2;
   while i2 <= length(s) do
   begin
-    if (copy(s,i2,1) = ' ') or (copy(s,i2,1) = dlinebreak) then i_break := i2;
-    if (textwidth(copy(s,i1,i2-i1)) > w) or (copy(s,i2,1) = dlinebreak) then
+    if (copy(s,i2,1) = ' ') or (copy(s,i2,length(dlinebreak)) = dlinebreak) then i_break := i2;
+    if (textwidth(copy(s,i1,i2-i1)) > w) or (copy(s,i2,length(dlinebreak)) = dlinebreak) then
     begin
       newString := DString.create;
       newString.value := copy(s,i1,i_break-i1);

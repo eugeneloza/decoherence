@@ -9,7 +9,7 @@ object MainForm: TMainForm
   OnClose = FormClose
   OnCreate = FormCreate
   OnDestroy = FormDestroy
-  LCLVersion = '1.6.2.0'
+  LCLVersion = '1.6.4.0'
   object FactsEditorButton: TButton
     Left = 208
     Height = 25
@@ -28,7 +28,7 @@ object MainForm: TMainForm
     Hint = 'Select current displayed language.'
     Top = 8
     Width = 100
-    ItemHeight = 0
+    ItemHeight = 13
     ItemIndex = 0
     Items.Strings = (
       'Russian'

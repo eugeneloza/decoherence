@@ -24,7 +24,10 @@ interface
 uses SyncObjs,
   CastleImages, CastleXMLUtils, DOM, X3DNodes;
 
-var Lock: TCriticalSection;
+{$WARNING: Maybe, I'm using CriticalSection in a wrong way?}
+var
+  {}
+  Lock: TCriticalSection;
 
 {}
 function LoadImageSafe(const URL: String): TCastleImage;
@@ -33,11 +36,10 @@ function LoadImageSafe(const URL: string;
 {}
 function URLReadXMLSafe(const URL: String): TXMLDocument;
 {}
-function LoadBlenderX3DSafe(const URL: string): TX3DRootNode;
+function Load3DSafe(const URL: string): TX3DRootNode;
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-uses SysUtils,
-  decoload3d;
+uses SysUtils, x3dload;
 
 function LoadImageSafe(const URL: String): TCastleImage;
 begin
@@ -76,12 +78,12 @@ end;
 
 {----------------------------------------------------------------------------}
 
-function LoadBlenderX3DSafe(const URL: string): TX3DRootNode;
+function Load3DSafe(const URL: string): TX3DRootNode;
 begin
   Result := nil;
   Lock.Acquire;
   try
-    Result := LoadBlenderX3D(URL);
+    Result := Load3D(URL);
   finally
     Lock.Release;
   end;

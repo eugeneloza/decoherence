@@ -21,7 +21,7 @@ unit decodungeongenerator;
 {$INCLUDE compilerconfig.inc}
 interface
 
-uses Classes, CastleRandom, fgl, CastleGenericLists, SyncObjs,
+uses Classes, CastleRandom, fgl, CastleGenericLists,
   decoabstractgenerator, decodungeontiles,
   decothread, decoglobal;
 
@@ -380,7 +380,7 @@ end;
 {----------------------------------------------------------------------------}
 
 procedure DDungeonGenerator.InitParameters;
-var s: string;
+var
     tmp: DGeneratorTile;
     i : integer;
 begin
@@ -1363,7 +1363,7 @@ begin
       while Iterator.GetNext do if Iterator.current.NodeName = UTF8decode('Tile') then
       begin
         SmallContainer := Iterator.current;
-        TilesList.add(SmallContainer.TextData);
+        TilesList.add({$IFDEF UTF8Encode}UTF8encode{$ENDIF}(SmallContainer.TextData));
       end;
     finally
       FreeAndNil(Iterator);
