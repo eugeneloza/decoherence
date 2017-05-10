@@ -47,13 +47,6 @@ type
   protected
     procedure Execute; override;
   end;
-  TDummy = class
-    procedure ReleaseInterface(Sender: TObject);
-  end;
-
-procedure TDummy.ReleaseInterface(Sender: TObject);
-begin
-end;
 
 var LoadThread: DLoadThread;
 
@@ -225,7 +218,7 @@ end;
 
 {======================= initialization routines ==============================}
 
-procedure DLoadThread.execute;
+procedure LoadAndInitData;
 begin
   SetGameMode(gmLoadScreen);
 
@@ -235,6 +228,11 @@ begin
   Load_test_level; //remake it
   window.OnBeforeRender := @WindowManage;
   LoadCompleted := true;
+end;
+
+procedure DLoadThread.execute;
+begin
+  LoadAndInitData;
 end;
 
 procedure ApplicationInitialize;
@@ -279,10 +277,15 @@ begin
 
   WritelnLog('ApplicationInitialize','Init finished');
 
+  {$WARNING BUUUUUUUUUUUUUUUUUG!!!!!}
+  {$IFDEF Linux}{$IFNDEF RELEASE}{$DEFINE NoThreads}{$ENDIF}{$ENDIF}
+  {$IFNDEF NoThreads}
   LoadThread := DLoadThread.create(false);
   LoadThread.Priority := tpNormal;
   LoadThread.FreeOnTerminate := true;
-  LoadThread.OnTerminate := @TDummy(nil).ReleaseInterface;
+  {$ELSE}
+  LoadAndInitData;
+  {$ENDIF}
 end;
 
 {==========================================================================}
