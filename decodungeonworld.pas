@@ -285,7 +285,7 @@ begin
   BuildRoots;
   BuildScenes;
   ActivateScenes;
-  firstRended := true;
+  firstRender := true;
 end;
 
 {----------------------------------------------------------------------------}

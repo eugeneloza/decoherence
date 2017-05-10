@@ -37,7 +37,7 @@ Procedure InitTestLevel;
 
 var scene: TcastleScene;
   Camera: TWalkCamera;
-  monsters: array[0..10] of T3DOrient;
+  //monsters: array[0..10] of T3DOrient;
   //shaders: TSwitchNode;
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
@@ -118,7 +118,9 @@ begin
   camera := TWalkCamera.create(Window);
   {z-up orientation}
   camera.SetView(Vector3Single(0,0,1),Vector3Single(0,1,0),Vector3Single(0,0,1),Vector3Single(0,0,1),true);
-  camera.Position := vector3single(4*2,-4*2,-4*2);
+  camera.Position := vector3single((4+0.5)*2-1,-(4+0.5)*2,(0+0.3)*2);
+  camera.Gravity := true;
+  camera.PreferredHeight := (0+0.3)*2;
   camera.MoveSpeed := 5; //set to zero to stop
   camera.MouseDragMode := mdRotate;
   Window.SceneManager.Camera := camera;

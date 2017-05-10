@@ -77,13 +77,14 @@ Begin
   InternalTime += DeltaTime;
   //Recalculate all actors for events   //IN A THREAD??? Just using internaltime for their own deltatimes
   //If actor event fired, put it into sequence and if stop to act then put a softpause until % of the action animation has been played
-  for i := low(monsters) to high(monsters) do begin
+  {for i := low(monsters) to high(monsters) do begin
     monsters[i].Direction := camera.Position - monsters[i].Position;
     monsters[i].Up := Vector3Single(0,0,1);    //still sometimes fails so I have to reset it every frame
     //if rnd.Random<0.01 then (monsters[i].Items[0] as TCastleScene).PlayAnimation('attack',false);
 {    Scene.AnimationTimeSensor('my_animation').EventIsActive.OnReceive.Add(
               @AnimationIsActiveChanged)}
-  end;
+
+  end;        }
 End;
 
 
