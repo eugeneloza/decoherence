@@ -25,17 +25,33 @@ uses Classes,
   decoglobal;
 
 type
+  {a thread which reports its current state and progress
+   should be hold in actual state by calling UpdateProgress from the Execute}
   TAbstractThread = class(TThread)
   protected
+    {current progress in 0..1}
     fprogress: float;
+    {name of the current job}
     fcurrentjob: string;
+    {multiplier for scaling the current progress, e.g. in case each part
+     of the procedure is scaled in 0..1, then mult will equal to number of the procedures}
     fmult: float;
+    {should be called to update (and scale) the progress conveniently
+     pay attention: next progress is always larger than last progress
+     i.e. passing values 0.1, 0.2 and 0.1 will result in progress = 0.2 (last known largest value)
+     this is caused by progress most often used in procedures, making several tries to solve the taks
+     to reset progress, use fprogress}
     procedure UpdateProgress(currentJobValue: string; progressValue: float);
   public
+    {current progress of the thread}
     property progress: float read fprogress;
+    {name of the current job}
     property currentjob: string read fcurrentjob;
   end;
 
+{redundant function to get max value of two values,
+ I know there's such procedure somewhere already,
+ but I was too lazy to search for it}
 function minimum(v1,v2: float): float;
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
@@ -47,6 +63,8 @@ begin
     fprogress := progressValue*fmult;
   if fprogress>1 then fprogress := 1;
 end;
+
+{----}
 
 function minimum(v1,v2: float): float;
 begin

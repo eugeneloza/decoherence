@@ -21,13 +21,29 @@ unit decoabstractgenerator;
 {$INCLUDE compilerconfig.inc}
 interface
 
-uses {Classes,} CastleRandom,
+uses {Classes,} CastleRandom, fgl, CastleGenericLists,
   decothread;
 
 type
   {maybe I'll change it later}
   TTileType = word;
   TIntCoordinate = integer;
+
+type TIndexList = specialize TFPGList<TTileType>;
+{$warning change it to a generic list and export}
+type TIndexGroups = specialize TFPGObjectList<TIndexList>;
+
+type
+  {a two-value description of a "neighbour" tile}
+  DNeighbour = record
+    {index of current tile}
+    tile: TTileType;
+    {visiblity of the tile ~spatial angle}
+    visible: integer;
+  end;
+
+type TNeighboursList = specialize TGenericStructList<DNeighbour>;
+
 
 type
   {Most abstract generation routine to parent all the generation algorithms

@@ -22,13 +22,9 @@ unit decoabstractworld;
 {$INCLUDE compilerconfig.inc}
 interface
 
-uses CastleRandom, fgl, castleVectors,
-  X3DNodes, CastleScene,
+uses CastleRandom, castleVectors,
   decoabstractgenerator,
-  deconavigation, decoglobal;
-
-type TRootList = specialize TFPGObjectList<TX3DRootNode>;
-type TSceneList = specialize TFPGObjectList<TCastleScene>;
+  decoglobal;
 
 {Type PathElement = record
   {Absolute Coordinates of pathPoint}
@@ -40,25 +36,21 @@ type TSceneList = specialize TFPGObjectList<TCastleScene>;
 end;}
 
 Type
-  {The most abstract world implementation to merge independent world routines
-   Like manage and pathfind}
+  {The most abstract world implementation.
+   Used as external interface for the world}
   DAbstractWorld = class
   protected
     fSeed: LongWord;
-    { xorshift random generator, fast and thread-safe }
+    { xorshift random generator, fast and thread-safe
+      used by BUILD (maybe freed afterwards?) }
     RNDM: TCastleRandom;
+    {time of last render. Used for FPS management}
     LastRender: TDateTime;
+    {is this render the first one?
+     Additional initialization procedures may be required }
+    {$HINT todo: LastRender = -1 does the same job, optimize it}
+    {$HINT allow first initialization flow during load without caring for FPS!}
     FirstRender: boolean;
-  protected
-    {add a Node to a AbstractGrouping Node detecting
-     and replacing placeholders as necessary (detected by IsPlaceholder function)
-     At this moment dest/source can be only Grouping Nodes, maybe forever
-     WARNING DEST must be a "fresh-created" node
-     WARNING only Children of the source node are added
-     WARNING placeholders cannot be children of children!
-             Otherwise we'll have to recreate the whole nodes tree}
-    procedure AddRecoursive(dest,source: TAbstractX3DGroupingNode);
-  {*** "interface" section ***}
   public
     {Seed used to "build" the world if it requires random}
     property Seed: LongWord read fSeed write fSeed;
@@ -75,22 +67,19 @@ Type
     procedure Load(Generator: DAbstractGenerator); virtual; abstract;
     {builds a world from the obtained data }
     procedure Build; virtual;
-    {activates the current world. Caution it will modify Window.SceneManager!}
+    {activates the current world.
+     Caution, it might and will modify Window.SceneManager!}
     procedure Activate; virtual;
     {Splits the World into chunks}
     //Procedure chunk_n_slice; virtual; abstract;
     constructor create; virtual;
     destructor destroy; override;
-  End;
+  end;
 
 var CurrentWorld: DAbstractWorld;
 
-
 procedure FreeWorld;
 
-{temporary?
- if this node is a placeholder}
-function IsPlaceholder(node: TX3DNode): boolean;
 
 {procedure FreeRootList(List: TRootList);} //unneeded as list "owns" children
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
@@ -105,8 +94,6 @@ begin
   {we create an non-initialized random (i.e. initialized by a stupid constant integer)
   Just to make sure we don't waste any time (<1ms) on initialization now}
   RNDM := TCastleRandom.Create(1);
-  LastRender := -1;
-  FirstRender := true;
 end;
 
 {------------------------------------------------------------------------------}
@@ -130,46 +117,8 @@ end;
 Procedure DAbstractWorld.Activate;
 begin
   WriteLnLog('DAbstractWorld.Activate','Activating the world.');
-  firstRender := true;
-  Window.SceneManager.Items.Clear;
-  Window.SceneManager.Items.Add(Navigation);
-  Window.SceneManager.MainScene := Navigation;
-  Window.SceneManager.Camera := nil; {$HINT check here for a correct way to free camera}
-  Window.SceneManager.Camera := camera;
-
-end;
-
-{------------------------------------------------------------------------------}
-
-
-procedure DAbstractWorld.AddRecoursive(dest,source: TAbstractX3DGroupingNode);
-var i: integer;
-begin
-  for i := 0 to source.FdChildren.Count-1 do
-    if not isPlaceholder(source.FdChildren[i]) then
-      dest.FdChildren.add(source.FdChildren[i])
-    else
-      {addRecoursive};
-end;
-
-
-{------------------------------------------------------------------------------}
-
-{procedure FreeRootList(List: TRootList);
-var i: integer;
-begin
-  for i := 0 to List.count do FreeAndNil(List[i]);
-end;}
-
-{------------------------------------------------------------------------------}
-
-function IsPlaceholder(node: TX3DNode): boolean;
-begin
-  {$warning this is obsolete, and will interfere with collisions node}
-  if copy(node.X3DName,1,1) = '(' then
-    result := true
-  else
-    result := false;
+  LastRender := -1;
+  FirstRender := true;
 end;
 
 {------------------------------------------------------------------------------}

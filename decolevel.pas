@@ -24,11 +24,11 @@ interface
 
 uses
   CastleLog,
-  CastleWindow, CastleWindowTouch, CastleSceneCore, CastleScene, CastleFilesUtils,
+  CastleWindow, CastleWindowTouch, CastleSceneCore, CastleScene,
   castleVectors,  X3DNodes,
-  deco3dload, {decodungeontiles,}
-  {x3dload,} sysutils,
-  {castle3d,}
+  deco3dload,
+  sysutils,
+
   decoabstractworld, decodungeonworld, decodungeongenerator,
   deconavigation, decoglobal;
 
@@ -41,8 +41,8 @@ var scene: TcastleScene;
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-uses DecoGameMode
-  ;
+uses CastleFilesUtils,
+  DecoGameMode;
 
 procedure Generate3DWorld;
 var GENERATOR: D3dDungeonGenerator;
@@ -63,7 +63,7 @@ var loadedlevel:boolean=false;
 procedure load_test_level;
 {var Nav:; /// !!!
 
-var ScreenEffect: TX3DRootNode;
+var
     mRoot: TX3DRootNode;
     //i: integer; }
 begin

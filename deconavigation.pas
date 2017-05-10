@@ -26,17 +26,21 @@ uses Classes, SysUtils,
   castleVectors,  X3DNodes,
   decoglobal;
 
+const PlayerHeight = 0.5;
+
 var Camera: TWalkCamera;
     Navigation: TCastleScene;
 
 procedure InitNavigation;
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-uses CastleLog;
+uses  CastleFilesUtils, CastleLog,
+  x3dload;
 
 var Nav: TKambiNavigationInfoNode;
     NavRoot: TX3DRootNode;
-    NavLight: TPointLightNode; {$HIND Check this}
+    NavLight: TPointLightNode; {$HINT Check this}
+    ScreenEffect: TX3DRootNode;
 
 
 procedure InitNavigation;
@@ -44,8 +48,6 @@ begin
   WritelnLog('deconavigation.InitNavigation','Initialize navigation');
   camera := TWalkCamera.create(Window);
   {z-up orientation}
-  camera.SetView(Vector3Single(0,0,1),Vector3Single(0,1,0),Vector3Single(0,0,1),Vector3Single(0,0,1),true);
-  camera.Position := vector3single((4+0.5)*2-1,-(4+0.5)*2,(0+0.3)*2); {$WARNING to be managed by the world}
   camera.Gravity := true;
   camera.PreferredHeight := (0+0.3)*2;
   camera.MouseDragMode := mdRotate;
@@ -53,7 +55,10 @@ begin
   camera.MoveSpeed := 2; //set to zero to stop
   //camera.Input := [];  //-----  completely disable camera
 
+  NavRoot := TX3DRootNode.create;
+
   //create light that follows the player
+  {$Hint todo}
   NavLight:= TPointLightNode.Create;
   NavLight.FdColor.Value := vector3single(1,0.3,0.1);
   NavLight.FdAttenuation.value := Vector3Single(1,0,1);
@@ -67,10 +72,10 @@ begin
   nav.FdHeadLightNode.Value := NavLight;
   nav.FdHeadlight.Value := true;
 
-  NavRoot := TX3DRootNode.create;
   NavRoot.FdChildren.Add(nav);
 
-  {
+  {$Hint todo}
+
   {this is a temporary "addition" of a screen shader,
    should be replaced for something more useful some time later}
   {Shaders := TSwitchNode.create;}
@@ -83,11 +88,9 @@ begin
 
   NavRoot.FdChildren.add(ScreenEffect);
   //Scene.Attributes.EnableTextures := false;
-  }
-
 
   Navigation := TCastleScene.Create(Window);
-  Navigation.Spatial := [{ssRendering, ssDynamicCollisions}];  {$HINT Check here - no collisions are needed}
+  Navigation.Spatial := [{ssRendering, ssDynamicCollisions}];
   Navigation.ProcessEvents := true;
   Navigation.ShadowMaps := Shadow_maps_enabled;
   Navigation.Load(NavRoot,true);

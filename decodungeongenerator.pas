@@ -157,8 +157,6 @@ type
       destructor destroy; override;
   end;
 
-type TIndexList = specialize TFPGList<TTileType>;
-
 type
   { Preforms all map generation routines
     This is a relatively CPU-intensive work therefore must be heavily optimized }
@@ -295,17 +293,9 @@ type
   end;
 type TRaycastList = specialize TGenericStructList<Txyz>;
 
-type
-  {a two-value description of a "neighbour" tile}
-  DNeighbour = record
-    {index of current tile}
-    tile: TTileType;
-    {visiblity of the tile ~spatial angle}
-    visible: integer;
-  end;
-
-type TNeighboursList = specialize TGenericStructList<DNeighbour>;
 type TNeighboursMapArray = array of array of array of TNeighboursList;
+
+{$HINT needs to be changed to fit the abstract world definition.}
 type TGroupsArray = array of TIndexList;
 
 type
@@ -364,7 +354,7 @@ type
     {WARNING, exporting these WILL stop the Generator from freeing it
      and will NIL the corresponding links. Don't try to access it twice!}
     {exports groups of tiles and nils the link}
-    function ExportGroups: TGroupsArray;
+    function ExportGroups: TIndexGroups;
     {exports neighbours map and nils the link}
     function ExportNeighbours: TNeighboursMapArray;
   end;
@@ -1278,10 +1268,13 @@ end;
 
 {------------------------------------------------------------------------}
 
-function D3DDungeonGenerator.ExportGroups: TGroupsArray;
+function D3DDungeonGenerator.ExportGroups: TIndexGroups;
+var i: integer;
 begin
   if not isFinished then raise Exception.create('D3DDungeonGenerator.ExportGroups: ERROR! Trying to access an unfinished Generator');
-  Result := Groups;
+  Result := TIndexGroups.Create(true);
+  for i := 0 to high(groups) do
+    Result.Add(groups[i]);
   Groups := nil;
 end;
 
