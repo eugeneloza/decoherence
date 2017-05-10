@@ -17,14 +17,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 
 { contains definitions for 3d World entity }
 
-unit deco3dworld;
+unit decoabstractworld3d;
 
 {$INCLUDE compilerconfig.inc}
-{$DEFINE UseSwitches}
 interface
-uses fgl, castleVectors,
+uses classes, fgl, castleVectors,
   X3DNodes, CastleScene,
-  decoabstractworld, decoabstractgenerator,
+  decoabstractworld, decoabstractgenerator, deconodeparser,
   deconavigation, decoglobal;
 
 type TRootList = specialize TFPGObjectList<TX3DRootNode>;
@@ -34,13 +33,29 @@ type TTransformList = specialize TFPGObjectList<TTransformNode>;
 {list of switch nodes wrapping each element of TTransformList}
 {$IFDEF UseSwitches}type TSwitchList = specialize TFPGObjectList<TSwitchNode>;{$ENDIF}
 
+{Type PathElement = record
+  {Absolute Coordinates of pathPoint}
+  X,y,z: TCoordinate;
+  {world tile it belongs to}
+  Tile: TTileType;
+  {Link of tiles adjacent to this tile}
+  Links: TLinkList;
+end;}
 
 type
   {World using 3D management and definitions,
    shared by interior and exterior worlds
    WARNING: it is abstract. Use DungeonWorld or Overworld.}
-  D3dWorld = class(DAbstractWorld)
+  DAbstractWorld3d = class(DAbstractWorld)
+
+  (*build*)
   protected
+    {root nodes of the each tile
+     MUST go synchronous with groups/neighbours!}
+    WorldElements3d: TRootList;
+    {List of world objects filenames (Absolute URLs!)}
+    {$HINT MAY be freed after loading?}
+    WorldElementsURL: TStringList;
     {a list of transforms representing each generator step
      todo: unneeded after build and can be freed? (list only)
      todo: how to LODs?!!!}
@@ -54,8 +69,9 @@ type
     WorldRoots: TRootList;
     {list of scenes, representing each neighbour group}
     WorldScenes: TSceneList;
+    //WorldCHUNKs here
     {loads world objects from HDD}
-    procedure LoadWorldObjects; virtual; abstract;
+    procedure LoadWorldObjects;
     {assembles MapTiles from Tiles 3d, adding transforms nodes according to generator steps}
     procedure BuildTransforms; virtual; abstract;
     {wraps transforms into switches if enabled}
@@ -83,16 +99,29 @@ type
     destructor destroy; override;
   end;
 
-{temporary?
- if this node is a placeholder}
-function IsPlaceholder(node: TX3DNode): boolean;
+
+{creates a fresh empty copy of TTransformNode,
+ WARNING: the result must be freed manually
+ maybe should be moved somewhere to more abstract level?
+ No need to publish it yet}
+//function CopyTransform(const Source: TTransformNode): TTransformNode;
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
-uses sysutils,
+uses sysutils, deco3dload, CastleLog,
   castlescenecore;
 
-procedure D3dWorld.Activate;
+function CopyTransform(const Source: TTransformNode): TTransformNode;
+begin
+  Result := TTransformNode.create;
+  Result.Translation := Source.Translation;
+  Result.Scale := Source.Scale;
+  Result.Rotation := Source.Rotation;
+end;
+
+{============================ DAbstractWorld3D =============================}
+
+procedure DAbstractWorld3d.Activate;
 var  i: integer;
 begin
   inherited;
@@ -108,21 +137,47 @@ end;
 
 {------------------------------------------------------------------------------}
 
-procedure D3dWorld.AddRecoursive(dest,source: TAbstractX3DGroupingNode);
+procedure DAbstractWorld3d.AddRecoursive(dest,source: TAbstractX3DGroupingNode);
 var i: integer;
+    Slot,Replacement: TTransformNode;
+    Parsed: DNodeInfo;
 begin
   for i := 0 to source.FdChildren.Count-1 do
     if not isPlaceholder(source.FdChildren[i]) then
+      //add the node normally
       dest.FdChildren.add(source.FdChildren[i])
-    else
-      {addRecoursive};
+    else begin
+      //replace the node with the actual placeholder
+      Slot := source.FdChildren[i] as TTransformNode; //should fire an exception if this is wrong, we should have checked it in "isPlaceholder"
+      Parsed := ParseNode(Slot);
+      if RNDM.random<Parsed.rand then begin
+        Replacement := CopyTransform(Slot);
+        //rotate
+        //AddRecoursive(Replacement, GetPlaceholder(Parsed)); //plus symmetry groups
+        //WriteLnLog(Parsed.placeholder);
+        dest.FdChildren.add(Replacement);
+      end;
+    end;
 end;
 
 
+{----------------------------------------------------------------------------}
+
+procedure DAbstractWorld3d.LoadWorldObjects;
+var s: string;
+  tmpRoot: TX3DRootNode;
+begin
+  WorldElements3d := TRootList.create(true);
+  For s in WorldElementsURL do begin
+    tmpRoot := LoadBlenderX3D(s);
+    tmpRoot.KeepExisting := 1;   //List owns the nodes, so don't free them manually/automatically
+    WorldElements3d.add(tmpRoot);
+  end;
+end;
 
 {----------------------------------------------------------------------------}
 {$IFDEF UseSwitches}
-procedure D3dWorld.buildSwitches;
+procedure DAbstractWorld3d.buildSwitches;
 var i: integer;
   Switch: TSwitchNode;
 begin
@@ -137,7 +192,7 @@ end;
 {$ENDIF}
 {----------------------------------------------------------------------------}
 
-procedure D3dWorld.buildRoots;
+procedure DAbstractWorld3d.buildRoots;
 var i,j: integer;
   Root: TX3DRootNode;
 begin
@@ -152,7 +207,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure D3dWorld.buildScenes;
+procedure DAbstractWorld3d.buildScenes;
 var i: integer;
   Scene: TCastleScene;
 begin
@@ -169,7 +224,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure D3dWorld.build;
+procedure DAbstractWorld3d.build;
 begin
   inherited build;
   LoadWorldObjects;
@@ -181,27 +236,19 @@ end;
 
 {----------------------------------------------------------------------------}
 
-destructor D3dWorld.destroy;
+destructor DAbstractWorld3d.destroy;
 begin
   //free 3d-related lists
   FreeAndNil(WorldScenes);
   FreeAndNil(WorldRoots);
   {$IFDEF UseSwitches}FreeAndNil(WorldSwitches);{$ENDIF}
   FreeAndNil(WorldObjects);
-
+  FreeAndNil(WorldElements3d); //owns children, so will free them automatically
+  FreeAndNil(WorldElementsURL);
   inherited;
 end;
 
 {=============================== OTHER ROUTINES ===============================}
-
-function IsPlaceholder(node: TX3DNode): boolean;
-begin
-  {$warning this is obsolete, and will interfere with collisions node}
-  if copy(node.X3DName,1,1) = '(' then
-    result := true
-  else
-    result := false;
-end;
 
 
 {------------------------------------------------------------------------------}

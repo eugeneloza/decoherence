@@ -657,7 +657,7 @@ var s: string;
 begin
   Result := TStringList.create;
   for s in self.Parameters.TilesList do
-    Result.add(s);
+    Result.add(ApplicationData(TilesFolder+s+'.x3d'+GZ_ext));
 end;
 
 {-----------------------------------------------------------------------------}

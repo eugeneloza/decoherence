@@ -24,7 +24,7 @@ interface
 
 uses classes, fgl, castleVectors,
   X3DNodes, CastleScene,
-  decodungeongenerator, decoabstractgenerator, deco3dworld,
+  decodungeongenerator, decoabstractgenerator, decoabstractworld3d,
   decodungeontiles,
   deconavigation, decoglobal;
 
@@ -36,7 +36,7 @@ type TTilesList = specialize TFPGObjectList<DTileMap>;
 
 type
   {Dungeon world builds and manages any indoor tiled location}
-  DDungeonWorld = class(D3dWorld)
+  DDungeonWorld = class(DAbstractWorld3d)
   private
     {some ugly fix for coordinate uninitialized at the beginning of the world}
     const UninitializedCoordinate = -1000000;
@@ -53,18 +53,8 @@ type
     WorldScale: float;
     {neighbours array}
     Neighbours: TNeighboursMapArray;
-    {List of tile names.
-     MAY be freed after loading?}
-    TilesList: TStringList;
-    {is this one needed? We already have a map}
-    Tiles: TTilesList;
-    {root nodes of the each tile
-     MUST go synchronous with groups/neighbours!}
-    Tiles3d: TRootList;
     {sequential set of tiles, to be added to the world during "build"}
     Steps: TGeneratorStepsArray;
-    {loads tiles from HDD}
-    procedure LoadWorldObjects; override;
     {assembles MapTiles from Tiles 3d, adding transforms nodes according to generator steps}
     procedure BuildTransforms; override;
   public
@@ -91,8 +81,7 @@ type
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 uses sysutils, CastleFilesUtils,
-  CastleSceneCore,
-  deco3dload;
+  CastleSceneCore;
 
 procedure DDungeonWorld.manage_tiles; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
@@ -182,7 +171,7 @@ begin
   Map := DG.ExportMap;
   Groups := DG.ExportGroups;
   Neighbours := DG.ExportNeighbours;
-  TilesList := DG.ExportTiles;
+  WorldElementsURL := DG.ExportTiles;
   Steps := DG.ExportSteps;
   {$hint WorldScale must support different scales}
   WorldScale := TileScale;
@@ -198,25 +187,6 @@ end;
 procedure DDungeonWorld.Load(URL: string);
 begin
   {$Warning dummy}
-end;
-
-{----------------------------------------------------------------------------}
-
-procedure DDungeonWorld.LoadWorldObjects;
-var s: string;
-  tmpMap: DTileMap;
-  tmpRoot: TX3DRootNode;
-begin
-  FreeAndNil(Tiles);
-  tiles := TTilesList.create(true);
-  tiles3d := TRootList.create(true);
-  For s in TilesList do begin
-    tmpMap := DTileMap.Load(ApplicationData(TilesFolder+s),true);
-    tiles.Add(tmpMap);
-    tmpRoot := LoadBlenderX3D(ApplicationData(TilesFolder+s+'.x3d'+GZ_ext));
-    tmpRoot.KeepExisting := 1;   //List owns the nodes, so don't free them manually/automatically
-    Tiles3d.add(tmpRoot);
-  end;
 end;
 
 {----------------------------------------------------------------------------}
@@ -248,7 +218,7 @@ begin
     //put current tile into the world. Pay attention to y and z coordinate inversion.
     Transform.translation := Vector3Single(WorldScale*(steps[i].x),-WorldScale*(steps[i].y),-WorldScale*(steps[i].z));
     //Transform.scale := Vector3Single(myscale,myscale,myscale);
-    AddRecoursive(Transform,Tiles3d[steps[i].tile]);
+    AddRecoursive(Transform,WorldElements3d[steps[i].tile]);
     WorldObjects.Add(Transform);
   end;
 end;
@@ -276,11 +246,6 @@ begin
   freeandnil(map);
   FreeAndNil(groups);
   FreeNeighboursMap(Neighbours);
-  FreeAndNil(TilesList);
-  
-  //free loaded tiles
-  FreeAndNil(Tiles);   //owns children, so will free them automatically
-  FreeAndNil(Tiles3d); //owns children, so will free them automatically
 
   inherited;
 end;

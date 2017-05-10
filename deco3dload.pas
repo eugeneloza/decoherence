@@ -111,6 +111,7 @@ end;
 
 function LoadBlenderX3D(URL: string): TX3DRootNode;
 begin
+  writeLnLog('LoadBlenderX3D','Reading file '+URL);
   if TextureProperties = nil then MakeDefaultTextureProperties;
   result := load3D(URL);
   AddMaterial(result);

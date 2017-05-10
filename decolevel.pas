@@ -36,8 +36,6 @@ procedure load_test_level;
 Procedure InitTestLevel;
 
 var scene: TcastleScene;
-  //monsters: array[0..10] of T3DOrient;
-  //shaders: TSwitchNode;
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
@@ -57,22 +55,13 @@ begin
   CurrentWorld.Build;
 end;
 
-//var monster: TX3DRootNode;
-
 var loadedlevel:boolean=false;
 procedure load_test_level;
-{var Nav:; /// !!!
-
-var
-    mRoot: TX3DRootNode;
-    //i: integer; }
 begin
   Generate3DWorld;
 
   WritelnLog('load_test_level','Scene');
 
-
-  //monster := LoadBlenderX3D(ApplicationData('models/creatures/idle.castle-anim-frames'));
 
   Window.ShadowVolumes := Shadow_volumes_enabled;
   window.ShadowVolumesRender := Shadow_volumes_enabled;
@@ -84,38 +73,12 @@ begin
 end;
 
 Procedure InitTestLevel;
-//var i: integer;
- { monsterscene: array[0..10] of TCastleScene;
-  m: TCastleScene;}
 begin
   if not loadedlevel then begin
      WritelnLog('InitTestLevel','Init');
      loadedlevel := true;
      CurrentWorld.activate;
-    // Window.SceneManager.Items.Add(Scene);
 
-    { m := TCastleScene.create(window);
-     m.load(monster,true,true);
-     for i := 0 to 10 do begin
-{       monsterscene[i] := TCastleScene.create(window);
-       MonsterScene[i].load(monster,false,false);} //not working??? Switch node preserves its state, root must be cloned too... bad.
-       monsterscene[i] := m.clone(window);
-       monsterscene[i].ProcessEvents := true;
-       monsterscene[i].PlayAnimation('animation',paForceLooping);
-       monsterscene[i].increasetime(drnd.random);
-       //monsterscene[i].Attributes.EnableTextures := false;
-
-       monsters[i] := T3DOrient.Create(window);
-       monsters[i].Orientation := otUpZDirectionMinusY;
-       monsters[i].Up := Vector3Single(0,0,1);
-       //monsters[i].UpPrefer(Vector3Single(0,0,1)); //not working?
-       monsters[i].add(monsterscene[i]);
-       monsters[i].translate(Vector3Single(i,0,1));
-
-       Window.SceneManager.Items.Add(monsters[i]);
-     end;
-
-     //Window.SceneManager.MainScene := Scene; }
      Window.TouchInterface := {$IFDEF Android}tiCtlWalkDragRotate{$ELSE}tiNone{$ENDIF};
      SetGameMode(gmTravel);
   end;

@@ -26,15 +26,6 @@ uses CastleRandom, castleVectors,
   decoabstractgenerator,
   decoglobal;
 
-{Type PathElement = record
-  {Absolute Coordinates of pathPoint}
-  X,y,z: TCoordinate;
-  {world tile it belongs to}
-  Tile: TTileType;
-  {Link of tiles adjacent to this tile}
-  Links: TLinkList;
-end;}
-
 Type
   {The most abstract world implementation.
    Used as external interface for the world}
@@ -91,6 +82,7 @@ uses SysUtils, classes, castlelog
 constructor DAbstractWorld.create;
 begin
   inherited;
+  WriteLnLog('DAbstractWorld.create','Creating the World');
   {we create an non-initialized random (i.e. initialized by a stupid constant integer)
   Just to make sure we don't waste any time (<1ms) on initialization now}
   RNDM := TCastleRandom.Create(1);
@@ -100,6 +92,7 @@ end;
 
 destructor DAbstractWorld.destroy;
 begin
+  WriteLnLog('DAbstractWorld.destroy','Freeing the World');
   FreeAndNil(RNDM);
   inherited;
 end;
@@ -117,6 +110,8 @@ end;
 Procedure DAbstractWorld.Activate;
 begin
   WriteLnLog('DAbstractWorld.Activate','Activating the world.');
+  if (CurrentWorld<>nil) and (CurrentWorld<>self) then
+    raise Exception.Create('ERROR: Free and nil the previous World before activating this one!');
   LastRender := -1;
   FirstRender := true;
 end;
@@ -125,6 +120,7 @@ end;
 
 procedure FreeWorld;
 begin
+  if CurrentWorld<>nil then WriteLnLog('decoabstractworld.FreeWorld','World is not nil, freeing');
   FreeAndNil(CurrentWorld);
 end;
 

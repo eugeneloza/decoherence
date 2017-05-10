@@ -52,21 +52,21 @@ type
 {redundant function to get max value of two values,
  I know there's such procedure somewhere already,
  but I was too lazy to search for it}
-function minimum(v1,v2: float): float;
+function minimum(v1,v2: float): float; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
 procedure TAbstractThread.UpdateProgress(currentJobValue: string; progressValue: float);
 begin
   fcurrentJob := currentJobValue;
-  if fprogress < progressValue*fmult then
-    fprogress := progressValue*fmult;
+  if fprogress < progressValue/fmult then
+    fprogress := progressValue/fmult;
   if fprogress>1 then fprogress := 1;
 end;
 
-{----}
+{------------------------------------------------------------------------------}
 
-function minimum(v1,v2: float): float;
+function minimum(v1,v2: float): float; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
   if v1>v2 then result := v2 else result := v1;
 end;

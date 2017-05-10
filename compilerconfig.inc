@@ -17,12 +17,38 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 
 { Compiler directives/options to include in every unit }
 
+{====================== LANGUAGE-SPECIFIC DIRECTIVES =========================}
+
 {$mode objfpc}
 {$H+} //AnsiStrings
 {$J-} //non-writeable constants
 
 {write heap trace to file or to log?}
 //{$DEFINE HEAP_FILE}
+
+{Not using interfaces yet (and maybe will never use them). But let it be here for now}
+{$interfaces corba}
+
+{convenient global range-checking on/off. Redundand, as compiler mode already does that?}
+{$IFNDEF RELEASE}
+{$R+}{$Q+}
+{$ELSE}
+{$R-}{$Q-}
+{$ENDIF}
+
+{======================== ENGINE-SPECIFIC DIRECTIVES =========================}
+
+{inline code? Just in case of bugs...
+ e.g. freepascal debugger doesn't show line numbers in inlined code}
+{$define SUPPORTS_INLINE}
+
+{gzip or not gzip, that is the answer. This one deprecated as it seems I've fixed gzip-input problem}
+{$DEFINE gzipdata}
+
+{If we attach additional Switch Nodes to 3d world management}
+{$DEFINE UseSwitches}
+
+{======================== GAME-SPECIFIC DIRECTIVES =========================}
 
 {defines fullscreen mode}
 //{$DEFINE Fullscreen}
@@ -33,16 +59,3 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 {undefine rescale to save memory}
 {$UNDEF AllowRescale}
 
-{generic variable to inline code. Just in case of bugs...}
-{$define SUPPORTS_INLINE}
-
-{convenient global range-checking on/off. Redundand, as compiler mode already does that?}
-{$IFNDEF RELEASE}
-{$R+}{$Q+}
-{$ENDIF}
-
-{gzip or not gzip, that is the answer. This one deprecated as it seems I've fixed gzip-input problem}
-{$DEFINE gzipdata}
-
-{Not using interfaces yet (and maybe will never use them). But let it be here for now}
-{$interfaces corba}
