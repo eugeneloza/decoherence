@@ -26,16 +26,16 @@ uses SyncObjs,
 
 {$WARNING: Maybe, I'm using CriticalSection in a wrong way?}
 var
-  {}
+  {a lock to ensure no simultaneous HDD access}
   Lock: TCriticalSection;
 
-{}
+{safe wrapper for CastleImages.LoadImage, overloaded}
 function LoadImageSafe(const URL: String): TCastleImage;
 function LoadImageSafe(const URL: string;
   const AllowedImageClasses: array of TEncodedImageClass): TCastleImage;
-{}
+{safe wrapper for CastleXMLUtils.URLReadXMLSafe}
 function URLReadXMLSafe(const URL: String): TXMLDocument;
-{}
+{safe wrapper for x3dload.Load3D}
 function Load3DSafe(const URL: string): TX3DRootNode;
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation

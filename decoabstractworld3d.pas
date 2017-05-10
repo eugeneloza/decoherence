@@ -27,12 +27,16 @@ uses classes, fgl, castleVectors,
   decoabstractworld, decoabstractgenerator, deconodeparser,
   deconavigation, decoglobal;
 
+{generic list of TX3DRootNodes, representing render groups}
 type TRootList = specialize TFPGObjectList<TX3DRootNode>;
+{generic list of TCastleScene, sync with TRootList}
 type TSceneList = specialize TFPGObjectList<TCastleScene>;
-{list of ttransform nodes, reperesenting each tile in the dungeon}
+{list of ttransform nodes, reperesenting each basic object in the world}
 type TTransformList = specialize TFPGObjectList<TTransformNode>;
+{$IFDEF UseSwitches}
 {list of switch nodes wrapping each element of TTransformList}
-{$IFDEF UseSwitches}type TSwitchList = specialize TFPGObjectList<TSwitchNode>;{$ENDIF}
+type TSwitchList = specialize TFPGObjectList<TSwitchNode>;
+{$ENDIF}
 
 {Type PathElement = record
   {Absolute Coordinates of pathPoint}
@@ -93,6 +97,7 @@ type
              Otherwise we'll have to recreate the whole nodes tree}
     procedure AddRecoursive(dest,source: TAbstractX3DGroupingNode);
   public
+    {loads the World into Window.SceneManager}
     procedure Activate; override;
     {builds current 3d world}
     procedure build; override;
@@ -101,7 +106,9 @@ type
   end;
 
 type
-  {}
+  {Abstract 3d world with rendering support,
+   namely, rendering WorldObjects, groups and chunks into sprites
+   most needed for overworld, maybe redundant for dungeon world}
   DAbstractWorldRendered = class(DAbstractWorld3d)
   (*render something into sprite*)
   //protected
@@ -110,11 +117,12 @@ type
 
 
 type
-  {
+  {manages appear and vanish lists
+  by comparing previous and new neighbours lists
   will have access to protected fields as it is in the same unit}
-  DAppearVanishManagerThread = class(TThread)
+  DAppearVanishManagerThread = class(TThread) // no need to report progress
   public
-    {}
+    {link to the world that requested management}
     //parent: DAbstractWorldManaged;
     {
      read-only, pass only links, doesn't free them even with destructor}
@@ -127,17 +135,18 @@ type
     constructor create; {override;}
     destructor destroy; override;
   protected
-    {}
+    {actually preforms the requested task}
     procedure execute; override;
   end;
 
-  {}
+  {abstract world with worldObjects visibility management
+      a good bonus for a dungeon and critical for overworld}
   DAbstractWorldManaged = class(DAbstractWorldRendered)
   (*manage*)
   protected
-    {}
+    {appea/vanish manager}
     AppearVanishManager: DAppearVanishManagerThread;  //note, recoursive link
-    {}
+    {initialize the appea/vanish manager in a thread, results are usually ready next render}
     procedure StartAppearVanishManagerThread;
   public
     constructor create; override;
