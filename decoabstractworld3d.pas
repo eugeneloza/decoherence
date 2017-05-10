@@ -25,7 +25,7 @@ interface
 uses classes, fgl, castleVectors,
   X3DNodes, CastleScene,
   decoabstractworld, decoabstractgenerator, deconodeparser,
-  deconavigation, decoglobal;
+  deconavigation, decoglobal, decoinputoutput;
 
 type TRootList = specialize TFPGObjectList<TX3DRootNode>;
 type TSceneList = specialize TFPGObjectList<TCastleScene>;
@@ -152,7 +152,7 @@ type
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
-uses sysutils, deco3dload, CastleLog,
+uses sysutils, decoload3d, CastleLog,
   castlescenecore;
 
 {============================ DAbstractWorld3D =============================}
@@ -307,16 +307,11 @@ procedure DAbstractWorld3d.LoadWorldObjects;
 var s: string;
   tmpRoot: TX3DRootNode;
 begin
-  Lock.Acquire;
-  try
-    WorldElements3d := TRootList.create(true);
-    For s in WorldElementsURL do begin
-      tmpRoot := LoadBlenderX3D(s);
-      tmpRoot.KeepExisting := 1;   //List owns the nodes, so don't free them manually/automatically
-      WorldElements3d.add(tmpRoot);
-    end;
-  finally
-    Lock.Release;
+  WorldElements3d := TRootList.create(true);
+  For s in WorldElementsURL do begin
+    tmpRoot := LoadBlenderX3DSafe(s);
+    tmpRoot.KeepExisting := 1;   //List owns the nodes, so don't free them manually/automatically
+    WorldElements3d.add(tmpRoot);
   end;
 end;
 

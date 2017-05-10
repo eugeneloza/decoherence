@@ -169,7 +169,7 @@ procedure destroyTiles;
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 uses sysUtils, CastleURIUtils, CastleLog,
-  DOM, CastleXMLUtils;
+  DOM, CastleXMLUtils, decoinputoutput;
 
 function TileKindToStr(value: TTileKind): string;
 begin
@@ -333,7 +333,7 @@ begin
   try
     FullURL := URL+'.map';
     if gzipped then FullURL += GZ_ext;
-    TileDOC := URLReadXML(FullURL);
+    TileDOC := URLReadXMLSafe(FullURL);
     RootNode := TileDOC.DocumentElement;
     WorkNode := RootNode.ChildElement('Size');
     SizeX := WorkNode.AttributeInteger('size_x');
@@ -370,7 +370,7 @@ begin
 
   setLength(img,sizez);
   for jz := 0 to sizez-1 do
-    img[jz] := LoadImage(ChangeURIExt(URL,'_'+inttostr(jz)+'.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
+    img[jz] := LoadImageSafe(ChangeURIExt(URL,'_'+inttostr(jz)+'.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
 end;
 
 {----------------------------------------------------------------------------}

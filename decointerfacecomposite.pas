@@ -32,7 +32,6 @@ uses classes,
   decoactor, decoplayercharacter, decoperks,
   decoglobal;
 
-
 type
   { wrapper for composite Interface elements with ArrangeChildren procedure
     each child will define its own arrange method }
@@ -189,23 +188,23 @@ procedure DestroyCompositeInterface;
 implementation
 uses SysUtils, CastleLog, CastleFilesUtils, castleVectors,
    decofont, decoimages, decolabels,
-   decointerfaceblocks;
+   decointerfaceblocks, decoinputoutput;
 
 
 procedure InitCompositeInterface;
 var i: integer;
     s: string;
 begin
-  HpBarImage := LoadImage(ApplicationData(ProgressBarFolder+'hp_bar_CC-BY-SA_by_Saito00.png'));
-  StaBarImage := LoadImage(ApplicationData(ProgressBarFolder+'en_bar_CC-BY-SA_by_Saito00.png'));
-  CncBarImage := LoadImage(ApplicationData(ProgressBarFolder+'m_bar_CC-BY-SA_by_Saito00.png'));
-  MphBarImage := LoadImage(ApplicationData(ProgressBarFolder+'mph_bar_CC-BY-SA_by_Saito00.png'));
+  HpBarImage := LoadImageSafe(ApplicationData(ProgressBarFolder+'hp_bar_CC-BY-SA_by_Saito00.png'));
+  StaBarImage := LoadImageSafe(ApplicationData(ProgressBarFolder+'en_bar_CC-BY-SA_by_Saito00.png'));
+  CncBarImage := LoadImageSafe(ApplicationData(ProgressBarFolder+'m_bar_CC-BY-SA_by_Saito00.png'));
+  MphBarImage := LoadImageSafe(ApplicationData(ProgressBarFolder+'mph_bar_CC-BY-SA_by_Saito00.png'));
 
-  damageOverlay_img := LoadImage(ApplicationData(DamageFolder+'damageOverlay_CC0_by_EugeneLoza[GIMP].png'));
+  damageOverlay_img := LoadImageSafe(ApplicationData(DamageFolder+'damageOverlay_CC0_by_EugeneLoza[GIMP].png'));
 
   StatBarsFrame := DFrame.create(Window);
   with StatBarsFrame do begin
-    SourceImage := LoadImage(ApplicationData(FramesFolder+'blackframe.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
+    SourceImage := LoadImageSafe(ApplicationData(FramesFolder+'blackframe.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
     cornerTop := 0; CornerBottom := 0; cornerLeft := 0; CornerRight := 1;
   end;
 
@@ -213,76 +212,76 @@ begin
   for i := 0 to length(portrait_img)-1 do begin
     s := inttostr(i+1);
     if i+1<10 then s := '0'+s;
-    Portrait_img[i] := LoadImage(ApplicationData(PortraitFolder+'UNKNOWN_p'+s+'.jpg'));
+    Portrait_img[i] := LoadImageSafe(ApplicationData(PortraitFolder+'UNKNOWN_p'+s+'.jpg'));
   end;
   {load artwork by Saito00}
 
   portraitframe_left := DFrame.create(Window);
   with portraitframe_left do begin
-    SourceImage := LoadImage(ApplicationData(FramesFolder+'frameborder_left_CC-BY-SA_by_Saito00.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
+    SourceImage := LoadImageSafe(ApplicationData(FramesFolder+'frameborder_left_CC-BY-SA_by_Saito00.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
     cornerTop := 4; CornerBottom := 4; cornerLeft := 3; CornerRight := 4;
   end;
   portraitframe_right := DFrame.create(Window);
   with portraitframe_right do begin
-    SourceImage := LoadImage(ApplicationData(FramesFolder+'frameborder_right_CC-BY-SA_by_Saito00.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
+    SourceImage := LoadImageSafe(ApplicationData(FramesFolder+'frameborder_right_CC-BY-SA_by_Saito00.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
     cornerTop := 4; CornerBottom := 4; cornerLeft := 4; CornerRight := 3;
   end;
 
   decorationframe1_left := DFrame.create(Window);
   with decorationframe1_left do begin
-    SourceImage := LoadImage(ApplicationData(DecorationsFolder+'frame_1_left_CC-BY-SA_by_Saito00.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
+    SourceImage := LoadImageSafe(ApplicationData(DecorationsFolder+'frame_1_left_CC-BY-SA_by_Saito00.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
     cornerTop := 3; CornerBottom := 23; cornerLeft := 2; CornerRight := 6;
   end;
   decorationframe1_right := DFrame.create(Window);
   with decorationframe1_right do begin
-    SourceImage := LoadImage(ApplicationData(DecorationsFolder+'frame_1_right_CC-BY-SA_by_Saito00.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
+    SourceImage := LoadImageSafe(ApplicationData(DecorationsFolder+'frame_1_right_CC-BY-SA_by_Saito00.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
     cornerTop := 3; CornerBottom := 23; cornerLeft := 6; CornerRight := 2;
   end;
   decorationframe2_left := DFrame.create(Window);
   with decorationframe2_left do begin
-    SourceImage := LoadImage(ApplicationData(DecorationsFolder+'frame_2_left_CC-BY-SA_by_Saito00.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
+    SourceImage := LoadImageSafe(ApplicationData(DecorationsFolder+'frame_2_left_CC-BY-SA_by_Saito00.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
     cornerTop := 6; CornerBottom := 9; cornerLeft := 2; CornerRight := 6;
   end;
   decorationframe2_right := DFrame.create(Window);
   with decorationframe2_right do begin
-    SourceImage := LoadImage(ApplicationData(DecorationsFolder+'frame_2_right_CC-BY-SA_by_Saito00.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
+    SourceImage := LoadImageSafe(ApplicationData(DecorationsFolder+'frame_2_right_CC-BY-SA_by_Saito00.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
     cornerTop := 6; CornerBottom := 9; cornerLeft := 6; CornerRight := 2;
   end;
   decorationframe2_bottomleft := DFrame.create(Window);
   with decorationframe2_bottomleft do begin
-    SourceImage := LoadImage(ApplicationData(DecorationsFolder+'frame_2_bottomleft_CC-BY-SA_by_Saito00.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
+    SourceImage := LoadImageSafe(ApplicationData(DecorationsFolder+'frame_2_bottomleft_CC-BY-SA_by_Saito00.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
     cornerTop := 6; CornerBottom := 2; cornerLeft := 0; CornerRight := 9;
   end;
   decorationframe2_bottomright := DFrame.create(Window);
   with decorationframe2_bottomright do begin
-    SourceImage := LoadImage(ApplicationData(DecorationsFolder+'frame_2_bottomright_CC-BY-SA_by_Saito00.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
+    SourceImage := LoadImageSafe(ApplicationData(DecorationsFolder+'frame_2_bottomright_CC-BY-SA_by_Saito00.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
     cornerTop := 6; CornerBottom := 2; cornerLeft := 9; CornerRight := 0;
   end;
   decorationframe3_bottom := DFrame.create(Window);
   with decorationframe3_bottom do begin
-    SourceImage := LoadImage(ApplicationData(DecorationsFolder+'frame_3_bottom_CC-BY-SA_by_Saito00.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
+    SourceImage := LoadImageSafe(ApplicationData(DecorationsFolder+'frame_3_bottom_CC-BY-SA_by_Saito00.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
     cornerTop := 10; CornerBottom := 9; cornerLeft := 23; CornerRight := 23;
   end;
 
   characterbar_top := DFrame.create(Window);
   with characterbar_top do begin
-    SourceImage := LoadImage(ApplicationData(FramesFolder+'character_bar_top_CC-BY-SA_by_Saito00.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
+    SourceImage := LoadImageSafe(ApplicationData(FramesFolder+'character_bar_top_CC-BY-SA_by_Saito00.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
     cornerTop := 5; CornerBottom := 5; cornerLeft := 4; CornerRight := 4;
   end;
   characterbar_mid := DFrame.create(Window);
   with characterbar_mid do begin
-    SourceImage := LoadImage(ApplicationData(FramesFolder+'character_bar_mid_CC-BY-SA_by_Saito00.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
+    SourceImage := LoadImageSafe(ApplicationData(FramesFolder+'character_bar_mid_CC-BY-SA_by_Saito00.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
     cornerTop := 0; CornerBottom := 0; cornerLeft := 4; CornerRight := 4;
   end;
   characterbar_bottom := DFrame.create(Window);
   with characterbar_bottom do begin
-    SourceImage := LoadImage(ApplicationData(FramesFolder+'character_bar_bottom_CC-BY-SA_by_Saito00.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
+    SourceImage := LoadImageSafe(ApplicationData(FramesFolder+'character_bar_bottom_CC-BY-SA_by_Saito00.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
     cornerTop := 5; CornerBottom := 5; cornerLeft := 4; CornerRight := 4;
   end;
 
   ActionFrame := DFrame.create(Window);
   ActionFrame.Rectagonal := false;
-  ActionFrame.SourceImage := LoadImage(ApplicationData(FramesFolder+'action_frame_CC-BY-SA_by_Saito00.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
+  ActionFrame.SourceImage := LoadImageSafe(ApplicationData(FramesFolder+'action_frame_CC-BY-SA_by_Saito00.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
 end;
 
 procedure DestroyCompositeInterface;

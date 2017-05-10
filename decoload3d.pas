@@ -17,7 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 
 { x3d file loading and basic processing routines.
   The unit name is not good, should change it to something more informative}
-unit deco3dload;
+unit decoload3d;
 
 {$INCLUDE compilerconfig.inc}
 

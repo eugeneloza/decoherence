@@ -26,7 +26,7 @@ uses
   CastleLog,
   CastleWindow, CastleWindowTouch, CastleSceneCore, CastleScene,
   castleVectors,  X3DNodes,
-  deco3dload,
+  decoload3d,
   sysutils,
 
   decoabstractworld, decodungeonworld, decodungeongenerator,
@@ -78,6 +78,7 @@ begin
   if not LoadCompleted then exit;
   if not loadedlevel then begin
      WritelnLog('InitTestLevel','Init');
+     SetGameMode(gmTravel);
      loadedlevel := true;
      CurrentWorld.activate;
 

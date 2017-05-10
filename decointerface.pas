@@ -287,7 +287,7 @@ procedure InitInterface;
 implementation
 
 uses sysutils, CastleLog, castleFilesUtils,
-  decointerfacecomposite;
+  decointerfacecomposite, decoinputoutput;
 
 {-------------------- BURNER IMAGE --------------------------------------------}
 
@@ -297,7 +297,7 @@ begin
   {$IFNDEF AllowRescale}if BURNER_IMAGE<>nil then exit;{$ENDIF}
   WriteLnLog('Init_burner_image','started');
   if BURNER_IMAGE_UNSCALED = nil then
-    BURNER_IMAGE_UNSCALED := LoadImage(ApplicationData(InterfaceFolder+'burner/burner_Pattern_203_CC0_by_Nobiax_diffuse.png'), [TRGBImage]) as TRGBImage;
+    BURNER_IMAGE_UNSCALED := LoadImageSafe(ApplicationData(InterfaceFolder+'burner/burner_Pattern_203_CC0_by_Nobiax_diffuse.png'), [TRGBImage]) as TRGBImage;
   if (BURNER_IMAGE=nil) or (BURNER_IMAGE.height <> window.height) or (BURNER_IMAGE.width <> window.width) then begin
     FreeAndNil(BURNER_IMAGE);
     BURNER_IMAGE := BURNER_IMAGE_UNSCALED.MakeCopy;
@@ -317,19 +317,19 @@ begin
 
 {  SimpleFrame := DFrame.create(Window);
   with SimpleFrame do begin
-    SourceImage := LoadImage(ApplicationData(FramesFolder+'frame.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
+    SourceImage := LoadImageSafe(ApplicationData(FramesFolder+'frame.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
     cornerTop := 1; CornerBottom := 1; cornerLeft := 1; CornerRight := 1;
   end;
 
   CaptionFrame := DFrame.create(Window);
   with CaptionFrame do begin
-    SourceImage := LoadImage(ApplicationData(FramesFolder+'frame_caption.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
+    SourceImage := LoadImageSafe(ApplicationData(FramesFolder+'frame_caption.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
     cornerTop := 19; CornerBottom := 1; cornerLeft := 1; CornerRight := 1;            //todo: variable top line!
   end;    }
 
   BlackFrame := DFrame.create(Window);
   with BlackFrame do begin
-    SourceImage := LoadImage(ApplicationData(FramesFolder+'blackframe.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
+    SourceImage := LoadImageSafe(ApplicationData(FramesFolder+'blackframe.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
     cornerTop := 0; CornerBottom := 0; cornerLeft := 0; CornerRight := 0;
   end;
 

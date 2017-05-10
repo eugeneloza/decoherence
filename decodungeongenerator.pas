@@ -367,7 +367,7 @@ procedure FreeGroups(ngroups: TGroupsArray);
 implementation
 
 uses SysUtils, CastleLog, CastleFilesUtils, CastleImages, CastleVectors,
-  DOM, CastleXMLUtils;
+  DOM, CastleXMLUtils, decoinputoutput;
 
 {========================= GENERATION ALGORITHM ==============================}
 
@@ -1334,64 +1334,59 @@ begin
 
   if self=nil then raise Exception.create('DGeneratorParameters is nil!'); // HELLO, my best bug thing :)
 
-  Lock.Acquire;
   try
+    XMLdoc := URLReadXMLSafe(URL);
+    RootNode := XMLdoc.DocumentElement;
+    LargeContainer := RootNode.ChildElement('Parameters');
+    SmallContainer := LargeContainer.ChildElement('Size');
+    maxx := SmallContainer.AttributeInteger('maxx');
+    maxy := SmallContainer.AttributeInteger('maxy');
+    maxz := SmallContainer.AttributeInteger('maxz');
+    minx := SmallContainer.AttributeInteger('minx');
+    miny := SmallContainer.AttributeInteger('miny');
+    minz := SmallContainer.AttributeInteger('minz');
+
+    SmallContainer := LargeContainer.ChildElement('Volume');
+    volume := SmallContainer.AttributeInteger('value');
+
+    SmallContainer := LargeContainer.ChildElement('Faces');
+    maxFaces := SmallContainer.AttributeInteger('max');
+    minFaces := SmallContainer.AttributeInteger('min');
+
+    SmallContainer := LargeContainer.ChildElement('Seed');
+    seed := SmallContainer.AttributeInteger('value');
+
+    absoluteURL := false;
+    LargeContainer := RootNode.ChildElement('TilesList');
+    Iterator := LargeContainer.ChildrenIterator;
     try
-      XMLdoc := URLReadXML(URL);
-      RootNode := XMLdoc.DocumentElement;
-      LargeContainer := RootNode.ChildElement('Parameters');
-      SmallContainer := LargeContainer.ChildElement('Size');
-      maxx := SmallContainer.AttributeInteger('maxx');
-      maxy := SmallContainer.AttributeInteger('maxy');
-      maxz := SmallContainer.AttributeInteger('maxz');
-      minx := SmallContainer.AttributeInteger('minx');
-      miny := SmallContainer.AttributeInteger('miny');
-      minz := SmallContainer.AttributeInteger('minz');
-
-      SmallContainer := LargeContainer.ChildElement('Volume');
-      volume := SmallContainer.AttributeInteger('value');
-
-      SmallContainer := LargeContainer.ChildElement('Faces');
-      maxFaces := SmallContainer.AttributeInteger('max');
-      minFaces := SmallContainer.AttributeInteger('min');
-
-      SmallContainer := LargeContainer.ChildElement('Seed');
-      seed := SmallContainer.AttributeInteger('value');
-
-      absoluteURL := false;
-      LargeContainer := RootNode.ChildElement('TilesList');
-      Iterator := LargeContainer.ChildrenIterator;
-      try
-        while Iterator.GetNext do if Iterator.current.NodeName = UTF8decode('Tile') then
-        begin
-          SmallContainer := Iterator.current;
-          TilesList.add(SmallContainer.TextData);
-        end;
-      finally
-        FreeAndNil(Iterator);
+      while Iterator.GetNext do if Iterator.current.NodeName = UTF8decode('Tile') then
+      begin
+        SmallContainer := Iterator.current;
+        TilesList.add(SmallContainer.TextData);
       end;
-
-      LargeContainer := RootNode.ChildElement('FirstSteps');
-      Iterator := LargeContainer.ChildrenIterator;
-      try
-        while Iterator.GetNext do if Iterator.current.NodeName = UTF8decode('Tile') then
-        begin
-          SmallContainer := Iterator.current;
-          FS.tile := SmallContainer.TextData;
-          FS.x := SmallContainer.AttributeInteger('x');
-          FS.y := SmallContainer.AttributeInteger('y');
-          FS.z := SmallContainer.AttributeInteger('z');
-          FirstSteps.add(FS);
-        end;
-      finally
-        FreeAndNil(Iterator);
-      end;
-
-    except
-      writeLnLog('DGeneratorParameters.Load','ERROR: Exception in GeneratorParameters load');
+    finally
+      FreeAndNil(Iterator);
     end;
-  finally
-    Lock.release;
+
+    LargeContainer := RootNode.ChildElement('FirstSteps');
+    Iterator := LargeContainer.ChildrenIterator;
+    try
+      while Iterator.GetNext do if Iterator.current.NodeName = UTF8decode('Tile') then
+      begin
+        SmallContainer := Iterator.current;
+        FS.tile := SmallContainer.TextData;
+        FS.x := SmallContainer.AttributeInteger('x');
+        FS.y := SmallContainer.AttributeInteger('y');
+        FS.z := SmallContainer.AttributeInteger('z');
+        FirstSteps.add(FS);
+      end;
+    finally
+      FreeAndNil(Iterator);
+    end;
+
+  except
+    writeLnLog('DGeneratorParameters.Load','ERROR: Exception in GeneratorParameters load');
   end;
   FreeAndNil(XMLdoc);
 

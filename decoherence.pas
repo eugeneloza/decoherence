@@ -39,7 +39,7 @@ uses Classes, SysUtils,
      decolevel, decodungeontiles, decoabstractworld,
      decoloadscreen, decoperks,
      decointerfacecomposite,
-     decoplayercharacter, deco3dLoad,
+     decoplayercharacter, decoload3d,
      deconavigation, decoglobal, decogamemode;
 
 type
@@ -53,7 +53,6 @@ type
 
 procedure TDummy.ReleaseInterface(Sender: TObject);
 begin
-  LoadCompleted := true;
 end;
 
 var LoadThread: DLoadThread;
@@ -176,7 +175,6 @@ begin
     end;
   end;
 //  SetGameMode(gmCharacterGeneration);
-  SetGameMode(gmTravel);
   InitTestLevel;                         //ugly! I'll fix this soon.
 end;
 
@@ -236,6 +234,7 @@ begin
 
   Load_test_level; //remake it
   window.OnBeforeRender := @WindowManage;
+  LoadCompleted := true;
 end;
 
 procedure ApplicationInitialize;

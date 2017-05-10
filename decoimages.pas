@@ -19,7 +19,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 unit decoimages;
 
 {$INCLUDE compilerconfig.inc}
-
 interface
 
 uses Classes,
@@ -139,8 +138,8 @@ var LoadNewFloaterImage: boolean;
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
-uses SysUtils, CastleLog, CastleFilesUtils{,
-     decogui};
+uses SysUtils, CastleLog, CastleFilesUtils,
+  decoinputoutput;
 
 type TLoadImageThread = class(TThread)
   private
@@ -187,12 +186,7 @@ end;
 procedure DStaticImage.Load(const filename: string);
 begin
   WritelnLog('DStaticImage.LoadImage',filename);
-  Lock.Acquire;
-  try
-    SourceImage := LoadImage(ApplicationData(filename));
-  finally
-    Lock.Release;
-  end;
+  SourceImage := LoadImageSafe(ApplicationData(filename));
   afterload;
 end;
 procedure DStaticImage.Load(const CopyImage: TCastleImage);

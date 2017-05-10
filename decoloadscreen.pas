@@ -72,7 +72,7 @@ implementation
 
 uses SysUtils, CastleLog, CastleFilesUtils,
   DOM, CastleXMLUtils,
-  decoglobal;
+  decoglobal, decoinputoutput;
 
 var LastFact: integer = -1;
     CurrentFact: DFact = nil;      //looks ugly! Maybe I should remake it?
@@ -126,7 +126,7 @@ begin
 
   WriteLnLog('LoadFacts','Reading file '+FileName);
 
-  FactsDoc := URLReadXML(FileName);
+  FactsDoc := URLReadXMLSafe(FileName);
   BaseElement := FactsDoc.DocumentElement;
   Iterator := BaseElement.ChildrenIterator;
   try
