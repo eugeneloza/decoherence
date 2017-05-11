@@ -29,11 +29,14 @@ uses
   decoload3d,
   sysutils,
 
+  decotestcreature,
+
   decoabstractworld, decodungeonworld, decodungeongenerator,
   deconavigation, decoglobal;
 
 procedure load_test_level;
 Procedure InitTestLevel;
+procedure FreeTestLevel;
 
 var scene: TcastleScene;
     LoadCompleted: boolean = false;
@@ -70,6 +73,8 @@ begin
 
   InitNavigation;
 
+  InitCreatures;
+
   WritelnLog('load_test_level','Finished');
 end;
 
@@ -81,10 +86,16 @@ begin
      SetGameMode(gmTravel);
      loadedlevel := true;
      CurrentWorld.activate;
+     SpawnCreatures;
 
      Window.TouchInterface := {$IFDEF Android}tiCtlWalkDragRotate{$ELSE}tiNone{$ENDIF};
      SetGameMode(gmTravel);
   end;
+end;
+
+procedure FreeTestLevel;
+begin
+  FreeCreatures;
 end;
 
 end.

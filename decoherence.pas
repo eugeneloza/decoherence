@@ -315,6 +315,8 @@ Initialization
 
 Finalization
   { free all assigned memory }
+  FreeTestLevel;
+
   DestroyCompositeInterface;
   //DestroyGlobal;
   FreeLoadScreen;

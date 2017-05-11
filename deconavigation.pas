@@ -49,7 +49,7 @@ begin
   camera := TWalkCamera.create(Window);
   {z-up orientation}
   camera.Gravity := true;
-  camera.PreferredHeight := (0+0.3)*2;
+  camera.PreferredHeight := PlayerHeight;
   camera.MouseDragMode := mdRotate;
 
   camera.MoveSpeed := 2; //set to zero to stop
@@ -62,8 +62,9 @@ begin
   NavLight:= TPointLightNode.Create;
   NavLight.FdColor.Value := vector3single(1,0.3,0.1);
   NavLight.FdAttenuation.value := Vector3Single(1,0,1);
-  NavLight.FdRadius.value := 10;
-  NavLight.FdIntensity.value := 20;
+  {$Warning light distance}
+  NavLight.FdRadius.value := 10*3;
+  NavLight.FdIntensity.value := 20*3;
   NavLight.FdOn.value := true;
   NavLight.FdShadows.value := false;
 

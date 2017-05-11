@@ -47,6 +47,8 @@ type
     function UpdatePlayerCoordinates(x,y,z: float): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
     {Manages tiles (show/hide/trigger events) *time-critical procedure}
     Procedure manage_tiles; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+  private
+    const myscale = 3;
   protected
     {scale used to define a tile size. Usually 1 is man-height.
       CAUTION this scale must correspond to tiles model scale, otherwise it'll mess everything up}
@@ -140,7 +142,8 @@ begin
   WorldElementsURL := DG.ExportTiles;
   Steps := DG.ExportSteps;
   {$hint WorldScale must support different scales}
-  WorldScale := TileScale;
+  {$Warning this is ugly}
+  WorldScale := TileScale*myscale;
   {yes, we load tiles twice in this case (once in the generator and now here),
    however, loading from generator is *not* a normal case
    (used mostly for testing in pre-alpha), so such redundancy will be ok
@@ -168,7 +171,10 @@ begin
   startx := 4;
   starty := 4;
   startz := 0;
-  camera.Position := vector3single((startx)*WorldScale,-(starty)*WorldScale,(startz)*WorldScale+PlayerHeight);
+  {$Warning this is ugly}
+  camera.Position := vector3single((startx)*WorldScale,-(starty)*WorldScale,(startz)*WorldScale+PlayerHeight*myscale);
+  camera.MoveSpeed := 1*WorldScale;
+  camera.PreferredHeight := PlayerHeight*myscale;
   {$WARNING to be managed by the world}
 end;
 
@@ -183,7 +189,8 @@ begin
     Transform := TTransformNode.create;
     //put current tile into the world. Pay attention to y and z coordinate inversion.
     Transform.translation := Vector3Single(WorldScale*(steps[i].x),-WorldScale*(steps[i].y),-WorldScale*(steps[i].z));
-    //Transform.scale := Vector3Single(myscale,myscale,myscale);
+    {$Warning this is ugly}
+    Transform.scale := Vector3Single(myscale,myscale,myscale);
     AddRecoursive(Transform,WorldElements3d[steps[i].tile]);
     WorldObjects.Add(Transform);
   end;
