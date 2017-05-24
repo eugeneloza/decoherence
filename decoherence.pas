@@ -35,6 +35,8 @@ uses Classes, SysUtils,
 
      decothread,
 
+     decosound,
+
      decogui, decointerface, decomouse, decofont,
      decolevel, decodungeontiles, decoabstractworld,
      decoloadscreen, decoperks,

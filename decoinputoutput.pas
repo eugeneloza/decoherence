@@ -22,7 +22,10 @@ unit decoinputoutput;
 interface
 
 uses
-  CastleImages, CastleXMLUtils, DOM, X3DNodes;
+  CastleImages,
+  CastleXMLUtils, DOM,
+  X3DNodes,
+  CastleSoundEngine, CastleTimeUtils;
 
 {safe wrapper for CastleImages.LoadImage, overloaded}
 function LoadImageSafe(const URL: String): TCastleImage;
@@ -32,6 +35,8 @@ function LoadImageSafe(const URL: string;
 function URLReadXMLSafe(const URL: String): TXMLDocument;
 {safe wrapper for x3dload.Load3D}
 function Load3DSafe(const URL: string): TX3DRootNode;
+
+function LoadBufferSafe(const URL: string; out Duration: TFloatTime): TSoundBuffer;
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 uses SyncObjs, SysUtils, x3dload;
@@ -91,6 +96,19 @@ begin
 end;
 
 {----------------------------------------------------------------------------}
+
+function LoadBufferSafe(const URL: string; out Duration: TFloatTime): TSoundBuffer;
+const EmptyBuffer = 0;
+begin
+  Result := EmptyBuffer;
+  Lock.Acquire;
+  try
+    Result := soundengine.loadbuffer(URL, Duration);
+  finally
+    Lock.Release;
+  end;
+end;
+
 
 initialization
 Lock := TCriticalSection.create;
