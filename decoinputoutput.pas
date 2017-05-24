@@ -21,13 +21,8 @@ unit decoinputoutput;
 {$INCLUDE compilerconfig.inc}
 interface
 
-uses SyncObjs,
+uses
   CastleImages, CastleXMLUtils, DOM, X3DNodes;
-
-{$WARNING: Maybe, I'm using CriticalSection in a wrong way?}
-var
-  {a lock to ensure no simultaneous HDD access}
-  Lock: TCriticalSection;
 
 {safe wrapper for CastleImages.LoadImage, overloaded}
 function LoadImageSafe(const URL: String): TCastleImage;
@@ -39,7 +34,13 @@ function URLReadXMLSafe(const URL: String): TXMLDocument;
 function Load3DSafe(const URL: string): TX3DRootNode;
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-uses SysUtils, x3dload;
+uses SyncObjs, SysUtils, x3dload;
+
+//{$WARNING: Maybe, I'm using CriticalSection in a wrong way?}
+var
+  {a lock to ensure no simultaneous HDD access}
+  Lock: TCriticalSection;
+
 
 function LoadImageSafe(const URL: String): TCastleImage;
 begin
@@ -88,6 +89,8 @@ begin
     Lock.Release;
   end;
 end;
+
+{----------------------------------------------------------------------------}
 
 initialization
 Lock := TCriticalSection.create;
