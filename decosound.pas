@@ -36,15 +36,45 @@ var
   {a lock to ensure no simultaneous HDD access}
   MusicLock: TCriticalSection;
 
+{========================== INTERNAL TYPES =================================}
+
+type
+  {store and manage music track}
+  DTrack = class
+    music: TSoundBuffer;
+    duration: TFloatTime;
+    constructor create;
+    destructor destroy; override;
+  end;
+
 type
   {thread that actually loads the music}
   TMusicLoadThread = class(TThread)
   public
-    music: TSoundBuffer;
-    music_duration: TFloatTime;
+    track: DTrack;
   protected
     procedure Execute; override;
 end;
+
+
+{=============================== DTrack ===================================}
+
+constructor DTrack.create;
+begin
+  inherited;
+  music := 0;
+  duration := -1;
+end;
+
+{---------------------------------------------------------------------------}
+
+destructor DTrack.destroy;
+begin
+  soundengine.FreeBuffer(music);
+  inherited;
+end;
+
+{========================== TMusicLoadThread ===============================}
 
 procedure TMusicLoadThread.Execute;
 begin
@@ -55,9 +85,14 @@ begin
   end;
   //MusicLock.Acquire;
 
-  Music := LoadBufferSafe(ApplicationData(''{MusFolder+music_name}),music_duration);
+  track := DTrack.create;
+
+  track.Music := LoadBufferSafe(ApplicationData(''{MusFolder+music_name}),track.duration);
 
   MusicLock.Release;
+
+  {$warning dummy}
+  FreeAndNil(track);
 end;
 
 
