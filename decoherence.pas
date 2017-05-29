@@ -35,10 +35,9 @@ uses Classes, SysUtils,
 
      decothread,
 
-     decosound,
-
      decogui, decointerface, decomouse, decofont,
      decolevel, decodungeontiles, decoabstractworld,
+     decosound,
      decoloadscreen, decoperks,
      decointerfacecomposite,
      decoplayercharacter, decoload3d,
@@ -124,6 +123,7 @@ end;
 procedure WindowManage(Container : TUIContainer);
 begin
   if CurrentWorld <> nil then CurrentWorld.manage(camera.Position);
+  if Music <> nil then music.manage;
 end;
 
 {-------------------------------------------------------------------------}
@@ -222,6 +222,7 @@ end;
 
 procedure LoadAndInitData;
 begin
+  InitMusicManager;
   SetGameMode(gmLoadScreen);
 
   InitInterface;
@@ -326,6 +327,7 @@ Finalization
   FreePerks;
   DestroyFonts;
   FreeWorld;
+  FreeMusicManager;
   //FreeTextureProperties;
   WriteLnLog('Finalization','Bye...');
 end.
