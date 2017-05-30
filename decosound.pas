@@ -29,8 +29,10 @@ type
   {thread that actually loads the sound file}
   DSoundLoadThread = class(TThread)
   public
+    {refrence to DSoundFile / Why can't I make a cyclic refernce?}
     parent: TObject;
   protected
+    {loads the file}
     procedure Execute; override;
   end;
 
@@ -38,91 +40,119 @@ type
   {store and manage music track}
   DSoundFile = class
   private
+    {thread to load the sound file. Auto freed on terminate. Sets isLoaded flag}
     LoadThread: DSoundLoadThread;
+    {full URL of the sound file}
     fURL: string;
     fisLoaded: boolean;
   public
-    {}
+    {reference to the sound buffer of this file}
     buffer: TSoundBuffer;
-    {}
+    {duration of the loaded file}
     duration: TFloatTime;
 
+    {if the file is loaded and ready to play}
     property isLoaded: boolean read fisLoaded default false;
     {creates and starts LoadThread. When finished runs LoadFinished}
     procedure Load;
     procedure Load(URL: string);
     procedure LoadFinished;
+
     constructor create;
     constructor create(URL: string);
     destructor destroy; override;
   end;
 
 type
-  {}
+  {A sound file which is a Music track with additional features}
   DMusicTrack = class(DSoundFile)
   private
+    {reference to "now playing" sound file to adjust its properties realtime}
     fCurrent: TSound;
+    {is looping?}
     fLoop: boolean;
+    {actual beginning of the fade out process}
     FadeStart: TDateTime;
+    {if the file is playing at the moment}
     fisPlaying: boolean;
+    {preforms fade out by adjusting the track's gain}
     procedure doFade;
   private
+    {gain volume 0..1}
     const fgain = 1; {maybe, global music volume?}
+    {fade out time}
     const FadeTime = 3/24/60/60; {3 seconds}
   public
+    {if the current music is playing at the moment?}
     property isPlaying: boolean read fisPlaying default false;
+    {prepare and start the music}
     procedure Start;
+    {softly stop the music with a fade-out}
     procedure FadeOut;
+    {manage the music / should be called each frame}
     procedure manage;
+    {sets current music "gain", move to private?}
     procedure setGain(value: single);
     constructor create;
   end;
 
 type
-  {}
+  {describes and manages music intended to have a loop-part [a..b]
+   with optional intro [0..a] and ?ending [b..end]}
   DLoopMusicTrack = class(DMusicTrack)
     //a,b
   end;
 
 type
-  {}
+  {a list of music tracks}
   TTrackList = specialize TFPGObjectList<DMusicTrack>;
 
 type
-  {}
+  {abstract music tracks manager}
   DPlaylist = class
   public
     tracks: TTrackList;
     URLs: TStringList;
+    procedure manage; virtual; abstract;
     constructor create;
     destructor destroy; override;
   end;
 
 type
-  {}
+  {Tracks sequentially change each other with pre-loading and no fading
+   also supports occasional silence (silence will never be the first track playing)}
   DSequentialPlaylist = class(DPlayList)
 
   end;
 
 type
-  {}
+  {Vertical synchronized playlist for combat.
+   Softly changes the synchronized tracks according to current situation.
+   BeatList is optional, but recommended that fades will happen on beats change}
   DVerticalSyncPlaylist = class(DPlayList)
 
   end;
 
 type
-  {}
+  {Manages all the playlists, currently played music and ambience
+   also tries to merge playlists (not implemented yet)}
   DMusicManager = class
   private
+    {current ambient track, just plays continuously}
     Ambient: DLoopMusicTrack;
+    {current music playlist}
     Music,OldMusic: DPlaylist; //sequential or vertical
   public
+    {manage the music, should be called each frame}
     procedure manage;
+
     constructor create;
     destructor destroy; override;
   end;
 
-var Music: DMusicManager;
+var
+  {global music manager}
+  Music: DMusicManager;
 
 procedure initMusicManager;
 procedure freeMusicManager;
@@ -134,7 +164,8 @@ uses SyncObjs, SysUtils, CastleLog, castleFilesUtils,
  {CastleOpenAL,}
 
 var
-  {a lock to ensure that the music won't load twice accidetnally}
+  {a lock to ensure that the music won't load twice accidetnally
+   ??? Maybe it's wrong to do so, we already have a critical section in LoadBufferSafe?}
   MusicLock: TCriticalSection;
 
 {========================== INTERNAL TYPES =================================}
