@@ -25,10 +25,8 @@ uses decoinputoutput;
 procedure InitCreatures;
 begin
   Resources.LoadSafe(ApplicationData('models/creatures/knight_creature/'));
-  Resources.FindName('Knight').ConfigAlwaysPrepared := true;  {$hint doesn't work}
   CreatureResource := Resources.FindName('Knight') as TCreatureResource;
-  creatureResource.ConfigAlwaysPrepared := true;  {$hint doesn't work}
-  //CreatureResource.Prepare(nil,vector3single(0,0,1));
+  CreatureResource.Prepare;
 end;
 
 {---------------------------------------------------------------------------}

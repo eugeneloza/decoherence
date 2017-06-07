@@ -226,6 +226,7 @@ begin
   LoadThread.parent := self;
   LoadThread.FreeOnTerminate := true;
   LoadThread.Start;
+  {$warning get some inspiration from image.loadthread}
 end;
 procedure DSoundFile.LoadFinished;
 begin
@@ -238,9 +239,16 @@ destructor DSoundFile.destroy;
 begin
   soundengine.FreeBuffer(buffer);
   if Assigned(LoadThread) then begin
+    {$warning Buggy load thread "freeing" procedure}
+    {$warning copy it to image.loadthread}
+    //The situation is bad, the file being freed is in the "load" process
+    //stopping it now may cause memory leaks and file access errors!
+    //CAUTION: this doesn't check if the LoadTrhead is assigned, but only checks if LoadThread<>nil It might cause errors when trying to free an already-freed class as the reference is not niled!
     WriteLnLog('DSoundFile.destroy','Warning, Assigned(LoadThread)=true. Terminating and freeing...');
-    LoadThread.Terminate;
-    FreeAndNil(LoadThread); //if thread is working, terminate it;
+    try
+      LoadThread.Terminate;   //if thread is working, terminate it; might cause problems...?
+    end;
+    //FreeAndNil(LoadThread); //redundant, as freeonterminate=true?
   end;
   inherited;
 end;
