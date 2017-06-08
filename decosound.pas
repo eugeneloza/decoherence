@@ -42,6 +42,7 @@ type
   private
     {thread to load the sound file. Auto freed on terminate. Sets isLoaded flag}
     LoadThread: DSoundLoadThread;
+    ThreadWorking: boolean;
     {full URL of the sound file}
     fURL: string;
     fisLoaded: boolean;
@@ -168,28 +169,22 @@ var
    ??? Maybe it's wrong to do so, we already have a critical section in LoadBufferSafe?}
   MusicLock: TCriticalSection;
 
-{========================== INTERNAL TYPES =================================}
-
-
 {========================== TMusicLoadThread ===============================}
 
 procedure DSoundLoadThread.Execute;
 begin
-  if not MusicLock.TryEnter then begin
+  {if not MusicLock.TryEnter then begin
     WriteLnLog('TMusicLoadThread.Execute','Another thread is already loading music. Exiting.');
     {$HINT Something more usefull should happen here... The game situation has already changed, so, maybe, we just need to wait for this thread to finish and load the next one at once?}
     exit;
   end;
-  //MusicLock.Acquire;
+  }
+  MusicLock.Acquire;
 
-  //parent := DSoundFile.create;
-
-  (parent as DSoundFile).buffer := LoadBufferSafe((parent as DSoundFile).fURL,(parent as DSoundFile).duration);
+ (parent as DSoundFile).buffer := LoadBufferSafe((parent as DSoundFile).fURL,(parent as DSoundFile).duration);
 
   MusicLock.Release;
 
-  {$warning dummy}
-  //FreeAndNil(parent);
   (parent as DSoundFile).LoadFinished;
 end;
 
@@ -200,6 +195,7 @@ begin
   inherited;
   buffer := 0;
   duration := -1;
+  ThreadWorking := false;
 end;
 constructor DSoundFile.create(URL: string);
 begin
@@ -221,16 +217,19 @@ begin
     writeLnLog('DSoundFile.Load','ERROR: No valid URL provided. Exiting...');
     exit;
   end;
-  LoadThread := DSoundLoadThread.Create(true);
-  LoadThread.Priority := tpLower;
-  LoadThread.parent := self;
-  LoadThread.FreeOnTerminate := true;
-  LoadThread.Start;
-  {$warning get some inspiration from image.loadthread}
+  if not ThreadWorking then begin
+    LoadThread := DSoundLoadThread.Create(true);
+    LoadThread.Priority := tpLower;
+    LoadThread.parent := self;
+    LoadThread.FreeOnTerminate := true;
+    LoadThread.Start;
+    ThreadWorking := true;
+  end;
 end;
 procedure DSoundFile.LoadFinished;
 begin
   fisLoaded := true;
+  ThreadWorking := false;
 end;
 
 {---------------------------------------------------------------------------}
@@ -238,17 +237,27 @@ end;
 destructor DSoundFile.destroy;
 begin
   soundengine.FreeBuffer(buffer);
+  {
   if Assigned(LoadThread) then begin
     {$warning Buggy load thread "freeing" procedure}
     {$warning copy it to image.loadthread}
     //The situation is bad, the file being freed is in the "load" process
     //stopping it now may cause memory leaks and file access errors!
-    //CAUTION: this doesn't check if the LoadTrhead is assigned, but only checks if LoadThread<>nil It might cause errors when trying to free an already-freed class as the reference is not niled!
+    //CAUTION: this doesn't check if the LoadTrhead is really assigned, but only checks if LoadThread<>nil It might cause errors when trying to free an already-freed class as the reference is not niled!
     WriteLnLog('DSoundFile.destroy','Warning, Assigned(LoadThread)=true. Terminating and freeing...');
     try
-      LoadThread.Terminate;   //if thread is working, terminate it; might cause problems...?
+      LoadThread.Terminate;   //if thread is working, terminate it; might cause problems...? Hardly try...except will save us from a SIGSEGV which will be the case here.
+    except
     end;
     //FreeAndNil(LoadThread); //redundant, as freeonterminate=true?
+  end;
+  }
+  if ThreadWorking then begin
+    Try
+      LoadThread.Terminate;
+    finally
+      FreeAndNil(LoadThread); //redundant, as freeonterminate=true?
+    end;
   end;
   inherited;
 end;
@@ -266,10 +275,14 @@ begin
   fisPlaying := true;
 end;
 
+{---------------------------------------------------------------------------}
+
 procedure DMusicTrack.FadeOut;
 begin
   FadeStart := now;
 end;
+
+{---------------------------------------------------------------------------}
 
 procedure DMusicTrack.manage;
 begin
@@ -277,10 +290,14 @@ begin
     if FadeStart>0 then doFade;
 end;
 
+{---------------------------------------------------------------------------}
+
 constructor DMusicTrack.create;
 begin
   FadeStart := -1;
 end;
+
+{---------------------------------------------------------------------------}
 
 procedure DMusicTrack.doFade;
 begin
@@ -292,6 +309,8 @@ begin
     fisPlaying := false;
   end;
 end;
+
+{---------------------------------------------------------------------------}
 
 procedure DMusicTrack.setGain(value: single);
 begin

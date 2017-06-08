@@ -10,6 +10,7 @@ uses
 
   CastleResources, CastleCreatures,
 
+  decoinputoutput,
   decoglobal;
 
 
@@ -20,13 +21,13 @@ procedure FreeCreatures;
 procedure SpawnCreatures;
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-uses decoinputoutput;
+//uses decoinputoutput;
 
 procedure InitCreatures;
 begin
   Resources.LoadSafe(ApplicationData('models/creatures/knight_creature/'));
   CreatureResource := Resources.FindName('Knight') as TCreatureResource;
-  CreatureResource.Prepare;
+  //CreatureResource.PrepareSafe;
 end;
 
 {---------------------------------------------------------------------------}

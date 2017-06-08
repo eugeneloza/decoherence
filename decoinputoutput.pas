@@ -26,7 +26,7 @@ uses
   CastleXMLUtils, DOM,
   X3DNodes,
   CastleSoundEngine, CastleTimeUtils,
-  CastleResources;
+  CastleResources, CastleCreatures;
 
 type
   {enable thread-safe loading of resources}
@@ -34,6 +34,14 @@ type
   public
     {safe wrapper for T3DResourceList.LoadFromFiles}
     procedure LoadSafe(const URL: string);
+  end;
+
+type
+  {enable thread-safe loading of creature resources}
+  TCreatureResourceHelper = class helper for TCreatureResource
+  public
+    {safe wrapper for TCreatureResource.prepare(nil)}
+    procedure PrepareSafe;
   end;
 
 {safe wrapper for CastleImages.LoadImage, overloaded}
@@ -138,6 +146,19 @@ begin
   HDD_Lock.Acquire;
   try
     LoadFromFiles(URL{, true}); //T3DResourceList.AddFromFile doesn't work?
+  finally
+    HDD_Lock.Release;
+  end;
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure TCreatureResourceHelper.PrepareSafe;
+begin
+  HDD_Lock.Acquire;
+  try
+    {$HINT not working}
+    prepare;
   finally
     HDD_Lock.Release;
   end;

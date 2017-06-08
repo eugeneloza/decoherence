@@ -54,18 +54,31 @@ type
     procedure RescaleImage; virtual;
   end;
 
+
+type TLoadImageThread = class(TThread)
+  public
+    Target: DAbstractImage;
+    filename: String;
+  protected
+    procedure Execute; override;
+  end;
+
 type
   { most simple image type }
   DStaticImage = class(DAbstractImage)
-  public
+  private
+    LoadImageThread: TLoadImageThread;
     { if thread is running }
     ThreadWorking: boolean;
+  public
     { loads image in realtime }
     procedure Load(const filename:string); virtual;
     procedure Load(const CopyImage: TCastleImage);
     procedure afterload; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
     { loads image in a thread }
     procedure LoadThread(const filename:string);
+    constructor create(AOwner: TComponent); override;
+    destructor destroy; override;
   end;
 
 type
@@ -141,42 +154,53 @@ implementation
 uses SysUtils, CastleLog, CastleFilesUtils,
   decoinputoutput;
 
-type TLoadImageThread = class(TThread)
-  private
-  protected
-    Target: DStaticImage;
-    Source: String;
-    procedure Execute; override;
-end;
-
-{----------------------------------------------------------------------------}
-
 procedure TLoadImageThread.execute;
+var TargetImage: DSTaticImage;
 begin
-  target.ThreadWorking := true;
+  TargetImage := Target as DStaticImage;
+
   WritelnLog('TLoadImageThread.execute','Image thread started.');
-  Target.Load(Source);
-  if Target=nil then begin
-    WritelnLog('TLoadImageThread.execute','Image was destroyed before it was loaded!');
-    exit; //fix bug if the image didn't load completely but was already destroyed (NOT WORKING! TODO)
-  end else begin
-    Target.rescale;
-    WritelnLog('TLoadImageThread.execute','Image thread finished.');
-  end;
-  target.ThreadWorking := false;
+
+  TargetImage.Load(filename);
+  TargetImage.rescale;
+
+  WritelnLog('TLoadImageThread.execute','Image thread finished.');
+  TargetImage.ThreadWorking := false;
 end;
 
 {-----------------------------------------------------------------------------}
 
+constructor DStaticImage.create(AOwner: TComponent);
+begin
+  ThreadWorking := false;
+  Inherited create(AOwner);
+end;
+
+{----------------------------------------------------------------------------}
+
+destructor DStaticImage.destroy;
+begin
+  if ThreadWorking then begin
+    Try
+      LoadImageThread.Terminate;
+    finally
+      FreeAndNil(LoadImageThread); //redundant, as freeonterminate=true?
+    end;
+  end;
+  inherited;
+end;
+
+{----------------------------------------------------------------------------}
+
 procedure DStaticImage.LoadThread(const filename: string);
-var LoadImageThread: TLoadImageThread;
 begin
  if not ThreadWorking then begin
    LoadImageThread := TLoadImageThread.Create(true);
    LoadImageThread.Target := self;
-   LoadImageThread.Source := filename;
+   LoadImageThread.filename := filename;
    LoadImageThread.FreeOnTerminate := true;
    LoadImageThread.Priority := tpLower;
+   ThreadWorking := true;
    LoadImageThread.Start;
  end;
 end;
