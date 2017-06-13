@@ -37,6 +37,7 @@ type
   end;
 
 type
+  {$HINT not working}
   {enable thread-safe loading of creature resources}
   TCreatureResourceHelper = class helper for TCreatureResource
   public

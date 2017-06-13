@@ -754,7 +754,7 @@ begin
   //InterfaceList.Remove(self);
   FreeAndNil(GLFrame);
   //scaledImage is automatically freed by GlImage
-  {$WARNING BUG: why Scaled image is not freed automatically?????}
+  {$HINT BUG: why Scaled image is not freed automatically?????}
   {BUG: I still need to free ScaledImage - while it's owned by GLImage
    DAMN IT. The link may be obsolete after freeandnil(GLImage)!
    Looks like I always set ScaledImage := nil after sucessfuly assigning it,

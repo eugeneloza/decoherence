@@ -30,7 +30,7 @@ type
   DSoundLoadThread = class(TThread)
   public
     {refrence to DSoundFile / Why can't I make a cyclic refernce?}
-    parent: TObject;
+    parent: TObject; //DSoundFile
   protected
     {loads the file}
     procedure Execute; override;

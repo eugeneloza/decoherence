@@ -9,6 +9,8 @@ program decoherence_desktop;
 
 Uses {$IFDEF UNIX}cthreads,{$ENDIF}{$IFDEF DEBUG}SysUtils,{$ENDIF} decoglobal, decoherence;
 
+{$R *.res}
+
 begin
   {$IFDEF DEBUG}{$IFDEF HEAP_FILE}
   if FileExists('heap.trc') then
