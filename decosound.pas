@@ -98,28 +98,42 @@ type
     constructor create(URL: string);
   end;
 
+{situation differentiator. Best if assigned to const mysituation = 0.
+ situations must start from zero and be sequential. // todo?}
+type TSituation = byte;
+
 type
   {describes and manages music intended to have a loop-part [a..b]
    with optional intro [0..a] and ?ending [b..end]}
   DLoopMusicTrack = class(DMusicTrack)
     //a,b
+    Tension: single;
+    //Situation: TSituation;
   end;
 
 type
   {a list of music tracks}
   TTrackList = specialize TFPGObjectList<DMusicTrack>;
+  TLoopTrackList = specialize TFPGObjectList<DLoopMusicTrack>;
+
+type
+  {the most abstract features of the playlist}
+  DAbstractPlaylist = class
+    public
+      {manage the playlist (loading, start, stop, fade)}
+      procedure manage; virtual; abstract;
+    end;
 
 type
   {abstract music tracks manager}
-  DPlaylist = class
+  DPlaylist = class(DAbstractPlaylist)
   public
-    {tracks of this playlist}
-    tracks: TTrackList;  {$hint it looks wrong!}
     {URLs of the music files in this playlist}
     URLs: TStringList;
-    procedure manage; virtual; abstract;
-    procedure LoadAll;
-    constructor create;
+    {load all tracks in the URLs list}
+    //procedure LoadAll; // this is wrong in every way!
+
+    constructor create; virtual;
     destructor destroy; override;
   end;
 
@@ -128,22 +142,52 @@ type
    also supports occasional silence (silence will never be the first track playing)}
   DSequentialPlaylist = class(DPlayList)
     public
+      {tracks of this playlist}
+      tracks: TTrackList;  {$hint it looks wrong!}
       PreviousTrack: integer;
       procedure LoadNext;
-      constructor create;
+      constructor create; override;
+      destructor destroy; override;
   end;
+
+type TTension = single;
 
 type
   {Vertical synchronized playlist for combat.
    Softly changes the synchronized tracks according to current situation.
    BeatList is optional, but recommended that fades will happen on beats change}
   DVerticalSyncPlaylist = class(DPlayList)
+    private
+      tensionchanged: boolean;
+      ftension: TTension;
+      procedure settension(value: TTension);
+      function gettrack(newtension: TTension): integer;
     public
-      //situation: integer;
-      //strain
-      //tracks: array of tracks // array[situation] //situation = planning,combat,chainattack,chaindefense
+      {}
+      tracks: TLoopTrackList;
+      {current music tension. It's a good idea to keep this value in 0..1 range,
+       however it's not mandatory}
+      property tension: TTension read ftension write settension;
+      procedure manage; override;
+      constructor create; override;
+      destructor destroy; override;
+    end;
 
-  end;
+type
+  {}
+  DMultiSyncPlaylist = class(DAbstractPlaylist)
+    private
+      fsituation: TSituation;
+      situationchanged: boolean;
+      procedure setsituation(value: TSituation);
+    public
+      {}
+      playlists: array of DVerticalSyncPlaylist;
+      {}
+      property situation: TSituation read fsituation write setsituation;
+      procedure manage; override;
+    end;
+
 
 type
   {Manages all the playlists, currently played music and ambience
@@ -155,7 +199,12 @@ type
     {current music playlist}
     Music,OldMusic: DPlaylist; //sequential or vertical
   public
-    {manage the music, should be called each frame}
+    {manage the music, should be called each frame
+     or otherwise relatively often
+     Note, that loading a new track/playlist takes some time depending on HDD speed
+     so while MusicManager tries its best to make it as quick as possible,
+     the requested change usually won't be immediate,
+     especially in case of an unexpected change}
     procedure manage;
 
     constructor create;
@@ -331,7 +380,7 @@ end;
 constructor DPlaylist.create;
 begin
   Inherited;
-  Tracks := TTrackList.Create(true);
+  //Tracks := TTrackList.Create(true);
   URLs := TStringList.create;
 end;
 
@@ -339,14 +388,14 @@ end;
 
 destructor DPlayList.destroy;
 begin
-  freeAndNil(Tracks);
+  //freeAndNil(Tracks);
   FreeAndNil(URLs);
   Inherited;
 end;
 
 {---------------------------------------------------------------------------}
 
-procedure DPlayList.LoadAll;
+{procedure DPlayList.LoadAll;
 var s: string;
     musicTrack: DMusicTrack;
 begin
@@ -355,7 +404,9 @@ begin
     musicTrack := DMusicTrack.create(s);
   {$hint different implementation for loop tracks}
   {$hint delayed load of the music files!}
-end;
+end;}
+
+{---------------------------------------------------------------------------}
 
 procedure DSequentialPlaylist.LoadNext;
 var newTrack: integer;
@@ -369,10 +420,84 @@ begin
   //load here
 end;
 
+{---------------------------------------------------------------------------}
+
 constructor DSequentialPlaylist.create;
 begin
   inherited;
   PreviousTrack := -1;
+  tracks := TTrackList.create;
+end;
+
+destructor DSequentialPlaylist.destroy;
+begin
+  freeandnil(tracks);
+  inherited;
+end;
+
+{---------------------------------------------------------------------------}
+
+procedure DVerticalSyncPlaylist.settension(value: TTension);
+begin
+  if gettrack(ftension){current track playing}<>gettrack(value) then tensionchanged := true;
+  ftension := value;
+end;
+
+{---------------------------------------------------------------------------}
+
+function DVerticalSyncPlaylist.gettrack(newtension: TTension): integer;
+var i: integer;
+    tension_dist: single;
+begin
+  tension_dist := 9999; //some arbitrary large value
+  Result := -1;
+  {$warning the track may be not loaded yet!}
+  //select a track that fits the new tension best //todo: optmize?
+  for i := 0 to Tracks.count do
+    if abs(tracks[i].Tension - newtension)<tension_dist then begin
+      tension_dist := abs(tracks[i].Tension - newtension);
+      Result := i;
+    end;
+end;
+
+{---------------------------------------------------------------------------}
+
+procedure DVerticalSyncPlaylist.manage;
+begin
+  tensionchanged := false;
+end;
+
+{---------------------------------------------------------------------------}
+
+constructor DVerticalSyncPlaylist.create;
+begin
+  inherited;
+  tracks := TLoopTrackList.create;
+end;
+
+{---------------------------------------------------------------------------}
+
+destructor DVerticalSyncPlaylist.destroy;
+begin
+  freeandnil(tracks);
+  inherited;
+end;
+
+{---------------------------------------------------------------------------}
+
+procedure DMultiSyncPlaylist.SetSituation(value: TSituation);
+begin
+  if fsituation<>value then begin
+    situationChanged := true;
+    fsituation := value;
+  end;
+end;
+
+{---------------------------------------------------------------------------}
+
+procedure DMultiSyncPlaylist.manage;
+begin
+  situationchanged := false;
 end;
 
 {============================ DMusicManager ================================}
