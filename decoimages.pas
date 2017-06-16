@@ -202,7 +202,9 @@ begin
    LoadImageThread.Priority := tpLower;
    ThreadWorking := true;
    LoadImageThread.Start;
- end;
+ end
+ else
+   writeLnLog('DStaticImage.LoadThread','Thread already working...');
 end;
 
 {----------------------------------------------------------------------------}

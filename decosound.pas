@@ -95,6 +95,7 @@ type
     {sets current music "gain", move to private?}
     procedure setGain(value: single);
     constructor create;
+    constructor create(URL: string);
   end;
 
 type
@@ -112,9 +113,12 @@ type
   {abstract music tracks manager}
   DPlaylist = class
   public
-    tracks: TTrackList;
+    {tracks of this playlist}
+    tracks: TTrackList;  {$hint it looks wrong!}
+    {URLs of the music files in this playlist}
     URLs: TStringList;
     procedure manage; virtual; abstract;
+    procedure LoadAll;
     constructor create;
     destructor destroy; override;
   end;
@@ -123,7 +127,10 @@ type
   {Tracks sequentially change each other with pre-loading and no fading
    also supports occasional silence (silence will never be the first track playing)}
   DSequentialPlaylist = class(DPlayList)
-
+    public
+      PreviousTrack: integer;
+      procedure LoadNext;
+      constructor create;
   end;
 
 type
@@ -131,6 +138,10 @@ type
    Softly changes the synchronized tracks according to current situation.
    BeatList is optional, but recommended that fades will happen on beats change}
   DVerticalSyncPlaylist = class(DPlayList)
+    public
+      //situation: integer;
+      //strain
+      //tracks: array of tracks // array[situation] //situation = planning,combat,chainattack,chaindefense
 
   end;
 
@@ -161,7 +172,7 @@ procedure freeMusicManager;
 implementation
 uses SyncObjs, SysUtils, CastleLog, castleFilesUtils,
   CastleVectors,
-  decoinputoutput;
+  decoinputoutput, decoglobal;
  {CastleOpenAL,}
 
 var
@@ -224,7 +235,9 @@ begin
     LoadThread.FreeOnTerminate := true;
     LoadThread.Start;
     ThreadWorking := true;
-  end;
+  end
+  else
+     writeLnLog('DSoundFile.Load','Thread already working...');
 end;
 procedure DSoundFile.LoadFinished;
 begin
@@ -237,21 +250,6 @@ end;
 destructor DSoundFile.destroy;
 begin
   soundengine.FreeBuffer(buffer);
-  {
-  if Assigned(LoadThread) then begin
-    {$warning Buggy load thread "freeing" procedure}
-    {$warning copy it to image.loadthread}
-    //The situation is bad, the file being freed is in the "load" process
-    //stopping it now may cause memory leaks and file access errors!
-    //CAUTION: this doesn't check if the LoadTrhead is really assigned, but only checks if LoadThread<>nil It might cause errors when trying to free an already-freed class as the reference is not niled!
-    WriteLnLog('DSoundFile.destroy','Warning, Assigned(LoadThread)=true. Terminating and freeing...');
-    try
-      LoadThread.Terminate;   //if thread is working, terminate it; might cause problems...? Hardly try...except will save us from a SIGSEGV which will be the case here.
-    except
-    end;
-    //FreeAndNil(LoadThread); //redundant, as freeonterminate=true?
-  end;
-  }
   if ThreadWorking then begin
     Try
       LoadThread.Terminate;
@@ -294,6 +292,12 @@ end;
 
 constructor DMusicTrack.create;
 begin
+  inherited;
+  FadeStart := -1;
+end;
+constructor DMusicTrack.create(URL: string);
+begin
+  Inherited create(URL);
   FadeStart := -1;
 end;
 
@@ -338,6 +342,37 @@ begin
   freeAndNil(Tracks);
   FreeAndNil(URLs);
   Inherited;
+end;
+
+{---------------------------------------------------------------------------}
+
+procedure DPlayList.LoadAll;
+var s: string;
+    musicTrack: DMusicTrack;
+begin
+  {$warning this is wrong! we need to load only one url at once in sequential playlist!}
+  for s in URLs do
+    musicTrack := DMusicTrack.create(s);
+  {$hint different implementation for loop tracks}
+  {$hint delayed load of the music files!}
+end;
+
+procedure DSequentialPlaylist.LoadNext;
+var newTrack: integer;
+begin
+  if URLs.Count=1 then PreviousTrack := -1; //if only one track is available, then forget about shuffling
+  //shuffle tracks, but don't repeat the previous one
+  repeat
+    newTrack := drnd.Random(URLs.Count);
+  until NewTrack<>PreviousTrack;
+  {$hint process silence here}
+  //load here
+end;
+
+constructor DSequentialPlaylist.create;
+begin
+  inherited;
+  PreviousTrack := -1;
 end;
 
 {============================ DMusicManager ================================}
