@@ -16,8 +16,22 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 {---------------------------------------------------------------------------}
 
 { Sound and music routines
-  Adaptive music and playlists }
+  Adaptive music and playlists.
 
+  Sequential playlist. Just plays a random track from a provided list.
+
+  Adaptive (or inetractive) music is the term used for the music tracks
+  that adapt to current game situation, providing much better music blending
+  with the gameplay. There are two most used ways to use Adaptive Music.
+
+  Horizontal synchronization. The tracks match each other's beat, so that
+  they can be safely crossfaded one into another at the same playing position.
+
+  Vertical synchronization. The tracks match each other's harmony, so that
+  during crossfading the tracks will seamlessly blend into one another.
+
+  Of course only specially composed tracks that have the same rhythm
+  and harmony can be smoothly synchronized.}
 unit decosound;
 
 {$INCLUDE compilerconfig.inc}
@@ -141,48 +155,71 @@ type
   {Tracks sequentially change each other with pre-loading and no fading
    also supports occasional silence (silence will never be the first track playing)}
   DSequentialPlaylist = class(DPlayList)
-    public
+    protected
       {tracks of this playlist}
-      tracks: TTrackList;  {$hint it looks wrong!}
+      tracks: TTrackList;  {$hint it looks wrong! Only 2 (now playing & fading + there might be >1 fading) tracks are needed at every moment of time}
+      {number of the previous track, stored not to repeat that track again if possible}
       PreviousTrack: integer;
+    public
+      {(prepare to) load the next random track from the playlist}
       procedure LoadNext;
       constructor create; override;
       destructor destroy; override;
-  end;
+    end;
 
+{"tension" of the current track which determines which of the synchronized
+ tracks should be used at this moment.}
 type TTension = single;
 
 type
-  {Vertical synchronized playlist for combat.
+  {Synchronized playlist for combat.
    Softly changes the synchronized tracks according to current situation.
    BeatList is optional, but recommended that fades will happen on beats change}
-  DVerticalSyncPlaylist = class(DPlayList)
+  DSyncPlaylist = class(DPlayList)
     private
       tensionchanged: boolean;
       ftension: TTension;
       procedure settension(value: TTension);
       function gettrack(newtension: TTension): integer;
-    public
-      {}
+    protected
+      {list of tracks in the playlist. All the tracks are horizontally synchronized
+       and MUST have the same rhythm,
+       the melody line should also be blendable.
+       On the other hand, playing together with MultiSyncPlaylist in case the
+       tension changes only on situation change, then the tracks must only have
+       the same beat, and can be unblendable between one another}
       tracks: TLoopTrackList;
+    public
       {current music tension. It's a good idea to keep this value in 0..1 range,
        however it's not mandatory}
       property tension: TTension read ftension write settension;
+
       procedure manage; override;
+
       constructor create; override;
       destructor destroy; override;
     end;
 
 type
-  {}
+  {This is a set of several "vertically synchronized" synchronized playlists
+   The set of playlists sholud blend smoothly with one another depending on the situation,
+   i.e. the blending takes place in "2D space" of tension/situation,
+   e.g. situations may be player's/enemie's turn
+   with different tension depending on amount/strengths of enemy units visible
+   If the tension may change only on situation change, then there is no need to
+   blend harmony of all the tracks in the playlists, only different possible
+   situation changes should blend flawlessly.}
   DMultiSyncPlaylist = class(DAbstractPlaylist)
     private
       fsituation: TSituation;
       situationchanged: boolean;
       procedure setsituation(value: TSituation);
     public
-      {}
-      playlists: array of DVerticalSyncPlaylist;
+      {vertically synchronized synchronized playlists :)
+       You have to manage their blendability based on possible situation change,
+       e.g. an incoming nuke might happen only on enemy's turn, there's no need
+       to blend it with player's turn.}
+      playlists: array of DSyncPlaylist;
       {}
       property situation: TSituation read fsituation write setsituation;
       procedure manage; override;
@@ -197,7 +234,7 @@ type
     {current ambient track, just plays continuously}
     Ambient: DLoopMusicTrack;
     {current music playlist}
-    Music,OldMusic: DPlaylist; //sequential or vertical
+    Music,OldMusic: DPlaylist; //sequential or synchronized
   public
     {manage the music, should be called each frame
      or otherwise relatively often
@@ -221,31 +258,15 @@ procedure freeMusicManager;
 implementation
 uses SyncObjs, SysUtils, CastleLog, castleFilesUtils,
   CastleVectors,
-  decoinputoutput, decoglobal;
- {CastleOpenAL,}
-
-var
-  {a lock to ensure that the music won't load twice accidetnally
-   ??? Maybe it's wrong to do so, we already have a critical section in LoadBufferSafe?}
-  MusicLock: TCriticalSection;
+  decoinputoutput, //used for safe threaded loading of sound buffer
+  decoglobal;      //used for random
 
 {========================== TMusicLoadThread ===============================}
 
 procedure DSoundLoadThread.Execute;
 begin
-  {if not MusicLock.TryEnter then begin
-    WriteLnLog('TMusicLoadThread.Execute','Another thread is already loading music. Exiting.');
-    {$HINT Something more usefull should happen here... The game situation has already changed, so, maybe, we just need to wait for this thread to finish and load the next one at once?}
-    exit;
-  end;
-  }
-  MusicLock.Acquire;
-
  (parent as DSoundFile).buffer := LoadBufferSafe((parent as DSoundFile).fURL,(parent as DSoundFile).duration);
-
-  MusicLock.Release;
-
-  (parent as DSoundFile).LoadFinished;
+ (parent as DSoundFile).LoadFinished;
 end;
 
 {============================= DSoundFile ==================================}
@@ -380,7 +401,6 @@ end;
 constructor DPlaylist.create;
 begin
   Inherited;
-  //Tracks := TTrackList.Create(true);
   URLs := TStringList.create;
 end;
 
@@ -388,7 +408,6 @@ end;
 
 destructor DPlayList.destroy;
 begin
-  //freeAndNil(Tracks);
   FreeAndNil(URLs);
   Inherited;
 end;
@@ -437,7 +456,7 @@ end;
 
 {---------------------------------------------------------------------------}
 
-procedure DVerticalSyncPlaylist.settension(value: TTension);
+procedure DSyncPlaylist.settension(value: TTension);
 begin
   if gettrack(ftension){current track playing}<>gettrack(value) then tensionchanged := true;
   ftension := value;
@@ -445,7 +464,7 @@ end;
 
 {---------------------------------------------------------------------------}
 
-function DVerticalSyncPlaylist.gettrack(newtension: TTension): integer;
+function DSyncPlaylist.gettrack(newtension: TTension): integer;
 var i: integer;
     tension_dist: single;
 begin
@@ -462,14 +481,14 @@ end;
 
 {---------------------------------------------------------------------------}
 
-procedure DVerticalSyncPlaylist.manage;
+procedure DSyncPlaylist.manage;
 begin
   tensionchanged := false;
 end;
 
 {---------------------------------------------------------------------------}
 
-constructor DVerticalSyncPlaylist.create;
+constructor DSyncPlaylist.create;
 begin
   inherited;
   tracks := TLoopTrackList.create;
@@ -477,7 +496,7 @@ end;
 
 {---------------------------------------------------------------------------}
 
-destructor DVerticalSyncPlaylist.destroy;
+destructor DSyncPlaylist.destroy;
 begin
   freeandnil(tracks);
   inherited;
@@ -535,13 +554,10 @@ begin
   FreeAndNil(Music);
 end;
 
-
-
+{
 initialization
-MusicLock := TCriticalSection.create;
 
 finalization
-freeAndNil(MusicLock);
-
+}
 end.
 
