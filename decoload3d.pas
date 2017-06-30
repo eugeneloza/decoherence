@@ -92,8 +92,8 @@ procedure AddMaterial(Root: TX3DRootNode);
       if (source.FdChildren[i] is TShapeNode) then
         try
           // assign TextureProperties (anisotropic smoothing) for the imagetexture
-          {$Warning WHY THE TextureProperties keeps automatically released????}
-          (TShapeNode(source.FdChildren[i]).fdAppearance.Value.FindNode(TImageTextureNode,false) as TImageTextureNode).FdTextureProperties.Value := TextureProperties.DeepCopy;
+          //{$Warning WHY THE TextureProperties keeps automatically released????}
+          (TShapeNode(source.FdChildren[i]).fdAppearance.Value.FindNode(TImageTextureNode,false) as TImageTextureNode).{Fd}TextureProperties{.Value} := TextureProperties{.DeepCopy};
           {create a link to each and every material loaded}
           Material := (TShapeNode(source.FdChildren[i]).FdAppearance.Value.FindNode(TMaterialNode,false) as TMaterialNode);
           // set material ambient intensity to zero for complete darkness :)
