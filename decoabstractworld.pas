@@ -65,6 +65,9 @@ Type
     //Procedure chunk_n_slice; virtual; abstract;
     constructor create; virtual;
     destructor destroy; override;
+    {a dummy procedure to be overriden in rendered world types
+     (such as text or 2D)}
+    procedure render; virtual;
   end;
 
 var CurrentWorld: DAbstractWorld;
@@ -114,6 +117,13 @@ begin
     raise Exception.Create('ERROR: Free and nil the previous World before activating this one!');
   LastRender := -1;
   FirstRender := true;
+end;
+
+{------------------------------------------------------------------------------}
+
+Procedure DAbstractWorld.render;
+begin
+  {this is intentionally left blank}
 end;
 
 {------------------------------------------------------------------------------}
