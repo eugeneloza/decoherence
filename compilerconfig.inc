@@ -29,6 +29,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 {Not using interfaces yet (and maybe will never use them). But let it be here for now}
 {$interfaces corba}
 
+{I should try using cmem some day. They say in some cases it may +30% speed and -50% RAM usage. However, I didn't test it yet.}
+//{$DEFINE useCMEM}
+
 {convenient global range-checking on/off. Redundand, as compiler mode already does that?}
 {$IFNDEF RELEASE}
 {$R+}{$Q+}
