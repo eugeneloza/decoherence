@@ -212,7 +212,17 @@ begin
   for i := 0 to length(portrait_img)-1 do begin
     s := inttostr(i+1);
     if i+1<10 then s := '0'+s;
-    Portrait_img[i] := LoadImageSafe(ApplicationData(PortraitFolder+'UNKNOWN_p'+s+'.jpg'));
+    try
+      Portrait_img[i] := LoadImageSafe(ApplicationData(PortraitFolder+'UNKNOWN_p'+s+'.jpg'));
+    except
+      { If the UNKNOWN_p* does not exist, load the placeholder portrait.
+        This is signalled by EFOpenError now, although in the future LoadImage may re-raise
+        it as some EImageLoadError descendant. }
+      on EFOpenError do
+        Portrait_img[i] := LoadImageSafe(ApplicationData(PortraitFolder+'placeholder.png'));
+      on EImageLoadError do
+        Portrait_img[i] := LoadImageSafe(ApplicationData(PortraitFolder+'placeholder.png'));
+    end;
   end;
   {load artwork by Saito00}
 
