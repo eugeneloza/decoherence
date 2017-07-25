@@ -33,6 +33,9 @@ uses Classes, SysUtils,
 
      CastleVectors, CastleScene,
 
+     {needed to use load image}
+     CastleControls, decoloadembedded,
+
      decothread,
 
      decogui, decointerface, decomouse, decofont,
@@ -293,6 +296,18 @@ end;
 
 {==========================================================================}
 
+{thanks to Michalis, it's simple :) see https://github.com/eugeneloza/decoherence/issues/22}
+procedure SetLoadingImage;
+begin
+  {no need yet}
+  //Theme.LoadingBackgroundColor := Black; // adjust as needed
+  //Theme.LoadingTextColor := White; // adjust as needed
+
+  Theme.Images[tiLoading] := Loading_image;
+  Theme.OwnsImages[tiLoading] := false;
+end;
+
+
 function MyGetApplicationName: string;
 begin
   Result  :=  'Decoherence 1';
@@ -301,6 +316,9 @@ end;
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 Initialization
   OnGetApplicationName  :=  @MyGetApplicationName;
+
+  SetLoadingImage;
+
   Window := TCastleWindowTouch.create(Application);
 
   window.DoubleBuffer := false;//true;             //what's the difference? speed? memory?
