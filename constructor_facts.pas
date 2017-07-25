@@ -216,6 +216,7 @@ begin
   if length(memo1.Text)<=350 then FactLengthLabel.Color := clDefault
   else FactLengthLabel.Color := clRed;
   FactLengthLabel.caption := 'Total symbol: '+inttostr(length(memo1.Text));
+
 end;
 
 {-----------------------------------------------------------------------------}
