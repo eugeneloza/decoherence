@@ -53,7 +53,14 @@ my_animation_@counter(1).png
 
 --------------= CONSTRUCTOR TOOL =------------------
 
-170525-4 * UNDO
+170725-7 * Compile only changed data (keep track of?) Or comile only current session's changes.
+Warning: if you have changes from the previous sessions, they might not compile properly, use this feature only if you know what you're doing.
+
+170725-6 * ability to add different amount/quantity of facts for different languages
+
+170725-4 * UNDO
+
+170725-5 * MULTIFORM (for languages)
 
 170725-1a * Edit facts
 
@@ -74,6 +81,4 @@ my_animation_@counter(1).png
 000000-23 * Tutorial - constructor
 
 000000-24 * Constructor help pages describing how-to and where to place data
-
-
 

@@ -34,6 +34,8 @@ WHY?
 000000-26 LEAK * Memory leaks. Не могу выловить несколько memory leaks. Они не забирают много памяти и не накалпиваются со временем (вроде). Однако сильно мешают поиску будущих утечек памяти. Переписать всё с нуля, чтобы понять на каком этапе происходит сбой?
 Похоже, ошибка в interfaceelement.rescale, но где именно???
 
+170725-C CRITICAL * Threaded loading is not stable!
+
 
 --------------= CONSTRUCTOR TOOL =------------------
 
@@ -41,4 +43,6 @@ WHY?
 constructor_map.pas
 If an error encountered in map generator during a test (e.g. unable to block a map tile) the editor crashes, TEST button no longer enabled, and a SIGSEGV encountered on app close.
 
+170725-2 * When no LoadScreens are given for a fact, an error may occur
 
+170725-3 * Selecting another language in main form doesn't change MyLanguage variable?

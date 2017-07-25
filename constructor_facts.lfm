@@ -70,4 +70,13 @@ object FactsEditor: TFactsEditor
     ParentShowHint = False
     ShowHint = True
   end
+  object AddFactButton: TButton
+    Left = 8
+    Height = 25
+    Top = 240
+    Width = 148
+    Caption = 'New Fact'
+    OnClick = AddFactButtonClick
+    TabOrder = 5
+  end
 end

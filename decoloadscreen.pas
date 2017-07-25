@@ -31,6 +31,7 @@ type
     value: string;
 end;
 
+{actually this one looks like a TStringList for now, but may be extended in future}
 TLoadImageList = specialize TFPGObjectList<DLoadImage>;
 
 type
@@ -39,7 +40,8 @@ type
     {fact text}
     value: string;
     {how many times the fact has been displayed}
-    frequency: integer; //TODO: not saved/read ATM (should overridden by a savegame?)
+    {$HINT TODO: not saved/read ATM (should overridden by a savegame?)}
+    frequency: integer;
     {list of compatible loadscreen images. It's inefficient to store them
      "many copies" here... but that's for some optimization I might do later}
     compatibility: TLoadImageList;

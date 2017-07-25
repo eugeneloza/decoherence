@@ -33,13 +33,18 @@ end;
 
 type
   {Form to edit facts and corresponding loadscreen images}
+
+  { TFactsEditor }
+
   TFactsEditor = class(TWriterForm)
+    AddFactButton: TButton;
     DeselectAllButton: TButton;
     FactLengthLabel: TLabel;
     SelectAllButton: TButton;
     LoadScreensListBox: TCheckListBox;
     FactsListbox: TListBox;
     Memo1: TMemo;
+    procedure AddFactButtonClick(Sender: TObject);
     procedure DeselectAllButtonClick(Sender: TObject);
     procedure FactsListboxSelectionChange(Sender: TObject; User: boolean);
     procedure FormDestroy(Sender: TObject);
@@ -212,15 +217,20 @@ end;
 {-----------------------------------------------------------------------------}
 
 procedure TFactsEditor.Memo1Change(Sender: TObject);
+var CurrentFactText: string;
 begin
-  if length(memo1.Text)<=350 then FactLengthLabel.Color := clDefault
-  else FactLengthLabel.Color := clRed;
-  FactLengthLabel.caption := 'Total symbol: '+inttostr(length(memo1.Text));
+  CurrentFactText := trim(memo1.Text);
 
-  if Facts[MyLanguage][FactsListBox.ItemIndex].value <> memo1.Text then begin
-    Facts[MyLanguage][FactsListBox.ItemIndex].value := memo1.Text;
+  if length(CurrentFactText)<=350 then FactLengthLabel.Color := clDefault
+  else FactLengthLabel.Color := clRed;
+  FactLengthLabel.caption := 'Total symbol: '+inttostr(length(CurrentFactText));
+
+  if Facts[MyLanguage][FactsListBox.ItemIndex].value <> CurrentFactText then begin
+    Facts[MyLanguage][FactsListBox.ItemIndex].value := CurrentFactText;
     {$HINT may optimize here and set/clear "isChanged" flag based on whether there is unsaved data}
     self.isChanged := true;
+    //update the fact displayed in the list
+    FactsListBox.Items[FactsListBox.ItemIndex] := CurrentFactText;
   end;
 end;
 
@@ -235,6 +245,27 @@ procedure TFactsEditor.DeselectAllButtonClick(Sender: TObject);
 begin
   LoadScreensListBox.CheckAll(cbUnchecked);
   LoadScreensListBoxClickCheck(nil);
+end;
+
+procedure TFactsEditor.AddFactButtonClick(Sender: TObject);
+var NewFact: DFact;
+    L: TLanguage;
+begin
+  WriteLnLog('TFactsEditor.AddFactButtonClick','Creating a new empty fact');
+  for L in TLanguage do begin
+    NewFact := DFact.create;
+    NewFact.compatibility := TLoadImageList.create(true);
+    NewFact.value := 'Empty: ' + SayLaugnage(L);
+    Facts[L].add(NewFact);
+  end;
+
+  ReloadContent; {$HINT not optimal}
+  //  FactsListbox.Items.Add(NewFact[MyLanguage]);
+
+  //and select the last item (i.e. the one we've just added)
+  FactsListbox.Selected[FactsListBox.Count-1] := true;
+
+  {$WARNING and alert all other open forms}
 end;
 
 {-----------------------------------------------------------------------------}
