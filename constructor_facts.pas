@@ -217,6 +217,11 @@ begin
   else FactLengthLabel.Color := clRed;
   FactLengthLabel.caption := 'Total symbol: '+inttostr(length(memo1.Text));
 
+  if Facts[MyLanguage][FactsListBox.ItemIndex].value <> memo1.Text then begin
+    Facts[MyLanguage][FactsListBox.ItemIndex].value := memo1.Text;
+    {$HINT may optimize here and set/clear "isChanged" flag based on whether there is unsaved data}
+    self.isChanged := true;
+  end;
 end;
 
 {-----------------------------------------------------------------------------}
