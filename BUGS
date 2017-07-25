@@ -1,0 +1,44 @@
+--------------= DECOHERENCE GAME =------------------
+
+000000-7 IMPORTANT * handle "image not found" in thread
+
+000000-8 IMPORTANT * если кликнуть до загрузки floater image / floaterlabels выдаёт SIGSEGV
+
+000000-9a CRITICAL * FRAMES NOT SCALED CORRECTLY!!!
+Problem with float <==> fixed px conversions for frames.
+Set backwards x1x2y1y2
+property x1 read f_x1 write setx1
+
+000000-9b CRITICAL * scaling: Integer priority / float priority
+
+000000-10 * SingleInterfaceElement.FrameGap
+0 - default
+>0 - for text
+<0 for avatars, etc.
+
+000000-11 IMPORTANT * 1px frame for healthbars!
+Partly done
+
+000000-12 CRITICAL ARCHITECTURE FLAW * Interface element should rescale its onw content!
+e.g.
+damageOverlay.Content.base.copyxywh(self.base);
+damageOverlay.Content.AnimateTo(asFadeIn);
+damageOverlay.rescale;
+Проблема интерфеса - parent не передаёт scale для children, как это задумывалось изначально. Это серьёзная недоработка структуры, её будет необходимо исправить. Когда-нибудь. Пока на костылях работает...
+
+000000-13 CRITICAL * health label disappears after hit
+
+000000-24 IMPORTANT * textureproperties not working for animated objects!
+WHY?
+
+000000-26 LEAK * Memory leaks. Не могу выловить несколько memory leaks. Они не забирают много памяти и не накалпиваются со временем (вроде). Однако сильно мешают поиску будущих утечек памяти. Переписать всё с нуля, чтобы понять на каком этапе происходит сбой?
+Похоже, ошибка в interfaceelement.rescale, но где именно???
+
+
+--------------= CONSTRUCTOR TOOL =------------------
+
+170725-1
+constructor_map.pas
+If an error encountered in map generator during a test (e.g. unable to block a map tile) the editor crashes, TEST button no longer enabled, and a SIGSEGV encountered on app close.
+
+

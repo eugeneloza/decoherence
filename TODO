@@ -1,0 +1,77 @@
+--------------= DECOHERENCE GAME =------------------
+
+000000-15 MILESTONE * select character (click)
+
+000000-15 MILESTONE * enemy actions
+
+000000-15 MILESTONE * music
+
+
+
+000000-1 * override "Loading..." on startup
+"src/ui/opengl/castlecontrolsimages.pas":
+Loading := TGrayscaleAlphaImage.Create(LoadingWidth, LoadingHeight, LoadingDepth);
+Move(LoadingPixels, Loading.RawPixels^, SizeOf(LoadingPixels));
+Loading.URL := 'embedded-image:/Loading';
+LoadingPixels points to "src/ui/opengl/castlecontrolsimages.image_data"
+
+000000-2 * Убрать по-больше стартовых загрузок в тред, чтобы сразу загрузить интерфейс и показывать картинку.
+
+000000-3 * Color font in DecoFont
+TGrayscaleAlphaImage -> TRGBAlphaImage
+HTML текст? Как делать?
+
+000000-4 * right-click переключение стиля управления.
+доработать: если интерфейс не поймал клик, то смена стиля управления.
+Only in travel mode
+
+000000-5 * interface.id
+interface.find by id
+
+000000-6 * TouchOver interface_id
+что делать, когда id изменился
+
+000000-8 * Настройки сохранения jpg?
+
+000000-11 * Thread: all actors' actions in a thread. Thread suspend on pause
+
+000000-14 * timeout for slide-out depending on situation
+select: infinite
+over: 0 sec.
+hit: 1 sec. / fade out hit-overlay
+
+000000-16 * set animation time (not only default)
+e.g. faster for onHit
+
+000000-17 * Animated texture
+my_animation_@counter(1).png
+
+000000-18 * DebugTimeStopForCreatures
+
+000000-20 * Resize LoadScreen images to 1024x1024?
+
+
+--------------= CONSTRUCTOR TOOL =------------------
+
+170725-1a * Edit facts
+
+170725-1b * Add facts
+
+170725-2 * Edit music (unit)
+
+170725-3 * Edit enemies (unit)
+
+000000-19 * Перед сохранением делать бекап
+
+000000-21 * Textures TGA -> DDS automatic
+можно просто на винде через команд лайн вызывать nvcompress
+Скомпилировать на LINUX!!!
+
+000000-22 * добавить везде hints к конструктору
+
+000000-23 * Tutorial - constructor
+
+000000-24 * Constructor help pages describing how-to and where to place data
+
+
+
