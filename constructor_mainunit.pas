@@ -40,6 +40,7 @@ type TFormList = specialize TFPGObjectList<TWriterForm>;
 type
   { main form for launching other editors }
   TMainForm = class(TLanguageForm)
+    PlaceholdersEditorButton: TButton;
     MapEditorButton: TButton;
     DungeonTilesEditorButton: TButton;
     SaveButton: TButton;
@@ -52,6 +53,7 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure MapEditorButtonClick(Sender: TObject);
+    procedure PlaceholdersEditorButtonClick(Sender: TObject);
     procedure SaveButtonClick(Sender: TObject);
   public
     { Generic list of all editor forms }
@@ -72,7 +74,7 @@ implementation
 {$R *.lfm}
 
 uses
-  constructor_facts, constructor_tiles, constructor_map;
+  constructor_facts, constructor_tiles, constructor_map, constructor_placeholders;
 
 {-----------------------------------------------------------------------------}
 
@@ -106,6 +108,7 @@ begin
   AllForms.Add(FactsEditor);
   AllForms.Add(DungeonTilesEditor);
   AllForms.Add(MapEditor);
+  AllForms.Add(PlaceholdersEditor);
 end;
 
 {-----------------------------------------------------------------------------}
@@ -194,6 +197,14 @@ procedure TMainForm.MapEditorButtonClick(Sender: TObject);
 begin
   //Application.CreateForm(TMapEditor, MapEditor);
   MapEditor.Show;
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure TMainForm.PlaceholdersEditorButtonClick(Sender: TObject);
+begin
+  //Application.CreateForm(TMapEditor, MapEditor);
+  PlaceholdersEditor.Show;
 end;
 
 

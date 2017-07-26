@@ -63,8 +63,17 @@ object MainForm: TMainForm
     Height = 25
     Top = 72
     Width = 112
-    Caption = 'Map'
+    Caption = 'Dungeon Map'
     OnClick = MapEditorButtonClick
     TabOrder = 4
+  end
+  object PlaceholdersEditorButton: TButton
+    Left = 8
+    Height = 25
+    Top = 104
+    Width = 112
+    Caption = 'Placeholders'
+    OnClick = PlaceholdersEditorButtonClick
+    TabOrder = 5
   end
 end

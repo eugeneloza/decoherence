@@ -10,7 +10,7 @@ uses
   Interfaces, // this includes the LCL widgetset
   Forms, castle_base, castle_window, castle_components, constructor_mainunit,
   constructor_facts, constructor_global, decotranslation,
-  constructor_tiles, constructor_map;
+  constructor_tiles, constructor_map, constructor_placeholders;
 
 {$R *.res}
 
@@ -21,6 +21,7 @@ begin
   Application.CreateForm(TFactsEditor, FactsEditor);
   Application.CreateForm(TDungeonTilesEditor, DungeonTilesEditor);
   Application.CreateForm(TMapEditor, MapEditor);
+  Application.CreateForm(TPlaceholdersEditor, PlaceholdersEditor);
   Application.Run;
 end.
 
