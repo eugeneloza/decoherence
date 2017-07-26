@@ -39,31 +39,29 @@ type TFormList = specialize TFPGObjectList<TWriterForm>;
 
 type
   { main form for launching other editors }
-  TMainForm = class(TForm)
+  TMainForm = class(TLanguageForm)
     MapEditorButton: TButton;
     DungeonTilesEditorButton: TButton;
     SaveButton: TButton;
     CompileButton: TButton;
     FactsEditorButton: TButton;
-    LanguageSelect: TComboBox;
     procedure CompileButtonClick(Sender: TObject);
     procedure DungeonTilesEditorButtonClick(Sender: TObject);
     procedure FactsEditorButtonClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
-    procedure LanguageSelectChange(Sender: TObject);
     procedure MapEditorButtonClick(Sender: TObject);
     procedure SaveButtonClick(Sender: TObject);
   public
     { Generic list of all editor forms }
     AllForms: TFormList;
-    { Read the selected language from a ComboBox and gives it to CurrentLanguage }
-    procedure GetLanguage;
     { enumerates all the editor forms, fills AllForms }
     procedure MakeFormsList;
     { write the data to Architect or Game folder }
-    procedure WriteMe(ToGameFolder: boolean); //override;
+    procedure WriteMe(ToGameFolder: boolean); override;
+
+    procedure DetectLanguageSelect; override;
   end;
 
 var
@@ -78,21 +76,18 @@ uses
 
 {-----------------------------------------------------------------------------}
 
-procedure TMainForm.GetLanguage;
+procedure TMainForm.FormCreate(Sender: TObject);
 begin
-  case LanguageSelect.Items[LanguageSelect.ItemIndex] of
-    'English': ConstructorLanguage := Language_English;
-    'Russian': ConstructorLanguage := Language_Russian;
-    else raise Exception.Create('Unknown Language in constructor_mainunit.GetLanguage!');
-  end;
+  //MakeFormsList;  //other forms are nil yet... so doesn't help
+  MakeLanguageSwitch;
 end;
 
 {-----------------------------------------------------------------------------}
 
-procedure TMainForm.FormCreate(Sender: TObject);
+procedure TMainForm.DetectLanguageSelect;
 begin
-  //MakeFormsList;  //other forms are nil yet... so doesn't help
-  GetLanguage;
+  inherited;
+  ConstructorLanguage := MyLanguage;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -100,13 +95,6 @@ end;
 procedure TMainForm.FormDestroy(Sender: TObject);
 begin
   FreeAndNil(AllForms);
-end;
-
-{-----------------------------------------------------------------------------}
-
-procedure TMainForm.LanguageSelectChange(Sender: TObject);
-begin
-  GetLanguage;
 end;
 
 {-----------------------------------------------------------------------------}

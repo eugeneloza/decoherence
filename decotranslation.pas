@@ -36,7 +36,7 @@ var
 {Provides a name for the current language directory without backslashes}
 function LanguageDir(Lang: TLanguage): string;
 {Says the language name in English}
-function SayLaugnage(Lang: TLanguage): string;
+function SayLanguage(Lang: TLanguage): string;
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
@@ -55,7 +55,7 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-function SayLaugnage(Lang: TLanguage): string;
+function SayLanguage(Lang: TLanguage): string;
 begin
   case Lang of
     language_English: Result := 'English';

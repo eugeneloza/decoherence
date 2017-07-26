@@ -23,6 +23,8 @@ interface
 
 uses
   Classes, Forms, SysUtils,
+  //Controls,
+  StdCtrls,
   decotranslation;
 
 const
@@ -36,20 +38,33 @@ type
   private
     fisLoaded: boolean;
     fisChanged: boolean;
-    fMyLanguage: TLanguage;
   public
     {if the TWriterForm instance is loaded from the Architect?}
     property isLoaded: boolean read fisLoaded write fisLoaded default false;
     {Was the TWriterForm changed since last save/load?}
     property isChanged: boolean read fisChanged write fisChanged default false;
-    {TWriterForm current displayed language (if appliccable / else unused)}
-    property MyLanguage: TLanguage read fMyLanguage write fMyLanguage;
     {TWriterForm abstract load procedure}
     procedure LoadMe; virtual; abstract;
     {TWriterForm abstract save procedure}
     procedure WriteMe(ToGameFolder: boolean); virtual;
     {TWriterForm abstract destructor}
     procedure FreeMe; virtual; abstract;
+  end;
+
+type
+  TLanguageForm = class (TWriterForm)
+  private
+    fMyLanguage: TLanguage;
+  public
+    LanguageSwitch: TComboBox;
+
+    {TWriterForm current displayed language}
+    property MyLanguage: TLanguage read fMyLanguage write fMyLanguage;
+
+    Procedure MakeLanguageSwitch;
+    Procedure ResetLanguageSwitch;
+    Procedure DetectLanguageSelect; virtual;
+    procedure LanguageSelectChange(Sender: TObject);
   end;
 
 var ConstructorLanguage: TLanguage;
@@ -154,6 +169,55 @@ begin
   if not ToGameFolder then isChanged := false;
 end;
 
+{============================================================================}
+
+Procedure TLanguageForm.MakeLanguageSwitch;
+var L: TLanguage;
+begin
+  if LanguageSwitch = nil then begin
+    LanguageSwitch := TComboBox.Create(self);
+    LanguageSwitch.parent := self;
+    LanguageSwitch.Style := csDropDownList;
+    LanguageSwitch.Hint := 'Select current displayed language.';
+    LanguageSwitch.ShowHint := true;
+    LanguageSwitch.Left := 208;
+    LanguageSwitch.Top := 8;
+    LanguageSwitch.Width := 100;
+    LanguageSwitch.Height := 21;
+    LanguageSwitch.Visible := true;
+    LanguageSwitch.Enabled := true;
+    for L in TLanguage do
+      LanguageSwitch.Items.add(SayLanguage(L));
+    LanguageSwitch.ItemIndex := 0;
+    LanguageSwitch.OnChange := @LanguageSelectChange;
+  end else WriteLnLog('TLanguageForm.MakeLanguageSwitch','ERROR: LanguageSelect already exists.');
+  ResetLanguageSwitch;
+end;
+
+{---------------------------------------------------------------------------}
+
+Procedure TLanguageForm.ResetLanguageSwitch;
+begin
+  MyLanguage := ConstructorLanguage;
+end;
+
+{---------------------------------------------------------------------------}
+
+Procedure TLanguageForm.DetectLanguageSelect;
+var L: TLanguage;
+begin
+  //not optimal
+  For L in TLanguage do
+    if trim(LanguageSwitch.Items[LanguageSwitch.ItemIndex]) = SayLanguage(L) then
+    MyLanguage := L;
+  //what should happen in case of no language found?
+end;
+Procedure TLanguageForm.LanguageSelectChange(Sender: TObject);
+begin
+  DetectLanguageSelect;
+end;
+
+{---------------------------------------------------------------------------}
 
 end.
 

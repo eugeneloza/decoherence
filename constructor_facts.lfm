@@ -12,7 +12,7 @@ object FactsEditor: TFactsEditor
   object FactsListbox: TListBox
     Left = 8
     Height = 232
-    Top = 8
+    Top = 32
     Width = 148
     ItemHeight = 0
     OnSelectionChange = FactsListboxSelectionChange
@@ -23,7 +23,7 @@ object FactsEditor: TFactsEditor
   object Memo1: TMemo
     Left = 160
     Height = 133
-    Top = 8
+    Top = 32
     Width = 304
     Lines.Strings = (
       'Memo1'
@@ -34,7 +34,7 @@ object FactsEditor: TFactsEditor
   object LoadScreensListBox: TCheckListBox
     Left = 472
     Height = 232
-    Top = 8
+    Top = 32
     Width = 168
     ItemHeight = 0
     OnClickCheck = LoadScreensListBoxClickCheck
@@ -44,7 +44,7 @@ object FactsEditor: TFactsEditor
   object SelectAllButton: TButton
     Left = 472
     Height = 25
-    Top = 249
+    Top = 273
     Width = 75
     Caption = 'SelectAll'
     OnClick = SelectAllButtonClick
@@ -53,7 +53,7 @@ object FactsEditor: TFactsEditor
   object DeselectAllButton: TButton
     Left = 555
     Height = 25
-    Top = 248
+    Top = 272
     Width = 85
     Caption = 'DeselectAll'
     OnClick = DeselectAllButtonClick
@@ -63,7 +63,7 @@ object FactsEditor: TFactsEditor
     Left = 160
     Height = 15
     Hint = 'Fact length should not exceed 350 symbols (not strictly)'
-    Top = 145
+    Top = 169
     Width = 105
     Caption = 'FactLengthLabel'
     ParentColor = False
@@ -73,7 +73,7 @@ object FactsEditor: TFactsEditor
   object AddFactButton: TButton
     Left = 8
     Height = 25
-    Top = 240
+    Top = 264
     Width = 148
     Caption = 'New Fact'
     OnClick = AddFactButtonClick

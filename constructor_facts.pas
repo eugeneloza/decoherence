@@ -36,7 +36,7 @@ type
 
   { TFactsEditor }
 
-  TFactsEditor = class(TWriterForm)
+  TFactsEditor = class(TLanguageForm)
     AddFactButton: TButton;
     DeselectAllButton: TButton;
     FactLengthLabel: TLabel;
@@ -255,7 +255,7 @@ begin
   for L in TLanguage do begin
     NewFact := DFact.create;
     NewFact.compatibility := TLoadImageList.create(true);
-    NewFact.value := 'Empty: ' + SayLaugnage(L);
+    NewFact.value := 'Empty: ' + SayLanguage(L);
     Facts[L].add(NewFact);
   end;
 
