@@ -779,6 +779,7 @@ begin
   end;
 
   //FreeAndNil(FrameImage);
+  if FrameImage<>nil then WriteLnLog('DSingleInterfaceElement.FrameResize3x3','ERROR: FrameImage is not nil! (memory leak)');
   FrameImage := frame.SourceImage.CreateCopy as TRGBAlphaImage;
 
   UnscaledWidth := FrameImage.width;

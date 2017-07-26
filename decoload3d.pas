@@ -89,6 +89,8 @@ procedure AddMaterial(Root: TX3DRootNode);
     if source.FdChildren[i] is TAbstractX3DGroupingNode then
       ScanNodesRecoursive(TAbstractX3DGroupingNode(source.FdChildren[i]))
     else
+      {NOT FOUND exception is a normal error here, it's processed internally,
+       set it to "always ignore this type of exceptions"}
       if (source.FdChildren[i] is TShapeNode) then
         try
           // assign TextureProperties (anisotropic smoothing) for the imagetexture

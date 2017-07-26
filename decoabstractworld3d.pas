@@ -300,6 +300,7 @@ begin
       Slot := source.FdChildren[i] as TTransformNode; //should fire an exception if this is wrong, we should have checked it in "isPlaceholder"
       Parsed := ParseNode(Slot);
       if RNDM.random<Parsed.rand then begin
+        {$WARNING Memory Leak Here}
         Replacement := CopyTransform(Slot);
         //rotate
         //AddRecoursive(Replacement, GetPlaceholder(Parsed)); //plus symmetry groups

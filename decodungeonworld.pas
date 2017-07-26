@@ -63,7 +63,8 @@ type
     {all-purpose map of the current world, also contains minimap image}
     Map: DMap;
 
-    {Detects if the current tile has been changed and launches manage_tiles}
+    {Detects if the current tile has been changed and launches manage_tiles
+     position is CAMERA.position}
     Procedure manage(position: TVector3Single); override;
     {Sorts tiles into chunks}
     //Procedure chunk_n_slice; override;
@@ -126,7 +127,8 @@ begin
     FirstRender := false;
   end;
 
-  if UpdatePlayerCoordinates(position[0],position[1],position[2]) then manage_tiles;
+  if UpdatePlayerCoordinates(position[0],position[1],position[2]) then
+    manage_tiles;
 end;
 
 {----------------------------------------------------------------------------}

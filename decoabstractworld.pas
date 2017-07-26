@@ -123,7 +123,9 @@ end;
 
 Procedure DAbstractWorld.render;
 begin
-  {this is intentionally left blank}
+  {this is an abstract routine,
+  it must be overridden by DRenderedWorld}
+  WriteLnLog('DAbstractWorld.render','Warning: This shouldn''t happen in normal situation, it''s abstract');
 end;
 
 {------------------------------------------------------------------------------}
