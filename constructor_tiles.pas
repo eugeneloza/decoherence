@@ -56,7 +56,7 @@ type
      todo: WILL fail if blocker is ~0.5 dx}
     procedure DetectBlocker;
     {safe wrapper for Load. Just catches exception in case the file is not found}
-    constructor LoadSafe(URL: string);
+    constructor LoadForConstructor(URL: string);
     {save procedure}
     procedure Save(TName: string; ToGameFolder: boolean);
 end;
@@ -334,7 +334,7 @@ begin
   {load tile map}
 
   FreeAndNil(TileM);
-  TileM := DTileMap.loadSafe( ConstructorData(TilesFolder+Filename,false) );
+  TileM := DTileMap.LoadForConstructor( ConstructorData(TilesFolder+Filename,false) );
   if not TileM.Ready then TileM.GuessSize(TileScene);
 
   ResetCamera;
@@ -394,7 +394,7 @@ begin
   FreeAndNil(TmpRoot);
 
   //compile tile map
-  tmpMap := DTileMap.LoadSafe( ConstructorData(TilesFolder+FileName,false) );
+  tmpMap := DTileMap.LoadForConstructor( ConstructorData(TilesFolder+FileName,false) );
   if tmpMap.Ready then begin
     tmpMap.Save(FileName, true);
 
@@ -882,12 +882,12 @@ end;
 
 {-----------------------------------------------------------------------}
 
-constructor DTileMapHelper.LoadSafe(URL: string);
+constructor DTileMapHelper.LoadForConstructor(URL: string);
 begin
   try
     Load(URL,false);
   except
-    WriteLnLog('DTileMapHelper.LoadSafe','Exception caught. Usually it''s ok.');
+    WriteLnLog('DTileMapHelper.LoadForConstructor','Exception caught. Usually it''s ok.');
   end;
 end;
 
