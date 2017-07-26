@@ -279,6 +279,14 @@ end;
 
 {----------------------------------------------------------------------------}
 
+procedure TFactsEditor.FormCreate(Sender: TObject);
+begin
+  MakeLanguageSwitch;
+  self.OnLanguageChange := @ReloadContent;
+end;
+
+{----------------------------------------------------------------------------}
+
 procedure TFactsEditor.FreeMe;
 var L: TLanguage;
 begin
@@ -317,12 +325,6 @@ begin
   //compatibility
 end;
 
-{----------------------------------------------------------------------------}
-
-procedure TFactsEditor.FormCreate(Sender: TObject);
-begin
-  MakeLanguageSwitch
-end;
 
 {----------------------------------------------------------------------------}
 

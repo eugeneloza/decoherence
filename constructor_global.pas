@@ -51,18 +51,22 @@ type
     procedure FreeMe; virtual; abstract;
   end;
 
+type LanguageChangeCallback = procedure of object;
+
 type
   TLanguageForm = class (TWriterForm)
   private
     fMyLanguage: TLanguage;
   public
     LanguageSwitch: TComboBox;
+    OnLanguageChange: LanguageChangeCallback;
 
     {TWriterForm current displayed language}
     property MyLanguage: TLanguage read fMyLanguage write fMyLanguage;
 
     Procedure MakeLanguageSwitch;
-    Procedure ResetLanguageSwitch;
+    {sets MyLanguage to ConstructorLanguage and returns "true" if they were different}
+    Function ResetLanguageSwitch: boolean;
     Procedure DetectLanguageSelect; virtual;
     procedure LanguageSelectChange(Sender: TObject);
   end;
@@ -176,7 +180,7 @@ var L: TLanguage;
 begin
   if LanguageSwitch = nil then begin
     LanguageSwitch := TComboBox.Create(self);
-    LanguageSwitch.parent := self;
+    LanguageSwitch.parent := self;  //required to be displayed on the form
     LanguageSwitch.Style := csDropDownList;
     LanguageSwitch.Hint := 'Select current displayed language.';
     LanguageSwitch.ShowHint := true;
@@ -196,20 +200,34 @@ end;
 
 {---------------------------------------------------------------------------}
 
-Procedure TLanguageForm.ResetLanguageSwitch;
+function TLanguageForm.ResetLanguageSwitch: boolean;
+var i: integer;
 begin
-  MyLanguage := ConstructorLanguage;
+  Result := MyLanguage <> ConstructorLanguage;
+  if Result then begin
+    MyLanguage := ConstructorLanguage;
+    if assigned(self.OnLanguageChange) then self.OnLanguageChange;
+    For i := 0 to LanguageSwitch.Items.Count-1 do
+      if trim(LanguageSwitch.Items[i]) = SayLanguage(MyLanguage) then
+              LanguageSwitch.ItemIndex := i;
+  end;
 end;
 
 {---------------------------------------------------------------------------}
 
 Procedure TLanguageForm.DetectLanguageSelect;
 var L: TLanguage;
+    NL: TLanguage;
 begin
   //not optimal
+  NL := MyLanguage;
   For L in TLanguage do
     if trim(LanguageSwitch.Items[LanguageSwitch.ItemIndex]) = SayLanguage(L) then
-    MyLanguage := L;
+    NL := L;
+  if NL <> MyLanguage then begin
+    MyLanguage := NL;
+    if assigned(self.OnLanguageChange) then self.OnLanguageChange;
+  end;
   //what should happen in case of no language found?
 end;
 Procedure TLanguageForm.LanguageSelectChange(Sender: TObject);
