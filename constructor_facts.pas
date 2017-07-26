@@ -47,6 +47,7 @@ type
     procedure AddFactButtonClick(Sender: TObject);
     procedure DeselectAllButtonClick(Sender: TObject);
     procedure FactsListboxSelectionChange(Sender: TObject; User: boolean);
+    procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure LoadScreensListBoxClickCheck(Sender: TObject);
@@ -212,6 +213,7 @@ end;
 procedure TFactsEditor.FormShow(Sender: TObject);
 begin
   if (not isLoaded) then LoadMe;
+  ResetLanguageSwitch;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -313,6 +315,13 @@ begin
     else
       LoadScreensListBox.Checked[i] := false
   //compatibility
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure TFactsEditor.FormCreate(Sender: TObject);
+begin
+  MakeLanguageSwitch
 end;
 
 {----------------------------------------------------------------------------}

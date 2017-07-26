@@ -1,11 +1,12 @@
 object FactsEditor: TFactsEditor
-  Left = 437
+  Left = 573
   Height = 306
-  Top = 321
+  Top = 172
   Width = 650
   Caption = 'FactsEditor'
   ClientHeight = 306
   ClientWidth = 650
+  OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnShow = FormShow
   LCLVersion = '1.8.0.3'
