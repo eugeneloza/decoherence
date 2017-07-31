@@ -36,7 +36,7 @@ uses Classes, SysUtils,
      {needed to use load image}
      CastleControls, decoloadembedded,
 
-     decothread,
+     decothread, decothrash,
 
      decogui, decointerface, decomouse, decofont,
      decolevel, decodungeontiles, decoabstractworld,
@@ -131,19 +131,11 @@ end;
 
 {-------------------------------------------------------------------------}
 
-var RenderFinished: boolean = true;
 Procedure WindowRender(Container : TUIContainer);
 begin
-  //todo if renderfinished to make frameskip, but this might conflict with 3D world render
-  if RenderFinished then begin
-    RenderFinished := false;
+  GUI.draw;
 
-    GUI.draw;
-
-    ProcessTimeEvents;
-    RenderFinished := true;
-  end else
-    WriteLnLog('WindowRender','CRITICAL ERROR!!! Interface render frameskip!');
+  ProcessTimeEvents;
 end;
 
 {======================== Mouse & keyboard =================================}
