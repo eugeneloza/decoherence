@@ -10,7 +10,7 @@
   screen_orientation="landscape">
 
   <icons>
-    <icon path="decoherence_icon.png" />
+    <icon path="data/decoherence_icon.png" />
   </icons>
 
   <android project_type="integrated" /> <!-- necessary for sound to work -->
