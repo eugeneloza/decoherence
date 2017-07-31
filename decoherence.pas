@@ -85,7 +85,7 @@ end;
 
 var InternalTime: DTime = 0;
 Procedure TimeFlow(DeltaTime: DTime);
-var i: integer;
+//var i: integer;
 Begin
   //Adjust time flow speed based on game situation
   InternalTime += DeltaTime;
@@ -112,7 +112,9 @@ begin
   TimePassed := now-LastRender;
   LastRender := now;
   Case CurrentGameMode of
+    { time flows normally in travel mode }
     gmTravel: TimeFlow(TimePassed);
+    { time stops at softpause }
     gmBattle: begin
 {                  If not pause then TimeFlow(TimePassed);
                 If not softPause then animations.freeze!}
@@ -123,19 +125,22 @@ end;
 
 {-------------------------------------------------------------------------}
 
+{ this is a management procedure that takes place before
+  WindowRender }
 procedure WindowManage(Container : TUIContainer);
 begin
   if CurrentWorld <> nil then CurrentWorld.manage(camera.Position);
   if Music <> nil then music.manage;
+  ProcessTimeEvents;
 end;
 
 {-------------------------------------------------------------------------}
 
+{ generic rendering procedure. 3D world is rendered automatically
+  on each Window.Render, so we just need to add a GUI render here }
 Procedure WindowRender(Container : TUIContainer);
 begin
   GUI.draw;
-
-  ProcessTimeEvents;
 end;
 
 {======================== Mouse & keyboard =================================}
