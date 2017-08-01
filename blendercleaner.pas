@@ -1,6 +1,25 @@
-unit blendercleaner;
+{Copyright (C) 2012-2017 Yevhen Loza
 
-{$mode objfpc}{$H+}
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.}
+
+{---------------------------------------------------------------------------}
+
+{ Cleans Blender exporter garbage nodes, unused in the game }
+
+unit BlenderCleaner;
+
+{$INCLUDE compilerconfig.inc}
 
 interface
 
@@ -36,14 +55,14 @@ function CleanUp(Root: TX3DRootNode; CleanWorld: boolean = false; CleanUnitTrans
     //if given vector is zero translation
     function ZeroVector(a: TVector3Single): boolean;
     begin
-      result := (Abs(a[0]  ) < SingleEqualityEpsilon) and
+      Result := (Abs(a[0]  ) < SingleEqualityEpsilon) and
                 (Abs(a[1]  ) < SingleEqualityEpsilon) and
                 (Abs(a[2]  ) < SingleEqualityEpsilon)
     end;
     //if given vector is unit scale
     function UnitVector(a: TVector3Single): boolean;
     begin
-      result := (Abs(a[0]-1) < SingleEqualityEpsilon) and
+      Result := (Abs(a[0]-1) < SingleEqualityEpsilon) and
                 (Abs(a[1]-1) < SingleEqualityEpsilon) and
                 (Abs(a[2]-1) < SingleEqualityEpsilon)
     end;
@@ -51,10 +70,10 @@ function CleanUp(Root: TX3DRootNode; CleanWorld: boolean = false; CleanUnitTrans
     function NoRotation(a: TVector4Single): boolean;
     begin
       //zero rotation angle is absolutely enough.
-      result := Abs(a[3]) < SingleEqualityEpsilon
+      Result := Abs(a[3]) < SingleEqualityEpsilon
     end;
   begin
-    result := false;
+    Result := false;
 
     RemoveNodeOnly := false;
     RemoveAll := false;

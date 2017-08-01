@@ -1,6 +1,24 @@
+{Copyright (C) 2012-2017 Yevhen Loza
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.}
+
+{---------------------------------------------------------------------------}
+
+{ Temporary unit to test animated creatures loading }   
 unit decotestcreature;
 
-{$mode objfpc}{$H+}
+{$INCLUDE compilerconfig.inc}
 
 interface
 
@@ -10,8 +28,8 @@ uses
 
   CastleResources, CastleCreatures,
 
-  decoinputoutput,
-  decoglobal;
+  DecoInputOutput,
+  DecoGlobal;
 
 
 var CreatureResource: TCreatureResource;
@@ -33,12 +51,12 @@ end;
 {---------------------------------------------------------------------------}
 
 procedure SpawnCreatures;
-const scale = 2*3;
+const Scale = 2*3;
 begin
-  CreatureResource.CreateCreature(window.SceneManager.Items, vector3single((4-1)*scale,-(4)*scale,0), Vector3Single(1,0,0));
-  CreatureResource.CreateCreature(window.SceneManager.Items, vector3single((4)*scale,-(4-1)*scale,0), Vector3Single(1,0,0));
-  CreatureResource.CreateCreature(window.SceneManager.Items, vector3single((4+1)*scale,-(4)*scale,0), Vector3Single(1,0,0));
-  CreatureResource.CreateCreature(window.SceneManager.Items, vector3single((4)*scale,-(4+1)*scale,0), Vector3Single(1,0,0));
+  CreatureResource.CreateCreature(window.SceneManager.Items, vector3single((4-1)*Scale,-(4)*Scale,0), Vector3Single(1,0,0));
+  CreatureResource.CreateCreature(window.SceneManager.Items, vector3single((4)*Scale,-(4-1)*Scale,0), Vector3Single(1,0,0));
+  CreatureResource.CreateCreature(window.SceneManager.Items, vector3single((4+1)*Scale,-(4)*Scale,0), Vector3Single(1,0,0));
+  CreatureResource.CreateCreature(window.SceneManager.Items, vector3single((4)*Scale,-(4+1)*Scale,0), Vector3Single(1,0,0));
 end;
 
 {---------------------------------------------------------------------------}
