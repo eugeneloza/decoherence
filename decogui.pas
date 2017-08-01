@@ -250,9 +250,7 @@ procedure DInterfaceContainer.Draw;
 begin
   { clear the screen depending on the game mode
     in case SceneManager doesn't clear it }
-  {$HINT may be unrequired in some game modes, which render all the screen, e.g. inventory screen}
-  if (Window.SceneManager = nil) or (Window.SceneManager.Exists = false) then
-    RenderContext.Clear([cbColor], Black);
+  if GameModeNeedsClearingScreen then RenderContext.Clear([cbColor], Black);
 
   //some drawing for specific gamemodes
   // if CurrentGameMode = gmCharacterScreen then DrawCharacterScreenBackground

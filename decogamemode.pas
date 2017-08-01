@@ -39,10 +39,12 @@ var CurrentGameMode: TGameMode = gmNone;
 procedure SetGameMode(GM: TGameMode);
 { Does this game mode require a 3D world render }
 function is3DGameMode: boolean;
+function GameModeNeedsClearingScreen: boolean;
 
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-uses decogui, decoabstractworld;
+uses decogui, decoabstractworld, decoabstractworld3d,
+  decoglobal;
 
 procedure SetGameMode(GM: TGameMode);
 begin
@@ -69,7 +71,8 @@ begin
   CurrentGameMode := GM;
 
   { set 3D world rendering }
-  if CurrentWorld<>nil then CurrentWorld.ToggleSceneManager(is3DGameMode);
+  if (CurrentWorld<>nil) and (CurrentWorld is DAbstractWorld3d) then
+    (CurrentWorld as DAbstractWorld3d).ToggleSceneManager(is3DGameMode);
 {  if Window.SceneManager <> nil then
     if is3DGameMode then Window.SceneManager.exists := true
                     else Window.SceneManager.exists := false;}
@@ -86,6 +89,14 @@ begin
     Result := false;
 end;
 
+function GameModeNeedsClearingScreen: boolean;
+begin
+  {$HINT something more efficient, or world-attached might be here}
+  if (Window.SceneManager = nil) or (Window.SceneManager.Exists = false) then
+    Result := true
+  else
+    Result := false;
+end;
 
 
 end.
