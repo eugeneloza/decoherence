@@ -22,18 +22,29 @@ unit decogamemode;
 
 interface
 
-type TGameMode = (gmNone,gmLoadScreen,gmCharacterGeneration,gmTravel,gmBattle);
+type TGameMode = (gmNone,
+  { displays load screen }
+  gmLoadScreen,
+  gmCharacterGeneration,
+  { any travel mode displaying 3D World }
+  gmTravel,
+  { any battle mode displaying 3D World }
+  gmBattle);
 
-var CurrentGameMode : TGameMode = gmNone;
-    LastGameMode : TGameMode = gmNone;
+var CurrentGameMode: TGameMode = gmNone;
+    LastGameMode: TGameMode = gmNone;
 
-procedure SetGameMode(GM : TGameMode);
+{ Correctly sets the current game mode and initializes all the corresponding
+  routines }
+procedure SetGameMode(GM: TGameMode);
+{ Does this game mode require a 3D world render }
+function is3DGameMode: boolean;
 
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 uses decogui;
 
-procedure SetGameMode(GM : TGameMode);
+procedure SetGameMode(GM: TGameMode);
 begin
   if GM = LastGameMode then exit;
 
@@ -57,6 +68,15 @@ begin
   LastGameMode := CurrentGameMode;
   CurrentGameMode := GM;
 end;
+
+function is3DGameMode: boolean;
+begin
+  if (CurrentGameMode = gmTravel) or (CurrentGameMode = gmBattle) then
+    Result := true
+  else
+    Result := false;
+end;
+
 
 
 end.

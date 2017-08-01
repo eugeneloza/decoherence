@@ -67,6 +67,7 @@ var GUI: DInterfaceContainer;
 implementation
 
 uses SysUtils, CastleLog,
+  CastleGLUtils, castleColors,
   decoloadscreen,
   decointerfacecomposite, decointerfaceblocks,
   decoplayercharacter,
@@ -247,6 +248,11 @@ end;
 
 procedure DInterfaceContainer.Draw;
 begin
+  { clear the screen depending on the game mode
+    in case SceneManager doesn't clear it }
+  if (Window.SceneManager = nil) or (Window.SceneManager.Exists = false) then
+    RenderContext.Clear([cbColor], Black);
+
   //some drawing for specific gamemodes
   // if CurrentGameMode = gmCharacterScreen then DrawCharacterScreenBackground
   if CurrentGameMode = gmCharacterGeneration then DrawCharacterGenerationBackground else

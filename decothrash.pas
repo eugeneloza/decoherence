@@ -23,7 +23,7 @@ unit decothrash;
 
 {$INCLUDE compilerconfig.inc}
 interface
-uses fgl;
+uses SysUtils, fgl;
 
 type TThrash = specialize TFPGObjectList<TObject>;
 
@@ -35,7 +35,7 @@ initialization
 Thrash := TThrash.create(true);
 
 finalization
-FreeAndNil (Thrash)
+FreeAndNil(Thrash);
 
 end.
 
