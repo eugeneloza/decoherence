@@ -68,9 +68,6 @@ Type
     { a dummy procedure to be overriden in rendered world types
      (such as text or 2D)}
     procedure Render; virtual;
-    { turns on or off SceneManager.Exists
-      This should not be called in Rendered World types }
-    procedure ToggleSceneManager(value: boolean);
   end;
 
 var CurrentWorld: DAbstractWorld;
@@ -128,13 +125,6 @@ begin
   {this is an abstract routine,
   it must be overridden by DRenderedWorld}
   WriteLnLog('DAbstractWorld.render','Warning: This shouldn''t happen in normal situation, it''s abstract');
-end;
-
-{------------------------------------------------------------------------------}
-
-Procedure DAbstractWorld.ToggleSceneManager(value: boolean);
-begin
-  Window.SceneManager.Exists := value;
 end;
 
 {------------------------------------------------------------------------------}

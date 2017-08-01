@@ -102,6 +102,10 @@ type
     {builds current 3d world}
     procedure build; override;
 
+    { turns on or off SceneManager.Exists
+      This should not be called in Rendered World types }
+    procedure ToggleSceneManager(value: boolean);
+
     destructor destroy; override;
   end;
 
@@ -383,6 +387,14 @@ begin
   BuildRoots;
   BuildScenes;
 end;
+
+{------------------------------------------------------------------------------}
+
+Procedure DAbstractWorld3d.ToggleSceneManager(Value: boolean);
+begin
+  Window.SceneManager.Exists := Value;
+end;
+
 
 {----------------------------------------------------------------------------}
 
