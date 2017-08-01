@@ -69,11 +69,14 @@ function GetRandomFact: string;
  MUST BE CALLED AFTER GetRandomFact}
 function GetRandomFactImage: string;
 
+function LoadScreenMainText: string;
+
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
 uses SysUtils, CastleLog, CastleFilesUtils,
   DOM, CastleXMLUtils,
+  decofont,
   decoglobal, decoinputoutput;
 
 var LastFact: integer = -1;
@@ -181,6 +184,17 @@ end;
 procedure FreeLoadScreen;
 begin
   FreeAndNil(Facts);
+end;
+
+{--------------------------------------------------------------------------}
+
+function LoadScreenMainText: string;
+begin
+  Result := 'Добро пожаловать в Decoherence :)'+dlinebreak+
+            'Идёт загрузка, подождите...'+dlinebreak+
+            'Индикатора прогресса ещё нет,'+dlinebreak+
+            'Просто нажмите любую клавишу через 1-2 секунды...';
+
 end;
 
 end.

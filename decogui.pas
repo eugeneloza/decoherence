@@ -169,7 +169,7 @@ begin
     LoadScreenLabel.Shadow := 1;
     LoadScreenLabel.Font := RegularFont16;
   end;
-  LoadScreenLabel.text := 'Добро пожаловать в Decoherence :)'+dlinebreak+'Идёт загрузка, подождите...'+dlinebreak+'П.С. пока "почти нечего грузить" :)'+dlinebreak+'Просто нажмите любую клавишу...';
+  LoadScreenLabel.text := LoadScreenMainText;
 
   if floaterLabel = nil then begin
     FloaterLabel := DLabel.create(self);
