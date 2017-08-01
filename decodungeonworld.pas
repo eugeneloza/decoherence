@@ -46,7 +46,7 @@ type
      *time-critical procedure}
     function UpdatePlayerCoordinates(x,y,z: float): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
     {Manages tiles (show/hide/trigger events) *time-critical procedure}
-    Procedure manage_tiles; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+    Procedure ManageTiles; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
   private
     const myscale = 3;
   protected
@@ -65,7 +65,7 @@ type
 
     {Detects if the current tile has been changed and launches manage_tiles
      position is CAMERA.position}
-    Procedure manage(position: TVector3Single); override;
+    Procedure Manage(position: TVector3Single); override;
     {Sorts tiles into chunks}
     //Procedure chunk_n_slice; override;
     {loads the world from a running generator}
@@ -83,10 +83,10 @@ type
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-uses sysutils, CastleFilesUtils,
-  CastleSceneCore;
+uses sysutils, CastleFilesUtils{,
+  CastleSceneCore};
 
-procedure DDungeonWorld.manage_tiles; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+procedure DDungeonWorld.ManageTiles; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
   {$WARNING dummy}
 end;
@@ -119,7 +119,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DDungeonWorld.manage(position: TVector3Single);
+procedure DDungeonWorld.Manage(position: TVector3Single);
 begin
   if FirstRender then begin
     {$warning reset all tiles visibility here}
@@ -128,7 +128,7 @@ begin
   end;
 
   if UpdatePlayerCoordinates(position[0],position[1],position[2]) then
-    manage_tiles;
+    ManageTiles;
 end;
 
 {----------------------------------------------------------------------------}
@@ -164,36 +164,36 @@ end;
 
 procedure DDungeonWorld.Activate;
 var
-  startx,starty,startz: integer;
+  StartX,StartY,StartZ: integer;
 begin
   inherited;
   {$HINT navigation set_nav}
-  camera.SetView(Vector3Single(0,0,1),Vector3Single(0,1,0),Vector3Single(0,0,1),Vector3Single(0,0,1),true);
+  Camera.SetView(Vector3(0,0,1),Vector3(0,1,0),Vector3(0,0,1),Vector3(0,0,1),true);
 
-  startx := 4;
-  starty := 4;
-  startz := 0;
+  StartX := 4;
+  StartY := 4;
+  StartZ := 0;
   {$Warning this is ugly}
-  camera.Position := vector3single((startx)*WorldScale,-(starty)*WorldScale,(startz)*WorldScale+PlayerHeight*myscale);
-  camera.MoveSpeed := 1*WorldScale;
-  camera.PreferredHeight := PlayerHeight*myscale;
+  Camera.Position := Vector3((StartX)*WorldScale,-(StartY)*WorldScale,(StartZ)*WorldScale+PlayerHeight*MyScale);
+  Camera.MoveSpeed := 1*WorldScale;
+  Camera.PreferredHeight := PlayerHeight*myscale;
   {$WARNING to be managed by the world}
 end;
 
 {----------------------------------------------------------------------------}
 
-procedure DDungeonWorld.buildTransforms;
+procedure DDungeonWorld.BuildTransforms;
 var i: integer;
   Transform: TTransformNode;
 begin
-  WorldObjects := TTransformList.create(false); //scene will take care of freeing
+  WorldObjects := TTransformList.Create(false); //scene will take care of freeing
   for i := 0 to high(steps) do begin
-    Transform := TTransformNode.create;
+    Transform := TTransformNode.Create;
     //put current tile into the world. Pay attention to y and z coordinate inversion.
-    Transform.translation := Vector3Single(WorldScale*(steps[i].x),-WorldScale*(steps[i].y),-WorldScale*(steps[i].z));
+    Transform.translation := Vector3(WorldScale*(Steps[i].x),-WorldScale*(Steps[i].y),-WorldScale*(steps[i].z));
     {$Warning this is ugly}
-    Transform.scale := Vector3Single(myscale,myscale,myscale);
-    AddRecoursive(Transform,WorldElements3d[steps[i].tile]);
+    Transform.scale := Vector3(MyScale,MyScale,MyScale);
+    AddRecoursive(Transform,WorldElements3d[Steps[i].Tile]);
     WorldObjects.Add(Transform);
   end;
 end;
@@ -218,7 +218,7 @@ begin
   {$hint freeandnil(window.scenemanager)?}
   
   //free basic map parameters
-  freeandnil(map);
+  FreeAndNil(map);
   FreeAndNil(groups);
   FreeNeighboursMap(Neighbours);
 
