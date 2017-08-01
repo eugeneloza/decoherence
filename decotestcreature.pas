@@ -40,6 +40,8 @@ procedure SpawnCreatures;
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 //uses decoinputoutput;
+uses CastleLog,
+  DecoDungeonWorld, DecoNav, DecoAbstractWorld;
 
 procedure InitCreatures;
 begin
@@ -51,12 +53,18 @@ end;
 {---------------------------------------------------------------------------}
 
 procedure SpawnCreatures;
-const Scale = 2*3;
+var i: integer;
+    n: DNavPt;
+    DW: DDungeonWorld;
 begin
-  CreatureResource.CreateCreature(window.SceneManager.Items, vector3single((4-1)*Scale,-(4)*Scale,0), Vector3Single(1,0,0));
-  CreatureResource.CreateCreature(window.SceneManager.Items, vector3single((4)*Scale,-(4-1)*Scale,0), Vector3Single(1,0,0));
-  CreatureResource.CreateCreature(window.SceneManager.Items, vector3single((4+1)*Scale,-(4)*Scale,0), Vector3Single(1,0,0));
-  CreatureResource.CreateCreature(window.SceneManager.Items, vector3single((4)*Scale,-(4+1)*Scale,0), Vector3Single(1,0,0));
+  //temporary - unsafe
+  DW := CurrentWorld as DDungeonWorld;
+  for i := 0 to DW.Nav.Count div 10 do begin
+    n := DW.Nav[DRND.Random(DW.Nav.Count)];
+    WriteLnLog('Adding creature');
+    CreatureResource.CreateCreature(window.SceneManager.Items, Vector3(n.x*DW.WorldScale,-n.y*DW.WorldScale,-n.z*DW.WorldScale+1*DW.MyScale), Vector3(1,0,0));
+  end;
+//  WriteLnLog('Adding creature');
 end;
 
 {---------------------------------------------------------------------------}

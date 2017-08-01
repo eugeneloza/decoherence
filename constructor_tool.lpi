@@ -194,6 +194,7 @@
         <Filename Value="constructor_placeholders.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="PlaceholdersEditor"/>
+        <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
       </Unit17>
     </Units>

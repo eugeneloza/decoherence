@@ -22,11 +22,12 @@ unit decodungeonworld;
 {$INCLUDE compilerconfig.inc}
 interface
 
-uses classes, fgl, castleVectors,
+uses classes, fgl, CastleVectors,
   X3DNodes, CastleScene,
-  decodungeongenerator, decoabstractgenerator, decoabstractworld3d,
-  decodungeontiles,
-  deconavigation, decoglobal;
+  DecoDungeonGenerator, DecoAbstractGenerator, DecoAbstractWorld3d,
+  DecoDungeonTiles,
+  DecoNav,
+  DecoNavigation, DecoGlobal;
 
 
 {list of "normal" tiles}
@@ -47,12 +48,13 @@ type
     function UpdatePlayerCoordinates(x,y,z: float): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
     {Manages tiles (show/hide/trigger events) *time-critical procedure}
     Procedure ManageTiles; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
-  private
+  public
     const myscale = 3;
-  protected
+  public
     {scale used to define a tile size. Usually 1 is man-height.
       CAUTION this scale must correspond to tiles model scale, otherwise it'll mess everything up}
     WorldScale: float;
+  protected
     {neighbours array}
     Neighbours: TNeighboursMapArray;
     {sequential set of tiles, to be added to the world during "build"}
@@ -78,13 +80,14 @@ type
 
     constructor create; override;
     destructor destroy; override;
+  public
+    procedure BuildNav; override;
   end;
 
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-uses sysutils, CastleFilesUtils{,
-  CastleSceneCore};
+uses sysutils, CastleFilesUtils, CastleLog;
 
 procedure DDungeonWorld.ManageTiles; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
@@ -145,7 +148,7 @@ begin
   Steps := DG.ExportSteps;
   {$hint WorldScale must support different scales}
   {$Warning this is ugly}
-  WorldScale := TileScale*myscale;
+  WorldScale := TileScale*MyScale;
   {yes, we load tiles twice in this case (once in the generator and now here),
    however, loading from generator is *not* a normal case
    (used mostly for testing in pre-alpha), so such redundancy will be ok
@@ -174,7 +177,7 @@ begin
   StartY := 4;
   StartZ := 0;
   {$Warning this is ugly}
-  Camera.Position := Vector3((StartX)*WorldScale,-(StartY)*WorldScale,(StartZ)*WorldScale+PlayerHeight*MyScale);
+  Camera.Position := Vector3((StartX)*WorldScale,-(StartY)*WorldScale,-(StartZ)*WorldScale+PlayerHeight*MyScale);
   Camera.MoveSpeed := 1*WorldScale;
   Camera.PreferredHeight := PlayerHeight*myscale;
   {$WARNING to be managed by the world}
@@ -213,13 +216,38 @@ end;
 
 {----------------------------------------------------------------------------}
 
-destructor DDungeonWorld.destroy;
+procedure DDungeonWorld.BuildNav;
+var ix,iy,iz: TIntCoordinate;
+    tmpNav: DNavPt;
+begin
+  if Nav<>nil then begin
+    WriteLnLog('DDungeonWorld.BuildNav','WARNING: Nav is not nil! Freeing');
+    FreeAndNil(Nav);
+  end;
+  Nav := TNavList.create;
+
+  for iz := 0 to Map.SizeZ-1 do
+    for ix := 0 to Map.SizeX-1 do
+      for iy := 0 to Map.SizeZ-1 do if isPassable(Map.Map[ix,iy,iz].base) then begin
+        tmpNav.x := ix;
+        tmpNav.y := iy;
+        tmpNav.z := iz;
+        Nav.Add(tmpNav);
+      end;
+
+  WriteLnLog('DDungeonWorld.BuildNav','Navigation Graph created, nodes: '+inttostr(Nav.Count));
+end;
+
+{----------------------------------------------------------------------------}
+
+destructor DDungeonWorld.Destroy;
 begin
   {$hint freeandnil(window.scenemanager)?}
   
   //free basic map parameters
-  FreeAndNil(map);
-  FreeAndNil(groups);
+  FreeAndNil(Map);
+  FreeAndNil(Nav);
+  FreeAndNil(Groups);
   FreeNeighboursMap(Neighbours);
 
   inherited;

@@ -38,15 +38,6 @@ type TTransformList = specialize TFPGObjectList<TTransformNode>;
 type TSwitchList = specialize TFPGObjectList<TSwitchNode>;
 {$ENDIF}
 
-{Type PathElement = record
-  {Absolute Coordinates of pathPoint}
-  X,y,z: TCoordinate;
-  {world tile it belongs to}
-  Tile: TTileType;
-  {Link of tiles adjacent to this tile}
-  Links: TLinkList;
-end;}
-
 type
   {World using 3D management and definitions,
    shared by interior and exterior worlds}
@@ -124,7 +115,7 @@ type
   {manages appear and vanish lists
   by comparing previous and new neighbours lists
   will have access to protected fields as it is in the same unit}
-  DAppearVanishManagerThread = class(TThread) // no need to report progress
+  DAppearVanishManagerThread = class(TThread) // no need to report progress, so most generic TThread is used as ancestor
   public
     {link to the world that requested management}
     //parent: DAbstractWorldManaged;
@@ -385,6 +376,7 @@ begin
   BuildTransforms;
   {$IFDEF UseSwitches}BuildSwitches;{$ENDIF}
   BuildRoots;
+  BuildNav;
   BuildScenes;
 end;
 

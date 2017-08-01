@@ -23,7 +23,7 @@ unit decoabstractworld;
 interface
 
 uses CastleRandom, castleVectors,
-  decoabstractgenerator,
+  decoabstractgenerator, DecoNav,
   decoglobal;
 
 Type
@@ -37,8 +37,8 @@ Type
     RNDM: TCastleRandom;
     {time of last render. Used for FPS management}
     LastRender: TDateTime;
-    {is this render the first one?
-     Additional initialization procedures may be required }
+    { Is this render the first one?
+      Additional initialization procedures may be required }
     {$HINT todo: LastRender = -1 does the same job, optimize it}
     {$HINT allow first initialization flow during load without caring for FPS!}
     FirstRender: boolean;
@@ -52,11 +52,11 @@ Type
     Procedure Manage(position: TVector3Single); virtual; abstract;
     {Builds a PathTree for the world}
     //Function pathfind: DPathTree;
-    {load the World from a file}
+    { Load the World from a file}
     procedure Load(URL: string); virtual; abstract;
-    { load the World from a running Generator }
+    { Load the World from a running Generator }
     procedure Load(Generator: DAbstractGenerator); virtual; abstract;
-    { builds a world from the obtained data }
+    { Builds a world from the obtained data }
     procedure Build; virtual;
     { activates the current world.
       Caution, it might and will modify Window.SceneManager! }
@@ -65,9 +65,14 @@ Type
     //Procedure chunk_n_slice; virtual; abstract;
     constructor Create; virtual;
     destructor Destroy; override;
-    { a dummy procedure to be overriden in rendered world types
+    { A dummy procedure to be overriden in rendered world types
      (such as text or 2D)}
     procedure Render; virtual;
+
+  public
+    Nav: TNavList;
+    { Builds a Nav network }
+    procedure BuildNav; virtual; abstract;
   end;
 
 var CurrentWorld: DAbstractWorld;

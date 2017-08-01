@@ -339,7 +339,6 @@ Finalization
   DestroyCompositeInterface;
   //DestroyGlobal;
   FreeLoadScreen;
-  DestroyTiles;
   FreePerks;
   DestroyFonts;
   FreeWorld;
