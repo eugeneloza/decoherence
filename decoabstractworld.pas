@@ -43,31 +43,34 @@ Type
     {$HINT allow first initialization flow during load without caring for FPS!}
     FirstRender: boolean;
   public
-    {Seed used to "build" the world if it requires random}
+    { Seed used to "build" the world if it requires random}
     property Seed: LongWord read fSeed write fSeed;
-    {World management routine. Called every frame;
-     Most important thing it does is managing LODs of tiles/landscape
-     And hiding/LODding world chunks
-     x,y,z are current world coordinates of render camera}
-    Procedure manage(position: TVector3Single); virtual; abstract;
+    { World management routine. Called every frame;
+      Most important thing it does is managing LODs of tiles/landscape
+      And hiding/LODding world chunks
+      x,y,z are current world coordinates of render camera }
+    Procedure Manage(position: TVector3Single); virtual; abstract;
     {Builds a PathTree for the world}
     //Function pathfind: DPathTree;
     {load the World from a file}
     procedure Load(URL: string); virtual; abstract;
-    {load the World from a running Generator}
+    { load the World from a running Generator }
     procedure Load(Generator: DAbstractGenerator); virtual; abstract;
-    {builds a world from the obtained data }
+    { builds a world from the obtained data }
     procedure Build; virtual;
-    {activates the current world.
-     Caution, it might and will modify Window.SceneManager!}
+    { activates the current world.
+      Caution, it might and will modify Window.SceneManager! }
     procedure Activate; virtual;
-    {Splits the World into chunks}
+    { Splits the World into chunks }
     //Procedure chunk_n_slice; virtual; abstract;
-    constructor create; virtual;
-    destructor destroy; override;
-    {a dummy procedure to be overriden in rendered world types
+    constructor Create; virtual;
+    destructor Destroy; override;
+    { a dummy procedure to be overriden in rendered world types
      (such as text or 2D)}
-    procedure render; virtual;
+    procedure Render; virtual;
+    { turns on or off SceneManager.Exists
+      This should not be called in Rendered World types }
+    procedure ToggleSceneManager(value: boolean);
   end;
 
 var CurrentWorld: DAbstractWorld;
@@ -79,8 +82,7 @@ procedure FreeWorld;
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
-uses SysUtils, classes, castlelog
-  ;
+uses SysUtils, classes, castlelog;
 
 constructor DAbstractWorld.create;
 begin
@@ -104,7 +106,7 @@ end;
 
 procedure DAbstractWorld.Build;
 begin
-  if fSeed = 0 then raise exception.create('DAbstractWorld.Build: World random must be predefined!');
+  if fSeed = 0 then raise Exception.Create('DAbstractWorld.Build: World random must be predefined!');
   RNDM.Initialize(fSeed);
 end;
 
@@ -126,6 +128,13 @@ begin
   {this is an abstract routine,
   it must be overridden by DRenderedWorld}
   WriteLnLog('DAbstractWorld.render','Warning: This shouldn''t happen in normal situation, it''s abstract');
+end;
+
+{------------------------------------------------------------------------------}
+
+Procedure DAbstractWorld.ToggleSceneManager(value: boolean);
+begin
+  Window.SceneManager.Exists := value;
 end;
 
 {------------------------------------------------------------------------------}

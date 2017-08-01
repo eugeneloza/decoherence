@@ -129,15 +129,7 @@ end;
   WindowRender }
 procedure WindowManage(Container : TUIContainer);
 begin
-  if is3DGameMode then begin
-      if Window.SceneManager <> nil then Window.SceneManager.exists := true;
-      if CurrentWorld <> nil then CurrentWorld.manage(camera.Position);
-    end
-  else
-    begin
-      {$HINT may cause errors as something may be processed in a thread}
-      if Window.SceneManager <> nil then Window.SceneManager.exists := false;
-    end;
+  if CurrentWorld <> nil then CurrentWorld.manage(camera.Position);
 
   if Music <> nil then music.manage;
   ProcessTimeEvents;

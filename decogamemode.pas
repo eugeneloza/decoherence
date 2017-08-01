@@ -42,7 +42,7 @@ function is3DGameMode: boolean;
 
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-uses decogui;
+uses decogui, decoabstractworld;
 
 procedure SetGameMode(GM: TGameMode);
 begin
@@ -67,7 +67,16 @@ begin
 
   LastGameMode := CurrentGameMode;
   CurrentGameMode := GM;
+
+  { set 3D world rendering }
+  if CurrentWorld<>nil then CurrentWorld.ToggleSceneManager(is3DGameMode);
+{  if Window.SceneManager <> nil then
+    if is3DGameMode then Window.SceneManager.exists := true
+                    else Window.SceneManager.exists := false;}
+
 end;
+
+{------------------------------------------------------------}
 
 function is3DGameMode: boolean;
 begin

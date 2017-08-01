@@ -221,6 +221,7 @@
       <Unit28>
         <Filename Value="decoabstractworld3d.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoAbstractWorld3d"/>
       </Unit28>
       <Unit29>
         <Filename Value="deconodeparser.pas"/>

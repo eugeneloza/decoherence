@@ -18,7 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 { contains definitions for 3d World entity
   WARNING: it is abstract. Use DungeonWorld or Overworld.}
 
-unit decoabstractworld3d;
+unit DecoAbstractWorld3d;
 
 {$INCLUDE compilerconfig.inc}
 interface
@@ -132,11 +132,11 @@ type
     ObjectsAppear, ObjectsVanish,
     GroupsAppear, GroupsVanish: TIndexList;
 
-    constructor create; {override;}
-    destructor destroy; override;
+    constructor Create; {override;}
+    destructor Destroy; override;
   protected
     {actually preforms the requested task}
-    procedure execute; override;
+    procedure Execute; override;
   end;
 
   {abstract world with worldObjects visibility management
@@ -149,8 +149,8 @@ type
     {initialize the appea/vanish manager in a thread, results are usually ready next render}
     procedure StartAppearVanishManagerThread;
   public
-    constructor create; override;
-    destructor destroy; override;
+    constructor Create; override;
+    destructor Destroy; override;
   end;
 
 {creates a fresh empty copy of TTransformNode,
@@ -161,8 +161,8 @@ type
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
-uses sysutils, decoload3d, CastleLog,
-  castlescenecore;
+uses SysUtils, DecoLoad3d, CastleLog,
+  CastleSceneCore;
 
 {============================ DAbstractWorld3D =============================}
 {================================ MANAGE ===================================}
@@ -180,10 +180,10 @@ end;
 
 destructor DAppearVanishManagerThread.destroy;
 begin
-  freeandnil(ObjectsAppear);
-  freeandnil(ObjectsVanish);
-  freeandnil(GroupsAppear);
-  freeandnil(GroupsVanish);
+  FreeAndNil(ObjectsAppear);
+  FreeAndNil(ObjectsVanish);
+  FreeAndNil(GroupsAppear);
+  FreeAndNil(GroupsVanish);
   inherited;
 end;
 
