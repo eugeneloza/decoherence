@@ -157,6 +157,7 @@
       <Unit12>
         <Filename Value="decoactor.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoActor"/>
       </Unit12>
       <Unit13>
         <Filename Value="decointerfacecomposite.pas"/>
@@ -177,6 +178,7 @@
       <Unit17>
         <Filename Value="decostats.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoStats"/>
       </Unit17>
       <Unit18>
         <Filename Value="decoraceprofession.pas"/>

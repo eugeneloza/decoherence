@@ -22,52 +22,62 @@ unit decoplayercharacter;
 
 interface
 
-uses classes,
-  decoactor, decoraceprofession, decoperks,
-  decoglobal;
+uses Classes,
+  DecoActor, DecoRaceProfession, DecoPerks,
+  DecoGlobal;
 
-const maxparty = 6; {0..6 = 7 characters}
+const MaxParty = 6; {0..6 = 7 characters}
 
 Type
   {player character - the most complex actor available :)}
   DPlayerCharacter = class(DActor)
   public
     Actions: DPerksList;
-    Procedure die; override;
-    constructor create(AOwner: Tcomponent); override;
-    destructor destroy; override;
+    Procedure Die; override;
+    constructor Create; override;
+    destructor Destroy; override;
 end;
 
-var Party: array[0..maxparty] of DPlayerCharacter;
+  {$WARNING party must be an object with a proper create/destroy}
+var Party: array[0..MaxParty] of DPlayerCharacter;
 
 {creates a test party. Temporary}
 procedure CreateTestParty;
+procedure FreeTestParty;
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-uses SysUtils, castleLog;
+uses SysUtils, CastleLog;
 
 procedure CreateTestParty;
 var i: integer;
 begin
-  for i := 0 to maxparty do begin
-    Party[i] := DPlayerCharacter.create(Window);
-    {if i<4 then }party[i].maxmaxMPH := 0;
-    party[i].hit(drnd.Random(80),1);
-    party[i].drainCNC(drnd.Random(80),1);
-    party[i].drainMPH(drnd.Random(80),1);
-    party[i].drainSTA(drnd.Random(80),1);
+  for i := 0 to MaxParty do begin
+    Party[i] := DPlayerCharacter.Create;
+    {if i<4 then }Party[i].MaxMaxMPH := 0;
+    Party[i].Hit(DRND.Random(80),1);
+    Party[i].DrainCNC(DRND.Random(80),1);
+    Party[i].DrainMPH(DRND.Random(80),1);
+    Party[i].DrainSTA(DRND.Random(80),1);
     if (Perks=nil) or (Perks.count=0) then WriteLnLog('CreateTestParty','FATAL ERROR: Perks is empty!');
-    party[i].Actions := DPerksList.create(false);
-    Party[i].actions.Add(perks[0]);
+    Party[i].Actions := DPerksList.Create(false);
+    Party[i].Actions.Add(Perks[0]);
   end;
 
 end;
 
-{---------------------------------------------------------------------------}
+{----------------------------------------------------------------------------}
 
-constructor DPlayerCharacter.create(AOwner: TComponent);
+procedure FreeTestParty;
+var i: integer;
 begin
-  inherited create(AOwner);
+  for i:= 0 to MaxParty do FreeAndNil(Party[i]);
+end;
+
+{======================== DPlayerCharacter ==================================}
+
+constructor DPlayerCharacter.Create;
+begin
+  inherited;
 end;
 
 {----------------------------------------------------------------------------}
@@ -84,7 +94,6 @@ begin
   FreeAndNil(Actions);
   Inherited;
 end;
-
 
 end.
 

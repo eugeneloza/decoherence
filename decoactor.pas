@@ -29,10 +29,16 @@ uses Classes, CastleRandom,
 type TDamageType = (dtHealth);
 type TDamageProcedure = procedure (Dam: float; Damtype: TDamageType) of Object;
 
-{Maybe, add some basic actor (visible only, no collisions)}
+type
+  { Actor with a rendered body }
+  DActorBody = class (TObject)
+
+  end;
+
+
 Type
-  {basic actor. With hit-points and coordinates}
-  DActor = class(TComponent)
+  {basic actor. With stats.}
+  DActor = class(DActorBody)
   private
     fHP,fMaxHP,fMaxMaxHP: float;
     { maybe, move all non-HP to deco player character? }
@@ -53,7 +59,7 @@ Type
     Procedure SetMaxMaxMPH(Value: float);
   public
     destructor Destroy; override;
-    constructor Create(AOwner: TComponent); override;
+    constructor Create; virtual; //(AOwner: TComponent); override;
     { getters and setters }
     Property HP: float read fHP write SetHP;
     Property MaxHP: float read fMaxHP write SetMaxHP;
@@ -93,9 +99,15 @@ Type
   public
     { events }
     onHit: TDamageProcedure;
+
   public
+    { Stats of this Actor, they must be initialized afterwards, when it
+      is clear, whether SetFullStats is true (PC and RPC) or false (NPC and monsters) }
+    Stats, MaxStats: DStats;
+
+  public
+    {three-letter nickname for short display}
     Nickname: string;
-    Stats: DStats;
     {these are randoms for the actor: defense gives his defense rolls,
      Attack provides for attack rolls, and JustRandom determines actor's
      behaviour and any other not too important random rolls}
@@ -104,14 +116,16 @@ end;
 
 
 
+
+
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
 uses SysUtils,CastleLog;
 
-constructor DActor.Create(AOwner: TComponent);
+constructor DActor.Create;
 begin
-  inherited Create(AOwner);
+  inherited;
   Nickname := 'abc';
   SetMaxMaxHP(100);
   SetMaxMaxSTA(100);

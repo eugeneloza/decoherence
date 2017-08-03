@@ -335,6 +335,7 @@ Initialization
 Finalization
   { free all assigned memory }
   FreeTestLevel;
+  FreeTestParty;
 
   DestroyCompositeInterface;
   //DestroyGlobal;
