@@ -16,15 +16,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 {---------------------------------------------------------------------------}
 
 { Manages player camera and other effects such as lights and screen shaders }
-unit deconavigation;
+unit DecoNavigation;
 
 {$INCLUDE compilerconfig.inc}
 interface
 
 uses Classes, SysUtils,
-  castleCameras, {castlePlayer,} CastleSceneCore, CastleScene,
-  castleVectors,  X3DNodes,
-  decoglobal;
+  CastleCameras, {castlePlayer,} CastleSceneCore, CastleScene,
+  CastleVectors,  X3DNodes,
+  DecoGlobal;
 
 const PlayerHeight = 0.5;
 
@@ -35,7 +35,7 @@ procedure InitNavigation;
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 uses  CastleFilesUtils, CastleLog,
-  x3dload;
+  x3dLoad;
 
 var Nav: TKambiNavigationInfoNode;
     NavRoot: TX3DRootNode;

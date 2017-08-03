@@ -193,6 +193,7 @@
       <Unit21>
         <Filename Value="decoabstractworld.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoAbstractWorld"/>
       </Unit21>
       <Unit22>
         <Filename Value="decodungeongenerator.pas"/>
@@ -217,6 +218,7 @@
       <Unit27>
         <Filename Value="deconavigation.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoNavigation"/>
       </Unit27>
       <Unit28>
         <Filename Value="decoabstractworld3d.pas"/>
@@ -252,9 +254,9 @@
         <IsPartOfProject Value="True"/>
       </Unit35>
       <Unit36>
-        <Filename Value="deconav.pas"/>
+        <Filename Value="deconavigationnetwork.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="DecoNav"/>
+        <UnitName Value="DecoNavigationNetwork"/>
       </Unit36>
     </Units>
   </ProjectOptions>

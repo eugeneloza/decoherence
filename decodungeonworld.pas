@@ -22,11 +22,11 @@ unit decodungeonworld;
 {$INCLUDE compilerconfig.inc}
 interface
 
-uses classes, fgl, CastleVectors,
+uses Classes, fgl, CastleVectors,
   X3DNodes, CastleScene,
   DecoDungeonGenerator, DecoAbstractGenerator, DecoAbstractWorld3d,
   DecoDungeonTiles,
-  DecoNav,
+  DecoNavigationNetwork,
   DecoNavigation, DecoGlobal;
 
 
@@ -49,7 +49,7 @@ type
     {Manages tiles (show/hide/trigger events) *time-critical procedure}
     Procedure ManageTiles; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
   public
-    const myscale = 3;
+    const myScale = 3;
   public
     {scale used to define a tile size. Usually 1 is man-height.
       CAUTION this scale must correspond to tiles model scale, otherwise it'll mess everything up}
@@ -78,8 +78,8 @@ type
     {loads word scenes into scene manager}
     Procedure Activate; override;
 
-    constructor create; override;
-    destructor destroy; override;
+    constructor Create; override;
+    destructor Destroy; override;
   public
     procedure BuildNav; override;
   end;
@@ -87,7 +87,7 @@ type
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-uses sysutils, CastleFilesUtils, CastleLog;
+uses SysUtils, CastleFilesUtils, CastleLog;
 
 procedure DDungeonWorld.ManageTiles; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
@@ -105,24 +105,24 @@ begin
   px0 := px;
   py0 := py;
   pz0 := pz;
-  px := round( x/WorldScale);
-  py := round(-y/WorldScale);     //pay attention: y-coordinate is inversed!
-  pz := round(-(z-1)/WorldScale); //pay attention: z-coordinate is inversed and shifted!
-  if px<0 then px :=0 else if px>map.sizex-1 then px := map.sizex-1;
-  if py<0 then py :=0 else if py>map.sizey-1 then py := map.sizey-1;
-  if pz<0 then pz :=0 else if pz>map.sizez-1 then pz := map.sizez-1;
+  px := Round( x/WorldScale);
+  py := Round(-y/WorldScale);     //pay attention: y-coordinate is inversed!
+  pz := Round(-(z-1)/WorldScale); //pay attention: z-coordinate is inversed and shifted!
+  if px<0 then px :=0 else if px>Map.SizeX-1 then px := map.SizeX-1;
+  if py<0 then py :=0 else if py>Map.SizeY-1 then py := map.SizeY-1;
+  if pz<0 then pz :=0 else if pz>Map.SizeZ-1 then pz := map.SizeZ-1;
   if (px<>px0) or (py<>py0) or (pz<>pz0) then {begin}
     {current tile has changed}
-    result := true
+    Result := true
   {end}
   else
     {current tile hasn't changed}
-    result := false;
+    Result := false;
 end;
 
 {----------------------------------------------------------------------------}
 
-procedure DDungeonWorld.Manage(position: TVector3Single);
+procedure DDungeonWorld.Manage(Position: TVector3Single);
 begin
   if FirstRender then begin
     {$warning reset all tiles visibility here}
@@ -190,12 +190,12 @@ var i: integer;
   Transform: TTransformNode;
 begin
   WorldObjects := TTransformList.Create(false); //scene will take care of freeing
-  for i := 0 to high(steps) do begin
+  for i := 0 to High(Steps) do begin
     Transform := TTransformNode.Create;
     //put current tile into the world. Pay attention to y and z coordinate inversion.
-    Transform.translation := Vector3(WorldScale*(Steps[i].x),-WorldScale*(Steps[i].y),-WorldScale*(steps[i].z));
+    Transform.Translation := Vector3(WorldScale*(Steps[i].x),-WorldScale*(Steps[i].y),-WorldScale*(steps[i].z));
     {$Warning this is ugly}
-    Transform.scale := Vector3(MyScale,MyScale,MyScale);
+    Transform.Scale := Vector3(MyScale,MyScale,MyScale);
     AddRecoursive(Transform,WorldElements3d[Steps[i].Tile]);
     WorldObjects.Add(Transform);
   end;
@@ -206,9 +206,9 @@ end;
 constructor DDungeonWorld.create;
 begin
   inherited;
-  px := UninitializedCoordinate;
-  py := UninitializedCoordinate;
-  pz := UninitializedCoordinate;
+  px  := UninitializedCoordinate;
+  py  := UninitializedCoordinate;
+  pz  := UninitializedCoordinate;
   px0 := UninitializedCoordinate;        //we use px0 := px at the moment, so these are not needed, but it might change in future
   py0 := UninitializedCoordinate;
   pz0 := UninitializedCoordinate;

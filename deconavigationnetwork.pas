@@ -15,10 +15,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 
 {---------------------------------------------------------------------------}
 
-{ routines linked to Navigation&pathfinding
+{ Routines linked to Navigation&pathfinding
   Actually it is a very simplified map graph
   Pay attention that NavMesh is built by the World, and processed here }
-unit DecoNav;
+unit DecoNavigationNetwork;
 
 {$INCLUDE compilerconfig.inc}
 interface
@@ -28,7 +28,7 @@ uses CastleGenericLists,
 
 Type DNavPt = record
   { Absolute Coordinates of pathPoint }
-  x,y,z: float;
+  x,y,z: Float;
   {{ world tile it belongs to }
   Tile: TTileType;
   {Link of tiles adjacent to this tile}

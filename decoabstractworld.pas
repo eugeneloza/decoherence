@@ -17,14 +17,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 
 { contains definitions for most abstract World entity }
 
-unit decoabstractworld;
+unit DecoAbstractWorld;
 
 {$INCLUDE compilerconfig.inc}
 interface
 
-uses CastleRandom, castleVectors,
-  decoabstractgenerator, DecoNav,
-  decoglobal;
+uses CastleRandom, CastleVectors,
+  DecoAbstractGenerator, deconavigationnetwork,
+  DecoGlobal;
 
 Type
   {The most abstract world implementation.
@@ -84,7 +84,7 @@ procedure FreeWorld;
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
-uses SysUtils, classes, castlelog;
+uses SysUtils, Classes, CastleLog;
 
 constructor DAbstractWorld.create;
 begin
@@ -117,7 +117,7 @@ end;
 Procedure DAbstractWorld.Activate;
 begin
   WriteLnLog('DAbstractWorld.Activate','Activating the world.');
-  if (CurrentWorld<>nil) and (CurrentWorld<>self) then
+  if (CurrentWorld<>nil) and (CurrentWorld<>Self) then
     raise Exception.Create('ERROR: Free and nil the previous World before activating this one!');
   LastRender := -1;
   FirstRender := true;

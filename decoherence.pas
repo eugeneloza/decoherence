@@ -34,17 +34,17 @@ uses Classes, SysUtils,
      CastleVectors, CastleScene,
 
      {needed to use load image}
-     CastleControls, decoloadembedded,
+     CastleControls, DecoLoadEmbedded,
 
-     decothread, decothrash,
+     DecoThread, DecoThrash,
 
-     decogui, decointerface, decomouse, decofont,
-     decolevel, decodungeontiles, decoabstractworld,
-     decosound,
-     decoloadscreen, decoperks,
-     decointerfacecomposite,
-     decoplayercharacter, decoload3d,
-     deconavigation, decoglobal, decogamemode;
+     DecoGui, DecoInterface, DecoMouse, DecoFont,
+     DecoLevel, DecoAbstractWorld,
+     DecoSound,
+     DecoLoadScreen, DecoPerks,
+     DecoInterfaceComposite,
+     DecoPlayerCharacter, DecoLoad3d,
+     DecoNavigation, DecoGlobal, DecoGamemode;
 
 type
   DLoadThread = class(TAbstractThread)

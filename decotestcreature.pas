@@ -41,7 +41,7 @@ procedure SpawnCreatures;
 implementation
 //uses decoinputoutput;
 uses CastleLog,
-  DecoDungeonWorld, DecoNav, DecoAbstractWorld;
+  DecoDungeonWorld, deconavigationnetwork, DecoAbstractWorld;
 
 procedure InitCreatures;
 begin

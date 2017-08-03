@@ -275,8 +275,8 @@ begin
   Window.SceneManager.Camera := nil; {$HINT check here for a correct way to free camera}
   Window.SceneManager.Camera := Camera;
 
-  for i := 0 to WorldScenes.count-1 do
-    Window.sceneManager.Items.add(WorldScenes[i]);
+  for i := 0 to WorldScenes.Count-1 do
+    Window.SceneManager.Items.Add(WorldScenes[i]);
 end;
 
 {------------------------------------------------------------------------------}
@@ -289,10 +289,10 @@ begin
   for i := 0 to Source.FdChildren.Count-1 do
     if not isPlaceholder(Source.FdChildren[i]) then
       //add the node normally
-      Dest.FdChildren.add(Source.FdChildren[i])
+      Dest.FdChildren.Add(Source.FdChildren[i])
     else begin
       //replace the node with the actual placeholder
-      Slot := source.FdChildren[i] as TTransformNode; //should fire an exception if this is wrong, we should have checked it in "isPlaceholder"
+      Slot := Source.FdChildren[i] as TTransformNode; //should fire an exception if this is wrong, we should have checked it in "isPlaceholder"
       Parsed := ParseNode(Slot);
       if RNDM.random<Parsed.rand then begin
         {$WARNING Memory Leak Here}
@@ -300,7 +300,7 @@ begin
         //rotate
         //AddRecoursive(Replacement, GetPlaceholder(Parsed)); //plus symmetry groups
         //WriteLnLog(Parsed.placeholder);
-        Dest.FdChildren.add(Replacement);
+        Dest.FdChildren.Add(Replacement);
       end;
     end;
 end;
@@ -312,11 +312,11 @@ procedure DAbstractWorld3d.LoadWorldObjects;
 var s: string;
   tmpRoot: TX3DRootNode;
 begin
-  WorldElements3d := TRootList.create(true);
+  WorldElements3d := TRootList.Create(true);
   For s in WorldElementsURL do begin
     tmpRoot := LoadBlenderX3D(s);
     tmpRoot.KeepExisting := 1;   //List owns the nodes, so don't free them manually/automatically
-    WorldElements3d.add(tmpRoot);
+    WorldElements3d.Add(tmpRoot);
   end;
 end;
 
@@ -356,14 +356,14 @@ procedure DAbstractWorld3d.BuildScenes;
 var i: integer;
     Scene: TCastleScene;
 begin
-  WorldScenes := TSceneList.create(true); //list owns the scenes and will free them accordingly
-  for i := 0 to WorldRoots.count-1 do begin
-    Scene := TCastleScene.create(nil); //List will free the scenes, not freeing them automatically
+  WorldScenes := TSceneList.Create(true); //list owns the scenes and will free them accordingly
+  for i := 0 to WorldRoots.Count-1 do begin
+    Scene := TCastleScene.Create(nil); //List will free the scenes, not freeing them automatically
     Scene.ShadowMaps := Shadow_maps_enabled;  {?????}
     Scene.Spatial := [ssRendering, ssDynamicCollisions];
     Scene.ProcessEvents := true;
     Scene.Load(WorldRoots[i],true);
-    WorldScenes.add(Scene);
+    WorldScenes.Add(Scene);
   end;
 end;
 
