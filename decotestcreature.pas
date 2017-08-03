@@ -56,13 +56,15 @@ procedure SpawnCreatures;
 var i: integer;
     n: DNavPt;
     DW: DDungeonWorld;
+    MyCreature: TCreature;
 begin
   //temporary - unsafe
   DW := CurrentWorld as DDungeonWorld;
   for i := 0 to DW.Nav.Count div 10 do begin
     n := DW.Nav[DRND.Random(DW.Nav.Count)];
     WriteLnLog('Adding creature');
-    CreatureResource.CreateCreature(window.SceneManager.Items, Vector3(n.x*DW.WorldScale,-n.y*DW.WorldScale,-n.z*DW.WorldScale+1*DW.MyScale), Vector3(1,0,0));
+    MyCreature := CreatureResource.CreateCreature(window.SceneManager.Items, Vector3(n.x*DW.WorldScale,-n.y*DW.WorldScale,-n.z*DW.WorldScale+1*DW.MyScale), Vector3(1,0,0));
+    MyCreature.Exists := true;
   end;
 //  WriteLnLog('Adding creature');
 end;
