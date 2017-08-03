@@ -16,86 +16,86 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 {---------------------------------------------------------------------------}
 
 { Describes characters and creatures basic behaviour }
-unit decoactor;
+unit DecoActor;
 
 {$INCLUDE compilerconfig.inc}
 
 interface
 
-uses classes, CastleRandom,
-  decostats,
-  decoglobal;
+uses Classes, CastleRandom,
+  DecoStats,
+  DecoGlobal;
 
 type TDamageType = (dtHealth);
-type TDamageProcedure = procedure (dam: float; damtype: TDamageType) of Object;
+type TDamageProcedure = procedure (Dam: float; Damtype: TDamageType) of Object;
 
 {Maybe, add some basic actor (visible only, no collisions)}
 Type
   {basic actor. With hit-points and coordinates}
   DActor = class(TComponent)
   private
-    fHP,fMAXHP,fMAXMAXHP: float;
+    fHP,fMaxHP,fMaxMaxHP: float;
     { maybe, move all non-HP to deco player character? }
-    fSTA,fMAXSTA,fMAXMAXSTA: float;
-    fCNC,fMAXCNC,fMAXMAXCNC: float;
-    fMPH,fMAXMPH,fMAXMAXMPH: float;
-    Procedure setHP(value: float);
-    Procedure setmaxHP(value: float);
-    Procedure setmaxmaxHP(value: float);
-    Procedure setSTA(value: float);
-    Procedure setmaxSTA(value: float);
-    Procedure setmaxmaxSTA(value: float);
-    Procedure setCNC(value: float);
-    Procedure setmaxCNC(value: float);
-    Procedure setmaxmaxCNC(value: float);
-    Procedure setMPH(value: float);
-    Procedure setmaxMPH(value: float);
-    Procedure setmaxmaxMPH(value: float);
+    fSTA,fMaxSTA,fMaxMaxSTA: float;
+    fCNC,fMaxCNC,fMaxMaxCNC: float;
+    fMPH,fMaxMPH,fMaxMaxMPH: float;
+    Procedure SetHP(Value: float);
+    Procedure SetMaxHP(Value: float);
+    Procedure SetMaxMaxHP(Value: float);
+    Procedure SetSTA(Value: float);
+    Procedure SetMaxSTA(Value: float);
+    Procedure SetMaxMaxSTA(Value: float);
+    Procedure SetCNC(Value: float);
+    Procedure SetMaxCNC(Value: float);
+    Procedure SetMaxMaxCNC(Value: float);
+    Procedure SetMPH(Value: float);
+    Procedure SetMaxMPH(Value: float);
+    Procedure SetMaxMaxMPH(Value: float);
   public
-    destructor destroy; override;
-    constructor create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    constructor Create(AOwner: TComponent); override;
     { getters and setters }
-    Property HP: float read fHP write sethp;
-    Property maxHP: float read fMAXHP write setmaxhp;
-    Property maxmaxHP: float read fMAXMAXHP write setmaxmaxhp;
-    procedure resetHP;
-    Property STA: float read fSTA write setSTA;
-    Property maxSTA: float read fMAXSTA write setmaxSTA;
-    Property maxmaxSTA: float read fMAXMAXSTA write setmaxmaxSTA;
-    procedure resetSTA;
-    Property CNC: float read fCNC write setCNC;
-    Property maxCNC: float read fMAXCNC write setmaxCNC;
-    Property maxmaxCNC: float read fMAXMAXCNC write setmaxmaxCNC;
-    procedure resetCNC;
-    Property MPH: float read fMPH write setMPH;
-    Property maxMPH: float read fMAXMPH write setmaxMPH;
-    Property maxmaxMPH: float read fMAXMAXMPH write setmaxmaxMPH;
-    procedure resetMPH;
+    Property HP: float read fHP write SetHP;
+    Property MaxHP: float read fMaxHP write SetMaxHP;
+    Property MaxMaxHP: float read fMaxMaxHP write SetMaxMaxHP;
+    procedure ResetHP;
+    Property STA: float read fSTA write SetSTA;
+    Property MaxSTA: float read fMaxSTA write SetMaxSTA;
+    Property MaxMaxSTA: float read fMaxMaxSTA write SetMaxMaxSTA;
+    procedure ResetSTA;
+    Property CNC: float read fCNC write SetCNC;
+    Property MaxCNC: float read fMaxCNC write SetMaxCNC;
+    Property MaxMaxCNC: float read fMaxMaxCNC write SetMaxMaxCNC;
+    procedure ResetCNC;
+    Property MPH: float read fMPH write SetMPH;
+    Property MaxMPH: float read fMaxMPH write SetMaxMPH;
+    Property MaxMaxMPH: float read fMaxMaxMPH write SetMaxMaxMPH;
+    procedure ResetMPH;
 
     {hit equals to consume+drain}
-    procedure hit(damage: float; skill: float); //=consumeHP
+    procedure Hit(Damage: float; Skill: float); //=consumeHP
     {returns true if healed or false if nothing to heal}
-    function heal(value: float; skill: float): boolean; //=restoreHP
-    Procedure die; virtual; abstract;
+    function Heal(Value: float; Skill: float): boolean; //=restoreHP
+    Procedure Die; virtual; abstract;
 
     {"consumption" procedures return true if success and false if failed,
      "restoration" procedures return true if something has been restored,
      "drain" procedures can drain values below zero}
-    function consumeSTA(consumption: float; skill: float): boolean;
-    function restoreSTA(restoration: float; skill: float): boolean;
-    procedure drainSTA(drain: float; skill: float);
-    function consumeCNC(consumption: float; skill: float): boolean;
-    function restoreCNC(restoration: float; skill: float): boolean;
-    procedure drainCNC(drain: float; skill: float);
-    function consumeMPH(consumption: float; skill: float): boolean;
-    function restoreMPH(restoration: float; skill: float): boolean;
-    procedure drainMPH(drain: float; skill: float);
+    function ConsumeSTA(Consumption: float; Skill: float): boolean;
+    function RestoreSTA(Restoration: float; Skill: float): boolean;
+    procedure DrainSTA(Drain: float;        Skill: float);
+    function ConsumeCNC(Consumption: float; Skill: float): boolean;
+    function RestoreCNC(Restoration: float; Skill: float): boolean;
+    procedure DrainCNC(Drain: float;        Skill: float);
+    function ConsumeMPH(Consumption: float; Skill: float): boolean;
+    function RestoreMPH(Restoration: float; Skill: float): boolean;
+    procedure DrainMPH(Drain: float;        Skill: float);
   public
     { events }
     onHit: TDamageProcedure;
   public
-    nickname: string;
-    stats: DStats;
+    Nickname: string;
+    Stats: DStats;
     {these are randoms for the actor: defense gives his defense rolls,
      Attack provides for attack rolls, and JustRandom determines actor's
      behaviour and any other not too important random rolls}
@@ -107,221 +107,221 @@ end;
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
-uses SysUtils,castleLog;
+uses SysUtils,CastleLog;
 
-constructor DActor.create(AOwner: TComponent);
+constructor DActor.Create(AOwner: TComponent);
 begin
-  inherited create(AOwner);
-  nickname := 'abc';
-  setmaxmaxHP(100);
-  setmaxmaxSTA(100);
-  setmaxmaxCNC(100);
-  setmaxmaxMPH(100);
-  DefenseRandom := TCastleRandom.create; //read seed from the savegame
-  AttackRandom := TCastleRAndom.create;
-  JustRandom := TCastleRandom.create;
-  resetHP;
-  resetSTA;
-  resetCNC;
-  resetMPH;
+  inherited Create(AOwner);
+  Nickname := 'abc';
+  SetMaxMaxHP(100);
+  SetMaxMaxSTA(100);
+  SetMaxMaxCNC(100);
+  SetMaxMaxMPH(100);
+  DefenseRandom := TCastleRandom.Create; {$HINT read seed from the savegame}
+  AttackRandom := TCastleRAndom.Create;
+  JustRandom := TCastleRandom.Create;
+  ResetHP;
+  ResetSTA;
+  ResetCNC;
+  ResetMPH;
 end;
 
-destructor DActor.destroy;
+destructor DActor.Destroy;
 begin
-  freeandnil(DefenseRandom);
-  freeandnil(AttackRandom);
-  freeandnil(JustRandom);
+  FreeAndNil(DefenseRandom);
+  FreeAndNil(AttackRandom);
+  FreeAndNil(JustRandom);
   inherited;
 end;
 
 {----------------------------------------------------------------------------}
 
-Procedure DActor.setHP(value: float);
+Procedure DActor.SetHP(Value: float);
 begin
-  If value < fmaxHP then fHP := value else fHP := fmaxHP;
-  If value < 0 then die;
+  If Value < fMaxHP then fHP := Value else fHP := fMaxHP;
+  If Value < 0 then Die;     {$HINT clinical death state}
 end;
-Procedure DActor.setmaxHP(value: float);
+Procedure DActor.SetMaxHP(Value: float);
 begin
-  If value < fmaxmaxHP then fmaxHP := value else fmaxHP := fmaxmaxHP;
-  If value < 0 then die;
+  If Value < fMaxMaxHP then fMaxHP := Value else fMaxHP := fMaxMaxHP;
+  If Value < 0 then Die;
 end;
-Procedure DActor.setmaxmaxHP(value: float);
+Procedure DActor.SetMaxMaxHP(Value: float);
 begin
-  if maxmaxHP < value then heal(value-fmaxmaxHP,1);
-  fmaxmaxHP := value;
-  If value < 0 then die;
+  if MaxMaxHP < Value then Heal(Value-fMaxMaxHP,1);
+  fMaxMaxHP := Value;
+  If Value < 0 then Die;
 end;
-procedure DActor.resetHP;
+procedure DActor.ResetHP;
 begin
-  fmaxHP := fmaxmaxHP;
-  fHP := fmaxHP;
-end;
-
-{---------------------------------------------------------------------------}
-
-Procedure DActor.setSTA(value: float);
-begin
-  If value < fmaxSTA then fSTA := value else fSTA := fmaxSTA;
-  If value < 0 then {EXAUSTED STATE};
-end;
-Procedure DActor.setmaxSTA(value: float);
-begin
-  If value < fmaxmaxSTA then fmaxSTA := value else fmaxSTA := fmaxmaxSTA;
-  If value < 0 then {EXAUSTED STATE};
-end;
-Procedure DActor.setmaxmaxSTA(value: float);
-begin
-  if maxmaxSTA < value then restoreSTA(value-fmaxmaxSTA,1);
-  fmaxmaxSTA := value;
-  If value < 0 then {EXAUSTED STATE};
-end;
-procedure DActor.resetSTA;
-begin
-  fmaxSTA := fmaxmaxSTA;
-  fSTA := fmaxSTA;
-end;
-
-{-----------------------------------------------------------------------------}
-
-Procedure DActor.setCNC(value: float);
-begin
-  If value < fmaxCNC then fCNC := value else fCNC := fmaxCNC;
-  If value < 0 then {BURN-OUT STATE};
-end;
-Procedure DActor.setmaxCNC(value: float);
-begin
-  If value < fmaxmaxCNC then fmaxCNC := value else fmaxCNC := fmaxmaxCNC;
-  If value < 0 then {BURN-OUT STATE};
-end;
-Procedure DActor.setmaxmaxCNC(value: float);
-begin
-  if maxmaxCNC < value then restoreCNC(value-fmaxmaxCNC,1);
-  fmaxmaxCNC := value;
-  If value < 0 then {BURN-OUT STATE};
-end;
-procedure DActor.resetCNC;
-begin
-  fmaxCNC := fmaxmaxCNC;
-  fCNC := fmaxCNC;
+  fMaxHP := fMaxMaxHP;
+  fHP := fMaxHP;
 end;
 
 {---------------------------------------------------------------------------}
 
-Procedure DActor.setMPH(value: float);
+Procedure DActor.SetSTA(Value: float);
 begin
-  If value < fmaxMPH then fMPH := value else fMPH := fmaxMPH;
-  If value < 0 then {* STATE};
+  If Value < fMaxSTA then fSTA := Value else fSTA := fMaxSTA;
+  If Value < 0 then {EXAUSTED STATE};
 end;
-Procedure DActor.setmaxMPH(value: float);
+Procedure DActor.SetMaxSTA(Value: float);
 begin
-  If value < fmaxmaxMPH then fmaxMPH := value else fmaxMPH := fmaxmaxMPH;
-  If value < 0 then {* STATE};
+  If Value < fMaxMaxSTA then fMaxSTA := Value else fMaxSTA := fMaxMaxSTA;
+  If Value < 0 then {EXAUSTED STATE};
 end;
-Procedure DActor.setmaxmaxMPH(value: float);
+Procedure DActor.SetMaxMaxSTA(Value: float);
 begin
-  if maxmaxMPH < value then restoreMPH(value-fmaxmaxMPH,1);
-  fmaxmaxMPH := value;
-  If value < 0 then {* STATE};
+  if MaxMaxSTA < Value then RestoreSTA(Value-fMaxMaxSTA,1);
+  fMaxMaxSTA := Value;
+  If Value < 0 then {EXAUSTED STATE};
 end;
-procedure DActor.resetMPH;
+procedure DActor.ResetSTA;
 begin
-  fmaxMPH := fmaxmaxMPH;
-  fMPH := fmaxMPH;
+  fMaxSTA := fMaxMaxSTA;
+  fSTA := fMaxSTA;
+end;
+
+{-----------------------------------------------------------------------------}
+
+Procedure DActor.SetCNC(Value: float);
+begin
+  If Value < fMaxCNC then fCNC := Value else fCNC := fMaxCNC;
+  If Value < 0 then {BURN-OUT STATE};
+end;
+Procedure DActor.SetMaxCNC(Value: float);
+begin
+  If Value < fMaxMaxCNC then fMaxCNC := Value else fMaxCNC := fMaxMaxCNC;
+  If Value < 0 then {BURN-OUT STATE};
+end;
+Procedure DActor.SetMaxMaxCNC(Value: float);
+begin
+  if MaxMaxCNC < Value then RestoreCNC(Value-fMaxMaxCNC,1);
+  fMaxMaxCNC := Value;
+  If Value < 0 then {BURN-OUT STATE};
+end;
+procedure DActor.ResetCNC;
+begin
+  fMaxCNC := fMaxMaxCNC;
+  fCNC := fMaxCNC;
 end;
 
 {---------------------------------------------------------------------------}
 
-Procedure DActor.hit(damage: float; skill: float);
+Procedure DActor.SetMPH(Value: float);
 begin
-  setHP(HP-damage);
-  setmaxHP(maxHP-damage*skill); // todo
-  if Assigned(self.onHit) then self.onHit(damage, dtHealth);
+  If Value < fMaxMPH then fMPH := Value else fMPH := fmaxMPH;
+  If Value < 0 then {* STATE};
+end;
+Procedure DActor.SetMaxMPH(Value: float);
+begin
+  If Value < fMaxmaxMPH then fMaxMPH := Value else fMaxMPH := fMaxmaxMPH;
+  If Value < 0 then {* STATE};
+end;
+Procedure DActor.SetMaxMaxMPH(Value: float);
+begin
+  if MaxMaxMPH < Value then RestoreMPH(Value-fMaxMaxMPH,1);
+  fMaxMaxMPH := Value;
+  If Value < 0 then {* STATE};
+end;
+procedure DActor.ResetMPH;
+begin
+  fMaxMPH := fMaxMaxMPH;
+  fMPH := fMaxMPH;
 end;
 
-function DActor.heal(value: float; skill: float): boolean;
+{---------------------------------------------------------------------------}
+
+Procedure DActor.Hit(Damage: float; Skill: float);
 begin
-  if (HP < maxHP) or ((maxHP < maxmaxHP) and (skill > 0)) then begin
-    setHP(HP+value);
-    setMaxHP(MaxHP+value*skill); // todo
-    result := true;
+  SetHP(HP-Damage);
+  SetmaxHP(MaxHP-Damage*Skill); // todo
+  if Assigned(Self.onHit) then Self.onHit(Damage, dtHealth);
+end;
+
+function DActor.Heal(Value: float; Skill: float): boolean;
+begin
+  if (HP < MaxHP) or ((MaxHP < MaxMaxHP) and (Skill > 0)) then begin
+    SetHP(HP+Value);
+    SetMaxHP(MaxHP+Value*Skill); // todo
+    Result := true;
   end else
-    result := false;
+    Result := false;
 end;
 
 {-----------------------------------------------------------------------------}
 
-function DActor.consumeSTA(consumption: float; skill: float): boolean;
+function DActor.ConsumeSTA(Consumption: float; Skill: float): boolean;
 begin
-  if (STA > consumption) then begin
-    setSTA(STA-consumption);
-    setmaxSTA(maxSTA-consumption*skill); // todo
-    result := true;
-  end else result := false;
+  if (STA > Consumption) then begin
+    SetSTA(STA-Consumption);
+    SetMaxSTA(MaxSTA-Consumption*Skill); // todo
+    Result := true;
+  end else Result := false;
 end;
-function DActor.restoreSTA(restoration: float; skill: float): boolean;
+function DActor.RestoreSTA(Restoration: float; Skill: float): boolean;
 begin
-  if (STA < maxSTA) or ((maxSTA < maxmaxSTA) and (skill > 0)) then begin
-    setSTA(STA+restoration);
-    setMaxSTA(MaxSTA+restoration*skill); // todo
-    result := true;
+  if (STA < MaxSTA) or ((MaxSTA < MaxMaxSTA) and (Skill > 0)) then begin
+    SetSTA(STA+Restoration);
+    SetMaxSTA(MaxSTA+Restoration*Skill); // todo
+    Result := true;
   end else
-    result := false;
+    Result := false;
 end;
-procedure DActor.drainSTA(drain: float; skill: float);
+procedure DActor.DrainSTA(Drain: float; Skill: float);
 begin
- setSTA(STA-drain);
- setmaxSTA(maxSTA-drain*skill); // todo
+ SetSTA(STA-Drain);
+ SetMaxSTA(MaxSTA-Drain*Skill); // todo
 end;
 
 {-----------------------------------------------------------------------------}
 
-function DActor.consumeCNC(consumption: float; skill: float): boolean;
+function DActor.ConsumeCNC(Consumption: float; Skill: float): boolean;
 begin
-  if (CNC > consumption) then begin
-    setCNC(CNC-consumption);
-    setmaxCNC(maxCNC-consumption*skill); // todo
-    result := true;
-  end else result := false;
+  if (CNC > Consumption) then begin
+    SetCNC(CNC-Consumption);
+    SetMaxCNC(MaxCNC-Consumption*Skill); // todo
+    Result := true;
+  end else Result := false;
 end;
-function DActor.restoreCNC(restoration: float; skill: float): boolean;
+function DActor.RestoreCNC(Restoration: float; Skill: float): boolean;
 begin
-  if (CNC < maxCNC) or ((maxCNC < maxmaxCNC) and (skill > 0)) then begin
-    setCNC(CNC+restoration);
-    setMaxCNC(MaxCNC+restoration*skill); // todo
-    result := true;
+  if (CNC < MaxCNC) or ((MaxCNC < MaxMaxCNC) and (Skill > 0)) then begin
+    SetCNC(CNC+Restoration);
+    SetMaxCNC(MaxCNC+Restoration*Skill); // todo
+    Result := true;
   end else
-    result := false;
+    Result := false;
 end;
-procedure DActor.drainCNC(drain: float; skill: float);
+procedure DActor.DrainCNC(Drain: float; Skill: float);
 begin
-  setCNC(CNC-drain);
-  setmaxCNC(maxCNC-drain*skill); // todo
+  SetCNC(CNC-Drain);
+  SetMaxCNC(MaxCNC-Drain*Skill); // todo
 end;
 
 {-----------------------------------------------------------------------------}
 
-function DActor.consumeMPH(consumption: float; skill: float): boolean;
+function DActor.ConsumeMPH(Consumption: float; Skill: float): boolean;
 begin
-  if (MPH > consumption) then begin
-    setMPH(MPH-consumption);
-    setmaxMPH(maxMPH-consumption*skill); // todo
-    result := true;
-  end else result := false;
+  if (MPH > Consumption) then begin
+    SetMPH(MPH-Consumption);
+    SetMaxMPH(MaxMPH-Consumption*Skill); // todo
+    Result := true;
+  end else Result := false;
 end;
-function DActor.restoreMPH(restoration: float; skill: float): boolean;
+function DActor.RestoreMPH(Restoration: float; Skill: float): boolean;
 begin
-  if (MPH < maxMPH) or ((maxMPH < maxmaxMPH) and (skill > 0)) then begin
-    setMPH(MPH+restoration);
-    setMaxMPH(MaxMPH+restoration*skill); // todo
-    result := true;
+  if (MPH < MaxMPH) or ((MaxMPH < MaxMaxMPH) and (Skill > 0)) then begin
+    SetMPH(MPH+Restoration);
+    SetMaxMPH(MaxMPH+Restoration*Skill); // todo
+    Result := true;
   end else
-    result := false;
+    Result := false;
 end;
-procedure DActor.drainMPH(drain: float; skill: float);
+procedure DActor.DrainMPH(Drain: float; Skill: float);
 begin
-  setMPH(MPH-drain);
-  setmaxMPH(maxMPH-drain*skill); // todo
+  SetMPH(MPH-Drain);
+  SetMaxMPH(MaxMPH-Drain*Skill); // todo
 end;
 
 
