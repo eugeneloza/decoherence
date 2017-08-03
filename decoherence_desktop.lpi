@@ -104,7 +104,7 @@
         <PackageName Value="castle_base"/>
       </Item2>
     </RequiredPackages>
-    <Units Count="37">
+    <Units Count="36">
       <Unit0>
         <Filename Value="decoherence_desktop.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -236,30 +236,26 @@
         <IsPartOfProject Value="True"/>
       </Unit30>
       <Unit31>
-        <Filename Value="decotestcreature.pas"/>
+        <Filename Value="decosound.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit31>
       <Unit32>
-        <Filename Value="decosound.pas"/>
+        <Filename Value="decoloadembedded.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit32>
       <Unit33>
-        <Filename Value="decoloadembedded.pas"/>
+        <Filename Value="decoloadembedded.image_data"/>
         <IsPartOfProject Value="True"/>
       </Unit33>
       <Unit34>
-        <Filename Value="decoloadembedded.image_data"/>
+        <Filename Value="decothrash.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit34>
       <Unit35>
-        <Filename Value="decothrash.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit35>
-      <Unit36>
         <Filename Value="deconavigationnetwork.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="DecoNavigationNetwork"/>
-      </Unit36>
+      </Unit35>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

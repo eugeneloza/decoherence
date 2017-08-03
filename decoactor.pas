@@ -22,13 +22,15 @@ unit DecoActor;
 
 interface
 
-uses Classes, CastleRandom, CastleVectors,
+uses Classes, CastleRandom, fgl, CastleVectors,
   CastleResources, CastleCreatures,
   DecoStats,
   DecoGlobal;
 
 type TDamageType = (dtHealth);
 type TDamageProcedure = procedure (Dam: float; Damtype: TDamageType) of Object;
+
+type DBody = TCreatureResource;
 
 type
   { Actor with a rendered body and corresponding management routines }
@@ -38,9 +40,13 @@ type
       RAM or belongs to an body-less entity, like Player's character at the moment }
     body: TCreature;
 
+    procedure spawn(Pos: TVector3single; SpawnBody: DBody);
+
     destructor Destroy; override;
     constructor Create; virtual;
   end;
+
+type TActorList = specialize TFPGObjectList<DActorBody>;
 
 
 Type
@@ -124,11 +130,13 @@ end;
 
 
 
+var tmpKnightCreature: DBody;
 
-
+procedure tmpLoadKnightCreature;
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-uses SysUtils, CastleLog;
+uses SysUtils, CastleLog,
+  CastleFilesUtils, DecoInputOutput;
 
 constructor DActor.Create;
 begin
@@ -357,6 +365,22 @@ end;
 destructor DActorBody.Destroy;
 begin
   inherited;
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DActorBody.Spawn(Pos: TVector3; SpawnBody: DBody);
+begin
+  body := SpawnBody.CreateCreature(Window.SceneManager.Items, Pos, Vector3(1,0,0));
+  body.Exists := true;
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure tmpLoadKnightCreature;
+begin
+  Resources.LoadSafe(ApplicationData('models/creatures/knight_creature/'));
+  tmpKnightCreature := Resources.FindName('Knight') as TCreatureResource;
 end;
 
 

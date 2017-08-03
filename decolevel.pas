@@ -24,14 +24,12 @@ interface
 
 uses
   CastleLog,
-  CastleWindow, CastleWindowTouch, CastleSceneCore, CastleScene,
-  castleVectors,  X3DNodes,
+  CastleWindow, CastleWindowTouch, CastleScene, X3DNodes,
   DecoLoad3d,
   SysUtils,
 
-  DecoTestCreature,
-
   DecoAbstractWorld, DecoDungeonWorld, DecoDungeonGenerator,
+  DecoActor,
   DecoNavigation, DecoGlobal;
 
 procedure load_test_level;
@@ -56,6 +54,8 @@ begin
   CurrentWorld.Load(Generator);
   FreeAndNil(GENERATOR);
   CurrentWorld.Build;
+
+  tmpLoadKnightCreature;
 end;
 
 var LoadedLevel: boolean = false;
@@ -70,9 +70,8 @@ begin
   Window.ShadowVolumesRender := Shadow_volumes_enabled;
   Window.AntiAliasing := aa8SamplesNicer;
 
-  InitNavigation;
 
-  InitCreatures;
+  InitNavigation;
 
   WritelnLog('load_test_level','Finished');
 end;
@@ -85,7 +84,10 @@ begin
      SetGameMode(gmTravel);
      LoadedLevel := true;
      CurrentWorld.activate;
-     SpawnCreatures;
+
+     {$WARNING this is wrong}
+     {why does it gets a wrong GRAVITY_UP if called from Self.Activate?????}
+     CurrentWorld.SpawnActors; //must go after BuildNav;
 
      Window.TouchInterface := {$IFDEF Android}tiCtlWalkDragRotate{$ELSE}tiNone{$ENDIF};
      SetGameMode(gmTravel);
@@ -94,7 +96,7 @@ end;
 
 procedure FreeTestLevel;
 begin
-  FreeCreatures;
+
 end;
 
 end.

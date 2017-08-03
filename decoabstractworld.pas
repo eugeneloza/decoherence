@@ -63,7 +63,11 @@ Type
     procedure Activate; virtual;
     { Splits the World into chunks }
     //Procedure chunk_n_slice; virtual; abstract;
+
+    procedure SpawnActors; virtual; abstract;
+
     constructor Create; virtual;
+
     destructor Destroy; override;
     { A dummy procedure to be overriden in rendered world types
      (such as text or 2D)}

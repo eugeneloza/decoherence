@@ -48,12 +48,6 @@ type
     function UpdatePlayerCoordinates(x,y,z: float): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
     {Manages tiles (show/hide/trigger events) *time-critical procedure}
     Procedure ManageTiles; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
-  public
-    const myScale = 3;
-  public
-    {scale used to define a tile size. Usually 1 is man-height.
-      CAUTION this scale must correspond to tiles model scale, otherwise it'll mess everything up}
-    WorldScale: float;
   protected
     {neighbours array}
     Neighbours: TNeighboursMapArray;

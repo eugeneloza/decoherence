@@ -24,6 +24,7 @@ unit DecoAbstractWorld3d;
 interface
 uses Classes, fgl, CastleVectors, X3DNodes, CastleScene,
   DecoAbstractWorld, DecoAbstractGenerator, DecoNodeParser,
+  DecoActor,
   DecoNavigation, DecoGlobal;
 
 {generic list of TX3DRootNodes, representing render groups}
@@ -43,6 +44,12 @@ type
    shared by interior and exterior worlds}
   DAbstractWorld3d = class(DAbstractWorld)
   (*build*)
+  public
+    const myScale = 3;
+  public
+    {scale used to define a tile size. Usually 1 is man-height.
+      CAUTION this scale must correspond to tiles model scale, otherwise it'll mess everything up}
+    WorldScale: float;
   protected
     {root nodes of the each tile
      MUST go synchronous with groups/neighbours!}
@@ -86,7 +93,11 @@ type
              The root (container) node is not added
      WARNING placeholders cannot be children of children!
              Otherwise we'll have to recreate the whole nodes tree}
-    procedure AddRecoursive(dest,source: TAbstractX3DGroupingNode);
+    procedure AddRecoursive(Dest,Source: TAbstractX3DGroupingNode);
+  protected
+    Actors: TActorList;
+  public
+    procedure SpawnActors; override;
   public
     {loads the World into Window.SceneManager}
     procedure Activate; override;
@@ -95,7 +106,7 @@ type
 
     { turns on or off SceneManager.Exists
       This should not be called in Rendered World types }
-    procedure ToggleSceneManager(value: boolean);
+    procedure ToggleSceneManager(Value: boolean);
 
     destructor Destroy; override;
   end;
@@ -157,6 +168,7 @@ type
 implementation
 
 uses SysUtils, DecoLoad3d, CastleLog,
+  DecoNavigationNetwork,
   CastleSceneCore;
 
 {============================ DAbstractWorld3D =============================}
@@ -369,6 +381,28 @@ end;
 
 {----------------------------------------------------------------------------}
 
+procedure DAbstractWorld3d.SpawnActors;
+var i: integer;
+    n: DNavPt;
+    a: DActorBody;
+begin
+  if Actors <> nil then begin
+    WriteLnLog('DAbstractWorld3d.SpawnActors','WARNING: Actors is not nil, freeing...');
+    FreeAndNil(Actors);
+  end;
+  Actors := TActorList.Create(true);
+
+  {$hint todo}
+  for i := 0 to Self.Nav.Count div 10 do begin
+    n := Self.Nav[DRND.Random(Self.Nav.Count)];
+    a := DActorBody.Create;
+    a.Spawn(Vector3(n.x*WorldScale,-n.y*WorldScale,-n.z*WorldScale+1*MyScale),tmpKnightCreature);
+    Actors.Add(a);
+  end;
+end;
+
+{----------------------------------------------------------------------------}
+
 procedure DAbstractWorld3d.Build;
 begin
   inherited Build;
@@ -399,6 +433,7 @@ begin
   FreeAndNil(WorldObjects);
   FreeAndNil(WorldElements3d); //owns children, so will free them automatically
   FreeAndNil(WorldElementsURL);
+  FreeAndNil(Actors);           //owns children, so will free them automatically (! might conflict);
   inherited;
 end;
 
