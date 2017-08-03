@@ -22,7 +22,8 @@ unit DecoActor;
 
 interface
 
-uses Classes, CastleRandom,
+uses Classes, CastleRandom, CastleVectors,
+  CastleResources, CastleCreatures,
   DecoStats,
   DecoGlobal;
 
@@ -30,9 +31,15 @@ type TDamageType = (dtHealth);
 type TDamageProcedure = procedure (Dam: float; Damtype: TDamageType) of Object;
 
 type
-  { Actor with a rendered body }
+  { Actor with a rendered body and corresponding management routines }
   DActorBody = class (TObject)
+  public
+    { 3D body of this Actor, it may be nil (in case the body is unloaded from
+      RAM or belongs to an body-less entity, like Player's character at the moment }
+    body: TCreature;
 
+    destructor Destroy; override;
+    constructor Create; virtual;
   end;
 
 
@@ -58,8 +65,6 @@ Type
     Procedure SetMaxMPH(Value: float);
     Procedure SetMaxMaxMPH(Value: float);
   public
-    destructor Destroy; override;
-    constructor Create; virtual; //(AOwner: TComponent); override;
     { getters and setters }
     Property HP: float read fHP write SetHP;
     Property MaxHP: float read fMaxHP write SetMaxHP;
@@ -112,6 +117,9 @@ Type
      Attack provides for attack rolls, and JustRandom determines actor's
      behaviour and any other not too important random rolls}
     DefenseRandom,AttackRandom,JustRandom: TCastleRandom;
+  public
+    destructor Destroy; override;
+    constructor Create; override;
 end;
 
 
@@ -120,8 +128,7 @@ end;
 
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-
-uses SysUtils,CastleLog;
+uses SysUtils, CastleLog;
 
 constructor DActor.Create;
 begin
@@ -338,6 +345,21 @@ begin
   SetMaxMPH(MaxMPH-Drain*Skill); // todo
 end;
 
+{========================== ACTOR BODY =====================================}
+
+constructor DActorBody.Create;
+begin
+
+end;
+
+{-----------------------------------------------------------------------------}
+
+destructor DActorBody.Destroy;
+begin
+  inherited;
+end;
+
 
 end.
+
 

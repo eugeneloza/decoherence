@@ -58,7 +58,7 @@ begin
     Party[i].DrainCNC(DRND.Random(80),1);
     Party[i].DrainMPH(DRND.Random(80),1);
     Party[i].DrainSTA(DRND.Random(80),1);
-    if (Perks=nil) or (Perks.count=0) then WriteLnLog('CreateTestParty','FATAL ERROR: Perks is empty!');
+    if (Perks=nil) or (Perks.Count=0) then WriteLnLog('CreateTestParty','FATAL ERROR: Perks is empty!');
     Party[i].Actions := DPerksList.Create(false);
     Party[i].Actions.Add(Perks[0]);
   end;
