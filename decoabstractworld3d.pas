@@ -22,10 +22,9 @@ unit DecoAbstractWorld3d;
 
 {$INCLUDE compilerconfig.inc}
 interface
-uses classes, fgl, castleVectors,
-  X3DNodes, CastleScene,
-  decoabstractworld, decoabstractgenerator, deconodeparser,
-  deconavigation, decoglobal;
+uses Classes, fgl, CastleVectors, X3DNodes, CastleScene,
+  DecoAbstractWorld, DecoAbstractGenerator, DecoNodeParser,
+  DecoNavigation, DecoGlobal;
 
 {generic list of TX3DRootNodes, representing render groups}
 type TRootList = specialize TFPGObjectList<TX3DRootNode>;
@@ -37,6 +36,7 @@ type TTransformList = specialize TFPGObjectList<TTransformNode>;
 {list of switch nodes wrapping each element of TTransformList}
 type TSwitchList = specialize TFPGObjectList<TSwitchNode>;
 {$ENDIF}
+
 
 type
   {World using 3D management and definitions,
@@ -91,13 +91,13 @@ type
     {loads the World into Window.SceneManager}
     procedure Activate; override;
     {builds current 3d world}
-    procedure build; override;
+    procedure Build; override;
 
     { turns on or off SceneManager.Exists
       This should not be called in Rendered World types }
     procedure ToggleSceneManager(value: boolean);
 
-    destructor destroy; override;
+    destructor Destroy; override;
   end;
 
 type
@@ -162,13 +162,13 @@ uses SysUtils, DecoLoad3d, CastleLog,
 {============================ DAbstractWorld3D =============================}
 {================================ MANAGE ===================================}
 
-constructor DAppearVanishManagerThread.create;
+constructor DAppearVanishManagerThread.Create;
 begin
   inherited;
-  ObjectsAppear := TIndexList.create;
-  ObjectsVanish := TIndexList.create;
-  GroupsAppear := TIndexList.create;
-  GroupsVanish := TIndexList.create;
+  ObjectsAppear := TIndexList.Create;
+  ObjectsVanish := TIndexList.Create;
+  GroupsAppear  := TIndexList.Create;
+  GroupsVanish  := TIndexList.Create;
 end;
 
 {--------------------------------------------------------------------------}
@@ -186,10 +186,10 @@ end;
 
 procedure DAppearVanishManagerThread.execute;
 begin
-  ObjectsAppear.clear;
-  ObjectsVanish.clear;
-  GroupsAppear.clear;
-  GroupsVanish.clear;
+  ObjectsAppear.Clear;
+  ObjectsVanish.Clear;
+  GroupsAppear.Clear;
+  GroupsVanish.Clear;
 
   {prepare visibe lists,
    we can't assign the values directly, because groups can contain multiple tiles
@@ -236,16 +236,16 @@ end;
 
 {--------------------------------------------------------------------------}
 
-constructor DAbstractWorldManaged.create;
+constructor DAbstractWorldManaged.Create;
 begin
   inherited;
-  AppearVanishManager := DAppearVanishManagerThread.create;
+  AppearVanishManager := DAppearVanishManagerThread.Create;
   AppearVanishManager.Priority := tpNormal;  {$HINT maybe use tpLower}
 end;
 
 {--------------------------------------------------------------------------}
 
-destructor DAbstractWorldManaged.destroy;
+destructor DAbstractWorldManaged.Destroy;
 begin
   freeandnil(AppearVanishManager);
   inherited;
@@ -257,7 +257,7 @@ end;
 
 function CopyTransform(const Source: TTransformNode): TTransformNode;
 begin
-  Result := TTransformNode.create;
+  Result := TTransformNode.Create;
   Result.Translation := Source.Translation;
   Result.Scale := Source.Scale;
   Result.Rotation := Source.Rotation;
@@ -273,7 +273,7 @@ begin
   Window.SceneManager.Items.Add(Navigation);
   Window.SceneManager.MainScene := Navigation;
   Window.SceneManager.Camera := nil; {$HINT check here for a correct way to free camera}
-  Window.SceneManager.Camera := camera;
+  Window.SceneManager.Camera := Camera;
 
   for i := 0 to WorldScenes.count-1 do
     Window.sceneManager.Items.add(WorldScenes[i]);
@@ -281,15 +281,15 @@ end;
 
 {------------------------------------------------------------------------------}
 
-procedure DAbstractWorld3d.AddRecoursive(dest,source: TAbstractX3DGroupingNode);
+procedure DAbstractWorld3d.AddRecoursive(Dest, Source: TAbstractX3DGroupingNode);
 var i: integer;
     Slot,Replacement: TTransformNode;
     Parsed: DNodeInfo;
 begin
-  for i := 0 to source.FdChildren.Count-1 do
-    if not isPlaceholder(source.FdChildren[i]) then
+  for i := 0 to Source.FdChildren.Count-1 do
+    if not isPlaceholder(Source.FdChildren[i]) then
       //add the node normally
-      dest.FdChildren.add(source.FdChildren[i])
+      Dest.FdChildren.add(Source.FdChildren[i])
     else begin
       //replace the node with the actual placeholder
       Slot := source.FdChildren[i] as TTransformNode; //should fire an exception if this is wrong, we should have checked it in "isPlaceholder"
@@ -300,7 +300,7 @@ begin
         //rotate
         //AddRecoursive(Replacement, GetPlaceholder(Parsed)); //plus symmetry groups
         //WriteLnLog(Parsed.placeholder);
-        dest.FdChildren.add(Replacement);
+        Dest.FdChildren.add(Replacement);
       end;
     end;
 end;
@@ -322,13 +322,13 @@ end;
 
 {----------------------------------------------------------------------------}
 {$IFDEF UseSwitches}
-procedure DAbstractWorld3d.buildSwitches;
+procedure DAbstractWorld3d.BuildSwitches;
 var i: integer;
   Switch: TSwitchNode;
 begin
-  WorldSwitches := TSwitchList.create(false); //scene will take care of freeing
+  WorldSwitches := TSwitchList.Create(false); //scene will take care of freeing
   for i := 0 to WorldObjects.Count-1 do begin
-    Switch := TSwitchNode.create;
+    Switch := TSwitchNode.Create;
     Switch.FdChildren.add(WorldObjects[i]);
     Switch.WhichChoice := 0;
     WorldSwitches.add(Switch);
@@ -341,10 +341,10 @@ procedure DAbstractWorld3d.buildRoots;
 var i,j: integer;
   Root: TX3DRootNode;
 begin
-  WorldRoots := TRootList.create(false); //scene will take care of freeing, owns root
-  for i := 0 to groups.count-1 do begin
-    Root := TX3DRootNode.create;
-    for j := 0 to groups[i].Count-1 do
+  WorldRoots := TRootList.Create(false); //scene will take care of freeing, owns root
+  for i := 0 to Groups.Count-1 do begin
+    Root := TX3DRootNode.Create;
+    for j := 0 to Groups[i].Count-1 do
       Root.FdChildren.Add({$IFDEF UseSwitches}WorldSwitches[groups[i].Items[j]]{$ELSE}WorldObjects[groups[i].Items[j]]{$ENDIF});
     WorldRoots.Add(Root);
   end;
@@ -352,9 +352,9 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DAbstractWorld3d.buildScenes;
+procedure DAbstractWorld3d.BuildScenes;
 var i: integer;
-  Scene: TCastleScene;
+    Scene: TCastleScene;
 begin
   WorldScenes := TSceneList.create(true); //list owns the scenes and will free them accordingly
   for i := 0 to WorldRoots.count-1 do begin
@@ -363,15 +363,15 @@ begin
     Scene.Spatial := [ssRendering, ssDynamicCollisions];
     Scene.ProcessEvents := true;
     Scene.Load(WorldRoots[i],true);
-    WorldScenes.add(scene);
+    WorldScenes.add(Scene);
   end;
 end;
 
 {----------------------------------------------------------------------------}
 
-procedure DAbstractWorld3d.build;
+procedure DAbstractWorld3d.Build;
 begin
-  inherited build;
+  inherited Build;
   LoadWorldObjects;
   BuildTransforms;
   {$IFDEF UseSwitches}BuildSwitches;{$ENDIF}
