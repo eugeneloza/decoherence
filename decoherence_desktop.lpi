@@ -104,7 +104,7 @@
         <PackageName Value="castle_base"/>
       </Item2>
     </RequiredPackages>
-    <Units Count="37">
+    <Units Count="38">
       <Unit0>
         <Filename Value="decoherence_desktop.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -256,6 +256,11 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="DecoNav"/>
       </Unit36>
+      <Unit37>
+        <Filename Value="decocreatures.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoCreatures"/>
+      </Unit37>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

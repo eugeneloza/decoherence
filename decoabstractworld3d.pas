@@ -24,6 +24,7 @@ unit DecoAbstractWorld3d;
 interface
 uses Classes, fgl, CastleVectors, X3DNodes, CastleScene,
   DecoAbstractWorld, DecoAbstractGenerator, DecoNodeParser,
+  DecoCreatures,
   DecoNavigation, DecoGlobal;
 
 {generic list of TX3DRootNodes, representing render groups}
@@ -36,6 +37,8 @@ type TTransformList = specialize TFPGObjectList<TTransformNode>;
 {list of switch nodes wrapping each element of TTransformList}
 type TSwitchList = specialize TFPGObjectList<TSwitchNode>;
 {$ENDIF}
+{list of creatures in this world}
+type TCreatureList = specialize TFPGObjectList<DCreature>;
 
 
 type
