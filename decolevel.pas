@@ -26,20 +26,19 @@ uses
   CastleLog,
   CastleWindow, CastleWindowTouch, CastleSceneCore, CastleScene,
   castleVectors,  X3DNodes,
-  decoload3d,
-  sysutils,
+  DecoLoad3d,
+  SysUtils,
 
-  decotestcreature,
+  DecoTestCreature,
 
-  decoabstractworld, decodungeonworld, decodungeongenerator,
-  deconavigation, decoglobal;
+  DecoAbstractWorld, DecoDungeonWorld, DecoDungeonGenerator,
+  DecoNavigation, DecoGlobal;
 
 procedure load_test_level;
 Procedure InitTestLevel;
 procedure FreeTestLevel;
 
-var scene: TcastleScene;
-    LoadCompleted: boolean = false;
+var LoadCompleted: boolean = false;
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
@@ -59,7 +58,7 @@ begin
   CurrentWorld.Build;
 end;
 
-var loadedlevel:boolean=false;
+var LoadedLevel: boolean = false;
 procedure load_test_level;
 begin
   Generate3DWorld;
@@ -68,8 +67,8 @@ begin
 
 
   Window.ShadowVolumes := Shadow_volumes_enabled;
-  window.ShadowVolumesRender := Shadow_volumes_enabled;
-  window.AntiAliasing := aa8SamplesNicer;
+  Window.ShadowVolumesRender := Shadow_volumes_enabled;
+  Window.AntiAliasing := aa8SamplesNicer;
 
   InitNavigation;
 
@@ -84,7 +83,7 @@ begin
   if not loadedlevel then begin
      WritelnLog('InitTestLevel','Init');
      SetGameMode(gmTravel);
-     loadedlevel := true;
+     LoadedLevel := true;
      CurrentWorld.activate;
      SpawnCreatures;
 
