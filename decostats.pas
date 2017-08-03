@@ -15,9 +15,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 
 {---------------------------------------------------------------------------}
 
-{Contains description of basic characters and monsters stats}
+{ Contains description of basic characters and monsters stats }
 
-unit decostats;
+unit DecoStats;
 
 {$INCLUDE compilerconfig.inc}
 
@@ -47,24 +47,24 @@ Type
   public
     Value: array of integer;
     Count: integer;
-    Constructor create(setfullstats: boolean);
-    Destructor destroy; override;
+    Constructor Create(SetFullStats: boolean);
+    Destructor Destroy; override;
   End;
 
 implementation
 
-Constructor DStats.create(setfullstats: boolean);
+Constructor DStats.Create(SetFullStats: boolean);
 Begin
-  If setfullstats then
-    count := Maxstats+1
+  If SetFullStats then
+    Count := MaxStats+1
   Else
-    count := Maxbasestats+1;
-  setlength(Value,Count);
+    Count := MaxBaseStats+1;
+  SetLength(Value,Count);
 End;
 
-Destructor DStats.destroy;
+Destructor DStats.Destroy;
 begin
-  setlength(Value,0);
+  SetLength(Value,0); //redundant
 end;
 
 end.
