@@ -16,14 +16,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 {---------------------------------------------------------------------------}
 
 { Dungeon (a maze-like interior) map generator }
-unit decodungeongenerator;
+unit DecoDungeonGenerator;
 
 {$INCLUDE compilerconfig.inc}
 interface
 
 uses Classes, CastleRandom, fgl, CastleGenericLists,
-  decoabstractgenerator, decodungeontiles,
-  decothread, decoglobal;
+  DecoAbstractGenerator, DecoDungeonTiles,
+  DecoThread, DecoGlobal;
 
 type
   {a "dock point" of a tile or a map. This is a xyz coordinate of an open face
@@ -34,9 +34,9 @@ type
     x,y,z: TIntCoordinate;
     {face where dock point is open. Each dock point contains one face.
      if there are two (or more) exits from a tile element - it spawns two (or more) dock points}
-    face: TAngle;
+    Face: TAngle;
     {the face type of the dock point. For faster checking}
-    facetype: TTileFace;
+    FaceType: TTileFace;
   end;
 type TDockPointList = specialize TGenericStructList<DDockPoint>;
 
@@ -73,7 +73,7 @@ type
        optimized for DGeneratorMap}
       function CalculateFaces: integer; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 
-      destructor destroy; override;
+      destructor Destroy; override;
   end;
 type
   {DGeneratorMap extended with some tile-related parameters}
@@ -113,7 +113,7 @@ type
   {this is almost equal to TGeneratorStep except it refers to tiles by their names}
   DFirstStep = record
     {name of the tile}
-    tile: string;
+    Tile: string;
     {coordinates to place the tile}
     x,y,z: TIntCoordinate;
   end;
@@ -126,9 +126,9 @@ type
       fisReady: boolean;
     public
       {the map cannot be larger than these}
-      maxx,maxy,maxz: TIntCoordinate;
+      MaxX,MaxY,MaxZ: TIntCoordinate;
       {the map cannot be smaller than these}
-      minx,miny,minz: TIntCoordinate;
+      MinX,MinY,MinZ: TIntCoordinate;
       {target map volume. The map will be regenerated until it's met
        Usually the algorithm can handle up to ~30% packaging of maxx*maxy*maxz}
       Volume: integer;
@@ -141,7 +141,7 @@ type
       {random generation seed}
       Seed: LongWord;
       {are links in TilesList absolute URL or just a tile name}
-      absoluteURL: boolean;
+      AbsoluteURL: boolean;
       {list of tiles}
       TilesList: TStringList;
       {list of first generation steps}
@@ -153,8 +153,8 @@ type
        Generatie will raise an exception if it isn't}
       property isReady: boolean read fisReady default false;
 
-      constructor create;
-      destructor destroy; override;
+      constructor Create;
+      destructor Destroy; override;
   end;
 
 type
@@ -215,15 +215,15 @@ type
     {this stores a sequence of generator steps}
     Gen: TGeneratorStepsArray;
     {minSteps: minimal steps before undo, this corresponds to the pre-generated tiles which may not be cancelled}
-    minsteps: integer;
+    MinSteps: integer;
     {current size of the dynamic array}
-    maxsteps: integer;
+    MaxSteps: integer;
     {current (the last used) step of the generator;
      careful, currentStep starts from -1, while corresponding min/max steps start from 0
      so conversion is min/maxStep = currentStep+1}
     CurrentStep: integer;
     {adds +1 to CurrentStep and resizes the array if necessary}
-    procedure incCurrentStep; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+    procedure IncCurrentStep; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
     {resizes the dynamic array - adds 100 steps if needed}
     procedure ResizeSteps; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 
@@ -237,11 +237,11 @@ type
     {checks tile compatibility to the map and adds it if its possible
      returns true if tile is put successfully
      and false if the tile cannot be placed at these coordinates  }
-    function AddTile(tile: TTileType; x,y,z: TIntCoordinate): boolean;
+    function AddTile(Tile: TTileType; x,y,z: TIntCoordinate): boolean;
     {When we're sure what we are doing, we're not making any checks, just add the tile as fast as it is possible}
     procedure AddTileUnsafe(Tile: DGeneratorTile; x,y,z: TIntCoordinate); {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
     {overloaded version that accepts a DGeneratorStep;}
-    procedure AddTileUnsafe(step: DGeneratorStep);
+    procedure AddTileUnsafe(Step: DGeneratorStep);
     {creates a minimap as Map.img}
     procedure MakeMinimap;
     {resizes the generated map for its real size}
@@ -318,7 +318,7 @@ type
     {puts tile # markers on a map to detect which tile is here}
     procedure MakeTileIndexMap;
   private
-    raycastcount: integer;
+    RaycastCount: integer;
     {temporary map for first-order neighbours lists}
     tmpNeighboursMap: TNeighboursMapArray;
     {final neighbours map}
@@ -349,7 +349,7 @@ type
      can be launched directly for debugging}
     procedure Generate; override;
 
-    destructor destroy; override;
+    destructor Destroy; override;
   public
     {WARNING, exporting these WILL stop the Generator from freeing it
      and will NIL the corresponding links. Don't try to access it twice!}
@@ -367,7 +367,7 @@ procedure FreeGroups(ngroups: TGroupsArray);
 implementation
 
 uses SysUtils, CastleLog, CastleFilesUtils, CastleImages, CastleVectors,
-  DOM, CastleXMLUtils, decoinputoutput;
+  DOM, CastleXMLUtils, DecoInputOutput;
 
 {========================= GENERATION ALGORITHM ==============================}
 
@@ -380,26 +380,25 @@ end;
 {----------------------------------------------------------------------------}
 
 procedure DDungeonGenerator.InitParameters;
-var
-    tmp: DGeneratorTile;
+var tmp: DGeneratorTile;
     i : integer;
 begin
-  if not parameters.isReady then
-    raise exception.create('DDungeonGenerator.Generate FATAL - parameters are not loaded!');
+  if not Parameters.isReady then
+    raise Exception.Create('DDungeonGenerator.Generate FATAL - parameters are not loaded!');
   {load tiles}
-  tiles.clear;
+  Tiles.Clear;
 
   UpdateProgress('Loading tiles',0);
 
-  For i := 0 to parameters.TilesList.Count-1 do begin
-    if parameters.AbsoluteURL then
-      tmp := DGeneratorTile.Load(parameters.TilesList[i],false)
+  For i := 0 to Parameters.TilesList.Count-1 do begin
+    if Parameters.AbsoluteURL then
+      tmp := DGeneratorTile.Load(Parameters.TilesList[i],false)
     else
-      tmp := DGeneratorTile.Load(ApplicationData(TilesFolder+parameters.TilesList[i]),true);
+      tmp := DGeneratorTile.Load(ApplicationData(TilesFolder+Parameters.TilesList[i]),true);
     tmp.CalculateFaces;
     tmp.ProcessBlockers;
-    tiles.Add(tmp);
-    UpdateProgress('Loading tiles',0.3*i/(parameters.TilesList.Count-1));
+    Tiles.Add(tmp);
+    UpdateProgress('Loading tiles',0.3*i/(Parameters.TilesList.Count-1));
   end;
 
   UpdateProgress('Processing tiles',0.3);
@@ -425,25 +424,25 @@ begin
     inc(NormalTilesTotalDocks,Tiles[NormalTiles[i]].FreeFaces);
 
   {initialize random seed}
-  InitSeed(parameters.seed);
+  InitSeed(Parameters.seed);
 
   {initialize map size}
-  Map.SetSize(parameters.maxx,parameters.maxy,parameters.maxz); //we don't care about RAM now, we'll shrink the map later
+  Map.SetSize(Parameters.MaxX,Parameters.MaxY,Parameters.MaxZ); //we don't care about RAM now, we'll shrink the map later
 
   {load pregenerated tiles}
-  maxSteps := 0;
-  setlength(Gen, maxSteps);
+  MaxSteps := 0;
+  SetLength(Gen, maxSteps);
   CurrentStep := -1;
 
-  for i := 0 to parameters.FirstSteps.Count-1 do begin
+  for i := 0 to Parameters.FirstSteps.Count-1 do begin
     incCurrentStep;
-    Gen[CurrentStep].tile := GetTileByName(parameters.FirstSteps[i].tile);
-    Gen[CurrentStep].x := parameters.FirstSteps[i].x;
-    Gen[CurrentStep].y := parameters.FirstSteps[i].y;
-    Gen[CurrentStep].z := parameters.FirstSteps[i].z;
+    Gen[CurrentStep].tile := GetTileByName(Parameters.FirstSteps[i].Tile);
+    Gen[CurrentStep].x := Parameters.FirstSteps[i].x;
+    Gen[CurrentStep].y := Parameters.FirstSteps[i].y;
+    Gen[CurrentStep].z := Parameters.FirstSteps[i].z;
   end;
 
-  minSteps := currentStep+1;
+  MinSteps := CurrentStep+1;
   fisInitialized := true;
 end;
 
@@ -483,15 +482,15 @@ var d,t,td: integer;
 
   function CanDock: boolean;
   begin
-    Result := (InvertAngle(Tiles[t].Dock[td].face) = Map.Dock[d].face) and
-               (Tiles[t].Dock[td].facetype = Map.Dock[d].facetype)
+    Result := (InvertAngle(Tiles[t].Dock[td].Face) = Map.Dock[d].Face) and
+               (Tiles[t].Dock[td].FaceType = Map.Dock[d].FaceType)
   end;
   function TryAdd: boolean;
   begin
     Result :=
-      AddTile(t, Map.Dock[d].x - Tiles[t].Dock[td].x + a_dx(Map.Dock[d].face),
-                 Map.Dock[d].y - Tiles[t].Dock[td].y + a_dy(Map.Dock[d].face),
-                 Map.Dock[d].z - Tiles[t].Dock[td].z + a_dz(Map.Dock[d].face))
+      AddTile(t, Map.Dock[d].x - Tiles[t].Dock[td].x + a_dx(Map.Dock[d].Face),
+                 Map.Dock[d].y - Tiles[t].Dock[td].y + a_dy(Map.Dock[d].Face),
+                 Map.Dock[d].z - Tiles[t].Dock[td].z + a_dz(Map.Dock[d].Face))
   end;
 
 begin
@@ -510,14 +509,14 @@ begin
         if (Map.FreeFaces < parameters.MinFaces) and (Map.Volume<Parameters.Volume) then
           t := GetRichTile
         else
-        if (Map.MaxDepth < parameters.minz*(Map.Volume/Parameters.Volume)) then
+        if (Map.MaxDepth < parameters.MinZ*(Map.Volume/Parameters.Volume)) then
           t := GetDownTile
         else
           t := GetNormalTile;
       end else
         t := GetNormalTile;
 
-      td := RNDM.Random(Tiles[t].Dock.count);
+      td := RNDM.Random(Tiles[t].Dock.Count);
     until CanDock;
     Success := TryAdd;
     inc(TriesCount);
@@ -525,29 +524,29 @@ begin
 
   if not Success then begin
     {if we've failed random search next we try sequential search}
-    for tt := 0 to NormalTiles.count-1 do begin
+    for tt := 0 to NormalTiles.Count-1 do begin
       t := NormalTiles[tt];
-      for td := 0 to Tiles[t].Dock.count-1 do
+      for td := 0 to Tiles[t].Dock.Count-1 do
         if canDock then
-          if TryAdd then exit;
+          if TryAdd then Exit;
     end;
     {if we haven't "exited" yet, then there is no tile that fits this
      map's dock point. We have to block it out}
-    for tt := 0 to BlockerTiles.count-1 do begin
+    for tt := 0 to BlockerTiles.Count-1 do begin
       t := BlockerTiles[tt];
-      for td := 0 to Tiles[t].dock.count-1 do //actually it should be always just one
-        if canDock then
-          if TryAdd then exit;
+      for td := 0 to Tiles[t].dock.Count-1 do //actually it should be always just one
+        if CanDock then
+          if TryAdd then Exit;
     end;
     {finally, if we can't even block the face out... it's horrible :(
      The only alternative to just hanging forever up is...}
-    writelnLog(inttostr(BlockerTiles.count));
-    writelnLog('x='+inttostr(Map.Dock[d].x));
-    writelnLog('y='+inttostr(Map.Dock[d].y));
-    writelnLog('z='+inttostr(Map.Dock[d].z));
-    writeLnLog('face='+inttostr(Map.Dock[d].facetype));
-    WriteLnLog('at '+AngleToStr(Map.Dock[d].face));
-    raise Exception.create('DDungeonGenerator.AddRandomTile: FATAL! Unable to block the map element.')
+    WriteLnLog(IntToStr(BlockerTiles.Count));
+    WriteLnLog('x='+IntToStr(Map.Dock[d].x));
+    WriteLnLog('y='+IntToStr(Map.Dock[d].y));
+    WriteLnLog('z='+IntToStr(Map.Dock[d].z));
+    WriteLnLog('face='+IntToStr(Map.Dock[d].FaceType));
+    WriteLnLog('at '+AngleToStr(Map.Dock[d].Face));
+    raise Exception.Create('DDungeonGenerator.AddRandomTile: FATAL! Unable to block the map element.')
   end;
 end;
 
@@ -557,37 +556,37 @@ procedure DDungeonGenerator.Generate;
 var i: integer;
     t1,t2: TDateTime;
 begin
-  if self is DDungeonGenerator then fmult := 1 else fmult := 2;
-  fprogress := 0;
-  updateprogress('Initialize',0);
+  if Self is DDungeonGenerator then fMult := 1 else fMult := 2;
+  fProgress := 0;
+  UpdateProgress('Initialize',0);
 
-  if not parameters.isReady then
-    raise exception.create('DDungeonGenerator.Generate FATAL - parameters are not loaded!');
+  if not Parameters.isReady then
+    raise Exception.Create('DDungeonGenerator.Generate FATAL - parameters are not loaded!');
   if not isInitialized then begin
     WriteLnLog('DDungeonGenerator.Generate','Warning: parameters were automatically initialized! It''s best to initialize parameters manually outside the thread.');
     InitParameters;
   end;
   if isWorking then begin
-    WriteLnLog('DDungeonGenerator.Generate','Generation thread is buisy! Aborting...');
-    exit;
+    WriteLnLog('DDungeonGenerator.Generate','WARNING: Generation thread is buisy! Aborting...');
+    Exit;
   end;
   fisWorking := true;
 
-  t1 := now;
+  t1 := Now;
   repeat
-    t2 := now;
+    t2 := Now;
     Map.EmptyMap(false);
     //add prgenerated or undo tiles
-    CurrentStep := RNDM.random(currentStep);
+    CurrentStep := RNDM.random(CurrentStep);
     if CurrentStep < MinSteps-1 then CurrentStep := MinSteps-1;
-    WriteLnLog('DDungeonGenerator.Generate','Starting from '+inttostr(currentstep));
-    for i := 0 to currentStep do AddTileUnsafe(Gen[i]);
+    WriteLnLog('DDungeonGenerator.Generate','Starting from '+inttostr(CurrentStep));
+    for i := 0 to CurrentStep do AddTileUnsafe(Gen[i]);
 
     while Map.CalculateFaces<>0 do begin
       {writeLnLog(inttostr(Map.dock.count));}
       //add a tile
       AddRandomTile;
-      UpdateProgress('Generating',minimum(map.Volume/parameters.Volume,0.90));
+      UpdateProgress('Generating',Minimum(Map.Volume/Parameters.Volume,0.90));
     end;
     {if map doesn't meet the paramters then undo}
 
@@ -609,16 +608,17 @@ begin
 
       end;
     end;  }
-    WriteLnLog('DDungeonGenerator.Generate','Done in = '+inttostr(round((now-t2)*24*60*60*1000))+'ms');
-    WriteLnLog('DDungeonGenerator.Generate','Map volume = '+inttostr(map.Volume) +'/'+inttostr(parameters.volume));
-    WriteLnLog('DDungeonGenerator.Generate','Max depth = '+inttostr(map.MaxDepth+1)+'/'+inttostr(parameters.minz));
-  until (map.Volume>=parameters.Volume) and (map.MaxDepth+1>=parameters.minz); {until map meets the paramters}
+    WriteLnLog('DDungeonGenerator.Generate','Done in = '+IntToStr(Round((Now-t2)*24*60*60*1000))+'ms');
+    WriteLnLog('DDungeonGenerator.Generate','Map volume = '+IntToStr(Map.Volume) +'/'+IntToStr(Parameters.Volume));
+    WriteLnLog('DDungeonGenerator.Generate','Max depth = '+IntToStr(Map.MaxDepth+1)+'/'+IntToStr(Parameters.MinZ));
+  until (Map.Volume>=Parameters.Volume) and (Map.MaxDepth+1>=Parameters.MinZ); {until map meets the paramters}
+  {$WARNING may hang up forever here, if paremeters cannot be satisfied}
 
   UpdateProgress('Finalizing',0.95);
   //finally resize the dynamic array
   MaxSteps := CurrentStep+1;
   SetLength(Gen,MaxSteps);
-  WriteLnLog('DDungeonGenerator.Generate','Job finished in = '+inttostr(round((now-t1)*24*60*60*1000))+'ms');
+  WriteLnLog('DDungeonGenerator.Generate','Job finished in = '+IntToStr(Round((Now-t1)*24*60*60*1000))+'ms');
 
   // finalize
   FreeLists; //we no longer need them
@@ -628,7 +628,7 @@ begin
 
   fisWorking := false;
   fisFinished := true;
-  if self is DDungeonGenerator then UpdateProgress('Done',1);
+  if Self is DDungeonGenerator then UpdateProgress('Done',1);
 end;
 
 {-----------------------------------------------------------------------------}
@@ -636,18 +636,18 @@ end;
 function DDungeonGenerator.ExportMap: DMap;
 var ix,iy,iz: TIntCoordinate;
 begin
-  if not isFinished then raise Exception.create('DDungeonGenerator.ExportMap: ERROR! Trying to access an unfinished Generator');
+  if not isFinished then raise Exception.Create('DDungeonGenerator.ExportMap: ERROR! Trying to access an unfinished Generator');
   {Result := Map;
   Map := nil;}
-  Result := DMap.create;
-  Result.setsize(Map.sizex,Map.sizey,Map.sizez);
-  for ix := 0 to Map.sizex-1 do
-    for iy := 0 to Map.sizey-1 do
-      for iz := 0 to Map.sizez-1 do
-        Result.map[ix,iy,iz] := Map.Map[ix,iy,iz];
-  setLength(Result.img,length(Map.img));
-  for iz := 0 to Map.sizez-1 do
-    Result.img[iz] := Map.img[iz].MakeCopy as TRGBAlphaImage;
+  Result := DMap.Create;
+  Result.SetSize(Map.SizeX,Map.SizeY,Map.SizeZ);
+  for ix := 0 to Map.SizeX-1 do
+    for iy := 0 to Map.SizeY-1 do
+      for iz := 0 to Map.SizeZ-1 do
+        Result.Map[ix,iy,iz] := Map.Map[ix,iy,iz];
+  SetLength(Result.Img,Length(Map.Img));
+  for iz := 0 to Map.SizeZ-1 do
+    Result.Img[iz] := Map.Img[iz].MakeCopy as TRGBAlphaImage;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -655,9 +655,9 @@ end;
 function DDungeonGenerator.ExportTiles: TStringList;
 var s: string;
 begin
-  Result := TStringList.create;
-  for s in self.Parameters.TilesList do
-    Result.add(ApplicationData(TilesFolder+s+'.x3d'+GZ_ext));
+  Result := TStringList.Create;
+  for s in Self.Parameters.TilesList do
+    Result.Add(ApplicationData(TilesFolder+s+'.x3d'+GZ_ext));
 end;
 
 {-----------------------------------------------------------------------------}
@@ -672,34 +672,34 @@ end;
 
 procedure DDungeonGenerator.ResizeSteps; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
-  if currentstep+1>=maxsteps then begin
-    inc(maxsteps,GeneratorShift);
-    setlength(Gen, maxsteps);
+  if CurrentStep+1>=MaxSteps then begin
+    inc(MaxSteps,GeneratorShift);
+    SetLength(Gen, MaxSteps);
   end
 end;
 procedure DDungeonGenerator.incCurrentStep; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
-  inc(currentStep);
+  inc(CurrentStep);
   ResizeSteps;
 end;
 
 {-----------------------------------------------------------------------------}
 
-function DDungeonGenerator.AddTile(tile: TTileType; x,y,z: TIntCoordinate): boolean;
+function DDungeonGenerator.AddTile(Tile: TTileType; x,y,z: TIntCoordinate): boolean;
 var jx,jy,jz: TIntCoordinate;
 begin
   Result := false;
   //check all tiles against map area they are placed to
-  for jx := 0 to tiles[tile].sizex-1 do
-   for jy := 0 to tiles[tile].sizey-1 do
-    for jz := 0 to tiles[tile].sizez-1 do
-      if not CheckCompatibility(tiles[tile].Map[jx,jy,jz],x+jx,y+jy,z+jz)
-      then exit;
+  for jx := 0 to Tiles[Tile].SizeX-1 do
+   for jy := 0 to Tiles[Tile].SizeY-1 do
+    for jz := 0 to Tiles[Tile].SizeZ-1 do
+      if not CheckCompatibility(Tiles[Tile].Map[jx,jy,jz],x+jx,y+jy,z+jz)
+      then Exit;
 
-  AddTileUnsafe(Tiles[tile],x,y,z);
+  AddTileUnsafe(Tiles[Tile],x,y,z);
   {add current step to GEN}
   incCurrentStep;
-  Gen[CurrentStep].tile := tile;
+  Gen[CurrentStep].Tile := Tile;
   Gen[CurrentStep].x := x;
   Gen[CurrentStep].y := y;
   Gen[CurrentStep].z := z;
@@ -709,27 +709,27 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-procedure DDungeonGenerator.AddTileUnsafe(tile: DGeneratorTile; x,y,z: TIntCoordinate); {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+procedure DDungeonGenerator.AddTileUnsafe(Tile: DGeneratorTile; x,y,z: TIntCoordinate); {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 var jx,jy,jz: TIntCoordinate;
     a: TAngle;
 begin
-  for jx := 0 to tile.sizex-1 do
-   for jy := 0 to tile.sizey-1 do
-    for jz := 0 to tile.sizez-1 do begin
-      if Tile.Map[jx,jy,jz].base <> tkNone then
-        Map.Map[x+jx,y+jy,z+jz].base := Tile.Map[jx,jy,jz].base;
-      for a in TAngle do if Tile.Map[jx,jy,jz].faces[a] <> tfNone then
-        if Tile.blocker then begin
-          Map.Map[x+jx,y+jy,z+jz].faces[a] := tfWall;
-          Map.Map[x+jx+a_dx(a),y+jy+a_dy(a),z+jz+a_dz(a)].faces[InvertAngle(a)] := tfWall;
+  for jx := 0 to Tile.SizeX-1 do
+   for jy := 0 to Tile.SizeY-1 do
+    for jz := 0 to Tile.SizeZ-1 do begin
+      if Tile.Map[jx,jy,jz].Base <> tkNone then
+        Map.Map[x+jx,y+jy,z+jz].Base := Tile.Map[jx,jy,jz].Base;
+      for a in TAngle do if Tile.Map[jx,jy,jz].Faces[a] <> tfNone then
+        if Tile.Blocker then begin
+          Map.Map[x+jx,y+jy,z+jz].Faces[a] := tfWall;
+          Map.Map[x+jx+a_dx(a),y+jy+a_dy(a),z+jz+a_dz(a)].Faces[InvertAngle(a)] := tfWall;
         end
         else
-          Map.Map[x+jx,y+jy,z+jz].faces[a] := Tile.Map[jx,jy,jz].faces[a];
+          Map.Map[x+jx,y+jy,z+jz].Faces[a] := Tile.Map[jx,jy,jz].Faces[a];
     end;
 end;
-procedure DDungeonGenerator.AddTileUnsafe(step: DGeneratorStep);
+procedure DDungeonGenerator.AddTileUnsafe(Step: DGeneratorStep);
 begin
-  AddTileUnsafe(Tiles[step.tile],step.x,step.y,step.z);
+  AddTileUnsafe(Tiles[Step.Tile],Step.x,Step.y,Step.z);
 end;
 
 {-----------------------------------------------------------------------------}
@@ -739,15 +739,15 @@ var TmpTile: BasicTile;
     a: TAngle;
 begin
   Result := true;
-  if Tile.base <> tkNone then begin   // we can place an "empty" tile anywhere whether it's just empty or a blocker
+  if Tile.Base <> tkNone then begin   // we can place an "empty" tile anywhere whether it's just empty or a blocker
     TmpTile := Map.MapSafe(x,y,z);
     {check if tile base fits the map}
-    if TmpTile.base <> tkNone then
+    if TmpTile.Base <> tkNone then
       Result := false // if the "map" is occupied at (x,y,z) nothing but "empty" can be placed there
     else begin
       {check current tile faces fit the map}
-      for a in TAngle do if (TmpTile.faces[a] <> Tile.faces[a]) and
-                            (TmpTile.faces[a] <> tfNone) then Result := false;
+      for a in TAngle do if (TmpTile.Faces[a] <> Tile.Faces[a]) and
+                            (TmpTile.Faces[a] <> tfNone) then Result := false;
       if Result then begin
         {if current tile ok, then check adjacent tiles}
         {this algorithm may be significantly optimized by
@@ -757,9 +757,9 @@ begin
         //horizontal angles -> full 6 angles
         for a in TAngle do begin
           TmpTile := Map.MapSafe(x+a_dx(a), y+a_dy(a), z+a_dz(a));
-          if TmpTile.base <> tkInacceptible then
-            if (TmpTile.faces[InvertAngle(a)] <> Tile.faces[a]) and
-               (TmpTile.faces[invertAngle(a)] <> tfNone) then Result := false;
+          if TmpTile.Base <> tkInacceptible then
+            if (TmpTile.Faces[InvertAngle(a)] <> Tile.Faces[a]) and
+               (TmpTile.Faces[invertAngle(a)] <> tfNone) then Result := false;
         end;
       end;
     end;
@@ -773,23 +773,23 @@ var i: integer;
     iz: TIntCoordinate;
 begin
   Map.FreeMinimap;
-  setLength(Map.img,Map.sizez);
+  setLength(Map.Img,Map.SizeZ);
   for i := 0 to Map.SizeZ-1 do begin
-    Map.img[i] := TRGBAlphaImage.create;
-    Map.img[i].setsize((map.sizex)*16,(map.sizey)*16,1);
-    Map.img[i].Clear(Vector4Byte(0,0,0,0));
+    Map.Img[i] := TRGBAlphaImage.Create;
+    Map.Img[i].SetSize((Map.SizeX)*16,(Map.SizeY)*16,1);
+    Map.Img[i].Clear(Vector4Byte(0,0,0,0));
   end;
-  for i := 0 to currentStep do
-    for iz := 0 to tiles[Gen[i].tile].sizez-1 do begin
-      if not tiles[Gen[i].tile].blocker then begin
-        tiles[Gen[i].tile].img[iz].DrawTo(Map.img[iz+Gen[i].z], Gen[i].x*16,
-             (Map.sizey-Gen[i].y-tiles[Gen[i].tile].sizey)*16, dmBlendSmart);
+  for i := 0 to CurrentStep do
+    for iz := 0 to Tiles[Gen[i].Tile].SizeZ-1 do begin
+      if not Tiles[Gen[i].Tile].Blocker then begin
+        Tiles[Gen[i].Tile].Img[iz].DrawTo(Map.Img[iz+Gen[i].z], Gen[i].x*16,
+             (Map.SizeY-Gen[i].y-Tiles[Gen[i].Tile].SizeY)*16, dmBlendSmart);
       end else begin
-        tiles[Gen[i].tile].img[iz].DrawTo(Map.img[iz+Gen[i].z], (Gen[i].x+Tiles[Gen[i].tile].b_x)*16,
-             (Map.sizey-(Gen[i].y+Tiles[Gen[i].tile].b_y)-tiles[Gen[i].tile].sizey)*16, dmBlendSmart);
+        Tiles[Gen[i].Tile].Img[iz].DrawTo(Map.Img[iz+Gen[i].z], (Gen[i].x+Tiles[Gen[i].Tile].b_x)*16,
+             (Map.SizeY-(Gen[i].y+Tiles[Gen[i].Tile].b_y)-Tiles[Gen[i].Tile].SizeY)*16, dmBlendSmart);
       end;
     end;
-  writeLnLog('DDungeonGenerator.MakeMinimap',inttostr(length(Map.img)));
+  WriteLnLog('DDungeonGenerator.MakeMinimap',IntToStr(Length(Map.Img)));
 end;
 
 {-------------------------------------------------------------------------}
@@ -802,9 +802,9 @@ begin
   {only z-resize now. Maybe I won't make xy-resizes
    due to possible blockers problems
    (actually not a problem, but requires some work)}
-  if map.maxDepth+1<map.sizez then begin
-    map.sizez := map.maxDepth+1;
-    map.setsize(map.sizex,map.sizey,map.sizez);
+  if Map.MaxDepth+1<Map.SizeZ then begin
+    Map.SizeZ := Map.MaxDepth+1;
+    Map.SetSize(Map.SizeX,Map.SizeY,Map.SizeZ);
   end;
 end;
 
@@ -813,12 +813,12 @@ end;
 function D3DDungeonGenerator.ZeroIntegerMap: TIntMapArray;
 var ix,iy,iz: TIntCoordinate;
 begin
-  setLength(Result,Map.sizex);
-  for ix := 0 to map.sizex-1 do begin
-    setLength(Result[ix],map.sizey);
-    for iy := 0 to map.sizey-1 do begin
-      setLength(Result[ix,iy],map.sizez);
-      for iz := 0 to map.sizez-1 do
+  SetLength(Result,Map.SizeX);
+  for ix := 0 to Map.SizeX-1 do begin
+    SetLength(Result[ix],Map.SizeY);
+    for iy := 0 to Map.SizeY-1 do begin
+      SetLength(Result[ix,iy],Map.SizeZ);
+      for iz := 0 to Map.SizeZ-1 do
         Result[ix,iy,iz] := -1;
     end;
   end;
@@ -829,11 +829,11 @@ end;
 function D3DDungeonGenerator.NilIndexMap: TNeighboursMapArray;
 var ix,iy{,iz}: TIntCoordinate;
 begin
-  setLength(Result,Map.sizex);
-  for ix := 0 to map.sizex-1 do begin
-    setLength(Result[ix],map.sizey);
-    for iy := 0 to map.sizey-1 do begin
-      setLength(Result[ix,iy],map.sizez);
+  SetLength(Result,Map.SizeX);
+  for ix := 0 to Map.SizeX-1 do begin
+    SetLength(Result[ix],Map.SizeY);
+    for iy := 0 to Map.SizeY-1 do begin
+      SetLength(Result[ix,iy],Map.SizeZ);
     end;
   end;
 end;
@@ -845,13 +845,13 @@ var i: integer;
     ix,iy,iz: TIntCoordinate;
 begin
   TileIndexMap := ZeroIntegerMap;
-  for i := 0 to maxsteps-1 do with Tiles[Gen[i].tile] do
-    if not blocker then // we don't count blockers here, they are not normal tiles :) We'll have to add them later
-    for ix := 0 to sizex-1 do
-      for iy := 0 to sizey-1 do
-        for iz := 0 to sizez-1 do
-          if map[ix,iy,iz].base <> tkNone then
-            TileIndexMap[ix+gen[i].x,iy+gen[i].y,iz+gen[i].z] := i;
+  for i := 0 to MaxSteps-1 do with Tiles[Gen[i].Tile] do
+    if not Blocker then // we don't count blockers here, they are not normal tiles :) We'll have to add them later
+    for ix := 0 to SizeX-1 do
+      for iy := 0 to SizeY-1 do
+        for iz := 0 to SizeZ-1 do
+          if Map[ix,iy,iz].Base <> tkNone then
+            TileIndexMap[ix+Gen[i].x,iy+Gen[i].y,iz+Gen[i].z] := i;
 end;
 
 {----------------------------------------------------------------------------}
@@ -879,46 +879,46 @@ begin
    with result "false"}
 
   if x2>x1 then
-    for ix := trunc(x1) to trunc(x2)-1 do begin
+    for ix := Trunc(x1) to Trunc(x2)-1 do begin
       a := (ix-x1+1)/vx;
-      iy := trunc(y1+a*vy);
-      iz := trunc(z1+a*vz);
-      if not IsLookable(Map.map[ix,iy,iz].faces[aRight]) then exit;
+      iy := Trunc(y1+a*vy);
+      iz := Trunc(z1+a*vz);
+      if not IsLookable(Map.Map[ix,iy,iz].Faces[aRight]) then Exit;
     end
   else
-    for ix := trunc(x2) to trunc(x1)-1 do begin
+    for ix := Trunc(x2) to Trunc(x1)-1 do begin
       a := (ix-x1+1)/vx;
-      iy := trunc(y1+a*vy);
-      iz := trunc(z1+a*vz);
-      if not IsLookable(Map.map[ix,iy,iz].faces[aLeft]) then exit;
+      iy := Trunc(y1+a*vy);
+      iz := Trunc(z1+a*vz);
+      if not IsLookable(Map.Map[ix,iy,iz].Faces[aLeft]) then Exit;
     end;
   if y2>y1 then
-    for iy := trunc(y1) to trunc(y2)-1 do begin
+    for iy := Trunc(y1) to Trunc(y2)-1 do begin
       a := (iy-y1+1)/vy;
-      ix := trunc(x1+a*vx);
-      iz := trunc(z1+a*vz);
-      if not IsLookable(Map.map[ix,iy,iz].faces[aTop]) then exit;
+      ix := Trunc(x1+a*vx);
+      iz := Trunc(z1+a*vz);
+      if not IsLookable(Map.Map[ix,iy,iz].Faces[aTop]) then Exit;
     end
   else
-    for iy := trunc(y2) to trunc(y1)-1 do begin
+    for iy := Trunc(y2) to Trunc(y1)-1 do begin
       a := (iy-y1+1)/vy;
-      ix := trunc(x1+a*vx);
-      iz := trunc(z1+a*vz);
-      if not IsLookable(Map.map[ix,iy,iz].faces[aBottom]) then exit;
+      ix := Trunc(x1+a*vx);
+      iz := Trunc(z1+a*vz);
+      if not IsLookable(Map.Map[ix,iy,iz].Faces[aBottom]) then Exit;
     end;
   if z2>z1 then
-    for iz := trunc(z1) to trunc(z2)-1 do begin
+    for iz := Trunc(z1) to Trunc(z2)-1 do begin
       a := (iz-z1+1)/vz;
-      ix := trunc(x1+a*vx);
-      iy := trunc(y1+a*vy);
-      if not IsLookable(Map.map[ix,iy,iz].faces[aDown]) then exit;
+      ix := Trunc(x1+a*vx);
+      iy := Trunc(y1+a*vy);
+      if not IsLookable(Map.Map[ix,iy,iz].Faces[aDown]) then Exit;
     end
   else
-    for iz := trunc(z2) to trunc(z1)-1 do begin
+    for iz := Trunc(z2) to Trunc(z1)-1 do begin
       a := (iz-z1+1)/vz;
-      ix := trunc(x1+a*vx);
-      iy := trunc(y1+a*vy);
-      if not IsLookable(Map.map[ix,iy,iz].faces[aUp]) then exit;
+      ix := Trunc(x1+a*vx);
+      iy := Trunc(y1+a*vy);
+      if not IsLookable(Map.Map[ix,iy,iz].Faces[aUp]) then Exit;
     end;
 
   Result := true;
@@ -929,10 +929,10 @@ end;
 procedure D3DDungeonGenerator.RaycastTile(mx,my,mz: TIntCoordinate); {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 var
     HelperMap: TIntMapArray;
-    raycastList,OldList: TRaycastList;
+    RaycastList,OldList: TRaycastList;
     j: integer;
     nx,ny,nz: integer;
-    raycount,raytrue: integer;
+    RayCount,RayTrue: integer;
     Neighbour: DNeighbour;
 
     {safely set a tile candidate}
@@ -950,7 +950,7 @@ var
         NewCandidate.x := x;
         NewCandidate.y := y;
         NewCandidate.z := z;
-        raycastList.Add(NewCandidate);
+        RaycastList.Add(NewCandidate);
       end;
     end;
     {advance a next step of candidate tiles}
@@ -962,7 +962,7 @@ var
       for i := 0 to OldList.Count-1 do
         if HelperMap[OldList[i].x,OldList[i].y,OldList[i].z]>0 then
           for a in TAngle do
-            if isLookable(Map.Map[OldList[i].x,OldList[i].y,OldList[i].z].faces[a]) then
+            if isLookable(Map.Map[OldList[i].x,OldList[i].y,OldList[i].z].Faces[a]) then
               SetCandidate(OldList[i].x+a_dx(a),OldList[i].y+a_dy(a),OldList[i].z+a_dz(a));
     end;
     {raycast 8 corners of one tile to another}
@@ -989,12 +989,12 @@ begin
     //re-init all the variables, grow the map
     FreeAndNil(OldList);
     OldList := RaycastList;
-    RaycastList := TRaycastList.create;
+    RaycastList := TRaycastList.Create;
     //get candidates
     GrowHelperMap;
 
     //raycast mx,my,mz -> RaycastList[i] (candidates)
-    for j := 0 to RaycastList.count-1 do begin
+    for j := 0 to RaycastList.Count-1 do begin
       RayCount := 0;
       RayTrue := 0;
 
@@ -1008,7 +1008,7 @@ begin
         if Ray(mx              +RNDM.Random,my              +RNDM.Random,mz              +RNDM.Random,
                RayCastList[j].x+RNDM.Random,RayCastList[j].y+RNDM.Random,RayCastList[j].z+RNDM.Random)
         then inc(RayTrue);
-      until ((RayTrue >= RayCount div 2) or (RayCount >= MaxNeighboursIndex)) and (rayCount>CornerCount);
+      until ((RayTrue >= RayCount div 2) or (RayCount >= MaxNeighboursIndex)) and (RayCount>CornerCount);
 
       if RayTrue>0 then
         HelperMap[RayCastList[j].x,RayCastList[j].y,RayCastList[j].z] := MaxNeighboursIndex * RayTrue div RayCount
@@ -1023,23 +1023,23 @@ begin
 
   //convert HelperMap to NeighbourList
 
-  tmpNeighboursMap[mx,my,mz] := TNeighboursList.create;
+  tmpNeighboursMap[mx,my,mz] := TNeighboursList.Create;
   //make a list of neighbours
   for nx := 0 to Map.sizex-1 do
     for ny := 0 to map.sizey-1 do
       for nz := 0 to map.sizez-1 do if HelperMap[nx,ny,nz]>0 then begin
         Neighbour.tile := TileIndexMap[nx,ny,nz];
         Neighbour.visible := HelperMap[nx,ny,nz];
-        tmpNeighboursMap[mx,my,mz].add(Neighbour);
+        tmpNeighboursMap[mx,my,mz].Add(Neighbour);
 
         //Add blockers
         //THIS IS UGLY AND INEFFICIENT both on CPU and RAM!!!
-        for j := 0 to maxsteps-1 do if Tiles[Gen[j].tile].blocker then
+        for j := 0 to MaxSteps-1 do if Tiles[Gen[j].Tile].Blocker then
           {warning! This works only for 1x1x1 blockers with only ONE open face}
-          if (gen[j].x+Tiles[Gen[j].tile].b_x=nx) and (gen[j].y+Tiles[Gen[j].tile].b_y=ny) and (gen[j].z+Tiles[Gen[j].tile].b_z=nz) then begin
-            Neighbour.tile := j;
-            Neighbour.visible := HelperMap[nx,ny,nz];
-            tmpNeighboursMap[mx,my,mz].add(Neighbour);
+          if (Gen[j].x+Tiles[Gen[j].Tile].b_x=nx) and (Gen[j].y+Tiles[Gen[j].Tile].b_y=ny) and (Gen[j].z+Tiles[Gen[j].Tile].b_z=nz) then begin
+            Neighbour.Tile := j;
+            Neighbour.Visible := HelperMap[nx,ny,nz];
+            tmpNeighboursMap[mx,my,mz].Add(Neighbour);
           end;
       end;
 
@@ -1047,15 +1047,15 @@ begin
   RemoveDuplicatesNeighbours(tmpNeighboursMap[mx,my,mz]);
   //WriteLnLog(inttostr(mx)+inttostr(my)+inttostr(mz),inttostr(tmpNeighboursMap[mx,my,mz].count));
 
-  inc(raycastcount);
-  UpdateProgress('Raycasting',1+(raycastcount/map.Volume)*0.8);
+  inc(RaycastCount);
+  UpdateProgress('Raycasting',1+(RaycastCount/Map.Volume)*0.8);
 end;
 
 {----------------------------------------------------------------------------}
 
 function CompareNeighbours(const i1,i2: DNeighbour): integer;
 begin
-  result := i1.tile - i2.tile;
+  Result := i1.tile - i2.tile;
 end;
 
 {----------------------------------------------------------------------------}
@@ -1063,14 +1063,14 @@ end;
 procedure D3DDungeonGenerator.RemoveDuplicatesNeighbours(var List: TNeighboursList);
 var i: integer;
 begin
-  if list.count <= 1 then exit;
-  List.sort(@CompareNeighbours);
+  if list.count <= 1 then Exit;
+  List.Sort(@CompareNeighbours);
   i := 0;
   repeat
-    if List[i].tile = List[i+1].tile then begin
+    if List[i].Tile = List[i+1].Tile then begin
       {duplicate found, choose the largest value and go delete one duplicate}
-      if List[i].visible < list[i+1].visible then
-        list.Delete(i)
+      if List[i].Visible < List[i+1].Visible then
+        List.Delete(i)
       else
         List.Delete(i+1);
       {"The argument cannot be assigned to" - are you joking???
@@ -1080,7 +1080,7 @@ begin
        Thanks, Michalis!}
     end
     else inc(i);
-  until i >= List.count-1;
+  until i >= List.Count-1;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -1092,10 +1092,10 @@ var i: integer;
 begin
   NeighboursMap := NilIndexMap;
 
-  writelnLog('D3DDungeonGenerator.Neighbours_of_neighbours','Merging neighbours of neighbours...');
-  for ix := 0 to Map.sizex-1 do
-    for iy := 0 to Map.sizey-1 do
-      for iz := 0 to Map.sizez-1 do if tmpNeighboursMap[ix,iy,iz]<>nil then begin
+  WriteLnLog('D3DDungeonGenerator.Neighbours_of_neighbours','Merging neighbours of neighbours...');
+  for ix := 0 to Map.SizeX-1 do
+    for iy := 0 to Map.SizeY-1 do
+      for iz := 0 to Map.SizeZ-1 do if tmpNeighboursMap[ix,iy,iz]<>nil then begin
         //writeLnLog('neighbours',inttostr(tmpNeighboursMap[ix,iy,iz].count));
         //process neighbours
  {       for dx := 0 to tiles[tmpNeighboursMap[ix,iy,iz].tile].sizex do
@@ -1103,9 +1103,9 @@ begin
             for dz := 0 to tiles[tmpNeighboursMap[ix,iy,iz].tile].sizex do {***};
  }
         {$warning not working yet}
-        NeighboursMap[ix,iy,iz] := TNeighboursList.create;
-        for i := 0 to tmpNeighboursMap[ix,iy,iz].count-1 do
-          NeighboursMap[ix,iy,iz].add(tmpNeighboursMap[ix,iy,iz].L[i]);
+        NeighboursMap[ix,iy,iz] := TNeighboursList.Create;
+        for i := 0 to tmpNeighboursMap[ix,iy,iz].Count-1 do
+          NeighboursMap[ix,iy,iz].Add(tmpNeighboursMap[ix,iy,iz].L[i]);
         RemoveDuplicatesNeighbours(NeighboursMap[ix,iy,iz]);
       end;
 end;
@@ -1116,13 +1116,13 @@ end;
 procedure D3DDungeonGenerator.Raycast;
 var ix,iy,iz: TIntCoordinate;
 begin
- raycastcount := 0;
+ RaycastCount := 0;
  tmpNeighboursMap := NilIndexMap; //create a nil-initialized neighbours lists of all accessible map tiles
 
  {here we fill in the neighbours}
- for ix := 0 to Map.sizex-1 do
-   for iy := 0 to Map.sizey-1 do
-     for iz := 0 to Map.sizez-1 do if TileIndexMap[ix,iy,iz]>=0 {and is accessible} then
+ for ix := 0 to Map.SizeX-1 do
+   for iy := 0 to Map.SizeY-1 do
+     for iz := 0 to Map.SizeZ-1 do if TileIndexMap[ix,iy,iz]>=0 {and is accessible} then
        RaycastTile(ix,iy,iz);
 
  UpdateProgress('Processing',0.8);
@@ -1139,8 +1139,8 @@ end;
 
 {can't make it nested because TCompareFunction cannot accept "is nested"}
 type DIndexRec = record
-  index: integer;
-  hits: integer;
+  Index: integer;
+  Hits: integer;
 end;
 type HitList = specialize TGenericStructList<DIndexRec>;
 //{$DEFINE InverseSort}
@@ -1155,40 +1155,40 @@ end;
 procedure D3DDungeonGenerator.Chunk_N_Slice;
 var i,j,g: integer;
     ix,iy,iz: integer;
-    hit_count: HitList;
+    HitCount: HitList;
     tIndex: DIndexRec;
-    tilesused: array of boolean;
+    TilesUsed: array of boolean;
 begin
   {this part of the code will combine tiles in larger groups to boost FPS
   also this will provide for LOD of the whole group generation and far land support for overworld later
   I'm not yet sure how textures will behave... but let's leave this question for later}
 
   //prepare to count hits
-  hit_count := HitList.create;
-  for i := 0 to high(Gen) do begin
-    tIndex.index := i;
-    tIndex.hits := 0;
-    hit_count.Add(tIndex);
+  HitCount := HitList.Create;
+  for i := 0 to High(Gen) do begin
+    tIndex.Index := i;
+    tIndex.Hits := 0;
+    HitCount.Add(tIndex);
   end;
   {first we just count how much time a tile is 'hit' by neighbours
   Therefore we find "more popular" tiles which will be 'seeds' for groups}
-  for ix := 0 to Map.sizex-1 do
-    for iy := 0 to Map.sizey-1 do
-      for iz := 0 to Map.sizez-1 do if NeighboursMap[ix,iy,iz]<>nil then {begin}
+  for ix := 0 to Map.SizeX-1 do
+    for iy := 0 to Map.SizeY-1 do
+      for iz := 0 to Map.SizeZ-1 do if NeighboursMap[ix,iy,iz]<>nil then {begin}
         //writeLnLog(inttostr(ix)+inttostr(iy)+inttostr(iz),inttostr(NeighboursMap[ix,iy,iz].count));
-        for j := 0 to NeighboursMap[ix,iy,iz].count-1 do
-          inc(Hit_count.L[NeighboursMap[ix,iy,iz].L[j].Tile].hits);
+        for j := 0 to NeighboursMap[ix,iy,iz].Count-1 do
+          inc(HitCount.L[NeighboursMap[ix,iy,iz].L[j].Tile].Hits);
       {end;}
-  Hit_count.Sort(@CompareHits);
+  HitCount.Sort(@CompareHits);
 
   {now let's start the main algorithm}
   g := 0;
-  setlength(tilesUsed,length(Gen));
-  for j := 0 to high(tilesused) do tilesUsed[j] := false;
+  setlength(TilesUsed,Length(Gen));
+  for j := 0 to high(TilesUsed) do TilesUsed[j] := false;
   i := 0;
   repeat
-    setLength(Groups,g+1);
-    Groups[g] := TIndexList.create;
+    SetLength(Groups,g+1);
+    Groups[g] := TIndexList.Create;
     {here we find the tile with minimal amount (>0) of currently visible neighbours,
     it produces smoother amount of members in a group
     versus less groups in case maximum is used
@@ -1200,35 +1200,35 @@ begin
 
       {we don't actually need to scan the whole tile(sizex,sizey,sizez), only top-left element,
        if we'll miss something, we'll just add missed tiles to *other* groups later}
-      ix := Gen[Hit_count[i].index].x;
-      iy := Gen[Hit_count[i].index].y;
-      iz := Gen[Hit_count[i].index].z;
+      ix := Gen[HitCount[i].Index].x;
+      iy := Gen[HitCount[i].Index].y;
+      iz := Gen[HitCount[i].Index].z;
       //blockers behave a bit differently
-      if Tiles[Gen[Hit_count[i].index].tile].blocker then begin
-        ix += Tiles[Gen[Hit_count[i].index].tile].b_x;
-        iy += Tiles[Gen[Hit_count[i].index].tile].b_y;
-        iz += Tiles[Gen[Hit_count[i].index].tile].b_z;
+      if Tiles[Gen[HitCount[i].index].Tile].Blocker then begin
+        ix += Tiles[Gen[HitCount[i].Index].Tile].b_x;
+        iy += Tiles[Gen[HitCount[i].Index].Tile].b_y;
+        iz += Tiles[Gen[HitCount[i].Index].Tile].b_z;
       end;
 
       {we're sure neighbours list is not nil!}
-      if NeighboursMap[ix,iy,iz]=nil then raise exception.create('NeighboursMap is nil!');
-      for j := 0 to NeighboursMap[ix,iy,iz].count-1 do
-        if not tilesUsed[NeighboursMap[ix,iy,iz].L[j].tile] then begin
-          tilesUsed[NeighboursMap[ix,iy,iz].L[j].tile] := true;
-          Groups[g].add(NeighboursMap[ix,iy,iz].L[j].tile);
+      if NeighboursMap[ix,iy,iz]=nil then raise Exception.Create('NeighboursMap is nil!');
+      for j := 0 to NeighboursMap[ix,iy,iz].Count-1 do
+        if not TilesUsed[NeighboursMap[ix,iy,iz].L[j].Tile] then begin
+          TilesUsed[NeighboursMap[ix,iy,iz].L[j].Tile] := true;
+          Groups[g].Add(NeighboursMap[ix,iy,iz].L[j].Tile);
         end;
 
     end;
 
-    while (i <= high(tilesUsed)) and (tilesUsed[Hit_count[i].index]) do inc(i);
+    while (i <= High(TilesUsed)) and (TilesUsed[HitCount[i].Index]) do inc(i);
     inc(g);
 
-  until i >= high(Gen);
+  until i >= High(Gen);
 
-  writeLnLog('D3DDungeonGenerator.Chunk_N_Slice','N groups = '+inttostr(length(groups)));
-  for i := 0 to high(groups) do writeLnLog('group '+inttostr(i),inttostr(groups[i].Count));
+  WriteLnLog('D3DDungeonGenerator.Chunk_N_Slice','N groups = '+inttostr(length(groups)));
+  for i := 0 to High(Groups) do WriteLnLog('group '+IntToStr(i),IntToStr(Groups[i].Count));
 
-  freeAndNil(Hit_count);
+  FreeAndNil(HitCount);
 end;
 
 {------------------------------------------------------------------------}
@@ -1236,7 +1236,7 @@ end;
 procedure D3DDungeonGenerator.Generate;
 var t,t0: TDateTime;
 begin
-  t0 := now;
+  t0 := Now;
   //make the logic map
   inherited Generate;
   fisFinished := false;
@@ -1245,8 +1245,8 @@ begin
   UpdateProgress('Raycasting',1);
 
   //raycast
-  writeLnLog('D3DDungeonGenerator.Generate','Raycasting started...');
-  t := now;
+  WriteLnLog('D3DDungeonGenerator.Generate','Raycasting started...');
+  t := Now;
 
   MakeTileIndexMap;
 
@@ -1256,13 +1256,13 @@ begin
 
   UpdateProgress('Chunking',0.95);
 
-  writeLnLog('D3DDungeonGenerator.Generate','Raycasting finished in '+inttostr(round((now-t)*24*60*60*1000))+'ms.');
+  WriteLnLog('D3DDungeonGenerator.Generate','Raycasting finished in '+IntToStr(Round((Now-t)*24*60*60*1000))+'ms.');
   Chunk_N_Slice;
 
   fisWorking := false;
   fisFinished := true;
 
-  writeLnLog('D3DDungeonGenerator.Generate','Finished. Everything done in '+inttostr(round((now-t0)*24*60*60*1000))+'ms.');
+  writeLnLog('D3DDungeonGenerator.Generate','Finished. Everything done in '+IntToStr(Round((Now-t0)*24*60*60*1000))+'ms.');
   UpdateProgress('Done',2);
 end;
 
@@ -1271,10 +1271,10 @@ end;
 function D3DDungeonGenerator.ExportGroups: TIndexGroups;
 var i: integer;
 begin
-  if not isFinished then raise Exception.create('D3DDungeonGenerator.ExportGroups: ERROR! Trying to access an unfinished Generator');
+  if not isFinished then raise Exception.Create('D3DDungeonGenerator.ExportGroups: ERROR! Trying to access an unfinished Generator');
   Result := TIndexGroups.Create(true);
-  for i := 0 to high(groups) do
-    Result.Add(groups[i]);
+  for i := 0 to High(Groups) do
+    Result.Add(Groups[i]);
   Groups := nil;
 end;
 
@@ -1282,7 +1282,7 @@ end;
 
 function D3DDungeonGenerator.ExportNeighbours: TNeighboursMapArray;
 begin
-  if not isFinished then raise Exception.create('Generator.ExportNeighbours: ERROR! Trying to access an unfinished Generator');
+  if not isFinished then raise Exception.Create('Generator.ExportNeighbours: ERROR! Trying to access an unfinished Generator');
   Result := NeighboursMap;
   NeighboursMap := nil;
 end;
@@ -1304,10 +1304,10 @@ function DGeneratorMap.CalculateFaces: integer; {$IFDEF SUPPORTS_INLINE}inline;{
 procedure DGeneratorMap.ProcessBlockers;
 var a: TAngle;
 begin
-  if blocker then begin
+  if Blocker then begin
     {this works only for 1x1x1 blockers with only ONE face and only HORIZONTAL!}
     for a in THorizontalAngle do
-      if isPassable(Map[0,0,0].faces[a]) then begin
+      if isPassable(Map[0,0,0].Faces[a]) then begin
         b_x := a_dx(a);
         b_y := a_dy(a);
       end;
@@ -1316,7 +1316,7 @@ end;
 
 {--------------------------------------------------------------------------}
 
-destructor DGeneratorMap.destroy;
+destructor DGeneratorMap.Destroy;
 begin
   FreeAndNil(Dock);
   inherited;
@@ -1332,37 +1332,37 @@ var XMLdoc: TXMLDocument;
 begin
   WriteLnLog('DGeneratorParameters.Load',URL);
 
-  if self=nil then raise Exception.create('DGeneratorParameters is nil!'); // HELLO, my best bug thing :)
+  if Self=nil then raise Exception.Create('DGeneratorParameters is nil!'); // HELLO, my best bug thing :)
 
   try
     XMLdoc := URLReadXMLSafe(URL);
     RootNode := XMLdoc.DocumentElement;
     LargeContainer := RootNode.ChildElement('Parameters');
     SmallContainer := LargeContainer.ChildElement('Size');
-    maxx := SmallContainer.AttributeInteger('maxx');
-    maxy := SmallContainer.AttributeInteger('maxy');
-    maxz := SmallContainer.AttributeInteger('maxz');
-    minx := SmallContainer.AttributeInteger('minx');
-    miny := SmallContainer.AttributeInteger('miny');
-    minz := SmallContainer.AttributeInteger('minz');
+    MaxX := SmallContainer.AttributeInteger('maxx');
+    MaxY := SmallContainer.AttributeInteger('maxy');
+    MaxZ := SmallContainer.AttributeInteger('maxz');
+    MinX := SmallContainer.AttributeInteger('minx');
+    MinY := SmallContainer.AttributeInteger('miny');
+    MinZ := SmallContainer.AttributeInteger('minz');
 
     SmallContainer := LargeContainer.ChildElement('Volume');
-    volume := SmallContainer.AttributeInteger('value');
+    Volume := SmallContainer.AttributeInteger('value');
 
     SmallContainer := LargeContainer.ChildElement('Faces');
-    maxFaces := SmallContainer.AttributeInteger('max');
-    minFaces := SmallContainer.AttributeInteger('min');
+    MaxFaces := SmallContainer.AttributeInteger('max');
+    MinFaces := SmallContainer.AttributeInteger('min');
 
     SmallContainer := LargeContainer.ChildElement('Seed');
-    seed := SmallContainer.AttributeInteger('value');
+    Seed := SmallContainer.AttributeInteger('value');
 
-    absoluteURL := false;
+    AbsoluteURL := false;
     LargeContainer := RootNode.ChildElement('TilesList');
     Iterator := LargeContainer.ChildrenIterator;
     try
       while Iterator.GetNext do if Iterator.current.NodeName = UTF8decode('Tile') then
       begin
-        SmallContainer := Iterator.current;
+        SmallContainer := Iterator.Current;
         TilesList.add({$IFDEF UTF8Encode}UTF8encode{$ENDIF}(SmallContainer.TextData));
       end;
     finally
@@ -1379,14 +1379,14 @@ begin
         FS.x := SmallContainer.AttributeInteger('x');
         FS.y := SmallContainer.AttributeInteger('y');
         FS.z := SmallContainer.AttributeInteger('z');
-        FirstSteps.add(FS);
+        FirstSteps.Add(FS);
       end;
     finally
       FreeAndNil(Iterator);
     end;
 
   except
-    writeLnLog('DGeneratorParameters.Load','ERROR: Exception in GeneratorParameters load');
+    WriteLnLog('DGeneratorParameters.Load','ERROR: Exception in GeneratorParameters load');
   end;
   FreeAndNil(XMLdoc);
 
@@ -1409,20 +1409,20 @@ end;}
 Function DDungeonGenerator.GetTileByName(TileName: string): TTileType;
 var i: integer;
 begin
-  for i := 0 to Tiles.count do if tiles[i].TileName = TileName then begin
+  for i := 0 to Tiles.Count do if tiles[i].TileName = TileName then begin
     Result := i;
-    exit;
+    Exit;
   end;
-  raise Exception.create('DDungeonGenerator.GetTileByName: FATAL! Tile cannot be found!');
+  raise Exception.Create('DDungeonGenerator.GetTileByName: FATAL! Tile cannot be found!');
 end;
 
 {-----------------------------------------------------------------------------}
 
-constructor DGeneratorParameters.create;
+constructor DGeneratorParameters.Create;
 begin
   inherited;
-  TilesList := TStringList.create;
-  FirstSteps := TFirstStepsArray.create;
+  TilesList := TStringList.Create;
+  FirstSteps := TFirstStepsArray.Create;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -1430,15 +1430,15 @@ end;
 constructor DDungeonGenerator.create;
 begin
   inherited;
-  Map := DGeneratorMap.create;
+  Map := DGeneratorMap.Create;
   Tiles := TGeneratorTileList.Create(true);
-  parameters := DGeneratorParameters.create;
+  Parameters := DGeneratorParameters.Create;
 
-  NormalTiles := TIndexList.create;
-  BlockerTiles := TIndexList.create;
-  DownTiles := TIndexList.create;
-  RichTiles := TIndexList.create;
-  PoorTiles := TIndexList.create;
+  NormalTiles  := TIndexList.Create;
+  BlockerTiles := TIndexList.Create;
+  DownTiles    := TIndexList.Create;
+  RichTiles    := TIndexList.Create;
+  PoorTiles    := TIndexList.Create;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -1457,8 +1457,8 @@ end;
 destructor DDungeonGenerator.Destroy;
 begin
   FreeAndNil(Map);
-  FreeAndNil(tiles);
-  FreeAndNil(parameters);
+  FreeAndNil(Tiles);
+  FreeAndNil(Parameters);
   FreeLists;
   inherited;
 end;
@@ -1479,36 +1479,36 @@ destructor D3DDungeonGenerator.Destroy;
 begin
   FreeNeighboursMap(tmpNeighboursMap);
   FreeNeighboursMap(NeighboursMap);
-  FreeGroups(groups);
+  FreeGroups(Groups);
   inherited;
 end;
 
 {============================ FREEING ROUTINES ==============================}
 
-procedure FreeGroups(ngroups: TGroupsArray);
+procedure FreeGroups(nGroups: TGroupsArray);
 var i: integer;
 begin
-  if ngroups<>nil then
-    for i := 0 to high(ngroups) do
-      FreeAndNil(ngroups[i]);
+  if nGroups<>nil then
+    for i := 0 to high(nGroups) do
+      FreeAndNil(nGroups[i]);
 end;
 
 {------------------------------------------------------------------------}
 
-procedure FreeNeighboursMap(var nmap: TNeighboursMapArray);
+procedure FreeNeighboursMap(var nMap: TNeighboursMapArray);
 var ix,iy,iz: TIntCoordinate;
 begin
-  if nmap = nil then exit;
+  if nMap = nil then Exit;
   //just to be safe (in case the nmap was not initialized completely)
-  if length(nmap) = 0 then exit;
+  if Length(nMap) = 0 then Exit;
 
   //free and nil all the elements
-  for ix := 0 to high(nmap) do
-    for iy := 0 to high(nmap[ix]) do
-      for iz := 0 to high(nmap[ix,iy]) do
-        freeAndNil(nmap[ix,iy,iz]);
+  for ix := 0 to High(nMap) do
+    for iy := 0 to High(nMap[ix]) do
+      for iz := 0 to High(nMap[ix,iy]) do
+        FreeAndNil(nMap[ix,iy,iz]);
 
-  nmap := nil; //this will automatically free the array
+  nMap := nil; //this will automatically free the array
 end;
 
 end.

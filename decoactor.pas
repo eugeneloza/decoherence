@@ -40,7 +40,7 @@ type
       RAM or belongs to an body-less entity, like Player's character at the moment }
     body: TCreature;
 
-    procedure spawn(Pos: TVector3single; SpawnBody: DBody);
+    procedure Spawn(Pos: TVector3single; SpawnBody: DBody);
 
     destructor Destroy; override;
     constructor Create; virtual;

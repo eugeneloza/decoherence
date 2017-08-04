@@ -16,13 +16,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 {---------------------------------------------------------------------------}
 
 { contains definitions for most abstract Generator entity }
-unit decoabstractgenerator;
+unit DecoAbstractGenerator;
 
 {$INCLUDE compilerconfig.inc}
 interface
 
 uses {Classes,} CastleRandom, fgl, CastleGenericLists,
-  decothread;
+  DecoThread;
 
 type
   {maybe I'll change it later}
@@ -37,9 +37,9 @@ type
   {a two-value description of a "neighbour" tile}
   DNeighbour = record
     {index of current tile}
-    tile: TTileType;
+    Tile: TTileType;
     {visiblity of the tile ~spatial angle}
-    visible: integer;
+    Visible: integer;
   end;
 
 type TNeighboursList = specialize TGenericStructList<DNeighbour>;
@@ -81,8 +81,8 @@ type
      Will launch a 3D routines also in specific children classes}
     procedure Generate; virtual; abstract;
 
-    constructor create; virtual;//override;
-    destructor destroy; override;
+    constructor Create; virtual;//override;
+    destructor Destroy; override;
   protected
     { here we simply launch "Generate" in a Thread }
     procedure Execute; override;
@@ -96,7 +96,7 @@ uses SysUtils, CastleLog;
 
 {-----------------------------------------------------------------------------}
 
-constructor DAbstractGenerator.create;
+constructor DAbstractGenerator.Create;
 begin
   inherited;
   {we create an non-initialized random (i.e. initialized by a stupid constant integer)
@@ -106,7 +106,7 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-destructor DAbstractGenerator.destroy;
+destructor DAbstractGenerator.Destroy;
 begin
   FreeAndNil(RNDM);
   inherited;
@@ -114,14 +114,14 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-procedure DAbstractGenerator.InitSeed(newseed: longword = 0);
+procedure DAbstractGenerator.InitSeed(NewSeed: longword = 0);
 begin
-  RNDM.initialize(newseed);
+  RNDM.Initialize(NewSeed);
 end;
 
 {-----------------------------------------------------------------------------}
 
-procedure DAbstractGenerator.execute;
+procedure DAbstractGenerator.Execute;
 begin
   Generate;
 end;
