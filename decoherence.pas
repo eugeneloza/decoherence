@@ -188,34 +188,34 @@ end;
 procedure doMotion(Container: TUIContainer; const Event: TInputMotion);
 var i: integer;
     tmpLink: DAbstractElement;
-    dragging: boolean;
+    Dragging: boolean;
 begin
   {check for drag-n-drops}
-  dragging := false;
+  Dragging := false;
   {if Event.EventType = itMouseButton then }begin
     if touchArray.count>0 then begin
      i:=0;
      repeat
-       if touchArray[i].fingerindex=event.fingerindex then begin
-         touchArray[i].update(Event);
-         if (touchArray[i].click_element<>nil) and (touchArray[i].click_element.CanDrag) then begin
-           touchArray[i].click_element.drag(round(event.Position[0]),round(event.Position[1]));
-           dragging := true;
+       if TouchArray[i].FingerIndex=Event.FingerIndex then begin
+         TouchArray[i].update(Event);
+         if (TouchArray[i].ClickElement<>nil) and (TouchArray[i].ClickElement.CanDrag) then begin
+           TouchArray[i].ClickElement.Drag(Round(event.Position[0]),Round(Event.Position[1]));
+           Dragging := true;
          end;
-         break;
+         Break;
        end;
        inc(i);
-     until (i>=touchArray.Count);
+     until (i>=TouchArray.Count);
     end;
 
   end;
   {mouse over / if no drag-n-drop}
   //this is not needed at the moment, we'll turn here a bit later when implementing drag-n-drop
   //no mouseover is detected if no ifmouseover is run, so should still be here
-  if not dragging then begin
-    tmpLink := GUI.IfMouseOver(round(event.Position[0]),round(event.Position[1]),true,true);
+  if not Dragging then begin
+    tmpLink := GUI.IfMouseOver(Round(Event.Position[0]),Round(Event.Position[1]),true,true);
     if tmpLink <> nil then
-      writelnLog('doMotion','Motion caught '+tmpLink.ClassName);
+      WriteLnLog('doMotion','Motion caught '+tmpLink.ClassName);
   end;
 end;
 

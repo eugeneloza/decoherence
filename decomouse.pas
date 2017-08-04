@@ -16,24 +16,24 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 {---------------------------------------------------------------------------}
 
 { Handles mouse behaviour }
-unit decomouse;
+unit DecoMouse;
 
 {$INCLUDE compilerconfig.inc}
 
 interface
 
-uses classes, fgl, sysUtils,
+uses Classes, fgl, SysUtils,
   CastleLog,
-  castleFilesUtils, CastleKeysMouse,
-  decointerface, decogui{,
+  CastleFilesUtils, CastleKeysMouse,
+  DecoInterface, DecoGui{,
   decoglobal};
 
 type DTouch = class (TObject)
   FingerIndex: integer;
   x0,y0: integer;     //to handle sweeps, drags and cancels
-  click_element: DSingleInterfaceElement;
-  constructor create(const xx,yy: single; const finger: integer);
-  procedure update(Event: TInputMotion);
+  ClickElement: DSingleInterfaceElement;
+  constructor Create(const xx,yy: single; const Finger: integer);
+  procedure Update(Event: TInputMotion);
 end;
 
 type DTouchList = specialize TFPGObjectList<DTouch>;
@@ -50,56 +50,56 @@ procedure doMouseRelease(const Event: TInputPressRelease);
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
-constructor DTouch.create(const xx,yy:single; const finger:integer);
+constructor DTouch.Create(const xx,yy: single; const Finger: integer);
 begin
-  x0 := round(xx);
-  y0 := round(yy);
-  fingerindex := finger;
+  x0 := Round(xx);
+  y0 := Round(yy);
+  FingerIndex := Finger;
 end;
 
-procedure DTouch.update(Event: TInputMotion);
+procedure DTouch.Update(Event: TInputMotion);
 begin
-  x0 := round(event.Position[0]);
-  y0 := round(event.Position[1]);
+  x0 := Round(Event.Position[0]);
+  y0 := Round(Event.Position[1]);
 end;
 
 {-----------------------------------------------------------------------------}
 
-function GetFingerIndex(const Event: TInputPressRelease):integer;
+function GetFingerIndex(const Event: TInputPressRelease): integer;
 begin
-  if event.MouseButton = mbleft then
-    result := event.FingerIndex
-  else if event.MouseButton = mbright then
-    result := 100
-  else if event.MouseButton = mbmiddle then
-    result := 200
+  if Event.MouseButton = mbLeft then
+    Result := Event.FingerIndex
+  else if Event.MouseButton = mbRight then
+    Result := 100
+  else if Event.MouseButton = mbMiddle then
+    Result := 200
   else raise Exception.Create('Unknown event.MouseButton in decomouse.GetFingerIndex!');
 end;
 
 procedure doMouseRelease(const Event: TInputPressRelease);
-var i,fingerindex:integer;
-    found:boolean;
+var i,FingerIndex: integer;
+    Found: boolean;
 begin
  if TouchArray.Count>0 then begin
     fingerindex := GetFingerIndex(Event);
     i := 0;
-    found := false;
+    Found := false;
     Repeat
-      if touchArray[i].FingerIndex = fingerindex then found := true else inc(i);
-    until (i>TouchArray.Count-1) or found;
-    WritelnLog('doMouseRelease','Caught mouse release finger='+inttostr(fingerindex)+' n='+inttostr(i));
-    if found then begin
-      if (touchArray[i].click_element <> nil) then begin
-        if assigned(touchArray[i].click_element.OnMouseRelease) then
-          touchArray[i].click_element.OnMouseRelease(touchArray[i].click_element,touchArray[i].x0,touchArray[i].y0);
-        if assigned(touchArray[i].click_element.OnDrop) then
-          touchArray[i].click_element.OnDrop(touchArray[i].click_element,touchArray[i].x0,touchArray[i].y0);
+      if TouchArray[i].FingerIndex = FingerIndex then Found := true else inc(i);
+    until (i>TouchArray.Count-1) or Found;
+    WritelnLog('doMouseRelease','Caught mouse release finger='+IntToStr(FingerIndex)+' n='+IntToStr(i));
+    if Found then begin
+      if (TouchArray[i].ClickElement <> nil) then begin
+        if Assigned(touchArray[i].ClickElement.OnMouseRelease) then
+          TouchArray[i].ClickElement.OnMouseRelease(TouchArray[i].ClickElement,TouchArray[i].x0,TouchArray[i].y0);
+        if Assigned(TouchArray[i].ClickElement.OnDrop) then
+          TouchArray[i].ClickElement.OnDrop(TouchArray[i].ClickElement,TouchArray[i].x0,TouchArray[i].y0);
       end;
-      TouchArray.Remove(touchArray[i])
+      TouchArray.Remove(TouchArray[i]);
     end else
-      WritelnLog('doMouseRelease','ERROR: Touch event not found!');
+      WriteLnLog('doMouseRelease','ERROR: Touch event not found!');
  end else
-   WritelnLog('doMouseRelease','ERROR: Touch event list is empty!');
+   WriteLnLog('doMouseRelease','ERROR: Touch event list is empty!');
 
 end;
 
@@ -107,29 +107,29 @@ end;
 
 procedure doMousePress(const Event: TInputPressRelease);
 var NewEventTouch: DTouch;
-    fingerindex: integer;
+    FingerIndex: integer;
     tmpLink: DAbstractElement;
 begin
-  fingerindex := GetFingerIndex(Event);
-  NewEventTouch := DTouch.create(event.Position[0],event.Position[1],fingerindex);
+  FingerIndex := GetFingerIndex(Event);
+  NewEventTouch := DTouch.Create(Event.Position[0],Event.Position[1],FingerIndex);
 
   //catch the element which has been pressed
-  tmpLink := GUI.IfMouseOver(round(event.Position[0]),round(event.Position[1]),true,true);
+  tmpLink := GUI.IfMouseOver(Round(Event.Position[0]),Round(Event.Position[1]),true,true);
   if (tmpLink is DSingleInterfaceElement) then begin
-    NewEventTouch.click_element := DSingleInterfaceElement(tmpLink);
-    if assigned(NewEventTouch.click_element.OnMousePress) then
-      NewEventTouch.click_element.OnMousePress(tmpLink,round(event.Position[0]),round(event.Position[1]));
-    if NewEventTouch.click_element.CanDrag then NewEventTouch.click_element.startDrag(round(event.Position[0]),round(event.Position[1]));
+    NewEventTouch.ClickElement := DSingleInterfaceElement(tmpLink);
+    if Assigned(NewEventTouch.ClickElement.OnMousePress) then
+      NewEventTouch.ClickElement.OnMousePress(tmpLink,Round(Event.Position[0]),Round(Event.Position[1]));
+    if NewEventTouch.ClickElement.CanDrag then NewEventTouch.ClickElement.StartDrag(Round(Event.Position[0]),Round(Event.Position[1]));
   end;
 
   TouchArray.Add(NewEventTouch);
-  WritelnLog('doMousePress','Caught mouse press finger='+inttostr(FingerIndex));
+  WriteLnLog('doMousePress','Caught mouse press finger='+IntToStr(FingerIndex));
 end;
 
 {----------------------------------------------------------------------------}
 
 Initialization
-  TouchArray := DTouchList.create;
+  TouchArray := DTouchList.Create;
 
 Finalization
   FreeAndNil(TouchArray);
