@@ -151,7 +151,9 @@ procedure tmpLoadKnightCreature;
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 uses SysUtils, CastleLog,
-  CastleFilesUtils, DecoInputOutput;
+  CastleFilesUtils, DecoInputOutput,
+
+  DecoNavigation{?}, CastleScene, CastleSceneCore;
 
 constructor DActor.Create;
 begin
@@ -387,6 +389,7 @@ end;
 procedure DActorBody.Spawn(Pos: TVector3; SpawnBody: DBody);
 begin
   body := SpawnBody.CreateCreature(Window.SceneManager.Items, Pos, Vector3(1,0,0));
+  body.Up := Vector3(0,0,1);
   body.Exists := true;
 end;
 
@@ -409,7 +412,11 @@ end;
 
 procedure DMonster.doAI;
 begin
-
+  if (Camera.Position - body.Position).Length < 10 then
+  body.Direction := Camera.Position - body.Position;
+  body.Up := Vector3(0,0,1); {$Warning this is a bug!}
+  //(body.Items[0] as TCastleScene).PlayAnimation('attack', paForceNotLooping);
+  //Scene.AnimationTimeSensor('my_animation').EventIsActive.OnReceive.Add(@AnimationIsActiveChanged)
 end;
 
 {-----------------------------------------------------------------------------}
