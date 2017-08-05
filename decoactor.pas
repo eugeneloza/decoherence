@@ -35,19 +35,24 @@ type DBody = TCreatureResource;
 type
   { Actor with a rendered body and corresponding management routines }
   DActorBody = class (TObject)
+  protected
+    procedure doAI; virtual;
   public
     { 3D body of this Actor, it may be nil (in case the body is unloaded from
       RAM or belongs to an body-less entity, like Player's character at the moment }
-    body: TCreature;
+    Body: TCreature;
 
-    procedure Spawn(Pos: TVector3single; SpawnBody: DBody);
+    {Spawns a body for the Actor, overriden in children to spawn attributes}
+    procedure Spawn(Pos: TVector3single; SpawnBody: DBody); virtual;
+
+    { manages this actor, e.g. preforms AI }
+    procedure Manage; virtual;
 
     destructor Destroy; override;
     constructor Create; virtual;
   end;
 
 type TActorList = specialize TFPGObjectList<DActorBody>;
-
 
 Type
   {basic actor. With stats.}
@@ -127,6 +132,16 @@ Type
     destructor Destroy; override;
     constructor Create; override;
 end;
+
+type
+  { this is a monster Actor, featuring AI depending on its type,
+    NPCs will have a different AI (?) because they can "switch" to moster/agressive AI }
+  DMonster = class(DActor)
+  protected
+    procedure doAI; override;
+  public
+    //procedure Manage; override;
+  end;
 
 
 
@@ -373,6 +388,28 @@ procedure DActorBody.Spawn(Pos: TVector3; SpawnBody: DBody);
 begin
   body := SpawnBody.CreateCreature(Window.SceneManager.Items, Pos, Vector3(1,0,0));
   body.Exists := true;
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DActorBody.doAI;
+begin
+  //does nothing yet, maybe should be abstract?
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DActorBody.Manage;
+begin
+  //cute and simple, maybe merge them?
+  doAI;
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DMonster.doAI;
+begin
+
 end;
 
 {-----------------------------------------------------------------------------}

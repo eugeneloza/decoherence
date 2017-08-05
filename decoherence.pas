@@ -156,11 +156,11 @@ begin
       if mbRight=event.MouseButton then camera.MouseLook := not Camera.MouseLook;
 
   end else if Event.EventType = itKey then begin
-    case event.key of
+    case Event.key of
        K_P,K_PrintScreen:                //k_printscreen doesn't work in x-window system if assigned to some external program like scrot
                          Window.SaveScreen('deco_'+NiceDate+'.jpg');
        K_r: party[0].hit(1,1);
-       k_i: if AmbientIntensity.ambient = 0 then
+       k_i: if AmbientIntensity.Ambient = 0 then
                AmbientIntensity.SetAmbientIntensity(3)
             else
                AmbientIntensity.SetAmbientIntensity(0);
@@ -193,10 +193,10 @@ begin
   {check for drag-n-drops}
   Dragging := false;
   {if Event.EventType = itMouseButton then }begin
-    if touchArray.count>0 then begin
+    if touchArray.count > 0 then begin
      i:=0;
      repeat
-       if TouchArray[i].FingerIndex=Event.FingerIndex then begin
+       if TouchArray[i].FingerIndex = Event.FingerIndex then begin
          TouchArray[i].update(Event);
          if (TouchArray[i].ClickElement<>nil) and (TouchArray[i].ClickElement.CanDrag) then begin
            TouchArray[i].ClickElement.Drag(Round(event.Position[0]),Round(Event.Position[1]));
@@ -205,7 +205,7 @@ begin
          Break;
        end;
        inc(i);
-     until (i>=TouchArray.Count);
+     until (i >= TouchArray.Count);
     end;
 
   end;

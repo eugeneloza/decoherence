@@ -78,12 +78,12 @@ end;
 
 Procedure InitTestLevel;
 begin
-  if not LoadCompleted then exit;
-  if not loadedlevel then begin
+  if not LoadCompleted then Exit;
+  if not LoadedLevel then begin
      WritelnLog('InitTestLevel','Init');
      SetGameMode(gmTravel);
      LoadedLevel := true;
-     CurrentWorld.activate;
+     CurrentWorld.Activate;
 
      {$WARNING this is wrong}
      {why does it gets a wrong GRAVITY_UP if called from Self.Activate?????}

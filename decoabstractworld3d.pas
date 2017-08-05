@@ -104,6 +104,8 @@ type
     {builds current 3d world}
     procedure Build; override;
 
+    procedure Manage(Position: TVector3Single); override;
+
     { turns on or off SceneManager.Exists
       This should not be called in Rendered World types }
     procedure ToggleSceneManager(Value: boolean);
@@ -243,7 +245,7 @@ end;
 
 procedure DAbstractWorldManaged.StartAppearVanishManagerThread;
 begin
-
+  {$warning todo}
 end;
 
 {--------------------------------------------------------------------------}
@@ -349,7 +351,7 @@ end;
 {$ENDIF}
 {----------------------------------------------------------------------------}
 
-procedure DAbstractWorld3d.buildRoots;
+procedure DAbstractWorld3d.BuildRoots;
 var i,j: integer;
   Root: TX3DRootNode;
 begin
@@ -384,7 +386,7 @@ end;
 procedure DAbstractWorld3d.SpawnActors;
 var i: integer;
     n: DNavPt;
-    a: DActorBody;
+    a: DMonster;
 begin
   if Actors <> nil then begin
     WriteLnLog('DAbstractWorld3d.SpawnActors','WARNING: Actors is not nil, freeing...');
@@ -395,7 +397,7 @@ begin
   {$hint todo}
   for i := 0 to Self.Nav.Count div 10 do begin
     n := Self.Nav[DRND.Random(Self.Nav.Count)];
-    a := DActorBody.Create;
+    a := DMonster.Create;
     a.Spawn(Vector3(n.x*WorldScale,-n.y*WorldScale,-n.z*WorldScale+1*MyScale),tmpKnightCreature);
     Actors.Add(a);
   end;
@@ -415,6 +417,19 @@ begin
 end;
 
 {------------------------------------------------------------------------------}
+
+Procedure DAbstractWorld3d.Manage(Position: TVector3Single);
+var a: DActorBody;
+begin
+  //inherited; --- nothing to inherit yet
+
+  //manage all actors in the World
+  if Actors<>nil then
+    for a in Actors do a.Manage;
+end;
+
+{------------------------------------------------------------------------------}
+
 
 Procedure DAbstractWorld3d.ToggleSceneManager(Value: boolean);
 begin

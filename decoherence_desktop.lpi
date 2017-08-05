@@ -145,6 +145,7 @@
       <Unit9>
         <Filename Value="decomouse.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoMouse"/>
       </Unit9>
       <Unit10>
         <Filename Value="decolevel.pas"/>
@@ -200,6 +201,7 @@
       <Unit22>
         <Filename Value="decodungeongenerator.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoDungeonGenerator"/>
       </Unit22>
       <Unit23>
         <Filename Value="decodungeongenerator_calculatefaces.inc"/>

@@ -118,6 +118,7 @@ end;
 
 procedure DDungeonWorld.Manage(Position: TVector3Single);
 begin
+  inherited;
   if FirstRender then begin
     {$warning reset all tiles visibility here}
     LastRender := now;
