@@ -661,9 +661,9 @@ var phase: single;
 begin
   if true then begin //todo!!!!!!!!!!!!!!!!!!!!!!!
     if (last.initialized) and (next.initialized) and
-      ((animationstart<0) or (now-animationstart < animationduration)) then begin
-      if animationstart<0 then animationstart := now;
-      phase := (now-animationstart)/animationduration; //animationtime
+      ((animationstart<0) or (decoNow-animationstart < animationduration)) then begin
+      if animationstart<0 then animationstart := decoNow;
+      phase := (decoNow-animationstart)/animationduration; //animationtime
       //make curve slower at ends and sharper at middle
       if phase<0.5 then phase := sqr(2*phase)/2 else phase := 1 - sqr(2*(1-phase))/2;
       CurrentAnimationState.x1 := last.x1+round((next.x1-last.x1)*phase);
@@ -975,8 +975,8 @@ end;
 
 procedure DTimer.update;
 begin
-  if StartDate<0 then StartDate := Now else
-  if (now-startDate) >= Interval then begin
+  if StartDate<0 then StartDate := decoNow else
+  if (decoNow-startDate) >= Interval then begin
     enabled := false;
     if assigned(onTimer) then onTimer;
   end;

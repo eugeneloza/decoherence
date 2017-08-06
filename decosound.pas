@@ -347,7 +347,7 @@ end;
 
 procedure DMusicTrack.FadeOut;
 begin
-  FadeStart := now;
+  FadeStart := decoNow;
 end;
 
 {---------------------------------------------------------------------------}
@@ -375,8 +375,8 @@ end;
 
 procedure DMusicTrack.doFade;
 begin
-  if Now-FadeStart<FadeTime then begin
-    setGain(1-(Now-FadeStart)/FadeTime);
+  if decoNow-FadeStart<FadeTime then begin
+    setGain(1-(decoNow-FadeStart)/FadeTime);
   end else begin
     SetGain(0);       //fade to zero
     fCurrent.Release; //stop the music

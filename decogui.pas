@@ -82,7 +82,7 @@ begin
   writeLnLog('DInterfaceContainer.create','Creating interface.');
   inherited create(AOwner);
 
-  Last_render_time := now;
+  Last_render_time := decoNow;
   FPS_count := 0;
   FPS_Label := DLabel.create(self);
   FPS_Label.setbasesize(0,0,0.05,0.05,1,asNone);
@@ -261,12 +261,12 @@ begin
   inherited draw;
 
   //draw FPS label
-  if ((now-Last_render_time)*24*60*60 >= 1) then begin
+  if ((decoNow-Last_render_time)*24*60*60 >= 1) then begin
     FPS_label.text := Inttostr(FPS_count){+' '+inttostr(round(Window.Fps.RealTime))};
     FPS_count := 0;
-    Last_Render_time:=now;
+    Last_Render_time := decoNow;
   end else inc(FPS_count);
-  FPS_label.draw;
+  FPS_label.Draw;
 end;
 
 {======================== Interface modes creation ===========================}

@@ -36,14 +36,23 @@ type
   { Actor with a rendered body and corresponding management routines }
   DActorBody = class (TObject)
   protected
+    {$warning separate global and local time}
+    LastTime, dt: DTime;
+    {position, direction and rotate_to_direction of the Body}
+    Pos,Dir,Rot: TVector3;
+    {speed of actor's rotation}
+    RotSpeed: float;
+  protected
     procedure doAI; virtual;
+    {rotates the body}
+    procedure doRotate;
   public
     { 3D body of this Actor, it may be nil (in case the body is unloaded from
       RAM or belongs to an body-less entity, like Player's character at the moment }
     Body: TCreature;
 
     {Spawns a body for the Actor, overriden in children to spawn attributes}
-    procedure Spawn(Pos: TVector3single; SpawnBody: DBody); virtual;
+    procedure Spawn(Position: TVector3single; SpawnBody: DBody); virtual;
 
     { manages this actor, e.g. preforms AI }
     procedure Manage; virtual;
@@ -374,7 +383,7 @@ end;
 
 constructor DActorBody.Create;
 begin
-
+  LastTime := DecoNow;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -386,9 +395,13 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-procedure DActorBody.Spawn(Pos: TVector3; SpawnBody: DBody);
+procedure DActorBody.Spawn(Position: TVector3; SpawnBody: DBody);
+var rDir: float;
 begin
-  body := SpawnBody.CreateCreature(Window.SceneManager.Items, Pos, Vector3(1,0,0));
+  rDir := drnd.Random*2*Pi;
+  Dir := Vector3(sin(rDir),cos(rDir),0);
+  Pos := Position;
+  body := SpawnBody.CreateCreature(Window.SceneManager.Items, Pos, Dir);
   body.Up := Vector3(0,0,1);
   body.Exists := true;
 end;
@@ -402,10 +415,28 @@ end;
 
 {-----------------------------------------------------------------------------}
 
+procedure DActorBody.doRotate;
+begin
+
+end;
+
+
+{-----------------------------------------------------------------------------}
+
 procedure DActorBody.Manage;
 begin
+
+  dt := DecoNow - LastTime;
+  LastTime := DecoNow;
+
   //cute and simple, maybe merge them?
   doAI;
+
+  if Body<>nil then begin
+    doRotate;
+    Body.Position := Pos;
+    Body.Direction := Dir;
+  end;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -413,7 +444,7 @@ end;
 procedure DMonster.doAI;
 begin
   if (Camera.Position - body.Position).Length < 10 then
-  body.Direction := Camera.Position - body.Position;
+  Dir := Camera.Position - body.Position;
   body.Up := Vector3(0,0,1); {$Warning this is a bug!}
   //(body.Items[0] as TCastleScene).PlayAnimation('attack', paForceNotLooping);
   //Scene.AnimationTimeSensor('my_animation').EventIsActive.OnReceive.Add(@AnimationIsActiveChanged)

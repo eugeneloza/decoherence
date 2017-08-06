@@ -100,9 +100,13 @@ var LastRender: DTime = -1;
 procedure ProcessTimeEvents;
 var TimePassed: DTime;
 begin
-  If LastRender = -1 then LastRender := now;
-  TimePassed := now-LastRender;
-  LastRender := now;
+  DecoNow := Now;
+  If LastRender = -1 then LastRender := DecoNow;
+  TimePassed := DecoNow - LastRender;
+  {if not softpause...}
+  DecoNowLocal := DecoNowLocal + TimePassed;
+  LastRender := DecoNow;
+
   Case CurrentGameMode of
     { time flows normally in travel mode }
     gmTravel: TimeFlow(TimePassed);

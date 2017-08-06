@@ -73,6 +73,12 @@ var {global window of the game}
     CurrentScenarioFolder: string='test/';
     { random generator used for all interface random events }
     drnd: TCastleRandom;
+    { analogue to Now function, but a fast-access variable, representing
+      current global time (accessed once per frame) }
+    DecoNow: DTime;
+    { analogue to Now function, but a fast-access variable, representing
+      current in-game time }
+    DecoNowLocal: DTime;
     {$IFNDEF Android}
     LogStream : TFileStream;
     {$ENDIF}

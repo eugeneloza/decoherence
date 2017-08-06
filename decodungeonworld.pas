@@ -121,7 +121,7 @@ begin
   inherited;
   if FirstRender then begin
     {$warning reset all tiles visibility here}
-    LastRender := now;
+    LastRender := decoNow;
     FirstRender := false;
   end;
 
