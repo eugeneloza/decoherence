@@ -46,6 +46,21 @@ type TNeighboursList = specialize TGenericStructList<DNeighbour>;
 
 
 type
+  DAbstractGeneratorParameters = class(TObject)
+  private
+    fisReady: boolean;
+  public
+    {random generation seed}
+    Seed: LongWord;
+    {are links in TilesList absolute URL or just a tile name}
+    AbsoluteURL: boolean;
+    {is the generator ready to wrok?
+     Generatie will raise an exception if it isn't}
+    property isReady: boolean read fisReady write fisReady default false;
+  end;
+
+
+type
   {Most abstract generation routine to parent all the generation algorithms
    Required for abstract calls to different implementation of generators}
   DAbstractGenerator = class(TAbstractThread)

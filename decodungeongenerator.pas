@@ -121,9 +121,7 @@ type
 
 type
   {a set of map generation parameters}
-  DGeneratorParameters = class
-    protected
-      fisReady: boolean;
+  DDungeonGeneratorParameters = class(DAbstractGeneratorParameters)
     public
       {the map cannot be larger than these}
       MaxX,MaxY,MaxZ: TIntCoordinate;
@@ -138,10 +136,6 @@ type
       {when the map has FreeFaces<MinFaces it will try to "extend" the amount
        of free faces by using rich tiles (in case the Volume is not yet met)}
       MinFaces: integer;
-      {random generation seed}
-      Seed: LongWord;
-      {are links in TilesList absolute URL or just a tile name}
-      AbsoluteURL: boolean;
       {list of tiles}
       TilesList: TStringList;
       {list of first generation steps}
@@ -149,9 +143,6 @@ type
 
       {loads and applies the map parameters}
       procedure Load(URL: string);
-      {is the generator ready to wrok?
-       Generatie will raise an exception if it isn't}
-      property isReady: boolean read fisReady default false;
 
       constructor Create;
       destructor Destroy; override;
@@ -248,7 +239,7 @@ type
     procedure ShrinkMap;
   public
     {map parameters}
-    Parameters: DGeneratorParameters;
+    Parameters: DDungeonGeneratorParameters;
     {this forces isReady to true. Must be used only in constructor which skips
      loading of the map}
     procedure ForceReady;
@@ -375,7 +366,7 @@ uses SysUtils, CastleLog, CastleFilesUtils, CastleImages, CastleVectors,
 
 procedure DDungeonGenerator.ForceReady;
 begin
-  Parameters.fisReady := true;
+  Parameters.isReady := true;
   WriteLnLog('DDungeonGenerator.ForceReady','Warning: Be careful, parameters might not be initialized correctly.');
 end;
 
@@ -1326,7 +1317,7 @@ end;
 
 {========================= OTHER ROUTINES ===================================}
 
-procedure DGeneratorParameters.Load(URL: string);
+procedure DDungeonGeneratorParameters.Load(URL: string);
 var XMLdoc: TXMLDocument;
     RootNode, LargeContainer,SmallContainer: TDOMElement;
     Iterator: TXMLElementIterator;
@@ -1393,7 +1384,7 @@ begin
   FreeAndNil(XMLdoc);
 
   {initialize generator parameters}
-  fisReady := true;
+  isReady := true;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -1420,7 +1411,7 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-constructor DGeneratorParameters.Create;
+constructor DDungeonGeneratorParameters.Create;
 begin
   inherited;
   TilesList := TStringList.Create;
@@ -1434,7 +1425,7 @@ begin
   inherited;
   Map := DGeneratorMap.Create;
   Tiles := TGeneratorTileList.Create(true);
-  Parameters := DGeneratorParameters.Create;
+  Parameters := DDungeonGeneratorParameters.Create;
 
   NormalTiles  := TIndexList.Create;
   BlockerTiles := TIndexList.Create;
@@ -1467,7 +1458,7 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-destructor DGeneratorParameters.destroy;
+destructor DDungeonGeneratorParameters.destroy;
 begin
   FreeAndNil(TilesList);
   FreeAndNil(FirstSteps);
