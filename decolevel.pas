@@ -86,11 +86,6 @@ begin
      SetGameMode(gmTravel);
      LoadedLevel := true;
      CurrentWorld.Activate;
-
-     {$WARNING this is wrong}
-     {why does it gets a wrong GRAVITY_UP if called from Self.Activate?????}
-     CurrentWorld.SpawnActors; //must go after BuildNav;
-
      Window.TouchInterface := {$IFDEF Android}tiCtlWalkDragRotate{$ELSE}tiNone{$ENDIF};
      SetGameMode(gmTravel);
   end;

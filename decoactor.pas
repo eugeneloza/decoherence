@@ -562,8 +562,10 @@ end;
 
 procedure DMonster.doAI;
 begin
-  if (Camera.Position - Position).Length < 10 then LookAt(Camera.Position);
-  //body.Up := Vector3(0,0,1); {$Warning this is a bug!}
+  {if the target is close enough look at it}
+  if fTarget<>nil then
+    if (fTarget.Position - Position).Length < 10 then LookAt;
+
   //(body.Items[0] as TCastleScene).PlayAnimation('attack', paForceNotLooping);
   //Scene.AnimationTimeSensor('my_animation').EventIsActive.OnReceive.Add(@AnimationIsActiveChanged)
 end;

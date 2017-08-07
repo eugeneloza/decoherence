@@ -170,7 +170,7 @@ type
 implementation
 
 uses SysUtils, DecoLoad3d, CastleLog,
-  DecoNavigationNetwork,
+  DecoNavigationNetwork, DecoPlayerCharacter,
   CastleSceneCore;
 
 {============================ DAbstractWorld3D =============================}
@@ -398,6 +398,7 @@ begin
   for i := 0 to Self.Nav.Count div 10 do begin
     n := Self.Nav[DRND.Random(Self.Nav.Count)];
     a := DMonster.Create;
+    a.Target := Party.CameraMan;
     {monsters are centered by "underfeet" point}
     a.Spawn(Vector3(n.x*WorldScale,-n.y*WorldScale,-n.z*WorldScale),tmpKnightCreature);
     Actors.Add(a);

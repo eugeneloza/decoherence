@@ -172,7 +172,10 @@ begin
   StartZ := 0;
   {$Warning this is ugly}
   Party.TeleportTo(Vector3((StartX)*WorldScale,-(StartY)*WorldScale,-(StartZ)*WorldScale),Vector3(0,1,0));
-  {$WARNING to be managed by the world}
+
+  {$WARNING this is wrong}
+  {why does it gets a wrong GRAVITY_UP if called from Self.Activate?????}
+  SpawnActors; //must go after BuildNav;
 end;
 
 {----------------------------------------------------------------------------}

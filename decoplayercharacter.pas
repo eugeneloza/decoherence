@@ -136,6 +136,9 @@ end;
 procedure DParty.Manage;
 begin
   //UpdateCamera;
+  {actually we're doing the very opposite now:}
+  CameraMan.Position := Camera.Position;
+  CameraMan.Direction := Camera.Direction;
 end;
 
 {----------------------------------------------------------------------------}
