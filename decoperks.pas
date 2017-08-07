@@ -23,7 +23,7 @@ unit decoperks;
 interface
 
 uses classes, fgl,
-  decoimages,
+  //decoimages,
   decostats,
   decoglobal;
 
@@ -36,14 +36,8 @@ Type TPerkEffect = (peDamage, peHeal, peStat);   }
 
 type
   {Simplest perk is a passive perk that influences the character in some way}
-  DPerk = class(TComponent)
+  DPerk = class(TObject)
   public
-    {Stores the perk's image. Generally we don't use perks directly as static images,
-     but static images provide a convenient routine to load the image in a thread
-     so let it be this way for now. Theoretically, it's better to make a separate
-     object that handles perks and items images and allows just rescaling them
-     correctly - to save memory. But it is not the issue for now.}
-    Image: DStaticImage;
     //PerkKind: TPerkKind;
     //PerkType: TPerkType;
     //Effect: TPerkEffect;
@@ -52,7 +46,7 @@ type
     //Efficiency  modifier
     //Requirements
     //Requirements for research
-    Constructor create(AOwner: TComponent); override;
+    Constructor create(AOwner: TComponent); virtual;//override;
     Destructor destroy; override;
 end;
 (*
@@ -100,7 +94,7 @@ Var TmpPerk: DPerk;
 Begin
   perks := DPerksList.create(true);
   TmpPerk := DPerk.create(Application);
-  TmpPerk.image.LoadThread(PerksFolder+'crossed-swords.png');
+  //TmpPerk.image.LoadThread(PerksFolder+'crossed-swords.png');
   Perks.add(TmpPerk);
 End;
 
@@ -108,8 +102,8 @@ End;
 
 Constructor DPerk.create(AOwner: TComponent);
 Begin
-  Inherited create(AOwner);
-  Image := DStaticImage.create(self);
+  Inherited create;
+  //Image := DStaticImage.create(self);
 End;
 
 {---------------------------------------------------------------------------}

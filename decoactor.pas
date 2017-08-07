@@ -24,7 +24,7 @@ interface
 
 uses Classes, CastleRandom, fgl, CastleVectors,
   CastleResources, CastleCreatures,
-  DecoStats,
+  DecoStats, DecoPerks,
   DecoGlobal;
 
 type TDamageType = (dtHealth);
@@ -40,26 +40,36 @@ type
   end;
 
 type
-  { Actor with a rendered body and corresponding management routines }
-  DActorBody = class (DSimpeActor)
+  { Actor with full World coordinates,
+    Mostly needed as a Target for AI
+    and Base for Player camera mangement }
+  DCoordActor = class (DSimpeActor)
   protected
-    {$warning separate global and local time}
-    LastTime, dt: DTime;
     {position, direction and rotate_to_direction of the Body}
-    Pos,Dir,Rot: TVector3;
+    Position,Direction: TVector3;
+    toPos,toDir: TVector3;
+    {rotates the body}
+    procedure doRotate;
+    procedure doMove;
+  end;
+
+type
+  { Actor with a rendered body and corresponding management routines }
+  DActorBody = class (DCoordActor)
+  protected
+    {last time, last local time, and corresponding (temporary) deltas}
+    LastT, dt, LastTLocal, dtl: DTime;
     {speed of actor's rotation}
     RotSpeed: float;
   protected
     procedure doAI; virtual;
-    {rotates the body}
-    procedure doRotate;
   public
     { 3D body of this Actor, it may be nil (in case the body is unloaded from
       RAM or belongs to an body-less entity, like Player's character at the moment }
     Body: TCreature;
 
     {Spawns a body for the Actor, overriden in children to spawn attributes}
-    procedure Spawn(Position: TVector3single; SpawnBody: DBody); virtual;
+    procedure Spawn(aPosition: TVector3single; SpawnBody: DBody); virtual;
 
     { manages this actor, e.g. preforms AI }
     procedure Manage; virtual;
@@ -71,8 +81,8 @@ type
 type TActorList = specialize TFPGObjectList<DActorBody>;
 
 Type
-  {basic actor. With stats.}
-  DActor = class(DActorBody)
+  { basic actor. With stats }
+  DBasicActor = class(DActorBody)
   private
     fHP,fMaxHP,fMaxMaxHP: float;
     { maybe, move all non-HP to deco player character? }
@@ -150,6 +160,22 @@ Type
 end;
 
 type
+  { Actor with actions and target }
+  DActor = class(DBasicActor)
+  private
+    fTarget: DCoordActor;
+    function GetTarget: DCoordActor;
+  protected
+    procedure LookAt;
+    procedure LookAt(aPosition: TVector3);
+  public
+    Actions: DPerksList;
+    {used for AI and preforming actions
+     if target is nil any valid target is selected}
+    property Target: DCoordActor read GetTarget write fTarget;
+  end;
+
+type
   { this is a monster Actor, featuring AI depending on its type,
     NPCs will have a different AI (?) because they can "switch" to moster/agressive AI }
   DMonster = class(DActor)
@@ -171,7 +197,7 @@ uses SysUtils, CastleLog,
 
   DecoNavigation{?}, CastleScene, CastleSceneCore;
 
-constructor DActor.Create;
+constructor DBasicActor.Create;
 begin
   inherited;
   Nickname := 'abc';
@@ -187,7 +213,7 @@ begin
   ResetMPH;
 end;
 
-destructor DActor.Destroy;
+destructor DBasicActor.Destroy;
 begin
   FreeAndNil(DefenseRandom);
   FreeAndNil(AttackRandom);
@@ -196,23 +222,23 @@ end;
 
 {----------------------------------------------------------------------------}
 
-Procedure DActor.SetHP(Value: float);
+Procedure DBasicActor.SetHP(Value: float);
 begin
   If Value < fMaxHP then fHP := Value else fHP := fMaxHP;
   If Value < 0 then Die;     {$HINT clinical death state}
 end;
-Procedure DActor.SetMaxHP(Value: float);
+Procedure DBasicActor.SetMaxHP(Value: float);
 begin
   If Value < fMaxMaxHP then fMaxHP := Value else fMaxHP := fMaxMaxHP;
   If Value < 0 then Die;
 end;
-Procedure DActor.SetMaxMaxHP(Value: float);
+Procedure DBasicActor.SetMaxMaxHP(Value: float);
 begin
   if MaxMaxHP < Value then Heal(Value-fMaxMaxHP,1);
   fMaxMaxHP := Value;
   If Value < 0 then Die;
 end;
-procedure DActor.ResetHP;
+procedure DBasicActor.ResetHP;
 begin
   fMaxHP := fMaxMaxHP;
   fHP := fMaxHP;
@@ -220,23 +246,23 @@ end;
 
 {---------------------------------------------------------------------------}
 
-Procedure DActor.SetSTA(Value: float);
+Procedure DBasicActor.SetSTA(Value: float);
 begin
   If Value < fMaxSTA then fSTA := Value else fSTA := fMaxSTA;
   If Value < 0 then {EXAUSTED STATE};
 end;
-Procedure DActor.SetMaxSTA(Value: float);
+Procedure DBasicActor.SetMaxSTA(Value: float);
 begin
   If Value < fMaxMaxSTA then fMaxSTA := Value else fMaxSTA := fMaxMaxSTA;
   If Value < 0 then {EXAUSTED STATE};
 end;
-Procedure DActor.SetMaxMaxSTA(Value: float);
+Procedure DBasicActor.SetMaxMaxSTA(Value: float);
 begin
   if MaxMaxSTA < Value then RestoreSTA(Value-fMaxMaxSTA,1);
   fMaxMaxSTA := Value;
   If Value < 0 then {EXAUSTED STATE};
 end;
-procedure DActor.ResetSTA;
+procedure DBasicActor.ResetSTA;
 begin
   fMaxSTA := fMaxMaxSTA;
   fSTA := fMaxSTA;
@@ -244,23 +270,23 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-Procedure DActor.SetCNC(Value: float);
+Procedure DBasicActor.SetCNC(Value: float);
 begin
   If Value < fMaxCNC then fCNC := Value else fCNC := fMaxCNC;
   If Value < 0 then {BURN-OUT STATE};
 end;
-Procedure DActor.SetMaxCNC(Value: float);
+Procedure DBasicActor.SetMaxCNC(Value: float);
 begin
   If Value < fMaxMaxCNC then fMaxCNC := Value else fMaxCNC := fMaxMaxCNC;
   If Value < 0 then {BURN-OUT STATE};
 end;
-Procedure DActor.SetMaxMaxCNC(Value: float);
+Procedure DBasicActor.SetMaxMaxCNC(Value: float);
 begin
   if MaxMaxCNC < Value then RestoreCNC(Value-fMaxMaxCNC,1);
   fMaxMaxCNC := Value;
   If Value < 0 then {BURN-OUT STATE};
 end;
-procedure DActor.ResetCNC;
+procedure DBasicActor.ResetCNC;
 begin
   fMaxCNC := fMaxMaxCNC;
   fCNC := fMaxCNC;
@@ -268,23 +294,23 @@ end;
 
 {---------------------------------------------------------------------------}
 
-Procedure DActor.SetMPH(Value: float);
+Procedure DBasicActor.SetMPH(Value: float);
 begin
   If Value < fMaxMPH then fMPH := Value else fMPH := fmaxMPH;
   If Value < 0 then {* STATE};
 end;
-Procedure DActor.SetMaxMPH(Value: float);
+Procedure DBasicActor.SetMaxMPH(Value: float);
 begin
   If Value < fMaxmaxMPH then fMaxMPH := Value else fMaxMPH := fMaxmaxMPH;
   If Value < 0 then {* STATE};
 end;
-Procedure DActor.SetMaxMaxMPH(Value: float);
+Procedure DBasicActor.SetMaxMaxMPH(Value: float);
 begin
   if MaxMaxMPH < Value then RestoreMPH(Value-fMaxMaxMPH,1);
   fMaxMaxMPH := Value;
   If Value < 0 then {* STATE};
 end;
-procedure DActor.ResetMPH;
+procedure DBasicActor.ResetMPH;
 begin
   fMaxMPH := fMaxMaxMPH;
   fMPH := fMaxMPH;
@@ -292,14 +318,14 @@ end;
 
 {---------------------------------------------------------------------------}
 
-Procedure DActor.Hit(Damage: float; Skill: float);
+Procedure DBasicActor.Hit(Damage: float; Skill: float);
 begin
   SetHP(HP-Damage);
   SetmaxHP(MaxHP-Damage*Skill); // todo
   if Assigned(Self.onHit) then Self.onHit(Damage, dtHealth);
 end;
 
-function DActor.Heal(Value: float; Skill: float): boolean;
+function DBasicActor.Heal(Value: float; Skill: float): boolean;
 begin
   if (HP < MaxHP) or ((MaxHP < MaxMaxHP) and (Skill > 0)) then begin
     SetHP(HP+Value);
@@ -311,7 +337,7 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-function DActor.ConsumeSTA(Consumption: float; Skill: float): boolean;
+function DBasicActor.ConsumeSTA(Consumption: float; Skill: float): boolean;
 begin
   if (STA > Consumption) then begin
     SetSTA(STA-Consumption);
@@ -319,7 +345,7 @@ begin
     Result := true;
   end else Result := false;
 end;
-function DActor.RestoreSTA(Restoration: float; Skill: float): boolean;
+function DBasicActor.RestoreSTA(Restoration: float; Skill: float): boolean;
 begin
   if (STA < MaxSTA) or ((MaxSTA < MaxMaxSTA) and (Skill > 0)) then begin
     SetSTA(STA+Restoration);
@@ -328,7 +354,7 @@ begin
   end else
     Result := false;
 end;
-procedure DActor.DrainSTA(Drain: float; Skill: float);
+procedure DBasicActor.DrainSTA(Drain: float; Skill: float);
 begin
  SetSTA(STA-Drain);
  SetMaxSTA(MaxSTA-Drain*Skill); // todo
@@ -336,7 +362,7 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-function DActor.ConsumeCNC(Consumption: float; Skill: float): boolean;
+function DBasicActor.ConsumeCNC(Consumption: float; Skill: float): boolean;
 begin
   if (CNC > Consumption) then begin
     SetCNC(CNC-Consumption);
@@ -344,7 +370,7 @@ begin
     Result := true;
   end else Result := false;
 end;
-function DActor.RestoreCNC(Restoration: float; Skill: float): boolean;
+function DBasicActor.RestoreCNC(Restoration: float; Skill: float): boolean;
 begin
   if (CNC < MaxCNC) or ((MaxCNC < MaxMaxCNC) and (Skill > 0)) then begin
     SetCNC(CNC+Restoration);
@@ -353,7 +379,7 @@ begin
   end else
     Result := false;
 end;
-procedure DActor.DrainCNC(Drain: float; Skill: float);
+procedure DBasicActor.DrainCNC(Drain: float; Skill: float);
 begin
   SetCNC(CNC-Drain);
   SetMaxCNC(MaxCNC-Drain*Skill); // todo
@@ -361,7 +387,7 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-function DActor.ConsumeMPH(Consumption: float; Skill: float): boolean;
+function DBasicActor.ConsumeMPH(Consumption: float; Skill: float): boolean;
 begin
   if (MPH > Consumption) then begin
     SetMPH(MPH-Consumption);
@@ -369,7 +395,7 @@ begin
     Result := true;
   end else Result := false;
 end;
-function DActor.RestoreMPH(Restoration: float; Skill: float): boolean;
+function DBasicActor.RestoreMPH(Restoration: float; Skill: float): boolean;
 begin
   if (MPH < MaxMPH) or ((MaxMPH < MaxMaxMPH) and (Skill > 0)) then begin
     SetMPH(MPH+Restoration);
@@ -378,7 +404,7 @@ begin
   end else
     Result := false;
 end;
-procedure DActor.DrainMPH(Drain: float; Skill: float);
+procedure DBasicActor.DrainMPH(Drain: float; Skill: float);
 begin
   SetMPH(MPH-Drain);
   SetMaxMPH(MaxMPH-Drain*Skill); // todo
@@ -388,7 +414,7 @@ end;
 
 constructor DActorBody.Create;
 begin
-  LastTime := DecoNow;
+  {$warning dummy, should set LastTime here}
 end;
 
 {-----------------------------------------------------------------------------}
@@ -400,13 +426,15 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-procedure DActorBody.Spawn(Position: TVector3; SpawnBody: DBody);
+procedure DActorBody.Spawn(aPosition: TVector3; SpawnBody: DBody);
 var rDir: float;
 begin
   rDir := drnd.Random*2*Pi;
-  Dir := Vector3(sin(rDir),cos(rDir),0);
-  Pos := Position;
-  body := SpawnBody.CreateCreature(Window.SceneManager.Items, Pos, Dir);
+  Direction := Vector3(sin(rDir),cos(rDir),0);
+  Position := aPosition;
+  body := SpawnBody.CreateCreature(Window.SceneManager.Items, Position, Direction);
+  toDir := Direction;
+  toPos := Position;
   body.Up := Vector3(0,0,1);
   body.Exists := true;
 end;
@@ -420,9 +448,15 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-procedure DActorBody.doRotate;
+procedure DCoordActor.doRotate;
 begin
-
+  {$Warning dummy}
+  Direction := toDir;
+end;
+procedure DCoordActor.doMove;
+begin
+  {$Warning dummy}
+  Position := toPos;
 end;
 
 
@@ -431,16 +465,21 @@ end;
 procedure DActorBody.Manage;
 begin
 
-  dt := DecoNow - LastTime;
-  LastTime := DecoNow;
+
+  dt := DecoNow - LastT;
+  dtl := DecoNowLocal - LastTLocal;
+  LastT := DecoNow;
+  LastTLocal := DecoNowLocal;
 
   //cute and simple, maybe merge them?
   doAI;
 
+  doRotate;
+  doMove;
+
   if Body<>nil then begin
-    doRotate;
-    Body.Position := Pos;
-    Body.Direction := Dir;
+    Body.Position := Position;
+    Body.Direction := Direction;
   end;
 end;
 
@@ -448,12 +487,38 @@ end;
 
 procedure DMonster.doAI;
 begin
-  if (Camera.Position - body.Position).Length < 10 then
-  Dir := Camera.Position - body.Position;
-  Dir[2] := 0;
-  body.Up := Vector3(0,0,1); {$Warning this is a bug!}
+  if (Camera.Position - Position).Length < 10 then LookAt(Camera.Position);
+  //body.Up := Vector3(0,0,1); {$Warning this is a bug!}
   //(body.Items[0] as TCastleScene).PlayAnimation('attack', paForceNotLooping);
   //Scene.AnimationTimeSensor('my_animation').EventIsActive.OnReceive.Add(@AnimationIsActiveChanged)
+end;
+
+{-----------------------------------------------------------------------------}
+
+function DActor.GetTarget: DCoordActor;
+begin
+  if fTarget = nil then begin
+    Result := nil;
+    WriteLnLog('DActor.GetTarget','Warning: Autoselecting target not implemented yet...');
+  end
+  else
+    Result := fTarget;
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DActor.LookAt;
+begin
+  if fTarget<>nil then begin
+    toDir := Target.Position - Position;
+    toDir[2] := 0;
+  end else
+    WriteLnLog('DActor.LookAt','Warning: trying to look at a nil target...');
+end;
+procedure DActor.LookAt(aPosition: TVector3);
+begin
+  toDir := aPosition - Position;
+  toDir[2] := 0;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -463,6 +528,8 @@ begin
   Resources.LoadSafe(ApplicationData('models/creatures/knight_creature/'));
   tmpKnightCreature := Resources.FindName('Knight') as TCreatureResource;
 end;
+
+
 
 
 end.

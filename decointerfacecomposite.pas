@@ -623,7 +623,8 @@ begin
   if value <> fTarget then begin
     fTarget := value;
     (PerkImage.content as DStaticImage).FreeImage;
-    (PerkImage.content as DStaticImage).load(fTarget.Image.SourceImage);
+    {$Warning todo}
+    //(PerkImage.content as DStaticImage).load(fTarget.Image.SourceImage);
     //add events?
   end;
 end;
@@ -685,7 +686,8 @@ begin
       for i:= 0 to fTarget.Actions.count-1 do begin
         tmp := DSingleInterfaceElement.create(self);
         tmp.Content := DStaticImage.create(tmp);
-        (tmp.Content as DSTaticImage).Load(fTarget.Actions[0].Image.SourceImage);
+        {$warning todo}
+        //(tmp.Content as DSTaticImage).Load(fTarget.Actions[0].Image.SourceImage);
         grab(tmp);
       end;
       ArrangeChildren(animate);

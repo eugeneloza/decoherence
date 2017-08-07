@@ -28,11 +28,19 @@ uses Classes,
 
 const MaxParty = 6; {0..6 = 7 characters}
 
+{
+  {Stores the perk's image. Generally we don't use perks directly as static images,
+   but static images provide a convenient routine to load the image in a thread
+   so let it be this way for now. Theoretically, it's better to make a separate
+   object that handles perks and items images and allows just rescaling them
+   correctly - to save memory. But it is not the issue for now.}
+  Image: DStaticImage;
+}
+
 Type
   {player character - the most complex actor available :)}
   DPlayerCharacter = class(DActor)
   public
-    Actions: DPerksList;
     Procedure Die; override;
     constructor Create; override;
     destructor Destroy; override;
