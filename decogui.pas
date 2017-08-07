@@ -279,7 +279,6 @@ var
 begin
   if interfaceReady then exit;
   interfaceReady := true;
-  createTestParty;
   tmp := DPartyView.create(self);
   tmp2 := DDecorations.create(self);
   GUI.grab(tmp2);

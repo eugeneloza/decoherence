@@ -34,13 +34,13 @@ uses
 
 procedure load_test_level;
 Procedure InitTestLevel;
-procedure FreeTestLevel;
 
 var LoadCompleted: boolean = false;
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 uses CastleFilesUtils,
+  DecoPlayerCharacter,
   DecoGameMode;
 
 procedure Generate3DWorld;
@@ -70,8 +70,12 @@ begin
   Window.ShadowVolumesRender := Shadow_volumes_enabled;
   Window.AntiAliasing := aa8SamplesNicer;
 
+  //make a temporary party {wrong place}
+  Party := DParty.Create(Window);
+  Party.tmpParty;
 
   InitNavigation;
+
 
   WritelnLog('load_test_level','Finished');
 end;
@@ -94,10 +98,6 @@ begin
   end;
 end;
 
-procedure FreeTestLevel;
-begin
-
-end;
 
 end.
 

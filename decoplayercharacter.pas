@@ -22,7 +22,7 @@ unit decoplayercharacter;
 
 interface
 
-uses Classes,
+uses Classes, fgl,
   DecoActor, DecoRaceProfession, DecoPerks,
   DecoGlobal;
 
@@ -46,39 +46,61 @@ Type
     destructor Destroy; override;
 end;
 
-  {$WARNING party must be an object with a proper create/destroy}
-var Party: array[0..MaxParty] of DPlayerCharacter;
+{list of the party characters}
+type DCharList = specialize TFPGObjectList<DPlayerCharacter>;
 
-{creates a test party. Temporary}
-procedure CreateTestParty;
-procedure FreeTestParty;
+type
+  { Physical manifestation of Player in the world
+    including camera
+    party characters }
+  DParty = class (TComponent)
+  public
+    CameraMan: DCoordActor;
+    Char: DCharList;
+    procedure tmpParty;
+    constructor Create(AOwner: TComponent); override;
+    Destructor Destroy; override;
+  end;
+
+var Party: DParty;
+
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 uses SysUtils, CastleLog;
 
-procedure CreateTestParty;
-var i: integer;
+constructor DParty.create(AOwner: TComponent);
 begin
-  for i := 0 to MaxParty do begin
-    Party[i] := DPlayerCharacter.Create;
-    {if i<4 then }Party[i].MaxMaxMPH := 0;
-    Party[i].Hit(DRND.Random(80),1);
-    Party[i].DrainCNC(DRND.Random(80),1);
-    Party[i].DrainMPH(DRND.Random(80),1);
-    Party[i].DrainSTA(DRND.Random(80),1);
-    if (Perks=nil) or (Perks.Count=0) then WriteLnLog('CreateTestParty','FATAL ERROR: Perks is empty!');
-    Party[i].Actions := DPerksList.Create(false);
-    Party[i].Actions.Add(Perks[0]);
-  end;
-
+  inherited Create(AOwner);
+  Char := DCharList.create(true);
 end;
 
 {----------------------------------------------------------------------------}
 
-procedure FreeTestParty;
+Procedure DParty.tmpParty;
+var i: integer;
+    NewMember: DPlayerCharacter;
+begin
+  for i := 0 to MaxParty do begin
+    NewMember := DPlayerCharacter.Create;
+    NewMember.MaxMaxMPH := 0;
+    NewMember.Hit(DRND.Random(80),1);
+    NewMember.DrainCNC(DRND.Random(80),1);
+    NewMember.DrainMPH(DRND.Random(80),1);
+    NewMember.DrainSTA(DRND.Random(80),1);
+
+    if (Perks=nil) or (Perks.Count=0) then WriteLnLog('CreateTestParty','FATAL ERROR: Perks is empty!');
+    NewMember.Actions.Add(Perks[0]);
+
+    Char.Add(NewMember);
+  end;
+end;
+
+{----------------------------------------------------------------------------}
+
+Destructor DParty.Destroy;
 var i: integer;
 begin
-  for i:= 0 to MaxParty do FreeAndNil(Party[i]);
+  FreeAndNil(Char); //it will auto free all its components
 end;
 
 {======================== DPlayerCharacter ==================================}
@@ -90,16 +112,15 @@ end;
 
 {----------------------------------------------------------------------------}
 
-Procedure DPlayerCharacter.die;
+Procedure DPlayerCharacter.Die;
 begin
-  WriteLnLog('DPlayerCharacter.die','Character has died');
+  WriteLnLog('DPlayerCharacter.die','Character has entered clinical death state');
 end;
 
 {----------------------------------------------------------------------------}
 
-destructor DPlayerCharacter.destroy;
+destructor DPlayerCharacter.Destroy;
 begin
-  FreeAndNil(Actions);
   Inherited;
 end;
 

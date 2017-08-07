@@ -231,7 +231,7 @@ begin
   for i := 0 to maxparty do begin
     CharacterSpace[i] := DCharacterSpace.create(self);
     CharacterSpace[i].ID := i;
-    CharacterSpace[i].Target := party[i];
+    CharacterSpace[i].Target := party.char[i];
     CharacterSpace[i].ScaleToChildren := true;
     grab(CharacterSpace[i]);
     //at grab we set parent as DPartyView;

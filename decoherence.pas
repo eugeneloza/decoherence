@@ -141,7 +141,7 @@ begin
     case Event.key of
        K_P,K_PrintScreen:                //k_printscreen doesn't work in x-window system if assigned to some external program like scrot
                          Window.SaveScreen('deco_'+NiceDate+'.jpg');
-       K_r: party[0].hit(1,1);
+       K_r: party.char[0].hit(1,1);
        k_i: if AmbientIntensity.Ambient = 0 then
                AmbientIntensity.SetAmbientIntensity(3)
             else
@@ -213,6 +213,7 @@ begin
 
   Load_test_level; //remake it
   window.OnBeforeRender := @WindowManage;
+
   LoadCompleted := true;
 end;
 
@@ -316,8 +317,6 @@ Initialization
 
 Finalization
   { free all assigned memory }
-  FreeTestLevel;
-  FreeTestParty;
 
   DestroyCompositeInterface;
   //DestroyGlobal;
