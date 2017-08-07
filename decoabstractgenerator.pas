@@ -21,7 +21,8 @@ unit DecoAbstractGenerator;
 {$INCLUDE compilerconfig.inc}
 interface
 
-uses {Classes,} CastleRandom, fgl, CastleGenericLists,
+uses Classes, CastleRandom, fgl, CastleGenericLists,
+  DecoNavigationNetwork,
   DecoThread;
 
 type
@@ -30,7 +31,6 @@ type
   TIntCoordinate = integer;
 
 type TIndexList = specialize TFPGList<TTileType>;
-{$warning change it to a generic list and export}
 type TIndexGroups = specialize TFPGObjectList<TIndexList>;
 
 type
@@ -44,8 +44,9 @@ type
 
 type TNeighboursList = specialize TGenericStructList<DNeighbour>;
 
-
 type
+  { abstract level of Generator Parameters,
+    maybe redundant, but maybe it'll turn useful some day }
   DAbstractGeneratorParameters = class(TObject)
   private
     fisReady: boolean;
@@ -55,10 +56,9 @@ type
     {are links in TilesList absolute URL or just a tile name}
     AbsoluteURL: boolean;
     {is the generator ready to wrok?
-     Generatie will raise an exception if it isn't}
+     Generate will raise an exception if it isn't}
     property isReady: boolean read fisReady write fisReady default false;
   end;
-
 
 type
   {Most abstract generation routine to parent all the generation algorithms
@@ -88,8 +88,19 @@ type
      Will attempt automatic initialization if possible
      Use ForceReady to define parameters manually}
     procedure InitParameters; virtual; abstract;
+  protected
+    NavList: TNavList;
+    {contains a set of "interesting" places}
+    Weenies: TWeeniesList;
   public
-
+    {WARNING, exporting Nav stop the Generator from freeing it
+     and will NIL the corresponding link. Don't try to access it twice!}
+    {exports navigation network and nils the link}
+    function ExportNav: TNavList;
+    function ExportWeenies: TWeeniesList;
+    function ExportGroups: TIndexGroups; virtual; abstract;
+    function ExportTiles: TStringList; virtual; abstract;
+  public
     //Property Seed: LongWord;
     {Abstract call to generation procedure
      It has different implementation in different generators
@@ -141,6 +152,21 @@ begin
   Generate;
 end;
 
+{-----------------------------------------------------------------------------}
+
+function DAbstractGenerator.ExportNav: TNavList;
+begin
+  Result := NavList;
+  NavList := nil;
+end;
+
+{-----------------------------------------------------------------------------}
+
+function DAbstractGenerator.ExportWeenies: TWeeniesList;
+begin
+  Result := Weenies;
+  Weenies := nil;
+end;
 
 
 end.

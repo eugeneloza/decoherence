@@ -53,9 +53,9 @@ Type
     {Builds a PathTree for the world}
     //Function pathfind: DPathTree;
     { Load the World from a file}
-    procedure Load(URL: string); virtual; abstract;
+    procedure Load(URL: string); virtual;
     { Load the World from a running Generator }
-    procedure Load(Generator: DAbstractGenerator); virtual; abstract;
+    procedure Load(Generator: DAbstractGenerator); virtual;
     { Builds a world from the obtained data }
     procedure Build; virtual;
     { activates the current world.
@@ -75,11 +75,11 @@ Type
 
   public
     Nav: TNavList;
-    { Builds a Nav network }
-    procedure BuildNav; virtual; abstract;
+    Weenies: TWeeniesList;
     function NavToVector3(aNav: TNavID): TVector3;
     procedure BlockNav(aNav: TNavID);
     procedure ReleaseNav(aNav: TNavID);
+    procedure ClearNavBlocks;
   end;
 
 var CurrentWorld: DAbstractWorld;
@@ -104,10 +104,12 @@ end;
 
 {------------------------------------------------------------------------------}
 
-destructor DAbstractWorld.destroy;
+destructor DAbstractWorld.Destroy;
 begin
   WriteLnLog('DAbstractWorld.destroy','Freeing the World');
   FreeAndNil(RNDM);
+  FreeAndNil(Nav);
+  FreeAndNil(Weenies);
   inherited;
 end;
 
@@ -132,7 +134,7 @@ end;
 
 {------------------------------------------------------------------------------}
 
-Procedure DAbstractWorld.render;
+Procedure DAbstractWorld.Render;
 begin
   {this is an abstract routine,
   it must be overridden by DRenderedWorld}
@@ -164,6 +166,34 @@ end;
 
 {------------------------------------------------------------------------------}
 
+procedure DAbstractWorld.ClearNavBlocks;
+var i: integer;
+begin
+  //actually, it seems redundant for now
+  for i := 0 to Nav.Count-1 do Nav.L[i].Blocked := false;
+end;
+
+{------------------------------------------------------------------------------}
+
+procedure DAbstractWorld.Load(Generator: DAbstractGenerator);
+begin
+  fSeed := drnd.Random32bit; //maybe other algorithm?
+  if Nav<>nil then begin
+    WriteLnLog('DAbstractWorld.Load','WARNING: Nav is not nil! Freeing');
+    FreeAndNil(Nav);
+  end;
+  Nav := Generator.ExportNav;
+  ClearNavBlocks;
+  Weenies := Generator.ExportWeenies;
+end;
+
+{------------------------------------------------------------------------------}
+
+procedure DAbstractWorld.Load(URL: string);
+begin
+  {$hint dummy}
+  //load seed and Nav
+end;
 
 {------------------------------------------------------------------------------}
 

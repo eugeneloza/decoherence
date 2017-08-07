@@ -23,7 +23,10 @@ interface
 
 uses Classes, CastleRandom, fgl, CastleGenericLists,
   DecoAbstractGenerator, DecoDungeonTiles,
+  DecoNavigationNetwork,
   DecoThread, DecoGlobal;
+
+type TIntMapArray = array of array of array of integer;
 
 type
   {a "dock point" of a tile or a map. This is a xyz coordinate of an open face
@@ -237,6 +240,10 @@ type
     procedure MakeMinimap;
     {resizes the generated map for its real size}
     procedure ShrinkMap;
+  private
+    NavMap: TIntMapArray;
+    procedure BuildNav;
+    procedure BuildWeenies;
   public
     {map parameters}
     Parameters: DDungeonGeneratorParameters;
@@ -271,12 +278,11 @@ type
      makes a *copy* of the "internal" map to external request
      it's "lower-level" than used DGenerationMap so useful :)}
     function ExportMap: DMap; //maybe better saveTo when finished?: DMap;
-    function ExportTiles: TStringList;
+    function ExportTiles: TStringList; override;
     {nils GEN link!}
     function ExportSteps: TGeneratorStepsArray;
 end;
 
-type TIntMapArray = array of array of array of integer;
 type
   {coordinate of a raycast_to candidate}
   Txyz = record
@@ -345,7 +351,7 @@ type
     {WARNING, exporting these WILL stop the Generator from freeing it
      and will NIL the corresponding links. Don't try to access it twice!}
     {exports groups of tiles and nils the link}
-    function ExportGroups: TIndexGroups;
+    function ExportGroups: TIndexGroups; override;
     {exports neighbours map and nils the link}
     function ExportNeighbours: TNeighboursMapArray;
   end;
@@ -617,6 +623,10 @@ begin
   FreeLists; //we no longer need them
 
   ShrinkMap;
+
+  BuildNav; //build navigation network for the dungeon
+  BuildWeenies;
+
   MakeMinimap;
 
   fisWorking := false;
@@ -799,6 +809,42 @@ begin
     Map.SizeZ := Map.MaxDepth+1;
     Map.SetSize(Map.SizeX,Map.SizeY,Map.SizeZ);
   end;
+end;
+
+{-------------------------------------------------------------------------}
+
+procedure DDungeonGenerator.BuildNav;
+var ix,iy,iz: TIntCoordinate;
+    tmpNav: DNavPt;
+begin
+  NavMap := ZeroIntegerMap(Map.SizeX,Map.SizeY,Map.SizeZ);
+
+  NavList := TNavList.create;
+  for iz := 0 to Map.SizeZ-1 do
+    for ix := 0 to Map.SizeX-1 do
+      for iy := 0 to Map.SizeZ-1 do if isPassable(Map.Map[ix,iy,iz].Base)
+      and not isPassable(Map.Map[ix,iy,iz].Faces[aDown])
+      and not isPassable(Map.Map[ix,iy,iz].Faces[aUp])         {$hint ignore up/down tiles for now}
+        then begin
+        tmpNav.x := ix;
+        tmpNav.y := iy;
+        tmpNav.z := iz;
+        tmpNav.Blocked := false;
+        NavMap[ix,iy,iz] := NavList.Add(tmpNav);
+      end;
+  WriteLnLog('DDungeonGenerator.BuildNav','Navigation Graph created, nodes: '+IntToStr(NavList.Count));
+end;
+
+{-------------------------------------------------------------------------}
+
+procedure DDungeonGenerator.BuildWeenies;
+var w: DWeenie;
+begin
+  {$hint All weenies actually will be defined by CONSTRUCTOR in first steps, not here!}
+  Weenies := TWeeniesList.create;
+  w.kind := wtEntrance;
+  w.NavId := NavMap[Self.Gen[0].x,Self.Gen[0].y,Self.Gen[0].z];
+  Weenies.Add(w);
 end;
 
 {================== 3D DUNGEON GENERATOR ROUTINES ===========================}

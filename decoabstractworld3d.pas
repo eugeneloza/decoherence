@@ -103,6 +103,10 @@ type
     procedure Activate; override;
     {builds current 3d world}
     procedure Build; override;
+    { Load the World from a running Generator }
+    procedure Load(Generator: DAbstractGenerator); override;
+    procedure Load(URL: string); override;
+    procedure RescaleNavigationNetwork;
 
     procedure Manage(Position: TVector3Single); override;
 
@@ -279,6 +283,37 @@ end;
 
 {---------------------------------------------------------------------------}
 
+procedure DAbstractWorld3d.Load(Generator: DAbstractGenerator);
+begin
+  inherited Load(Generator);
+  Groups := Generator.ExportGroups;
+  WorldElementsURL := Generator.ExportTiles;
+end;
+
+{---------------------------------------------------------------------------}
+
+procedure DAbstractWorld3d.RescaleNavigationNetwork;
+var i: integer;
+begin
+  {$hint I don't like that!}
+  for i := 0 to Nav.Count-1 do begin
+    Nav.L[i].x *= WorldScale;
+    Nav.L[i].y *= -WorldScale;
+    Nav.L[i].z *= -WorldScale;
+  end;
+end;
+
+{---------------------------------------------------------------------------}
+
+procedure DAbstractWorld3d.Load(URL: string);
+begin
+  inherited Load(URL);
+  //load groups and WorldElementsList
+end;
+
+{---------------------------------------------------------------------------}
+
+
 procedure DAbstractWorld3d.Activate;
 var  i: integer;
 begin
@@ -415,7 +450,6 @@ begin
   BuildTransforms;
   {$IFDEF UseSwitches}BuildSwitches;{$ENDIF}
   BuildRoots;
-  BuildNav;
   BuildScenes;
 end;
 

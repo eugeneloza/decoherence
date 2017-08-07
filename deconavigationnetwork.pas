@@ -39,9 +39,19 @@ Type DNavPt = record
   Blocked: boolean;
 end;
 
+type TWeenieType = (wtEntrance);
+type
+  { this is an "interesting point" in the map,
+    required to spawn enemies properly, set up triggers,
+    etc,etc,etc.
+    I'm not sure yet how to organize them flexible and easily. }
+  DWeenie = record
+    kind: TWeenieType;
+    NavId: TNavID;
+end;
+
 type TNavList = specialize TGenericStructList<DNavPt>;
-
-
+type TWeeniesList = specialize TGenericStructList<DWeenie>;
 
 implementation
 

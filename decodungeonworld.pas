@@ -74,9 +74,6 @@ type
 
     constructor Create; override;
     destructor Destroy; override;
-  public
-    NavNet: TIntMapArray;
-    procedure BuildNav; override;
   end;
 
 
@@ -136,22 +133,20 @@ end;
 procedure DDungeonWorld.Load(Generator: DAbstractGenerator);
 var DG: D3dDungeonGenerator;
 begin
+  inherited Load(Generator);
   DG := Generator as D3dDungeonGenerator;
-  fSeed := drnd.Random32bit; //todo: maybe other algorithm
   Map := DG.ExportMap;
-  Groups := DG.ExportGroups;
   Neighbours := DG.ExportNeighbours;
-  WorldElementsURL := DG.ExportTiles;
   Steps := DG.ExportSteps;
-  {$hint WorldScale must support different scales}
-  {$Warning this is ugly}
+  {$HINT this is ugly. WorldScale must support different scales}
   WorldScale := TileScale*MyScale;
+  RescaleNavigationNetwork;
+
   {yes, we load tiles twice in this case (once in the generator and now here),
    however, loading from generator is *not* a normal case
    (used mostly for testing in pre-alpha), so such redundancy will be ok
    normally World should load from a file and loading tiles will happen only once}
 end;
-
 
 {----------------------------------------------------------------------------}
 
@@ -163,15 +158,10 @@ end;
 {----------------------------------------------------------------------------}
 
 procedure DDungeonWorld.Activate;
-var
-  StartX,StartY,StartZ: integer;
 begin
   inherited;
-  StartX := 4;
-  StartY := 4;
-  StartZ := 0;
-  {$Warning this is ugly}
-  Party.TeleportTo(NavNet[StartX,StartY,StartZ]);
+  {$Hint todo}
+  Party.TeleportTo(Weenies[0].NavId);
 
   {$WARNING this is wrong}
   {why does it gets a wrong GRAVITY_UP if called from Self.Activate?????}
@@ -211,42 +201,12 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DDungeonWorld.BuildNav;
-var ix,iy,iz: TIntCoordinate;
-    tmpNav: DNavPt;
-begin
-  if Nav<>nil then begin
-    WriteLnLog('DDungeonWorld.BuildNav','WARNING: Nav is not nil! Freeing');
-    FreeAndNil(Nav);
-  end;
-  Nav := TNavList.create;
-  NavNet := ZeroIntegerMap(Map.SizeX,Map.SizeY,Map.SizeZ);
-
-  for iz := 0 to Map.SizeZ-1 do
-    for ix := 0 to Map.SizeX-1 do
-      for iy := 0 to Map.SizeZ-1 do if isPassable(Map.Map[ix,iy,iz].Base)
-      and not isPassable(Map.Map[ix,iy,iz].Faces[aDown])
-      and not isPassable(Map.Map[ix,iy,iz].Faces[aUp])         {$hint ignore up/down tiles for now}
-        then begin
-        tmpNav.x := ix*WorldScale;
-        tmpNav.y := -iy*WorldScale;
-        tmpNav.z := -iz*WorldScale;
-        tmpNav.Blocked := false;
-        NavNet[ix,iy,iz] := Nav.Add(tmpNav);
-      end;
-
-  WriteLnLog('DDungeonWorld.BuildNav','Navigation Graph created, nodes: '+inttostr(Nav.Count));
-end;
-
-{----------------------------------------------------------------------------}
-
 destructor DDungeonWorld.Destroy;
 begin
   {$hint freeandnil(window.scenemanager)?}
   
   //free basic map parameters
   FreeAndNil(Map);
-  FreeAndNil(Nav);
   FreeAndNil(Groups);
   FreeNeighboursMap(Neighbours);
 
