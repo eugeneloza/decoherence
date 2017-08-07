@@ -385,7 +385,7 @@ end;
 
 procedure DAbstractWorld3d.SpawnActors;
 var i: integer;
-    n: DNavPt;
+    n: TNavID;
     a: DMonster;
 begin
   if Actors <> nil then begin
@@ -394,13 +394,14 @@ begin
   end;
   Actors := TActorList.Create(true);
 
-  {$hint todo}
-  for i := 0 to Self.Nav.Count div 10 do begin
-    n := Self.Nav[DRND.Random(Self.Nav.Count)];
+  for i := 0 to Nav.Count div 10 do begin
+    repeat
+      n := DRND.Random(Nav.Count);
+    until Nav[n].Blocked = false;
     a := DMonster.Create;
     a.Target := Party.CameraMan;
     {monsters are centered by "underfeet" point}
-    a.Spawn(Vector3(n.x*WorldScale,-n.y*WorldScale,-n.z*WorldScale),tmpKnightCreature);
+    a.Spawn(n, tmpKnightCreature);
     Actors.Add(a);
   end;
 end;

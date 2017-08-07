@@ -77,6 +77,9 @@ Type
     Nav: TNavList;
     { Builds a Nav network }
     procedure BuildNav; virtual; abstract;
+    function NavToVector3(aNav: TNavID): TVector3;
+    procedure BlockNav(aNav: TNavID);
+    procedure ReleaseNav(aNav: TNavID);
   end;
 
 var CurrentWorld: DAbstractWorld;
@@ -135,6 +138,32 @@ begin
   it must be overridden by DRenderedWorld}
   WriteLnLog('DAbstractWorld.render','Warning: This shouldn''t happen in normal situation, it''s abstract');
 end;
+
+{------------------------------------------------------------------------------}
+
+function DAbstractWorld.NavToVector3(aNav: TNavID): TVector3;
+begin
+  Result[0] := Nav[aNav].x;
+  Result[1] := Nav[aNav].y;
+  Result[2] := Nav[aNav].z;
+end;
+
+{------------------------------------------------------------------------------}
+
+procedure DAbstractWorld.BlockNav(aNav: TNavId);
+begin
+  Nav.L[aNav].Blocked := true;
+end;
+
+{------------------------------------------------------------------------------}
+
+procedure DAbstractWorld.ReleaseNav(aNav: TNavId);
+begin
+  Nav.L[aNav].Blocked := false;
+end;
+
+{------------------------------------------------------------------------------}
+
 
 {------------------------------------------------------------------------------}
 

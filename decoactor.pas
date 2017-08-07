@@ -24,6 +24,7 @@ interface
 
 uses Classes, CastleRandom, fgl, CastleVectors,
   CastleResources, CastleCreatures,
+  DecoNavigationNetwork,
   DecoStats, DecoPerks,
   DecoGlobal;
 
@@ -55,6 +56,7 @@ type
     procedure GetRandomDirection;
     {rotates the body}
     procedure doRotate;
+    {moves the body}
     procedure doMove;
   end;
 
@@ -78,6 +80,7 @@ type
     { Shows or hides the actor's body}
     property Visible: boolean read GetVisible write SetVisible;
     { Spawns a body for the Actor, overriden in children to spawn attributes}
+    procedure Spawn(aNav: TNavID; SpawnBody: DBody);
     procedure Spawn(aPosition: TVector3single; SpawnBody: DBody); virtual;
     { Manages this actor, e.g. preforms AI }
     procedure Manage; virtual;
@@ -208,6 +211,7 @@ implementation
 uses SysUtils, CastleLog,
   CastleFilesUtils, DecoInputOutput,
 
+  DecoAbstractWorld,
   DecoNavigation{?}, CastleScene, CastleSceneCore;
 
 constructor DBasicActor.Create;
@@ -449,6 +453,11 @@ end;
 
 {-----------------------------------------------------------------------------}
 
+procedure DActorBody.Spawn(aNav: TNavID; SpawnBody: DBody);
+begin
+  Spawn(CurrentWorld.NavToVector3(aNav),SpawnBody);
+  CurrentWorld.BlockNav(aNav);
+end;
 procedure DActorBody.Spawn(aPosition: TVector3; SpawnBody: DBody);
 begin
   TeleportTo(aPosition);

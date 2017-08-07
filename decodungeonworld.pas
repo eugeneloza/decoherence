@@ -225,9 +225,10 @@ begin
   for iz := 0 to Map.SizeZ-1 do
     for ix := 0 to Map.SizeX-1 do
       for iy := 0 to Map.SizeZ-1 do if isPassable(Map.Map[ix,iy,iz].base) then begin
-        tmpNav.x := ix;
-        tmpNav.y := iy;
-        tmpNav.z := iz;
+        tmpNav.x := ix*WorldScale;
+        tmpNav.y := -iy*WorldScale;
+        tmpNav.z := -iz*WorldScale;
+        tmpNav.Blocked := false;
         NavNet[ix,iy,iz] := Nav.Add(tmpNav);
       end;
 

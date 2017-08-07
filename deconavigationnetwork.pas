@@ -26,6 +26,8 @@ interface
 uses CastleGenericLists,
   DecoGlobal;
 
+type TNavID = integer;
+
 Type DNavPt = record
   { Absolute Coordinates of pathPoint }
   x,y,z: Float;
@@ -33,6 +35,7 @@ Type DNavPt = record
   Tile: TTileType;
   {Link of tiles adjacent to this tile}
   Links: TLinkList;}
+  Blocked: boolean;
 end;
 
 type TNavList = specialize TGenericStructList<DNavPt>;
