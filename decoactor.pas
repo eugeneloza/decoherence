@@ -127,6 +127,7 @@ Type
     Property MaxMPH: float read fMaxMPH write SetMaxMPH;
     Property MaxMaxMPH: float read fMaxMaxMPH write SetMaxMaxMPH;
     procedure ResetMPH;
+    procedure ResetAll;
 
     {hit equals to consume+drain}
     procedure Hit(Damage: float; Skill: float); //=consumeHP
@@ -181,6 +182,8 @@ type
     {used for AI and preforming actions
      if target is nil any valid target is selected}
     property Target: DCoordActor read GetTarget write fTarget;
+    {rests all stats and removes all effects}
+    procedure RecoverAll;
     constructor Create; override;
     destructor Destroy; override;
   end;
@@ -324,6 +327,14 @@ procedure DBasicActor.ResetMPH;
 begin
   fMaxMPH := fMaxMaxMPH;
   fMPH := fMaxMPH;
+end;
+
+procedure DBasicActor.ResetAll;
+begin
+  ResetHP;
+  ResetSTA;
+  ResetCNC;
+  ResetMPH;
 end;
 
 {---------------------------------------------------------------------------}
@@ -583,6 +594,14 @@ begin
   toDir := aPosition - Position;
   toDir[2] := 0;  //cut-off z component
   toDir.NormalizeMe;
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DActor.RecoverAll;
+begin
+  //dummy, should also reset all active statuses
+  ResetAll;
 end;
 
 {-----------------------------------------------------------------------------}

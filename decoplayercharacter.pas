@@ -64,8 +64,9 @@ type
     procedure tmpParty;
     procedure Manage;
     constructor Create(AOwner: TComponent); override;
-    Destructor Destroy; override;
+    destructor Destroy; override;
     procedure TeleportTo(aPosition, aDirection: TVector3);
+    procedure Rest;
   end;
 
 var Party: DParty;
@@ -101,6 +102,15 @@ begin
 
     Char.Add(NewMember);
   end;
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DParty.Rest;
+var c: DPlayerCharacter;
+begin
+  {for now it just resets the Actor to its initial state}
+  for c in char do c.RecoverAll;
 end;
 
 {----------------------------------------------------------------------------}

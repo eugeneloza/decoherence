@@ -144,7 +144,8 @@ begin
     case Event.key of
        K_P,K_PrintScreen:                //k_printscreen doesn't work in x-window system if assigned to some external program like scrot
                          Window.SaveScreen('deco_'+NiceDate+'.jpg');
-       K_r: party.char[0].hit(1,1);
+       K_y: Party.char[0].hit(1,1);
+       K_r: Party.Rest;
        k_i: if AmbientIntensity.Ambient = 0 then
                AmbientIntensity.SetAmbientIntensity(3)
             else
