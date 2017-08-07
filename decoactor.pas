@@ -33,8 +33,15 @@ type TDamageProcedure = procedure (Dam: float; Damtype: TDamageType) of Object;
 type DBody = TCreatureResource;
 
 type
+  { This Actor has only the most basic features like his "tile" position
+    Will be used in some remote future for Actors behaviour on global map }
+  DSimpeActor = class (TObject)
+  public
+  end;
+
+type
   { Actor with a rendered body and corresponding management routines }
-  DActorBody = class (TObject)
+  DActorBody = class (DSimpeActor)
   protected
     {$warning separate global and local time}
     LastTime, dt: DTime;
@@ -133,10 +140,10 @@ Type
   public
     {three-letter nickname for short display}
     Nickname: string;
-    {these are randoms for the actor: defense gives his defense rolls,
-     Attack provides for attack rolls, and JustRandom determines actor's
-     behaviour and any other not too important random rolls}
-    DefenseRandom,AttackRandom,JustRandom: TCastleRandom;
+    { these are randoms for the actor: defense gives his defense rolls,
+      Attack provides for attack rolls
+      All non-important random rolls are taken by global DRND }
+    DefenseRandom,AttackRandom: TCastleRandom;
   public
     destructor Destroy; override;
     constructor Create; override;
@@ -174,7 +181,6 @@ begin
   SetMaxMaxMPH(100);
   DefenseRandom := TCastleRandom.Create; {$HINT read seed from the savegame}
   AttackRandom := TCastleRAndom.Create;
-  JustRandom := TCastleRandom.Create;
   ResetHP;
   ResetSTA;
   ResetCNC;
@@ -185,7 +191,6 @@ destructor DActor.Destroy;
 begin
   FreeAndNil(DefenseRandom);
   FreeAndNil(AttackRandom);
-  FreeAndNil(JustRandom);
   inherited;
 end;
 
