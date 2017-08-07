@@ -314,7 +314,7 @@ type
      maybe not needed?}
     TileIndexMap: TIntMapArray;
     {returns an integer array of (map.sizex,map.sizey,map.sizez) size}
-    function ZeroIntegerMap: TIntMapArray;
+    //function ZeroIntegerMap: TIntMapArray;
     {puts tile # markers on a map to detect which tile is here}
     procedure MakeTileIndexMap;
   private
@@ -363,6 +363,8 @@ type
 procedure FreeNeighboursMap(var nmap: TNeighboursMapArray);
 {free every element of a groups array}
 procedure FreeGroups(ngroups: TGroupsArray);
+{returns an integer array of (map.sizex,map.sizey,map.sizez) size}
+function ZeroIntegerMap(sx,sy,sz: integer): TIntMapArray;
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
@@ -810,15 +812,15 @@ end;
 
 {================== 3D DUNGEON GENERATOR ROUTINES ===========================}
 
-function D3DDungeonGenerator.ZeroIntegerMap: TIntMapArray;
+function ZeroIntegerMap(sx,sy,sz: integer): TIntMapArray;
 var ix,iy,iz: TIntCoordinate;
 begin
-  SetLength(Result,Map.SizeX);
-  for ix := 0 to Map.SizeX-1 do begin
-    SetLength(Result[ix],Map.SizeY);
-    for iy := 0 to Map.SizeY-1 do begin
-      SetLength(Result[ix,iy],Map.SizeZ);
-      for iz := 0 to Map.SizeZ-1 do
+  SetLength(Result,sx);
+  for ix := 0 to sx-1 do begin
+    SetLength(Result[ix],sy);
+    for iy := 0 to sy-1 do begin
+      SetLength(Result[ix,iy],sz);
+      for iz := 0 to sz-1 do
         Result[ix,iy,iz] := -1;
     end;
   end;
@@ -844,7 +846,7 @@ procedure D3DDungeonGenerator.MakeTileIndexMap;
 var i: integer;
     ix,iy,iz: TIntCoordinate;
 begin
-  TileIndexMap := ZeroIntegerMap;
+  TileIndexMap := ZeroIntegerMap(Map.SizeX,Map.SizeY,Map.SizeZ);
   for i := 0 to MaxSteps-1 do with Tiles[Gen[i].Tile] do
     if not Blocker then // we don't count blockers here, they are not normal tiles :) We'll have to add them later
     for ix := 0 to SizeX-1 do
@@ -981,7 +983,7 @@ begin
   //init HelperMap and raycast list
   RaycastList := TRaycastList.Create;
   OldList := nil;
-  HelperMap := ZeroIntegerMap;
+  HelperMap := ZeroIntegerMap(Map.SizeX,Map.SizeY,Map.SizeZ);
   SetCandidate(mx,my,mz); //seed for the growth of the map
   HelperMap[mx,my,mz] := MaxNeighboursIndex; //and already define it.
 

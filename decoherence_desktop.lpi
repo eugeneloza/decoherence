@@ -215,6 +215,7 @@
       <Unit25>
         <Filename Value="decoabstractgenerator.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoAbstractGenerator"/>
       </Unit25>
       <Unit26>
         <Filename Value="decothread.pas"/>

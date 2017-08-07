@@ -75,6 +75,7 @@ type
     constructor Create; override;
     destructor Destroy; override;
   public
+    NavNet: TIntMapArray;
     procedure BuildNav; override;
   end;
 
@@ -216,6 +217,7 @@ begin
     FreeAndNil(Nav);
   end;
   Nav := TNavList.create;
+  NavNet := ZeroIntegerMap(Map.SizeX,Map.SizeY,Map.SizeZ);
 
   for iz := 0 to Map.SizeZ-1 do
     for ix := 0 to Map.SizeX-1 do
@@ -223,7 +225,7 @@ begin
         tmpNav.x := ix;
         tmpNav.y := iy;
         tmpNav.z := iz;
-        Nav.Add(tmpNav);
+        NavNet[ix,iy,iz] := Nav.Add(tmpNav);
       end;
 
   WriteLnLog('DDungeonWorld.BuildNav','Navigation Graph created, nodes: '+inttostr(Nav.Count));
