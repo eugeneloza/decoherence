@@ -27,6 +27,7 @@ uses CastleGenericLists,
   DecoGlobal;
 
 type TNavID = integer;
+const UnitinializedNav: TNavID = -1;
 
 Type DNavPt = record
   { Absolute Coordinates of pathPoint }

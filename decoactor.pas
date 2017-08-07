@@ -36,15 +36,19 @@ type DBody = TCreatureResource;
 type
   { This Actor has only the most basic features like his "tile" position
     Will be used in some remote future for Actors behaviour on global map }
-  DSimpeActor = class (TObject)
+  DSimpleActor = class (TObject)
+  private
+    LastNav: TNavID;
   public
+    constructor create; virtual; // override;
+    procedure TeleportTo(aNav: TNavID); virtual;
   end;
 
 type
   { Actor with full World coordinates,
     Mostly needed as a Target for AI
     and Base for Player camera mangement }
-  DCoordActor = class (DSimpeActor)
+  DCoordActor = class (DSimpleActor)
   private
     procedure FixZeroDirection; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
   public
@@ -52,6 +56,7 @@ type
     Position,Direction: TVector3;
     procedure TeleportTo(aPosition: TVector3);
     procedure TeleportTo(aPosition, aDirection: TVector3);
+    procedure TeleportTo(aNav: TNavID); override;
   protected
     toPos,toDir: TVector3;
     {initializes direction with a random value}
@@ -60,6 +65,8 @@ type
     procedure doRotate;
     {moves the body}
     procedure doMove;
+  public
+    constructor create; override;
   end;
 
 type
@@ -75,6 +82,7 @@ type
   private
     procedure SetVisible(value: boolean);
     function GetVisible: boolean;
+    procedure SpawnBodyHere(SpawnBody: DBody);
   public
     { 3D body of this Actor, it may be nil (in case the body is unloaded from
       RAM or belongs to an body-less entity, like Player's character at the moment }
@@ -88,7 +96,7 @@ type
     procedure Manage; virtual;
 
     destructor Destroy; override;
-    constructor Create; virtual;
+    constructor Create; override;
   end;
 
 type TActorList = specialize TFPGObjectList<DActorBody>;
@@ -455,29 +463,36 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-procedure DActorBody.Spawn(aNav: TNavID; SpawnBody: DBody);
+procedure DActorBody.SpawnBodyHere(SpawnBody: DBody);
 begin
-  Spawn(CurrentWorld.NavToVector3(aNav),SpawnBody);
-  CurrentWorld.BlockNav(aNav);
-end;
-procedure DActorBody.Spawn(aPosition: TVector3; SpawnBody: DBody);
-begin
-  TeleportTo(aPosition);
   Body := SpawnBody.CreateCreature(Window.SceneManager.Items, Position, Direction);
   Body.Up := Vector3(0,0,1); {$Warning sometimes it's not enough, why???}
   Visible := true;
 end;
 
+{-----------------------------------------------------------------------------}
+
+procedure DActorBody.Spawn(aNav: TNavID; SpawnBody: DBody);
+begin
+  TeleportTo(aNav);
+  SpawnBodyHere(SpawnBody);
+end;
+procedure DActorBody.Spawn(aPosition: TVector3; SpawnBody: DBody);
+begin
+  TeleportTo(aPosition);
+  SpawnBodyHere(SpawnBody);
+end;
+
+{-----------------------------------------------------------------------------}
+
 procedure DActorBody.SetVisible(Value: boolean);
 begin
   Body.Exists := Value;
 end;
-
 function DActorBody.GetVisible: boolean;
 begin
   Result := Body.Exists;
 end;
-
 
 {-----------------------------------------------------------------------------}
 
@@ -546,6 +561,28 @@ begin
   toDir := Direction;
   Position := aPosition;
   toPos := Position;
+end;
+procedure DCoordActor.TeleportTo(aNav: TNavID);
+begin
+  inherited TeleportTo(aNav);
+  TeleportTo(CurrentWorld.NavToVector3(aNav));
+end;
+
+{------------------------------------------------------------------------}
+
+procedure DSimpleActor.TeleportTo(aNav: TNavID);
+begin
+  if LastNav<>UnitinializedNav then CurrentWorld.ReleaseNav(LastNav);
+  CurrentWorld.BlockNav(aNav);
+  LastNav := aNav;
+end;
+
+{-----------------------------------------------------------------------------}
+
+constructor DCoordActor.create;
+begin
+  inherited;
+  LastNav := UnitinializedNav;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -631,6 +668,13 @@ procedure DActor.RecoverAll;
 begin
   //dummy, should also reset all active statuses
   ResetAll;
+end;
+
+{-----------------------------------------------------------------------------}
+
+constructor DSimpleActor.create;
+begin
+  //nothing to create yet
 end;
 
 {-----------------------------------------------------------------------------}

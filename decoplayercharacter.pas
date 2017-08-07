@@ -24,6 +24,7 @@ interface
 
 uses Classes, fgl, CastleVectors,
   DecoActor, DecoRaceProfession, DecoPerks,
+  DecoNavigationNetwork,
   DecoGlobal;
 
 const MaxParty = 6; {0..6 = 7 characters}
@@ -66,6 +67,8 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure TeleportTo(aPosition, aDirection: TVector3);
+    procedure TeleportTo(aNav: TNavId; aDirection: TVector3);
+    procedure TeleportTo(aNav: TNavId);
     procedure Rest;
   end;
 
@@ -116,7 +119,6 @@ end;
 {----------------------------------------------------------------------------}
 
 Destructor DParty.Destroy;
-var i: integer;
 begin
   FreeAndNil(Char); //it will auto free all its components
   FreeAndNil(CameraMan);
@@ -145,9 +147,9 @@ end;
 
 procedure DParty.TeleportTo(aPosition, aDirection: TVector3);
 begin
+  CameraMan.TeleportTo(aPosition, aDirection);
   if Camera = nil then Raise Exception.Create('Camrea is nil!');//InitNavigation;
 
-  CameraMan.TeleportTo(aPosition, aDirection);
   CameraMan.Position[2] := CameraMan.Position[2]+PlayerHeight*(CurrentWorld as DAbstractWorld3d).MyScale;
 
   {$Hint Do it only once per World!}
@@ -157,6 +159,16 @@ begin
   Camera.GravityUp := Camera.Up; //can't disable Camera.Gravity yet, some day it will be overtaken by Actor.Gravity
 
   UpdateCamera;
+end;
+procedure DParty.TeleportTo(aNav: TNavId);
+begin
+  CameraMan.TeleportTo(aNav); //this is redundant, but blocking navNet would be more stable
+  TeleportTo(CurrentWorld.NavToVector3(aNav),Vector3(0,1,0));
+end;
+procedure DParty.TeleportTo(aNav: TNavId; aDirection: TVector3Single);
+begin
+  CameraMan.TeleportTo(aNav);
+  TeleportTo(CurrentWorld.NavToVector3(aNav),aDirection);
 end;
 
 {======================== DPlayerCharacter ==================================}

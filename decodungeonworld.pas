@@ -171,7 +171,7 @@ begin
   StartY := 4;
   StartZ := 0;
   {$Warning this is ugly}
-  Party.TeleportTo(Vector3((StartX)*WorldScale,-(StartY)*WorldScale,-(StartZ)*WorldScale),Vector3(0,1,0));
+  Party.TeleportTo(NavNet[StartX,StartY,StartZ]);
 
   {$WARNING this is wrong}
   {why does it gets a wrong GRAVITY_UP if called from Self.Activate?????}
@@ -224,7 +224,10 @@ begin
 
   for iz := 0 to Map.SizeZ-1 do
     for ix := 0 to Map.SizeX-1 do
-      for iy := 0 to Map.SizeZ-1 do if isPassable(Map.Map[ix,iy,iz].base) then begin
+      for iy := 0 to Map.SizeZ-1 do if isPassable(Map.Map[ix,iy,iz].Base)
+      and not isPassable(Map.Map[ix,iy,iz].Faces[aDown])
+      and not isPassable(Map.Map[ix,iy,iz].Faces[aUp])         {$hint ignore up/down tiles for now}
+        then begin
         tmpNav.x := ix*WorldScale;
         tmpNav.y := -iy*WorldScale;
         tmpNav.z := -iz*WorldScale;
