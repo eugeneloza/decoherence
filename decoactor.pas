@@ -448,15 +448,21 @@ end;
 
 {-----------------------------------------------------------------------------}
 
+//function Angle(a1,a2)
+
 procedure DCoordActor.doRotate;
 begin
   {$Warning dummy}
-  Direction := toDir;
+  if not Direction.Equals(Direction, toDir) then begin
+    Direction := toDir;
+  end;
 end;
 procedure DCoordActor.doMove;
 begin
   {$Warning dummy}
-  Position := toPos;
+  if Direction.Equals(Direction, toDir) then begin
+    Position := toPos;
+  end;
 end;
 
 
@@ -511,14 +517,16 @@ procedure DActor.LookAt;
 begin
   if fTarget<>nil then begin
     toDir := Target.Position - Position;
-    toDir[2] := 0;
+    toDir[2] := 0;  //cut-off z component
+    toDir.NormalizeMe;
   end else
     WriteLnLog('DActor.LookAt','Warning: trying to look at a nil target...');
 end;
 procedure DActor.LookAt(aPosition: TVector3);
 begin
   toDir := aPosition - Position;
-  toDir[2] := 0;
+  toDir[2] := 0;  //cut-off z component
+  toDir.NormalizeMe;
 end;
 
 {-----------------------------------------------------------------------------}
