@@ -31,7 +31,7 @@ uses Classes, SysUtils,
      CastleLog, CastleTimeUtils,
      CastleWindow, CastleWindowTouch, CastleKeysMouse,
 
-     CastleVectors, CastleScene,
+     CastleScene,
 
      {needed to use load image}
      CastleControls, DecoLoadEmbedded,
@@ -68,31 +68,17 @@ begin
 end;
 {$ENDIF}
 
-function NiceDate:string;
-var s:String;
-    i:integer;
+function NiceDate: string;
+var s: string;
+    i: integer;
 begin
-  s := DateTimeToAtStr(now);
-  result := '';
-  for i := 1 to length(s) do
-    if copy(s,i,1)=' ' then result+='_' else
-    if copy(s,i,1)=':' then result+='-' else
-    result+=copy(s,i,1);
+  s := DateTimeToAtStr(Now);
+  Result := '';
+  for i := 1 to Length(s) do
+    if Copy(s,i,1) = ' ' then Result += '_' else
+    if Copy(s,i,1) = ':' then Result += '-' else
+    Result += Copy(s,i,1);
 end;
-
-
-{-------------------------------------------------------------------------}
-
-var InternalTime: DTime = 0;
-Procedure TimeFlow(DeltaTime: DTime);
-//var i: integer;
-Begin
-  //Adjust time flow speed based on game situation
-  InternalTime += DeltaTime;
-  //Recalculate all actors for events   //IN A THREAD??? Just using internaltime for their own deltatimes
-  //If actor event fired, put it into sequence and if stop to act then put a softpause until % of the action animation has been played
-End;
-
 
 {-------------------------------------------------------------------------}
 
@@ -109,7 +95,7 @@ begin
 
   Case CurrentGameMode of
     { time flows normally in travel mode }
-    gmTravel: TimeFlow(TimePassed);
+    gmTravel: {TimeFlow(TimePassed)};
     { time stops at softpause }
     gmBattle: begin
 {                  If not pause then TimeFlow(TimePassed);
@@ -125,9 +111,9 @@ end;
   WindowRender }
 procedure WindowManage(Container : TUIContainer);
 begin
-  if CurrentWorld <> nil then CurrentWorld.manage(camera.Position);
+  if CurrentWorld <> nil then CurrentWorld.Manage(Camera.Position);
 
-  if Music <> nil then music.manage;
+  if Music <> nil then Music.Manage;
   ProcessTimeEvents;
 end;
 
@@ -149,7 +135,7 @@ begin
     doMousePress(Event);
     {todo: if interface didn't catch the click then}
     if CurrentGameMode = gmTravel then
-      if mbRight=event.MouseButton then camera.MouseLook := not Camera.MouseLook;
+      if mbRight = Event.MouseButton then Camera.MouseLook := not Camera.MouseLook;
 
   end else if Event.EventType = itKey then begin
     case Event.key of

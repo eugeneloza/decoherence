@@ -445,6 +445,7 @@ procedure DMonster.doAI;
 begin
   if (Camera.Position - body.Position).Length < 10 then
   Dir := Camera.Position - body.Position;
+  Dir[2] := 0;
   body.Up := Vector3(0,0,1); {$Warning this is a bug!}
   //(body.Items[0] as TCastleScene).PlayAnimation('attack', paForceNotLooping);
   //Scene.AnimationTimeSensor('my_animation').EventIsActive.OnReceive.Add(@AnimationIsActiveChanged)
