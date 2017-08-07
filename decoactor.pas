@@ -173,6 +173,8 @@ type
     {used for AI and preforming actions
      if target is nil any valid target is selected}
     property Target: DCoordActor read GetTarget write fTarget;
+    constructor Create; override;
+    destructor Destroy; override;
   end;
 
 type
@@ -414,6 +416,7 @@ end;
 
 constructor DActorBody.Create;
 begin
+  inherited;
   {$warning dummy, should set LastTime here}
 end;
 
@@ -421,6 +424,7 @@ end;
 
 destructor DActorBody.Destroy;
 begin
+  //body is freed automatically (IF IT HAS BEEN ADDED TO SceneManager)
   inherited;
 end;
 
@@ -448,7 +452,17 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-//function Angle(a1,a2)
+constructor DActor.create;
+begin
+  inherited;
+  Actions := DPerksList.Create(false);
+end;
+
+destructor DActor.destroy;
+begin
+  FreeAndNil(Actions);
+  inherited;
+end;
 
 procedure DCoordActor.doRotate;
 begin
@@ -470,8 +484,6 @@ end;
 
 procedure DActorBody.Manage;
 begin
-
-
   dt := DecoNow - LastT;
   dtl := DecoNowLocal - LastTLocal;
   LastT := DecoNow;
@@ -515,11 +527,9 @@ end;
 
 procedure DActor.LookAt;
 begin
-  if fTarget<>nil then begin
-    toDir := Target.Position - Position;
-    toDir[2] := 0;  //cut-off z component
-    toDir.NormalizeMe;
-  end else
+  if fTarget<>nil then
+    LookAt(Target.Position)
+  else
     WriteLnLog('DActor.LookAt','Warning: trying to look at a nil target...');
 end;
 procedure DActor.LookAt(aPosition: TVector3);
