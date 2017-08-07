@@ -52,7 +52,6 @@ begin
   camera.PreferredHeight := PlayerHeight;
   camera.MouseDragMode := mdRotate;
 
-  Camera.SetView(Vector3(0,0,1),Vector3(0,1,0),Vector3(0,0,1),Vector3(0,0,1),true); //init the view correctly
   //camera.Input := [];  //-----  completely disable camera
 
   NavRoot := TX3DRootNode.create;

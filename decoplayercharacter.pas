@@ -151,6 +151,7 @@ begin
   Camera.MoveSpeed := 1*(CurrentWorld as DAbstractWorld3d).WorldScale;
   Camera.PreferredHeight := PlayerHeight*(CurrentWorld as DAbstractWorld3d).MyScale;
   Camera.Up := Vector3(0,0,1);
+  Camera.GravityUp := Camera.Up; //can't disable Camera.Gravity yet, some day it will be overtaken by Actor.Gravity
 
   UpdateCamera;
 end;
