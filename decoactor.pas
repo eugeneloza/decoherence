@@ -44,10 +44,15 @@ type
     Mostly needed as a Target for AI
     and Base for Player camera mangement }
   DCoordActor = class (DSimpeActor)
-  protected
+  public
     {position, direction and rotate_to_direction of the Body}
     Position,Direction: TVector3;
+    procedure TeleportTo(aPosition: TVector3);
+    procedure TeleportTo(aPosition, aDirection: TVector3);
+  protected
     toPos,toDir: TVector3;
+    {initializes direction with a random value}
+    procedure GetRandomDirection;
     {rotates the body}
     procedure doRotate;
     procedure doMove;
@@ -63,15 +68,18 @@ type
     RotSpeed: float;
   protected
     procedure doAI; virtual;
+  private
+    procedure SetVisible(value: boolean);
+    function GetVisible: boolean;
   public
     { 3D body of this Actor, it may be nil (in case the body is unloaded from
       RAM or belongs to an body-less entity, like Player's character at the moment }
     Body: TCreature;
-
-    {Spawns a body for the Actor, overriden in children to spawn attributes}
+    { Shows or hides the actor's body}
+    property Visible: boolean read GetVisible write SetVisible;
+    { Spawns a body for the Actor, overriden in children to spawn attributes}
     procedure Spawn(aPosition: TVector3single; SpawnBody: DBody); virtual;
-
-    { manages this actor, e.g. preforms AI }
+    { Manages this actor, e.g. preforms AI }
     procedure Manage; virtual;
 
     destructor Destroy; override;
@@ -431,17 +439,23 @@ end;
 {-----------------------------------------------------------------------------}
 
 procedure DActorBody.Spawn(aPosition: TVector3; SpawnBody: DBody);
-var rDir: float;
 begin
-  rDir := drnd.Random*2*Pi;
-  Direction := Vector3(sin(rDir),cos(rDir),0);
-  Position := aPosition;
-  body := SpawnBody.CreateCreature(Window.SceneManager.Items, Position, Direction);
-  toDir := Direction;
-  toPos := Position;
-  body.Up := Vector3(0,0,1);
-  body.Exists := true;
+  TeleportTo(aPosition);
+  Body := SpawnBody.CreateCreature(Window.SceneManager.Items, Position, Direction);
+  Body.Up := Vector3(0,0,1); {$Warning sometimes it's not enough, why???}
+  Visible := true;
 end;
+
+procedure DActorBody.SetVisible(Value: boolean);
+begin
+  Body.Exists := Value;
+end;
+
+function DActorBody.GetVisible: boolean;
+begin
+  Result := Body.Exists;
+end;
+
 
 {-----------------------------------------------------------------------------}
 
@@ -458,11 +472,25 @@ begin
   Actions := DPerksList.Create(false);
 end;
 
+{-----------------------------------------------------------------------------}
+
 destructor DActor.destroy;
 begin
   FreeAndNil(Actions);
   inherited;
 end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DCoordActor.GetRandomDirection;
+var rDir: float;
+begin
+  rDir := drnd.Random*2*Pi;
+  Direction := Vector3(sin(rDir),cos(rDir),0);
+  toDir := Direction;
+end;
+
+{-----------------------------------------------------------------------------}
 
 procedure DCoordActor.doRotate;
 begin
@@ -471,6 +499,9 @@ begin
     Direction := toDir;
   end;
 end;
+
+{-----------------------------------------------------------------------------}
+
 procedure DCoordActor.doMove;
 begin
   {$Warning dummy}
@@ -479,6 +510,21 @@ begin
   end;
 end;
 
+{-----------------------------------------------------------------------------}
+
+procedure DCoordActor.TeleportTo(aPosition: TVector3);
+begin
+  GetRandomDirection;
+  Position := aPosition;
+  toPos := Position;
+end;
+procedure DCoordActor.TeleportTo(aPosition, aDirection: TVector3);
+begin
+  Direction := aDirection;
+  toDir := Direction;
+  Position := aPosition;
+  toPos := Position;
+end;
 
 {-----------------------------------------------------------------------------}
 

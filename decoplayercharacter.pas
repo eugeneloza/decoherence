@@ -22,7 +22,7 @@ unit decoplayercharacter;
 
 interface
 
-uses Classes, fgl,
+uses Classes, fgl, CastleVectors,
   DecoActor, DecoRaceProfession, DecoPerks,
   DecoGlobal;
 
@@ -54,24 +54,32 @@ type
     including camera
     party characters }
   DParty = class (TComponent)
+  private
+    {updates game camera with CameraMan coordinates}
+    procedure UpdateCamera;
   public
     CameraMan: DCoordActor;
     Char: DCharList;
+    {generates a temporary party}
     procedure tmpParty;
+    procedure Manage;
     constructor Create(AOwner: TComponent); override;
     Destructor Destroy; override;
+    procedure TeleportTo(aPosition, aDirection: TVector3);
   end;
 
 var Party: DParty;
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-uses SysUtils, CastleLog;
+uses SysUtils, CastleLog,
+  DecoNavigation, DecoAbstractWorld, DecoAbstractWorld3D;
 
 constructor DParty.create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   Char := DCharList.create(true);
+  CameraMan := DCoordActor.Create;
 end;
 
 {----------------------------------------------------------------------------}
@@ -101,6 +109,40 @@ Destructor DParty.Destroy;
 var i: integer;
 begin
   FreeAndNil(Char); //it will auto free all its components
+  FreeAndNil(CameraMan);
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DParty.UpdateCamera;
+begin
+  if Camera = nil then Exit;// InitNavigation;
+  Camera.Position := CameraMan.Position;
+  Camera.Direction := CameraMan.Direction;
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DParty.Manage;
+begin
+  //UpdateCamera;
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DParty.TeleportTo(aPosition, aDirection: TVector3);
+begin
+  if Camera = nil then Raise Exception.Create('Camrea is nil!');//InitNavigation;
+
+  CameraMan.TeleportTo(aPosition, aDirection);
+  CameraMan.Position[2] := CameraMan.Position[2]+PlayerHeight*(CurrentWorld as DAbstractWorld3d).MyScale;
+
+  {$Hint Do it only once per World!}
+  Camera.MoveSpeed := 1*(CurrentWorld as DAbstractWorld3d).WorldScale;
+  Camera.PreferredHeight := PlayerHeight*(CurrentWorld as DAbstractWorld3d).MyScale;
+  Camera.Up := Vector3(0,0,1);
+
+  UpdateCamera;
 end;
 
 {======================== DPlayerCharacter ==================================}

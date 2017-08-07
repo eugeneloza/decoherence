@@ -111,7 +111,10 @@ end;
   WindowRender }
 procedure WindowManage(Container : TUIContainer);
 begin
-  if CurrentWorld <> nil then CurrentWorld.Manage(Camera.Position);
+  if Party <> nil then begin
+    Party.Manage;
+    if CurrentWorld <> nil then CurrentWorld.Manage(Camera.Position);
+  end;
 
   if Music <> nil then Music.Manage;
   ProcessTimeEvents;

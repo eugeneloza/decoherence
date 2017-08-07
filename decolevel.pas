@@ -65,7 +65,6 @@ begin
 
   WritelnLog('load_test_level','Scene');
 
-
   Window.ShadowVolumes := Shadow_volumes_enabled;
   Window.ShadowVolumesRender := Shadow_volumes_enabled;
   Window.AntiAliasing := aa8SamplesNicer;
@@ -75,7 +74,6 @@ begin
   Party.tmpParty;
 
   InitNavigation;
-
 
   WritelnLog('load_test_level','Finished');
 end;

@@ -27,7 +27,7 @@ uses Classes, fgl, CastleVectors,
   DecoDungeonGenerator, DecoAbstractGenerator, DecoAbstractWorld3d,
   DecoDungeonTiles,
   DecoNavigationNetwork,
-  DecoNavigation, DecoGlobal;
+  DecoGlobal;
 
 
 {list of "normal" tiles}
@@ -81,7 +81,8 @@ type
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-uses SysUtils, CastleFilesUtils, CastleLog;
+uses SysUtils, CastleFilesUtils, CastleLog,
+  DecoPlayerCharacter;
 
 procedure DDungeonWorld.ManageTiles; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
@@ -165,16 +166,11 @@ var
   StartX,StartY,StartZ: integer;
 begin
   inherited;
-  {$HINT navigation set_nav}
-  Camera.SetView(Vector3(0,0,1),Vector3(0,1,0),Vector3(0,0,1),Vector3(0,0,1),true);
-
   StartX := 4;
   StartY := 4;
   StartZ := 0;
   {$Warning this is ugly}
-  Camera.Position := Vector3((StartX)*WorldScale,-(StartY)*WorldScale,-(StartZ)*WorldScale+PlayerHeight*MyScale);
-  Camera.MoveSpeed := 1*WorldScale;
-  Camera.PreferredHeight := PlayerHeight*myscale;
+  Party.TeleportTo(Vector3((StartX)*WorldScale,-(StartY)*WorldScale,-(StartZ)*WorldScale),Vector3(0,1,0));
   {$WARNING to be managed by the world}
 end;
 
