@@ -45,6 +45,8 @@ type
     Mostly needed as a Target for AI
     and Base for Player camera mangement }
   DCoordActor = class (DSimpeActor)
+  private
+    procedure FixZeroDirection; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
   public
     {position, direction and rotate_to_direction of the Body}
     Position,Direction: TVector3;
@@ -604,7 +606,23 @@ procedure DActor.LookAt(aPosition: TVector3);
 begin
   toDir := aPosition - Position;
   toDir[2] := 0;  //cut-off z component
+  FixZeroDirection;
   toDir.NormalizeMe;
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DCoordActor.FixZeroDirection; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+begin
+  {this is a critical, very rare and nearly unfixable error, so making just
+   some precautions to forget about it forever.}
+  if ToDir.IsZero then begin
+    if not Direction.IsZero then
+      toDir := Direction
+    else
+      toDir := Vector3(0,1,0);
+    WriteLnLog('DActor.LookAt','ERROR: Direction is zero!');
+  end;
 end;
 
 {-----------------------------------------------------------------------------}
