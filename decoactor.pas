@@ -515,7 +515,7 @@ end;
 procedure DCoordActor.doRotate;
 begin
   {$Warning dummy}
-  if not Direction.Equals(Direction, toDir) then begin
+  if not TVector3.Equals(Direction, toDir) then begin
     Direction := toDir;
   end;
 end;
@@ -525,7 +525,7 @@ end;
 procedure DCoordActor.doMove;
 begin
   {$Warning dummy}
-  if Direction.Equals(Direction, toDir) then begin
+  if TVector3.Equals(Direction, toDir) then begin
     Position := toPos;
   end;
 end;
