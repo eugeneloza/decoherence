@@ -85,7 +85,7 @@ type
     procedure DrawMap;
     {fills a DGeneratorParameters from the form elements
      Result must be assigned to the generator (or freed)}
-    function GetMapParameters: DGeneratorParameters;
+    function GetMapParameters: DDungeonGeneratorParameters;
     {saves current map parameters to a file}
     procedure SaveMap(filename: string; togamefolder: boolean);
     {compile all the maps to game folder}
@@ -119,11 +119,11 @@ uses {StrUtils, }CastleLog, castleimages, castlevectors,
 
 {-------------------------------------------------------------------------}
 
-function TMapEditor.GetMapParameters: DGeneratorParameters;
+function TMapEditor.GetMapParameters: DDungeonGeneratorParameters;
 var i: integer;
     fs: DFirstStep;
 begin
-  Result := DGeneratorParameters.create; //this creates tiles and first steps
+  Result := DDungeonGeneratorParameters.create; //this creates tiles and first steps
   with Result do begin
     maxx := strToInt(EditSizeX.text);
     maxy := strToInt(EditSizeY.text);
@@ -370,7 +370,7 @@ end;
 {------------------------------------------------------------------------------}
 
 procedure TMapEditor.SaveMap(filename: string; togamefolder: boolean);
-var GParam: DGeneratorParameters;
+var GParam: DDungeonGeneratorParameters;
     XMLdoc: TXMLDocument;
     RootNode: TDOMNode;
     LargeContainer, SmallContainer: TDOMElement;
@@ -395,8 +395,8 @@ begin
     MapSelector.Items.Add(filename);
     GParam := self.GetMapParameters;
   end else begin
-    GParam := DGeneratorParameters.create;
-    GParam.Load(ConstructorData(GetScenarioFolder+MapsFolder+filename+'.xml',false));
+    GParam := DDungeonGeneratorParameters.create;
+    GParam.Load(ConstructorData(GetScenarioFolder+MapsFolder+FileName+'.xml',false));
   end;
 
   XMLdoc := TXMLDocument.Create;
