@@ -91,7 +91,7 @@ type
     property Visible: boolean read GetVisible write SetVisible;
     { Spawns a body for the Actor, overriden in children to spawn attributes}
     procedure Spawn(aNav: TNavID; SpawnBody: DBody);
-    procedure Spawn(aPosition: TVector3single; SpawnBody: DBody); virtual;
+    procedure Spawn(aPosition: TVector3; SpawnBody: DBody); virtual;
     { Manages this actor, e.g. preforms AI }
     procedure Manage; virtual;
 

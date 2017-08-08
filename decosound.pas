@@ -338,7 +338,7 @@ begin
     WriteLnLog('DMusicTrack.Start','ERROR: Music is not loaded!');
     exit;
   end;
-  fCurrent := SoundEngine.PlaySound(self.buffer, false, fLoop, 10, fgain, 0, 1, ZeroVector3Single);
+  fCurrent := SoundEngine.PlaySound(self.buffer, false, fLoop, 10, fgain, 0, 1, TVector3.Zero);
   if fCurrent = nil then WriteLnLog('DMusicTrack.Start','ERROR: Unable to allocate music!');
   fisPlaying := true;
 end;

@@ -52,25 +52,18 @@ function CleanUp(Root: TX3DRootNode; CleanWorld: boolean = false; CleanUnitTrans
   var i: integer;
       RemoveNodeOnly, RemoveAll: boolean;
 
-    //if given vector is zero translation
-    function ZeroVector(a: TVector3Single): boolean;
-    begin
-      Result := (Abs(a[0]  ) < SingleEqualityEpsilon) and
-                (Abs(a[1]  ) < SingleEqualityEpsilon) and
-                (Abs(a[2]  ) < SingleEqualityEpsilon)
-    end;
     //if given vector is unit scale
-    function UnitVector(a: TVector3Single): boolean;
+    function UnitVector(a: TVector3): boolean;
     begin
-      Result := (Abs(a[0]-1) < SingleEqualityEpsilon) and
-                (Abs(a[1]-1) < SingleEqualityEpsilon) and
-                (Abs(a[2]-1) < SingleEqualityEpsilon)
+      Result := (Abs(a[0]-1) < SingleEpsilon) and
+                (Abs(a[1]-1) < SingleEpsilon) and
+                (Abs(a[2]-1) < SingleEpsilon)
     end;
     //if given vector is zero rotation
-    function NoRotation(a: TVector4Single): boolean;
+    function NoRotation(a: TVector4): boolean;
     begin
       //zero rotation angle is absolutely enough.
-      Result := Abs(a[3]) < SingleEqualityEpsilon
+      Result := Abs(a[3]) < SingleEpsilon
     end;
   begin
     Result := false;
@@ -105,7 +98,7 @@ function CleanUp(Root: TX3DRootNode; CleanWorld: boolean = false; CleanUnitTrans
           but its name carries information. However, we can't
           automatically tell that. So this is a "risky" option. }
         if (CleanUnitTransform) and (child is TTransformNode) then
-          if ZeroVector(TTransformNode(child).Translation) and
+          if TTransformNode(child).Translation.IsZero and
              UnitVector(TTransformNode(child).Scale) and
              NoRotation(TTransformNode(child).rotation) then RemoveNodeOnly := true;
 

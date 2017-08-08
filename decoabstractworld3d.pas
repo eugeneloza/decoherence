@@ -108,7 +108,7 @@ type
     procedure Load(URL: string); override;
     procedure RescaleNavigationNetwork;
 
-    procedure Manage(Position: TVector3Single); override;
+    procedure Manage(Position: TVector3); override;
 
     { turns on or off SceneManager.Exists
       This should not be called in Rendered World types }
@@ -455,7 +455,7 @@ end;
 
 {------------------------------------------------------------------------------}
 
-Procedure DAbstractWorld3d.Manage(Position: TVector3Single);
+Procedure DAbstractWorld3d.Manage(Position: TVector3);
 var a: DActorBody;
 begin
   //inherited; --- nothing to inherit yet

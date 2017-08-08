@@ -277,7 +277,7 @@ begin
     if isTileLoaded {?} then begin
       //set up the camera
       if (TileScene<>nil) then begin
-        TileDisplay.scenemanager.camera.setView(TileScene.BoundingBox.center+Vector3Single(0,0,TileScene.BoundingBox.maxsize+1),Vector3Single(0,0,-1),Vector3Single(0,1,0));
+        TileDisplay.scenemanager.camera.setView(TileScene.BoundingBox.center+Vector3(0,0,TileScene.BoundingBox.maxsize+1),Vector3(0,0,-1),Vector3(0,1,0));
         TileDisplay.scenemanager.camera.input:=TCamera.DefaultInput;
         TileDisplay.update;
       end else

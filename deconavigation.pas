@@ -59,20 +59,20 @@ begin
   //create light that follows the player
   {$Hint todo}
   NavLight:= TPointLightNode.Create;
-  NavLight.FdColor.Value := vector3single(1,0.3,0.1);
-  NavLight.FdAttenuation.value := Vector3Single(1,0,1);
+  NavLight.FdColor.Value := Vector3(1,0.3,0.1);
+  NavLight.FdAttenuation.Value := Vector3(1,0,1);
   {$Warning light distance}
-  NavLight.FdRadius.value := 10*3;
+  NavLight.FdRadius.Value := 10*3;
   NavLight.FdIntensity.value := 20*3;
-  NavLight.FdOn.value := true;
-  NavLight.FdShadows.value := false;
+  NavLight.FdOn.Value := true;
+  NavLight.FdShadows.Value := false;
 
   //and create a respective navigation node
   nav := TKambiNavigationInfoNode.Create;
   nav.FdHeadLightNode.Value := NavLight;
   nav.FdHeadlight.Value := true;
 
-  NavRoot.FdChildren.Add(nav);
+  NavRoot.FdChildren.Add(Nav);
 
   {$Hint todo}
 

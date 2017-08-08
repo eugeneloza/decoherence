@@ -61,7 +61,7 @@ type
 
     {Detects if the current tile has been changed and launches manage_tiles
      position is CAMERA.position}
-    Procedure Manage(position: TVector3Single); override;
+    Procedure Manage(position: TVector3); override;
     {Sorts tiles into chunks}
     //Procedure chunk_n_slice; override;
     {loads the world from a running generator}
@@ -115,7 +115,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DDungeonWorld.Manage(Position: TVector3Single);
+procedure DDungeonWorld.Manage(Position: TVector3);
 begin
   inherited;
   if FirstRender then begin

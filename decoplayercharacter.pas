@@ -165,7 +165,7 @@ begin
   CameraMan.TeleportTo(aNav); //this is redundant, but blocking navNet would be more stable
   TeleportTo(CurrentWorld.NavToVector3(aNav),Vector3(0,1,0));
 end;
-procedure DParty.TeleportTo(aNav: TNavId; aDirection: TVector3Single);
+procedure DParty.TeleportTo(aNav: TNavId; aDirection: TVector3);
 begin
   CameraMan.TeleportTo(aNav);
   TeleportTo(CurrentWorld.NavToVector3(aNav),aDirection);

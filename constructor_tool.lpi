@@ -158,6 +158,7 @@
       <Unit9>
         <Filename Value="blendercleaner.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="BlenderCleaner"/>
       </Unit9>
       <Unit10>
         <Filename Value="constructor_map.pas"/>

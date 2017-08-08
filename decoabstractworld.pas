@@ -49,7 +49,7 @@ Type
       Most important thing it does is managing LODs of tiles/landscape
       And hiding/LODding world chunks
       x,y,z are current world coordinates of render camera }
-    Procedure Manage(position: TVector3Single); virtual; abstract;
+    Procedure Manage(position: TVector3); virtual; abstract;
     {Builds a PathTree for the world}
     //Function pathfind: DPathTree;
     { Load the World from a file}
