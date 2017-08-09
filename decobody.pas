@@ -79,8 +79,9 @@ uses CastleLog, CastleFilesUtils,
 function DBody.GetChild: T3D;
 begin
   if not (GetExists and Resource.Prepared) then Exit;
-  if CurrentAnimation = nil then Exit;
   CurrentAnimation := Resource.Animations.FindName(CurrentAnimationName); //should be done only on "changing" the animation
+  if CurrentAnimation = nil then Exit;
+
   Result := CurrentAnimation.Scene(Time, true);
 end;
 
