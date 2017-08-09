@@ -175,6 +175,7 @@ implementation
 
 uses SysUtils, DecoLoad3d, CastleLog,
   DecoNavigationNetwork, DecoPlayerCharacter,
+  DecoBody,
   CastleSceneCore;
 
 {============================ DAbstractWorld3D =============================}
@@ -313,7 +314,6 @@ end;
 
 {---------------------------------------------------------------------------}
 
-
 procedure DAbstractWorld3d.Activate;
 var  i: integer;
 begin
@@ -429,7 +429,8 @@ begin
   end;
   Actors := TActorList.Create(true);
 
-  for i := 0 to Nav.Count div 10 do begin
+  {$hint some rules on actors spawning should go here}
+  for i := 0 to Nav.Count div 2 do begin
     repeat
       n := DRND.Random(Nav.Count);
     until Nav[n].Blocked = false;

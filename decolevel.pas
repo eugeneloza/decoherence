@@ -41,6 +41,7 @@ var LoadCompleted: boolean = false;
 implementation
 uses CastleFilesUtils,
   DecoPlayerCharacter,
+  DecoBody,
   DecoGameMode;
 
 procedure Generate3DWorld;

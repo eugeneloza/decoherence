@@ -25,13 +25,11 @@ interface
 uses Classes, CastleRandom, fgl, CastleVectors,
   CastleResources, CastleCreatures,
   DecoNavigationNetwork,
-  DecoStats, DecoPerks,
+  DecoStats, DecoPerks, DecoBody,
   DecoGlobal;
 
 type TDamageType = (dtHealth);
 type TDamageProcedure = procedure (Dam: float; Damtype: TDamageType) of Object;
-
-type DBody = TCreatureResource;
 
 type
   { This Actor has only the most basic features like his "tile" position
@@ -82,16 +80,17 @@ type
   private
     procedure SetVisible(value: boolean);
     function GetVisible: boolean;
-    procedure SpawnBodyHere(SpawnBody: DBody);
+    procedure SpawnBodyHere(SpawnBody: DBodyResource);
   public
     { 3D body of this Actor, it may be nil (in case the body is unloaded from
       RAM or belongs to an body-less entity, like Player's character at the moment }
-    Body: TCreature;
+    Body: DBody;
+    BodyResource: DBodyResource;
     { Shows or hides the actor's body}
     property Visible: boolean read GetVisible write SetVisible;
     { Spawns a body for the Actor, overriden in children to spawn attributes}
-    procedure Spawn(aNav: TNavID; SpawnBody: DBody);
-    procedure Spawn(aPosition: TVector3; SpawnBody: DBody); virtual;
+    procedure Spawn(aNav: TNavID; SpawnBody: DBodyResource);
+    procedure Spawn(aPosition: TVector3; SpawnBody: DBodyResource); virtual;
     { Manages this actor, e.g. preforms AI }
     procedure Manage; virtual;
 
@@ -211,11 +210,6 @@ type
     //procedure Manage; override;
   end;
 
-
-
-var tmpKnightCreature: DBody;
-
-procedure tmpLoadKnightCreature;
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 uses SysUtils, CastleLog,
@@ -239,6 +233,8 @@ begin
   ResetCNC;
   ResetMPH;
 end;
+
+{----------------------------------------------------------------------------}
 
 destructor DBasicActor.Destroy;
 begin
@@ -457,27 +453,33 @@ end;
 
 destructor DActorBody.Destroy;
 begin
-  //body is freed automatically (IF IT HAS BEEN ADDED TO SceneManager)
+  Window.SceneManager.Items.Remove(Body); //looks afwul
+  FreeAndNil(Body);
   inherited;
 end;
 
 {-----------------------------------------------------------------------------}
 
-procedure DActorBody.SpawnBodyHere(SpawnBody: DBody);
+procedure DActorBody.SpawnBodyHere(SpawnBody: DBodyResource);
 begin
-  Body := SpawnBody.CreateCreature(Window.SceneManager.Items, Position, Direction);
+  Body := DBody.Create(nil);   //No one owns Body, so we'll free it manually in DActor.destroy
+  //SpawnBody.CreateCreature(Window.SceneManager.Items, Position, Direction);
+  Body.Resource := SpawnBody;
+  Window.SceneManager.Items.Add(Body);
   Body.Up := Vector3(0,0,1); {$Warning sometimes it's not enough, why???}
   Visible := true;
+  Body.Collides := true;
+  Body.CollidesWithMoving := true;
 end;
 
 {-----------------------------------------------------------------------------}
 
-procedure DActorBody.Spawn(aNav: TNavID; SpawnBody: DBody);
+procedure DActorBody.Spawn(aNav: TNavID; SpawnBody: DBodyResource);
 begin
   TeleportTo(aNav);
   SpawnBodyHere(SpawnBody);
 end;
-procedure DActorBody.Spawn(aPosition: TVector3; SpawnBody: DBody);
+procedure DActorBody.Spawn(aPosition: TVector3; SpawnBody: DBodyResource);
 begin
   TeleportTo(aPosition);
   SpawnBodyHere(SpawnBody);
@@ -614,6 +616,12 @@ begin
   if fTarget<>nil then
     if (fTarget.Position - Position).Length < 10 then LookAt;
 
+
+
+  //body.Resource.Animations.FindName('Attack');
+  //body.Sound3d();
+  //body.ExecuteAction();
+
   //(body.Items[0] as TCastleScene).PlayAnimation('attack', paForceNotLooping);
   //Scene.AnimationTimeSensor('my_animation').EventIsActive.OnReceive.Add(@AnimationIsActiveChanged)
 end;
@@ -676,15 +684,6 @@ constructor DSimpleActor.create;
 begin
   //nothing to create yet
 end;
-
-{-----------------------------------------------------------------------------}
-
-procedure tmpLoadKnightCreature;
-begin
-  Resources.LoadSafe(ApplicationData('models/creatures/knight_creature/'));
-  tmpKnightCreature := Resources.FindName('Knight') as TCreatureResource;
-end;
-
 
 
 
