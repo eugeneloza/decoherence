@@ -78,21 +78,33 @@ type
   protected
     procedure doAI; virtual;
   private
+    {shows or hides body of this actor}
     procedure SetVisible(value: boolean);
+    {reads visibility of this Actor's body}
     function GetVisible: boolean;
+    {creates a body}
     procedure SpawnBodyHere(SpawnBody: DBodyResource);
   public
     { 3D body of this Actor, it may be nil (in case the body is unloaded from
       RAM or belongs to an body-less entity, like Player's character at the moment }
     Body: DBody;
+    { This is a type of the Actor's body
+      and the resource, containing 3D model animations and etc.}
     BodyResource: DBodyResource;
     { Shows or hides the actor's body}
     property Visible: boolean read GetVisible write SetVisible;
     { Spawns a body for the Actor, overriden in children to spawn attributes}
     procedure Spawn(aNav: TNavID; SpawnBody: DBodyResource);
     procedure Spawn(aPosition: TVector3; SpawnBody: DBodyResource); virtual;
-    { Manages this actor, e.g. preforms AI }
+    { Manages this actor, e.g. preforms AI,
+      called each frame}
     procedure Manage; virtual;
+    { Forces immediate change of the animation }
+    procedure ForceAnimation(at: TAnimationType);
+    procedure ForceAnimation(at: string);
+    { Softly changes the animation (when the current animation cycle ends) }
+    procedure Animation(at: TAnimationType);
+    procedure Animation(at: string);
 
     destructor Destroy; override;
     constructor Create; override;
@@ -609,6 +621,27 @@ begin
 end;
 
 {-----------------------------------------------------------------------------}
+
+procedure DActorBody.ForceAnimation(at: TAnimationType);
+begin
+  Body.CurrentAnimationName := AnimationToString(at);
+  Body.ResetAnimation;
+end;
+procedure DActorBody.ForceAnimation(at: string);
+begin
+  Body.CurrentAnimationName := at;
+  Body.ResetAnimation;
+end;
+procedure DActorBody.Animation(at: TAnimationType);
+begin
+  Body.NextAnimationName := AnimationToString(at);
+end;
+procedure DActorBody.Animation(at: string);
+begin
+  Body.NextAnimationName := at;
+end;
+
+{=========================== D MONSTER =======================================}
 
 procedure DMonster.doAI;
 begin
