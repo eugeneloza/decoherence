@@ -163,6 +163,23 @@ end;
 procedure DBody.AdvanceTime(SecondsPassed: single);{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
   Time += SecondsPassed * SlowTimeRate;
+
+  // manage end of the animation
+  if (CurrentAnimation<>nil) and (time>CurrentAnimation.Duration) then begin
+    if NextAnimationName<>'' then begin
+      CurrentAnimationName := NextAnimationName;
+      ResetAnimation;
+      NextAnimationName := '';
+    end else
+      case AnimationEnd(CurrentAnimationName) of
+        aeLoop: Time -= CurrentAnimation.Duration;
+        aeIdle: begin
+                  CurrentAnimationName := 'idle';
+                  ResetAnimation;
+                end;
+        aeStop: Time := CurrentAnimation.Duration-0.01; //this is ugly, fix it soon
+      end;
+  end;
 end;
 procedure DBody.Update(const SecondsPassed: Single; var RemoveMe: TRemoveType);
 begin

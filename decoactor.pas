@@ -649,7 +649,8 @@ begin
   if fTarget<>nil then
     if (fTarget.Position - Position).Length < 10 then LookAt;
 
-
+  if drnd.Random<0.006 then self.Animation(atAttack);
+  if drnd.Random<0.002 then self.ForceAnimation(atDie);
 
   //body.Resource.Animations.FindName('Attack');
   //body.Sound3d();
