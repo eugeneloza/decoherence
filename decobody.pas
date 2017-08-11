@@ -154,6 +154,7 @@ end;
 procedure DBody.ResetAnimation;
 begin
   //if not (GetExists and Resource.Prepared) then Exit;
+  if Resource = nil then Exit; //if the actor has no body, just hang up
   CurrentAnimation := Resource.Animations.FindName(CurrentAnimationName);
   time := 0;
 end;
