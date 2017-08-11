@@ -28,9 +28,9 @@ uses
   DecoLoad3d,
   SysUtils,
 
-  DecoAbstractWorld, DecoDungeonWorld, DecoDungeonGenerator,
+  DecoAbstractWorld, decodungeonworld, DecoDungeonGenerator,
   DecoActor,
-  DecoNavigation, DecoGlobal;
+  DecoNavigation, decoglobal;
 
 procedure load_test_level;
 Procedure InitTestLevel;
@@ -42,7 +42,7 @@ implementation
 uses CastleFilesUtils,
   DecoPlayerCharacter,
   DecoBody,
-  DecoGameMode;
+  decogamemode;
 
 procedure Generate3DWorld;
 var GENERATOR: D3dDungeonGenerator;

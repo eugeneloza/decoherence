@@ -170,7 +170,7 @@ implementation
 
 uses CastleVectors, CastleCameras, castleLog,
      DOM, CastleXMLUtils,
-     decoLoad3d, x3dLoad, CastleURIUtils, blendercleaner,
+     decoLoad3d, x3dLoad, CastleURIUtils, BlenderCleaner,
      castleFilesUtils,
      decoglobal;
 

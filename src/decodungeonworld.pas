@@ -25,7 +25,7 @@ interface
 uses Classes, fgl, CastleVectors,
   X3DNodes, CastleScene,
   DecoDungeonGenerator, DecoAbstractGenerator, DecoAbstractWorld3d,
-  DecoDungeonTiles,
+  decodungeontiles,
   DecoNavigationNetwork,
   DecoGlobal;
 

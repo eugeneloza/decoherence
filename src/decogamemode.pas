@@ -43,7 +43,7 @@ function GameModeNeedsClearingScreen: boolean;
 
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-uses decogui, decoabstractworld, decoabstractworld3d,
+uses decogui, DecoAbstractWorld, DecoAbstractWorld3d,
   decoglobal;
 
 procedure SetGameMode(GM: TGameMode);

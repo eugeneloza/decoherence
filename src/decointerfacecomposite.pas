@@ -29,7 +29,7 @@ interface
 uses classes,
   castleImages,
   decointerface,
-  decoactor, decoplayercharacter, decoperks,
+  DecoActor, decoplayercharacter, decoperks,
   decoglobal;
 
 type

@@ -25,7 +25,7 @@
             <Filename Value="constructor_tool"/>
           </Target>
           <SearchPaths>
-            <IncludeFiles Value="$(ProjOutDir)"/>
+            <IncludeFiles Value="$(ProjOutDir);src"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
           <Parsing>
@@ -64,7 +64,7 @@
             <Filename Value="constructor_tool"/>
           </Target>
           <SearchPaths>
-            <IncludeFiles Value="$(ProjOutDir)"/>
+            <IncludeFiles Value="$(ProjOutDir);src"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
           <CodeGeneration>
@@ -109,95 +109,99 @@
         <PackageName Value="LCL"/>
       </Item4>
     </RequiredPackages>
-    <Units Count="18">
+    <Units Count="19">
       <Unit0>
         <Filename Value="constructor_tool.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit0>
       <Unit1>
-        <Filename Value="constructor_mainunit.pas"/>
+        <Filename Value="src/constructor_mainunit.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="MainForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
       </Unit1>
       <Unit2>
-        <Filename Value="constructor_facts.pas"/>
+        <Filename Value="src/constructor_facts.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="FactsEditor"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
       </Unit2>
       <Unit3>
-        <Filename Value="constructor_global.pas"/>
+        <Filename Value="src/constructor_global.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit3>
       <Unit4>
-        <Filename Value="decoloadscreen.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit4>
-      <Unit5>
-        <Filename Value="decotranslation.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit5>
-      <Unit6>
-        <Filename Value="decoglobal.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit6>
-      <Unit7>
-        <Filename Value="constructor_tiles.pas"/>
+        <Filename Value="src/constructor_tiles.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="DungeonTilesEditor"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-      </Unit7>
-      <Unit8>
-        <Filename Value="decodungeontiles.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit8>
-      <Unit9>
-        <Filename Value="blendercleaner.pas"/>
+      </Unit4>
+      <Unit5>
+        <Filename Value="src/blendercleaner.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="BlenderCleaner"/>
-      </Unit9>
-      <Unit10>
-        <Filename Value="constructor_map.pas"/>
+      </Unit5>
+      <Unit6>
+        <Filename Value="src/constructor_map.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="MapEditor"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-      </Unit10>
-      <Unit11>
-        <Filename Value="decodungeongenerator.pas"/>
+      </Unit6>
+      <Unit7>
+        <Filename Value="src/constructor_tiles_png_map.inc"/>
         <IsPartOfProject Value="True"/>
-      </Unit11>
-      <Unit12>
-        <Filename Value="constructor_tiles_png_map.inc"/>
-        <IsPartOfProject Value="True"/>
-      </Unit12>
-      <Unit13>
-        <Filename Value="decoabstractworld.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit13>
-      <Unit14>
-        <Filename Value="decoabstractgenerator.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit14>
-      <Unit15>
-        <Filename Value="decodungeonworld.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit15>
-      <Unit16>
-        <Filename Value="decoload3d.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit16>
-      <Unit17>
-        <Filename Value="constructor_placeholders.pas"/>
+      </Unit7>
+      <Unit8>
+        <Filename Value="src/constructor_placeholders.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="PlaceholdersEditor"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+      </Unit8>
+      <Unit9>
+        <Filename Value="src/decoabstractgenerator.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit9>
+      <Unit10>
+        <Filename Value="src/decoabstractworld.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit10>
+      <Unit11>
+        <Filename Value="src/decodungeongenerator.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit11>
+      <Unit12>
+        <Filename Value="src/decodungeontiles.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit12>
+      <Unit13>
+        <Filename Value="src/decodungeonworld.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit13>
+      <Unit14>
+        <Filename Value="src/decoglobal.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit14>
+      <Unit15>
+        <Filename Value="src/decoload3d.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit15>
+      <Unit16>
+        <Filename Value="src/decoloadscreen.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit16>
+      <Unit17>
+        <Filename Value="src/decotranslation.pas"/>
+        <IsPartOfProject Value="True"/>
       </Unit17>
+      <Unit18>
+        <Filename Value="src/compilerconfig.inc"/>
+        <IsPartOfProject Value="True"/>
+      </Unit18>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
@@ -206,7 +210,8 @@
       <Filename Value="constructor_tool"/>
     </Target>
     <SearchPaths>
-      <IncludeFiles Value="$(ProjOutDir)"/>
+      <IncludeFiles Value="$(ProjOutDir);src"/>
+      <OtherUnitFiles Value="src"/>
       <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <Linking>

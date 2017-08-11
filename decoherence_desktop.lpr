@@ -7,7 +7,7 @@ program decoherence_desktop;
   {$IFDEF Windows}{$APPTYPE GUI}{$ENDIF}
 {$ENDIF}
 
-Uses {$IFDEF useCMEM}cmem,{$ENDIF}{$IFDEF UNIX}cthreads,{$ENDIF}{$IFDEF DEBUG}SysUtils,{$ENDIF} decoglobal, decoherence;
+Uses {$IFDEF useCMEM}cmem,{$ENDIF}{$IFDEF UNIX}cthreads,{$ENDIF}{$IFDEF DEBUG}SysUtils,{$ENDIF} decoglobal, Decoherence;
 
 {$R *.res}
 

@@ -23,7 +23,7 @@ interface
 
 uses Classes,
   castleVectors, CastleGLImages, CastleImages,
-  decointerface, decoactor,
+  decointerface, DecoActor,
   decoglobal;
 
 type

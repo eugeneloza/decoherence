@@ -33,7 +33,8 @@
             <Filename Value="decoherence_desktop"/>
           </Target>
           <SearchPaths>
-            <IncludeFiles Value="$(ProjOutDir)"/>
+            <IncludeFiles Value="$(ProjOutDir);src"/>
+            <OtherUnitFiles Value="src"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
           <Parsing>
@@ -68,7 +69,7 @@
             <Filename Value="decoherence_desktop"/>
           </Target>
           <SearchPaths>
-            <IncludeFiles Value="$(ProjOutDir)"/>
+            <IncludeFiles Value="$(ProjOutDir);src"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
           <CodeGeneration>
@@ -105,166 +106,174 @@
         <PackageName Value="castle_base"/>
       </Item2>
     </RequiredPackages>
-    <Units Count="37">
+    <Units Count="39">
       <Unit0>
         <Filename Value="decoherence_desktop.lpr"/>
         <IsPartOfProject Value="True"/>
       </Unit0>
       <Unit1>
-        <Filename Value="decoglobal.pas"/>
+        <Filename Value="src/decoglobal.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit1>
       <Unit2>
-        <Filename Value="decoherence.pas"/>
+        <Filename Value="src/decoherence.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="Decoherence"/>
       </Unit2>
       <Unit3>
-        <Filename Value="decointerface.pas"/>
+        <Filename Value="src/decointerface.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit3>
       <Unit4>
-        <Filename Value="decoimages.pas"/>
+        <Filename Value="src/decoimages.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit4>
       <Unit5>
-        <Filename Value="decogui.pas"/>
+        <Filename Value="src/decogui.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit5>
       <Unit6>
-        <Filename Value="decoloadscreen.pas"/>
+        <Filename Value="src/decoloadscreen.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit6>
       <Unit7>
-        <Filename Value="decofont.pas"/>
+        <Filename Value="src/decofont.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit7>
       <Unit8>
-        <Filename Value="decolabels.pas"/>
+        <Filename Value="src/decolabels.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit8>
       <Unit9>
-        <Filename Value="decomouse.pas"/>
+        <Filename Value="src/decomouse.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="DecoMouse"/>
       </Unit9>
       <Unit10>
-        <Filename Value="decolevel.pas"/>
+        <Filename Value="src/decolevel.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit10>
       <Unit11>
-        <Filename Value="decogamemode.pas"/>
+        <Filename Value="src/decogamemode.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit11>
       <Unit12>
-        <Filename Value="decoactor.pas"/>
+        <Filename Value="src/decoactor.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="DecoActor"/>
       </Unit12>
       <Unit13>
-        <Filename Value="decointerfacecomposite.pas"/>
+        <Filename Value="src/decointerfacecomposite.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit13>
       <Unit14>
-        <Filename Value="decointerfaceblocks.pas"/>
+        <Filename Value="src/decointerfaceblocks.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit14>
       <Unit15>
-        <Filename Value="decoplayercharacter.pas"/>
+        <Filename Value="src/decoplayercharacter.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit15>
       <Unit16>
-        <Filename Value="decoperks.pas"/>
+        <Filename Value="src/decoperks.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit16>
       <Unit17>
-        <Filename Value="decostats.pas"/>
+        <Filename Value="src/decostats.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="DecoStats"/>
       </Unit17>
       <Unit18>
-        <Filename Value="decoraceprofession.pas"/>
+        <Filename Value="src/decoraceprofession.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit18>
       <Unit19>
-        <Filename Value="decoload3d.pas"/>
+        <Filename Value="src/decoload3d.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit19>
       <Unit20>
-        <Filename Value="decodungeontiles.pas"/>
+        <Filename Value="src/decodungeontiles.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit20>
       <Unit21>
-        <Filename Value="decoabstractworld.pas"/>
+        <Filename Value="src/decoabstractworld.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="DecoAbstractWorld"/>
       </Unit21>
       <Unit22>
-        <Filename Value="decodungeongenerator.pas"/>
+        <Filename Value="src/decodungeongenerator.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="DecoDungeonGenerator"/>
       </Unit22>
       <Unit23>
-        <Filename Value="decodungeongenerator_calculatefaces.inc"/>
+        <Filename Value="src/decodungeongenerator_calculatefaces.inc"/>
         <IsPartOfProject Value="True"/>
       </Unit23>
       <Unit24>
-        <Filename Value="decodungeonworld.pas"/>
+        <Filename Value="src/decodungeonworld.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit24>
       <Unit25>
-        <Filename Value="decoabstractgenerator.pas"/>
+        <Filename Value="src/decoabstractgenerator.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="DecoAbstractGenerator"/>
       </Unit25>
       <Unit26>
-        <Filename Value="decothread.pas"/>
+        <Filename Value="src/decothread.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit26>
       <Unit27>
-        <Filename Value="deconavigation.pas"/>
+        <Filename Value="src/deconavigation.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="DecoNavigation"/>
       </Unit27>
       <Unit28>
-        <Filename Value="decoabstractworld3d.pas"/>
+        <Filename Value="src/decoabstractworld3d.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="DecoAbstractWorld3d"/>
       </Unit28>
       <Unit29>
-        <Filename Value="deconodeparser.pas"/>
+        <Filename Value="src/deconodeparser.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit29>
       <Unit30>
-        <Filename Value="decoinputoutput.pas"/>
+        <Filename Value="src/decoinputoutput.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit30>
       <Unit31>
-        <Filename Value="decosound.pas"/>
+        <Filename Value="src/decosound.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit31>
       <Unit32>
-        <Filename Value="decoloadembedded.pas"/>
+        <Filename Value="src/decoloadembedded.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit32>
       <Unit33>
-        <Filename Value="decoloadembedded.image_data"/>
+        <Filename Value="src/decoloadembedded.image_data"/>
         <IsPartOfProject Value="True"/>
       </Unit33>
       <Unit34>
-        <Filename Value="decothrash.pas"/>
+        <Filename Value="src/decothrash.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit34>
       <Unit35>
-        <Filename Value="deconavigationnetwork.pas"/>
+        <Filename Value="src/deconavigationnetwork.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="DecoNavigationNetwork"/>
       </Unit35>
       <Unit36>
-        <Filename Value="decobody.pas"/>
+        <Filename Value="src/decobody.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="DecoBody"/>
       </Unit36>
+      <Unit37>
+        <Filename Value="src/decotranslation.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit37>
+      <Unit38>
+        <Filename Value="src/compilerconfig.inc"/>
+        <IsPartOfProject Value="True"/>
+      </Unit38>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
@@ -273,7 +282,7 @@
       <Filename Value="decoherence_desktop"/>
     </Target>
     <SearchPaths>
-      <IncludeFiles Value="$(ProjOutDir)"/>
+      <IncludeFiles Value="$(ProjOutDir);src"/>
       <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <Other>

@@ -23,9 +23,9 @@ unit decoplayercharacter;
 interface
 
 uses Classes, fgl, CastleVectors,
-  DecoActor, DecoRaceProfession, DecoPerks,
+  DecoActor, DecoRaceProfession, decoperks,
   DecoNavigationNetwork,
-  DecoGlobal;
+  decoglobal;
 
 const MaxParty = 6; {0..6 = 7 characters}
 
@@ -77,7 +77,7 @@ var Party: DParty;
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 uses SysUtils, CastleLog,
-  DecoNavigation, DecoAbstractWorld, DecoAbstractWorld3D;
+  DecoNavigation, DecoAbstractWorld, DecoAbstractWorld3d;
 
 constructor DParty.create(AOwner: TComponent);
 begin
