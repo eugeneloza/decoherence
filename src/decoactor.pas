@@ -480,7 +480,7 @@ begin
   //SpawnBody.CreateCreature(Window.SceneManager.Items, Position, Direction);
   Body.Resource := SpawnBody;
   Window.SceneManager.Items.Add(Body);
-  Body.Up := Vector3(0,0,1); {$Warning sometimes it's not enough, why???}
+  Body.Up := CurrentWorld.GetGravity(Body.Position); {$Warning sometimes it's not enough, why???}
   Visible := true;
   Body.Collides := true;
   Body.CollidesWithMoving := true;

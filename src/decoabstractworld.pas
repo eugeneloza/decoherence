@@ -64,14 +64,22 @@ Type
     { Splits the World into chunks }
     //Procedure chunk_n_slice; virtual; abstract;
 
+    { Spawns Actors in the World }
     procedure SpawnActors; virtual; abstract;
+    { Returns Gravity Up for the given location in the world
+      Maybe, move this one to AbstractWorld3D, as it's not needed in non-3D world
+      it's bad, that there is no way to make this procedure inline,
+      because it might be important to keep it efficiently
+      However, for now it's used only for spawning process, so don't bother yet}
+    function GetGravity(aPosition: TVector3): TVector3; virtual; abstract;
+    function GetGravity(aNav: TNavID): TVector3; virtual; abstract;
 
-    constructor Create; virtual;
-
-    destructor Destroy; override;
     { A dummy procedure to be overriden in rendered world types
      (such as text or 2D)}
     procedure Render; virtual;
+
+    constructor Create; virtual;
+    destructor Destroy; override;
 
   public
     Nav: TNavList;

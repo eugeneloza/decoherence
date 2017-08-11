@@ -155,8 +155,10 @@ begin
   {$Hint Do it only once per World!}
   Camera.MoveSpeed := 1*(CurrentWorld as DAbstractWorld3d).WorldScale;
   Camera.PreferredHeight := PlayerHeight*(CurrentWorld as DAbstractWorld3d).MyScale;
-  Camera.Up := Vector3(0,0,1);
-  Camera.GravityUp := Camera.Up; //can't disable Camera.Gravity yet, some day it will be overtaken by Actor.Gravity
+
+  //make it a "reset gravity"? and call at every nav change?
+  Camera.GravityUp := CurrentWorld.GetGravity(CameraMan.Position); //can't disable Camera.Gravity yet, some day it will be overtaken by Actor.Gravity
+  Camera.Up := CurrentWorld.GetGravity(CameraMan.Position);
 
   UpdateCamera;
 end;

@@ -72,6 +72,11 @@ type
     {loads word scenes into scene manager}
     Procedure Activate; override;
 
+    { Dungeong world is flat, so it always returns (0,0,1)
+      See also https://github.com/eugeneloza/decoherence/issues/76#issuecomment-321906640 }
+    function GetGravity(aPosition: TVector3): TVector3; override;
+    function GetGravity(aNav: TNavID): TVector3; override;
+
     constructor Create; override;
     destructor Destroy; override;
   end;
@@ -126,6 +131,17 @@ begin
 
   if UpdatePlayerCoordinates(position[0],position[1],position[2]) then
     ManageTiles;
+end;
+
+{----------------------------------------------------------------------------}
+
+function DDungeonWorld.GetGravity(aPosition: TVector3): TVector3;
+begin
+  Result := Vector3(0,0,1);
+end;
+function DDungeonWorld.GetGravity(aNav: TNavID): TVector3;
+begin
+  Result := Vector3(0,0,1);
 end;
 
 {----------------------------------------------------------------------------}
@@ -188,7 +204,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-constructor DDungeonWorld.create;
+constructor DDungeonWorld.Create;
 begin
   inherited;
   px  := UninitializedCoordinate;
