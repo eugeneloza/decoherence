@@ -218,8 +218,10 @@ type
   DMonster = class(DActor)
   protected
     procedure doAI; override;
+    procedure doHit(Dam: float; Damtype: TDamageType);
   public
     //procedure Manage; override;
+    constructor Create; override;
   end;
 
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
@@ -658,6 +660,23 @@ begin
 
   //(body.Items[0] as TCastleScene).PlayAnimation('attack', paForceNotLooping);
   //Scene.AnimationTimeSensor('my_animation').EventIsActive.OnReceive.Add(@AnimationIsActiveChanged)
+end;
+
+{-----------------------------------------------------------------------------}
+
+constructor DMonster.Create;
+begin
+  inherited;
+  Self.onHit := @Self.doHit;
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DMonster.doHit(Dam: float; Damtype: TDamageType);
+begin
+  Self.ForceAnimation(atHurt);
+  //and show numeric representation of Dam
+  //? and negative status applied ?
 end;
 
 {-----------------------------------------------------------------------------}
