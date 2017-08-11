@@ -826,9 +826,9 @@ begin
       and not isPassable(Map.Map[ix,iy,iz].Faces[aDown])
       and not isPassable(Map.Map[ix,iy,iz].Faces[aUp])         {$hint ignore up/down tiles for now}
         then begin
-        tmpNav.x := ix;
-        tmpNav.y := iy;
-        tmpNav.z := iz;
+        tmpNav.Pos[0] := ix;
+        tmpNav.Pos[1] := iy;
+        tmpNav.Pos[2] := iz;
         tmpNav.Blocked := false;
         NavMap[ix,iy,iz] := NavList.Add(tmpNav);
       end;

@@ -298,9 +298,14 @@ var i: integer;
 begin
   {$hint I don't like that!}
   for i := 0 to Nav.Count-1 do begin
-    Nav.L[i].x *= WorldScale;
-    Nav.L[i].y *= -WorldScale;
-    Nav.L[i].z *= -WorldScale;
+{
+    Nav.L[i].Pos[0] *=  WorldScale;
+    Nav.L[i].Pos[1] *= -WorldScale;
+    Nav.L[i].Pos[2] *= -WorldScale;
+}
+    Nav.L[i].Pos[0] :=  WorldScale * Nav.L[i].Pos[0];
+    Nav.L[i].Pos[1] := -WorldScale * Nav.L[i].Pos[1];
+    Nav.L[i].Pos[2] := -WorldScale * Nav.L[i].Pos[2];
   end;
 end;
 

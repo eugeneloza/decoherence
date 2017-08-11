@@ -23,7 +23,7 @@ unit DecoNavigationNetwork;
 {$INCLUDE compilerconfig.inc}
 interface
 
-uses CastleGenericLists,
+uses CastleGenericLists, CastleVectors,
   DecoGlobal;
 
 type TNavID = integer;
@@ -31,7 +31,7 @@ const UnitinializedNav: TNavID = -1;
 
 Type DNavPt = record
   { Absolute Coordinates of pathPoint }
-  x,y,z: Float;
+  Pos: TVector3;
   {{ world tile it belongs to }
   Tile: TTileType;
   {Link of tiles adjacent to this tile}

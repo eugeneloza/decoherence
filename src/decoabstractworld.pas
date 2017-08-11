@@ -23,14 +23,22 @@ unit DecoAbstractWorld;
 interface
 
 uses CastleRandom, CastleVectors,
-  DecoAbstractGenerator, deconavigationnetwork,
+  DecoAbstractGenerator, DecoNavigationNetwork,
   DecoGlobal;
 
 Type
   {The most abstract world implementation.
    Used as external interface for the world}
   DAbstractWorld = class
+  private
+    { Average and Min distance between nav points
+      Warning, this might go very,very wrong if 2 nav poinst are too close
+      this should be something like "average distance between two *adjacent* Nav",
+      but it requires Nav.Links which aren't implemented yet }
+    fNavMinStep: float;
+    procedure CacheNavDistance;
   protected
+
     fSeed: LongWord;
     { xorshift random generator, fast and thread-safe
       used by BUILD (maybe freed afterwards?) }
@@ -85,6 +93,7 @@ Type
     Nav: TNavList;
     Weenies: TWeeniesList;
     function NavToVector3(aNav: TNavID): TVector3;
+    function PositionToNav(aPosition: TVector3): TNavID;
     procedure BlockNav(aNav: TNavID);
     procedure ReleaseNav(aNav: TNavID);
     procedure ClearNavBlocks;
@@ -108,6 +117,8 @@ begin
   {we create an non-initialized random (i.e. initialized by a stupid constant integer)
   Just to make sure we don't waste any time (<1ms) on initialization now}
   RNDM := TCastleRandom.Create(1);
+
+  fNavMinStep := -1;
 end;
 
 {------------------------------------------------------------------------------}
@@ -153,9 +164,49 @@ end;
 
 function DAbstractWorld.NavToVector3(aNav: TNavID): TVector3;
 begin
-  Result[0] := Nav[aNav].x;
-  Result[1] := Nav[aNav].y;
-  Result[2] := Nav[aNav].z;
+  Result := Nav[aNav].Pos;
+end;
+
+{------------------------------------------------------------------------------}
+
+procedure DAbstractWorld.CacheNavDistance;
+var i,j: integer;
+    d, min{,sum}: float;
+begin
+  //warning, this will significantly changed after "LINKS" between navs will be implemented
+  min := (Nav[0].Pos-Nav[1].Pos).Length;
+  //sum := min;
+
+  { we've already included "0" in the min, starting from "1" }
+  for i := 1 to Nav.Count-1 do
+    for j := i+1 to Nav.Count-1 do begin
+      d := (Nav[i].Pos-Nav[j].Pos).Length;
+      if d < min then min := d;
+    end;
+
+  fNavMinStep := min;
+end;
+function DAbstractWorld.PositionToNav(aPosition: TVector3): TNavID;
+var i, m: TNavID;
+    d, min_d: float;
+begin
+  if fNavMinStep<0 then CacheNavDistance; //maybe throw this into BuildNav?
+  min_d := (aPosition-Nav[0].Pos).Length;
+  m := 0;
+  { we've already included "0" in the min, starting from "1" }
+  if min_d > fNavMinStep/2 then
+    for i := 1 to Nav.Count-1 do begin
+      d := (aPosition-Nav[i].Pos).Length;
+      if d <= fNavMinStep/2 then begin
+        m := i;
+        break;
+      end else
+      if d < min_d then begin
+        m := i;
+        min_d := d;
+      end;
+    end;
+  Result := m;
 end;
 
 {------------------------------------------------------------------------------}
