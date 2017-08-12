@@ -26,7 +26,7 @@ uses Classes, CastleRandom, fgl, CastleVectors,
   CastleResources, CastleCreatures,
   DecoNavigationNetwork,
   DecoStats, DecoPerks, DecoBody,
-  DecoGlobal;
+  DecoGlobal, DecoTime;
 
 type TDamageType = (dtHealth);
 type TDamageProcedure = procedure (Dam: float; Damtype: TDamageType) of Object;

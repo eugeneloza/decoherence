@@ -24,8 +24,8 @@ interface
 
 uses
   Classes, fgl,
-  castleVectors, castleImages, CastleGLImages,
-  decoglobal;
+  CastleVectors, CastleImages, CastleGLImages,
+  DecoGlobal, DecoTime;
 
 const InterfaceScalingMethod: TResizeInterpolation = riBilinear;  //to quickly change it. Maybe will be a variable some day to support older PCs.
 

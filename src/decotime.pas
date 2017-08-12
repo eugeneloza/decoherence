@@ -1,4 +1,4 @@
-{Copyright (C) 2012-2017 Michalis Kamburelis
+{Copyright (C) 2012-2017 Michalis Kamburelis, Yevhen Loza
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -24,8 +24,11 @@ interface
 
 uses
   {$ifdef MSWINDOWS} Windows{,} {$endif}
-  {$ifdef UNIX} BaseUnix, Unix{, Dl, }{$endif}
-  {SysUtils, Math};
+  {$ifdef UNIX} BaseUnix, Unix{, Dl, }{$endif},
+  CastleTimeUtils{SysUtils, Math};
+
+Type DTime = TFloatTime;
+
 
 type
   { Current time from @link(ProcessTimer).
@@ -37,26 +40,6 @@ type
       {$ifdef MSWINDOWS} DWord {$endif};
   end;
 
-const
-  { Resolution of the timer used by @link(ProcessTimer). }
-  ProcessTimersPerSec
-    {$ifdef UNIX}
-      = { What is the frequency of FpTimes ?
-          sysconf (_SC_CLK_TCK) ?
-          Or does sysconf exist only in Libc ? }
-        { Values below were choosen experimentally for Linux and FreeBSD
-          (and I know that on most UNIXes it should be 128, that's
-          a traditional value) }
-        {$ifdef LINUX} 100 {$else}
-          {$ifdef DARWIN}
-            { In /usr/include/ppc/_limits.h and
-                 /usr/include/i386/_limits.h
-              __DARWIN_CLK_TCK is defined to 100. }
-            100 {$else}
-              128 {$endif} {$endif}
-    {$endif}
-    {$ifdef MSWINDOWS} = 1000 { Using GetLastError } {$endif}
-
 type
   { Current time from @link(Timer). }
   TTimerResult = object
@@ -65,6 +48,15 @@ type
       are happy with Int64. }
     Value: Int64;
   end;
+
+var
+    { analogue to Now function, but a fast-access variable, representing
+      current global time (accessed once per frame) }
+    DecoNow: DTime;
+    { analogue to Now function, but a fast-access variable, representing
+      current in-game time }
+    DecoNowLocal: DTime;
+
 
 { Current time, to measure real time passed.
   This may be a time local to this process. It is a "real" time,
@@ -76,10 +68,13 @@ type
   using the TimerSeconds. }
 function Timer: TTimerResult;
 
-{ Subtract two times obtained from @link(Timer),
-  A-B, return a difference in seconds. }
-function TimerSeconds(const A, B: TTimerResult): TFloatTime;
-function TimerSecondsInt(const A, B: TTimerResult): integer; inline;
+{ Gets CastleTimeUtils.Timer value from some "starting point"
+  Starting point is thread-safe (Read only). }
+function GetNow: DTime; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+{ This is a less accurate but accelerated (~130 times) version
+  of the timer, using threads }
+function GetNowThread: DTime; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
@@ -150,18 +145,6 @@ begin
 
   { We can fit whole TTimeval inside Int64, no problem. }
   Result.Value := Int64(tv.tv_sec) * 1000000 + Int64(tv.tv_usec);
-
-  { We cannot trust some Android systems to return increasing values here
-    (Android device "Moto X Play", "XT1562", OS version 5.1.1).
-    Maybe they synchronize the time from the Internet, and do not take care
-    to keep it monotonic (unlike https://lwn.net/Articles/23313/ says?) }
-
-  if Result.Value < LastTimer.Value then
-  begin
-    WritelnLog('Time', 'Detected gettimeofday() going backwards on Unix, workarounding. This is known to happen on some Android devices');
-    Result.Value := LastTimer.Value;
-  end else
-    LastTimer.Value := Result.Value;
 end;
 {$endif UNIX}
 
@@ -173,5 +156,23 @@ function TimerSecondsInt(const A, B: TTimerResult): integer; inline;
 begin
   Result := A.Value - B.Value;
 end;
+
+{ maybe initTime shift should be saved with the game and correspond to
+  global playtime}
+var InitTime: TTimerResult;
+
+function GetNow: DTime; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+begin
+  Result := TimerSeconds(Timer, InitTime);
+end;
+function GetNowThread: DTime; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+begin
+  Result := TimerSeconds(Timer, InitTime);
+end;
+
+initialization
+InitTime := Timer;
+
+
 
 end.

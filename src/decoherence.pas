@@ -44,7 +44,7 @@ uses Classes, SysUtils,
      DecoLoadScreen, DecoPerks,
      DecoInterfaceComposite,
      DecoPlayerCharacter, DecoLoad3d,
-     DecoNavigation, DecoGlobal, DecoGamemode;
+     DecoNavigation, DecoGlobal, DecoGamemode, DecoTime;
 
 type
   DLoadThread = class(TAbstractThread)

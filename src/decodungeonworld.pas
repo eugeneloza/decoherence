@@ -85,7 +85,7 @@ type
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 uses SysUtils, CastleFilesUtils, CastleLog,
-  DecoPlayerCharacter;
+  DecoPlayerCharacter, DecoTime;
 
 procedure DDungeonWorld.ManageTiles; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin

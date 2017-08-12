@@ -368,7 +368,7 @@ function ZeroIntegerMap(sx,sy,sz: integer): TIntMapArray;
 implementation
 
 uses SysUtils, CastleLog, CastleFilesUtils, CastleImages, CastleVectors,
-  DOM, CastleXMLUtils, DecoInputOutput;
+  DOM, CastleXMLUtils, DecoInputOutput, DecoTime;
 
 {========================= GENERATION ALGORITHM ==============================}
 

@@ -67,11 +67,11 @@ var GUI: DInterfaceContainer;
 implementation
 
 uses SysUtils, CastleLog,
-  CastleGLUtils, castleColors,
-  decoloadscreen,
-  decointerfacecomposite, decointerfaceblocks,
-  decoplayercharacter,
-  decogamemode;
+  CastleGLUtils, CastleColors,
+  DecoLoadScreen,
+  DecoInterfaceComposite, DecoInterfaceBlocks,
+  DecoPlayerCharacter,
+  Decogamemode, DecoTime;
 
 {=============================================================================}
 {========================== interface container ==============================}
@@ -82,7 +82,7 @@ begin
   writeLnLog('DInterfaceContainer.create','Creating interface.');
   inherited create(AOwner);
 
-  Last_render_time := decoNow;
+  Last_render_time := DecoNow;
   FPS_count := 0;
   FPS_Label := DLabel.create(self);
   FPS_Label.setbasesize(0,0,0.05,0.05,1,asNone);

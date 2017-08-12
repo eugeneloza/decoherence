@@ -256,10 +256,10 @@ procedure initMusicManager;
 procedure freeMusicManager;
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-uses SyncObjs, SysUtils, CastleLog, castleFilesUtils,
+uses SysUtils, CastleLog, castleFilesUtils,
   CastleVectors,
-  decoinputoutput, //used for safe threaded loading of sound buffer
-  decoglobal;      //used for random
+  decoInputOutput, //used for safe threaded loading of sound buffer
+  decoglobal, DecoTime;      //used for random
 
 {========================== TMusicLoadThread ===============================}
 

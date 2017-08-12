@@ -30,7 +30,7 @@ type
   { General routines shared by images and labels }
   DAbstractImage = class(DAbstractElement)
   public
-    color: TVector4Single; //todo
+    color: TVector4; //todo
     { very simple draw procedure }
     procedure draw; override;
     constructor create(AOwner:TComponent); override;
@@ -152,7 +152,7 @@ var LoadNewFloaterImage: boolean;
 implementation
 
 uses SysUtils, CastleLog, CastleFilesUtils,
-  decoinputoutput;
+  DecoInputOutput, DecoTime;
 
 procedure TLoadImageThread.execute;
 var TargetImage: DSTaticImage;

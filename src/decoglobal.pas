@@ -26,12 +26,11 @@ interface
 
 uses {todo: temporary}//SysUtils,
   Classes, CastleWindowTouch,
-  CastleRandom, CastleTimeUtils;
+  CastleRandom;
 
 { for easy changing into double in case needed }
 type Float = single;
      pFloat = ^Float;
-     DTime = TFloatTime;
 
 { folders constants relative to ApplicationData path
   should be "/", not pathdelim, because those are URLs }
@@ -73,12 +72,6 @@ var {global window of the game}
     CurrentScenarioFolder: string='test/';
     { random generator used for all interface random events }
     drnd: TCastleRandom;
-    { analogue to Now function, but a fast-access variable, representing
-      current global time (accessed once per frame) }
-    DecoNow: DTime;
-    { analogue to Now function, but a fast-access variable, representing
-      current in-game time }
-    DecoNowLocal: DTime;
 
     {$IFNDEF Android}
     LogStream : TFileStream;
@@ -94,27 +87,9 @@ var {global window of the game}
 function GetRandomSeed: LongWord;
 
 function GetScenarioFolder: string;
-
-{at this point both do the same}
-function GetNow: DTime;
-function GetNowThread: DTime;
-
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 uses SysUtils;
-
-{ maybe initTime shift should be saved with the game and correspond to
-  global playtime}
-var InitTime: TTimerResult;
-
-function GetNow: DTime;
-begin
-  Result := TimerSeconds(Timer, InitTime);
-end;
-function GetNowThread: DTime;
-begin
-  Result := TimerSeconds(Timer, InitTime);
-end;
 
 {---------------------------------------------------------------------------}
 
@@ -163,7 +138,6 @@ end;
 
 initialization
 InitGlobal;
-InitTime := Timer;
 
 finalization
 DestroyGlobal;

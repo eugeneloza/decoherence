@@ -106,7 +106,7 @@
         <PackageName Value="castle_base"/>
       </Item2>
     </RequiredPackages>
-    <Units Count="39">
+    <Units Count="40">
       <Unit0>
         <Filename Value="decoherence_desktop.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -114,6 +114,7 @@
       <Unit1>
         <Filename Value="src/decoglobal.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoGlobal"/>
       </Unit1>
       <Unit2>
         <Filename Value="src/decoherence.pas"/>
@@ -274,6 +275,11 @@
         <Filename Value="src/compilerconfig.inc"/>
         <IsPartOfProject Value="True"/>
       </Unit38>
+      <Unit39>
+        <Filename Value="src/decotime.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoTime"/>
+      </Unit39>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
