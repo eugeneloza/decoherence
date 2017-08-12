@@ -15,10 +15,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 
 {---------------------------------------------------------------------------}
 
-{ Crop of Castle Game Engine Time utilities.
+{ Crop of Castle Game Engine Time utilities plus a threaded timer.
   Provides for accurate and fast time access, hopefully thread-safe :)
-  In moste cases GetNow should be used to access immediate time value
-  In other cases DecoNow and DecoNowLocal should be used.
+  GetNow should be used to access immediate time value.
+  Everywhere possible, DecoNow and DecoNowLocal should be used (updated once per frame).
   GetNowThread and ForceGetNowThread are very specific and should be used
   only in extremely time-critical routines often calculating time like World.Manage}
 unit DecoTime;
@@ -37,18 +37,19 @@ Type DTime = TFloatTime;
      DIntTime = int64;
 
 var { analogue to Now function, but a fast-access variable, representing
-      current global time (accessed once per frame)
+      current global time (time where animations take place)
       works ~200 times faster than SysUtils.Now so should be used anywhere possible
       Updated once per frame}
     DecoNow: DTime;
     { analogue to Now function, but a fast-access variable, representing
-      current in-game time (changed by soft-pauses)
+      current in-game time (time where actions take place)
       Updated once per frame }
     DecoNowLocal: DTime;
 
 { Gets CastleTimeUtils.Timer value from some "starting point" in a thread-safe way }
 function GetNow: DTime; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 
+{$HINT maybe use raw integer for these values? That'll give approx +0.5% speed, but will require converting FPS_goal to integer}
 { This is a less accurate but accelerated (~130 times) version
   of the timer by using threads. Should be used after ForceGetNowThread.
   Should be used only in time-critical cases, such as World.Manage }
@@ -62,6 +63,7 @@ uses SysUtils, Classes;
 
 {$ifdef MSWINDOWS}
 {************************* WINDOWS TIME **************************************}
+{$WARNING todo - windows timer}
 type
   TTimerFrequency = Int64;
   TTimerState = (tsNotInitialized, tsQueryPerformance, tsGetTickCount64);
@@ -163,14 +165,25 @@ end;
 
 {----------------------------------------------------------------------------}
 
+{ This procedure forces correct initialization of ThreadedTimer
+  and must always be used once before starting accessing the GetNowThread sequentially
+  so that the first value will be correct (otherwise it might be extermely wrong,
+  which is bad for World.Manage) }
 function ForceGetNowThread: DTime; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
   LastTime := GetNow;
+  {//DecoNow; --- actually we should perfectly fine with this value?
+   It will give "a bit incorrect" (it can't go badly wrong) value for first
+   several cycles of World.Manage, but anyway it should preform
+   several additional routines.
+   On the other hand, we access ForceGetNowThread only once per frame,
+   so, maybe, better not to bother}
   Result := LastTime;
   if ThreadedTimer.Finished then ThreadedTimer.Start;
 end;
 
 initialization
+  //create threaded timer and run it immediately to make sure everything is initialized properly
   ThreadedTimer := TTimerThread.create(false);
   ThreadedTimer.Priority := tpLower;
   ThreadedTimer.FreeOnTerminate := false;
