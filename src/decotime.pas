@@ -28,17 +28,8 @@ uses
   CastleTimeUtils{SysUtils, Math};
 
 Type DTime = TFloatTime;
-
-
-type
-  { Current time from @link(ProcessTimer).
-    If possible, this measures only the CPU usage local to this process. }
-  TProcessTimerResult = object
-  private
-    Value:
-      {$ifdef UNIX} clock_t {$endif}
-      {$ifdef MSWINDOWS} DWord {$endif};
-  end;
+     {see note for CastleTimeUtils.TTimerResult}
+     DIntTime = int64;
 
 type
   { Current time from @link(Timer). }
@@ -57,17 +48,6 @@ var
       current in-game time }
     DecoNowLocal: DTime;
 
-
-{ Current time, to measure real time passed.
-  This may be a time local to this process. It is a "real" time,
-  which means that subtracting two values measures the actual time
-  that passed between two events. Contrast this with @link(ProcessTimer)
-  and friends that try to measure only CPU time used by the current process.
-
-  Call Timer twice, and calculate the difference (in seconds)
-  using the TimerSeconds. }
-function Timer: TTimerResult;
-
 { Gets CastleTimeUtils.Timer value from some "starting point"
   Starting point is thread-safe (Read only). }
 function GetNow: DTime; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
@@ -75,13 +55,11 @@ function GetNow: DTime; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
   of the timer, using threads }
 function GetNowThread: DTime; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 
-
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 //uses CastleLog;
 
-{ timer ---------------------------------------------------------- }
-
+{---------------------------------------------------------------------------}
 {$ifdef MSWINDOWS}
 type
   TTimerFrequency = Int64;
@@ -134,8 +112,6 @@ type
   TTimerFrequency = LongWord;
 const
   TimerFrequency: TTimerFrequency = 1000000;
-var
-  LastTimer: TTimerResult;
 
 function Timer: TTimerResult;
 var
@@ -156,6 +132,8 @@ function TimerSecondsInt(const A, B: TTimerResult): integer; inline;
 begin
   Result := A.Value - B.Value;
 end;
+
+{---------------------------------------------------------------------------}
 
 { maybe initTime shift should be saved with the game and correspond to
   global playtime}
