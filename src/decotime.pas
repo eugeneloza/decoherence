@@ -31,15 +31,6 @@ Type DTime = TFloatTime;
      {see note for CastleTimeUtils.TTimerResult}
      DIntTime = int64;
 
-type
-  { Current time from @link(Timer). }
-  TTimerResult = object
-  private
-    { The type of this could be platform-dependent. But for now, all platforms
-      are happy with Int64. }
-    Value: Int64;
-  end;
-
 var
     { analogue to Now function, but a fast-access variable, representing
       current global time (accessed once per frame) }
@@ -59,8 +50,8 @@ function GetNowThread: DTime; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 implementation
 //uses CastleLog;
 
-{---------------------------------------------------------------------------}
 {$ifdef MSWINDOWS}
+{************************* WINDOWS TIME **************************************}
 type
   TTimerFrequency = Int64;
   TTimerState = (tsNotInitialized, tsQueryPerformance, tsGetTickCount64);
@@ -93,7 +84,7 @@ begin
   if FTimerState = tsNotInitialized then InitTimer;
 
   if FTimerState = tsQueryPerformance then
-    QueryPerformanceCounter(Result.Value)
+    QueryPerformanceCounter(Value)
   else
   begin
     { Deliberately using deprecated GetTickCount64 and friends.
@@ -101,56 +92,38 @@ begin
     {$warnings off}
     { Unfortunately, below will cast GetTickCount64 back to 32-bit.
       Hopefully QueryPerformanceCounter is usually available. }
-    Result.Value := GetTickCount64;
+    Value := GetTickCount64;
     {$warnings on}
   end;
 end;
 {$endif MSWINDOWS}
 
 {$ifdef UNIX}
+{************************* UNIX TIME **************************************}
+
 type
   TTimerFrequency = LongWord;
 const
   TimerFrequency: TTimerFrequency = 1000000;
 
-function Timer: TTimerResult;
+function Timer: DIntTime; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 var
   tv: TTimeval;
 begin
   FpGettimeofday(@tv, nil);
-
-  { We can fit whole TTimeval inside Int64, no problem. }
-  Result.Value := Int64(tv.tv_sec) * 1000000 + Int64(tv.tv_usec);
+  Result := Int64(tv.tv_sec) * 1000000 + Int64(tv.tv_usec);
 end;
 {$endif UNIX}
 
-function TimerSeconds(const A, B: TTimerResult): TFloatTime;
-begin
-  Result := (A.Value - B.Value) / TimerFrequency;
-end;
-function TimerSecondsInt(const A, B: TTimerResult): integer; inline;
-begin
-  Result := A.Value - B.Value;
-end;
-
-{---------------------------------------------------------------------------}
-
-{ maybe initTime shift should be saved with the game and correspond to
-  global playtime}
-var InitTime: TTimerResult;
+{============================= GET TIME ====================================}
 
 function GetNow: DTime; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
-  Result := TimerSeconds(Timer, InitTime);
+  Result := Timer / TimerFrequency;
 end;
 function GetNowThread: DTime; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
-  Result := TimerSeconds(Timer, InitTime);
+  Result := Timer / TimerFrequency;
 end;
-
-initialization
-InitTime := Timer;
-
-
 
 end.
