@@ -187,7 +187,7 @@ end;
 procedure DCharacterSpace.slideOut(Sender: DAbstractElement; x,y: integer);
 begin
   if slided then
-    if not MouseOverTree(x,y) then timer.settimeout(1/24/60/60){doSlideOut};
+    if not MouseOverTree(x,y) then timer.settimeout(PortraitTimeOut){doSlideOut};
   //if selected then timeout 10-30 seconds, else just doslideout
 end;
 

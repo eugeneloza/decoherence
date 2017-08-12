@@ -18,7 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 { Defines some generic variables,
   also handles random initialzation and random for GUI and other minor purposes }
 
-unit decoglobal;
+unit DecoGlobal;
 
 {$INCLUDE compilerconfig.inc}
 
@@ -30,7 +30,7 @@ uses {todo: temporary}//SysUtils,
 
 { for easy changing into double in case needed }
 type Float = single;
-     pFloat = ^float;
+     pFloat = ^Float;
      DTime = TFloatTime;
 
 { folders constants relative to ApplicationData path
@@ -79,6 +79,7 @@ var {global window of the game}
     { analogue to Now function, but a fast-access variable, representing
       current in-game time }
     DecoNowLocal: DTime;
+
     {$IFNDEF Android}
     LogStream : TFileStream;
     {$ENDIF}
@@ -94,9 +95,28 @@ function GetRandomSeed: LongWord;
 
 function GetScenarioFolder: string;
 
+{at this point both do the same}
+function GetNow: DTime;
+function GetNowThread: DTime;
+
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 uses SysUtils;
+
+{ maybe initTime shift should be saved with the game and correspond to
+  global playtime}
+var InitTime: TTimerResult;
+
+function GetNow: DTime;
+begin
+  Result := TimerSeconds(Timer, InitTime);
+end;
+function GetNowThread: DTime;
+begin
+  Result := TimerSeconds(Timer, InitTime);
+end;
+
+{---------------------------------------------------------------------------}
 
 function GetRandomSeed: LongWord;
 {$IFDEF USE_DEV_URANDOM}
@@ -143,6 +163,7 @@ end;
 
 initialization
 InitGlobal;
+InitTime := Timer;
 
 finalization
 DestroyGlobal;

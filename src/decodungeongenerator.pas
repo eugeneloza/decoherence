@@ -555,7 +555,7 @@ end;
 
 procedure DDungeonGenerator.Generate;
 var i: integer;
-    t1,t2: TDateTime;
+    t1,t2: DTime;
 begin
   if Self is DDungeonGenerator then fMult := 1 else fMult := 2;
   fProgress := 0;
@@ -573,9 +573,9 @@ begin
   end;
   fisWorking := true;
 
-  t1 := Now;
+  t1 := GetNow;
   repeat
-    t2 := Now;
+    t2 := GetNow;
     Map.EmptyMap(false);
     //add prgenerated or undo tiles
     CurrentStep := RNDM.random(CurrentStep);
@@ -609,7 +609,7 @@ begin
 
       end;
     end;  }
-    WriteLnLog('DDungeonGenerator.Generate','Done in = '+IntToStr(Round((Now-t2)*24*60*60*1000))+'ms');
+    WriteLnLog('DDungeonGenerator.Generate','Done in = '+IntToStr(Round((GetNow-t2)*1000))+'ms');
     WriteLnLog('DDungeonGenerator.Generate','Map volume = '+IntToStr(Map.Volume) +'/'+IntToStr(Parameters.Volume));
     WriteLnLog('DDungeonGenerator.Generate','Max depth = '+IntToStr(Map.MaxDepth+1)+'/'+IntToStr(Parameters.MinZ));
   until (Map.Volume>=Parameters.Volume) and (Map.MaxDepth+1>=Parameters.MinZ); {until map meets the paramters}
@@ -619,7 +619,7 @@ begin
   //finally resize the dynamic array
   MaxSteps := CurrentStep+1;
   SetLength(Gen,MaxSteps);
-  WriteLnLog('DDungeonGenerator.Generate','Job finished in = '+IntToStr(Round((Now-t1)*24*60*60*1000))+'ms');
+  WriteLnLog('DDungeonGenerator.Generate','Job finished in = '+IntToStr(Round((GetNow-t1)*1000))+'ms');
 
   // finalize
   FreeLists; //we no longer need them
@@ -1292,9 +1292,9 @@ end;
 {------------------------------------------------------------------------}
 
 procedure D3DDungeonGenerator.Generate;
-var t,t0: TDateTime;
+var t,t0: DTime;
 begin
-  t0 := Now;
+  t0 := GetNow;
   //make the logic map
   inherited Generate;
   fisFinished := false;
@@ -1304,7 +1304,7 @@ begin
 
   //raycast
   WriteLnLog('D3DDungeonGenerator.Generate','Raycasting started...');
-  t := Now;
+  t := GetNow;
 
   MakeTileIndexMap;
 
@@ -1314,13 +1314,13 @@ begin
 
   UpdateProgress('Chunking',0.95);
 
-  WriteLnLog('D3DDungeonGenerator.Generate','Raycasting finished in '+IntToStr(Round((Now-t)*24*60*60*1000))+'ms.');
+  WriteLnLog('D3DDungeonGenerator.Generate','Raycasting finished in '+IntToStr(Round((GetNow-t)*1000))+'ms.');
   Chunk_N_Slice;
 
   fisWorking := false;
   fisFinished := true;
 
-  writeLnLog('D3DDungeonGenerator.Generate','Finished. Everything done in '+IntToStr(Round((Now-t0)*24*60*60*1000))+'ms.');
+  writeLnLog('D3DDungeonGenerator.Generate','Finished. Everything done in '+IntToStr(Round((GetNow-t0)*1000))+'ms.');
   UpdateProgress('Done',2);
 end;
 

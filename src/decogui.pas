@@ -261,7 +261,7 @@ begin
   inherited draw;
 
   //draw FPS label
-  if ((decoNow-Last_render_time)*24*60*60 >= 1) then begin
+  if (decoNow-Last_render_time >= 1) then begin
     FPS_label.text := Inttostr(FPS_count){+' '+inttostr(round(Window.Fps.RealTime))};
     FPS_count := 0;
     Last_Render_time := decoNow;

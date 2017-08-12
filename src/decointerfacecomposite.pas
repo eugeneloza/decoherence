@@ -26,11 +26,13 @@ unit decointerfacecomposite;
 
 interface
 
-uses classes,
-  castleImages,
-  decointerface,
-  DecoActor, decoplayercharacter, decoperks,
-  decoglobal;
+uses Classes,
+  CastleImages,
+  DecoInterface,
+  DecoActor, DecoPlayerCharacter, DecoPerks,
+  DecoGlobal;
+
+const PortraitTimeOut = 1; {seconds}
 
 type
   { wrapper for composite Interface elements with ArrangeChildren procedure
@@ -516,7 +518,7 @@ end;
 procedure DPortrait.doHit(dam: float; damtype: TDamageType);
 begin
   DCharacterSpace(parent).doSlideIn;
-  DCharacterSpace(parent).timer.settimeout(1/24/60/60);
+  DCharacterSpace(parent).timer.settimeout(PortraitTimeOut);
   (damageOverlay.content as DStaticImage).FreeImage;
   case damtype of
     dtHealth: (damageOverlay.content as DStaticImage).Load(damageOverlay_img);

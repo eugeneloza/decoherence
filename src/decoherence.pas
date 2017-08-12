@@ -72,7 +72,7 @@ function NiceDate: string;
 var s: string;
     i: integer;
 begin
-  s := DateTimeToAtStr(Now);
+  s := DateTimeToAtStr(Now); //only place where I'm using SysUtils.Now
   Result := '';
   for i := 1 to Length(s) do
     if Copy(s,i,1) = ' ' then Result += '_' else
@@ -86,7 +86,7 @@ var LastRender: DTime = -1;
 procedure ProcessTimeEvents;
 var TimePassed: DTime;
 begin
-  DecoNow := Now;
+  DecoNow := GetNow;
   If LastRender = -1 then LastRender := DecoNow;
   TimePassed := DecoNow - LastRender;
   {if not softpause...}

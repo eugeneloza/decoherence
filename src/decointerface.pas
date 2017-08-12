@@ -29,7 +29,7 @@ uses
 
 const InterfaceScalingMethod: TResizeInterpolation = riBilinear;  //to quickly change it. Maybe will be a variable some day to support older PCs.
 
-const defaultanimationduration = 300 /1000/60/60/24; {in ms}
+const defaultanimationduration = 0.3; {in seconds}
 
 {animation style of the object. asDefault means "animate from previous state",
  presuming that there was some "previous state"}
@@ -220,17 +220,17 @@ Type
   DTimer = class(TObject)
     private
       {set automatically, date of the timer count start}
-      StartDate: DTime;
+      StartTime: DTime;
     public
       {if the timer is running}
       enabled: boolean;
-      {how long (in days) will it take the timer to fire}
+      {how long (in seconds) will it take the timer to fire}
       Interval: DTime;
       {action to preform}
       onTimer: TSimpleProcedure;
       constructor create;
       {a simple way to set and run timer}
-      procedure settimeout(days: DTime);
+      procedure settimeout(seconds: DTime);
       {check if the timer finished and run onTimer if true}
       procedure update;
   end;
@@ -968,27 +968,27 @@ end;
  begin
    inherited;
    enabled := false;
-   StartDate := -1;
+   StartTime := -1;
  end;
 
 {-----------------------------------------------------------------------------}
 
 procedure DTimer.update;
 begin
-  if StartDate<0 then StartDate := decoNow else
-  if (decoNow-startDate) >= Interval then begin
-    enabled := false;
-    if assigned(onTimer) then onTimer;
+  if StartTime<0 then StartTime := DecoNow else
+  if (DecoNow-StartTime) >= Interval then begin
+    Enabled := false;
+    if Assigned(onTimer) then onTimer;
   end;
 end;
 
 {-----------------------------------------------------------------------------}
 
-procedure DTimer.settimeout(days: DTime);
+procedure DTimer.settimeout(Seconds: DTime);
 begin
-  StartDate := -1;
-  enabled := true;
-  Interval := days;
+  StartTime := -1;
+  Enabled := true;
+  Interval := Seconds;
 end;
 
 {-----------------------------------------------------------------------------}

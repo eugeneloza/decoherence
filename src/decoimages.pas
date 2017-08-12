@@ -361,21 +361,21 @@ end;
 {=============================================================================}
 
 procedure DWindImage.CyclePhase;
-var phaseshift: float;
+var PhaseShift: float;
 begin
-  if lasttime = -1 then lasttime := DecoNow;
-  phaseshift := (now-lasttime)*24*60*60*phaseSpeed;
-  if phaseshift < 0.5 then begin
-    phase -= phaseshift*(1+0.1*drnd.Random);
-    if phase<0 then phase += 1;
-    opacityphase -= phaseshift/2*(1+0.2*drnd.Random);
-    if opacityphase<0 then opacityphase += 1;
+  if Lasttime = -1 then LastTime := DecoNow;
+  PhaseShift := (DecoNow-LastTime)*phaseSpeed;
+  if PhaseShift < 0.5 then begin
+    Phase -= PhaseShift*(1+0.1*drnd.Random);
+    if Phase<0 then Phase += 1;
+    OpacityPhase -= PhaseShift/2*(1+0.2*drnd.Random);
+    if OpacityPhase<0 then OpacityPhase += 1;
   end else begin
     //if pause was too long reinitialize with random phases.
-    phase := drnd.Random;
-    opacityphase := drnd.Random;
+    Phase := drnd.Random;
+    OpacityPhase := drnd.Random;
   end;
-  lasttime := DecoNow;
+  LastTime := DecoNow;
 end;
 
 {----------------------------------------------------------------------------}
@@ -415,18 +415,18 @@ end;
 procedure DFloatImage.CyclePhase;
 var phaseshift: float;
 begin
-  if lasttime = -1 then begin
-    lasttime := decoNow;
+  if LastTime = -1 then begin
+    LastTime := DecoNow;
     phase := 0;
   end;
-  phaseshift := (decoNow-lasttime)*24*60*60*phaseSpeed;
+  phaseshift := (DecoNow-LastTime)*PhaseSpeed;
   phase += phaseshift*(1+0.1*drnd.Random);
-  if phase>1 then begin
-    phase:=1;
-    LoadNewFloaterImage:=true;
-    ImageLoaded:=false;
+  if phase > 1 then begin
+    phase := 1;
+    LoadNewFloaterImage := true;
+    ImageLoaded := false;
   end;
-  lasttime := decoNow;
+  LastTime := DecoNow;
 end;
 
 {----------------------------------------------------------------------------}

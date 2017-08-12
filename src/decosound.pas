@@ -96,7 +96,7 @@ type
     {gain volume 0..1}
     const fgain = 1; {maybe, global music volume?}
     {fade out time}
-    const FadeTime = 3/24/60/60; {3 seconds}
+    const FadeTime = 3; {in seconds}
   public
     {if the current music is playing at the moment?}
     property isPlaying: boolean read fisPlaying default false;
