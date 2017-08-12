@@ -241,6 +241,8 @@ type
     {resizes the generated map for its real size}
     procedure ShrinkMap;
   private
+    {temporary, maybe it can be made local in BuildNav, but it's also required
+     for building weenies at the moment}
     NavMap: TIntMapArray;
     procedure BuildNav;
     procedure BuildWeenies;
@@ -816,6 +818,8 @@ end;
 procedure DDungeonGenerator.BuildNav;
 var ix,iy,iz: TIntCoordinate;
     tmpNav: DNavPt;
+    aNav: TNavID;
+    a: TAngle;
 begin
   NavMap := ZeroIntegerMap(Map.SizeX,Map.SizeY,Map.SizeZ);
 
@@ -833,6 +837,21 @@ begin
         NavMap[ix,iy,iz] := NavList.Add(tmpNav);
       end;
   WriteLnLog('DDungeonGenerator.BuildNav','Navigation Graph created, nodes: '+IntToStr(NavList.Count));
+  {build links between the nav points}
+  for iz := 0 to Map.SizeZ-1 do
+    for ix := 0 to Map.SizeX-1 do
+      for iy := 0 to Map.SizeZ-1 do if NavMap[ix,iy,iz]>0 then with NavList.L[NavMap[ix,iy,iz]] do begin
+        LinksCount := -1;
+        for a in TAngle do if isPassable(Map.Map[ix,iy,iz].faces[a]) then begin
+          aNav := NavMap[ix+a_dx(a),iy+a_dy(a),iz+a_dz(a)];
+          if aNav>0 then begin
+            inc(LinksCount);
+            Links[LinksCount] := aNav;
+          end;
+        end;
+      end;
+
+
 end;
 
 {-------------------------------------------------------------------------}

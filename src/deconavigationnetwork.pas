@@ -29,13 +29,19 @@ uses CastleGenericLists, CastleVectors,
 type TNavID = integer;
 const UnitinializedNav: TNavID = -1;
 
+{$hint not sure how to work correctly here, specialized lists must be managed (from a class constructor/destructor)}
+{looks like 8 nav points links is enough}
+type TLinksList = array [0..7] of TNavID; //specialize TGenericStructList<TNavID>;
+
 Type DNavPt = record
   { Absolute Coordinates of pathPoint }
   Pos: TVector3;
   {{ world tile it belongs to }
-  Tile: TTileType;
+  Tile: TTileType;}
   {Link of tiles adjacent to this tile}
-  Links: TLinkList;}
+  LinksCount: shortint;
+  Links: TLinksList;
+  {is somebody standing over this Nav?}
   Blocked: boolean;
 end;
 

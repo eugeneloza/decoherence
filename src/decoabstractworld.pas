@@ -238,7 +238,7 @@ procedure DAbstractWorld.Load(Generator: DAbstractGenerator);
 begin
   fSeed := drnd.Random32bit; //maybe other algorithm?
   if Nav<>nil then begin
-    WriteLnLog('DAbstractWorld.Load','WARNING: Nav is not nil! Freeing');
+    WriteLnLog('DAbstractWorld.Load','WARNING: Nav is not nil! Freeing...');
     FreeAndNil(Nav);
   end;
   Nav := Generator.ExportNav;
