@@ -15,7 +15,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 
 {---------------------------------------------------------------------------}
 
-{ Copy of Castle Game Engine Time utilities. }
+{ Crop of Castle Game Engine Time utilities.
+  Provides for accurate and fast time access, hopefully thread-safe :)
+  In moste cases GetNow should be used to access immediate time value
+  In other cases DecoNow and DecoNowLocal should be used.
+  GetNowThread and ForceGetNowThread are very specific and should be used
+  only in extremely time-critical routines often calculating time like World.Manage}
 unit DecoTime;
 
 {$INCLUDE compilerconfig.inc}
@@ -23,24 +28,25 @@ unit DecoTime;
 interface
 
 uses
-  {$ifdef MSWINDOWS} Windows{,} {$endif}
-  {$ifdef UNIX} BaseUnix, Unix{, Dl, }{$endif},
-  CastleTimeUtils{SysUtils, Math};
+  {$ifdef MSWINDOWS} Windows, {$endif}
+  {$ifdef UNIX} Unix, {$endif}
+  CastleTimeUtils;
 
 Type DTime = TFloatTime;
      {see note for CastleTimeUtils.TTimerResult}
      DIntTime = int64;
 
-var
-    { analogue to Now function, but a fast-access variable, representing
-      current global time (accessed once per frame) }
+var { analogue to Now function, but a fast-access variable, representing
+      current global time (accessed once per frame)
+      works ~200 times faster than SysUtils.Now so should be used anywhere possible
+      Updated once per frame}
     DecoNow: DTime;
     { analogue to Now function, but a fast-access variable, representing
-      current in-game time }
+      current in-game time (changed by soft-pauses)
+      Updated once per frame }
     DecoNowLocal: DTime;
 
-{ Gets CastleTimeUtils.Timer value from some "starting point"
-  Starting point is thread-safe (Read only). }
+{ Gets CastleTimeUtils.Timer value from some "starting point" in a thread-safe way }
 function GetNow: DTime; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 
 { This is a less accurate but accelerated (~130 times) version
@@ -76,14 +82,14 @@ begin
   end;
 end;
 
-function TimerFrequency: TTimerFrequency;
+function TimerFrequency: TTimerFrequency; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
   if FTimerState = tsNotInitialized then InitTimer;
 
   Result := FTimerFrequency;
 end;
 
-function Timer: TTimerResult;
+function Timer: TTimerResult; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
   if FTimerState = tsNotInitialized then InitTimer;
 
