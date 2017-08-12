@@ -42,13 +42,17 @@ var
 { Gets CastleTimeUtils.Timer value from some "starting point"
   Starting point is thread-safe (Read only). }
 function GetNow: DTime; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+
 { This is a less accurate but accelerated (~130 times) version
-  of the timer, using threads }
+  of the timer by using threads. Should be used after ForceGetNowThread.
+  Should be used only in time-critical cases, such as World.Manage }
 function GetNowThread: DTime; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+{ Forces initialization of the threaded timer value. }
+function ForceGetNowThread: DTime; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-//uses CastleLog;
+uses SysUtils, Classes;
 
 {$ifdef MSWINDOWS}
 {************************* WINDOWS TIME **************************************}
@@ -115,15 +119,57 @@ begin
 end;
 {$endif UNIX}
 
-{============================= GET TIME ====================================}
+{============================= GET TIME DIRECTLY =============================}
 
 function GetNow: DTime; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
   Result := Timer / TimerFrequency;
 end;
+
+{========================== GET TIME IN A THREAD =============================}
+
+type TTimerThread = class(TThread)
+  protected
+    procedure Execute; override;
+  public
+    Time: DIntTime;
+  end;
+
+var ThreadedTimer: TTimerThread;
+
+procedure TTimerThread.Execute;
+begin
+  Time := Timer;
+end;
+
+{----------------------------------------------------------------------------}
+
+var LastTime: DTime;
 function GetNowThread: DTime; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
-  Result := Timer / TimerFrequency;
+  if ThreadedTimer.Finished then begin
+    LastTime := ThreadedTimer.time / TimerFrequency;
+    Result := LastTime;
+    ThreadedTimer.Start;
+  end else
+    Result := LastTime;
 end;
+
+{----------------------------------------------------------------------------}
+
+function ForceGetNowThread: DTime; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+begin
+  LastTime := GetNow;
+  Result := LastTime;
+  if ThreadedTimer.Finished then ThreadedTimer.Start;
+end;
+
+initialization
+  ThreadedTimer := TTimerThread.create(false);
+  ThreadedTimer.Priority := tpLower;
+  ThreadedTimer.FreeOnTerminate := false;
+
+finalization
+  FreeAndNil(ThreadedTimer);
 
 end.
