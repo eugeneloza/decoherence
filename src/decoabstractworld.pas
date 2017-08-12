@@ -32,10 +32,8 @@ Type
   DAbstractWorld = class
   private
     { Average and Min distance between nav points
-      Warning, this might go very,very wrong if 2 nav poinst are too close
-      this should be something like "average distance between two *adjacent* Nav",
-      but it requires Nav.Links which aren't implemented yet }
-    fNavMinStep: float;
+      Warning, this might go very,very wrong if 2 nav poinst are too close }
+    fNavMinStep, fNavAvgStep: float;
     procedure CacheNavDistance;
   protected
 
@@ -170,20 +168,22 @@ end;
 {------------------------------------------------------------------------------}
 
 procedure DAbstractWorld.CacheNavDistance;
-var i,j: integer;
-    d, min{,sum}: float;
+var i,j: TNavID;
+    count: integer;
+    d, min,sum: float;
 begin
   //warning, this will significantly changed after "LINKS" between navs will be implemented
   min := (Nav[0].Pos-Nav[1].Pos).Length;
-  //sum := min;
-
-  { we've already included "0" in the min, starting from "1" }
-  for i := 1 to Nav.Count-1 do
-    for j := i+1 to Nav.Count-1 do begin
-      d := (Nav[i].Pos-Nav[j].Pos).Length;
+  sum := min;
+  count := 0;
+  for i := 0 to Nav.Count-1 do
+    for j := 0 to Nav[i].LinksCount do begin
+      d := (Nav[i].Pos-Nav[Nav[i].Links[j]].Pos).Length;
       if d < min then min := d;
+      sum += d;
+      inc(count);
     end;
-
+  fNavAvgStep := sum/count;
   fNavMinStep := min;
 end;
 function DAbstractWorld.PositionToNav(aPosition: TVector3): TNavID;
