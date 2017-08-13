@@ -4,8 +4,7 @@ Compiles to: Windows, Linux, Android
 
 # Multilingual
 
-At this moment most of the game content is available only in Russian, but I will eventually translate everything into English too... ~~This fact is determined by an existing Russian Wizardry-8 fans community. If you wish to include English translation as a priority task, please, write me you also wait for this game :) and support the development just by being interested in it :)~~
-At this moment English is included as a priority task (thanks to everybody for your interest!), so, hopefully, we'll have English version nearly up-to-date with Russian variant.
+At this moment most of the game content is available only in Russian, but I will eventually translate everything into English too... At this moment English is included as a priority task (thanks to everybody for your interest!), so, hopefully, we'll have English version nearly up-to-date with Russian variant.
 
 # Short introduction
 
