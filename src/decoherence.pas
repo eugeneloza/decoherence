@@ -269,6 +269,7 @@ begin
   WritelnLog('ApplicationInitialize','Init finished');
 
   {$WARNING BUUUUUUUUUUUUUUUUUG!!!!!}
+  {$DEFINE NoThreads}
   {$IFDEF Linux}{$IFNDEF RELEASE}{$DEFINE NoThreads}{$ENDIF}{$ENDIF}
   {$IFNDEF NoThreads}
   LoadThread := DLoadThread.create(false);
