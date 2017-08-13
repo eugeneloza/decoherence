@@ -59,58 +59,34 @@ function ForceGetNowThread: DTime; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-uses SysUtils, Classes;
+uses SysUtils, Classes{$IFDEF Windows}, SyncObjs{$ENDIF};
 
-{$ifdef MSWINDOWS}
+{$IFDEF Windows}
 {************************* WINDOWS TIME **************************************}
-{$WARNING todo - windows timer}
-type
-  TTimerFrequency = Int64;
-  TTimerState = (tsNotInitialized, tsQueryPerformance, tsGetTickCount64);
+type TTimerFrequency = Int64;
+     TTimerState = (tsQueryPerformance, tsGetTickCount64);
 
 var
-  FTimerState: TTimerState = tsNotInitialized;
-  FTimerFrequency: TTimerFrequency;
+  FTimerState: TTimerState;
+  TimerFrequency: TTimerFrequency;
+  TimerLock: TCriticalSection;  //we'll need a critical section as we access FTimerState.
 
-{ Set FTimerState to something <> tsNotInitialized.
-  Also set FTimerFrequency. }
-procedure InitTimer;
+function Timer: DIntTime; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+var QueryPerformance: boolean;
 begin
-  if QueryPerformanceFrequency(FTimerFrequency) then
-    FTimerState := tsQueryPerformance else
-  begin
-    FTimerState := tsGetTickCount64;
-    FTimerFrequency := 1000;
-  end;
-end;
+  TimerLock.Acquire;   //maybe, this is redundant, but let it be here for now...
+  QueryPerformance := FTimerState = tsQueryPerformance;
+  TimerLock.Release;
 
-function TimerFrequency: TTimerFrequency; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
-begin
-  if FTimerState = tsNotInitialized then InitTimer;
-
-  Result := FTimerFrequency;
-end;
-
-function Timer: TTimerResult; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
-begin
-  if FTimerState = tsNotInitialized then InitTimer;
-
-  if FTimerState = tsQueryPerformance then
-    QueryPerformanceCounter(Value)
+  if QueryPerformance then
+    QueryPerformanceCounter({$hints off}Result{$warnings on})
   else
-  begin
-    { Deliberately using deprecated GetTickCount64 and friends.
-      It should be internal in this unit. }
-    {$warnings off}
-    { Unfortunately, below will cast GetTickCount64 back to 32-bit.
-      Hopefully QueryPerformanceCounter is usually available. }
-    Value := GetTickCount64;
-    {$warnings on}
-  end;
+    {in case of ancient Windows version fall back to GetTickCount :)}
+    Result := {$warnings off} GetTickCount64 {$warnings on};
 end;
-{$endif MSWINDOWS}
+{$ENDIF}
 
-{$ifdef UNIX}
+{$IFDEF Unix}
 {************************* UNIX TIME **************************************}
 
 type
@@ -125,7 +101,7 @@ begin
   FpGettimeofday(@tv, nil);
   Result := Int64(tv.tv_sec) * 1000000 + Int64(tv.tv_usec);
 end;
-{$endif UNIX}
+{$ENDIF}
 
 {============================= GET TIME DIRECTLY =============================}
 
@@ -172,8 +148,8 @@ end;
 function ForceGetNowThread: DTime; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
   LastTime := GetNow;
-  {//DecoNow; --- actually we should perfectly fine with this value?
-   It will give "a bit incorrect" (it can't go badly wrong) value for first
+  {//DecoNow; --- actually we should be perfectly fine with this value?
+   It will give "a bit incorrect" (thou it can't go badly wrong) value for first
    several cycles of World.Manage, but anyway it should preform
    several additional routines.
    On the other hand, we access ForceGetNowThread only once per frame,
@@ -188,7 +164,21 @@ initialization
   ThreadedTimer.Priority := tpLower;
   ThreadedTimer.FreeOnTerminate := false;
 
+  {$IFDEF Windows}
+  //initialize the timer in Windows and determine TimerFrequency
+  if QueryPerformanceFrequency(TimerFrequency) then
+    FTimerState := tsQueryPerformance else
+  begin
+    FTimerState := tsGetTickCount64;
+    TimerFrequency := 1000;
+  end;
+  TimerLock := TCriticalSection.Create;
+  {$ENDIF}
+
 finalization
   FreeAndNil(ThreadedTimer);
+  {$IFDEF Windows}
+  FreeAndNil(TimerLock);
+  {$ENDIF}
 
 end.
