@@ -55,10 +55,10 @@ Count=0
 [IncludeDirectories]
 Count=2
 Item_0=../src
-Item_1=../../DECO-170811-175
+Item_1=../../DECO-170811-176
 
 [Files]
-Count=44
+Count=45
 Item_0=../constructor_tool.pas
 Item_1=../src/blendercleaner.pas
 Item_2=../src/castletexturefont_linbiolinumrg_16.pas
@@ -102,7 +102,8 @@ Item_39=../src/decosound.pas
 Item_40=../src/decostats.pas
 Item_41=../src/decothrash.pas
 Item_42=../src/decothread.pas
-Item_43=../src/decotranslation.pas
+Item_43=../src/decotime.pas
+Item_44=../src/decotranslation.pas
 
 [HyphenatedWords]
 Count=0
