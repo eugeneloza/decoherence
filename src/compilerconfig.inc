@@ -52,7 +52,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 {$DEFINE UseSwitches}
 
 {fix a windows encoding bug}
-//{$IFDEF Windows}{$DEFINE UTF8Encode}{$ENDIF}
+{$IFDEF Windows}{$DEFINE UTF8Encode}{$ENDIF}
 
 {======================== GAME-SPECIFIC DIRECTIVES =========================}
 
