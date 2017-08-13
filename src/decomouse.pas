@@ -29,7 +29,7 @@ uses Classes, fgl, SysUtils,
   decoglobal};
 
 type DTouch = class (TObject)
-  FingerIndex: integer;
+  FingerIndex: cardinal;
   x0,y0: integer;     //to handle sweeps, drags and cancels
   ClickElement: DSingleInterfaceElement;
   constructor Create(const xx,yy: single; const Finger: integer);
