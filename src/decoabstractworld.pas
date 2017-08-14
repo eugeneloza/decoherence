@@ -48,6 +48,9 @@ Type
     {$HINT todo: LastRender = -1 does the same job, optimize it}
     {$HINT allow first initialization flow during load without caring for FPS!}
     FirstRender: boolean;
+  protected
+    { Spawns Actors in the World }
+    procedure SpawnActors; virtual; abstract;
   public
     { Seed used to "build" the world if it requires random}
     property Seed: LongWord read fSeed write fSeed;
@@ -70,8 +73,6 @@ Type
     { Splits the World into chunks }
     //Procedure chunk_n_slice; virtual; abstract;
 
-    { Spawns Actors in the World }
-    procedure SpawnActors; virtual; abstract;
     { Returns Gravity Up for the given location in the world
       Maybe, move this one to AbstractWorld3D, as it's not needed in non-3D world
       it's bad, that there is no way to make this procedure inline,

@@ -178,6 +178,7 @@ end;
 constructor DPlayerCharacter.Create;
 begin
   inherited;
+  Faction := fPlayer;
 end;
 
 {----------------------------------------------------------------------------}

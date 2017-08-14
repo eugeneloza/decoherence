@@ -94,9 +94,10 @@ type
      WARNING placeholders cannot be children of children!
              Otherwise we'll have to recreate the whole nodes tree}
     procedure AddRecoursive(Dest,Source: TAbstractX3DGroupingNode);
-  protected
-    Actors: TActorList;
   public
+    {list of actors in the world}
+    Actors: TActorList;
+  protected
     procedure SpawnActors; override;
   public
     {loads the World into Window.SceneManager}

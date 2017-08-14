@@ -31,6 +31,8 @@ uses Classes, CastleRandom, fgl, CastleVectors,
 type TDamageType = (dtHealth);
 type TDamageProcedure = procedure (Dam: float; Damtype: TDamageType) of Object;
 
+type TFaction = (fPlayer, fHostile);
+
 type
   { This Actor has only the most basic features like his "tile" position
     Will be used in some remote future for Actors behaviour on global map }
@@ -38,6 +40,7 @@ type
   private
     LastNav: TNavID;
   public
+    Faction: TFaction;
     constructor create; virtual; // override;
     procedure TeleportTo(aNav: TNavID); virtual;
     procedure Manage; virtual; //it'll do something useful some day...
@@ -196,12 +199,16 @@ end;
 type
   { Actor with actions and target }
   DActor = class(DBasicActor)
+  const
+    CombatRange = 10;
   private
-    fTarget: DCoordActor;
+    fTarget, fTargetGroup: DCoordActor;
     function GetTarget: DCoordActor;
+    procedure GetEnemyTarget;
   protected
     procedure LookAt;
     procedure LookAt(aPosition: TVector3);
+    function CanSee(a1: DCoordActor): boolean;
   public
     Actions: DPerksList;
     {used for AI and preforming actions
@@ -230,7 +237,7 @@ implementation
 uses SysUtils, CastleLog,
   CastleFilesUtils, DecoInputOutput,
 
-  DecoAbstractWorld,
+  DecoAbstractWorld, DecoAbstractWorld3D,
   {DecoNavigation{?},} CastleScene{, CastleSceneCore};
 
 
@@ -675,11 +682,53 @@ end;
 function DActor.GetTarget: DCoordActor;
 begin
   if fTarget = nil then begin
-    Result := nil;
+
     WriteLnLog('DActor.GetTarget','Warning: Autoselecting target not implemented yet...');
   end
   else
     Result := fTarget;
+end;
+
+{-----------------------------------------------------------------------------}
+
+function isEnemyFaction(f1,f2: TFaction): boolean;
+begin
+  //todo
+  if f1<>f2 then Result := true else Result := false;
+end;
+function isEnemy(const a1,a2: DSimpleActor): boolean;
+begin
+  if isEnemyFaction(a1.Faction,a2.Faction) then Result := true else Result := false;
+end;
+procedure DActor.GetEnemyTarget;
+var a,e: DSimpleActor;
+    d,d_min: float;
+begin
+  fTarget := nil;
+  fTargetGroup := nil;
+  //may be optimized by caching.
+  if CurrentWorld is DAbstractWorld3d then
+
+  d_min := -1;
+  e := nil;
+  for a in DAbstractWorld3d(CurrentWorld).Actors do
+  {$hint dummy, actually this is wrong, as "target" may be a friendly unit, e.g. to heal, or in case of control loss}
+  if (a<>Self) and (a is DCoordActor) and isEnemy(Self,a) and CanSee(DCoordActor(a)) then begin
+    d := (DCoordActor(a).Position - Self.Position).Length;
+    if (d<Self.CombatRange) and ((d_min<d) or (d_min<0)) then begin
+      d_min := d;
+      e := a;
+    end;
+  end;
+  fTarget := DCoordActor(e);
+end;
+
+{-----------------------------------------------------------------------------}
+
+function DActor.CanSee(a1: DCoordActor): boolean;
+begin
+  if (TVector3.DotProduct(Self.Direction,(a1.Position-Self.Position))>0)
+     then Result := true else Result := false;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -709,7 +758,7 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-constructor DActor.create;
+constructor DActor.Create;
 begin
   inherited;
   Actions := DPerksList.Create(false);
@@ -717,7 +766,7 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-destructor DActor.destroy;
+destructor DActor.Destroy;
 begin
   FreeAndNil(Actions);
   inherited;
@@ -731,7 +780,7 @@ procedure DMonster.doAI;
 begin
   {if the target is close enough look at it}
   if fTarget<>nil then
-    if (fTarget.Position - Position).Length < 10 then LookAt;
+    if ((fTarget.Position - Position).Length < Self.CombatRange) and (CanSee(fTarget)) then LookAt;
 
   if drnd.Random<0.006 then self.Animation(atAttack);
   if drnd.Random<0.002 then self.ForceAnimation(atDie);
@@ -750,6 +799,7 @@ constructor DMonster.Create;
 begin
   inherited;
   Self.onHit := @Self.doHit;
+  Faction := fHostile;
 end;
 
 {-----------------------------------------------------------------------------}
