@@ -232,20 +232,117 @@ uses SysUtils, CastleLog,
   DecoAbstractWorld,
   DecoNavigation{?}, CastleScene, CastleSceneCore;
 
+
+{===========================================================================}
+{====================== SIMPLE ACTOR =======================================}
+{===========================================================================}
+
+procedure DSimpleActor.TeleportTo(aNav: TNavID);
+begin
+  if LastNav<>UnitinializedNav then CurrentWorld.ReleaseNav(LastNav);
+  CurrentWorld.BlockNav(aNav);
+  LastNav := aNav;
+end;
+
+{-----------------------------------------------------------------------------}
+
+constructor DSimpleActor.create;
+begin
+  //nothing to create yet
+end;
+
+{===========================================================================}
+{====================== COORD ACTOR ========================================}
+{===========================================================================}
+
+procedure DCoordActor.GetRandomDirection;
+var rDir: float;
+begin
+  rDir := drnd.Random*2*Pi;
+  Direction := Vector3(sin(rDir),cos(rDir),0);
+  toDir := Direction;
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DCoordActor.doRotate;
+begin
+  {$Warning dummy}
+  if not TVector3.Equals(Direction, toDir) then begin
+    Direction := toDir;
+  end;
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DCoordActor.doMove;
+begin
+  {$Warning dummy}
+  if TVector3.Equals(Direction, toDir) then begin
+    Position := toPos;
+  end;
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DCoordActor.TeleportTo(aPosition: TVector3);
+begin
+  GetRandomDirection;
+  Position := aPosition;
+  toPos := Position;
+end;
+procedure DCoordActor.TeleportTo(aPosition, aDirection: TVector3);
+begin
+  Direction := aDirection;
+  toDir := Direction;
+  Position := aPosition;
+  toPos := Position;
+end;
+procedure DCoordActor.TeleportTo(aNav: TNavID);
+begin
+  inherited TeleportTo(aNav);
+  TeleportTo(CurrentWorld.NavToVector3(aNav));
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DCoordActor.FixZeroDirection; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+begin
+  {this is a critical, very rare and nearly unfixable error, so making just
+   some precautions to forget about it forever.}
+  if ToDir.IsZero then begin
+    if not Direction.IsZero then
+      toDir := Direction
+    else
+      toDir := Vector3(0,1,0);
+    WriteLnLog('DActor.LookAt','ERROR: Direction is zero!');
+  end;
+end;
+
+{-----------------------------------------------------------------------------}
+
+constructor DCoordActor.create;
+begin
+  inherited;
+  LastNav := UnitinializedNav;
+end;
+
+{===========================================================================}
+{========================== BASIC ACTOR ====================================}
+{===========================================================================}
+
 constructor DBasicActor.Create;
 begin
   inherited;
   Nickname := 'abc';
+  //setting some values to avoid uncertainity
   SetMaxMaxHP(100);
   SetMaxMaxSTA(100);
   SetMaxMaxCNC(100);
   SetMaxMaxMPH(100);
   DefenseRandom := TCastleRandom.Create; {$HINT read seed from the savegame}
   AttackRandom := TCastleRAndom.Create;
-  ResetHP;
-  ResetSTA;
-  ResetCNC;
-  ResetMPH;
+  ResetAll;
 end;
 
 {----------------------------------------------------------------------------}
@@ -353,6 +450,8 @@ begin
   fMPH := fMaxMPH;
 end;
 
+{---------------------------------------------------------------------------}
+
 procedure DBasicActor.ResetAll;
 begin
   ResetHP;
@@ -455,7 +554,9 @@ begin
   SetMaxMPH(MaxMPH-Drain*Skill); // todo
 end;
 
+{===========================================================================}
 {========================== ACTOR BODY =====================================}
+{===========================================================================}
 
 constructor DActorBody.Create;
 begin
@@ -519,86 +620,23 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-constructor DActor.create;
+procedure DActorBody.ForceAnimation(at: TAnimationType);
 begin
-  inherited;
-  Actions := DPerksList.Create(false);
+  Body.CurrentAnimationName := AnimationToString(at);
+  Body.ResetAnimation;
 end;
-
-{-----------------------------------------------------------------------------}
-
-destructor DActor.destroy;
+procedure DActorBody.ForceAnimation(at: string);
 begin
-  FreeAndNil(Actions);
-  inherited;
+  Body.CurrentAnimationName := at;
+  Body.ResetAnimation;
 end;
-
-{-----------------------------------------------------------------------------}
-
-procedure DCoordActor.GetRandomDirection;
-var rDir: float;
+procedure DActorBody.Animation(at: TAnimationType);
 begin
-  rDir := drnd.Random*2*Pi;
-  Direction := Vector3(sin(rDir),cos(rDir),0);
-  toDir := Direction;
+  Body.NextAnimationName := AnimationToString(at);
 end;
-
-{-----------------------------------------------------------------------------}
-
-procedure DCoordActor.doRotate;
+procedure DActorBody.Animation(at: string);
 begin
-  {$Warning dummy}
-  if not TVector3.Equals(Direction, toDir) then begin
-    Direction := toDir;
-  end;
-end;
-
-{-----------------------------------------------------------------------------}
-
-procedure DCoordActor.doMove;
-begin
-  {$Warning dummy}
-  if TVector3.Equals(Direction, toDir) then begin
-    Position := toPos;
-  end;
-end;
-
-{-----------------------------------------------------------------------------}
-
-procedure DCoordActor.TeleportTo(aPosition: TVector3);
-begin
-  GetRandomDirection;
-  Position := aPosition;
-  toPos := Position;
-end;
-procedure DCoordActor.TeleportTo(aPosition, aDirection: TVector3);
-begin
-  Direction := aDirection;
-  toDir := Direction;
-  Position := aPosition;
-  toPos := Position;
-end;
-procedure DCoordActor.TeleportTo(aNav: TNavID);
-begin
-  inherited TeleportTo(aNav);
-  TeleportTo(CurrentWorld.NavToVector3(aNav));
-end;
-
-{------------------------------------------------------------------------}
-
-procedure DSimpleActor.TeleportTo(aNav: TNavID);
-begin
-  if LastNav<>UnitinializedNav then CurrentWorld.ReleaseNav(LastNav);
-  CurrentWorld.BlockNav(aNav);
-  LastNav := aNav;
-end;
-
-{-----------------------------------------------------------------------------}
-
-constructor DCoordActor.create;
-begin
-  inherited;
-  LastNav := UnitinializedNav;
+  Body.NextAnimationName := at;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -622,28 +660,64 @@ begin
   end;
 end;
 
+{===========================================================================}
+{====================== D ACTOR ============================================}
+{===========================================================================}
+
+function DActor.GetTarget: DCoordActor;
+begin
+  if fTarget = nil then begin
+    Result := nil;
+    WriteLnLog('DActor.GetTarget','Warning: Autoselecting target not implemented yet...');
+  end
+  else
+    Result := fTarget;
+end;
+
 {-----------------------------------------------------------------------------}
 
-procedure DActorBody.ForceAnimation(at: TAnimationType);
+procedure DActor.LookAt;
 begin
-  Body.CurrentAnimationName := AnimationToString(at);
-  Body.ResetAnimation;
+  if fTarget<>nil then
+    LookAt(Target.Position)
+  else
+    WriteLnLog('DActor.LookAt','Warning: trying to look at a nil target...');
 end;
-procedure DActorBody.ForceAnimation(at: string);
+procedure DActor.LookAt(aPosition: TVector3);
 begin
-  Body.CurrentAnimationName := at;
-  Body.ResetAnimation;
-end;
-procedure DActorBody.Animation(at: TAnimationType);
-begin
-  Body.NextAnimationName := AnimationToString(at);
-end;
-procedure DActorBody.Animation(at: string);
-begin
-  Body.NextAnimationName := at;
+  toDir := aPosition - Position;
+  toDir[2] := 0;  //cut-off z component
+  FixZeroDirection;
+  toDir.NormalizeMe;
 end;
 
-{=========================== D MONSTER =======================================}
+{-----------------------------------------------------------------------------}
+
+procedure DActor.RecoverAll;
+begin
+  //dummy, should also reset all active statuses
+  ResetAll;
+end;
+
+{-----------------------------------------------------------------------------}
+
+constructor DActor.create;
+begin
+  inherited;
+  Actions := DPerksList.Create(false);
+end;
+
+{-----------------------------------------------------------------------------}
+
+destructor DActor.destroy;
+begin
+  FreeAndNil(Actions);
+  inherited;
+end;
+
+{===========================================================================}
+{=========================== D MONSTER =====================================}
+{===========================================================================}
 
 procedure DMonster.doAI;
 begin
@@ -677,65 +751,6 @@ begin
   Self.ForceAnimation(atHurt);
   //and show numeric representation of Dam
   //? and negative status applied ?
-end;
-
-{-----------------------------------------------------------------------------}
-
-function DActor.GetTarget: DCoordActor;
-begin
-  if fTarget = nil then begin
-    Result := nil;
-    WriteLnLog('DActor.GetTarget','Warning: Autoselecting target not implemented yet...');
-  end
-  else
-    Result := fTarget;
-end;
-
-{-----------------------------------------------------------------------------}
-
-procedure DActor.LookAt;
-begin
-  if fTarget<>nil then
-    LookAt(Target.Position)
-  else
-    WriteLnLog('DActor.LookAt','Warning: trying to look at a nil target...');
-end;
-procedure DActor.LookAt(aPosition: TVector3);
-begin
-  toDir := aPosition - Position;
-  toDir[2] := 0;  //cut-off z component
-  FixZeroDirection;
-  toDir.NormalizeMe;
-end;
-
-{-----------------------------------------------------------------------------}
-
-procedure DCoordActor.FixZeroDirection; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
-begin
-  {this is a critical, very rare and nearly unfixable error, so making just
-   some precautions to forget about it forever.}
-  if ToDir.IsZero then begin
-    if not Direction.IsZero then
-      toDir := Direction
-    else
-      toDir := Vector3(0,1,0);
-    WriteLnLog('DActor.LookAt','ERROR: Direction is zero!');
-  end;
-end;
-
-{-----------------------------------------------------------------------------}
-
-procedure DActor.RecoverAll;
-begin
-  //dummy, should also reset all active statuses
-  ResetAll;
-end;
-
-{-----------------------------------------------------------------------------}
-
-constructor DSimpleActor.create;
-begin
-  //nothing to create yet
 end;
 
 
