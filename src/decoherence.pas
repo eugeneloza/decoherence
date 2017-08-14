@@ -33,9 +33,6 @@ uses Classes, SysUtils,
 
      CastleScene,
 
-     {needed to use load image}
-     CastleControls, DecoLoadEmbedded,
-
      DecoThread, DecoThrash,
 
      DecoGui, DecoInterface, DecoMouse, DecoFont,
@@ -44,7 +41,7 @@ uses Classes, SysUtils,
      DecoLoadScreen, DecoPerks,
      DecoInterfaceComposite,
      DecoPlayerCharacter, DecoLoad3d,
-     DecoNavigation, DecoGlobal, DecoGamemode, DecoTime;
+     DecoNavigation, DecoGlobal, DecoTranslation, DecoGamemode, DecoTime;
 
 type
   DLoadThread = class(TAbstractThread)
@@ -281,18 +278,6 @@ begin
 end;
 
 {==========================================================================}
-
-{thanks to Michalis, it's simple :) see https://github.com/eugeneloza/decoherence/issues/22}
-procedure SetLoadingImage;
-begin
-  {no need yet}
-  //Theme.LoadingBackgroundColor := Black; // adjust as needed
-  //Theme.LoadingTextColor := White; // adjust as needed
-
-  Theme.Images[tiLoading] := Loading_image;
-  Theme.OwnsImages[tiLoading] := false;
-end;
-
 
 function MyGetApplicationName: string;
 begin

@@ -10,7 +10,10 @@ interface
 uses CastleImages;
 
 var
-  Loading_image: TGrayscaleImage;
+  Loading_eng: TGrayscaleImage;
+
+var
+  Loading_rus: TGrayscaleImage;
 
 implementation
 
@@ -24,9 +27,13 @@ uses SysUtils;
 {$I decoloadembedded.image_data}
 
 initialization
-  Loading_image := TGrayscaleImage.Create(Loading_imageWidth, Loading_imageHeight, Loading_imageDepth);
-  Move(Loading_imagePixels, Loading_image.RawPixels^, SizeOf(Loading_imagePixels));
-  Loading_image.URL := 'embedded-image:/Loading_image';
+  Loading_eng := TGrayscaleImage.Create(Loading_engWidth, Loading_engHeight, Loading_engDepth);
+  Move(Loading_engPixels, Loading_eng.RawPixels^, SizeOf(Loading_engPixels));
+  Loading_eng.URL := 'embedded-image:/Loading_eng';
+  Loading_rus := TGrayscaleImage.Create(Loading_rusWidth, Loading_rusHeight, Loading_rusDepth);
+  Move(Loading_rusPixels, Loading_rus.RawPixels^, SizeOf(Loading_rusPixels));
+  Loading_rus.URL := 'embedded-image:/Loading_rus';
 finalization
-  FreeAndNil(Loading_image);
+  FreeAndNil(Loading_eng);
+  FreeAndNil(Loading_rus);
 end.
