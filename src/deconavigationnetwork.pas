@@ -40,6 +40,7 @@ Type DNavPt = record
   Tile: TTileType;}
   {Link of tiles adjacent to this tile}
   LinksCount: shortint;
+  isSafe: boolean;
   Links: TLinksList;
   {is somebody standing over this Nav?}
   Blocked: boolean;

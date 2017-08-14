@@ -858,12 +858,25 @@ end;
 
 procedure DDungeonGenerator.BuildWeenies;
 var w: DWeenie;
+    i,j,k: integer;
 begin
   {$hint All weenies actually will be defined by CONSTRUCTOR in first steps, not here!}
   Weenies := TWeeniesList.create;
   w.kind := wtEntrance;
   w.NavId := NavMap[Self.Gen[0].x,Self.Gen[0].y,Self.Gen[0].z];
   Weenies.Add(w);
+  //make the area around the entranse safe
+  NavList.L[w.NavId].isSafe := true;
+  with NavList.L[w.NavId] do
+    for i := 0 to LinksCount do with NavList.L[Links[i]] do begin
+      isSafe := true;
+      for j := 0 to LinksCount do with NavList.L[Links[j]] do begin
+        isSafe := true;
+        for k := 0 to LinksCount do with NavList.L[Links[k]] do begin
+          isSafe := true;
+        end;
+      end;
+    end;
 end;
 
 {================== 3D DUNGEON GENERATOR ROUTINES ===========================}
@@ -1295,6 +1308,7 @@ procedure D3DDungeonGenerator.Generate;
 var t,t0: DTime;
 begin
   t0 := GetNow;
+
   //make the logic map
   inherited Generate;
   fisFinished := false;

@@ -438,7 +438,7 @@ begin
   for i := 0 to Nav.Count div 2 do begin
     repeat
       n := DRND.Random(Nav.Count);
-    until Nav[n].Blocked = false;
+    until (Nav[n].Blocked = false) and (Nav[n].isSafe = false);
     a := DMonster.Create;
     a.Target := Party.CameraMan;
     {monsters are centered by "underfeet" point}
