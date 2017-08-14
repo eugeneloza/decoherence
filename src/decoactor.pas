@@ -78,7 +78,7 @@ type
   DActorBody = class (DCoordActor)
   protected
     {last time, last local time, and corresponding (temporary) deltas}
-    LastT, dt, LastTLocal, dtl: DTime;
+    //LastT, dt, LastTLocal, dtl: DTime;
     {speed of actor's rotation}
     RotSpeed: float;
   protected
@@ -205,6 +205,7 @@ type
     fTarget, fTargetGroup: DCoordActor;
     function GetTarget: DCoordActor;
     procedure GetEnemyTarget;
+    procedure RequestSoftPause;
   protected
     procedure LookAt;
     procedure LookAt(aPosition: TVector3);
@@ -660,10 +661,10 @@ end;
 
 procedure DActorBody.Manage;
 begin
-  dt := DecoNow - LastT;
+{  dt := DecoNow - LastT;
   dtl := DecoNowLocal - LastTLocal;
   LastT := DecoNow;
-  LastTLocal := DecoNowLocal;
+  LastTLocal := DecoNowLocal;}
 
   //cute and simple, maybe merge them?
   doAI;
@@ -725,6 +726,14 @@ end;
 
 {-----------------------------------------------------------------------------}
 
+procedure DActor.RequestSoftPause;
+begin
+  {$warning todo}
+  SoftPause := 2*SoftPauseCoefficient; {request 0.5 seconds of pause for animation}
+end;
+
+{-----------------------------------------------------------------------------}
+
 function DActor.CanSee(a1: DCoordActor): boolean;
 begin
   if (TVector3.DotProduct(Self.Direction,(a1.Position-Self.Position))>0)
@@ -742,6 +751,7 @@ begin
 
   if (fTarget is DBasicActor) and ((Position-fTarget.Position).Length<self.CombatRange) then begin
     Self.Animation(atAttack);
+    Self.RequestSoftPause;
     DBasicActor(fTarget).Hit(10,1);
   end else WriteLnLog('DActor.PreformAction','ERROR: Trying to preform action on invalid actor...');
 end;
@@ -798,6 +808,8 @@ begin
 
   if fTarget<>nil then
     if ((fTarget.Position - Position).Length < Self.CombatRange) and (CanSee(fTarget)) then LookAt;
+
+  if SoftPause>0 then exit;
 
   if fTarget<>nil then
     //tmp

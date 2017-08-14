@@ -81,13 +81,19 @@ end;
 
 var LastRender: DTime = -1;
 procedure ProcessTimeEvents;
-var TimePassed: DTime;
 begin
   DecoNow := GetNow;
   If LastRender = -1 then LastRender := DecoNow;
-  TimePassed := DecoNow - LastRender;
-  {if not softpause...}
-  DecoNowLocal := DecoNowLocal + TimePassed;
+  DeltaT := DecoNow - LastRender;
+
+  if SoftPause < deltaT then begin
+    SoftPause := -1;
+    DeltaTLocal := DeltaT;
+    DecoNowLocal := DecoNowLocal + DeltaTLocal;
+  end else begin
+    SoftPause -= DeltaT;
+    DeltaTLocal := 0;
+  end;
   LastRender := DecoNow;
 
   Case CurrentGameMode of

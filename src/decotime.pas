@@ -30,7 +30,8 @@ interface
 uses
   {$ifdef MSWINDOWS} Windows, {$endif}
   {$ifdef UNIX} Unix, {$endif}
-  CastleTimeUtils;
+  CastleTimeUtils,
+  DecoGlobal;
 
 Type DTime = TFloatTime;
      {see note for CastleTimeUtils.TTimerResult}
@@ -41,10 +42,15 @@ var { analogue to Now function, but a fast-access variable, representing
       works ~200 times faster than SysUtils.Now so should be used anywhere possible
       Updated once per frame}
     DecoNow: DTime;
+    deltaT: DTime;
     { analogue to Now function, but a fast-access variable, representing
       current in-game time (time where actions take place)
       Updated once per frame }
     DecoNowLocal: DTime;
+    DeltaTLocal: DTime;
+
+    SoftPause: float = 0.0;
+    SoftPauseCoefficient: float = 1.0;
 
 { Gets CastleTimeUtils.Timer value from some "starting point" in a thread-safe way }
 function GetNow: DTime; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
