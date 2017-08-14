@@ -40,7 +40,10 @@ type
   public
     constructor create; virtual; // override;
     procedure TeleportTo(aNav: TNavID); virtual;
+    procedure Manage; virtual; //it'll do something useful some day...
   end;
+
+type TActorList = specialize TFPGObjectList<DSimpleActor>;
 
 type
   { Actor with full World coordinates,
@@ -98,7 +101,7 @@ type
     procedure Spawn(aPosition: TVector3; SpawnBody: DBodyResource); virtual;
     { Manages this actor, e.g. preforms AI,
       called each frame}
-    procedure Manage; virtual;
+    procedure Manage; override;
     { Forces immediate change of the animation }
     procedure ForceAnimation(at: TAnimationType);
     procedure ForceAnimation(at: string);
@@ -109,8 +112,6 @@ type
     destructor Destroy; override;
     constructor Create; override;
   end;
-
-type TActorList = specialize TFPGObjectList<DActorBody>;
 
 Type
   { basic actor. With stats }
@@ -230,7 +231,7 @@ uses SysUtils, CastleLog,
   CastleFilesUtils, DecoInputOutput,
 
   DecoAbstractWorld,
-  DecoNavigation{?}, CastleScene, CastleSceneCore;
+  {DecoNavigation{?},} CastleScene{, CastleSceneCore};
 
 
 {===========================================================================}
@@ -242,6 +243,13 @@ begin
   if LastNav<>UnitinializedNav then CurrentWorld.ReleaseNav(LastNav);
   CurrentWorld.BlockNav(aNav);
   LastNav := aNav;
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DSimpleActor.Manage;
+begin
+  {$hint todo}
 end;
 
 {-----------------------------------------------------------------------------}

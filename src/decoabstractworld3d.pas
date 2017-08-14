@@ -462,7 +462,7 @@ end;
 {------------------------------------------------------------------------------}
 
 Procedure DAbstractWorld3d.Manage(Position: TVector3);
-var a: DActorBody;
+var a: DSimpleActor;
 begin
   //inherited; --- nothing to inherit yet
 

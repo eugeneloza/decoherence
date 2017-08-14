@@ -180,7 +180,7 @@ begin
   Party.TeleportTo(Weenies[0].NavId);
 
   {$WARNING this is wrong}
-  {why does it gets a wrong GRAVITY_UP if called from Self.Activate?????}
+  {why does it get a wrong GRAVITY_UP if called from Self.Activate?????}
   SpawnActors; //must go after BuildNav;
 end;
 
