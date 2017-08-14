@@ -209,6 +209,7 @@ type
     procedure LookAt;
     procedure LookAt(aPosition: TVector3);
     function CanSee(a1: DCoordActor): boolean;
+    procedure PerformAction(doAction: DMultiPerk);
   public
     Actions: DPerksList;
     {used for AI and preforming actions
@@ -600,6 +601,7 @@ begin
   Visible := true;
   Body.Collides := true;
   Body.CollidesWithMoving := true;
+  ForceAnimation(atIdle);
 end;
 
 {-----------------------------------------------------------------------------}
@@ -681,12 +683,10 @@ end;
 
 function DActor.GetTarget: DCoordActor;
 begin
-  if fTarget = nil then begin
-
-    WriteLnLog('DActor.GetTarget','Warning: Autoselecting target not implemented yet...');
-  end
-  else
-    Result := fTarget;
+  if fTarget = nil then
+    GetEnemyTarget; //todo
+    //WriteLnLog('DActor.GetTarget','Warning: Autoselecting target not implemented yet...');
+  Result := fTarget;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -713,7 +713,7 @@ begin
   e := nil;
   for a in DAbstractWorld3d(CurrentWorld).Actors do
   {$hint dummy, actually this is wrong, as "target" may be a friendly unit, e.g. to heal, or in case of control loss}
-  if (a<>Self) and (a is DCoordActor) and isEnemy(Self,a) and CanSee(DCoordActor(a)) then begin
+  if (a<>Self) and (a is DBasicACtor) and isEnemy(Self,a) and CanSee(DCoordActor(a)) and (DBasicActor(a).HP>0) then begin
     d := (DCoordActor(a).Position - Self.Position).Length;
     if (d<Self.CombatRange) and ((d_min<d) or (d_min<0)) then begin
       d_min := d;
@@ -729,6 +729,21 @@ function DActor.CanSee(a1: DCoordActor): boolean;
 begin
   if (TVector3.DotProduct(Self.Direction,(a1.Position-Self.Position))>0)
      then Result := true else Result := false;
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DActor.PerformAction(doAction: DMultiPerk);
+begin
+  if fTarget = nil then begin
+    WriteLnLog('DActor.PreformAction','ERROR: Action was requested but no target specified...');
+    Exit;
+  end;
+
+  if (fTarget is DBasicActor) and ((Position-fTarget.Position).Length<self.CombatRange) then begin
+    Self.Animation(atAttack);
+    DBasicActor(fTarget).Hit(10,1);
+  end else WriteLnLog('DActor.PreformAction','ERROR: Trying to preform action on invalid actor...');
 end;
 
 {-----------------------------------------------------------------------------}
@@ -779,11 +794,17 @@ end;
 procedure DMonster.doAI;
 begin
   {if the target is close enough look at it}
+  if fTarget = nil then GetEnemyTarget;
+
   if fTarget<>nil then
     if ((fTarget.Position - Position).Length < Self.CombatRange) and (CanSee(fTarget)) then LookAt;
 
-  if drnd.Random<0.006 then self.Animation(atAttack);
-  if drnd.Random<0.002 then self.ForceAnimation(atDie);
+  if fTarget<>nil then
+    //tmp
+    if drnd.Random<0.005 then Self.PerformAction(nil);
+
+  //if drnd.Random<0.006 then self.Animation(atAttack);
+  //if drnd.Random<0.002 then self.ForceAnimation(atDie);
 
   //body.Resource.Animations.FindName('Attack');
   //body.Sound3d();
@@ -806,7 +827,10 @@ end;
 
 procedure DMonster.doHit(Dam: float; Damtype: TDamageType);
 begin
-  Self.ForceAnimation(atHurt);
+  if Self.HP > 0 then
+    Self.ForceAnimation(atHurt)
+  else
+    Self.ForceAnimation(atDie);
   //and show numeric representation of Dam
   //? and negative status applied ?
 end;

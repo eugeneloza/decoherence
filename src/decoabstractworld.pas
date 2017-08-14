@@ -36,7 +36,6 @@ Type
     fNavMinStep, fNavAvgStep: float;
     procedure CacheNavDistance;
   protected
-
     fSeed: LongWord;
     { xorshift random generator, fast and thread-safe
       used by BUILD (maybe freed afterwards?) }

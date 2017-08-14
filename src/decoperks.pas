@@ -16,16 +16,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 {---------------------------------------------------------------------------}
 
 {Contains description of perks and actions}
-unit decoperks;
+unit DecoPerks;
 
 {$INCLUDE compilerconfig.inc}
 
 interface
 
-uses classes, fgl,
+uses Classes, fgl,
   //decoimages,
-  decostats,
-  decoglobal;
+  DecoStats,
+  DecoGlobal;
 
 {Type
   TPerkKind = (pkAction, pkActive, pkPassive);
@@ -46,8 +46,8 @@ type
     //Efficiency  modifier
     //Requirements
     //Requirements for research
-    Constructor create(AOwner: TComponent); virtual;//override;
-    Destructor destroy; override;
+    constructor Create; virtual;//override;
+    destructor Destroy; override;
 end;
 (*
 Type
@@ -77,48 +77,70 @@ Type
 
 
 {list of perks}
-Type DPerksList = specialize TFPGObjectList<DPerk>;
+type DPerksList = specialize TFPGObjectList<DPerk>;
+
+type DMultiPerk = class(DPerk)
+  Children: DPerksList;
+  constructor Create; override;
+  destructor Destroy; override;
+end;
 
     {lists all perks possible ingame}
-Var perks: DPerksList;
+var Perks: DPerksList;
 
 {loads perks data and images}
-Procedure InitPerks;
+procedure InitPerks;
 procedure FreePerks;
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 Implementation
 uses SysUtils, CastleWindow;
 
-Procedure InitPerks;
-Var TmpPerk: DPerk;
+procedure InitPerks;
+var TmpPerk: DPerk;
 Begin
-  perks := DPerksList.create(true);
-  TmpPerk := DPerk.create(Application);
+  Perks := DPerksList.create(true);
+  TmpPerk := DPerk.create;
   //TmpPerk.image.LoadThread(PerksFolder+'crossed-swords.png');
   Perks.add(TmpPerk);
 End;
 
 {---------------------------------------------------------------------------}
 
-Constructor DPerk.create(AOwner: TComponent);
-Begin
-  Inherited create;
+constructor DPerk.Create;
+begin
+  inherited;
   //Image := DStaticImage.create(self);
-End;
+end;
 
 {---------------------------------------------------------------------------}
 
-Destructor DPerk.destroy;
-Begin
-  Inherited;
+destructor DPerk.Destroy;
+begin
+  inherited;
 
-End;
+end;
+
+{---------------------------------------------------------------------------}
+
+constructor DMultiPerk.Create;
+begin
+  inherited;
+  Children := DPerksList.Create;
+end;
+
+{---------------------------------------------------------------------------}
+
+destructor DMultiPerk.Destroy;
+begin
+  FreeAndNil(Children);
+  inherited;
+end;
 
 {---------------------------------------------------------------------------}
 
 procedure FreePerks;
 begin
-  FreeAndNil(perks);
+  FreeAndNil(Perks);
 end;
 
 end.

@@ -58,6 +58,7 @@ type
   private
     {updates game camera with CameraMan coordinates}
     procedure UpdateCamera;
+    procedure CollectCharacters;
   public
     CameraMan: DCoordActor;
     Char: DCharList;
@@ -82,7 +83,7 @@ uses SysUtils, CastleLog,
 constructor DParty.create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  Char := DCharList.create(true);
+  Char := DCharList.Create(true);
   CameraMan := DCoordActor.Create;
 end;
 
@@ -118,7 +119,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-Destructor DParty.Destroy;
+destructor DParty.Destroy;
 begin
   FreeAndNil(Char); //it will auto free all its components
   FreeAndNil(CameraMan);
@@ -141,6 +142,19 @@ begin
   {actually we're doing the very opposite now:}
   CameraMan.Position := Camera.Position;
   CameraMan.Direction := Camera.Direction;
+  //teleport all characters to CameraMan position;
+  CollectCharacters;
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DParty.CollectCharacters;
+var p: DPlayerCharacter;
+begin
+  for p in Char do begin
+    p.Position := CameraMan.Position;
+    p.Direction := CameraMan.Direction;
+  end;
 end;
 
 {----------------------------------------------------------------------------}

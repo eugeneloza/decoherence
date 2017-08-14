@@ -441,7 +441,7 @@ begin
       n := DRND.Random(Nav.Count);
     until (Nav[n].Blocked = false) and (Nav[n].isSafe = false);
     a := DMonster.Create;
-    a.Target := Party.CameraMan;
+    a.Target := Party.Char[0];
     {monsters are centered by "underfeet" point}
     a.Spawn(n, tmpKnightCreature);
     Actors.Add(a);

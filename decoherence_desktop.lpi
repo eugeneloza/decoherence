@@ -178,6 +178,7 @@
       <Unit16>
         <Filename Value="src/decoperks.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoPerks"/>
       </Unit16>
       <Unit17>
         <Filename Value="src/decostats.pas"/>
