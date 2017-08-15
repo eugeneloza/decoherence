@@ -157,6 +157,7 @@
       <Unit11>
         <Filename Value="src/decogamemode.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoGameMode"/>
       </Unit11>
       <Unit12>
         <Filename Value="src/decoactor.pas"/>
@@ -174,6 +175,7 @@
       <Unit15>
         <Filename Value="src/decoplayercharacter.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoPlayerCharacter"/>
       </Unit15>
       <Unit16>
         <Filename Value="src/decoperks.pas"/>

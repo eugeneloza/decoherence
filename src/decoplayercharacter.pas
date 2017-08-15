@@ -16,16 +16,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 {---------------------------------------------------------------------------}
 
 { Definitions and routines for player character and recruitable characters }
-unit decoplayercharacter;
+unit DecoPlayerCharacter;
 
 {$INCLUDE compilerconfig.inc}
 
 interface
 
 uses Classes, fgl, CastleVectors,
-  DecoActor, DecoRaceProfession, decoperks,
+  DecoActor, DecoRaceProfession, DecoPerks,
   DecoNavigationNetwork,
-  decoglobal;
+  DecoGlobal;
 
 const MaxParty = 6; {0..6 = 7 characters}
 
@@ -78,7 +78,8 @@ var Party: DParty;
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 uses SysUtils, CastleLog,
-  DecoNavigation, DecoAbstractWorld, DecoAbstractWorld3d;
+  DecoNavigation, DecoAbstractWorld, DecoAbstractWorld3d,
+  DecoGameMode;
 
 constructor DParty.create(AOwner: TComponent);
 begin
@@ -114,7 +115,7 @@ procedure DParty.Rest;
 var c: DPlayerCharacter;
 begin
   {for now it just resets the Actor to its initial state}
-  for c in char do c.RecoverAll;
+  for c in Char do c.RecoverAll;
 end;
 
 {----------------------------------------------------------------------------}
@@ -155,6 +156,8 @@ begin
     p.Position := CameraMan.Position;
     p.Direction := CameraMan.Direction;
   end;
+  {$hint collect battle state from char}
+  PlayerInBattle := true;
 end;
 
 {----------------------------------------------------------------------------}

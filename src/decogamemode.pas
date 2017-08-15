@@ -16,7 +16,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 {---------------------------------------------------------------------------}
 
 { Hanldes changes of game mode and corresponding interface changes }
-unit decogamemode;
+unit DecoGameMode;
 
 {$INCLUDE compilerconfig.inc}
 
@@ -34,6 +34,8 @@ type TGameMode = (gmNone,
 var CurrentGameMode: TGameMode = gmNone;
     LastGameMode: TGameMode = gmNone;
 
+    PlayerInBattle: boolean = false;
+
 { Correctly sets the current game mode and initializes all the corresponding
   routines }
 procedure SetGameMode(GM: TGameMode);
@@ -43,14 +45,16 @@ function GameModeNeedsClearingScreen: boolean;
 
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-uses decogui, DecoAbstractWorld, DecoAbstractWorld3d,
-  decoglobal;
+uses DecoGui, DecoAbstractWorld, DecoAbstractWorld3d,
+  DecoGlobal;
 
 procedure SetGameMode(GM: TGameMode);
 begin
-  if GM = LastGameMode then exit;
+  if GM = LastGameMode then Exit;
 
   {release interface elements used by previous game mode}
+
+  {$hint make through switching of game interfaces}
 
   case LastGameMode of
     {only gmLoadScreen and gmCharacterGeneration use wind so we can release it (true) after it was used}
@@ -88,6 +92,8 @@ begin
   else
     Result := false;
 end;
+
+{------------------------------------------------------------}
 
 function GameModeNeedsClearingScreen: boolean;
 begin

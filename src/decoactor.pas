@@ -240,7 +240,8 @@ uses SysUtils, CastleLog,
   CastleFilesUtils, DecoInputOutput,
 
   DecoAbstractWorld, DecoAbstractWorld3D,
-  {DecoNavigation{?},} CastleScene{, CastleSceneCore};
+  CastleScene,
+  DecoGameMode;
 
 
 {===========================================================================}
@@ -729,7 +730,9 @@ end;
 procedure DActor.RequestSoftPause;
 begin
   {$warning todo}
-  SoftPause := 2*SoftPauseCoefficient; {request 0.5 seconds of pause for animation}
+  {$hint and player in THIS battle}
+  if PlayerInBattle then
+    SoftPause := 2*SoftPauseCoefficient; {request 0.5 seconds of pause for animation}
 end;
 
 {-----------------------------------------------------------------------------}
