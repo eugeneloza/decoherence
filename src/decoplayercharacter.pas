@@ -73,8 +73,15 @@ type
     procedure Rest;
   end;
 
-var Party: DParty;
+{a list of player's parties}
+type DPartyList = specialize TFPGObjectList<DParty>;
 
+var Parties: DPartyList;
+    CurrentParty: DParty;
+
+
+{temporary to free the partyList}
+procedure FreeParty;
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 uses SysUtils, CastleLog,
@@ -210,6 +217,13 @@ end;
 destructor DPlayerCharacter.Destroy;
 begin
   Inherited;
+end;
+
+{============================================================================}
+
+procedure FreeParty;
+begin
+  FreeAndNil(Parties);
 end;
 
 end.

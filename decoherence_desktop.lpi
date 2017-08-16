@@ -171,6 +171,7 @@
       <Unit14>
         <Filename Value="src/decointerfaceblocks.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoInterfaceBlocks"/>
       </Unit14>
       <Unit15>
         <Filename Value="src/decoplayercharacter.pas"/>

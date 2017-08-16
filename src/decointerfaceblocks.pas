@@ -17,17 +17,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 
 { Creates large interface blocks for different game situations containing
   large amounts of interface elements and composite interface elements }
-unit decointerfaceblocks;
+unit DecoInterfaceBlocks;
 
 {$INCLUDE compilerconfig.inc}
 
 interface
 
-uses classes,
-  castlecontrols,
-  decointerface, decointerfacecomposite,
-  decoplayercharacter,
-  decoglobal;
+uses Classes,
+  CastleControls,
+  DecoInterface, DecoInterfaCecomposite,
+  DecoPlayerCharacter,
+  DecoGlobal;
 
 const appear_animation = asFadeIn;
 
@@ -224,19 +224,20 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-constructor DPartyView.create(AOwner: TComponent);
+constructor DPartyView.Create(AOwner: TComponent);
 var i: integer;
 begin
   inherited Create(AOwner);
-  for i := 0 to maxparty do begin
+  for i := 0 to CurrentParty.Char.Count-1 do begin
     CharacterSpace[i] := DCharacterSpace.create(self);
     CharacterSpace[i].ID := i;
-    CharacterSpace[i].Target := party.char[i];
+    {$warning todo}
+    CharacterSpace[i].Target := CurrentParty.Char[i];
     CharacterSpace[i].ScaleToChildren := true;
     grab(CharacterSpace[i]);
     //at grab we set parent as DPartyView;
   end;
-  setbasesize(0,0,fullwidth,fullheight,1,appear_animation);
+  SetBaseSize(0,0,FullWidth,FullHeight,1,Appear_Animation);
 //  ArrangeChildren(false); //automatically arranged on TCompositeElement.setbasesize
 end;
 

@@ -176,8 +176,8 @@ end;
 procedure DDungeonWorld.Activate;
 begin
   inherited;
-  {$Hint todo}
-  Party.TeleportTo(Weenies[0].NavId);
+  {$WARNING todo}
+  CurrentParty.TeleportTo(Weenies[0].NavId);
 
   {$WARNING this is wrong}
   {why does it get a wrong GRAVITY_UP if called from Self.Activate?????}

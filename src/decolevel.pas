@@ -71,8 +71,10 @@ begin
   Window.AntiAliasing := aa8SamplesNicer;
 
   //make a temporary party {wrong place}
-  Party := DParty.Create(Window);
-  Party.tmpParty;
+  Parties := DPartyList.Create(true);
+  CurrentParty := DParty.Create(nil);
+  CurrentParty.tmpParty;
+  Parties.Add(CurrentParty);
 
   InitNavigation;
 

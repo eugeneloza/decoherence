@@ -114,8 +114,8 @@ end;
   WindowRender }
 procedure WindowManage(Container : TUIContainer);
 begin
-  if Party <> nil then begin
-    Party.Manage;
+  if CurrentParty <> nil then begin
+    CurrentParty.Manage;
     if CurrentWorld <> nil then CurrentWorld.Manage(Camera.Position);
   end;
 
@@ -147,8 +147,8 @@ begin
     case Event.key of
        K_P,K_PrintScreen:                //k_printscreen doesn't work in x-window system if assigned to some external program like scrot
                          Window.SaveScreen('deco_'+NiceDate+'.jpg');
-       K_y: Party.char[0].hit(1,1);
-       K_r: Party.Rest;
+       K_y: CurrentParty.Char[0].Hit(1,1);
+       K_r: CurrentParty.Rest;
        k_i: if AmbientIntensity.Ambient = 0 then
                AmbientIntensity.SetAmbientIntensity(3)
             else
@@ -321,6 +321,7 @@ Finalization
   DestroyFonts;
   FreeWorld;
   FreeMusicManager;
+  FreeParty;
   //FreeTextureProperties;
   WriteLnLog('Finalization','Bye...');
 end.
