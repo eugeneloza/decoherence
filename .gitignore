@@ -4,6 +4,7 @@
 *.o
 *.or
 *.ppu
+*.blend
 *.blend1
 *.blend2
 *~
