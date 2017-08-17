@@ -53,6 +53,7 @@ const InterfaceFolder    = 'interface/';
       ModelsFolder      = 'models/';
       TilesFolder       = ModelsFolder+'tiles/';
       PlaceholdersFoldr = ModelsFolder+'placeholders/';
+      CreaturesFolder   = ModelsFolder+'creatures/';
 
       //TODO: Android incompatible!!!
       //Models_folder       = +'models'+pathdelim;

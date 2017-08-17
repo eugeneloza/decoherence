@@ -28,7 +28,7 @@ uses Classes,
   DecoGlobal;
 
 { at this moment it works fine. So no need to "upgrade" it }
-type DBodyResource = TCreatureResource;
+type DBodyResource = T3DResource;
 
 {type
   { this class contains references to animations of DBodyResource,
@@ -46,6 +46,19 @@ const atIdle = 'idle';
       atAttack = 'attack';
       atHurt = 'hurt';
       atDie = 'die';}
+
+const AnimationExtension = '.castle-anim-frames';
+
+type
+  {}
+  DAnimation = class(T3DResourceAnimation)
+  public
+    {loads animation from HDD
+     Relatively thread-safe (well, no :))}
+    procedure Load;
+    procedure Load(Creature,FileName: string);
+  end;
+
 
 type
   { Body is a 3D manifestation of an Actor in the 3D world.
@@ -83,6 +96,7 @@ type
     { Advances time and recalculates the geometry
       Engine-specific }
     procedure Update(const SecondsPassed: Single; var RemoveMe: TRemoveType); override;
+
     constructor Create(AOwner: TComponent); override;
   end;
 
@@ -101,9 +115,10 @@ function AnimationEnd(at: string): TAnimationEnd;
 function AnimationToString(at: TAnimationType): string;
 
 procedure tmpLoadKnightCreature;
+procedure FreeCreatures;
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-uses CastleLog, CastleFilesUtils,
+uses SysUtils, CastleLog, CastleFilesUtils,
   DecoInputOutput;
 
 function AnimationEnd(at: TAnimationType): TAnimationEnd;
@@ -155,7 +170,7 @@ procedure DBody.ResetAnimation;
 begin
   //if not (GetExists and Resource.Prepared) then Exit;
   if Resource = nil then Exit; //if the actor has no body, just hang up
-  CurrentAnimation := Resource.Animations.FindName(CurrentAnimationName);
+  CurrentAnimation := (Resource.Animations.FindName(CurrentAnimationName)) as T3DResourceAnimation{DAnimation};
   time := 0;
 end;
 
@@ -205,21 +220,62 @@ begin
   //ResetAnimation;
 end;
 
+{============================================================================}
+
+procedure DAnimation.Load;
+begin
+{  FSceneForAnimation := TCastleScene.Create(nil);
+  FSceneForAnimation.Load(URL);}
+end;
+procedure DAnimation.Load(Creature,FileName: string);
+begin
+  Self.URL := ApplicationData(CreaturesFolder+Creature+'/'+FileName+AnimationExtension);
+  Load;
+end;
+
 {****************************************************************************}
 
 procedure tmpLoadKnightCreature;
+var Animation: DAnimation;
+    CreatureName: string;
 begin
-  Resources.LoadSafe(ApplicationData('models/creatures/knight_creature/'));
-  {$hint todo}
-  {  Animation := TMyAnimation.Create(Res,'idle');
-  Animation.URL := ApplicationData('knight_multiple_castle_anim_frames/idle.castle-anim-frames');
-  Animation.Prepare1;
-  Res.Animations.Add(Animation);
-  Res.Prepare(nil);}
+  CreatureName := 'knight';
 
+  {MEMORY LEAKS + SIGSEGVS, I'm doing something badly wrong}
+
+  {tmpKnightCreature := DBodyResource.Create(CreatureName);
+  Animation := DAnimation.Create(tmpKnightCreature,'idle');
+  Animation.Load(CreatureName,'idle');
+  tmpKnightCreature.Animations.Add(Animation);
+  Animation := DAnimation.Create(tmpKnightCreature,'hurt');
+  Animation.Load(CreatureName,'hurt');
+  tmpKnightCreature.Animations.Add(Animation);
+  Animation := DAnimation.Create(tmpKnightCreature,'attack');
+  Animation.Load(CreatureName,'attack');
+  tmpKnightCreature.Animations.Add(Animation);
+  Animation := DAnimation.Create(tmpKnightCreature,'walk');
+  Animation.Load(CreatureName,'walk');
+  tmpKnightCreature.Animations.Add(Animation);
+  Animation := DAnimation.Create(tmpKnightCreature,'die');
+  Animation.Load(CreatureName,'die');
+  tmpKnightCreature.Animations.Add(Animation);
+  tmpKnightCreature.Prepare(nil); }
+  //Resources.Add(tmpKnightCreature);
+
+
+  Resources.LoadSafe(ApplicationData(CreaturesFolder+CreatureName));
   tmpKnightCreature := Resources.FindName('Knight') as DBodyResource;
   tmpKnightCreature.Prepare(nil);
 end;
+
+procedure FreeCreatures;
+begin
+  //tmpKnightCreature.Animations.clear;
+  WriteLnLog('FreeCreatures','Freeing creature resources...');
+  //FreeAndNil(tmpKnightCreature);
+end;
+
+
 
 end.
 

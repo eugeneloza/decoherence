@@ -38,7 +38,7 @@ uses Classes, SysUtils,
      DecoGui, DecoInterface, DecoMouse, DecoFont,
      DecoLevel, DecoAbstractWorld,
      DecoSound,
-     DecoLoadScreen, DecoPerks,
+     DecoLoadScreen, DecoPerks, DecoBody,
      DecoInterfaceComposite,
      DecoPlayerCharacter, DecoLoad3d,
      DecoNavigation, DecoGlobal, DecoTranslation, DecoGamemode, DecoTime;
@@ -322,6 +322,7 @@ Finalization
   FreeWorld;
   FreeMusicManager;
   FreeParty;
+  FreeCreatures;
   //FreeTextureProperties;
   WriteLnLog('Finalization','Bye...');
 end.
