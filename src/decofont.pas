@@ -61,6 +61,10 @@ end;
 
 var {$IFNDEF Android}MyCharSet: TUnicodeCharList;{$ENDIF}
   RegularFont16: DFont;
+  RegularFont12: DFont;
+
+  CharHealthFont: DFont;
+  CharNickNameFont: DFont;
 
 procedure InitializeFonts;
 procedure DestroyFonts;
@@ -74,6 +78,7 @@ begin
   WritelnLog('DecoFont : InitializeFonts','Init started');
    {$IFDEF Android}
    RegularFont16 := DFont.Create(TextureFont_LinBiolinumRG_16);
+   RegularFont14 := RegularFont16; {!!!! TODO}
    {$ELSE}
    if MyCharSet = nil then begin
       MyCharSet := TUnicodeCharList.Create;
@@ -81,21 +86,26 @@ begin
       MyCharSet.Add('ЁЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮёйцукенгшщзхъфывапролджэячсмитьбюІЇЄіїє');
    end;
    RegularFont16 := DFont.Create(ApplicationData(FontFolder+NormalFontFile),16,true,MyCharSet);
+   RegularFont12 := DFont.Create(ApplicationData(FontFolder+NormalFontFile),12,true,MyCharSet);
    {$ENDIF}
    WriteLnLog('DecoFont : InitializeFonts','Fonts loaded successfully.');
+
+   CharHealthFont := RegularFont12;
+   CharNickNameFont := RegularFont12;
 end;
 
 {----------------------------------------------------------------------------}
 
 procedure DestroyFonts;
 begin
-  freeAndNil(RegularFont16);
+  FreeAndNil(RegularFont16);
+  FreeAndNil(RegularFont12);
   FreeAndNil(MyCharSet);
 end;
 
 {-----------------------------------------------------------------------------}
 
-function DFont.StringToImage(const s : string): TGrayscaleAlphaImage;
+function DFont.StringToImage(const s: string): TGrayscaleAlphaImage;
 var P : Pvector2byte;
     i : integer;
 begin

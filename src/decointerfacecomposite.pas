@@ -444,27 +444,27 @@ end;
 
 {---------------------------------------------------------------------------}
 
-constructor DPlayerBarsFull.create(AOwner:TComponent);
+constructor DPlayerBarsFull.Create(AOwner:TComponent);
 var tmp_flt: DFloatLabel;
     tmp_str: DStringLabel;
 begin
   inherited create(AOwner);
-  PartyBars := DPlayerBars.create(self);
-  NumHealth := DSingleInterfaceElement.create(self);
-  NickName  := DSingleInterfaceElement.create(self);
+  PartyBars := DPlayerBars.Create(Self);
+  NumHealth := DSingleInterfaceElement.Create(Self);
+  NickName  := DSingleInterfaceElement.Create(Self);
 
-  PartyBars.frame := characterbar_mid;
-  NickName.frame  := characterbar_top;
-  NumHealth.frame := characterbar_bottom;
+  PartyBars.frame := Characterbar_mid;
+  NickName.frame  := Characterbar_top;
+  NumHealth.frame := Characterbar_bottom;
 
   tmp_flt := DFloatLabel.create(NumHealth);
   tmp_flt.Digits := 0;
-  tmp_flt.ScaleLabel := true;
-  tmp_flt.Font := RegularFont16;
+  tmp_flt.ScaleLabel := false;
+  tmp_flt.Font := CharHealthFont;
   NumHealth.Content := tmp_flt;
   tmp_str := DStringLabel.create(NickName);
   tmp_str.ScaleLabel := true;
-  tmp_str.Font := RegularFont16;
+  tmp_str.Font := CharNickNameFont;
   NickName.content := tmp_str;
 
   grab(PartyBars);
