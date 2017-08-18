@@ -20,7 +20,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
   some specific function, i.e. describe specific data management elements
   in cotrast to more abstract "interface elements" which describe how elements
   are organized and displayed}
-unit decointerfacecomposite;
+unit DecoInterfaceComposite;
 
 {$INCLUDE compilerconfig.inc}
 
@@ -43,9 +43,9 @@ type
       basically at this level it is abstract, it just substracts the frame
       from base.w and base.h and does nothing more}
     var cnt_x,cnt_y,cnt_w,cnt_h: float;
-    procedure ArrangeChildren(animate: TAnimationStyle); virtual;
+    procedure ArrangeChildren(Animate: TAnimationStyle); virtual;
     { additionally calls ArrangeChildren }
-    procedure setbasesize(const newx,newy,neww,newh,newo: float; animate: TAnimationStyle); override;
+    procedure setbasesize(const newx,newy,neww,newh,newo: float; Animate: TAnimationStyle); override;
 end;
 
 type
@@ -61,7 +61,7 @@ type
     {the character being monitored}
     property Target: DActor read ftarget write settarget;
     constructor create(AOwner: TComponent); override;
-    procedure ArrangeChildren(animate: TAnimationStyle); override;
+    procedure ArrangeChildren(Animate: TAnimationStyle); override;
 end;
 
 type
@@ -73,13 +73,13 @@ type
     NumHealth: DSingleInterfaceElement;
     NickName: DSingleInterfaceElement;
     {target character}
-    ftarget: DActor;
-    procedure settarget(value: DActor);
+    fTarget: DActor;
+    procedure SetTarget(value: DActor);
   public
     {the character being monitored}
-    property Target: DActor read ftarget write settarget;
-    constructor create(AOwner: TComponent); override;
-    procedure ArrangeChildren(animate: TAnimationStyle); override;
+    property Target: DActor read fTarget write SetTarget;
+    constructor Create(AOwner: TComponent); override;
+    procedure ArrangeChildren(Animate: TAnimationStyle); override;
   end;
 
 type
@@ -87,15 +87,15 @@ type
     the 3d character face :) Only 2D inanimated image for now... }
   DPortrait = class(DInterfaceElement)
   private
-    damageoverlay: DSingleInterfaceElement;
-    damagelabel: DSingleInterfaceElement;
+    DamageOverlay: DSingleInterfaceElement;
+    DamageLabel: DSingleInterfaceElement;
     fTarget: DPlayerCharacter;
-    procedure settarget(value: DPlayerCharacter);
+    procedure SetTarget(value: DPlayerCharacter);
   public
     {Player character which portrait is displayed}
     property Target: DPlayerCharacter read ftarget write settarget;
-    constructor create(AOwner: TComponent); override;
-    procedure doHit(dam: float; damtype: TDamageType);
+    constructor Create(AOwner: TComponent); override;
+    procedure doHit(Dam: float; DamType: TDamageType);
   end;
 
 
@@ -523,19 +523,19 @@ begin
   case damtype of
     dtHealth: (damageOverlay.content as DStaticImage).Load(damageOverlay_img);
   end;
-  damageOverlay.base.copyxywh(self.base);
+  DamageOverlay.Base.copyxywh(self.base);
   //damageOverlay.resetContentSize?
-  damageOverlay.Content.base.copyxywh(self.base);
-  damageOverlay.Content.AnimateTo(asFadeIn);
-  damageOverlay.rescale;
-  damageOverlay.AnimateTo(asFadeIn);
-  if dam>0 then begin
-    damageLabel.base.copyxywh(self.base);
-    damageLabel.Content.base.copyxywh(self.base);
-    damageLabel.AnimateTo(asFadeIn);
-    damageLabel.Content.AnimateTo(asFadeIn);
-    DLabel(damageLabel.content).text := inttostr(round(dam));
-    damageLabel.rescale;
+  DamageOverlay.Content.base.copyxywh(self.base);
+  DamageOverlay.Content.AnimateTo(asFadeIn);
+  DamageOverlay.Rescale;
+  DamageOverlay.AnimateTo(asFadeIn);
+  if Dam>0 then begin
+    DamageLabel.Base.CopyXYWH(self.base);
+    DamageLabel.Content.Base.CopyXYWH(self.base);
+    DamageLabel.AnimateTo(asFadeIn);
+    DamageLabel.Content.AnimateTo(asFadeIn);
+    DLabel(damageLabel.content).Text := IntToStr(Round(Dam));
+    DamageLabel.Rescale;
   end;
 end;
 
@@ -549,34 +549,34 @@ procedure DIntegerEdit.incTarget(Sender: DAbstractElement; x,y: integer);
 begin
   //remake to self.ftarget! make min/max
   {hmm... looks complex...}
-  if sender is DSingleInterfaceElement then  //fool's check
-    if DSingleInterfaceElement(sender).parent is DIntegerEdit then    //another fool's check :)
-      inc(DIntegerEdit(DSingleInterfaceElement(sender).parent).Target^); //todo!!!!!!!!!
+  if Sender is DSingleInterfaceElement then  //fool's check
+    if DSingleInterfaceElement(Sender).Parent is DIntegerEdit then    //another fool's check :)
+      Inc(DIntegerEdit(DSingleInterfaceElement(Sender).Parent).Target^); //todo!!!!!!!!!
 end;
 
 procedure DIntegerEdit.decTarget(Sender: DAbstractElement; x,y: integer);
 begin
   //remake to self.ftarget! make min/max
   {hmm... looks complex...}
-  if sender is DSingleInterfaceElement then  //fool's check
-    if DSingleInterfaceElement(sender).parent is DIntegerEdit then    //another fool's check :)
-      dec(DIntegerEdit(DSingleInterfaceElement(sender).parent).Target^); //todo!!!!!!!!!
+  if Sender is DSingleInterfaceElement then  //fool's check
+    if DSingleInterfaceElement(Sender).Parent is DIntegerEdit then    //another fool's check :)
+      Dec(DIntegerEdit(DSingleInterfaceElement(Sender).Parent).Target^); //todo!!!!!!!!!
 end;
 
 {---------------------------------------------------------------------------}
 
 constructor DIntegerEdit.create(AOwner: TComponent);
 var tmp: DIntegerLabel;
-    tmpimg: DStaticImage;
+    tmpImg: DStaticImage;
 begin
   inherited create(AOwner);
-  ilabel := DSingleInterfaceElement.create(self);
+  iLabel := DSingleInterfaceElement.create(Self);
   tmp := DIntegerLabel.create(ilabel);
-  ilabel.content := tmp;
+  iLabel.content := tmp;
   //ilabel.frame := simpleframe;
-  grab(ilabel);
+  Grab(iLabel);
 
-  PlusButton := DSingleInterfaceElement.create(self);
+  PlusButton := DSingleInterfaceElement.Create(Self);
   //PlusButton.parent
   PlusButton.CanMouseOver := true;
   PlusButton.OnMousePress := @IncTarget;
@@ -585,35 +585,35 @@ begin
   PlusButton.content := tmpImg;
   grab(PlusButton);
 
-  MinusButton := DSingleInterfaceElement.create(self);
+  MinusButton := DSingleInterfaceElement.create(Self);
   MinusButton.CanMouseOver := true;
   MinusButton.OnMousePress := @decTarget;
   tmpImg := DStaticImage.create(MinusButton);
   //tmpImg.LoadThread('');
-  MinusButton.content := tmpImg;
-  grab(MinusButton);
+  MinusButton.Content := tmpImg;
+  Grab(MinusButton);
 end;
 
 {---------------------------------------------------------------------------}
 
-procedure DIntegerEdit.settarget(value: pinteger);
+procedure DIntegerEdit.SetTarget(Value: pInteger);
 begin
-  if ftarget <> value then begin
-    ftarget := value;
-    DIntegerLabel(ilabel.content).value := value;
+  if fTarget <> Value then begin
+    fTarget := Value;
+    DIntegerLabel(iLabel.Content).Value := Value;
     //reset button activity
   end;
 end;
 
 {---------------------------------------------------------------------------}
 
-procedure DIntegerEdit.ArrangeChildren(animate: TAnimationStyle);
+procedure DIntegerEdit.ArrangeChildren(Animate: TAnimationStyle);
 begin
-  inherited ArrangeChildren(animate);
+  inherited ArrangeChildren(Animate);
   //todo ***
-  PlusButton.setbasesize(cnt_x,cnt_y,cnt_h,cnt_h,1,animate);
-  MinusButton.setbasesize(cnt_x+cnt_w-cnt_h,cnt_y,cnt_h,cnt_h,1,animate);
-  iLabel.setbasesize(cnt_x+cnt_h,cnt_y,cnt_w-2*cnt_h,cnt_h,1,animate);
+  PlusButton.SetBaseSize(cnt_x,cnt_y,cnt_h,cnt_h,1,Animate);
+  MinusButton.SetBaseSize(cnt_x+cnt_w-cnt_h,cnt_y,cnt_h,cnt_h,1,Animate);
+  iLabel.SetBaseSize(cnt_x+cnt_h,cnt_y,cnt_w-2*cnt_h,cnt_h,1,Animate);
 end;
 
 {=============================================================================}
@@ -622,9 +622,9 @@ end;
 
 procedure DPerkInterfaceItem.settarget(value: DPerk);
 begin
-  if value <> fTarget then begin
-    fTarget := value;
-    (PerkImage.content as DStaticImage).FreeImage;
+  if Value <> fTarget then begin
+    fTarget := Value;
+    (PerkImage.Content as DStaticImage).FreeImage;
     {$Warning todo}
     //(PerkImage.content as DStaticImage).load(fTarget.Image.SourceImage);
     //add events?
@@ -638,7 +638,7 @@ begin
   PerkImage := DSingleInterfaceElement.create(self);
   tmp := DStaticImage.create(self);
   PerkImage.Content := tmp;
-  grab(PerkImage);
+  Grab(PerkImage);
 end;
 
 {=============================================================================}
@@ -667,11 +667,10 @@ end;
 {=========================== Perks container =================================}
 {=============================================================================}
 
-
-procedure DPerksContainer.settarget(value: DPlayerCharacter);
+procedure DPerksContainer.SetTarget(Value: DPlayerCharacter);
 begin
-  if ftarget <> value then begin
-    ftarget := value;
+  if fTarget <> Value then begin
+    fTarget := Value;
     MakePerksList(asNone);
   end;
 end;

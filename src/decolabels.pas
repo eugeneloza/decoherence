@@ -16,17 +16,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 {---------------------------------------------------------------------------}
 
 { Works with different types of labels }
-unit decolabels;
+unit DecoLabels;
 
 {$INCLUDE compilerconfig.inc}
 
 interface
 
-uses classes,
-  decoimages, decofont,
-  decoglobal;
+uses Classes,
+  DecoImages, DecoFont,
+  DecoGlobal;
 
-Type
+type
   { a powerful text label, converted to GLImage to be extremely fast }
   DLabel = class(DAbstractImage)
   public
@@ -43,13 +43,13 @@ Type
     //procedure draw; override;
   private
     procedure PrepareTextImage;
-    procedure settext(const value: string);
-    function gettext: string;
+    procedure SetText(const value: string);
+    function GetText: string;
   public
     { text at the label }
-    property text: string read gettext write settext;
+    property Text: string read GetText write SetText;
   private
-    ftext:  string;
+    fText:  string;
     BrokenString: DStringList;
   end;
 
@@ -58,8 +58,8 @@ Type
   DIntegerLabel = class (DLabel)
   public
     { pointer to the value it monitors }
-    value: Pinteger;
-    procedure draw; override;
+    Value: Pinteger;
+    procedure Draw; override;
   end;
 
 Type
@@ -68,7 +68,7 @@ Type
   public
     { pointer to the value it monitors }
     value: Pstring;
-    procedure draw; override;
+    procedure Draw; override;
   end;
 
 Type
@@ -76,7 +76,7 @@ Type
   DFloatLabel = class (DLabel)
   public
     { pointer to the value it monitors }
-    value: PFloat;
+    Value: PFloat;
     { how many digits after point are displayed?
       0 - float is rounded to integer (1.6423 -> 2)
       1 - one digit like 1.2
@@ -84,21 +84,21 @@ Type
       no more needed at the moment }
     Digits: integer;
     constructor Create(AOwner: TComponent); override;
-    procedure draw; override;
+    procedure Draw; override;
   end;
 
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 
 implementation
 
-uses sysutils, CastleImages, CastleLog,
-  decointerface;
+uses SysUtils, CastleImages, CastleLog,
+  DecoInterface;
 
 {----------------------------------------------------------------------------}
 
-constructor DLabel.create(AOwner : TComponent);
+constructor DLabel.Create(AOwner : TComponent);
 begin
-  inherited create(AOwner);
+  inherited Create(AOwner);
   ScaleLabel := false;
   Shadow := 0;
 end;
@@ -114,19 +114,19 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DLabel.settext(const value : string);
+procedure DLabel.SetText(const Value: string);
 begin
-  if ftext <> value then begin
-    ftext := value;
+  if fText <> Value then begin
+    fText := Value;
     PrepareTextImage;
   end;
 end;
 
 {----------------------------------------------------------------------------}
 
-function DLabel.gettext : string;
+function DLabel.GetText: string;
 begin
-  result := ftext;
+  Result := fText;
 end;
 
 {----------------------------------------------------------------------------}
@@ -167,8 +167,8 @@ end;
 
 procedure DLabel.RescaleImage;
 begin
-  {$IFNDEF AllowRescale}If sourceImage=nil then exit;{$ENDIF}
-  If self.ScaleLabel then
+  {$IFNDEF AllowRescale}If SourceImage = nil then Exit;{$ENDIF}
+  If Self.ScaleLabel then
     inherited //rescale this label as a simple image to fit "base size"
   else begin
     //don't rescale this label to provide sharp font
@@ -180,7 +180,7 @@ begin
           {$IFNDEF AllowRescale}freeandnil(sourceImage);{$ENDIF}
         end
        else
-         writeLnLog('DLabel.RescaleImage/no scale label','ERROR: base.initialized = false');
+         WriteLnLog('DLabel.RescaleImage/no scale label','ERROR: base.initialized = false');
   end;
 end;
 
@@ -189,9 +189,9 @@ end;
 {========================= Integer label =====================================}
 {=============================================================================}
 
-procedure DIntegerLabel.draw;
+procedure DIntegerLabel.Draw;
 begin
-  Text := inttostr(value^);
+  Text := IntToStr(value^);
   inherited;
 end;
 
@@ -199,9 +199,9 @@ end;
 {========================== String label =====================================}
 {=============================================================================}
 
-procedure DStringLabel.draw;
+procedure DStringLabel.Draw;
 begin
-  Text := value^;
+  Text := Value^;
   inherited;
 end;
 
@@ -209,18 +209,18 @@ end;
 {=========================== Float label =====================================}
 {=============================================================================}
 
-Constructor DFloatLabel.create(AOwner: TComponent);
+Constructor DFloatLabel.Create(AOwner: TComponent);
 begin
-  inherited create(AOwner);
+  inherited Create(AOwner);
   Digits := 0;
 end;
 
-procedure DFloatLabel.draw;
+procedure DFloatLabel.Draw;
 begin
   case Digits of
-    1: Text := inttostr(trunc(value^))+'.'+inttostr(round(frac(value^)*10));
-    2: Text := inttostr(trunc(value^))+'.'+inttostr(round(frac(value^)*100));
-    else Text := inttostr(round(value^));
+    1: Text := IntToStr(Trunc(Value^))+'.'+IntToStr(Round(Frac(Value^)*10));
+    2: Text := IntToStr(Trunc(Value^))+'.'+IntToStr(Round(Frac(Value^)*100));
+    else Text := IntToStr(Round(Value^));
   end;
   inherited;
 end;

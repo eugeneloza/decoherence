@@ -40,27 +40,27 @@ const dLineBreak = sLineBreak;
 
 type DString = class(TObject)
   { each line text content }
-  Value : String;
+  Value: String;
   { specific size parameters of this line }
-  Width,Height,HeightBase : integer;
+  Width, Height, HeightBase: integer;
 end;
 type DStringList  =  specialize TFPGObjectList<DString>;
 
 Type DFont = class(TTextureFont)
   { Converts a broken string into a single image }
-  function BrokenStringToImage(const s : DStringList): TGrayscaleAlphaImage;
+  function BrokenStringToImage(const s: DStringList): TGrayscaleAlphaImage;
   { Converts a broken string into a single image with shadow }
-  function BrokenStringToImageWithShadow(const s: DStringList; ShadowStrength: float; ShadowLength : integer): TGrayscaleAlphaImage;
+  function BrokenStringToImageWithShadow(const s: DStringList; ShadowStrength: float; ShadowLength: integer): TGrayscaleAlphaImage;
   { Breaks a string to a DStringList }
-  function BreakStings(const s : String; const w : integer): DStringList;
+  function BreakStings(const s : String; const w: integer): DStringList;
  private
   //todo  : RGB Alpha image;
   { Converts a single line of text to an image }
-  function StringToImage(const s : string): TGrayscaleAlphaImage;
+  function StringToImage(const s: string): TGrayscaleAlphaImage;
 end;
 
-var {$IFNDEF Android}MyCharSet : TUnicodeCharList;{$ENDIF}
-  RegularFont16 : DFont;
+var {$IFNDEF Android}MyCharSet: TUnicodeCharList;{$ENDIF}
+  RegularFont16: DFont;
 
 procedure InitializeFonts;
 procedure DestroyFonts;

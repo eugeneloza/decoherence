@@ -32,9 +32,9 @@ type
   public
     color: TVector4; //todo
     { very simple draw procedure }
-    procedure draw; override;
-    constructor create(AOwner:TComponent); override;
-    destructor destroy; override;
+    procedure Draw; override;
+    constructor Create(AOwner:TComponent); override;
+    destructor Destroy; override;
     { initialize GL image. NOT THREAD SAFE! }
     procedure InitGL;{ override;}
     { frees an image without freeing the whole instance }
@@ -234,20 +234,20 @@ end;
 
 procedure DAbstractImage.FreeImage;
 begin
-  freeandnil(GLImage);
-  freeandnil(SourceImage);
+  FreeAndNil(GLImage);
+  FreeAndNil(SourceImage);
 
   //scaledImage is automatically freed by GlImage
   {$WARNING BUG: why Scaled image is not freed automatically?????}
   {BUG: I still need to free ScaledImage - while it's owned by GLImage
-   DAMN IT. The link may be obsolete after freeandnil(GLImage)!
+   DAMN IT. The link may be obsolete after FreeAndNil(GLImage)!
    Looks like I always set ScaledImage := nil after sucessfuly assigning it,
    but should keep an eye on it!}
-  freeandnil(ScaledImage);
+  FreeAndNil(ScaledImage);
 
   ImageReady := false;
   ImageLoaded := false;
-  InitGLPending:=false;
+  InitGLPending := false;
 end;
 
 {----------------------------------------------------------------------------}
@@ -301,19 +301,19 @@ end;
 
 procedure DAbstractImage.RescaleImage;
 begin
- {$IFNDEF AllowRescale}If sourceImage=nil then exit;{$ENDIF}
+ {$IFNDEF AllowRescale}If SourceImage = nil then exit;{$ENDIF}
  if ImageLoaded then begin
    if base.initialized then
     if (ScaledWidth <> base.w) or (ScaledHeight <> base.h) then begin
       ImageReady:=false;
       FreeAndNil(GLImage);
-      scaledImage := SourceImage.CreateCopy as TCastleImage;
-      {$IFNDEF AllowRescale}freeandnil(sourceImage);{$ENDIF}
-      scaledImage.Resize(base.w,base.h,InterfaceScalingMethod);
+      ScaledImage := SourceImage.CreateCopy as TCastleImage;
+      {$IFNDEF AllowRescale}FreeAndNil(SourceImage);{$ENDIF}
+      ScaledImage.Resize(base.w,base.h,InterfaceScalingMethod);
       InitGLPending := true;
     end
    else
-     writeLnLog('DStaticImage.RescaleImage','ERROR: base.initialized = false');
+     WriteLnLog('DStaticImage.RescaleImage','ERROR: base.initialized = false');
  end;
 end;
 
@@ -325,10 +325,10 @@ begin
     //animate
     update;
 
-    if not visible then exit;
+    if not Visible then Exit;
 
-    GLImage.color := vector4single(1,1,1,currentAnimationState.Opacity); //todo
-    GLIMage.Draw(currentAnimationState.x1,currentAnimationState.y1,currentAnimationState.w,currentAnimationState.h); //todo
+    GLImage.Color := Vector4(1,1,1,CurrentAnimationState.Opacity); //todo
+    GLIMage.Draw(CurrentAnimationState.x1,CurrentAnimationState.y1,CurrentAnimationState.w,CurrentAnimationState.h); //todo
   end else begin
     if InitGLPending then InitGL;
   end;

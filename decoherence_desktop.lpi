@@ -145,6 +145,7 @@
       <Unit8>
         <Filename Value="src/decolabels.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoLabels"/>
       </Unit8>
       <Unit9>
         <Filename Value="src/decomouse.pas"/>
@@ -168,6 +169,7 @@
       <Unit13>
         <Filename Value="src/decointerfacecomposite.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoInterfaceComposite"/>
       </Unit13>
       <Unit14>
         <Filename Value="src/decointerfaceblocks.pas"/>
