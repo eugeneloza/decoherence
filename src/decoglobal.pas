@@ -44,6 +44,7 @@ const InterfaceFolder    = 'interface/';
       PortraitFolder     = InterfaceFolder+'portrait/';
       PerksFolder        = InterfaceFolder+'perks/';
       DamageFolder       = InterfaceFolder+'damage/';
+      FontFolder         = InterfaceFolder+'fonts/';
 
       ScenarioBaseFolder = 'scenario/';
       {because there can be several scenario subfolders, these are only for "addition"}

@@ -144,20 +144,20 @@ procedure DLabel.PrepareTextImage;
 begin
   if BrokenString<> nil then BrokenString.Clear;
   FreeAndNil(BrokenString);
-  BrokenString := font.break_stings(text,base.w);
+  BrokenString := Font.BreakStings(Text,Base.w);
   FreeImage;
 
   // for i := 0 to brokenString.count-1 do writeLnLog('',inttostr(brokenstring[i].height));
 
 //  SourceImage := nil; // let it be as a safeguard here. I don't want to freeannil GImage before it is instantly created to avoid sigsegvs
 
-  if shadow = 0 then
-    SourceImage := font.broken_string_to_image(BrokenString)
+  if Shadow = 0 then
+    SourceImage := Font.BrokenStringToImage(BrokenString)
   else
-    SourceImage := font.broken_string_to_image_with_shadow(BrokenString,shadow,3);
+    SourceImage := Font.BrokenStringToImageWithShadow(BrokenString,Shadow,3);
 
-  RealHeight := SourceImage.height;
-  RealWidth := sourceImage.width;
+  RealHeight := SourceImage.Height;
+  RealWidth := SourceImage.Width;
 
   ImageLoaded := true;     //not good...
   RescaleImage;

@@ -16,46 +16,47 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 {---------------------------------------------------------------------------}
 
 { Describes the game fonts and handles their conversion to images }
-unit decofont;
+unit DecoFont;
 
 {$INCLUDE compilerconfig.inc}
 
 interface
 
 uses
-  sysutils, fgl,
+  SysUtils, fgl,
   {$IFDEF Android}
-  castletexturefont_linbiolinumrg_16,
+  CastleTextureFont_LinBiolinumRG_16,
   {$ENDIF}
   CastleFonts, CastleUnicode, CastleStringUtils,
-  CastleImages, {CastleTextureFontData,} castleVectors, castlecolors,
-  CastleLog, castleFilesUtils;
+  CastleImages, {CastleTextureFontData,} CastleVectors, CastleColors,
+  CastleLog, CastleFilesUtils,
+  DecoGlobal;
 
 {$IFNDEF Android}
-const NormalFontFile = 'interface/fonts/LinBiolinum_R_G.ttf';
+const NormalFontFile = 'LinBiolinum_R_G.ttf';
 {$ENDIF}
 
-const dlinebreak = slinebreak;
+const dLineBreak = sLineBreak;
 
 type DString = class(TObject)
   { each line text content }
-  value : String;
+  Value : String;
   { specific size parameters of this line }
-  width,height,heightbase : integer;
+  Width,Height,HeightBase : integer;
 end;
 type DStringList  =  specialize TFPGObjectList<DString>;
 
 Type DFont = class(TTextureFont)
   { Converts a broken string into a single image }
-  function broken_string_to_image(const s : DStringList): TGrayscaleAlphaImage;
+  function BrokenStringToImage(const s : DStringList): TGrayscaleAlphaImage;
   { Converts a broken string into a single image with shadow }
-  function broken_string_to_image_with_shadow(const s: DStringList;shadow_strength : single;shadow_length : integer) : TGrayscaleAlphaImage;
+  function BrokenStringToImageWithShadow(const s: DStringList; ShadowStrength: float; ShadowLength : integer): TGrayscaleAlphaImage;
   { Breaks a string to a DStringList }
-  function break_stings(const s : String;const w : integer) : DStringList;
+  function BreakStings(const s : String; const w : integer): DStringList;
  private
   //todo  : RGB Alpha image;
   { Converts a single line of text to an image }
-  function string_to_image(const s : string) : TGrayscaleAlphaImage;
+  function StringToImage(const s : string): TGrayscaleAlphaImage;
 end;
 
 var {$IFNDEF Android}MyCharSet : TUnicodeCharList;{$ENDIF}
@@ -76,12 +77,12 @@ begin
    {$ELSE}
    if MyCharSet = nil then begin
       MyCharSet := TUnicodeCharList.Create;
-      MyCharSet.add(SimpleAsciiCharacters);
-      MyCharSet.add('ЁЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮёйцукенгшщзхъфывапролджэячсмитьбюІЇЄіїє');
+      MyCharSet.Add(SimpleAsciiCharacters);
+      MyCharSet.Add('ЁЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮёйцукенгшщзхъфывапролджэячсмитьбюІЇЄіїє');
    end;
-   RegularFont16 := DFont.Create(ApplicationData(NormalFontFile),16,true,MyCharSet);
+   RegularFont16 := DFont.Create(ApplicationData(FontFolder+NormalFontFile),16,true,MyCharSet);
    {$ENDIF}
-   WritelnLog('DecoFont : InitializeFonts','Fonts loaded successfully.');
+   WriteLnLog('DecoFont : InitializeFonts','Fonts loaded successfully.');
 end;
 
 {----------------------------------------------------------------------------}
@@ -94,12 +95,12 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-function DFont.string_to_image(const s : string) : TGrayscaleAlphaImage;
+function DFont.StringToImage(const s : string): TGrayscaleAlphaImage;
 var P : Pvector2byte;
     i : integer;
 begin
-  Result := TGrayscaleAlphaImage.create;
-  Result.setsize(TextWidth(s),TextHeight(s));  //including baseline
+  Result := TGrayscaleAlphaImage.Create;
+  Result.SetSize(TextWidth(s),TextHeight(s));  //including baseline
   Result.Clear(Vector2Byte(0,255));
 
   PushProperties; // save previous TargetImage value
@@ -109,101 +110,101 @@ begin
 
   //reset alpha for correct next drawing
   //todo :  RGB alpha image
-  P  := result.GrayscaleAlphaPixels;
-  for I  :=  1 to result.Width * result.Height * result.Depth do
+  P  := Result.GrayscaleAlphaPixels;
+  for i  :=  1 to Result.Width * Result.Height * Result.Depth do
   begin
     p^[1] := p^[0];
     p^[0] := 255;
-    Inc(P);
+    inc(P);
   end;
 end;
 
 {---------------------------------------------------------------------------}
 
-function DFont.broken_string_to_image(const s : DStringList) : TGrayscaleAlphaImage;
-var dummyImage : TGrayscaleAlphaImage;
+function DFont.BrokenStringToImage(const s: DStringList): TGrayscaleAlphaImage;
+var DummyImage : TGrayscaleAlphaImage;
     i : integer;
-    maxh,maxhb,maxw : integer;
+    MaxH,MaxHb,MaxW : integer;
 begin
-  maxh  := 0;
-  maxhb := 0;
-  maxw  := 0;
-  for i := 0 to s.count-1 do begin
-    if maxh < s[i].height then maxh := s[i].height;
-    if maxhb < s[i].height-s[i].heightbase then maxhb := s[i].height-s[i].heightbase;
-    if maxw < s[i].width then maxw := s[i].width;
+  MaxH  := 0;
+  MaxHb := 0;
+  MaxW  := 0;
+  for i := 0 to s.Count-1 do begin
+    if MaxH < s[i].Height then MaxH := s[i].Height;
+    if MaxHb < s[i].Height-s[i].HeightBase then MaxHb := s[i].Height-s[i].HeightBase;
+    if MaxW < s[i].Width then MaxW := s[i].Width;
   end;
 //  writelnLog('DFont.broken_string_to_image','max height base  =  ', inttostr(maxhb));
-  result := TGRayScaleAlphaImage.create;
-  result.SetSize(maxw,maxh*(s.count));
-  result.Clear(Vector2Byte(0,0));
-  for i := 0 to s.count-1 do begin
-    DummyImage := string_to_image(s[i].value);
-    result.DrawFrom(DummyImage,0,maxh*(s.count-1-i)+maxhb-(s[i].height-s[i].heightbase),dmBlendSmart);
-    freeandnil(dummyImage);
+  Result := TGRayScaleAlphaImage.Create;
+  Result.SetSize(MaxW,MaxH*(s.Count));
+  Result.Clear(Vector2Byte(0,0));
+  for i := 0 to s.Count-1 do begin
+    DummyImage := StringToImage(s[i].Value);
+    Result.DrawFrom(DummyImage,0,MaxH*(s.Count-1-i)+MaxHb-(s[i].Height-s[i].HeightBase),dmBlendSmart);
+    FreeAndNil(DummyImage);
   end;
 end;
 
 {---------------------------------------------------------------------------}
 
-function DFont.broken_string_to_image_with_shadow(const s : DStringList;shadow_strength : single;shadow_length : integer) : TGrayscaleAlphaImage;
+function DFont.BrokenStringToImageWithShadow(const s: DStringList; ShadowStrength: float; ShadowLength : integer): TGrayscaleAlphaImage;
 var DummyImage,ShadowImage : TGrayscaleAlphaImage;
-    iteration,i : integer;
+    Iteration,i : integer;
     P : Pvector2byte;
 begin
-  DummyImage := broken_string_to_image(s);
-  if (shadow_strength>0) and (shadow_length>0) then begin
-    Result := TGrayscaleAlphaImage.Create(dummyImage.Width+shadow_length,dummyImage.Height+shadow_length);//dummyImage.MakeCopy as TGrayscaleAlphaImage;
-    Result.Clear(vector2byte(0,0));
-    shadowImage := dummyImage.MakeCopy as TGrayscaleAlphaImage;
-    for iteration := 1 to shadow_length do begin
-      P  := shadowImage.GrayscaleAlphaPixels;
-      for I  :=  1 to shadowImage.Width * shadowImage.Height * shadowImage.Depth do
+  DummyImage := BrokenStringToImage(s);
+  if (ShadowStrength>0) and (ShadowLength>0) then begin
+    Result := TGrayscaleAlphaImage.Create(DummyImage.Width+ShadowLength,DummyImage.Height+ShadowLength);//dummyImage.MakeCopy as TGrayscaleAlphaImage;
+    Result.Clear(Vector2Byte(0,0));
+    ShadowImage := DummyImage.MakeCopy as TGrayscaleAlphaImage;
+    for Iteration := 1 to ShadowLength do begin
+      P := ShadowImage.GrayscaleAlphaPixels;
+      for i :=  1 to ShadowImage.Width * ShadowImage.Height * ShadowImage.Depth do
         begin
-          p^[1] := round(p^[1] * shadow_strength / sqr(iteration));
+          p^[1] := Round(p^[1] * ShadowStrength / Sqr(Iteration));
           p^[0] := 0;        //shadow color intensity might be specified here... or even an RGB color if make Shadow a TRGBAlphaImage
           Inc(P);
         end;
-      Result.DrawFrom(ShadowImage,iteration,shadow_length-iteration,dmBlendSmart);
+      Result.DrawFrom(ShadowImage,Iteration,ShadowLength-Iteration,dmBlendSmart);
     end;
-    Result.DrawFrom(dummyImage,0,Shadow_Length,dmBlendSmart);
-    freeAndNil(ShadowImage);
-    freeAndNil(DummyImage);
+    Result.DrawFrom(DummyImage,0,ShadowLength,dmBlendSmart);
+    FreeAndNil(ShadowImage);
+    FreeAndNil(DummyImage);
   end else
-    result := DummyImage;
+    Result := DummyImage;
 end;
 
 {---------------------------------------------------------------------------}
 
-function DFont.break_stings(const s : String;const w : integer) : DStringList;
+function DFont.BreakStings(const s: string; const w: integer): DStringList;
 var i1,i2,i_break : integer;
-    newstring : DString;
+    NewString : DString;
 begin
-  result := DStringList.create;
+  Result := DStringList.Create;
   i1 := 1;
   i2 := 1;
   i_break := i2;
-  while i2 <= length(s) do
+  while i2 <= Length(s) do
   begin
-    if (copy(s,i2,1) = ' ') or (copy(s,i2,length(dlinebreak)) = dlinebreak) then i_break := i2;
-    if (textwidth(copy(s,i1,i2-i1)) > w) or (copy(s,i2,length(dlinebreak)) = dlinebreak) then
+    if (Copy(s,i2,1) = ' ') or (Copy(s,i2,Length(dLineBreak)) = dLineBreak) then i_break := i2;
+    if (TextWidth(Copy(s,i1,i2-i1)) > w) or (Copy(s,i2,Length(dLineBreak)) = dLineBreak) then
     begin
-      newString := DString.create;
-      newString.value := copy(s,i1,i_break-i1);
-      newString.heightbase := textheightbase(newString.value);
-      newString.height := textheight(newString.value);
-      newString.width := textwidth(newString.value);
-      result.add(newString);
+      NewString := DString.Create;
+      NewString.Value := Copy(s,i1,i_break-i1);
+      NewString.HeightBase := TextHeightBase(NewString.Value);
+      NewString.Height := TextHeight(NewString.Value);
+      NewString.Width := TextWidth(NewString.Value);
+      Result.Add(NewString);
       i1 := i_break+1;
     end;
-    inc(i2);
+    Inc(i2);
   end;
-  newString := DString.create;
-  newString.value := copy(s,i1,i2-i1);
-  newString.heightbase := textheightbase(newString.value);
-  newString.height := textheight(newString.value);
-  newString.width := textwidth(newString.value);
-  result.add(newString);
+  NewString := DString.Create;
+  NewString.Value := Copy(s,i1,i2-i1);
+  NewString.HeightBase := TextHeightBase(NewString.Value);
+  NewString.Height := TextHeight(NewString.Value);
+  NewString.Width := TextWidth(NewString.Value);
+  Result.Add(NewString);
 end;
 
 end.
