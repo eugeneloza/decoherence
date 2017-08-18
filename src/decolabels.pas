@@ -173,11 +173,11 @@ begin
   else begin
     //don't rescale this label to provide sharp font
     if ImageLoaded then
-       if base.initialized then begin
+       if Base.Initialized then begin
           ScaledImage := SourceImage.MakeCopy;
-          base.backwardsetsize(RealWidth,RealHeight);
+          Base.BackwardSetSize(RealWidth,RealHeight);
           InitGLPending := true;
-          {$IFNDEF AllowRescale}freeandnil(sourceImage);{$ENDIF}
+          {$IFNDEF AllowRescale}FreeAndNil(SourceImage);{$ENDIF}
         end
        else
          WriteLnLog('DLabel.RescaleImage/no scale label','ERROR: base.initialized = false');
@@ -214,6 +214,8 @@ begin
   inherited Create(AOwner);
   Digits := 0;
 end;
+
+{---------------------------------------------------------------------------}
 
 procedure DFloatLabel.Draw;
 begin

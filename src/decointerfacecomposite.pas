@@ -55,7 +55,7 @@ type
     {these are links for easier access to the children}
     HP_bar, STA_bar, CNC_bar, MPH_bar: DSingleInterfaceElement;
     {target character}
-    ftarget: DActor;
+    fTarget: DActor;
     procedure settarget(value: DActor);
   public
     {the character being monitored}
@@ -74,7 +74,7 @@ type
     NickName: DSingleInterfaceElement;
     {target character}
     fTarget: DActor;
-    procedure SetTarget(value: DActor);
+    procedure SetTarget(Value: DActor);
   public
     {the character being monitored}
     property Target: DActor read fTarget write SetTarget;
@@ -188,9 +188,9 @@ procedure DestroyCompositeInterface;
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 
 implementation
-uses SysUtils, CastleLog, CastleFilesUtils, castleVectors,
-   decofont, decoimages, decolabels,
-   decointerfaceblocks, decoinputoutput;
+uses SysUtils, CastleLog, CastleFilesUtils, {castleVectors,}
+   DecoFont, DecoImages, DecoLabels,
+   DecoInterfaceBlocks, DecoInputOutput;
 
 
 procedure InitCompositeInterface;
@@ -202,15 +202,15 @@ begin
   CncBarImage := LoadImageSafe(ApplicationData(ProgressBarFolder+'m_bar_CC-BY-SA_by_Saito00.png'));
   MphBarImage := LoadImageSafe(ApplicationData(ProgressBarFolder+'mph_bar_CC-BY-SA_by_Saito00.png'));
 
-  damageOverlay_img := LoadImageSafe(ApplicationData(DamageFolder+'damageOverlay_CC0_by_EugeneLoza[GIMP].png'));
+  DamageOverlay_img := LoadImageSafe(ApplicationData(DamageFolder+'damageOverlay_CC0_by_EugeneLoza[GIMP].png'));
 
   StatBarsFrame := DFrame.create(Window);
   with StatBarsFrame do begin
     SourceImage := LoadImageSafe(ApplicationData(FramesFolder+'blackframe.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
-    cornerTop := 0; CornerBottom := 0; cornerLeft := 0; CornerRight := 1;
+    CornerTop := 0; CornerBottom := 0; cornerLeft := 0; CornerRight := 1;
   end;
 
-  setlength(portrait_img,20);
+  Setlength(Portrait_img,20);
   for i := 0 to length(portrait_img)-1 do begin
     s := inttostr(i+1);
     if i+1<10 then s := '0'+s;
@@ -433,14 +433,16 @@ end;
 
 procedure DPlayerBarsFull.settarget(value: DActor);
 begin
-  if ftarget <> value then begin
-    ftarget := value;
+  if fTarget <> Value then begin
+    fTarget := Value;
     //and copy the target to all children
-    PartyBars.Target := value;
-    DFloatLabel(NumHealth.content).Value := @value.HP;
-    DStringLabel(NickName.content).Value := @value.nickname;
+    PartyBars.Target := Value;
+    DFloatLabel(NumHealth.Content).Value := @Value.HP;
+    DStringLabel(NickName.Content).Value := @Value.nickname;
   end;
 end;
+
+{---------------------------------------------------------------------------}
 
 constructor DPlayerBarsFull.create(AOwner:TComponent);
 var tmp_flt: DFloatLabel;
@@ -470,6 +472,8 @@ begin
   grab(NickName);
 end;
 
+{---------------------------------------------------------------------------}
+
 Procedure DPlayerBarsFull.ArrangeChildren(animate: TAnimationStyle);
 var labelspace: float;
 begin
@@ -497,6 +501,8 @@ begin
   end;
 end;
 
+{---------------------------------------------------------------------------}
+
 constructor DPortrait.create(AOwner: TComponent);
 var tmp_staticimage: DStaticImage;
     tmp_label: DLabel;
@@ -514,6 +520,8 @@ begin
   damageLabel.content := tmp_label;
   grab(damageLabel);
 end;
+
+{---------------------------------------------------------------------------}
 
 procedure DPortrait.doHit(dam: float; damtype: TDamageType);
 begin
@@ -553,6 +561,8 @@ begin
     if DSingleInterfaceElement(Sender).Parent is DIntegerEdit then    //another fool's check :)
       Inc(DIntegerEdit(DSingleInterfaceElement(Sender).Parent).Target^); //todo!!!!!!!!!
 end;
+
+{---------------------------------------------------------------------------}
 
 procedure DIntegerEdit.decTarget(Sender: DAbstractElement; x,y: integer);
 begin
@@ -630,6 +640,8 @@ begin
     //add events?
   end;
 end;
+
+{---------------------------------------------------------------------------}
 
 constructor DPerkInterfaceItem.create(AOwner: TComponent);
 var tmp: DStaticImage;

@@ -50,7 +50,7 @@ type
     {due to a little bug I have to define these separately}
     ScaledWidth, ScaledHeight: integer;
     { Thread-safe part of rescaling the image }
-    procedure rescale; override;
+    procedure Rescale; override;
     procedure RescaleImage; virtual;
   end;
 
@@ -255,11 +255,11 @@ end;
 procedure DAbstractImage.InitGL;
 begin
   if InitGLPending then begin
-    InitGLPending:=false;
+    InitGLPending := false;
     {if ScaledImage<>nil then} begin
       FreeAndNil(GLImage);
-      ScaledWidth := ScaledImage.width;
-      ScaledHeight := ScaledImage.height;
+      ScaledWidth := ScaledImage.Width;
+      ScaledHeight := ScaledImage.Height;
       GLImage := TGLImage.create(ScaledImage,true,true);
       ScaledImage := nil;
       ImageReady := true;
@@ -303,13 +303,13 @@ procedure DAbstractImage.RescaleImage;
 begin
  {$IFNDEF AllowRescale}If SourceImage = nil then exit;{$ENDIF}
  if ImageLoaded then begin
-   if base.initialized then
+   if Base.Initialized then
     if (ScaledWidth <> base.w) or (ScaledHeight <> base.h) then begin
-      ImageReady:=false;
+      ImageReady := false;
       FreeAndNil(GLImage);
       ScaledImage := SourceImage.CreateCopy as TCastleImage;
       {$IFNDEF AllowRescale}FreeAndNil(SourceImage);{$ENDIF}
-      ScaledImage.Resize(base.w,base.h,InterfaceScalingMethod);
+      ScaledImage.Resize(Base.w,Base.h,InterfaceScalingMethod);
       InitGLPending := true;
     end
    else
@@ -319,11 +319,11 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DAbstractImage.draw;
+procedure DAbstractImage.Draw;
 begin
   if ImageReady then begin
     //animate
-    update;
+    Update;
 
     if not Visible then Exit;
 
