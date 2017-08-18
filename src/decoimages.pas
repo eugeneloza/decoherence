@@ -304,7 +304,8 @@ begin
  {$IFNDEF AllowRescale}If SourceImage = nil then exit;{$ENDIF}
  if ImageLoaded then begin
    if Base.Initialized then
-    if (ScaledWidth <> base.w) or (ScaledHeight <> base.h) then begin
+   {this is not optimal, however, required in case content has been changed}
+    {if (ScaledWidth <> base.w) or (ScaledHeight <> base.h) then} begin
       ImageReady := false;
       FreeAndNil(GLImage);
       ScaledImage := SourceImage.CreateCopy as TCastleImage;
