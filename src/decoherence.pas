@@ -178,6 +178,11 @@ procedure doRelease(Container: TUIContainer; const Event: TInputPressRelease);
 begin
   if Event.EventType = itMouseButton then begin
     doMouseRelease(Event);
+  end else
+  if Event.EventType = itKey then begin
+   case Event.key of
+      k_W, k_S, k_A, k_D: CurrentParty.Stop;
+   end;
   end;
 end;
 

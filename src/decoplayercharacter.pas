@@ -58,7 +58,8 @@ type
     party characters }
   DParty = class (TComponent)
   private
-    const speed = 1;
+    const Speed = 0.3;
+    const Friction = 0.4;
   private
     {updates game camera with CameraMan coordinates}
     procedure UpdateCamera;
@@ -81,6 +82,7 @@ type
     procedure doMove;
   public
     procedure Move(MoveDir: TMoveDirection);
+    procedure Stop;
   end;
 
 {a list of player's parties}
@@ -159,9 +161,6 @@ end;
 procedure DParty.Manage;
 begin
   UpdateCamera;
-  {actually we're doing the very opposite now:}
-  {CameraMan.Position := Camera.Position;
-  CameraMan.Direction := Camera.Direction;}
   //teleport all characters to CameraMan position;
   CollectCharacters;
 end;
@@ -246,15 +245,21 @@ end;
 procedure DParty.doMove;
 var NewPos, tmp: TVector3;
 begin
-  MoveSpeed := 0.5*(MoveSpeed+Acceleration);
+  MoveSpeed := (1-Friction)*MoveSpeed+Friction*Acceleration;
   if not isAccelerating then Acceleration := TVector3.Zero;
-  isAccelerating := false;
 
-  NewPos := CameraMan.Position+MoveSpeed;
+  NewPos := CameraMan.Position+Speed*MoveSpeed;
   if Camera.DoMoveAllowed(NewPos,tmp,false) then begin
     CameraMan.Position := NewPos;
     //Camera.Position := NewPos;
   end;
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DParty.Stop;
+begin
+  isAccelerating := false;
 end;
 
 {======================== DPlayerCharacter ==================================}

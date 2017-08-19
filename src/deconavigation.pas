@@ -48,7 +48,7 @@ begin
   WritelnLog('deconavigation.InitNavigation','Initialize navigation');
   camera := TWalkCamera.create(Window);
   {z-up orientation}
-  camera.Gravity := true;
+  camera.Gravity := false;
   camera.PreferredHeight := PlayerHeight;
   camera.MouseDragMode := mdRotate;
 
