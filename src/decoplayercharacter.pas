@@ -75,7 +75,10 @@ type
     procedure TeleportTo(aNav: TNavId; aDirection: TVector3);
     procedure TeleportTo(aNav: TNavId);
     procedure Rest;
-
+  private
+    Acceleration,MoveSpeed: TVector3;
+    isAccelerating: boolean;
+    procedure doMove;
   public
     procedure Move(MoveDir: TMoveDirection);
   end;
@@ -100,6 +103,7 @@ begin
   inherited Create(AOwner);
   Char := DCharList.Create(true);
   CameraMan := DCoordActor.Create;
+  isAccelerating := false;
 end;
 
 {----------------------------------------------------------------------------}
@@ -144,6 +148,7 @@ end;
 
 procedure DParty.UpdateCamera;
 begin
+  doMove;
   if Camera = nil then Exit;// InitNavigation;
   Camera.Position := CameraMan.Position;
   Camera.Direction := CameraMan.Direction;
@@ -153,7 +158,7 @@ end;
 
 procedure DParty.Manage;
 begin
-  //UpdateCamera;
+  UpdateCamera;
   {actually we're doing the very opposite now:}
   {CameraMan.Position := Camera.Position;
   CameraMan.Direction := Camera.Direction;}
@@ -207,7 +212,7 @@ end;
 {----------------------------------------------------------------------------}
 
 procedure DParty.Move(MoveDir: TMoveDirection);
-var MoveVector,NewPos,tmp: TVector3;
+var MoveVector: TVector3;
   procedure Right90(var v: TVector3); {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
   var tt: single;
   begin
@@ -232,10 +237,23 @@ begin
     mdRight  : Right90(MoveVector);
   end;
   MoveVector.Normalize;
-  NewPos := MoveVector+CameraMan.Position;
+  Acceleration := MoveVector;
+  isAccelerating := true;
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DParty.doMove;
+var NewPos, tmp: TVector3;
+begin
+  MoveSpeed := 0.5*(MoveSpeed+Acceleration);
+  if not isAccelerating then Acceleration := TVector3.Zero;
+  isAccelerating := false;
+
+  NewPos := CameraMan.Position+MoveSpeed;
   if Camera.DoMoveAllowed(NewPos,tmp,false) then begin
     CameraMan.Position := NewPos;
-    Camera.Position := NewPos;
+    //Camera.Position := NewPos;
   end;
 end;
 
