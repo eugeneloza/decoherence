@@ -16,7 +16,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 {---------------------------------------------------------------------------}
 
 { Contains most of interface basics and grouping }
-unit decointerface;
+unit DecoInterface;
 
 {$INCLUDE compilerconfig.inc}
 
@@ -29,7 +29,7 @@ uses
 
 const InterfaceScalingMethod: TResizeInterpolation = riBilinear;  //to quickly change it. Maybe will be a variable some day to support older PCs.
 
-const defaultanimationduration = 0.3; {in seconds}
+const DefaultAnimationDuration = 0.3; {in seconds}
 
 {animation style of the object. asDefault means "animate from previous state",
  presuming that there was some "previous state"}
@@ -48,16 +48,16 @@ Type
  public
    SourceImage: TRGBAlphaImage;
    {frame borders}
-   cornerTop, cornerbottom, cornerLeft, cornerRight: integer;
+   CornerTop, CornerBottom, CornerLeft, CornerRight: integer;
    Rectagonal: boolean;
-   constructor create(AOwner: TComponent); override;
-   destructor destroy; override;
+   constructor Create(AOwner: TComponent); override;
+   destructor Destroy; override;
 end;
 
  { constants for special scaling cases }
-const fullwidth = -1;
-      fullheight = -2;
-      proportionalscale = -3;
+const FullWidth = -1;
+      FullHeight = -2;
+      ProportionalScale = -3;
 type
   { Yes, that looks stupid for now. But I'll simplify it later. Maybe.
    Contains redunant data on animation with possible rescaling in mind.}
@@ -68,18 +68,18 @@ type
     x1,y1,x2,y2,w,h: integer;
     { float }
     fx,fy,fw,fh: float;
-    opacity: float;
-    initialized: boolean;
+    Opacity: float;
+    Initialized: boolean;
     { assign float and convert to Integer }
-    procedure setsize(const newx,newy,neww,newh: float);
+    procedure SetSize(const NewX,NewY,NewW,NewH: float);
     { get integer and convert to float / for fixed-size objects }
-    procedure backwardsetsize(const neww,newh: integer);
-    procedure backwardsetxywh(const newx,newy,neww,newh: integer);
+    procedure BackwardSetSize(const NewW,NewH: integer);
+    procedure BackwardSetXYWH(const NewX,NewY,NewW,NewH: integer);
     {substract frame width from the base}
-    Procedure SubstractFrame(frame: DFrame; AdditionalGap: integer = 0);
+    procedure SubstractFrame(Frame: DFrame; AdditionalGap: integer = 0);
     { transform floats to integer }
-    procedure recalculate;
-    constructor create(AOwner: TComponent); override;
+    procedure Recalculate;
+    constructor Create(AOwner: TComponent); override;
     { provides for proportional width/height scaling for some images }
     procedure FixProportions(ww,hh: integer);
   end;
@@ -89,7 +89,7 @@ type
   Txywha = class(Txywh)
   public
     //function makecopy:Txywh;
-    procedure copyxywh(source: Txywh);
+    procedure CopyXYWH(Source: Txywh);
   end;
 
 Type
@@ -101,56 +101,56 @@ Type
     CurrentAnimationState: Txywha;
     procedure GetAnimationState; virtual;
 
-    constructor create(AOwner: TComponent); override;
-    destructor destroy; override;
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
     { changes the scale of the element relative to current window size }
-    procedure rescale; virtual;
+    procedure Rescale; virtual;
     { draw the element / as abstract as it might be :) }
-    procedure draw; virtual; abstract;
+    procedure Draw; virtual; abstract;
     //procedure InitGL; virtual; abstract; //no need for an abstract method?
     { updates the data of the class with current external data, most often
       just gets the current animation state }
-    procedure update; virtual;
+    procedure Update; virtual;
   private
     { Last and Next animation states. }
-    last, next: Txywha;
+    Last, Next: Txywha;
 //    Free_on_end: boolean;
-    fvisible: boolean;
-    procedure setvisible(value: boolean);
+    fVisible: boolean;
+    procedure SetVisible(Value: boolean);
   public
     { these values are "strict" and unaffected by animations. Usually determines
       the basic stage and implies image rescale and init GL. }
-    animationstart: TDateTime;
-    animationduration: single;
+    AnimationStart: TDateTime;
+    AnimationDuration: float;
     {base state of the element. contains its coordinates and width/height}
-    base: Txywha;
+    Base: Txywha;
     {source width/height of the element. Used to preserve proportions while scaling}
     RealWidth, RealHeight: integer;
-    procedure setbasesize(const newx,newy,neww,newh,newo: float; animate: TAnimationStyle); virtual;
-    procedure setIntSize(const x1,y1,x2,y2:integer; animate: TAnimationStyle); virtual;
+    procedure SetBaseSize(const NewX,NewY,NewW,NewH,NewO: float; Animate: TAnimationStyle); virtual;
+    procedure SetIntSize(const x1,y1,x2,y2:integer; Animate: TAnimationStyle); virtual;
     {if the element is visible, if false then draw will not be called.
      PAY ATTENTION: if assigned to a single interface element then the animations
      and initGL will occur as they would normally. BUT if assigned to a
      composite parent element, its children WILL NOT do anything like this and
      will be frozen until visible=true. Maybe I'll fix this.}
-    property visible: boolean read fvisible write setvisible;
+    property Visible: boolean read fVisible write SetVisible;
     {animates the interface element from current state to base state,
      Important: GetAnimationState must be called before setting basesize
      of the element as AnimateTo uses currentAnimationState}
-    procedure AnimateTo(animate: TAnimationStyle; duration: single = defaultanimationduration);
+    procedure AnimateTo(Animate: TAnimationStyle; Duration: float = DefaultAnimationDuration);
   end;
 
 {Definition of simple procedures for (mouse) events}
 //type TSimpleProcedure = procedure(sender: DAbstractElement) of Object;
 type TSimpleProcedure = procedure of Object;
-type TXYProcedure = procedure(sender: DAbstractElement; x,y: integer) of Object;
+type TXYProcedure = procedure(Sender: DAbstractElement; x,y: integer) of Object;
 
 Type
   {Element with a frame and content}
   DSingleInterfaceElement = class(DAbstractElement)
   public
     {Higher-level element. Seldomly used in specific cases}
-    parent: DAbstractElement;
+    Parent: DAbstractElement;
     {whether Interface element owns its contents? If true they'll bee freed
      on destroy // using TComponent Inheritance for now}
     //OwnsContent: boolean;
@@ -159,16 +159,16 @@ Type
     { multiplier to opacity <1, e.g. overall opacity=0.8 FrameOpacity=0.8, frame final Opacity=0.8*0.8 }
     FrameOpacity: float;
     { frame behind the Interface element }
-    frame: DFrame;
+    Frame: DFrame;
     {specifices if the frame draws over content or vice versa}
     FrameOnTop: boolean;
-    procedure draw; override;
-    procedure rescale; override;
-    constructor create(AOwner:TComponent); override;
-    destructor destroy; override;
+    procedure Draw; override;
+    procedure Rescale; override;
+    constructor Create(AOwner:TComponent); override;
+    destructor Destroy; override;
     //also resizes content and frame
-    procedure setbasesize(const newx,newy,neww,newh,newo: float; animate: TAnimationStyle); override;
-    procedure setIntSize(const x1,y1,x2,y2:integer; animate: TAnimationStyle); override;
+    procedure SetBaseSize(const NewX,NewY,NewW,NewH,NewO: float; Animate: TAnimationStyle); override;
+    procedure SetIntSize(const x1,y1,x2,y2:integer; Animate: TAnimationStyle); override;
   private
     {GL image of the frame}
     GLFrame: TGLImage;
@@ -184,7 +184,7 @@ Type
     { resets parent and content size after rescale if needed}
     procedure ResetContentSize(animate: TAnimationStyle);
 
-    procedure drawFrame;
+    procedure DrawFrame;
     procedure DrawContent;
   public
     {if this element is active (clickable)}
@@ -206,9 +206,9 @@ Type
     OnMouseRelease: TXYProcedure;
     {dragg-n-drop routines}
     OnDrop: TXYProcedure;
-    dragx, dragy: integer;
-    procedure drag(x,y: integer);
-    procedure startdrag(x,y: integer);
+    DragX, DragY: integer;
+    procedure Drag(x,y: integer);
+    procedure StartDrag(x,y: integer);
   end;
 
 type DInterfaceElementsList = specialize TFPGObjectList<DSingleInterfaceElement>;
@@ -223,16 +223,16 @@ Type
       StartTime: DTime;
     public
       {if the timer is running}
-      enabled: boolean;
+      Enabled: boolean;
       {how long (in seconds) will it take the timer to fire}
       Interval: DTime;
       {action to preform}
       onTimer: TSimpleProcedure;
-      constructor create;
+      constructor Create;
       {a simple way to set and run timer}
-      procedure settimeout(seconds: DTime);
+      procedure SetTimeOut(Seconds: DTime);
       {check if the timer finished and run onTimer if true}
-      procedure update;
+      procedure Update;
   end;
 
 Type
@@ -242,12 +242,12 @@ Type
     {if the interface element rescales each time children rescale}
     ScaleToChildren: boolean;
     {list of the children of this interface element}
-    children: DInterfaceElementsList;
+    Children: DInterfaceElementsList;
     {a simple timer to fire some event on time-out}
     Timer: DTimer;
-    procedure draw; override;
-    constructor create(AOwner: TComponent); override;
-    destructor destroy; override;
+    procedure Draw; override;
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
     procedure Rescale; override;
     procedure Update; override;
   public
@@ -286,8 +286,8 @@ procedure InitInterface;
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
-uses sysutils, CastleLog, castleFilesUtils,
-  decointerfacecomposite, decoinputoutput;
+uses SysUtils, CastleLog, castleFilesUtils,
+  DecoInterfaCecomposite, DecoInputOutput;
 
 {-------------------- BURNER IMAGE --------------------------------------------}
 
@@ -327,10 +327,10 @@ begin
     cornerTop := 19; CornerBottom := 1; cornerLeft := 1; CornerRight := 1;            //todo: variable top line!
   end;    }
 
-  BlackFrame := DFrame.create(Window);
+  BlackFrame := DFrame.Create(Window);
   with BlackFrame do begin
     SourceImage := LoadImageSafe(ApplicationData(FramesFolder+'blackframe.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
-    cornerTop := 0; CornerBottom := 0; cornerLeft := 0; CornerRight := 0;
+    CornerTop := 0; CornerBottom := 0; CornerLeft := 0; CornerRight := 0;
   end;
 
   InitCompositeInterface;
@@ -342,15 +342,15 @@ end;
 
 {=============================================================================}
 
-constructor DFrame.create(AOwner: TComponent);
+constructor DFrame.Create(AOwner: TComponent);
 begin
-  inherited create(AOwner);
-  rectagonal := true;
+  inherited Create(AOwner);
+  Rectagonal := true;
 end;
 
-destructor DFrame.destroy;
+destructor DFrame.Destroy;
 begin
-  freeandnil(SourceImage);
+  FreeAndNil(SourceImage);
   inherited;
 end;
 
@@ -359,132 +359,135 @@ end;
 {=============================================================================}
 
 
-constructor Txywh.create(AOwner: TComponent);
+constructor Txywh.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  initialized := false;
+  Initialized := false;
 end;
 
 {----------------------------------------------------------------------------}
 
-procedure Txywh.setsize(const newx,newy,neww,newh:float);
+procedure Txywh.SetSize(const NewX,NewY,NewW,NewH: float);
 begin
-  if (abs(newx) > 1) or (abs(newy) > 1) or
-     (((neww<0) or (neww>1)) and (not FloatsEqual(neww,proportionalscale) and not FloatsEqual(neww,fullwidth) and not FloatsEqual(neww,fullheight))) or
-     (((newh<0) or (newh>1)) and (not FloatsEqual(neww,proportionalscale) and not FloatsEqual(newh,fullheight))) then
+  if (Abs(NewX) > 1) or (Abs(NewY) > 1) or
+     (((NewW<0) or (NewW>1)) and (not FloatsEqual(NewW,ProportionalScale) and not FloatsEqual(NewW,FullWidth) and not FloatsEqual(NewW,FullHeight))) or
+     (((NewH<0) or (NewH>1)) and (not FloatsEqual(NewW,ProportionalScale) and not FloatsEqual(NewW,FullHeight))) then
   begin
-    writeLnLog('Txywh.setsize','ERROR: Incorrect newx,newy,neww,newh!');
-    exit;
+    WriteLnLog('Txywh.setsize','ERROR: Incorrect newx,newy,neww,newh!');
+    Exit;
   end;
 
   { stop if nothing was changed }
-  if FloatsEqual(fx,newx) and FloatsEqual(fy,newy) and FloatsEqual(fw,neww) and FloatsEqual(fh,newh) then exit;
+  if FloatsEqual(fx,NewX) and FloatsEqual(fy,NewY) and FloatsEqual(fw,NewW) and FloatsEqual(fh,NewH) then begin
+    initialized := true; //to avoid bugs
+    Exit;
+  end;
 
-  fx := newx;
-  fy := newy;
-  fw := neww;
-  fh := newh;
+  fx := NewX;
+  fy := NewY;
+  fw := NewW;
+  fh := NewH;
 
-  recalculate;
+  Recalculate;
 end;
 
 {----------------------------------------------------------------------------}
 
-procedure Txywh.recalculate;
+procedure Txywh.Recalculate;
 begin
   { convert float to integer }
 
   if fx >= 0 then
-    x1 := round(Window.height*fx)
+    x1 := Round(Window.Height*fx)
   else
-    x1 := Window.width + round(Window.height*fx);
+    x1 := Window.Width + Round(Window.Height*fx);
 
   if fy>=0 then
-    y1 := round(Window.height*fy)     // turn over y-axis?
+    y1 := Round(Window.Height*fy)     // turn over y-axis?
   else
-    y1 := Window.height + round(Window.height*fy);
+    y1 := Window.Height + Round(Window.Height*fy);
 
-  if FloatsEqual(fw,fullwidth) then begin
-    w := Window.width;
+  if FloatsEqual(fw,FullWidth) then begin
+    w := Window.Width;
     x1 := 0
   end
   else
-  if FloatsEqual(fw,fullheight) then
-    w := Window.height
+  if FloatsEqual(fw,FullHeight) then
+    w := Window.Height
   else
-    w := round(Window.height*fw);
+    w := Round(Window.Height*fw);
 
-  if FloatsEqual(fh,fullheight) then begin
-    h := Window.height;
+  if FloatsEqual(fh,FullHeight) then begin
+    h := Window.Height;
     y1 := 0
   end else
-    h := round(Window.height*fh);
+    h := Round(Window.Height*fh);
 
   x2 := x1+w;
   y2 := y1+h;
 
-  initialized := true;
+  Initialized := true;
 end;
 
 {----------------------------------------------------------------------------}
 
 
-procedure Txywh.backwardsetsize(const neww,newh: integer);
+procedure Txywh.BackwardSetSize(const NewW,NewH: integer);
 begin
-  if neww>0 then begin
-    w := neww;
-    fw := neww/window.height;
-    if x1+w > Window.width then begin
-      x1 := Window.width - w;
-      fx := x1/Window.height;
+  if NewW>0 then begin
+    w := NewW;
+    fw := NewW/Window.Height;
+    if x1+w > Window.Width then begin
+      x1 := Window.Width - w;
+      fx := x1/Window.Height;
     end;
     x2 := x1+w;
   end;
-  if newh>0 then begin
-    h := newh;
-    fh := newh/window.height;
-    if y1+h > Window.height then begin
-      y1 := Window.height - h;
-      fy := y1/Window.height;
+  if NewH>0 then begin
+    h := NewH;
+    fh := NewH/Window.Height;
+    if y1+h > Window.Height then begin
+      y1 := Window.Height - h;
+      fy := y1/Window.Height;
     end;
     y2 := y1+h;
   end;
 end;
 
-procedure Txywh.backwardsetxywh(const newx,newy,neww,newh: integer);
+procedure Txywh.BackwardSetXYWH(const NewX,NewY,NewW,NewH: integer);
 begin
   //todo check for consistency
-  x1 := newx;
-  y1 := newy;
-  w := neww;
-  h := newh;
-  if newx<window.width div 2 then fx := newx/window.height else fx := (newx-Window.Width)/window.height;
-  fy := newy/window.height;
-  fw := neww/window.height;
-  fh := newh/window.height;
-  initialized := true;
+  x1 := NewX;
+  y1 := NewY;
+  w := NewW;
+  h := NewH;
+  if NewX<Window.Width div 2 then fx := NewX/Window.Height else fx := (NewX-Window.Width)/Window.Height;
+  fy := NewY/Window.Height;
+  fw := NewW/Window.Height;
+  fh := NewH/Window.Height;
+  Initialized := true;
 end;
 
 {----------------------------------------------------------------------------}
 
-Procedure Txywh.SubstractFrame(frame: DFrame; AdditionalGap: integer = 0);
+Procedure Txywh.SubstractFrame(Frame: DFrame; AdditionalGap: integer = 0);
 Begin
-  If (frame<>nil) and (frame.rectagonal) then begin
-    X1 := x1 + frame.cornerleft+AdditionalGap;
-    X2 := x2 - frame.cornerright-AdditionalGap;
-    W := w - frame.cornerleft - frame.cornerright -2*AdditionalGap;
-    Y1 := y1 + frame.cornertop+AdditionalGap;
-    Y2 := y2 - frame.cornerbottom-AdditionalGap;
-    H := h - frame.cornertop - frame.cornerbottom -2*AdditionalGap;
-    backwardsetxywh(x1,y1,w,h);
+  If (Frame<>nil) and (Frame.Rectagonal) then begin
+    x1 := x1 + Frame.CornerLeft+AdditionalGap;
+    x2 := x2 - Frame.CornerRight-AdditionalGap;
+    w := w - Frame.CornerLeft - Frame.CorneRright -2*AdditionalGap;
+    y1 := y1 + Frame.CornerTop+AdditionalGap;
+    y2 := y2 - Frame.CornerBottom-AdditionalGap;
+    h := h - Frame.CornerTop - Frame.CornerBottom -2*AdditionalGap;
+    BackwardSetXYWH(x1,y1,w,h);
   end else if AdditionalGap<>0 then begin
-    X1 := x1 + AdditionalGap;
-    X2 := x2 - AdditionalGap;
-    W := w - 2*AdditionalGap;
-    Y1 := y1 + AdditionalGap;
-    Y2 := y2 - AdditionalGap;
-    H := h - 2*AdditionalGap;
-    backwardsetxywh(x1,y1,w,h);
+    x1 := x1 + AdditionalGap;
+    x2 := x2 - AdditionalGap;
+    w := w - 2*AdditionalGap;
+    y1 := y1 + AdditionalGap;
+    y2 := y2 - AdditionalGap;
+    h := h - 2*AdditionalGap;
+    BackwardSetXYWH(x1,y1,w,h);
   end;
 End;
 
@@ -492,85 +495,85 @@ End;
 
 procedure Txywh.FixProportions(ww,hh: integer);
 begin
-  if FloatsEqual(fw,proportionalscale) then
-    w := round(h*ww/hh)
+  if FloatsEqual(fw,ProportionalScale) then
+    w := Round(h*ww/hh)
   else                                 //they can't be proportional both
-  if FloatsEqual(fh,proportionalscale) then
-    h := round(w*hh/ww);
+  if FloatsEqual(fh,ProportionalScale) then
+    h := Round(w*hh/ww);
 end;
 
 {----------------------------------------------------------------------------}
 
-procedure Txywha.copyxywh(source: Txywh);
+procedure Txywha.copyXYWH(Source: Txywh);
 begin
-  x1 := source.x1;
-  y1 := source.y1;
-  x2 := source.x2;
-  y2 := source.y2;
-  w := source.w;
-  h := source.h;
-  fx := source.fx;
-  fy := source.fy;
-  fw := source.fw;
-  fh := source.fh;
-  opacity := source.opacity;
-  initialized := source.initialized;
+  x1 := Source.x1;
+  y1 := Source.y1;
+  x2 := Source.x2;
+  y2 := Source.y2;
+  w := Source.w;
+  h := Source.h;
+  fx := Source.fx;
+  fy := Source.fy;
+  fw := Source.fw;
+  fh := Source.fh;
+  Opacity := Source.Opacity;
+  Initialized := Source.Initialized;
 end;
 
 {============================================================================}
 
-procedure DAbstractElement.rescale;
+procedure DAbstractElement.Rescale;
 begin
-  base.recalculate;
-  last.recalculate;
-  next.recalculate;
+  Base.Recalculate;
+  Last.Recalculate;
+  Next.Recalculate;
 end;
 
 {----------------------------------------------------------------------------}
 
-procedure DAbstractElement.setvisible(value: boolean);
+procedure DAbstractElement.SetVisible(Value: boolean);
 begin
-  fvisible := value;
+  fVisible := Value;
 end;
 
 {----------------------------------------------------------------------------}
 
-procedure DAbstractElement.AnimateTo(animate: TAnimationStyle; duration: single = defaultanimationduration);
+procedure DAbstractElement.AnimateTo(Animate: TAnimationStyle; Duration: float = DefaultAnimationDuration);
 var mx,my: float;
 begin
-  if animate = asNone then exit else begin
-    animationstart := -1;
-    animationduration := duration;
-    last.copyxywh(base); //todo: CurrentAnimationState
-    next.copyxywh(base);
-    case animate of
+  if Animate = asNone then Exit else begin
+    AnimationStart := -1;
+    AnimationDuration := Duration;
+    Last.CopyXYWH(Base); //todo: CurrentAnimationState
+    Next.CopyXYWH(Base);
+    case Animate of
       {just grabs some previous locations and animates the item from there to base
        requires that CurrentAnimationState is initialized... TODO}
-      asDefault: last.copyxywh(CurrentAnimationState);
+      asDefault: Last.CopyXYWH(CurrentAnimationState);
       {fades in/out element}
-      asFadeIn:  last.opacity := 0;
-      asFadeOut: next.opacity := 0;
+      asFadeIn:  Last.Opacity := 0;
+      asFadeOut: Next.Opacity := 0;
       {asFadeOutSuicide}
       {zooms in/out element}
       asZoomIn:  begin
-                   Last.backwardsetsize(1,1);
-                   Last.opacity := 0;
+                   Last.BackwardSetSize(1,1);
+                   Last.Opacity := 0;
                  end;
       asZoomOut: begin
-                   Next.backwardsetsize(1,1);
-                   Next.opacity := 0;
+                   Next.BackwardSetSize(1,1);
+                   Next.Opacity := 0;
                  end;
       {asZoomOutSuicide}
       asFlyInRandom,asFlyOutRandom: begin
-                       mx := drnd.random*window.width/window.height;  //mult by aspect ratio
-                       my := drnd.random;
+                       mx := drnd.Random*Window.Width/Window.Height;  //mult by aspect ratio
+                       my := drnd.Random;
                        case drnd.Random(4) of
                          0: mx :=  0.0001;
                          1: mx := -0.0001;
                          2: my :=  0.0001;
                          3: my := -0.0001;
                        end;
-                       if animate=asFlyInRandom then begin
+                       if Animate=asFlyInRandom then begin
                          Last.fx := mx;
                          Last.fy := my;
                        end else begin
@@ -579,15 +582,15 @@ begin
                        end;
                      end;
       asFlyInTop,asFlyOutTop,asFlyInBottom,asFlyOutBottom,asFlyInLeft,asFlyOutLeft,asFlyInRight,asFlyOutRight: begin
-                       mx := drnd.random*window.width/window.height;
-                       my := drnd.random;
+                       mx := drnd.Random*Window.Width/Window.Height;
+                       my := drnd.Random;
                        case animate of
                          asFlyInLeft,asFlyOutLeft: mx :=  0.0001;
                          asFlyInRight,asFlyOutRight: mx := -0.0001;
                          asFlyInBottom,asFlyOutBottom: my := 0.0001;
                          asFlyInTop,asFlyOutTop: my := -0.0001;
                        end;
-                       if (animate=asFlyInLeft) or (animate=asFlyInRight) or (animate=asFlyInTop) or (animate=asFlyInBottom) then begin
+                       if (Animate=asFlyInLeft) or (Animate=asFlyInRight) or (Animate=asFlyInTop) or (Animate=asFlyInBottom) then begin
                          Last.fx := mx;
                          Last.fy := my;
                        end else begin
@@ -602,54 +605,54 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DAbstractElement.setbasesize(const newx,newy,neww,newh,newo: float; animate: TAnimationStyle);
+procedure DAbstractElement.SetBaseSize(const NewX,NewY,NewW,NewH,NewO: float; Animate: TAnimationStyle);
 begin
   GetAnimationState;
-  base.setsize(newx,newy,neww,newh);
-  base.opacity := newo;
-  animateTo(animate);
+  Base.setsize(NewX,NewY,NewW,NewH);
+  Base.opacity := NewO;
+  AnimateTo(Animate);
   //rescale; //????
 end;
 
 {----------------------------------------------------------------------------}
 
-procedure DAbstractElement.setIntSize(const x1,y1,x2,y2:integer; animate: TAnimationStyle);
+procedure DAbstractElement.SetIntSize(const x1,y1,x2,y2:integer; Animate: TAnimationStyle);
 begin
   GetAnimationState;
-  base.backwardsetxywh(x1,y1,x2-x1,y2-y1);
-  animateTo(animate);
+  Base.BackwardSetXYWH(x1,y1,x2-x1,y2-y1);
+  AnimateTo(Animate);
   //rescale; //????
 end;
 
 {----------------------------------------------------------------------------}
 
-procedure DSingleInterfaceElement.setbasesize(const newx,newy,neww,newh,newo: float; animate: TAnimationStyle);
+procedure DSingleInterfaceElement.SetBaseSize(const NewX,NewY,NewW,NewH,NewO: float; Animate: TAnimationStyle);
 begin
-  inherited setBaseSize(newx,newy,neww,newh,newo,animate);
-  ResetContentSize(animate);
+  inherited SetBaseSize(NewX,NewY,NewW,NewH,NewO,Animate);
+  ResetContentSize(Animate);
 end;
 
 {----------------------------------------------------------------------------}
 
-procedure DSingleInterfaceElement.setIntsize(const x1,y1,x2,y2:integer; animate: TAnimationStyle);
+procedure DSingleInterfaceElement.SetIntsize(const x1,y1,x2,y2:integer; Animate: TAnimationStyle);
 begin
-  inherited setIntsize(x1,y1,x2,y2,animate);
-  ResetContentSize(animate);
+  inherited SetIntsize(x1,y1,x2,y2,Animate);
+  ResetContentSize(Animate);
 end;
 
 {----------------------------------------------------------------------------}
 
-procedure DSingleInterfaceElement.resetContentSize(animate: TAnimationStyle);
+procedure DSingleInterfaceElement.ResetContentSize(Animate: TAnimationStyle);
 begin
-  if (parent<>nil) and (parent is DInterfaceElement) and (DInterfaceElement(parent).ScaleToChildren) then
-    DInterfaceElement(parent).RescaleToChildren(animate);
+  if (Parent<>nil) and (Parent is DInterfaceElement) and (DInterfaceElement(Parent).ScaleToChildren) then
+    DInterfaceElement(Parent).RescaleToChildren(Animate);
   //frame should be automatically resized during "rescale" and animated during draw...
-  if content <> nil then begin
-    content.base.copyxywh(self.base);
-    content.base.SubstractFrame(frame,0); //adjust to frame borders, no problem that frame may be unrescaled yet, because frame borders always the same
-    content.CurrentAnimationState.copyxywh(self.currentAnimationState);
-    content.CurrentAnimationState.SubstractFrame(frame,0);
-    content.animateTo(animate);
+  if Content <> nil then begin
+    Content.Base.CopyXYWH(Self.Base);
+    Content.Base.SubstractFrame(Frame,0); //adjust to frame borders, no problem that frame may be unrescaled yet, because frame borders always the same
+    Content.CurrentAnimationState.CopyXYWH(Self.CurrentAnimationState);
+    Content.CurrentAnimationState.SubstractFrame(Frame,0);
+    Content.AnimateTo(Animate);
   end;
 
 end;
@@ -657,38 +660,38 @@ end;
 {----------------------------------------------------------------------------}
 
 procedure DAbstractElement.GetAnimationState;
-var phase: single;
+var Phase: float;
 begin
   if true then begin //todo!!!!!!!!!!!!!!!!!!!!!!!
-    if (last.initialized) and (next.initialized) and
-      ((animationstart<0) or (decoNow-animationstart < animationduration)) then begin
-      if animationstart<0 then animationstart := decoNow;
-      phase := (decoNow-animationstart)/animationduration; //animationtime
+    if (Last.Initialized) and (Next.Initialized) and
+      ((Animationstart<0) or (DecoNow-AnimationStart < AnimationDuration)) then begin
+      if AnimationStart<0 then AnimationStart := DecoNow;
+      Phase := (DecoNow-AnimationStart)/AnimationDuration; //animationtime
       //make curve slower at ends and sharper at middle
-      if phase<0.5 then phase := sqr(2*phase)/2 else phase := 1 - sqr(2*(1-phase))/2;
-      CurrentAnimationState.x1 := last.x1+round((next.x1-last.x1)*phase);
-      CurrentAnimationState.x2 := last.x2+round((next.x2-last.x2)*phase);
-      CurrentAnimationState.y1 := last.y1+round((next.y1-last.y1)*phase);
-      CurrentAnimationState.y2 := last.y2+round((next.y2-last.y2)*phase);
-      CurrentAnimationState.h := last.h+round((next.h-last.h)*phase);
-      CurrentAnimationState.w := last.w+round((next.w-last.w)*phase);
-      CurrentAnimationState.opacity := last.opacity+((next.opacity-last.opacity)*phase);
-      CurrentAnimationState.initialized := true;
+      if Phase<0.5 then Phase := Sqr(2*Phase)/2 else Phase := 1 - Sqr(2*(1-Phase))/2;
+      CurrentAnimationState.x1 := Last.x1+Round((Next.x1-Last.x1)*Phase);
+      CurrentAnimationState.x2 := Last.x2+Round((Next.x2-Last.x2)*Phase);
+      CurrentAnimationState.y1 := Last.y1+Round((Next.y1-Last.y1)*Phase);
+      CurrentAnimationState.y2 := Last.y2+Round((Next.y2-Last.y2)*Phase);
+      CurrentAnimationState.h := Last.h+Round((Next.h-Last.h)*Phase);
+      CurrentAnimationState.w := Last.w+Round((Next.w-Last.w)*Phase);
+      CurrentAnimationState.Opacity := Last.Opacity+((Next.opacity-Last.Opacity)*Phase);
+      CurrentAnimationState.Initialized := true;
     end else begin
       {should be "next" here}
-      CurrentAnimationState.x1 := base.x1;
-      CurrentAnimationState.x2 := base.x2;
-      CurrentAnimationState.y1 := base.y1;
-      CurrentAnimationState.y2 := base.y2;
-      CurrentAnimationState.h := base.h;
-      CurrentAnimationState.w := base.w;
-      CurrentAnimationState.opacity := base.Opacity;
-      CurrentAnimationState.initialized := true;
+      CurrentAnimationState.x1 := Base.x1;
+      CurrentAnimationState.x2 := Base.x2;
+      CurrentAnimationState.y1 := Base.y1;
+      CurrentAnimationState.y2 := Base.y2;
+      CurrentAnimationState.h := Base.h;
+      CurrentAnimationState.w := Base.w;
+      CurrentAnimationState.Opacity := Base.Opacity;
+      CurrentAnimationState.Initialized := true;
     end;
   end;
 end;
 
-procedure DAbstractElement.update;
+procedure DAbstractElement.Update;
 begin
   GetAnimationState;
 end;
@@ -699,16 +702,16 @@ end;
 constructor DAbstractElement.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  visible := true;
-  base := Txywha.Create(self);
-  last := Txywha.Create(self);
-  next := Txywha.Create(self);
-  CurrentAnimationState := Txywha.Create(self);
+  Visible := true;
+  Base := Txywha.Create(Self);
+  Last := Txywha.Create(Self);
+  Next := Txywha.Create(Self);
+  CurrentAnimationState := Txywha.Create(Self);
 end;
 
 {----------------------------------------------------------------------------}
 
-destructor DAbstractElement.destroy;
+destructor DAbstractElement.Destroy;
 begin
   //actulally this is not needed as they are owned by the class
 {  freeandnil(base);
@@ -722,22 +725,22 @@ end;
 {=================== Single interface element ===============================}
 {=============================================================================}
 
-procedure DSingleInterfaceElement.rescale;
+procedure DSingleInterfaceElement.Rescale;
 begin
   {$WARNING Memory Leak here}
-  if frame <> nil then FrameResize3x3;
-  if content <> nil then begin
+  if Frame <> nil then FrameResize3x3;
+  if Content <> nil then begin
     //content.base.copyxywh(base);
     //content.base.SubstractFrame(frame,2);
-    content.rescale;   //todo
+    Content.Rescale;   //todo
   end;
 end;
 
 {----------------------------------------------------------------------------}
 
-constructor DSingleInterfaceElement.create(AOwner: TComponent);
+constructor DSingleInterfaceElement.Create(AOwner: TComponent);
 begin
-  inherited create(AOwner);
+  inherited Create(AOwner);
   FrameOnTop := false;
   //ID := -1;
   //OwnsContent := false;
@@ -749,7 +752,7 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-destructor DSingleInterfaceElement.destroy;
+destructor DSingleInterfaceElement.Destroy;
 begin
   //InterfaceList.Remove(self);
   FreeAndNil(GLFrame);
@@ -774,45 +777,47 @@ var ScaledImageParts: array [0..2,0..2] of TCastleImage;
     SourceXs, SourceYs, DestXs, DestYs: TVector4Integer;
 begin
   FrameReady := false;
-  if base.initialized = false then begin
-    writeLnLog('DAbstractInterfaceElement.FrameResize3x3','ERROR: Base is not initialized!');
+  if Base.Initialized = false then begin
+    WriteLnLog('DAbstractInterfaceElement.FrameResize3x3','ERROR: Base is not initialized!');
   end;
 
-  //FreeAndNil(FrameImage);
-  if FrameImage<>nil then WriteLnLog('DSingleInterfaceElement.FrameResize3x3','ERROR: FrameImage is not nil! (memory leak)');
-  FrameImage := frame.SourceImage.CreateCopy as TRGBAlphaImage;
+  if FrameImage<>nil then begin
+    FreeAndNil(FrameImage);
+    WriteLnLog('DSingleInterfaceElement.FrameResize3x3','ERROR: FrameImage is not nil! (memory leak)');
+  end;
+  FrameImage := Frame.SourceImage.CreateCopy as TRGBAlphaImage;
 
-  UnscaledWidth := FrameImage.width;
-  UnscaledHeight := FrameImage.height;
+  UnscaledWidth := FrameImage.Width;
+  UnscaledHeight := FrameImage.Height;
 
   {check if minimal frame size is larger than the requested frame size}
-  if frame.cornerLeft+frame.cornerRight+1 > base.w then begin
-    writeLnLog('DAbstractInterfaceElement.FrameResize3x3','Reset backwards base.w = '+inttostr(base.w)+' / cornerLeft+cornerRight = '+inttostr(frame.cornerLeft+frame.cornerRight));
-    base.w := frame.cornerLeft+frame.cornerRight+1;
-    base.backwardsetsize(base.w,-1);
+  if Frame.CornerLeft+Frame.CornerRight+1 > Base.w then begin
+    WriteLnLog('DAbstractInterfaceElement.FrameResize3x3','Reset backwards base.w = '+IntToStr(Base.w)+' / cornerLeft+cornerRight = '+IntToStr(Frame.CornerLeft+Frame.CornerRight));
+    Base.w := Frame.CornerLeft+Frame.CornerRight+1;
+    Base.BackwardSetSize(Base.w,-1);
   end;
-  if frame.cornerTop+frame.cornerBottom+1>base.h then begin
-    writeLnLog('DAbstractInterfaceElement.FrameResize3x3','Reset backwards base.h = '+inttostr(base.h)+' / cornerTop+cornerBottom = '+inttostr(frame.cornerTop+frame.cornerBottom));
-    base.h := frame.cornerTop+frame.cornerBottom+1;
-    base.backwardsetsize(-1,base.h);
+  if Frame.CornerTop+Frame.CornerBottom+1 > Base.h then begin
+    WriteLnLog('DAbstractInterfaceElement.FrameResize3x3','Reset backwards base.h = '+inttostr(base.h)+' / cornerTop+cornerBottom = '+inttostr(frame.cornerTop+frame.cornerBottom));
+    Base.h := Frame.CornerTop+Frame.CornerBottom+1;
+    Base.BackwardSetSize(-1,Base.h);
   end;
 
   SourceXs[0] := 0;
-  SourceXs[1] := frame.cornerLeft;
-  SourceXs[2] := UnscaledWidth-frame.cornerRight;
+  SourceXs[1] := Frame.CornerLeft;
+  SourceXs[2] := UnscaledWidth-Frame.CornerRight;
   SourceXs[3] := UnscaledWidth;
   SourceYs[0] := 0;
-  SourceYs[1] := frame.cornerBottom;
-  SourceYs[2] := UnscaledHeight-frame.cornerTop;
+  SourceYs[1] := Frame.cornerBottom;
+  SourceYs[2] := UnscaledHeight-Frame.CornerTop;
   SourceYs[3] := UnscaledHeight;
   DestXs[0] := 0;
-  DestXs[1] := frame.cornerLeft;
-  DestXs[2] := base.w-frame.cornerRight;
-  DestXs[3] := base.w;
+  DestXs[1] := Frame.CornerLeft;
+  DestXs[2] := Base.w-Frame.CornerRight;
+  DestXs[3] := Base.w;
   DestYs[0] := 0;
-  DestYs[1] := frame.cornerBottom;
-  DestYs[2] := base.h-frame.cornerTop;
-  DestYs[3] := base.h;
+  DestYs[1] := Frame.CornerBottom;
+  DestYs[2] := Base.h-Frame.CornerTop;
+  DestYs[3] := Base.h;
 
   for ix := 0 to 2 do
    for iy := 0 to 2 do begin
