@@ -58,8 +58,8 @@ type
     party characters }
   DParty = class (TComponent)
   private
-    const Speed = 0.3;
-    const Friction = 0.4;
+    const Speed = 10; {meters per second}
+    const Friction = 40; {~meters per second, 0 never stops}
   private
     {updates game camera with CameraMan coordinates}
     procedure UpdateCamera;
@@ -98,7 +98,7 @@ procedure FreeParty;
 implementation
 uses SysUtils, CastleLog,
   DecoNavigation, DecoAbstractWorld, DecoAbstractWorld3d,
-  DecoGameMode;
+  DecoGameMode, DecoTime;
 
 constructor DParty.create(AOwner: TComponent);
 begin
@@ -245,13 +245,13 @@ end;
 procedure DParty.doMove;
 var NewPos, tmp: TVector3;
 begin
-  MoveSpeed := (1-Friction)*MoveSpeed+Friction*Acceleration;
+  MoveSpeed := (1-Friction*DeltaTLocal)*MoveSpeed+Friction*DeltaTLocal*Acceleration;
   if not isAccelerating then Acceleration := TVector3.Zero;
 
-  NewPos := CameraMan.Position+Speed*MoveSpeed;
+  NewPos := CameraMan.Position+(Speed*DeltaTLocal)*MoveSpeed;
+  {use body here, including body.gravity}
   if Camera.DoMoveAllowed(NewPos,tmp,false) then begin
     CameraMan.Position := NewPos;
-    //Camera.Position := NewPos;
   end;
 end;
 
