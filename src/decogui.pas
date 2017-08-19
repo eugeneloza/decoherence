@@ -46,7 +46,7 @@ Type
     background: DStaticImage;
     LoadScreenLabel, FloaterLabel: DLabel;
     procedure DoLoadNewImage;
-    procedure loadwind;
+    procedure LoadWind;
 
     { draw loadscreen elements }
     procedure DrawLoadScreen;
@@ -219,11 +219,11 @@ end;
 procedure DInterfaceContainer.DrawLoadScreen;
 begin
   if (floater = nil) or (LoadNewFloaterImage) then DoLoadNewImage;
-  floater.draw;
+  floater.Draw;
 
   DrawWind;
 
-  LoadScreenLabel.draw;
+  LoadScreenLabel.Draw;
 
   floaterLabel.base.y1 := round((1 + 5*Floater.phase)*Window.height/17);
   floaterLabel.base.Opacity := sin(Pi*Floater.Phase);

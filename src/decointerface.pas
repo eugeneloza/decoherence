@@ -55,9 +55,9 @@ Type
 end;
 
  { constants for special scaling cases }
-const FullWidth = -1;
-      FullHeight = -2;
-      ProportionalScale = -3;
+const FullWidth = -10;
+      FullHeight = -11;
+      ProportionalScale = -12;
 type
   { Yes, that looks stupid for now. But I'll simplify it later. Maybe.
    Contains redunant data on animation with possible rescaling in mind.}
@@ -371,7 +371,7 @@ procedure Txywh.SetSize(const NewX,NewY,NewW,NewH: float);
 begin
   if (Abs(NewX) > 1) or (Abs(NewY) > 1) or
      (((NewW<0) or (NewW>1)) and (not FloatsEqual(NewW,ProportionalScale) and not FloatsEqual(NewW,FullWidth) and not FloatsEqual(NewW,FullHeight))) or
-     (((NewH<0) or (NewH>1)) and (not FloatsEqual(NewW,ProportionalScale) and not FloatsEqual(NewW,FullHeight))) then
+     (((NewH<0) or (NewH>1)) and (not FloatsEqual(NewH,ProportionalScale) and not FloatsEqual(NewH,FullHeight))) then
   begin
     WriteLnLog('Txywh.setsize','ERROR: Incorrect newx,newy,neww,newh!');
     Exit;
@@ -402,7 +402,7 @@ begin
   else
     x1 := Window.Width + Round(Window.Height*fx);
 
-  if fy>=0 then
+  if fy >= 0 then
     y1 := Round(Window.Height*fy)     // turn over y-axis?
   else
     y1 := Window.Height + Round(Window.Height*fy);

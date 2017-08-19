@@ -493,10 +493,10 @@ end;
 procedure DStatBarImage.Update;
   function AboveZero(const a: float): float; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
   begin
-    if a>0 then Result := a else Result := 0;
+    if a > 0 then Result := a else Result := 0;
   end;
 begin
-  if Target=nil then Exit; //don't waste time if target isn't present
+  if Target = nil then Exit; //don't waste time if target isn't present
 
   inherited Update;
 
