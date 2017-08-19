@@ -50,11 +50,15 @@ end;
 {list of the party characters}
 type DCharList = specialize TFPGObjectList<DPlayerCharacter>;
 
+type TMoveDirection = (mdForward,mdBack,mdLeft,mdRight);
+
 type
   { Physical manifestation of Player in the world
     including camera
     party characters }
   DParty = class (TComponent)
+  private
+    const speed = 1;
   private
     {updates game camera with CameraMan coordinates}
     procedure UpdateCamera;
@@ -71,6 +75,9 @@ type
     procedure TeleportTo(aNav: TNavId; aDirection: TVector3);
     procedure TeleportTo(aNav: TNavId);
     procedure Rest;
+
+  public
+    procedure Move(MoveDir: TMoveDirection);
   end;
 
 {a list of player's parties}
@@ -148,8 +155,8 @@ procedure DParty.Manage;
 begin
   //UpdateCamera;
   {actually we're doing the very opposite now:}
-  CameraMan.Position := Camera.Position;
-  CameraMan.Direction := Camera.Direction;
+  {CameraMan.Position := Camera.Position;
+  CameraMan.Direction := Camera.Direction;}
   //teleport all characters to CameraMan position;
   CollectCharacters;
 end;
@@ -195,6 +202,41 @@ procedure DParty.TeleportTo(aNav: TNavId; aDirection: TVector3);
 begin
   CameraMan.TeleportTo(aNav);
   TeleportTo(CurrentWorld.NavToVector3(aNav),aDirection);
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DParty.Move(MoveDir: TMoveDirection);
+var MoveVector,NewPos,tmp: TVector3;
+  procedure Right90(var v: TVector3); {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+  var tt: single;
+  begin
+    tt := v[0];
+    v[0] := v[1];
+    v[1] := -tt;
+  end;
+  procedure Left90(var v: TVector3); {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+  var tt: single;
+  begin
+    tt := v[0];
+    v[0] := -v[1];
+    v[1] := tt;
+  end;
+begin
+  MoveVector := CameraMan.Direction;
+  MoveVector[2] := 0;
+  case MoveDir of
+    //mdForward - does nothing
+    mdBack   : MoveVector := -MoveVector;
+    mdLeft   : Left90(MoveVector);
+    mdRight  : Right90(MoveVector);
+  end;
+  MoveVector.Normalize;
+  NewPos := MoveVector+CameraMan.Position;
+  if Camera.DoMoveAllowed(NewPos,tmp,false) then begin
+    CameraMan.Position := NewPos;
+    Camera.Position := NewPos;
+  end;
 end;
 
 {======================== DPlayerCharacter ==================================}

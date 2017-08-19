@@ -124,10 +124,12 @@
       <Unit3>
         <Filename Value="src/decointerface.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoInterface"/>
       </Unit3>
       <Unit4>
         <Filename Value="src/decoimages.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoImages"/>
       </Unit4>
       <Unit5>
         <Filename Value="src/decogui.pas"/>

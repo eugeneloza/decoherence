@@ -125,7 +125,7 @@ begin
   begin
     p^[1] := p^[0];
     p^[0] := 255;
-    inc(P);
+    Inc(P);
   end;
 end;
 

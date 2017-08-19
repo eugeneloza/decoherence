@@ -158,6 +158,15 @@ begin
        k_3: shaders.WhichChoice := 2;}
 
     end;
+
+    if (CurrentGameMode=gmTravel) and (CurrentParty<>nil) then begin
+     case Event.key of
+        k_W: CurrentParty.Move(mdForward);
+        k_S: CurrentParty.Move(mdBack);
+        k_A: CurrentParty.Move(mdLeft);
+        k_D: CurrentParty.Move(mdRight);
+     end;
+    end;
   end;
 //  SetGameMode(gmCharacterGeneration);
   InitTestLevel;                         //ugly! I'll fix this soon.
