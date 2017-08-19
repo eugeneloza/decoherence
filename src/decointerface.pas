@@ -821,25 +821,25 @@ begin
 
   for ix := 0 to 2 do
    for iy := 0 to 2 do begin
-     ScaledImageParts[ix,iy] := TRGBAlphaImage.create;
+     ScaledImageParts[ix,iy] := TRGBAlphaImage.Create;
      ScaledImageParts[ix,iy].SetSize(SourceXs[ix+1]-SourceXs[ix],SourceYs[iy+1]-SourceYs[iy]);
      ScaledImageParts[ix,iy].Clear(Vector4Byte(0,0,0,0));
      ScaledImageParts[ix,iy].DrawFrom(FrameImage,0,0,SourceXs[ix],SourceYs[iy],SourceXs[ix+1]-SourceXs[ix],SourceYs[iy+1]-SourceYs[iy],dmBlendSmart);
      ScaledImageParts[ix,iy].Resize(DestXs[ix+1]-DestXs[ix],DestYs[iy+1]-DestYs[iy],riNearest);
    end;
 
-  FrameImage.SetSize(base.w,base.h,1);
+  FrameImage.SetSize(Base.w,Base.h,1);
   FrameImage.Clear(Vector4byte(0,0,0,0));
   for ix := 0 to 2 do
     for iy := 0 to 2 do FrameImage.DrawFrom(ScaledImageParts[ix,iy],DestXs[ix],DestYs[iy],0,0,DestXs[ix+1]-DestXs[ix],DestYs[iy+1]-DestYs[iy],dmBlendSmart);
 
   for ix := 0 to 2 do
-    for iy := 0 to 2 do freeAndNil(ScaledImageParts[ix,iy]);
+    for iy := 0 to 2 do FreeAndNil(ScaledImageParts[ix,iy]);
 
   //and burn the burner
   //FrameImage.DrawFrom(BURNER_IMAGE,0,0,base.x1,base.y1,base.w,base.h,dmMultiply);
 
-  initGLPending := true;
+  InitGLPending := true;
 end;
 
 {----------------------------------------------------------------------------}
@@ -850,8 +850,8 @@ begin
   if InitGLPending then begin
     InitGLPending := false;
     if FrameImage<>nil then begin
-      freeandnil(GLFrame);
-      GLFrame := TGLImage.create(FrameImage,true,true);
+      FreeAndNil(GLFrame);
+      GLFrame := TGLImage.Create(FrameImage,true,true); //todo: maybe, it's inefficient
       FrameImage := nil;
       FrameReady := true;
     end;
@@ -862,10 +862,10 @@ end;
 
 procedure DSingleInterfaceElement.DrawFrame; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
-  if frame <> nil then begin
+  if Frame <> nil then begin
     if FrameReady then begin
-      GLFrame.color := vector4single(1,1,1,currentAnimationState.Opacity * FrameOpacity);     //todo
-      GLFrame.Draw(currentAnimationState.x1,currentAnimationState.y1,currentAnimationState.w,currentAnimationState.h);
+      GLFrame.Color := Vector4(1,1,1,CurrentAnimationState.Opacity * FrameOpacity);     //todo
+      GLFrame.Draw(CurrentAnimationState.x1,CurrentAnimationState.y1,CurrentAnimationState.w,CurrentAnimationState.h);
     end else begin
       if InitGLPending then InitGL;
     end;
@@ -875,16 +875,16 @@ end;
 procedure DSingleInterfaceElement.DrawContent; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
   //todo
-  if content <> nil then begin
+  if Content <> nil then begin
     //Content.base.copyxywh(currentAnimationState);
-    Content.draw;
+    Content.Draw;
   end;
 end;
 
-procedure DSingleInterfaceElement.draw;
+procedure DSingleInterfaceElement.Draw;
 begin
-  update;
-  if not visible then exit;
+  Update;
+  if not Visible then Exit;
 
   if FrameOnTop then begin
     DrawContent;
@@ -905,16 +905,16 @@ begin
   if (xx >= CurrentAnimationState.x1) and (xx <= CurrentAnimationState.x2) and
      (yy >= CurrentAnimationState.y1) and (yy <= CurrentAnimationState.y2)
   then
-    result := true
+    Result := true
   else
-    result := false;
+    Result := false;
 end;
 
 {-----------------------------------------------------------------------------}
 
 function DSingleInterfaceElement.ifMouseOver(xx,yy: integer; RaiseEvents: boolean; AllTree: boolean): DAbstractElement;
 begin
-  result := nil;
+  Result := nil;
   if IAmHere(xx,yy) then begin
     if RaiseEvents then begin
       if isMouseOver = false then begin
@@ -924,10 +924,10 @@ begin
       if Assigned(onMouseOver) then onMouseOver(self,xx,yy);
     end;
     if CanMouseOver then  //todo
-      result := self
+      Result := Self
   end else begin
     if isMouseOver and RaiseEvents then begin
-      if Assigned(onMouseLeave) then onMouseLeave(self,xx,yy);
+      if Assigned(onMouseLeave) then onMouseLeave(Self,xx,yy);
       isMouseOver := false;
     end;
   end;
@@ -935,50 +935,50 @@ end;
 
 function DInterfaceElement.ifMouseOver(xx,yy: integer; RaiseEvents: boolean; AllTree: boolean): DAbstractElement;
 var i: integer;
-    tmplink: DAbstractElement;
+    tmpLink: DAbstractElement;
 begin
-  result := inherited ifMouseOver(xx,yy,RaiseEvents,AllTree);
+  Result := inherited ifMouseOver(xx,yy,RaiseEvents,AllTree);
   //if rsult<>nil ... *or drag-n-drop should get the lowest child?
 
   // recoursively scan all children
-  for i := 0 to children.count-1 do begin
-    tmpLink := children[i].ifMouseOver(xx,yy,RaiseEvents,AllTree);
+  for i := 0 to Children.Count-1 do begin
+    tmpLink := Children[i].ifMouseOver(xx,yy,RaiseEvents,AllTree);
     if tmpLink <> nil then begin
-      result := tmpLink;
-      if not AllTree then break; // if drag-n-drop one is enough
+      Result := tmpLink;
+      if not AllTree then Break; // if drag-n-drop one is enough
     end;
   end;
 end;
 
 {-----------------------------------------------------------------------------}
 
-procedure DSingleInterfaceElement.startdrag(x,y: integer);
+procedure DSingleInterfaceElement.StartDrag(x,y: integer);
 begin
-  dragx := base.x1 - x;
-  dragy := base.y1 - y;
+  DragX := Base.x1 - x;
+  DragY := Base.y1 - y;
 end;
 
 
 procedure DSingleInterfaceElement.drag(x,y: integer);
 begin
-  base.x1 := dragx + x;
-  base.y1 := dragy + y;
+  Base.x1 := DragX + x;
+  Base.y1 := DragY + y;
 end;
 
 {=============================================================================}
 {=========================== interface element ===============================}
 {=============================================================================}
 
- constructor DTImer.create;
+ constructor DTimer.Create;
  begin
    inherited;
-   enabled := false;
+   Enabled := false;
    StartTime := -1;
  end;
 
 {-----------------------------------------------------------------------------}
 
-procedure DTimer.update;
+procedure DTimer.Update;
 begin
   if StartTime<0 then StartTime := DecoNow else
   if (DecoNow-StartTime) >= Interval then begin
@@ -989,7 +989,7 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-procedure DTimer.settimeout(Seconds: DTime);
+procedure DTimer.SetTimeout(Seconds: DTime);
 begin
   StartTime := -1;
   Enabled := true;
@@ -998,78 +998,78 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-procedure DInterfaceElement.rescale;
+procedure DInterfaceElement.Rescale;
 var i: integer;
 begin
   inherited;
   //{$WARNING Memory Leak here}
-  for i:=0 to children.Count-1 do children[i].rescale;
+  for i:=0 to Children.Count-1 do Children[i].Rescale;
 end;
 
 {-----------------------------------------------------------------------------}
 
-procedure DInterfaceElement.update;
+procedure DInterfaceElement.Update;
 begin
   inherited;
-  if timer.enabled then timer.update;
+  if Timer.Enabled then Timer.Update;
 end;
 
 {-----------------------------------------------------------------------------}
 
-constructor DInterfaceElement.create(AOwner: TComponent);
+constructor DInterfaceElement.Create(AOwner: TComponent);
 begin
-  inherited create(AOwner);
-  if AOwner is DSingleInterfaceElement then parent := DSingleInterfaceElement(AOwner);
+  inherited Create(AOwner);
+  if AOwner is DSingleInterfaceElement then Parent := DSingleInterfaceElement(AOwner);
   ScaleToChildren := false;
-  children := DInterfaceElementsList.Create(true);
-  timer := DTimer.create;
+  Children := DInterfaceElementsList.Create(true);
+  Timer := DTimer.Create; //maybe create timer on-demand?
 end;
 
 {----------------------------------------------------------------------------}
 
-destructor DInterfaceElement.destroy;
+destructor DInterfaceElement.Destroy;
 begin
-  freeandnil(children);   //this should fire as recoursive because children owns elements, which in turn will fire their destructors onfree
-  freeandnil(timer);
+  FreeAndNil(Children);   //this should fire as recoursive because children owns elements, which in turn will fire their destructors onfree
+  FreeAndNil(Timer);
   inherited;
 end;
 
 {----------------------------------------------------------------------------}
 
-procedure DInterfaceElement.draw;
+procedure DInterfaceElement.Draw;
 var i: integer;
 begin
   inherited;
-  for i := 0 to children.Count-1 do children[i].draw;
+  for i := 0 to Children.Count-1 do Children[i].Draw;
 end;
 
 {----------------------------------------------------------------------------}
 
 procedure DInterfaceElement.Grab(Child: DSingleInterfaceElement);
 begin
-  children.Add(Child);
-  if (Child is DSingleInterfaceElement) then DSingleInterfaceElement(Child).Parent := self; //not sure about this line
+  Children.Add(Child);
+  if (Child is DSingleInterfaceElement) then DSingleInterfaceElement(Child).Parent := Self; //not sure about this line
   //{Child.ID := }InterfaceList.Add(Child); //global ID of the element
 end;
 
 {----------------------------------------------------------------------------}
 
-procedure DInterfaceElement.RescaleToChildren(animate: TAnimationStyle);
+procedure DInterfaceElement.RescaleToChildren(Animate: TAnimationStyle);
 var i: integer;
     x1,y1,x2,y2: integer;
 begin
-  if children.count>0 then begin
-    x1 := window.width;
-    y1 := window.height;
+  if Children.Count>0 then begin
+    x1 := Window.Width;
+    y1 := Window.Height;
     x2 := 0;
     y2 := 0;
-    for i := 1 to children.count-1 do begin
-      if x1>children[i].base.x1 then x1 := children[i].base.x1;
-      if y1>children[i].base.y1 then y1 := children[i].base.y1;
-      if x2>children[i].base.x2 then x2 := children[i].base.x2;
-      if y2>children[i].base.y2 then y2 := children[i].base.y2;
+    for i := 1 to Children.Count-1 do begin
+      if x1>Children[i].Base.x1 then x1 := Children[i].Base.x1;
+      if y1>Children[i].Base.y1 then y1 := Children[i].Base.y1;
+      if x2>Children[i].Base.x2 then x2 := Children[i].Base.x2;
+      if y2>Children[i].Base.y2 then y2 := Children[i].Base.y2;
     end;
-    self.setIntSize(x1,y1,x2,y2,animate);
+    Self.SetIntSize(x1,y1,x2,y2,Animate);
   end
   else WriteLnLog('DInterfaceElement.RescaleToChildren','No children for resale to');
 end;
@@ -1080,13 +1080,13 @@ function DInterfaceElement.MouseOverTree(xx,yy: integer): boolean;
 var tmp: DAbstractElement;
 begin
   // maybe rewrite it using isMouseOver - the idea is still a little different
-  tmp := self.ifMouseOver(xx,yy,false,false);
+  tmp := Self.ifMouseOver(xx,yy,false,false);
   if (tmp <> nil) and (tmp is DSingleInterfaceElement) and (DSingleInterfaceElement(tmp).CanMouseOver){ and (tmp.base.opacity>0)} then
     isMouseOverTree := true
   else
     isMouseOverTree := false;
   //base.opacity breaks the algorithm, if transparent item is above (i.e. below) the opaque element
-  result := isMouseOverTree;
+  Result := isMouseOverTree;
 end;
 
 end.
