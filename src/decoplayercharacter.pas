@@ -244,8 +244,15 @@ end;
 
 procedure DParty.doMove;
 var NewPos, tmp: TVector3;
+    FixedFriction: float;
 begin
-  MoveSpeed := (1-Friction*DeltaTLocal)*MoveSpeed+Friction*DeltaTLocal*Acceleration;
+  {this is not a correct way to account for friction/innertia, but actually
+   it doesn't really matter. We're not driving a car, it just adds some
+   softness for movement and, maybe, provides for slippery ice surface}
+  FixedFriction := Friction*DeltaTLocal;
+  if FixedFriction > 1 then FixedFriction := 1;
+
+  MoveSpeed := (1-FixedFriction)*MoveSpeed+FixedFriction*Acceleration;
   if not isAccelerating then Acceleration := TVector3.Zero;
 
   NewPos := CameraMan.Position+(Speed*DeltaTLocal)*MoveSpeed;
