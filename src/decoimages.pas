@@ -491,6 +491,10 @@ end;
 {================ Stat Bar image =========================================}
 
 procedure DStatBarImage.Update;
+  function AboveZero(const a: float): float; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+  begin
+    if a>0 then Result := a else Result := 0;
+  end;
 begin
   if Target=nil then Exit; //don't waste time if target isn't present
 
@@ -501,26 +505,26 @@ begin
   case Style of
     sbHealth: begin
                 Max := Target.MaxMaxHp;
-                CurrentMax := Target.MaxHp;
-                Position := Target.Hp;
+                CurrentMax := AboveZero(Target.MaxHp);
+                Position := AboveZero(Target.Hp);
                 //color := Vector4Single(1,0,0,1);  //red  ? maybe green->red?
               end;
     sbStamina: begin
                 Max := Target.MaxMaxSta;
-                CurrentMax := Target.MaxSta;
-                Position := Target.Sta;
+                CurrentMax := AboveZero(Target.MaxSta);
+                Position := AboveZero(Target.Sta);
                 //color := Vector4Single(1,1,0,1);  //yellow
               end;
     sbConcentration: begin
                 Max := Target.MaxMaxCNC;
-                CurrentMax := Target.MaxCNC;
-                Position := Target.CNC;
+                CurrentMax := AboveZero(Target.MaxCNC);
+                Position := AboveZero(Target.CNC);
                 //color := Vector4Single(0,1,1,1);  //cyan
               end;
     sbMetaphysics: begin
                 Max := Target.MaxMaxMph;
-                CurrentMax := Target.MaxMph;
-                Position := Target.Mph;
+                CurrentMax := AboveZero(Target.MaxMph);
+                Position := AboveZero(Target.Mph);
                 //color := Vector4Single(1,0.5,1,1);  //purple
               end;
   end;
