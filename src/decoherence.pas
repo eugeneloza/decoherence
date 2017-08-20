@@ -161,10 +161,10 @@ begin
 
     if (CurrentGameMode=gmTravel) and (CurrentParty<>nil) then begin
      case Event.key of
-        k_W: CurrentParty.Move(mdForward);
-        k_S: CurrentParty.Move(mdBack);
-        k_A: CurrentParty.Move(mdLeft);
-        k_D: CurrentParty.Move(mdRight);
+        k_W: CurrentParty.InputMove(mdForward);
+        k_S: CurrentParty.InputMove(mdBack);
+        k_A: CurrentParty.InputMove(mdLeft);
+        k_D: CurrentParty.InputMove(mdRight);
      end;
     end;
   end;
@@ -180,9 +180,12 @@ begin
     doMouseRelease(Event);
   end else
   if Event.EventType = itKey then begin
-   case Event.key of
-      k_W, k_S, k_A, k_D: CurrentParty.Stop;
-   end;
+    case Event.key of
+      k_W: CurrentParty.InputRelease(mdForward);
+      k_S: CurrentParty.InputRelease(mdBack);
+      k_A: CurrentParty.InputRelease(mdLeft);
+      k_D: CurrentParty.InputRelease(mdRight);
+    end;
   end;
 end;
 

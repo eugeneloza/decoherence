@@ -77,11 +77,15 @@ type
     procedure TeleportTo(aNav: TNavId);
     procedure Rest;
   private
+    MovePress: array [TMoveDirection] of boolean;
     Acceleration,MoveSpeed: TVector3;
     isAccelerating: boolean;
-    procedure doMove;
+    procedure doMove1;
+    procedure doMove2;
+    procedure ResetMoveInput;
   public
-    procedure Move(MoveDir: TMoveDirection);
+    procedure InputMove(MoveDir: TMoveDirection);
+    procedure InputRelease(MoveDir: TMoveDirection);
     procedure Stop;
   end;
 
@@ -106,6 +110,7 @@ begin
   Char := DCharList.Create(true);
   CameraMan := DCoordActor.Create;
   isAccelerating := false;
+  ResetMoveInput;
 end;
 
 {----------------------------------------------------------------------------}
@@ -150,7 +155,7 @@ end;
 
 procedure DParty.UpdateCamera;
 begin
-  doMove;
+  doMove1; doMove2;
   if Camera = nil then Exit;// InitNavigation;
   Camera.Position := CameraMan.Position;
   Camera.Direction := CameraMan.Direction;
@@ -210,39 +215,62 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DParty.Move(MoveDir: TMoveDirection);
-var MoveVector: TVector3;
-  procedure Right90(var v: TVector3); {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
-  var tt: single;
-  begin
-    tt := v[0];
-    v[0] := v[1];
-    v[1] := -tt;
-  end;
-  procedure Left90(var v: TVector3); {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
-  var tt: single;
-  begin
-    tt := v[0];
-    v[0] := -v[1];
-    v[1] := tt;
-  end;
+procedure DParty.InputMove(MoveDir: TMoveDirection);
 begin
-  MoveVector := CameraMan.Direction;
-  MoveVector[2] := 0;
-  case MoveDir of
-    //mdForward - does nothing
-    mdBack   : MoveVector := -MoveVector;
-    mdLeft   : Left90(MoveVector);
-    mdRight  : Right90(MoveVector);
-  end;
-  MoveVector.Normalize;
-  Acceleration := MoveVector;
-  isAccelerating := true;
+  MovePress[MoveDir] := true;
+  isAccelerating := MovePress[mdForward] or
+                    MovePress[mdBack] or
+                    MovePress[mdLeft] or
+                    MovePress[mdRight];
+end;
+
+procedure DParty.InputRelease(MoveDir: TMoveDirection);
+begin
+  MovePress[MoveDir] := false;
+  isAccelerating := MovePress[mdForward] or
+                    MovePress[mdBack] or
+                    MovePress[mdLeft] or
+                    MovePress[mdRight];
+end;
+
+procedure DParty.ResetMoveInput;
+begin
+  MovePress[mdForward] := false;
+  MovePress[mdBack] := false;
+  MovePress[mdLeft] := false;
+  MovePress[mdRight] := false;
 end;
 
 {----------------------------------------------------------------------------}
 
-procedure DParty.doMove;
+procedure DParty.doMove1;
+var MoveVector: TVector3;
+  function Right90(var v: TVector3): TVector3; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+  begin
+    Result[0] :=  v[1];
+    Result[1] := -v[0];
+    Result[2] :=  v[2];
+  end;
+  function Left90(var v: TVector3): TVector3; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+  begin
+    Result[0] := -v[1];
+    Result[1] :=  v[0];
+    Result[2] :=  v[2];
+  end;
+begin
+  MoveVector := CameraMan.Direction;
+  MoveVector[2] := 0;
+  Acceleration := TVector3.Zero;
+  if MovePress[mdForward] then Acceleration += MoveVector;
+  if MovePress[mdBack]    then Acceleration += -MoveVector;
+  if MovePress[mdLeft]    then Acceleration += Left90(MoveVector);
+  if MovePress[mdRight]   then Acceleration += Right90(MoveVector);
+  Acceleration.Normalize;
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DParty.doMove2;
 var NewPos, tmp: TVector3;
     FixedFriction: float;
 begin
@@ -251,7 +279,6 @@ begin
    softness for movement and, maybe, provides for slippery ice surface}
   FixedFriction := Friction*DeltaTLocal;
   if FixedFriction > 1 then FixedFriction := 1;
-
   MoveSpeed := (1-FixedFriction)*MoveSpeed+FixedFriction*Acceleration;
   if not isAccelerating then Acceleration := TVector3.Zero;
 
