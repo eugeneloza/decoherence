@@ -59,47 +59,62 @@ Type DFont = class(TTextureFont)
   function StringToImage(const s: string): TGrayscaleAlphaImage;
 end;
 
-var {$IFNDEF Android}MyCharSet: TUnicodeCharList;{$ENDIF}
-  RegularFont16: DFont;
-  RegularFont12: DFont;
-
-  CharHealthFont: DFont;
-  CharNickNameFont: DFont;
+var CharHealthFont, CharNickNameFont: DFont;
+    LoadScreenFont: DFont;
+    PlayerDamageFont: DFont;
+    DebugFont: DFont;
 
 procedure InitializeFonts;
 procedure DestroyFonts;
 
 implementation
 
+var {$IFNDEF Android}MyCharSet: TUnicodeCharList;{$ENDIF}
+    RegularFont12,RegularFont16,RegularFont100: DFont;
+
 {------------------------------------------------------------------------------}
+
+procedure SetFonts;
+begin
+  DebugFont := RegularFont12;
+
+  CharHealthFont := RegularFont12;
+  CharNickNameFont := RegularFont12;
+
+  LoadScreenFont := RegularFont16;
+
+  PlayerDamageFont := RegularFont100;
+end;
 
 procedure InitializeFonts;
 begin
   WritelnLog('DecoFont : InitializeFonts','Init started');
    {$IFDEF Android}
    RegularFont16 := DFont.Create(TextureFont_LinBiolinumRG_16);
-   RegularFont14 := RegularFont16; {!!!! TODO}
+   RegularFont12 := RegularFont16; {!!!! TODO}
+   RegularFont100 := RegularFont16;
    {$ELSE}
    if MyCharSet = nil then begin
       MyCharSet := TUnicodeCharList.Create;
       MyCharSet.Add(SimpleAsciiCharacters);
       MyCharSet.Add('ЁЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮёйцукенгшщзхъфывапролджэячсмитьбюІЇЄіїє');
    end;
-   RegularFont16 := DFont.Create(ApplicationData(FontFolder+NormalFontFile),16,true,MyCharSet);
    RegularFont12 := DFont.Create(ApplicationData(FontFolder+NormalFontFile),12,true,MyCharSet);
+   RegularFont16 := DFont.Create(ApplicationData(FontFolder+NormalFontFile),16,true,MyCharSet);
+   RegularFont100 := DFont.Create(ApplicationData(FontFolder+NormalFontFile),100,true,MyCharSet);
    {$ENDIF}
    WriteLnLog('DecoFont : InitializeFonts','Fonts loaded successfully.');
 
-   CharHealthFont := RegularFont12;
-   CharNickNameFont := RegularFont12;
+   SetFonts;
 end;
 
 {----------------------------------------------------------------------------}
 
 procedure DestroyFonts;
 begin
-  FreeAndNil(RegularFont16);
   FreeAndNil(RegularFont12);
+  FreeAndNil(RegularFont16);
+  FreeAndNil(RegularFont100);
   FreeAndNil(MyCharSet);
 end;
 

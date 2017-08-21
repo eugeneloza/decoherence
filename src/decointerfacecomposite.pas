@@ -516,7 +516,7 @@ begin
   damageLabel := DSingleInterfaceElement.create(self);
   tmp_label := DLabel.create(self);
   tmp_label.ScaleLabel := false;
-  tmp_label.Font := RegularFont16;
+  tmp_label.Font := PlayerDamageFont;
   damageLabel.content := tmp_label;
   grab(damageLabel);
 end;

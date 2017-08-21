@@ -70,7 +70,7 @@ uses SysUtils, CastleLog,
   CastleGLUtils, CastleColors,
   DecoLoadScreen,
   DecoInterfaceComposite, DecoInterfaceBlocks,
-  DecoPlayerCharacter,
+  {DecoPlayerCharacter,}
   Decogamemode, DecoTime;
 
 {=============================================================================}
@@ -87,7 +87,7 @@ begin
   FPS_Label := DLabel.create(self);
   FPS_Label.setbasesize(0,0,0.05,0.05,1,asNone);
   FPS_Label.Shadow := 0;
-  FPS_Label.Font := RegularFont16;
+  FPS_Label.Font := DebugFont;
   FPS_Label.text := 'x';
 
   width := -1;
@@ -167,13 +167,13 @@ begin
     LoadScreenLabel := DLabel.create(self);
     LoadScreenLabel.setbasesize(1/17,-2/17,10/17,10/17,1,asNone);
     LoadScreenLabel.Shadow := 1;
-    LoadScreenLabel.Font := RegularFont16;
+    LoadScreenLabel.Font := LoadScreenFont;
   end;
   LoadScreenLabel.text := LoadScreenMainText;
 
   if floaterLabel = nil then begin
     FloaterLabel := DLabel.create(self);
-    floaterLabel.Font := RegularFont16;
+    floaterLabel.Font := LoadScreenFont;
     floaterLabel.Shadow := 1;
   end;
   floaterLabel.setbasesize(-11/17,1/17,10/17,10/17,0,asNone); //need to reset it each new fact, because w is reset to realwidth after text initialize
