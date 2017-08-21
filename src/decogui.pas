@@ -16,7 +16,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 {---------------------------------------------------------------------------}
 
 { A highets-level container for the interface and its routines }
-unit decogui;
+unit DecoGui;
 
 {$INCLUDE compilerconfig.inc}
 

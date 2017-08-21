@@ -62,6 +62,12 @@ type
   { Yes, that looks stupid for now. But I'll simplify it later. Maybe.
    Contains redunant data on animation with possible rescaling in mind.}
   Txywh = class(TComponent)
+  private
+    //looks ugly, but needed for scale-to-parent function properly
+    parent: TComponent;
+    {container width-height, yes, it's ugly}
+    cW,cH: integer;
+    procedure GetContainerWidthHeight;{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
   public
     //Property x1: integer get x1 set setx;  Setx -> set fx recalculate ffx
     { integer "box" }
@@ -393,35 +399,46 @@ end;
 
 {----------------------------------------------------------------------------}
 
+procedure Txywh.GetContainerWidthHeight;{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+begin
+  {detect "container" size}
+  cW := Window.Width;
+  cH := Window.Height;
+end;
+
+{----------------------------------------------------------------------------}
+
 procedure Txywh.Recalculate;
 begin
+  GetContainerWidthHeight;
+
   { convert float to integer }
 
   if fx >= 0 then
-    x1 := Round(Window.Height*fx)
+    x1 := Round(cH*fx)
   else
-    x1 := Window.Width + Round(Window.Height*fx);
+    x1 := cW + Round(cH*fx);
 
   if fy >= 0 then
-    y1 := Round(Window.Height*fy)     // turn over y-axis?
+    y1 := Round(cH*fy)     // turn over y-axis?
   else
-    y1 := Window.Height + Round(Window.Height*fy);
+    y1 := cH + Round(cH*fy);
 
   if FloatsEqual(fw,FullWidth) then begin
-    w := Window.Width;
+    w := cW;
     x1 := 0
   end
   else
   if FloatsEqual(fw,FullHeight) then
-    w := Window.Height
+    w := cH
   else
-    w := Round(Window.Height*fw);
+    w := Round(cH*fw);
 
   if FloatsEqual(fh,FullHeight) then begin
-    h := Window.Height;
+    h := cH;
     y1 := 0
   end else
-    h := Round(Window.Height*fh);
+    h := Round(cH*fh);
 
   x2 := x1+w;
   y2 := y1+h;
@@ -431,24 +448,24 @@ end;
 
 {----------------------------------------------------------------------------}
 
-
 procedure Txywh.BackwardSetSize(const NewW,NewH: integer);
 begin
+  GetContainerWidthHeight;
   if NewW>0 then begin
     w := NewW;
-    fw := NewW/Window.Height;
-    if x1+w > Window.Width then begin
-      x1 := Window.Width - w;
-      fx := x1/Window.Height;
+    fw := NewW/cH;
+    if x1+w > cW then begin
+      x1 := cW - w;
+      fx := x1/cH;
     end;
     x2 := x1+w;
   end;
   if NewH>0 then begin
     h := NewH;
-    fh := NewH/Window.Height;
-    if y1+h > Window.Height then begin
-      y1 := Window.Height - h;
-      fy := y1/Window.Height;
+    fh := NewH/cH;
+    if y1+h > cH then begin
+      y1 := cH - h;
+      fy := y1/cH;
     end;
     y2 := y1+h;
   end;
@@ -456,15 +473,16 @@ end;
 
 procedure Txywh.BackwardSetXYWH(const NewX,NewY,NewW,NewH: integer);
 begin
+  GetContainerWidthHeight;
   //todo check for consistency
   x1 := NewX;
   y1 := NewY;
   w := NewW;
   h := NewH;
-  if NewX<Window.Width div 2 then fx := NewX/Window.Height else fx := (NewX-Window.Width)/Window.Height;
-  fy := NewY/Window.Height;
-  fw := NewW/Window.Height;
-  fh := NewH/Window.Height;
+  if NewX<cW div 2 then fx := NewX/cH else fx := (NewX-cW)/cH;
+  fy := NewY/cH;
+  fw := NewW/cH;
+  fh := NewH/cH;
   Initialized := true;
 end;
 

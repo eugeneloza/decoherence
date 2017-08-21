@@ -39,17 +39,17 @@ type
     procedure settarget(value: DPlayerCharacter);
   public
     ID: integer;
-    slided: boolean;
+    Slided: boolean;
     StatBars: DPlayerBarsFull;
     Portrait: DPortrait;
     property Target: DPlayerCharacter read fTarget write settarget;
     procedure ArrangeChildren(animate: TAnimationStyle); override;
-    constructor create(AOwner: TComponent); override;
+    constructor Create(AOwner: TComponent); override;
   public
     procedure SlideIn(Sender: DAbstractElement; x,y: integer);
     procedure SlideOut(Sender: DAbstractElement; x,y: integer);
-    procedure DoSlideIn;
-    procedure DoSlideOut;
+    procedure doSlideIn;
+    procedure doSlideOut;
     procedure doTimeout;
   end;
 
@@ -59,7 +59,7 @@ type
   public
     CharacterSpace: array [0..maxparty] of DCharacterSpace;
     procedure ArrangeChildren(animate: TAnimationStyle); override;
-    constructor create(AOwner: TComponent); override;
+    constructor Create(AOwner: TComponent); override;
   end;
 
 type
@@ -71,14 +71,14 @@ type
     frame2bottomleft,frame2bottomright,
     frame3bottom : DSingleInterfaceElement;
   public
-    procedure ArrangeChildren(animate: TAnimationStyle); override;
-    constructor create(AOwner: TComponent); override;
+    procedure ArrangeChildren(Animate: TAnimationStyle); override;
+    constructor Create(AOwner: TComponent); override;
   end;
 
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-uses castleLog;
+uses CastleLog;
 
 {=============================================================================}
 {=========================== Character Space =================================}
@@ -86,26 +86,26 @@ uses castleLog;
 
 constructor DCharacterSpace.create(AOwner: TComponent);
 begin
-  inherited create(AOwner);
+  inherited Create(AOwner);
 
-  timer.onTimer := @self.doTimeout;
+  Timer.onTimer := @Self.doTimeout;
 
-  self.OnMouseEnter := @SlideIn;
-  self.OnMouseLeave := @SlideOut;
+  Self.OnMouseEnter := @SlideIn;
+  Self.OnMouseLeave := @SlideOut;
   //self.canMouseOver := true;
 
   //create portraits
   Portrait := DPortrait.create(self);
   Portrait.CanMouseOver := true;
   Portrait.OnMouseLeave := @SlideOut;
-  grab(Portrait);
+  Grab(Portrait);
 
   //create stat bars
   StatBars := DPlayerBarsFull.create(self);
   StatBars.CanMouseOver := true;
   StatBars.OnMouseEnter := @SlideIn;
   StatBars.OnMouseLeave := @SlideOut;
-  grab(StatBars);
+  Grab(StatBars);
 
 end;
 
@@ -115,10 +115,10 @@ procedure DCharacterSpace.ArrangeChildren(animate: TAnimationStyle);
 begin
   //inherited ArrangeChildren(animate); //not needed here as this element doesn't have a frame
   {********** INTERFACE DESIGN BY Saito00 ******************}
-  if odd(self.ID) then portrait.frame := portraitframe_right else
-                       portrait.frame := portraitframe_left;
+  if Odd(self.ID) then Portrait.Frame := portraitframe_right else
+                       Portrait.Frame := portraitframe_left;
 
-  if not odd(self.ID) then
+  if not Odd(self.ID) then
     StatBars.setbasesize(10/800,-(40+155+180*(self.ID div 2))/800,35/800,155/800,1,animate)
   else
     StatBars.setbasesize(-45/800,-(40+155+180*(self.ID div 2))/800,35/800,155/800,1,animate);
@@ -129,19 +129,19 @@ begin
   else
     Portrait.setbasesize(-(46+135)/800,-(40+155+180*(self.ID div 2))/800,135/800,155/800,1,animate);
   //Portrait.rescale;
-  slided := true;
+  Slided := true;
   doSlideOut;
 
 end;
 
 {---------------------------------------------------------------------------}
 
-procedure DCharacterSpace.settarget(value: DPlayerCharacter);
+procedure DCharacterSpace.SetTarget(value: DPlayerCharacter);
 begin
-  if fTarget <> value then begin
-    self.fTarget := value;
-    StatBars.Target := self.fTarget;
-    Portrait.Target := self.fTarget;
+  if fTarget <> Value then begin
+    Self.fTarget := Value;
+    StatBars.Target := Self.fTarget;
+    Portrait.Target := Self.fTarget;
   end;
 end;
 
@@ -150,11 +150,11 @@ end;
 procedure DCharacterSpace.DoSlideIn;
 var myx: float;
 begin
-  slided := true;
-  if not odd(self.ID) then
+  Slided := true;
+  if not Odd(self.ID) then
     myx := 47/800
   else
-    myx := -(46)/800-Portrait.base.fw;
+    myx := -(46)/800-Portrait.Base.fw;
   Portrait.setbasesize(myx,Portrait.base.fy,Portrait.base.fw,Portrait.base.fh,1,asDefault);
   Portrait.rescale;
 end;
