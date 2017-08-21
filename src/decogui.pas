@@ -82,16 +82,18 @@ begin
   writeLnLog('DInterfaceContainer.create','Creating interface.');
   inherited create(AOwner);
 
+  base.setsize(0,0,fullwidth,fullheight);
+
   Last_render_time := DecoNow;
   FPS_count := 0;
-  FPS_Label := DLabel.create(self);
-  FPS_Label.setbasesize(0,0,0.05,0.05,1,asNone);
+  FPS_Label := DLabel.create(Self);
+  FPS_Label.Setbasesize(0,0,0.05,0.05,1,asNone);
   FPS_Label.Shadow := 0;
   FPS_Label.Font := DebugFont;
   FPS_Label.text := 'x';
 
-  width := -1;
-  height := -1;
+  Width := -1;
+  Height := -1;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -102,12 +104,12 @@ begin
   Wind1.phasespeed := 1/(15+drnd.Random);
   Wind1.Load(WindFolder+'WindClouds1_GIMP.jpg');
   Wind1.Opacity:=0.1;
-  wind1.base.setsize(0,0,fullwidth,fullheight);
+  Wind1.base.setsize(0,0,fullwidth,fullheight);
   Wind1.rescale;
   Wind2 := DWindImage.create(self);
   Wind2.phasespeed := 1/(10+drnd.Random);
   Wind2.Load(WindFolder+'WindClouds2_GIMP.jpg');
-  wind2.base.setsize(0,0,fullwidth,fullheight);
+  Wind2.base.setsize(0,0,fullwidth,fullheight);
   Wind2.Opacity := 0.1;
   Wind2.rescale;
 end;
@@ -138,7 +140,7 @@ begin
   base.setsize(0,0,fullwidth,fullheight);
 
   { rescale special elements }
-  if fps_label <> nil then fps_label.rescale;
+  if fps_label <> nil then fps_label.Rescale;
 
   if (CurrentGameMode=gmLoadScreen) or (CurrentGameMode=gmCharacterGeneration) then begin
     if wind1 <> nil then wind1.rescale;

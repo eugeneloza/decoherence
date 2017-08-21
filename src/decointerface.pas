@@ -65,6 +65,8 @@ type
   private
     //looks ugly, but needed for scale-to-parent function properly
     parent: TComponent;
+    {even uglier, scale to content/window}
+    ScaleToParent: boolean;
     {container width-height, yes, it's ugly}
     cW,cH: integer;
     procedure GetContainerWidthHeight;{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
@@ -122,7 +124,9 @@ Type
     Last, Next: Txywha;
 //    Free_on_end: boolean;
     fVisible: boolean;
+    fScaleToParent: boolean;
     procedure SetVisible(Value: boolean);
+    procedure SetScaleToParent(Value: boolean);
   public
     { these values are "strict" and unaffected by animations. Usually determines
       the basic stage and implies image rescale and init GL. }
@@ -144,6 +148,8 @@ Type
      Important: GetAnimationState must be called before setting basesize
      of the element as AnimateTo uses currentAnimationState}
     procedure AnimateTo(Animate: TAnimationStyle; Duration: float = DefaultAnimationDuration);
+
+    property ScaleToParent: boolean read fScaleToParent write SetScaleToParent default false;
   end;
 
 {Definition of simple procedures for (mouse) events}
@@ -293,6 +299,7 @@ procedure InitInterface;
 implementation
 
 uses SysUtils, CastleLog, castleFilesUtils,
+  DecoGui {this is horrible},
   DecoInterfaCecomposite, DecoInputOutput;
 
 {-------------------- BURNER IMAGE --------------------------------------------}
@@ -368,7 +375,7 @@ end;
 constructor Txywh.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  Parent := AOwner;
+  Parent := DAbstractElement(AOwner).Owner;
   Initialized := false;
 end;
 
@@ -402,16 +409,37 @@ end;
 
 procedure Txywh.GetContainerWidthHeight;{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
-  {detect "container" size}
-  cW := Window.Width;
-  cH := Window.Height;
-
+  {ugly fix}
+  if (Parent is DInterfaceContainer) or (not ScaleToParent) then begin
+    cW := Window.Width;
+    cH := Window.Height;
+  end else begin
+    {detect "container" size}
+    if (Parent is DAbstractElement) then begin
+      if (Parent as DAbstractElement).CurrentAnimationState.Initialized then begin
+        cW := (Parent as DAbstractElement).CurrentAnimationState.w;
+        cH := (Parent as DAbstractElement).CurrentAnimationState.h;
+      end else if (Parent as DAbstractElement).Base.Initialized then begin
+        cW := (Parent as DAbstractElement).Base.w;
+        cH := (Parent as DAbstractElement).Base.h;
+      end else begin
+        WriteLnLog('Txywh.GetContainerWidthHeight','WARNING: '+Parent.ClassName+'.Base is not initialized, falling back to Window.Height/Width');
+        cW := Window.Width;
+        cH := Window.Height;
+      end;
+    end else begin
+      WriteLnLog('Txywh.GetContainerWidthHeight','WARNING: '+Parent.ClassName+' is not DAbstractElement, falling back to Window.Height/Width');
+      cW := Window.Width;
+      cH := Window.Height;
+    end;
+  end;
 end;
 
 {----------------------------------------------------------------------------}
 
 procedure Txywh.Recalculate;
 begin
+  WriteLnLog(Parent.ClassName);
   GetContainerWidthHeight;
 
   { convert float to integer }
@@ -558,6 +586,16 @@ end;
 
 {----------------------------------------------------------------------------}
 
+procedure DAbstractElement.SetScaleToParent(Value: boolean);
+begin
+  fScaleToParent := Value;
+  Base.ScaleToParent := Value;
+  Last.ScaleToParent := Value;
+  Next.ScaleToParent := Value;
+end;
+
+{----------------------------------------------------------------------------}
+
 procedure DAbstractElement.AnimateTo(Animate: TAnimationStyle; Duration: float = DefaultAnimationDuration);
 var mx,my: float;
 begin
@@ -696,6 +734,7 @@ begin
       CurrentAnimationState.h := Last.h+Round((Next.h-Last.h)*Phase);
       CurrentAnimationState.w := Last.w+Round((Next.w-Last.w)*Phase);
       CurrentAnimationState.Opacity := Last.Opacity+((Next.opacity-Last.Opacity)*Phase);
+      CurrentAnimationState.ScaleToParent := ScaleToParent;
       CurrentAnimationState.Initialized := true;
     end else begin
       {should be "next" here}
@@ -706,6 +745,7 @@ begin
       CurrentAnimationState.h := Base.h;
       CurrentAnimationState.w := Base.w;
       CurrentAnimationState.Opacity := Base.Opacity;
+      CurrentAnimationState.ScaleToParent := ScaleToParent;
       CurrentAnimationState.Initialized := true;
     end;
   end;
@@ -727,6 +767,7 @@ begin
   Last := Txywha.Create(Self);
   Next := Txywha.Create(Self);
   CurrentAnimationState := Txywha.Create(Self);
+  ScaleToParent := false;
 end;
 
 {----------------------------------------------------------------------------}

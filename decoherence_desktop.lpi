@@ -134,6 +134,7 @@
       <Unit5>
         <Filename Value="src/decogui.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoGui"/>
       </Unit5>
       <Unit6>
         <Filename Value="src/decoloadscreen.pas"/>

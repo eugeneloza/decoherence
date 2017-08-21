@@ -277,7 +277,7 @@ begin
   //create GUI
   WritelnLog('ApplicationInitialize','Create interface');
   GUI := DInterfaceContainer.create(Window);
-  GUI.rescale;
+  GUI.Rescale;
 
   WritelnLog('ApplicationInitialize','Initialize interface');
   InitLoadScreen;
