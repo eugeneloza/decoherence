@@ -1499,7 +1499,7 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-constructor DDungeonGenerator.create;
+constructor DDungeonGenerator.Create;
 begin
   inherited;
   Map := DGeneratorMap.Create;
@@ -1537,7 +1537,7 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-destructor DDungeonGeneratorParameters.destroy;
+destructor DDungeonGeneratorParameters.Destroy;
 begin
   FreeAndNil(TilesList);
   FreeAndNil(FirstSteps);

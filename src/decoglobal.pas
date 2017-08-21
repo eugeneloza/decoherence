@@ -89,6 +89,9 @@ var {global window of the game}
 function GetRandomSeed: LongWord;
 
 function GetScenarioFolder: string;
+
+{inlined equivalent of FloatEquals / Math.equals}
+function dEqual(const a,b: float): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 uses SysUtils;
@@ -136,6 +139,20 @@ end;
 function GetScenarioFolder: string;
 begin
   result := ScenarioBaseFolder + CurrentScenarioFolder;
+end;
+
+{----------------------------------------------------------------------------}
+
+function dEqual(const a,b: float): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+Const Epsilon = 1E-4;
+{  EZeroResolution = 1E-16;
+  DZeroResolution = 1E-12;
+  SZeroResolution = 1E-4;}
+begin
+  if (a>b) then
+    Result:=((A-B)<=Epsilon)
+  else
+    Result:=((B-A)<=Epsilon);
 end;
 
 initialization

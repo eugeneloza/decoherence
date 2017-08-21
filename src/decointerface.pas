@@ -368,6 +368,7 @@ end;
 constructor Txywh.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+  Parent := AOwner;
   Initialized := false;
 end;
 
@@ -376,15 +377,15 @@ end;
 procedure Txywh.SetSize(const NewX,NewY,NewW,NewH: float);
 begin
   if (Abs(NewX) > 1) or (Abs(NewY) > 1) or
-     (((NewW<0) or (NewW>1)) and (not FloatsEqual(NewW,ProportionalScale) and not FloatsEqual(NewW,FullWidth) and not FloatsEqual(NewW,FullHeight))) or
-     (((NewH<0) or (NewH>1)) and (not FloatsEqual(NewH,ProportionalScale) and not FloatsEqual(NewH,FullHeight))) then
+     (((NewW<0) or (NewW>1)) and (not dEqual(NewW,ProportionalScale) and not dEqual(NewW,FullWidth) and not dEqual(NewW,FullHeight))) or
+     (((NewH<0) or (NewH>1)) and (not dEqual(NewH,ProportionalScale) and not dEqual(NewH,FullHeight))) then
   begin
     WriteLnLog('Txywh.setsize','ERROR: Incorrect newx,newy,neww,newh!');
     Exit;
   end;
 
   { stop if nothing was changed }
-  if FloatsEqual(fx,NewX) and FloatsEqual(fy,NewY) and FloatsEqual(fw,NewW) and FloatsEqual(fh,NewH) then begin
+  if dEqual(fx,NewX) and dEqual(fy,NewY) and dEqual(fw,NewW) and dEqual(fh,NewH) then begin
     initialized := true; //to avoid bugs
     Exit;
   end;
@@ -404,6 +405,7 @@ begin
   {detect "container" size}
   cW := Window.Width;
   cH := Window.Height;
+
 end;
 
 {----------------------------------------------------------------------------}
@@ -424,17 +426,17 @@ begin
   else
     y1 := cH + Round(cH*fy);
 
-  if FloatsEqual(fw,FullWidth) then begin
+  if dEqual(fw,FullWidth) then begin
     w := cW;
     x1 := 0
   end
   else
-  if FloatsEqual(fw,FullHeight) then
+  if dEqual(fw,FullHeight) then
     w := cH
   else
     w := Round(cH*fw);
 
-  if FloatsEqual(fh,FullHeight) then begin
+  if dEqual(fh,FullHeight) then begin
     h := cH;
     y1 := 0
   end else
@@ -513,10 +515,10 @@ End;
 
 procedure Txywh.FixProportions(ww,hh: integer);
 begin
-  if FloatsEqual(fw,ProportionalScale) then
+  if dEqual(fw,ProportionalScale) then
     w := Round(h*ww/hh)
   else                                 //they can't be proportional both
-  if FloatsEqual(fh,ProportionalScale) then
+  if dEqual(fh,ProportionalScale) then
     h := Round(w*hh/ww);
 end;
 
