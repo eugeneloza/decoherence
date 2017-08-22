@@ -38,7 +38,16 @@ const MaxParty = 6; {0..6 = 7 characters}
   Image: DStaticImage;
 }
 
-Type
+type
+  {extension of DCoordActor with Up vector required for camera to work properly}
+  DCameraMan = class(DCoordActor)
+  public
+    Up: TVector3;
+    procedure ResetUp;
+    constructor Create; override;
+  end;
+
+type
   {player character - the most complex actor available :)}
   DPlayerCharacter = class(DActor)
   public
@@ -65,7 +74,7 @@ type
     procedure UpdateCamera;
     procedure CollectCharacters;
   public
-    CameraMan: DCoordActor;
+    CameraMan: DCameraMan;
     Char: DCharList;
     {generates a temporary party}
     procedure tmpParty;
@@ -110,7 +119,7 @@ constructor DParty.create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   Char := DCharList.Create(true);
-  CameraMan := DCoordActor.Create;
+  CameraMan := DCameraMan.Create;
   isAccelerating := false;
   ResetMoveInput;
 end;
@@ -161,7 +170,7 @@ begin
   if Camera = nil then Exit;// InitNavigation;
   Camera.Position := CameraMan.Position;
   Camera.Direction := CameraMan.Direction;
-  Camera.Up := Vector3(0,0,1); {$hint todo}
+  Camera.Up := CameraMan.Up;
 end;
 
 {----------------------------------------------------------------------------}
@@ -194,6 +203,7 @@ begin
   if Camera = nil then Raise Exception.Create('Camrea is nil!');//InitNavigation;
 
   CameraMan.Position[2] := CameraMan.Position[2]+PlayerHeight*(CurrentWorld as DAbstractWorld3d).MyScale;
+  CameraMan.ResetUp;
 
   {$Hint Do it only once per World!}
   Camera.MoveSpeed := 1*(CurrentWorld as DAbstractWorld3d).WorldScale;
@@ -256,8 +266,10 @@ begin
   TraverseAxis := TVector3.CrossProduct(CameraMan.Direction, UpVector);
   {rotate horizontal}
   CameraMan.Direction := RotatePointAroundAxisRad(-Delta[0]/1800, CameraMan.Direction, UpVector);
+  CameraMan.Up := RotatePointAroundAxisRad(-Delta[0]/1800, CameraMan.Up, UpVector);
   {rotate vertical}
   if TraverseAxis.isZero then TraverseAxis := AnyOrthogonalVector(UpVector);
+  CameraMan.Up := RotatePointAroundAxisRad(Delta[1]/1800, CameraMan.Up, TraverseAxis);
   CameraMan.Direction := RotatePointAroundAxisRad(Delta[1]/1800, CameraMan.Direction, TraverseAxis);
 end;
 
@@ -336,6 +348,19 @@ end;
 destructor DPlayerCharacter.Destroy;
 begin
   Inherited;
+end;
+
+{----------------------------------------------------------------------------}
+
+constructor DCameraMan.Create;
+begin
+  inherited;
+  ResetUp;
+end;
+
+procedure DCameraMan.ResetUp;
+begin
+  Up := Vector3(0,0,1);
 end;
 
 {============================================================================}
