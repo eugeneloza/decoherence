@@ -864,6 +864,9 @@ begin
   Weenies := TWeeniesList.create;
   w.kind := wtEntrance;
   w.NavId := NavMap[Self.Gen[0].x,Self.Gen[0].y,Self.Gen[0].z];
+
+  WriteLnLog('DDungeonGenerator.BuildWeenies','Start point = '+IntToStr(w.NavId));
+
   Weenies.Add(w);
   //make the area around the entranse safe
   NavList.L[w.NavId].isSafe := true;
@@ -873,6 +876,7 @@ begin
       for j := 0 to LinksCount do with NavList.L[Links[j]] do begin
         isSafe := true;
         for k := 0 to LinksCount do with NavList.L[Links[k]] do begin
+          {$warning an error might occur here on Windows / when w.NavId=0 ?}
           isSafe := true;
         end;
       end;
