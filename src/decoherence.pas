@@ -196,6 +196,8 @@ var i: integer;
     tmpLink: DAbstractElement;
     Dragging: boolean;
 begin
+  doMouseLook;
+
   {check for drag-n-drops}
   Dragging := false;
   {if Event.EventType = itMouseButton then }begin
@@ -223,6 +225,7 @@ begin
     if tmpLink <> nil then
       WriteLnLog('doMotion','Motion caught '+tmpLink.ClassName);
   end;
+
 end;
 
 {======================= initialization routines ==============================}
@@ -315,14 +318,14 @@ Initialization
 
   Window := TCastleWindowTouch.create(Application);
 
-  window.DoubleBuffer := false;//true;             //what's the difference? speed? memory?
+  Window.DoubleBuffer := true;//true;             //what's the difference? speed? memory?
 
   {$IFNDEF AllowRescale}window.ResizeAllowed := raOnlyAtOpen;{$ENDIF}
   {$IFDEF Fullscreen}
-    window.fullscreen := true;
+    Window.fullscreen := true;
   {$ELSE}
-    window.width := 1024;
-    window.height := 600;
+    Window.width := 1024;
+    Window.height := 600;
   {$ENDIF}
 
   Application.MainWindow  :=  Window;

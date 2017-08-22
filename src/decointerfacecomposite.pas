@@ -509,16 +509,20 @@ var tmp_staticimage: DStaticImage;
 begin
   inherited create(AOwner);
   content := DStaticImage.create(self);
+
   DamageOverlay := DSingleInterfaceElement.create(self);
   tmp_staticimage := DStaticImage.create(self);
   DamageOverlay.content := tmp_staticimage;
-  grab(damageOverlay);
-  damageLabel := DSingleInterfaceElement.create(self);
+  Grab(damageOverlay);
+  DamageOverlay.ScaleToParent := true;
+
+  DamageLabel := DSingleInterfaceElement.create(self);
   tmp_label := DLabel.create(self);
   tmp_label.ScaleLabel := false;
   tmp_label.Font := PlayerDamageFont;
-  damageLabel.content := tmp_label;
-  grab(damageLabel);
+  DamageLabel.content := tmp_label;
+  Grab(damageLabel);
+  DamageLabel.ScaleToParent := true;
 end;
 
 {---------------------------------------------------------------------------}

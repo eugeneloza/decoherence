@@ -439,7 +439,7 @@ end;
 
 procedure Txywh.Recalculate;
 begin
-  WriteLnLog(Parent.ClassName);
+  //WriteLnLog(Parent.ClassName);
   GetContainerWidthHeight;
 
   { convert float to integer }

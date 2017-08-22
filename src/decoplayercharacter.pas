@@ -84,8 +84,10 @@ type
     procedure doMove2;
     procedure ResetMoveInput;
   public
+    MouseLook: boolean;
     procedure InputMove(MoveDir: TMoveDirection);
     procedure InputRelease(MoveDir: TMoveDirection);
+    procedure InputMouse(Delta: TVector2);
     procedure Stop;
   end;
 
@@ -159,6 +161,7 @@ begin
   if Camera = nil then Exit;// InitNavigation;
   Camera.Position := CameraMan.Position;
   Camera.Direction := CameraMan.Direction;
+  Camera.Up := Vector3(0,0,1); {$hint todo}
 end;
 
 {----------------------------------------------------------------------------}
@@ -239,6 +242,23 @@ begin
   MovePress[mdBack] := false;
   MovePress[mdLeft] := false;
   MovePress[mdRight] := false;
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DParty.InputMouse(Delta: TVector2);
+var TraverseAxis: TVector3;
+    UpVector: TVector3;
+begin
+  {based on CastleCameras implementation}
+  UpVector := Vector3(0,0,1);
+  //TraverseAxis := RotatePointAroundAxisRad(Pi/2, CameraMan.Direction, UpVector);
+  TraverseAxis := TVector3.CrossProduct(CameraMan.Direction, UpVector);
+  {rotate horizontal}
+  CameraMan.Direction := RotatePointAroundAxisRad(-Delta[0]/1800, CameraMan.Direction, UpVector);
+  {rotate vertical}
+  if TraverseAxis.isZero then TraverseAxis := AnyOrthogonalVector(UpVector);
+  CameraMan.Direction := RotatePointAroundAxisRad(Delta[1]/1800, CameraMan.Direction, TraverseAxis);
 end;
 
 {----------------------------------------------------------------------------}

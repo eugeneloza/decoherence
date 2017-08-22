@@ -46,9 +46,11 @@ var TouchArray: DTouchList;
 
 procedure doMousePress(const Event: TInputPressRelease);
 procedure doMouseRelease(const Event: TInputPressRelease);
+procedure doMouseLook;
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
+uses DecoGlobal, CastleVectors, DecoPlayerCharacter;
 
 constructor DTouch.Create(const xx,yy: single; const Finger: integer);
 begin
@@ -127,6 +129,23 @@ begin
 end;
 
 {----------------------------------------------------------------------------}
+
+procedure doMouseLook;
+var WindowCenter: TVector2;   {pull it in GUI at rescale}
+begin
+  {if FMouseLook then
+    Cursor := mcForceNone else
+    Cursor := mcDefault;}
+  WindowCenter := Vector2(Window.Width div 2, Window.Height div 2);
+  if not TVector2.Equals(Window.MousePosition,WindowCenter) then begin
+    CurrentParty.InputMouse(Window.MousePosition - WindowCenter);
+    {$WARNING this calls back Window.OnMouseMove!!!!}
+    Window.MousePosition := WindowCenter;
+  end;
+end;
+
+{----------------------------------------------------------------------------}
+
 
 Initialization
   TouchArray := DTouchList.Create;
