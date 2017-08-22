@@ -28,6 +28,8 @@ uses {todo: temporary}//SysUtils,
   Classes, CastleWindowTouch,
   CastleRandom;
 
+const NEnemies = 0.05; {must be <1 / temporary quantity of enemies in % of NavPoints}
+
 { for easy changing into double in case needed }
 type Float = single;
      pFloat = ^Float;

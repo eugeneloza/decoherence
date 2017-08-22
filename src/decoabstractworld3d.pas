@@ -436,7 +436,7 @@ begin
   Actors := TActorList.Create(true);
 
   {$hint some rules on actors spawning should go here}
-  for i := 0 to Nav.Count div 2 do begin
+  for i := 0 to Round(Nav.Count*NEnemies) do begin
     repeat
       n := DRND.Random(Nav.Count);
     until (Nav[n].Blocked = false) and (Nav[n].isSafe = false);
