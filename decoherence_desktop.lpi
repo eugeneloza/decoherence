@@ -21,7 +21,7 @@
       <UseVersionInfo Value="True"/>
       <AutoIncrementBuild Value="True"/>
       <MinorVersionNr Value="1"/>
-      <BuildNr Value="7"/>
+      <BuildNr Value="17"/>
       <StringTable ProductVersion="0.0.0.0"/>
     </VersionInfo>
     <BuildModes Count="3">
@@ -70,6 +70,7 @@
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir);src"/>
+            <OtherUnitFiles Value="src"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
           <CodeGeneration>
@@ -303,6 +304,7 @@
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir);src"/>
+      <OtherUnitFiles Value="src"/>
       <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <Other>
