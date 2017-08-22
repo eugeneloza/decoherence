@@ -43,6 +43,7 @@ type
   DCameraMan = class(DCoordActor)
   public
     Up: TVector3;
+    theta,phi: float;
     procedure ResetUp;
     constructor Create; override;
   end;
@@ -258,19 +259,24 @@ end;
 
 procedure DParty.InputMouse(Delta: TVector2);
 var TraverseAxis: TVector3;
-    UpVector: TVector3;
+    UpVector,ForwardVector: TVector3;
 begin
   {based on CastleCameras implementation}
   UpVector := Vector3(0,0,1);
-  //TraverseAxis := RotatePointAroundAxisRad(Pi/2, CameraMan.Direction, UpVector);
-  TraverseAxis := TVector3.CrossProduct(CameraMan.Direction, UpVector);
+  ForwardVector := Vector3(1,0,0);
   {rotate horizontal}
-  CameraMan.Direction := RotatePointAroundAxisRad(-Delta[0]/1800, CameraMan.Direction, UpVector);
-  CameraMan.Up := RotatePointAroundAxisRad(-Delta[0]/1800, CameraMan.Up, UpVector);
-  {rotate vertical}
-  if TraverseAxis.isZero then TraverseAxis := AnyOrthogonalVector(UpVector);
-  CameraMan.Up := RotatePointAroundAxisRad(Delta[1]/1800, CameraMan.Up, TraverseAxis);
-  CameraMan.Direction := RotatePointAroundAxisRad(Delta[1]/1800, CameraMan.Direction, TraverseAxis);
+  CameraMan.Phi += -Delta[0]/1800;
+  if CameraMan.Phi>2*Pi then CameraMan.Phi -= 2*Pi else
+  if CameraMan.Phi<0 then CameraMan.Phi +=2*Pi;
+  CameraMan.Theta += Delta[1]/1800;
+  if CameraMan.Theta> Pi/3 then CameraMan.Theta :=  Pi/3 else
+  if CameraMan.Theta<-Pi/3 then CameraMan.Theta := -Pi/3;
+
+  CameraMan.Up := UpVector;
+  CameraMan.Direction := RotatePointAroundAxisRad(CameraMan.Phi, ForwardVector, UpVector);
+  TraverseAxis := TVector3.CrossProduct(CameraMan.Direction, UpVector);
+  CameraMan.Direction := RotatePointAroundAxisRad(CameraMan.Theta, CameraMan.Direction, TraverseAxis);
+  CameraMan.Up := RotatePointAroundAxisRad(CameraMan.Theta, CameraMan.Up, TraverseAxis);
 end;
 
 {----------------------------------------------------------------------------}
@@ -356,6 +362,8 @@ constructor DCameraMan.Create;
 begin
   inherited;
   ResetUp;
+  theta := 0;
+  phi := 0;
 end;
 
 procedure DCameraMan.ResetUp;
