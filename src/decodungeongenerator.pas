@@ -842,7 +842,8 @@ begin
     for ix := 0 to Map.SizeX-1 do
       for iy := 0 to Map.SizeZ-1 do if NavMap[ix,iy,iz]>0 then with NavList.L[NavMap[ix,iy,iz]] do begin
         LinksCount := -1;
-        for a in TAngle do if isPassable(Map.Map[ix,iy,iz].faces[a]) then begin
+        {$hint ignore up/down tiles for now}
+        for a in THorizontalAngle do if isPassable(Map.Map[ix,iy,iz].faces[a]) then begin
           aNav := NavMap[ix+a_dx(a),iy+a_dy(a),iz+a_dz(a)];
           if aNav>0 then begin
             inc(LinksCount);
