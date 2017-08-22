@@ -44,6 +44,7 @@ type
   public
     Up: TVector3;
     theta,phi: float;
+    Height: float;
     procedure ResetUp;
     constructor Create; override;
   end;
@@ -70,7 +71,7 @@ type
   private
     const Speed = 10; {meters per second}
     const Friction = 40; {~meters per second, 0 never stops}
-    const AngularFriction = 30; {~radians per second, rather hard to explain :) adds some inertion to camera, the higher this value the faster is rotation}
+    const AngularFriction = 40; {~radians per second, rather hard to explain :) adds some inertion to camera, the higher this value the faster is rotation}
     const MouseSensivity = 1/1800;
   private
     {updates game camera with CameraMan coordinates}
@@ -78,6 +79,7 @@ type
     procedure CollectCharacters;
   public
     CameraMan: DCameraMan;
+    CameraInitialized: boolean;
     Char: DCharList;
     {generates a temporary party}
     procedure tmpParty;
@@ -114,7 +116,7 @@ var Parties: DPartyList;
 procedure FreeParty;
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-uses SysUtils, CastleLog,
+uses SysUtils, CastleLog, Math,
   DecoNavigation, DecoAbstractWorld, DecoAbstractWorld3d,
   DecoGameMode, DecoTime;
 
@@ -171,12 +173,25 @@ procedure DParty.UpdateCamera;
 var aFriction: float;
 begin
   doMove1; doMove2;
-  if Camera = nil then Exit;// InitNavigation;
+  if Camera = nil then begin
+    Exit;// InitNavigation;
+    WriteLnLog('DParty.UpdateCamera','Camera is Nil!');
+  end;
+
   Camera.Position := CameraMan.Position;
-  aFriction := AngularFriction*DeltaT;
-  if aFriction>1 then aFriction := 1;
-  Camera.Direction := (1-aFriction)*Camera.Direction+aFriction*CameraMan.Direction;
-  Camera.Up := (1-aFriction)*Camera.Up + aFriction*CameraMan.Up;
+  Camera.Position[2] := Camera.Position[2] + CameraMan.Height;
+  {soften climb/fall here?}
+
+  if CameraInitialized then begin
+    aFriction := AngularFriction*DeltaT;
+    if aFriction>1 then aFriction := 1;
+    Camera.Direction := (1-aFriction)*Camera.Direction+aFriction*CameraMan.Direction;
+    Camera.Up := (1-aFriction)*Camera.Up + aFriction*CameraMan.Up;
+  end else begin
+    Camera.Direction := CameraMan.Direction;
+    Camera.Up := CameraMan.Up;
+    CameraInitialized := true;
+  end;
 end;
 
 {----------------------------------------------------------------------------}
@@ -206,19 +221,14 @@ end;
 procedure DParty.TeleportTo(aPosition, aDirection: TVector3);
 begin
   CameraMan.TeleportTo(aPosition, aDirection);
-  if Camera = nil then Raise Exception.Create('Camrea is nil!');//InitNavigation;
-
-  CameraMan.Position[2] := CameraMan.Position[2]+PlayerHeight*(CurrentWorld as DAbstractWorld3d).MyScale;
   CameraMan.ResetUp;
+  CameraMan.Height := PlayerHeight*(CurrentWorld as DAbstractWorld3d).MyScale;
 
-  {$Hint Do it only once per World!}
-  Camera.MoveSpeed := 1*(CurrentWorld as DAbstractWorld3d).WorldScale;
-  Camera.PreferredHeight := PlayerHeight*(CurrentWorld as DAbstractWorld3d).MyScale;
+  {ugly fix for initialization of phi and theta}
+  CameraMan.Theta := ArcSin(aDirection[2]/aDirection.Length);
+  CameraMan.Phi := Sign(aDirection[1])*ArcCos(aDirection[0]/(sqr(aDirection[0])+sqr(aDirection[1])));
 
-  //make it a "reset gravity"? and call at every nav change?
-  Camera.Direction := Vector3(0,0,1);//todo
-  Camera.GravityUp := CurrentWorld.GetGravity(CameraMan.Position); //can't disable Camera.Gravity yet, some day it will be overtaken by Actor.Gravity
-  Camera.Up := CurrentWorld.GetGravity(CameraMan.Position);
+  CameraInitialized := false;
 
   UpdateCamera;
 end;
@@ -272,8 +282,8 @@ begin
   ForwardVector := Vector3(1,0,0);
   {rotate horizontal}
   CameraMan.Phi += -Delta[0]*MouseSensivity;
-  if CameraMan.Phi>2*Pi then CameraMan.Phi -= 2*Pi else
-  if CameraMan.Phi<0 then CameraMan.Phi +=2*Pi;
+  if CameraMan.Phi> Pi then CameraMan.Phi -= 2*Pi else
+  if CameraMan.Phi<-Pi then CameraMan.Phi += 2*Pi;
   CameraMan.Theta += Delta[1]*MouseSensivity;
   if CameraMan.Theta> Pi/3 then CameraMan.Theta :=  Pi/3 else
   if CameraMan.Theta<-Pi/3 then CameraMan.Theta := -Pi/3;
@@ -315,7 +325,7 @@ end;
 {----------------------------------------------------------------------------}
 
 procedure DParty.doMove2;
-var NewPos, tmp: TVector3;
+var NewPos, NewPosHeightAdjusted, tmp: TVector3;
     FixedFriction: float;
 begin
   {this is not a correct way to account for friction/innertia, but actually
@@ -327,8 +337,10 @@ begin
   if not isAccelerating then Acceleration := TVector3.Zero;
 
   NewPos := CameraMan.Position+(Speed*DeltaTLocal)*MoveSpeed;
+  NewPosHeightAdjusted := NewPos;
+  NewPosHeightAdjusted[2] := NewPosHeightAdjusted[2]+CameraMan.Height; {ugly fix for difference in CameraMan height}
   {use body here, including body.gravity}
-  if Camera.DoMoveAllowed(NewPos,tmp,false) then begin
+  if Camera.DoMoveAllowed(NewPosHeightAdjusted,tmp,false) then begin
     CameraMan.Position := NewPos;
   end;
 end;
