@@ -196,7 +196,7 @@ var i: integer;
     tmpLink: DAbstractElement;
     Dragging: boolean;
 begin
-  doMouseLook;
+  if doMouseLook then Exit;
 
   {check for drag-n-drops}
   Dragging := false;

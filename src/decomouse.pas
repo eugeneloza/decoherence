@@ -46,7 +46,7 @@ var TouchArray: DTouchList;
 
 procedure doMousePress(const Event: TInputPressRelease);
 procedure doMouseRelease(const Event: TInputPressRelease);
-procedure doMouseLook;
+function doMouseLook: boolean;
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
@@ -130,7 +130,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure doMouseLook;
+function doMouseLook: boolean;
 var WindowCenter: TVector2;   {pull it in GUI at rescale}
 begin
   {if FMouseLook then
@@ -139,9 +139,10 @@ begin
   WindowCenter := Vector2(Window.Width div 2, Window.Height div 2);
   if not TVector2.Equals(Window.MousePosition,WindowCenter) then begin
     CurrentParty.InputMouse(Window.MousePosition - WindowCenter);
-    {$WARNING this calls back Window.OnMouseMove!!!!}
+    doMouseLook := false;
     Window.MousePosition := WindowCenter;
-  end;
+  end else
+    doMouseLook := true; {prevent onMotion}
 end;
 
 {----------------------------------------------------------------------------}
