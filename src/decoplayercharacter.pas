@@ -70,6 +70,7 @@ type
   private
     const Speed = 10; {meters per second}
     const Friction = 40; {~meters per second, 0 never stops}
+    const AngularFriction = 30; {~radians per second, rather hard to explain :) adds some inertion to camera, the higher this value the faster is rotation}
   private
     {updates game camera with CameraMan coordinates}
     procedure UpdateCamera;
@@ -166,12 +167,15 @@ end;
 {----------------------------------------------------------------------------}
 
 procedure DParty.UpdateCamera;
+var aFriction: float;
 begin
   doMove1; doMove2;
   if Camera = nil then Exit;// InitNavigation;
   Camera.Position := CameraMan.Position;
-  Camera.Direction := CameraMan.Direction;
-  Camera.Up := CameraMan.Up;
+  aFriction := AngularFriction*DeltaT;
+  if aFriction>1 then aFriction := 1;
+  Camera.Direction := (1-aFriction)*Camera.Direction+aFriction*CameraMan.Direction;
+  Camera.Up := (1-aFriction)*Camera.Up + aFriction*CameraMan.Up;
 end;
 
 {----------------------------------------------------------------------------}
@@ -211,6 +215,7 @@ begin
   Camera.PreferredHeight := PlayerHeight*(CurrentWorld as DAbstractWorld3d).MyScale;
 
   //make it a "reset gravity"? and call at every nav change?
+  Camera.Direction := Vector3(0,0,1);//todo
   Camera.GravityUp := CurrentWorld.GetGravity(CameraMan.Position); //can't disable Camera.Gravity yet, some day it will be overtaken by Actor.Gravity
   Camera.Up := CurrentWorld.GetGravity(CameraMan.Position);
 
@@ -368,7 +373,7 @@ end;
 
 procedure DCameraMan.ResetUp;
 begin
-  Up := Vector3(0,0,1);
+  Up := CurrentWorld.GetGravity(Position);
 end;
 
 {============================================================================}
