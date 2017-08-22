@@ -46,6 +46,7 @@ type
     theta,phi: float;
     Height: float;
     procedure ResetUp;
+    procedure ResetAngles;
     constructor Create; override;
   end;
 
@@ -91,6 +92,7 @@ type
     procedure TeleportTo(aNav: TNavId);
     procedure Rest;
   private
+    {movepress may be not discrete for gamepad! remake to 0..1 or -1..1}
     MovePress: array [TMoveDirection] of boolean;
     Acceleration,MoveSpeed: TVector3;
     isAccelerating: boolean;
@@ -224,9 +226,7 @@ begin
   CameraMan.ResetUp;
   CameraMan.Height := PlayerHeight*(CurrentWorld as DAbstractWorld3d).MyScale;
 
-  {ugly fix for initialization of phi and theta}
-  CameraMan.Theta := ArcSin(aDirection[2]/aDirection.Length);
-  CameraMan.Phi := Sign(aDirection[1])*ArcCos(aDirection[0]/(sqr(aDirection[0])+sqr(aDirection[1])));
+  CameraMan.ResetAngles;
 
   CameraInitialized := false;
 
@@ -325,8 +325,22 @@ end;
 {----------------------------------------------------------------------------}
 
 procedure DParty.doMove2;
-var NewPos, NewPosHeightAdjusted, tmp: TVector3;
+var NewPos: TVector3;
     FixedFriction: float;
+  function TryDirection(climb,slide: float): boolean;
+  var NewPosAdjusted, NewPosHeightAdjusted, tmp: TVector3;
+  begin
+    NewPosAdjusted := CameraMan.Position + (Speed*DeltaTLocal)*RotatePointAroundAxisRad(slide, MoveSpeed, vector3(0,0,1));
+    NewPosAdjusted[2] := NewPosAdjusted[2] + climb;
+    NewPosHeightAdjusted := NewPosAdjusted;
+    NewPosHeightAdjusted[2] := NewPosHeightAdjusted[2]+CameraMan.Height; {ugly fix for difference in CameraMan height}
+    if Camera.DoMoveAllowed(NewPosHeightAdjusted,tmp,false) then begin
+      CameraMan.Position := NewPosAdjusted;
+      Result := true
+    end else
+      Result := false;
+
+  end;
 begin
   {this is not a correct way to account for friction/innertia, but actually
    it doesn't really matter. We're not driving a car, it just adds some
@@ -336,13 +350,14 @@ begin
   MoveSpeed := (1-FixedFriction)*MoveSpeed+FixedFriction*Acceleration;
   if not isAccelerating then Acceleration := TVector3.Zero;
 
-  NewPos := CameraMan.Position+(Speed*DeltaTLocal)*MoveSpeed;
-  NewPosHeightAdjusted := NewPos;
-  NewPosHeightAdjusted[2] := NewPosHeightAdjusted[2]+CameraMan.Height; {ugly fix for difference in CameraMan height}
+  if not TryDirection(0,0) then
+  if not TryDirection(1,0) then
+  if not TryDirection(0,Pi/2) then
+  if not TryDirection(0,-Pi/2) then ;
+
+  TryDirection(-1,0);
+
   {use body here, including body.gravity}
-  if Camera.DoMoveAllowed(NewPosHeightAdjusted,tmp,false) then begin
-    CameraMan.Position := NewPos;
-  end;
 end;
 
 {----------------------------------------------------------------------------}
@@ -387,6 +402,14 @@ end;
 procedure DCameraMan.ResetUp;
 begin
   Up := CurrentWorld.GetGravity(Position);
+end;
+
+procedure DCameraMan.ResetAngles;
+begin
+  {ugly fix for initialization of phi and theta}
+  Theta := ArcSin(Direction[2]/Direction.Length);
+  Phi := Sign(Direction[1])*ArcCos(Direction[0]/(sqr(Direction[0])+sqr(Direction[1])));
+  //RESET MOUSE CURSOR HERE. / on evry return to World
 end;
 
 {============================================================================}
