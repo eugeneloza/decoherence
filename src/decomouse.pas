@@ -50,7 +50,9 @@ function doMouseLook: boolean;
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-uses DecoGlobal, CastleVectors, DecoPlayerCharacter;
+uses CastleVectors,
+  DecoNavigation,
+  DecoGlobal, DecoPlayerCharacter;
 
 constructor DTouch.Create(const xx,yy: single; const Finger: integer);
 begin
@@ -136,6 +138,7 @@ begin
   {if FMouseLook then
     Cursor := mcForceNone else
     Cursor := mcDefault;}
+  Camera.Cursor := mcForceNone;
   WindowCenter := Vector2(Window.Width div 2, Window.Height div 2);
   if not TVector2.Equals(Window.MousePosition,WindowCenter) then begin
     CurrentParty.InputMouse(Window.MousePosition - WindowCenter);
