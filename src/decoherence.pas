@@ -268,10 +268,10 @@ begin
   WritelnLog('ApplicationInitialize','Init');
 
   //Assign window events
-  window.OnPress := @doPress;
-  window.onRelease := @doRelease;
-  window.OnMotion := @doMotion;
-  application.LimitFPS := 60;
+  Window.OnPress := @doPress;
+  Window.onRelease := @doRelease;
+  Window.OnMotion := @doMotion;
+  Application.LimitFPS := 60;
 
   WritelnLog('ApplicationInitialize','Initialize fonts');
   InitializeFonts;      //load fonts

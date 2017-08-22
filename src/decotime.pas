@@ -85,7 +85,7 @@ begin
   TimerLock.Release;
 
   if QueryPerformance then
-    QueryPerformanceCounter({$warnings off}Result{$warnings on})
+    QueryPerformanceCounter({$hints off}Result{$hints on})
   else
     {in case of ancient Windows version fall back to GetTickCount :)}
     Result := {$warnings off} GetTickCount64 {$warnings on};
