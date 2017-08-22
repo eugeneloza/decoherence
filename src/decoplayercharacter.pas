@@ -71,6 +71,7 @@ type
     const Speed = 10; {meters per second}
     const Friction = 40; {~meters per second, 0 never stops}
     const AngularFriction = 30; {~radians per second, rather hard to explain :) adds some inertion to camera, the higher this value the faster is rotation}
+    const MouseSensivity = 1/1800;
   private
     {updates game camera with CameraMan coordinates}
     procedure UpdateCamera;
@@ -270,10 +271,10 @@ begin
   UpVector := Vector3(0,0,1);
   ForwardVector := Vector3(1,0,0);
   {rotate horizontal}
-  CameraMan.Phi += -Delta[0]/1800;
+  CameraMan.Phi += -Delta[0]*MouseSensivity;
   if CameraMan.Phi>2*Pi then CameraMan.Phi -= 2*Pi else
   if CameraMan.Phi<0 then CameraMan.Phi +=2*Pi;
-  CameraMan.Theta += Delta[1]/1800;
+  CameraMan.Theta += Delta[1]*MouseSensivity;
   if CameraMan.Theta> Pi/3 then CameraMan.Theta :=  Pi/3 else
   if CameraMan.Theta<-Pi/3 then CameraMan.Theta := -Pi/3;
 
