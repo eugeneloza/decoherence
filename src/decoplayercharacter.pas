@@ -81,7 +81,7 @@ type
   public
     CameraMan: DCameraMan;
     CameraInitialized: boolean;
-    Char: DCharList;
+    Character: DCharList;
     {generates a temporary party}
     procedure tmpParty;
     procedure Manage;
@@ -126,7 +126,7 @@ uses SysUtils, CastleLog, Math,
 constructor DParty.create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  Char := DCharList.Create(true);
+  Character := DCharList.Create(true);
   CameraMan := DCameraMan.Create;
   isAccelerating := false;
   ResetMoveInput;
@@ -149,7 +149,7 @@ begin
     if (Perks=nil) or (Perks.Count=0) then WriteLnLog('CreateTestParty','FATAL ERROR: Perks is empty!');
     NewMember.Actions.Add(Perks[0]);
 
-    Char.Add(NewMember);
+    Character.Add(NewMember);
   end;
 end;
 
@@ -159,14 +159,14 @@ procedure DParty.Rest;
 var c: DPlayerCharacter;
 begin
   {for now it just resets the Actor to its initial state}
-  for c in Char do c.RecoverAll;
+  for c in Character do c.RecoverAll;
 end;
 
 {----------------------------------------------------------------------------}
 
 destructor DParty.Destroy;
 begin
-  FreeAndNil(Char); //it will auto free all its components
+  FreeAndNil(Character); //it will auto free all its components
   FreeAndNil(CameraMan);
 end;
 
@@ -209,11 +209,11 @@ end;
 {----------------------------------------------------------------------------}
 
 procedure DParty.CollectCharacters;
-var p: DPlayerCharacter;
+var c: DPlayerCharacter;
 begin
-  for p in Char do begin
-    p.Position := CameraMan.Position;
-    p.Direction := CameraMan.Direction;
+  for c in Character do begin
+    c.Position := CameraMan.Position;
+    c.Direction := CameraMan.Direction;
   end;
   {$hint collect battle state from char}
   PlayerInBattle := true;

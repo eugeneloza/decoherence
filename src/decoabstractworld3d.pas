@@ -442,7 +442,7 @@ begin
     until (Nav[n].Blocked = false) and (Nav[n].isSafe = false);
     a := DMonster.Create;
     {$Warning todo}
-    a.Target := CurrentParty.Char[0];
+    a.Target := CurrentParty.Character[0];
     {monsters are centered by "underfeet" point}
     a.Spawn(n, tmpKnightCreature);
     Actors.Add(a);

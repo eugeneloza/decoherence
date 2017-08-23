@@ -228,11 +228,11 @@ constructor DPartyView.Create(AOwner: TComponent);
 var i: integer;
 begin
   inherited Create(AOwner);
-  for i := 0 to CurrentParty.Char.Count-1 do begin
+  for i := 0 to CurrentParty.Character.Count-1 do begin
     CharacterSpace[i] := DCharacterSpace.create(self);
     CharacterSpace[i].ID := i;
     {$warning todo}
-    CharacterSpace[i].Target := CurrentParty.Char[i];
+    CharacterSpace[i].Target := CurrentParty.Character[i];
     CharacterSpace[i].ScaleToChildren := true;
     grab(CharacterSpace[i]);
     //at grab we set parent as DPartyView;
