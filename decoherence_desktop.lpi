@@ -4,7 +4,6 @@
     <Version Value="10"/>
     <General>
       <Flags>
-        <MainUnitHasUsesSectionForAllUnits Value="False"/>
         <MainUnitHasCreateFormStatements Value="False"/>
         <MainUnitHasTitleStatement Value="False"/>
       </Flags>
@@ -21,7 +20,7 @@
       <UseVersionInfo Value="True"/>
       <AutoIncrementBuild Value="True"/>
       <MinorVersionNr Value="1"/>
-      <BuildNr Value="17"/>
+      <BuildNr Value="20"/>
       <StringTable ProductVersion="0.0.0.0"/>
     </VersionInfo>
     <BuildModes Count="3">
@@ -281,6 +280,7 @@
       <Unit37>
         <Filename Value="src/decotranslation.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoTranslation"/>
       </Unit37>
       <Unit38>
         <Filename Value="src/compilerconfig.inc"/>

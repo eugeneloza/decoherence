@@ -25,7 +25,7 @@ interface
 uses Classes, fgl, SysUtils,
   CastleLog,
   CastleFilesUtils, CastleKeysMouse,
-  decointerface, decogui{,
+  DecoInterface, DecoGui{,
   decoglobal};
 
 type DTouch = class (TObject)
@@ -47,7 +47,7 @@ var TouchArray: DTouchList;
 procedure doMousePress(const Event: TInputPressRelease);
 procedure doMouseRelease(const Event: TInputPressRelease);
 function doMouseLook: boolean;
-
+procedure CenterMouseCursor;
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 uses CastleVectors,
@@ -132,13 +132,14 @@ end;
 
 {----------------------------------------------------------------------------}
 
-function doMouseLook: boolean;
 var WindowCenter: TVector2;   {pull it in GUI at rescale}
+
+function doMouseLook: boolean;
 begin
   {if FMouseLook then
     Cursor := mcForceNone else
     Cursor := mcDefault;}
-  Camera.Cursor := mcForceNone;
+  Camera.Cursor := mcForceNone; {do it only once}
   WindowCenter := Vector2(Window.Width div 2, Window.Height div 2);
   if not TVector2.Equals(Window.MousePosition,WindowCenter) then begin
     CurrentParty.InputMouse(Window.MousePosition - WindowCenter);
@@ -146,6 +147,12 @@ begin
     Window.MousePosition := WindowCenter;
   end else
     doMouseLook := true; {prevent onMotion}
+end;
+
+procedure CenterMouseCursor;
+begin
+  WindowCenter := Vector2(Window.Width div 2, Window.Height div 2);
+  Window.MousePosition := WindowCenter;
 end;
 
 {----------------------------------------------------------------------------}

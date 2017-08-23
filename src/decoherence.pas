@@ -196,7 +196,10 @@ var i: integer;
     tmpLink: DAbstractElement;
     Dragging: boolean;
 begin
-  if doMouseLook then Exit;
+  if doMouseLook then begin
+    WriteLnLog('doMotion>MouseLook','Call-back encountered...');
+    Exit;
+  end;
 
   {check for drag-n-drops}
   Dragging := false;

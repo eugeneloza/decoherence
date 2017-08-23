@@ -16,9 +16,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 {---------------------------------------------------------------------------}
 
 { Management of game translations }
-unit decotranslation;
+unit DecoTranslation;
 
 {$INCLUDE compilerconfig.inc}
+
 interface
 
 //uses SysUtils;
@@ -78,7 +79,7 @@ begin
   case CurrentLanguage of
     Language_English: Theme.Images[tiLoading] := Loading_eng;
     Language_Russian: Theme.Images[tiLoading] := Loading_rus;
-    else              Theme.Images[tiLoading] := Loading_eng;
+    else              Theme.Images[tiLoading] := Loading_eng; //we don't have Log initialized here yet. So, don't report this error, just fall back to English.
   end;
 
   Theme.OwnsImages[tiLoading] := false;

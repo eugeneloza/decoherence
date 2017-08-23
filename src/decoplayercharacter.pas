@@ -120,6 +120,7 @@ procedure FreeParty;
 implementation
 uses SysUtils, CastleLog, Math,
   DecoNavigation, DecoAbstractWorld, DecoAbstractWorld3d,
+  DecoMouse,
   DecoGameMode, DecoTime;
 
 constructor DParty.create(AOwner: TComponent);
@@ -355,6 +356,7 @@ begin
   if not TryDirection(0,Pi/2) then
   if not TryDirection(0,-Pi/2) then ;
 
+  {gravity...}
   TryDirection(-1,0);
 
   {use body here, including body.gravity}
@@ -389,7 +391,7 @@ begin
   Inherited;
 end;
 
-{----------------------------------------------------------------------------}
+{============================================================================}
 
 constructor DCameraMan.Create;
 begin
@@ -399,17 +401,20 @@ begin
   phi := 0;
 end;
 
+{----------------------------------------------------------------------------}
+
 procedure DCameraMan.ResetUp;
 begin
   Up := CurrentWorld.GetGravity(Position);
 end;
 
+{----------------------------------------------------------------------------}
+
 procedure DCameraMan.ResetAngles;
 begin
-  {ugly fix for initialization of phi and theta}
   Theta := ArcSin(Direction[2]/Direction.Length);
   Phi := Sign(Direction[1])*ArcCos(Direction[0]/(sqr(Direction[0])+sqr(Direction[1])));
-  //RESET MOUSE CURSOR HERE. / on evry return to World
+  CenterMouseCursor;
 end;
 
 {============================================================================}
