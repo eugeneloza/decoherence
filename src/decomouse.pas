@@ -33,7 +33,7 @@ type DTouch = class (TObject)
   x0,y0: integer;     //to handle sweeps, drags and cancels
   ClickElement: DSingleInterfaceElement;
   constructor Create(const xx,yy: single; const Finger: integer);
-  procedure Update(Event: TInputMotion);
+  procedure Update(const Event: TInputMotion);
 end;
 
 type DTouchList = specialize TFPGObjectList<DTouch>;
@@ -47,6 +47,7 @@ var TouchArray: DTouchList;
 procedure doMousePress(const Event: TInputPressRelease);
 procedure doMouseRelease(const Event: TInputPressRelease);
 function doMouseLook: boolean;
+function doMouseDrag(const Event: TInputMotion) : boolean;
 procedure CenterMouseCursor;
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
@@ -61,7 +62,7 @@ begin
   FingerIndex := Finger;
 end;
 
-procedure DTouch.Update(Event: TInputMotion);
+procedure DTouch.Update(const Event: TInputMotion);
 begin
   x0 := Round(Event.Position[0]);
   y0 := Round(Event.Position[1]);
@@ -156,6 +157,30 @@ begin
 end;
 
 {----------------------------------------------------------------------------}
+
+function doMouseDrag(const Event: TInputMotion): boolean;
+var i: integer;
+begin
+  {check for drag-n-drops}
+  Result := false;
+  {if Event.EventType = itMouseButton then }begin
+    if TouchArray.Count > 0 then begin
+     i:=0;
+     repeat
+       if TouchArray[i].FingerIndex = Event.FingerIndex then begin
+         TouchArray[i].Update(Event);
+         if (TouchArray[i].ClickElement<>nil) and (TouchArray[i].ClickElement.CanDrag) then begin
+           TouchArray[i].ClickElement.Drag(Round(Event.Position[0]),Round(Event.Position[1]));
+           Result := true;
+         end;
+         Break;
+       end;
+       inc(i);
+     until (i >= TouchArray.Count);
+    end;
+
+  end;
+end;
 
 
 Initialization

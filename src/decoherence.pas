@@ -192,7 +192,7 @@ end;
 {--------------------------------------------------------------------------}
 
 procedure doMotion(Container: TUIContainer; const Event: TInputMotion);
-var i: integer;
+var
     tmpLink: DAbstractElement;
     Dragging: boolean;
 begin
@@ -201,25 +201,8 @@ begin
     Exit;
   end;
 
-  {check for drag-n-drops}
-  Dragging := false;
-  {if Event.EventType = itMouseButton then }begin
-    if touchArray.count > 0 then begin
-     i:=0;
-     repeat
-       if TouchArray[i].FingerIndex = Event.FingerIndex then begin
-         TouchArray[i].update(Event);
-         if (TouchArray[i].ClickElement<>nil) and (TouchArray[i].ClickElement.CanDrag) then begin
-           TouchArray[i].ClickElement.Drag(Round(event.Position[0]),Round(Event.Position[1]));
-           Dragging := true;
-         end;
-         Break;
-       end;
-       inc(i);
-     until (i >= TouchArray.Count);
-    end;
+  Dragging := doMouseDrag(Event);
 
-  end;
   {mouse over / if no drag-n-drop}
   //this is not needed at the moment, we'll turn here a bit later when implementing drag-n-drop
   //no mouseover is detected if no ifmouseover is run, so should still be here
