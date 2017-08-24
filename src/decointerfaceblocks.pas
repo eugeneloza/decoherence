@@ -124,10 +124,17 @@ begin
     StatBars.setbasesize(-45/800,-(40+155+180*(self.ID div 2))/800,35/800,155/800,1,animate);
   StatBars.rescale;
 
-  if not odd(self.ID) then
-    Portrait.setbasesize(47/800,-(40+155+180*(self.ID div 2))/800,135/800,155/800,1,animate)
-  else
+  if not odd(self.ID) then begin
+    Portrait.setbasesize(47/800,-(40+155+180*(self.ID div 2))/800,135/800,155/800,1,animate);
+    {bug}
+    Portrait.DamageLabel.setbasesize(47/800,-(40+155+180*(self.ID div 2))/800,135/800,155/800,1,animate);
+    Portrait.DamageOverlay.setbasesize(47/800,-(40+155+180*(self.ID div 2))/800,135/800,155/800,1,animate);
+  end else begin
     Portrait.setbasesize(-(46+135)/800,-(40+155+180*(self.ID div 2))/800,135/800,155/800,1,animate);
+    {bug}
+    Portrait.DamageLabel.setbasesize(-(46+135)/800,-(40+155+180*(self.ID div 2))/800,135/800,155/800,1,animate);
+    Portrait.DamageOverlay.setbasesize(-(46+135)/800,-(40+155+180*(self.ID div 2))/800,135/800,155/800,1,animate);
+  end;
   //Portrait.rescale;
   Slided := true;
   doSlideOut;
@@ -155,6 +162,13 @@ begin
     myx := 47/800
   else
     myx := -(46)/800-Portrait.Base.fw;
+
+  {bug}
+  Portrait.DamageLabel.setbasesize(myx,Portrait.base.fy,Portrait.base.fw,Portrait.base.fh,1,asDefault);
+  Portrait.DamageLabel.rescale;
+  Portrait.DamageOverlay.setbasesize(myx,Portrait.base.fy,Portrait.base.fw,Portrait.base.fh,1,asDefault);
+  Portrait.DamageOverlay.rescale;
+
   Portrait.setbasesize(myx,Portrait.base.fy,Portrait.base.fw,Portrait.base.fh,1,asDefault);
   Portrait.rescale;
 end;
@@ -170,6 +184,13 @@ begin
   else
     myx := -135{portrait.base.fw}/800;
   //{$WARNING Memory Leak here}
+
+  {bug}
+  Portrait.DamageLabel.setbasesize(myx,Portrait.base.fy,Portrait.base.fw,Portrait.base.fh,0,asDefault);
+  Portrait.DamageLabel.rescale;
+  Portrait.DamageOverlay.setbasesize(myx,Portrait.base.fy,Portrait.base.fw,Portrait.base.fh,0,asDefault);
+  Portrait.DamageOverlay.rescale;
+
   Portrait.setbasesize(myx,Portrait.base.fy,Portrait.base.fw,Portrait.base.fh,0,asDefault);
   Portrait.rescale;
 end;

@@ -86,9 +86,11 @@ type
   { character portrait. Some day it might be replaced for TUIContainer of
     the 3d character face :) Only 2D inanimated image for now... }
   DPortrait = class(DInterfaceElement)
-  private
+  public
+    {this is a BUG, but I won't fix it now, it requires remaking ALL THE INTERFACE}
     DamageOverlay: DSingleInterfaceElement;
     DamageLabel: DSingleInterfaceElement;
+  private
     fTarget: DPlayerCharacter;
     procedure SetTarget(value: DPlayerCharacter);
   public
@@ -513,8 +515,8 @@ begin
   DamageOverlay := DSingleInterfaceElement.create(self);
   tmp_staticimage := DStaticImage.create(self);
   DamageOverlay.content := tmp_staticimage;
-  Grab(damageOverlay);
-  DamageOverlay.ScaleToParent := true;
+  Grab(DamageOverlay);
+//  DamageOverlay.ScaleToParent := true;
 
   DamageLabel := DSingleInterfaceElement.create(self);
   tmp_label := DLabel.create(self);
@@ -522,7 +524,7 @@ begin
   tmp_label.Font := PlayerDamageFont;
   DamageLabel.content := tmp_label;
   Grab(damageLabel);
-  DamageLabel.ScaleToParent := true;
+//  DamageLabel.ScaleToParent := true;
 end;
 
 {---------------------------------------------------------------------------}
