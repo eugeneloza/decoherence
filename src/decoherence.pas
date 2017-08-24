@@ -195,10 +195,7 @@ var
     tmpLink: DAbstractElement;
     Dragging: boolean;
 begin
-  if doMouseLook then begin
-    WriteLnLog('doMotion>MouseLook','Call-back encountered...');
-    Exit;
-  end;
+  if doMouseLook(Event) then Exit;
 
   Dragging := doMouseDrag(Event);
 

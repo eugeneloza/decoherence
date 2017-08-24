@@ -96,6 +96,7 @@ begin
    {$ELSE}
    if MyCharSet = nil then begin
       MyCharSet := TUnicodeCharList.Create;
+      //MyCharSet := AllChars;
       MyCharSet.Add(SimpleAsciiCharacters);
       MyCharSet.Add('ЁЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮёйцукенгшщзхъфывапролджэячсмитьбюІЇЄіїє');
    end;

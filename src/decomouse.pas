@@ -46,8 +46,8 @@ var TouchArray: DTouchList;
 
 procedure doMousePress(const Event: TInputPressRelease);
 procedure doMouseRelease(const Event: TInputPressRelease);
-function doMouseLook: boolean;
-function doMouseDrag(const Event: TInputMotion) : boolean;
+function doMouseLook(const Event: TInputMotion): boolean;
+function doMouseDrag(const Event: TInputMotion): boolean;
 procedure CenterMouseCursor;
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
@@ -135,19 +135,19 @@ end;
 
 var WindowCenter: TVector2;   {pull it in GUI at rescale}
 
-function doMouseLook: boolean;
+function doMouseLook(const Event: TInputMotion): boolean;
 begin
   {if FMouseLook then
     Cursor := mcForceNone else
     Cursor := mcDefault;}
   Camera.Cursor := mcForceNone; {do it only once}
   WindowCenter := Vector2(Window.Width div 2, Window.Height div 2);
-  if not TVector2.Equals(Window.MousePosition,WindowCenter) then begin
-    CurrentParty.InputMouse(Window.MousePosition - WindowCenter);
+  if not TVector2.PerfectlyEquals(Event.Position,WindowCenter) then begin
+    CurrentParty.InputMouse(Event.Position - WindowCenter);
     doMouseLook := false;
     Window.MousePosition := WindowCenter;
   end else
-    doMouseLook := true; {prevent onMotion}
+    doMouseLook := true; {prevent onMotion call-back}
 end;
 
 procedure CenterMouseCursor;
