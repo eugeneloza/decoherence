@@ -44,12 +44,6 @@ type
    shared by interior and exterior worlds}
   DAbstractWorld3d = class(DAbstractWorld)
   (*build*)
-  public
-    const myScale = 3;
-  public
-    {scale used to define a tile size. Usually 1 is man-height.
-      CAUTION this scale must correspond to tiles model scale, otherwise it'll mess everything up}
-    WorldScale: float;
   protected
     {root nodes of the each tile
      MUST go synchronous with groups/neighbours!}

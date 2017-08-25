@@ -40,11 +40,10 @@ const MaxParty = 6; {0..6 = 7 characters}
 
 type
   {extension of DCoordActor with Up vector required for camera to work properly}
-  DCameraMan = class(DCoordActor)
+  DCameraMan = class(DActorPhysics)
   public
     Up: TVector3;
     theta,phi: float;
-    Height: float;
     procedure ResetUp;
     procedure ResetAngles;
     constructor Create; override;
@@ -226,6 +225,7 @@ begin
   CameraMan.TeleportTo(aPosition, aDirection);
   CameraMan.ResetUp;
   CameraMan.Height := PlayerHeight*(CurrentWorld as DAbstractWorld3d).MyScale;
+  CameraMan.InternalCamera := Camera;  {maybe, store camera in Controlled Party}
 
   CameraMan.ResetAngles;
 
@@ -326,23 +326,25 @@ end;
 {----------------------------------------------------------------------------}
 
 procedure DParty.doMove2;
-var NewPos: TVector3;
+var NewPosGravity,tmp: TVector3;
     FixedFriction: float;
   function TryDirection(climb,slide: float): boolean;
-  var NewPosAdjusted, NewPosHeightAdjusted, tmp: TVector3;
+  var NewPosAdjusted, NewPosHeightAdjusted, ProposedDir: TVector3;
   begin
     NewPosAdjusted := CameraMan.Position + (Speed*DeltaTLocal)*RotatePointAroundAxisRad(slide, MoveSpeed, vector3(0,0,1));
     NewPosAdjusted[2] := NewPosAdjusted[2] + climb;
     NewPosHeightAdjusted := NewPosAdjusted;
     NewPosHeightAdjusted[2] := NewPosHeightAdjusted[2]+CameraMan.Height; {ugly fix for difference in CameraMan height}
-    if Camera.DoMoveAllowed(NewPosHeightAdjusted,tmp,false) then begin
+    if Camera.DoMoveAllowed(NewPosHeightAdjusted,ProposedDir,false) then begin
       CameraMan.Position := NewPosAdjusted;
-      Result := true
+      Result := true;
     end else
       Result := false;
 
   end;
 begin
+  CameraMan.Manage;
+
   {this is not a correct way to account for friction/innertia, but actually
    it doesn't really matter. We're not driving a car, it just adds some
    softness for movement and, maybe, provides for slippery ice surface}
@@ -357,7 +359,11 @@ begin
   if not TryDirection(0,-Pi/2) then ;
 
   {gravity...}
-  TryDirection(-1,0);
+  {NewPos := CameraMan.Position;
+  NewPos[2] := NewPos[2]-0.1;
+  if Camera.DoMoveAllowed(NewPosGravity,tmp,false) then
+    CameraMan.Position := NewPosGravity; }
+
 
   {use body here, including body.gravity}
 end;

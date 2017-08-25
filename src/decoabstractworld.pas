@@ -47,10 +47,15 @@ Type
     {$HINT todo: LastRender = -1 does the same job, optimize it}
     {$HINT allow first initialization flow during load without caring for FPS!}
     FirstRender: boolean;
+    fGravityAcceleration: float;
   protected
     { Spawns Actors in the World }
     procedure SpawnActors; virtual; abstract;
   public
+    { Acceleration of gravity in this World
+      Pay attention, nothing special happens (yet) if it is zero
+      in m/s^2 }
+    property GravityAcceleration: float read fGravityAcceleration;
     { Seed used to "build" the world if it requires random}
     property Seed: LongWord read fSeed write fSeed;
     { World management routine. Called every frame;
@@ -87,6 +92,12 @@ Type
     constructor Create; virtual;
     destructor Destroy; override;
 
+  public
+    { scaling factor, required to set up FOV properly / or a bug? }
+    const myScale = 3;
+    {scale used to define a tile size. Usually 1 is man-height.
+      CAUTION this scale must correspond to tiles model scale, otherwise it'll mess everything up}
+    var WorldScale: float;
   public
     Nav: TNavList;
     Weenies: TWeeniesList;

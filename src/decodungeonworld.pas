@@ -150,6 +150,7 @@ procedure DDungeonWorld.Load(Generator: DAbstractGenerator);
 var DG: D3dDungeonGenerator;
 begin
   inherited Load(Generator);
+  fGravityAcceleration := 10;
   DG := Generator as D3dDungeonGenerator;
   Map := DG.ExportMap;
   Neighbours := DG.ExportNeighbours;

@@ -22,7 +22,7 @@ unit DecoActor;
 
 interface
 
-uses Classes, CastleRandom, fgl, CastleVectors,
+uses Classes, CastleRandom, fgl, CastleVectors, CastleCameras,
   CastleResources, CastleCreatures,
   DecoNavigationNetwork,
   DecoStats, DecoPerks, DecoBody,
@@ -36,7 +36,7 @@ type TFaction = (fPlayer, fHostile);
 type
   { This Actor has only the most basic features like his "tile" position
     Will be used in some remote future for Actors behaviour on global map }
-  DSimpleActor = class (TObject)
+  DSimpleActor = class abstract(TObject)
   private
     LastNav: TNavID;
   public
@@ -70,19 +70,33 @@ type
     {moves the body}
     procedure doMove;
   public
-    constructor create; override;
+    constructor Create; override;
+  end;
+
+type
+  { Actor with basic physics, mostly gravity and acceleration.
+    maybe, merge these with DCoordActor? but it'll come later. }
+  DActorPhysics = class abstract(DCoordActor)
+  private
+    { premultiplied by time gravity facing *down* }
+    CurrentGravityDown: TVector3;
+  protected
+    { DActorPhysics does not set the camera, but uses it! It's defined in descendants}
+    InternalCamera: TWalkCamera;
+    function CanMovePos(aPos: TVector3): boolean;{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+    function CanMoveDir(aDir: TVector3): boolean;{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+  public
+    Height: float;
+    procedure doGravity;
+    procedure Manage; override;
+    constructor Create; override;
   end;
 
 type
   { Actor with a rendered body and corresponding management routines }
-  DActorBody = class (DCoordActor)
+  DActorBody = class abstract (DActorPhysics)
   protected
-    {last time, last local time, and corresponding (temporary) deltas}
-    //LastT, dt, LastTLocal, dtl: DTime;
-    {speed of actor's rotation}
-    RotSpeed: float;
-  protected
-    procedure doAI; virtual;
+    procedure doAI; virtual; abstract;
   private
     {shows or hides body of this actor}
     procedure SetVisible(value: boolean);
@@ -118,7 +132,7 @@ type
 
 Type
   { basic actor. With stats }
-  DBasicActor = class(DActorBody)
+  DBasicActor = class abstract(DActorBody)
   private
     fHP,fMaxHP,fMaxMaxHP: float;
     { maybe, move all non-HP to deco player character? }
@@ -343,6 +357,47 @@ constructor DCoordActor.create;
 begin
   inherited;
   LastNav := UnitinializedNav;
+end;
+
+{===========================================================================}
+{====================== COORD ACTOR ========================================}
+{===========================================================================}
+
+procedure DActorPhysics.doGravity;
+begin
+  if InternalCamera=nil then exit;
+  if CanMoveDir(CurrentGravityDown-Vector3(0,0,Height)) then Position := Position+CurrentGravityDown;
+end;
+
+{----------------------------------------------------------------------------}
+
+constructor DActorPhysics.Create;
+begin
+  inherited;
+  Height := 0;
+  CurrentGravityDown := Vector3(0,0,1);
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DActorPhysics.Manage;
+begin
+  CurrentGravityDown := -DeltaTLocal*CurrentWorld.GetGravity(Position)*CurrentWorld.GravityAcceleration;
+  inherited;
+  doGravity;
+end;
+
+{----------------------------------------------------------------------------}
+
+function DActorPhysics.CanMovePos(aPos: TVector3): boolean;{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+var tmp: TVector3;
+begin
+  Result := InternalCamera.DoMoveAllowed(aPos,tmp,false)
+end;
+function DActorPhysics.CanMoveDir(aDir: TVector3): boolean;{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+var tmp: TVector3;
+begin
+  Result := InternalCamera.DoMoveAllowed(InternalCamera.Position+aDir,tmp,false)
 end;
 
 {===========================================================================}
@@ -603,6 +658,7 @@ begin
   Visible := true;
   Body.Collides := true;
   Body.CollidesWithMoving := true;
+  InternalCamera := Body.Camera;
   ForceAnimation(atIdle);
 end;
 
@@ -628,13 +684,6 @@ end;
 function DActorBody.GetVisible: boolean;
 begin
   Result := Body.Exists;
-end;
-
-{-----------------------------------------------------------------------------}
-
-procedure DActorBody.doAI;
-begin
-  //does nothing yet, maybe should be abstract?
 end;
 
 {-----------------------------------------------------------------------------}
