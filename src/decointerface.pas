@@ -175,23 +175,6 @@ Type
     //also resizes content and frame
     procedure SetBaseSize(const NewX,NewY,NewW,NewH,NewO: float; Animate: TAnimationStyle); override;
     procedure SetIntSize(const x1,y1,x2,y2:integer; Animate: TAnimationStyle); override;
-  private
-    {GL image of the frame}
-    GLFrame: TGLImage;
-    {scaled frame image}
-    FrameImage: TRGBAlphaImage;
-    {duplicates AbstractImage properties, but is private, so sohuldn't conflict}
-    InitGLPending: boolean;
-    FrameReady: boolean;
-    {Resizes the element's frame to fit base size}
-    procedure FrameResize3x3;
-    { initialize GL image. NOT THREAD SAFE! / Almost a copy of AbstractImage.initGl}
-    procedure InitGL;{ override;}
-    { resets parent and content size after rescale if needed}
-    procedure ResetContentSize(animate: TAnimationStyle);
-
-    procedure DrawFrame;
-    procedure DrawContent;
   public
     {if this element is active (clickable)}
     CanMouseOver: boolean;
@@ -697,23 +680,6 @@ end;}
 
 {----------------------------------------------------------------------------}
 
-{procedure DSingleInterfaceElement.ResetContentSize(Animate: TAnimationStyle);
-begin
-  if (Parent<>nil) and (Parent is DInterfaceElement) and (DInterfaceElement(Parent).ScaleToChildren) then
-    DInterfaceElement(Parent).RescaleToChildren(Animate);
-  //frame should be automatically resized during "rescale" and animated during draw...
-  if Content <> nil then begin
-    Content.Base.CopyXYWH(Self.Base);
-    Content.Base.SubstractFrame(Frame,0); //adjust to frame borders, no problem that frame may be unrescaled yet, because frame borders always the same
-    Content.CurrentAnimationState.CopyXYWH(Self.CurrentAnimationState);
-    Content.CurrentAnimationState.SubstractFrame(Frame,0);
-    Content.AnimateTo(Animate);
-  end;
-
-end;}
-
-{----------------------------------------------------------------------------}
-
 procedure DAbstractElement.GetAnimationState;
 var Phase: float;
 begin
@@ -827,130 +793,10 @@ end;}
 
 {----------------------------------------------------------------------------}
 
-{procedure DSingleInterfaceElement.FrameResize3x3;
-var ScaledImageParts: array [0..2,0..2] of TCastleImage;
-    ix,iy: integer;
-    UnscaledWidth, UnscaledHeight:integer;
-    SourceXs, SourceYs, DestXs, DestYs: TVector4Integer;
-begin
-  FrameReady := false;
-  if Base.Initialized = false then begin
-    WriteLnLog('DAbstractInterfaceElement.FrameResize3x3','ERROR: Base is not initialized!');
-  end;
-
-  if FrameImage<>nil then begin
-    FreeAndNil(FrameImage);
-    WriteLnLog('DSingleInterfaceElement.FrameResize3x3','ERROR: FrameImage is not nil! (memory leak)');
-  end;
-  FrameImage := Frame.SourceImage.CreateCopy as TRGBAlphaImage;
-
-  UnscaledWidth := FrameImage.Width;
-  UnscaledHeight := FrameImage.Height;
-
-  {check if minimal frame size is larger than the requested frame size}
-  if Frame.CornerLeft+Frame.CornerRight+1 > Base.w then begin
-    WriteLnLog('DAbstractInterfaceElement.FrameResize3x3','Reset backwards base.w = '+IntToStr(Base.w)+' / cornerLeft+cornerRight = '+IntToStr(Frame.CornerLeft+Frame.CornerRight));
-    Base.w := Frame.CornerLeft+Frame.CornerRight+1;
-    Base.BackwardSetSize(Base.w,-1);
-  end;
-  if Frame.CornerTop+Frame.CornerBottom+1 > Base.h then begin
-    WriteLnLog('DAbstractInterfaceElement.FrameResize3x3','Reset backwards base.h = '+inttostr(base.h)+' / cornerTop+cornerBottom = '+inttostr(frame.cornerTop+frame.cornerBottom));
-    Base.h := Frame.CornerTop+Frame.CornerBottom+1;
-    Base.BackwardSetSize(-1,Base.h);
-  end;
-
-  SourceXs[0] := 0;
-  SourceXs[1] := Frame.CornerLeft;
-  SourceXs[2] := UnscaledWidth-Frame.CornerRight;
-  SourceXs[3] := UnscaledWidth;
-  SourceYs[0] := 0;
-  SourceYs[1] := Frame.cornerBottom;
-  SourceYs[2] := UnscaledHeight-Frame.CornerTop;
-  SourceYs[3] := UnscaledHeight;
-  DestXs[0] := 0;
-  DestXs[1] := Frame.CornerLeft;
-  DestXs[2] := Base.w-Frame.CornerRight;
-  DestXs[3] := Base.w;
-  DestYs[0] := 0;
-  DestYs[1] := Frame.CornerBottom;
-  DestYs[2] := Base.h-Frame.CornerTop;
-  DestYs[3] := Base.h;
-
-  for ix := 0 to 2 do
-   for iy := 0 to 2 do begin
-     ScaledImageParts[ix,iy] := TRGBAlphaImage.Create;
-     ScaledImageParts[ix,iy].SetSize(SourceXs[ix+1]-SourceXs[ix],SourceYs[iy+1]-SourceYs[iy]);
-     ScaledImageParts[ix,iy].Clear(Vector4Byte(0,0,0,0));
-     ScaledImageParts[ix,iy].DrawFrom(FrameImage,0,0,SourceXs[ix],SourceYs[iy],SourceXs[ix+1]-SourceXs[ix],SourceYs[iy+1]-SourceYs[iy],dmBlendSmart);
-     ScaledImageParts[ix,iy].Resize(DestXs[ix+1]-DestXs[ix],DestYs[iy+1]-DestYs[iy],riNearest);
-   end;
-
-  FrameImage.SetSize(Base.w,Base.h,1);
-  FrameImage.Clear(Vector4byte(0,0,0,0));
-  for ix := 0 to 2 do
-    for iy := 0 to 2 do FrameImage.DrawFrom(ScaledImageParts[ix,iy],DestXs[ix],DestYs[iy],0,0,DestXs[ix+1]-DestXs[ix],DestYs[iy+1]-DestYs[iy],dmBlendSmart);
-
-  for ix := 0 to 2 do
-    for iy := 0 to 2 do FreeAndNil(ScaledImageParts[ix,iy]);
-
-  //and burn the burner
-  //FrameImage.DrawFrom(BURNER_IMAGE,0,0,base.x1,base.y1,base.w,base.h,dmMultiply);
-
-  InitGLPending := true;
-end;}
-
-{----------------------------------------------------------------------------}
-
-{procedure DSingleInterfaceElement.InitGL;
-begin
-  //content makes his own initGL on first draw
-  if InitGLPending then begin
-    InitGLPending := false;
-    if FrameImage<>nil then begin
-      FreeAndNil(GLFrame);
-      GLFrame := TGLImage.Create(FrameImage,true,true); //todo: maybe, it's inefficient
-      FrameImage := nil;
-      FrameReady := true;
-    end;
-  end;
-end;}
-
-{----------------------------------------------------------------------------}
-
-{procedure DSingleInterfaceElement.DrawFrame; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
-begin
-  if Frame <> nil then begin
-    if FrameReady then begin
-      GLFrame.Color := Vector4(1,1,1,CurrentAnimationState.Opacity * FrameOpacity);     //todo
-      GLFrame.Draw(CurrentAnimationState.x1,CurrentAnimationState.y1,CurrentAnimationState.w,CurrentAnimationState.h);
-    end else begin
-      if InitGLPending then InitGL;
-    end;
-  end;
-end;}
-
-{procedure DSingleInterfaceElement.DrawContent; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
-begin
-  //todo
-  if Content <> nil then begin
-    //Content.base.copyxywh(currentAnimationState);
-    Content.Draw;
-  end;
-end;}
-
 {procedure DSingleInterfaceElement.Draw;
 begin
   Update;
   if not Visible then Exit;
-
-  if FrameOnTop then begin
-    DrawContent;
-    DrawFrame;
-  end else begin
-    DrawFrame;
-    DrawContent;
-  end;
-
 end;}
 
 {========== Abstract intarface element : Mouse handling =====================}
