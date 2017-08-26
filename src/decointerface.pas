@@ -153,54 +153,14 @@ Type
       Important: GetAnimationState must be called before setting basesize
       of the element as AnimateTo uses currentAnimationState}
     procedure AnimateTo(Animate: TAnimationStyle; Duration: float = DefaultAnimationDuration);
-   constructor Create; //override;
+   constructor Create; virtual;//override;
    destructor Destroy; override;
   end;
 
-{ Simple procedures for (mouse) events }
+{ Simple procedures for (mouse and time) events }
 //type TSimpleProcedure = procedure(sender: DAbstractElement) of Object;
 type TSimpleProcedure = procedure of Object;
 type TXYProcedure = procedure(Sender: DAbstractElement; x,y: integer) of Object;
-
-Type
-  { Fully-featured Interface Element with Mouse/Touch support }
-  DSingleInterfaceElement = class(DAbstractElement)
-  public
-    {Higher-level element. Seldomly used in specific cases}
- {   Parent: DAbstractElement;
-    procedure Draw; override;
-    procedure Rescale; override;
-    constructor Create(AOwner:TComponent); override;
-    destructor Destroy; override;
-    //also resizes content and frame
-    procedure SetBaseSize(const NewX,NewY,NewW,NewH,NewO: float; Animate: TAnimationStyle); override;
-    procedure SetIntSize(const x1,y1,x2,y2:integer; Animate: TAnimationStyle); override;
-  public
-    {if this element is active (clickable)}
-    CanMouseOver: boolean;
-    CanDrag: boolean;
-    {are these coordinates in this element's box?}
-    function IAmHere(xx,yy: integer): boolean;
-    {returns self if IAmHere and runs all possible events}
-    function ifMouseOver(xx,yy: integer; RaiseEvents: boolean; AllTree: boolean): DAbstractElement; virtual;
-  private
-    {if mouse is over this element}
-    isMouseOver: boolean;
-  public
-    {events}
-    OnMouseEnter: TXYProcedure;
-    OnMouseLeave: TXYProcedure;
-    OnMouseOver: TXYProcedure;
-    OnMousePress: TXYProcedure;
-    OnMouseRelease: TXYProcedure;
-    {dragg-n-drop routines}
-    OnDrop: TXYProcedure;
-    DragX, DragY: integer;
-    procedure Drag(x,y: integer);
-    procedure StartDrag(x,y: integer); }
-  end;
-
-type DInterfaceElementsList = specialize TFPGObjectList<DSingleInterfaceElement>;
 
 Type
   { a simple time-out mechanisms to preform some timed events on interface
@@ -208,7 +168,7 @@ Type
     maybe should be just a few additional routines at the parent class}
   DTimer = class(TObject)
     private
-    {  {set automatically, date of the timer count start}
+      {set automatically, date of the timer count start}
       StartTime: DTime;
     public
       {if the timer is running}
@@ -221,8 +181,54 @@ Type
       {a simple way to set and run timer}
       procedure SetTimeOut(Seconds: DTime);
       {check if the timer finished and run onTimer if true}
-      procedure Update;}
+      procedure Update;
   end;
+
+Type
+  { Fully-featured Interface Element with Mouse/Touch support }
+  DSingleInterfaceElement = class abstract(DAbstractElement)
+  public
+    {a simple timer to fire some event on time-out}
+    Timer: DTimer;
+    procedure SetTimeOut(Seconds: DTime);
+    {Higher-level element. Seldomly used in specific cases}
+ {   Parent: DSingleInterfaceElement;
+    procedure Draw; override;
+    procedure Rescale; override;
+    //also resizes content and frame
+    procedure SetBaseSize(const NewX,NewY,NewW,NewH,NewO: float; Animate: TAnimationStyle); override;
+    procedure SetIntSize(const x1,y1,x2,y2:integer; Animate: TAnimationStyle); override;
+}
+  {* Mouse routines *}
+  public
+    {if this element is active (clickable)}
+    CanMouseOver: boolean;
+    CanDrag: boolean;
+    {are these coordinates in this element's box?}
+{    function IAmHere(xx,yy: integer): boolean;
+    {returns self if IAmHere and runs all possible events}
+    function ifMouseOver(xx,yy: integer; RaiseEvents: boolean; AllTree: boolean): DAbstractElement; virtual;}
+  private
+    {if mouse is over this element}
+    isMouseOver: boolean;
+  public
+    {events}
+ {   OnMouseEnter: TXYProcedure;
+    OnMouseLeave: TXYProcedure;
+    OnMouseOver: TXYProcedure;
+    OnMousePress: TXYProcedure;
+    OnMouseRelease: TXYProcedure;
+    {dragg-n-drop routines}
+    OnDrop: TXYProcedure;
+    DragX, DragY: integer;
+    procedure Drag(x,y: integer);
+    procedure StartDrag(x,y: integer); }
+  public
+    constructor Create; override;
+    destructor Destroy; override;
+  end;
+
+type DInterfaceElementsList = specialize TFPGObjectList<DSingleInterfaceElement>;
 
 Type
   {An interface element, that can contain "children"}
@@ -232,8 +238,6 @@ Type
  {   ScaleToChildren: boolean;
     {list of the children of this interface element}
     Children: DInterfaceElementsList;
-    {a simple timer to fire some event on time-out}
-    Timer: DTimer;
     procedure Draw; override;
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -723,10 +727,9 @@ end;
 
 {----------------------------------------------------------------------------}
 
-
 constructor DAbstractElement.Create;
 begin
-  inherited Create;
+  inherited;
   fVisible := true;
   AnimationCurve := acSquare;
   Base := DAbstractContainer.Create;
@@ -745,8 +748,37 @@ begin
 end;
 
 {=============================================================================}
-{=================== Single interface element ===============================}
+{=============== Single interface element & Timer ============================}
 {=============================================================================}
+
+constructor DTimer.Create;
+begin
+  inherited;
+  Enabled := false;
+  StartTime := -1;
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DTimer.Update;
+begin
+  if StartTime<0 then StartTime := DecoNow else
+  if (DecoNow-StartTime) >= Interval then begin
+    Enabled := false;
+    if Assigned(onTimer) then onTimer;
+  end;
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DTimer.SetTimeout(Seconds: DTime);
+begin
+  StartTime := -1;
+  Enabled := true;
+  Interval := Seconds;
+end;
+
+{============================================================================}
 
 {procedure DSingleInterfaceElement.Rescale;
 begin
@@ -761,35 +793,29 @@ end;}
 
 {----------------------------------------------------------------------------}
 
-{constructor DSingleInterfaceElement.Create(AOwner: TComponent);
+constructor DSingleInterfaceElement.Create;
 begin
-  inherited Create(AOwner);
-  FrameOnTop := false;
-  //ID := -1;
-  //OwnsContent := false;
-  FrameOpacity := 0.8;
+  inherited;
   isMouseOver := false;
   CanMouseOver := false;
   CanDrag := false;
-end;}
+end;
 
 {-----------------------------------------------------------------------------}
 
-{destructor DSingleInterfaceElement.Destroy;
+destructor DSingleInterfaceElement.Destroy;
 begin
-  //InterfaceList.Remove(self);
-  FreeAndNil(GLFrame);
-  //scaledImage is automatically freed by GlImage
-  {$HINT BUG: why Scaled image is not freed automatically?????}
-  {BUG: I still need to free ScaledImage - while it's owned by GLImage
-   DAMN IT. The link may be obsolete after freeandnil(GLImage)!
-   Looks like I always set ScaledImage := nil after sucessfuly assigning it,
-   but should keep an eye on it!}
-  FreeAndNil(FrameImage);
-  //if owns content destroy it here;
-  //if OwnsContent then FreeAndNil(content);  //content usually has AOwner = self
+  FreeAndNil(Timer);
   inherited;
-end;}
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DSingleInterfaceElement.SetTimeOut(Seconds: DTime);
+begin
+  if Timer = nil then Timer := DTimer.Create;
+  Timer.SetTimeOut(Seconds);
+end;
 
 {----------------------------------------------------------------------------}
 
@@ -872,32 +898,7 @@ end;}
 {=========================== interface element ===============================}
 {=============================================================================}
 
-{constructor DTimer.Create;
-begin
-  inherited;
-  Enabled := false;
-  StartTime := -1;
-end;}
 
-{-----------------------------------------------------------------------------}
-
-{procedure DTimer.Update;
-begin
-  if StartTime<0 then StartTime := DecoNow else
-  if (DecoNow-StartTime) >= Interval then begin
-    Enabled := false;
-    if Assigned(onTimer) then onTimer;
-  end;
-end; }
-
-{-----------------------------------------------------------------------------}
-
-{procedure DTimer.SetTimeout(Seconds: DTime);
-begin
-  StartTime := -1;
-  Enabled := true;
-  Interval := Seconds;
-end;}
 
 {-----------------------------------------------------------------------------}
 
@@ -925,7 +926,6 @@ begin
   if AOwner is DSingleInterfaceElement then Parent := DSingleInterfaceElement(AOwner);
   ScaleToChildren := false;
   Children := DInterfaceElementsList.Create(true);
-  Timer := DTimer.Create; //maybe create timer on-demand?
 end;}
 
 {----------------------------------------------------------------------------}
@@ -933,7 +933,6 @@ end;}
 {destructor DInterfaceElement.Destroy;
 begin
   FreeAndNil(Children);   //this should fire as recoursive because children owns elements, which in turn will fire their destructors onfree
-  FreeAndNil(Timer);
   inherited;
 end;}
 
