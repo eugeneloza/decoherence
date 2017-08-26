@@ -135,12 +135,19 @@ end;
 
 var WindowCenter: TVector2;   {pull it in GUI at rescale}
 
+var CameraWarning: boolean = true;
 function doMouseLook(const Event: TInputMotion): boolean;
 begin
   {if FMouseLook then
     Cursor := mcForceNone else
     Cursor := mcDefault;}
-  if Camera = nil then exit;
+  if Camera = nil then begin
+    if CameraWarning then begin
+      WriteLnLog('DecoMouse>doMouseLook','Warning: Camera is not initialized for MouseLook');
+      CameraWarning := false;
+    end;
+    Exit;
+  end;
   Camera.Cursor := mcForceNone; {do it only once}
   WindowCenter := Vector2(Window.Width div 2, Window.Height div 2);
   if not TVector2.PerfectlyEquals(Event.Position,WindowCenter) then begin

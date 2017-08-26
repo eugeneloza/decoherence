@@ -54,6 +54,18 @@ type
     procedure RescaleImage; virtual; }
   end;
 
+  {Type
+   { Several types of frames, including with captions }
+   DFrame = class(TComponent)
+   public
+     SourceImage: TRGBAlphaImage;
+     {frame borders}
+     CornerTop, CornerBottom, CornerLeft, CornerRight: integer;
+     Rectagonal: boolean;
+     constructor Create(AOwner: TComponent); override;
+     destructor Destroy; override;
+  end;     }
+
 
 type TLoadImageThread = class(TThread)
   public

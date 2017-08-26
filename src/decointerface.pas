@@ -46,7 +46,9 @@ type TAnchorSide = (asLeft,asRight,asTop,asBottom);
 type TAnchorAlign = (noalign, haLeft, haRight, haCenter, vaTop, vaBottom, vaMiddle);
 
 type
-  DAbstractContainer = class abstract(TObject)
+  { This is an abstract container with coordinates and size
+    Capable of rescaling / copying itself }
+  DAbstractContainer = class(TObject)
   strict private
     fInitialized: boolean;
     { Parent container size (cached) }
@@ -54,9 +56,12 @@ type
     //aScaleX,aScaleY: float;
     { Determine and cache parent container size }
     procedure GetAnchors;
-    { Converts float to integer and vice versa. }
-    procedure ToFloat;
-    procedure ToInteger;
+    { Converts integer size to float. }
+    procedure IntegerToFloat;
+  public
+    { Converts float size to integer.
+      should be public only for animation states. }
+    procedure FloatToInteger;
   public
     type
       DAnchor = record
@@ -85,101 +90,72 @@ type
     { If this Container ready to be used? }
     property isInitialized: boolean read fInitialized;
     constructor Create;
+    //destructor Destroy; override;
     { Copy parameters from the Source }
     procedure Assign(Source: DAbstractContainer);
     procedure AssignTo(Dest: DAbstractContainer);
+    { Set container position and size }
     procedure SetFloatCoord(afx1,afy1,afx2,afy2: float);
     procedure SetFloatSize(afx1,afy1,afWidth,afHeight: float);
     procedure SetIntCoord(ax1,ay1,ax2,ay2: integer);
     procedure SetIntSize(ax1,ay1,aWidth,aHeight: integer);
   end;
 
-
-
-{Type
- { Several types of frames, including with captions }
- DFrame = class(TComponent)
- public
-   SourceImage: TRGBAlphaImage;
-   {frame borders}
-   CornerTop, CornerBottom, CornerLeft, CornerRight: integer;
-   Rectagonal: boolean;
-   constructor Create(AOwner: TComponent); override;
-   destructor Destroy; override;
-end;     }
-
- { constants for special scaling cases }
-{const FullWidth = -10;
-      FullHeight = -11;
-      ProportionalScale = -12;}
-{type
-  Txywh = class(TComponent)
-  public
-    { assign float and convert to Integer }
-    procedure SetSize(const NewX,NewY,NewW,NewH: float);
-    { get integer and convert to float / for fixed-size objects }
-    procedure BackwardSetSize(const NewW,NewH: integer);
-    procedure BackwardSetXYWH(const NewX,NewY,NewW,NewH: integer);
-    {substract frame width from the base}
-    procedure SubstractFrame(Frame: DFrame; AdditionalGap: integer = 0);
-    { transform floats to integer }
-    procedure Recalculate;
-    constructor Create(AOwner: TComponent); override;
-    { provides for proportional width/height scaling for some images }
-    procedure FixProportions(ww,hh: integer);
-  end;
-}
+type
+  { Style of the animation.
+    asLinear is just linear interpolation,
+    asSquare is slower in the beginning and end, and faster in the middle}
+  TAnimationCurve = (acsLinear, acSquare);
 
 Type
   { most abstract container suitable for images, labels and interface elements
     Just defines the box and rescaling }
-  DAbstractElement = class(TComponent)
+  DAbstractElement = class abstract(DAbstractContainer)
   public
-  {  {stores current animation state, recalculated by GetAnimationState at every render}
-    CurrentAnimationState: Txywha;
-    procedure GetAnimationState; virtual;
+    {stores current animation state, recalculated by GetAnimationState at every render}
+    procedure GetAnimationState;
 
-    constructor Create(AOwner: TComponent); override;
-    destructor Destroy; override;
     { changes the scale of the element relative to current window size }
     procedure Rescale; virtual;
     { draw the element / as abstract as it might be :) }
-    procedure Draw; virtual; abstract;
+   { procedure Draw; virtual; abstract;
     //procedure InitGL; virtual; abstract; //no need for an abstract method?
     { updates the data of the class with current external data, most often
       just gets the current animation state }
-    procedure Update; virtual;
-  private
+    procedure Update; virtual; }
+  strict private
     { Last and Next animation states. }
-    Last, Next: Txywha;
-//    Free_on_end: boolean;
+    Last, Next: DAbstractContainer;
     fVisible: boolean;
-    fScaleToParent: boolean;
+    {$HINT should it set visible to all children? }
     procedure SetVisible(Value: boolean);
-    procedure SetScaleToParent(Value: boolean);
   public
     { these values are "strict" and unaffected by animations. Usually determines
       the basic stage and implies image rescale and init GL. }
-    AnimationStart: TDateTime;
-    AnimationDuration: float;
+    AnimationStart: DTime;
+    AnimationDuration: DTime;
+    AnimationCurve: TAnimationCurve;
     {base state of the element. contains its coordinates and width/height}
-    Base: Txywha;
+    Base: DAbstractContainer;
     {source width/height of the element. Used to preserve proportions while scaling}
-    RealWidth, RealHeight: integer;
+  {  RealWidth, RealHeight: integer;
     procedure SetBaseSize(const NewX,NewY,NewW,NewH,NewO: float; Animate: TAnimationStyle); virtual;
     procedure SetIntSize(const x1,y1,x2,y2:integer; Animate: TAnimationStyle); virtual;
-    {if the element is visible, if false then draw will not be called.
-     PAY ATTENTION: if assigned to a single interface element then the animations
-     and initGL will occur as they would normally. BUT if assigned to a
-     composite parent element, its children WILL NOT do anything like this and
-     will be frozen until visible=true. Maybe I'll fix this.}
+    }
+    { If the element is visible, if false then draw will not be called.
+      PAY ATTENTION: if assigned to a single interface element then the animations
+      and initGL will occur as they would normally. BUT if assigned to a
+      composite parent element, its children WILL NOT do anything like this and
+      will be frozen until visible=true. Maybe I'll fix this some day. }
     property Visible: boolean read fVisible write SetVisible;
     {animates the interface element from current state to base state,
      Important: GetAnimationState must be called before setting basesize
      of the element as AnimateTo uses currentAnimationState}
-    procedure AnimateTo(Animate: TAnimationStyle; Duration: float = DefaultAnimationDuration);
+   // procedure AnimateTo(Animate: TAnimationStyle; Duration: float = DefaultAnimationDuration);
 
-    property ScaleToParent: boolean read fScaleToParent write SetScaleToParent default false;  }
+
+   constructor Create; //override;
+   destructor Destroy; override;
   end;
 
 {Definition of simple procedures for (mouse) events}
@@ -398,7 +374,7 @@ begin
 end;}
 
 {=============================================================================}
-{========================== Abstract container ===============================}
+{========================== Abstract Container ===============================}
 {=============================================================================}
 
 constructor DAbstractContainer.Create;
@@ -421,6 +397,8 @@ end;
 begin
   inherited;
 end;}
+
+{----------------------------------------------------------------------------}
 
 procedure DAbstractContainer.GetAnchors;
 begin
@@ -471,7 +449,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DAbstractContainer.ToFloat;
+procedure DAbstractContainer.IntegerToFloat;
 begin
   GetAnchors;
 
@@ -485,7 +463,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DAbstractContainer.ToInteger;
+procedure DAbstractContainer.FloatToInteger;
 begin
   GetAnchors;
 
@@ -498,6 +476,45 @@ begin
   h := y2 - y1;
 
   fInitialized := true;
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DAbstractContainer.SetFloatCoord(afx1,afy1,afx2,afy2: float);
+begin
+  fx1 := afx1;
+  fy1 := afy1;
+  fx2 := afx2;
+  fy2 := afy2;
+
+  FloatToInteger;
+end;
+procedure DAbstractContainer.SetFloatSize(afx1,afy1,afWidth,afHeight: float);
+begin
+  fx1 := afx1;
+  fy1 := afy1;
+  fx2 := - (1 - afWidth - afx1);
+  fy2 := - (1 - afHeight - afy1);
+
+  FloatToInteger;
+end;
+procedure DAbstractContainer.SetIntCoord(ax1,ay1,ax2,ay2: integer);
+begin
+  x1 := ax1;
+  y1 := ay1;
+  x2 := ax2;
+  y2 := ay2;
+
+  IntegerToFloat;
+end;
+procedure DAbstractContainer.SetIntSize(ax1,ay1,aWidth,aHeight: integer);
+begin
+  x1 := ax1;
+  y1 := ay1;
+  x2 := ax1 + aWidth;
+  y2 := ay1 + aHeight;
+
+  IntegerToFloat;
 end;
 
 {----------------------------------------------------------------------------}
@@ -545,188 +562,24 @@ begin
     Dest.Anchor[aa] := Self.Anchor[aa];
 end;
 
-{----------------------------------------------------------------------------}
-
-procedure DAbstractContainer.SetFloatCoord(afx1,afy1,afx2,afy2: float);
-begin
-  fx1 := afx1;
-  fy1 := afy1;
-  fx2 := afx2;
-  fy2 := afy2;
-
-  ToInteger;
-end;
-procedure DAbstractContainer.SetFloatSize(afx1,afy1,afWidth,afHeight: float);
-begin
-  fx1 := afx1;
-  fy1 := afy1;
-  fx2 := - (1 - afWidth - afx1);
-  fy2 := - (1 - afHeight - afy1);
-
-  ToInteger;
-end;
-procedure DAbstractContainer.SetIntCoord(ax1,ay1,ax2,ay2: integer);
-begin
-  x1 := ax1;
-  y1 := ay1;
-  x2 := ax2;
-  y2 := ay2;
-
-  ToFloat;
-end;
-procedure DAbstractContainer.SetIntSize(ax1,ay1,aWidth,aHeight: integer);
-begin
-  x1 := ax1;
-  y1 := ay1;
-  x2 := ax1 + aWidth;
-  y2 := ay1 + aHeight;
-
-  ToInteger;
-end;
-
-{----------------------------------------------------------------------------}
-
-{procedure Txywh.SetSize(const NewX,NewY,NewW,NewH: float);
-begin
-  if (Abs(NewX) > 1) or (Abs(NewY) > 1) or
-     (((NewW<0) or (NewW>1)) and (not dEqual(NewW,ProportionalScale) and not dEqual(NewW,FullWidth) and not dEqual(NewW,FullHeight))) or
-     (((NewH<0) or (NewH>1)) and (not dEqual(NewH,ProportionalScale) and not dEqual(NewH,FullHeight))) then
-  begin
-    WriteLnLog('Txywh.setsize','ERROR: Incorrect newx,newy,neww,newh!');
-    Exit;
-  end;
-
-  { stop if nothing was changed }
-  if dEqual(fx,NewX) and dEqual(fy,NewY) and dEqual(fw,NewW) and dEqual(fh,NewH) then begin
-    initialized := true; //to avoid bugs
-    Exit;
-  end;
-
-  fx := NewX;
-  fy := NewY;
-  fw := NewW;
-  fh := NewH;
-
-  Recalculate;
-end;}
-
-{----------------------------------------------------------------------------}
-
-{procedure Txywh.BackwardSetSize(const NewW,NewH: integer);
-begin
-  GetContainerWidthHeight;
-  if NewW>0 then begin
-    w := NewW;
-    fw := NewW/cH;
-    if x1+w > cW then begin
-      x1 := cW - w;
-      fx := x1/cH;
-    end;
-    x2 := x1+w;
-  end;
-  if NewH>0 then begin
-    h := NewH;
-    fh := NewH/cH;
-    if y1+h > cH then begin
-      y1 := cH - h;
-      fy := y1/cH;
-    end;
-    y2 := y1+h;
-  end;
-end;}
-
-{procedure Txywh.BackwardSetXYWH(const NewX,NewY,NewW,NewH: integer);
-begin
-  GetContainerWidthHeight;
-  //todo check for consistency
-  x1 := NewX;
-  y1 := NewY;
-  w := NewW;
-  h := NewH;
-  if NewX<cW div 2 then fx := NewX/cH else fx := (NewX-cW)/cH;
-  fy := NewY/cH;
-  fw := NewW/cH;
-  fh := NewH/cH;
-  Initialized := true;
-end;}
-
-{----------------------------------------------------------------------------}
-
-{Procedure Txywh.SubstractFrame(Frame: DFrame; AdditionalGap: integer = 0);
-Begin
-  If (Frame<>nil) and (Frame.Rectagonal) then begin
-    x1 := x1 + Frame.CornerLeft+AdditionalGap;
-    x2 := x2 - Frame.CornerRight-AdditionalGap;
-    w := w - Frame.CornerLeft - Frame.CorneRright -2*AdditionalGap;
-    y1 := y1 + Frame.CornerTop+AdditionalGap;
-    y2 := y2 - Frame.CornerBottom-AdditionalGap;
-    h := h - Frame.CornerTop - Frame.CornerBottom -2*AdditionalGap;
-    BackwardSetXYWH(x1,y1,w,h);
-  end else if AdditionalGap<>0 then begin
-    x1 := x1 + AdditionalGap;
-    x2 := x2 - AdditionalGap;
-    w := w - 2*AdditionalGap;
-    y1 := y1 + AdditionalGap;
-    y2 := y2 - AdditionalGap;
-    h := h - 2*AdditionalGap;
-    BackwardSetXYWH(x1,y1,w,h);
-  end;
-End;}
-
-{----------------------------------------------------------------------------}
-
-{procedure Txywh.FixProportions(ww,hh: integer);
-begin
-  if dEqual(fw,ProportionalScale) then
-    w := Round(h*ww/hh)
-  else                                 //they can't be proportional both
-  if dEqual(fh,ProportionalScale) then
-    h := Round(w*hh/ww);
-end;}
-
-{----------------------------------------------------------------------------}
-
-{procedure Txywha.copyXYWH(Source: Txywh);
-begin
-  x1 := Source.x1;
-  y1 := Source.y1;
-  x2 := Source.x2;
-  y2 := Source.y2;
-  w := Source.w;
-  h := Source.h;
-  fx := Source.fx;
-  fy := Source.fy;
-  fw := Source.fw;
-  fh := Source.fh;
-  Opacity := Source.Opacity;
-  Initialized := Source.Initialized;
-end;}
-
+{============================================================================}
+{======================== ABSTRACT ELEMENT ==================================}
 {============================================================================}
 
-{procedure DAbstractElement.Rescale;
+procedure DAbstractElement.Rescale;
 begin
-  Base.Recalculate;
-  Last.Recalculate;
-  Next.Recalculate;
-end;}
+  {set animation states to changed container size}
+  Base.FloatToInteger;
+  Last.FloatToInteger;
+  Next.FloatToInteger;
+end;
 
 {----------------------------------------------------------------------------}
 
-{procedure DAbstractElement.SetVisible(Value: boolean);
+procedure DAbstractElement.SetVisible(Value: boolean);
 begin
   fVisible := Value;
-end;}
-
-{----------------------------------------------------------------------------}
-
-{procedure DAbstractElement.SetScaleToParent(Value: boolean);
-begin
-  fScaleToParent := Value;
-  Base.ScaleToParent := Value;
-  Last.ScaleToParent := Value;
-  Next.ScaleToParent := Value;
-end;}
+end;
 
 {----------------------------------------------------------------------------}
 
@@ -851,39 +704,40 @@ end;}
 
 {----------------------------------------------------------------------------}
 
-{procedure DAbstractElement.GetAnimationState;
+procedure DAbstractElement.GetAnimationState;
 var Phase: float;
 begin
-  if true then begin //todo!!!!!!!!!!!!!!!!!!!!!!!
-    if (Last.Initialized) and (Next.Initialized) and
+  if Base.isInitialized then begin
+    if (Last.isInitialized) and (Next.isInitialized) and
       ((Animationstart<0) or (DecoNow-AnimationStart < AnimationDuration)) then begin
+      //if this is start of the animation - init time
       if AnimationStart<0 then AnimationStart := DecoNow;
-      Phase := (DecoNow-AnimationStart)/AnimationDuration; //animationtime
-      //make curve slower at ends and sharper at middle
-      if Phase<0.5 then Phase := Sqr(2*Phase)/2 else Phase := 1 - Sqr(2*(1-Phase))/2;
-      CurrentAnimationState.x1 := Last.x1+Round((Next.x1-Last.x1)*Phase);
-      CurrentAnimationState.x2 := Last.x2+Round((Next.x2-Last.x2)*Phase);
-      CurrentAnimationState.y1 := Last.y1+Round((Next.y1-Last.y1)*Phase);
-      CurrentAnimationState.y2 := Last.y2+Round((Next.y2-Last.y2)*Phase);
-      CurrentAnimationState.h := Last.h+Round((Next.h-Last.h)*Phase);
-      CurrentAnimationState.w := Last.w+Round((Next.w-Last.w)*Phase);
-      CurrentAnimationState.Opacity := Last.Opacity+((Next.opacity-Last.Opacity)*Phase);
-      CurrentAnimationState.ScaleToParent := ScaleToParent;
-      CurrentAnimationState.Initialized := true;
+      //determine animation time passed
+      Phase := (DecoNow-AnimationStart)/AnimationDuration;
+      //determine animation phase
+      case AnimationCurve of
+        //acLinear: ; //<- change nothing.
+        acSquare: if Phase<0.5 then Phase := Sqr(2*Phase)/2 else Phase := 1 - Sqr(2*(1-Phase))/2;
+      end;
+      Self.x1 := Last.x1+Round((Next.x1-Last.x1)*Phase);
+      Self.y1 := Last.y1+Round((Next.y1-Last.y1)*Phase);
+      Self.x2 := Last.x2+Round((Next.x2-Last.x2)*Phase);
+      Self.y2 := Last.y2+Round((Next.y2-Last.y2)*Phase);
+      Self.Opacity := Last.Opacity+((Next.opacity-Last.Opacity)*Phase);
+      //we don't need scale back to float, as it's not a basic animation state
     end else begin
       {should be "next" here}
-      CurrentAnimationState.x1 := Base.x1;
-      CurrentAnimationState.x2 := Base.x2;
-      CurrentAnimationState.y1 := Base.y1;
-      CurrentAnimationState.y2 := Base.y2;
-      CurrentAnimationState.h := Base.h;
-      CurrentAnimationState.w := Base.w;
-      CurrentAnimationState.Opacity := Base.Opacity;
-      CurrentAnimationState.ScaleToParent := ScaleToParent;
-      CurrentAnimationState.Initialized := true;
+      Self.x1 := Base.x1;
+      Self.x2 := Base.x2;
+      Self.y1 := Base.y1;
+      Self.y2 := Base.y2;
+      Self.Opacity := Base.Opacity;
     end;
-  end;
-end;}
+    Self.w := Self.x2 - Self.x1;
+    Self.h := Self.y2 - Self.y1;
+    //we don't care if Self is initialized or not.
+ end;
+end;
 
 {procedure DAbstractElement.Update;
 begin
@@ -893,28 +747,25 @@ end;}
 {----------------------------------------------------------------------------}
 
 
-{constructor DAbstractElement.Create(AOwner: TComponent);
+constructor DAbstractElement.Create;
 begin
-  inherited Create(AOwner);
-  Visible := true;
-  Base := Txywha.Create(Self);
-  Last := Txywha.Create(Self);
-  Next := Txywha.Create(Self);
-  CurrentAnimationState := Txywha.Create(Self);
-  ScaleToParent := false;
-end;}
+  inherited Create;
+  fVisible := true;
+  AnimationCurve := acSquare;
+  Base := DAbstractContainer.Create;
+  Last := DAbstractContainer.Create;
+  Next := DAbstractContainer.Create;
+end;
 
 {----------------------------------------------------------------------------}
 
-{destructor DAbstractElement.Destroy;
+destructor DAbstractElement.Destroy;
 begin
-  //actulally this is not needed as they are owned by the class
-{  freeandnil(base);
-  freeandnil(last);
-  freeandnil(next);}
-
+  freeandnil(Base);
+  freeandnil(Last);
+  freeandnil(Next);
   inherited;
-end;}
+end;
 
 {=============================================================================}
 {=================== Single interface element ===============================}
