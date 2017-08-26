@@ -99,6 +99,8 @@ type
     procedure SetFloatSize(afx1,afy1,afWidth,afHeight: float);
     procedure SetIntCoord(ax1,ay1,ax2,ay2: integer);
     procedure SetIntSize(ax1,ay1,aWidth,aHeight: integer);
+    { Sets int width/height for scaling animations }
+    procedure SetIntWidthHeight(aWidth,aHeight: integer);
   end;
 
 type
@@ -111,18 +113,17 @@ Type
   { most abstract container suitable for images, labels and interface elements
     Just defines the box and rescaling }
   DAbstractElement = class abstract(DAbstractContainer)
-  public
-    {stores current animation state, recalculated by GetAnimationState at every render}
+  strict private
+    { Caches current animation state, recalculated by GetAnimationState at every render}
     procedure GetAnimationState;
-
+  public
     { changes the scale of the element relative to current window size }
     procedure Rescale; virtual;
     { draw the element / as abstract as it might be :) }
-   { procedure Draw; virtual; abstract;
-    //procedure InitGL; virtual; abstract; //no need for an abstract method?
-    { updates the data of the class with current external data, most often
-      just gets the current animation state }
-    procedure Update; virtual; }
+    procedure Draw; virtual; abstract;
+    { updates the data of the class with current external data,
+      here it just gets the current animation state }
+    procedure Update; virtual;
   strict private
     { Last and Next animation states. }
     Last, Next: DAbstractContainer;
@@ -148,38 +149,25 @@ Type
       composite parent element, its children WILL NOT do anything like this and
       will be frozen until visible=true. Maybe I'll fix this some day. }
     property Visible: boolean read fVisible write SetVisible;
-    {animates the interface element from current state to base state,
-     Important: GetAnimationState must be called before setting basesize
-     of the element as AnimateTo uses currentAnimationState}
-   // procedure AnimateTo(Animate: TAnimationStyle; Duration: float = DefaultAnimationDuration);
-
-
+    { animates the interface element from current state to base state,
+      Important: GetAnimationState must be called before setting basesize
+      of the element as AnimateTo uses currentAnimationState}
+    procedure AnimateTo(Animate: TAnimationStyle; Duration: float = DefaultAnimationDuration);
    constructor Create; //override;
    destructor Destroy; override;
   end;
 
-{Definition of simple procedures for (mouse) events}
+{ Simple procedures for (mouse) events }
 //type TSimpleProcedure = procedure(sender: DAbstractElement) of Object;
 type TSimpleProcedure = procedure of Object;
 type TXYProcedure = procedure(Sender: DAbstractElement; x,y: integer) of Object;
 
 Type
-  {Element with a frame and content}
+  { Fully-featured Interface Element with Mouse/Touch support }
   DSingleInterfaceElement = class(DAbstractElement)
   public
     {Higher-level element. Seldomly used in specific cases}
  {   Parent: DAbstractElement;
-    {whether Interface element owns its contents? If true they'll bee freed
-     on destroy // using TComponent Inheritance for now}
-    //OwnsContent: boolean;
-    { content of the Interface element: label or image }
-    Content: DAbstractElement;    {actually DAbstractImage, but cyclic references are not allowed}
-    { multiplier to opacity <1, e.g. overall opacity=0.8 FrameOpacity=0.8, frame final Opacity=0.8*0.8 }
-    FrameOpacity: float;
-    { frame behind the Interface element }
-    Frame: DFrame;
-    {specifices if the frame draws over content or vice versa}
-    FrameOnTop: boolean;
     procedure Draw; override;
     procedure Rescale; override;
     constructor Create(AOwner:TComponent); override;
@@ -519,6 +507,21 @@ end;
 
 {----------------------------------------------------------------------------}
 
+procedure DAbstractContainer.SetIntWidthHeight(aWidth,aHeight: integer);
+begin
+  x1 := x1 + (w-aWidth) div 2;
+  x2 := x2 - (w-aWidth) div 2;
+  y1 := y1 + (h-aHeight) div 2;
+  y2 := y2 - (h-aHeight) div 2;
+
+  w := aWidth;
+  h := aHeight;
+
+  IntegerToFloat; //not needed here?
+end;
+
+{----------------------------------------------------------------------------}
+
 procedure DAbstractContainer.Assign(Source: DAbstractContainer);
 var aa: TAnchorSide;
 begin
@@ -583,34 +586,37 @@ end;
 
 {----------------------------------------------------------------------------}
 
-{procedure DAbstractElement.AnimateTo(Animate: TAnimationStyle; Duration: float = DefaultAnimationDuration);
+procedure DAbstractElement.AnimateTo(Animate: TAnimationStyle; Duration: float = DefaultAnimationDuration);
 var mx,my: float;
 begin
   if Animate = asNone then Exit else begin
     AnimationStart := -1;
     AnimationDuration := Duration;
-    Last.CopyXYWH(Base); //todo: CurrentAnimationState
-    Next.CopyXYWH(Base);
+
+    GetAnimationState;
+    Last.Assign(Self);   //to current animation state
+    Next.Assign(Base);
     case Animate of
       {just grabs some previous locations and animates the item from there to base
        requires that CurrentAnimationState is initialized... TODO}
-      asDefault: Last.CopyXYWH(CurrentAnimationState);
+      //asDefault: Last.Assign(Self);
       {fades in/out element}
       asFadeIn:  Last.Opacity := 0;
       asFadeOut: Next.Opacity := 0;
       {asFadeOutSuicide}
       {zooms in/out element}
       asZoomIn:  begin
-                   Last.BackwardSetSize(1,1);
+                   Last.SetIntWidthHeight(1,1);
                    Last.Opacity := 0;
                  end;
       asZoomOut: begin
-                   Next.BackwardSetSize(1,1);
+                   Next.SetIntWidthHeight(1,1);
                    Next.Opacity := 0;
                  end;
+
       {asZoomOutSuicide}
       asFlyInRandom,asFlyOutRandom: begin
-                       mx := drnd.Random*Window.Width/Window.Height;  //mult by aspect ratio
+                       mx := drnd.Random;
                        my := drnd.Random;
                        case drnd.Random(4) of
                          0: mx :=  0.0001;
@@ -619,11 +625,13 @@ begin
                          3: my := -0.0001;
                        end;
                        if Animate=asFlyInRandom then begin
-                         Last.fx := mx;
-                         Last.fy := my;
+                         Last.fx1 := mx;
+                         Last.fy1 := my;
+                         Last.ScaleToWindow := true;
                        end else begin
-                         Next.fx := mx;
-                         Next.fy := my;
+                         Next.fx2 := mx;
+                         Next.fy2 := my;
+                         Next.ScaleToWindow := true;
                        end;
                      end;
       asFlyInTop,asFlyOutTop,asFlyInBottom,asFlyOutBottom,asFlyInLeft,asFlyOutLeft,asFlyInRight,asFlyOutRight: begin
@@ -636,17 +644,19 @@ begin
                          asFlyInTop,asFlyOutTop: my := -0.0001;
                        end;
                        if (Animate=asFlyInLeft) or (Animate=asFlyInRight) or (Animate=asFlyInTop) or (Animate=asFlyInBottom) then begin
-                         Last.fx := mx;
-                         Last.fy := my;
+                         Last.fx1 := mx;
+                         Last.fy1 := my;
+                         Last.ScaleToWindow := true;
                        end else begin
-                         Next.fx := mx;
-                         Next.fy := my;
+                         Next.fx2 := mx;
+                         Next.fy2 := my;
+                         Next.ScaleToWindow := true;
                        end;
                      end;
       {asFlyOutRandomSuicide}
     end;
   end;
-end;}
+end;
 
 {----------------------------------------------------------------------------}
 
@@ -735,14 +745,15 @@ begin
     end;
     Self.w := Self.x2 - Self.x1;
     Self.h := Self.y2 - Self.y1;
-    //we don't care if Self is initialized or not.
- end;
+    //Self.fInitialized := true;
+ end else
+   //Self.fInitialized := false;
 end;
 
-{procedure DAbstractElement.Update;
+procedure DAbstractElement.Update;
 begin
   GetAnimationState;
-end;}
+end;
 
 {----------------------------------------------------------------------------}
 
