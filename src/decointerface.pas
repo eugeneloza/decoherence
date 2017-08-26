@@ -51,7 +51,7 @@ type
     fInitialized: boolean;
     { Parent container size (cached) }
     ax1,ax2,ay1,ay2,aw,ah: integer;
-    aScaleX,aScaleY: float;
+    //aScaleX,aScaleY: float;
     { Determine and cache parent container size }
     procedure GetAnchors;
     { Converts float to integer and vice versa. }
@@ -60,15 +60,18 @@ type
   public
     type
       DAnchor = record
+        { Anchor to which element }
         Anchor: DAbstractContainer;
+        { To which side of the Anchor should it align? }
         AlignTo: TAnchorAlign;
+        { Additional gap between this element and Anchor in px }
         Gap: integer;
       end;
   public
+    { Anchors of this container }
     Anchor: array[TAnchorSide] of DAnchor;
-  public
     { Float size of the Container }
-    fx1,fy1,fx2,fy2,fw,fh: float;
+    fx1,fy1,fx2,fy2{,fw,fh}: float;
     { Real size of the Container }
     x1,y1,x2,y2,w,h: integer;
     { Opacity of the container }
@@ -82,6 +85,9 @@ type
     { If this Container ready to be used? }
     property isInitialized: boolean read fInitialized;
     constructor Create;
+    { Copy parameters from the Source }
+    procedure Assign(Source: DAbstractContainer);
+    procedure AssignTo(Dest: DAbstractContainer);
   end;
 
 
@@ -455,8 +461,8 @@ begin
   end;
   aw := ax2-ax1;
   ah := ay2-ay1;
-  aScaleX := 1/aw;
-  aScaleY := 1/ah;
+  {aScaleX := 1/aw;
+  aScaleY := 1/ah;}
 end;
 
 {----------------------------------------------------------------------------}
@@ -488,6 +494,51 @@ begin
   h := y2 - y1;
 
   fInitialized := true;
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DAbstractContainer.Assign(Source: DAbstractContainer);
+var aa: TAnchorSide;
+begin
+  Self.fx1 := Source.fx1;
+  Self.fy1 := Source.fy1;
+  Self.fx2 := Source.fx2;
+  Self.fy2 := Source.fy2;
+  {Self.fw := Source.fw;
+  Self.fh := Source.fh;}
+  Self.x1 := Source.x1;
+  Self.y1 := Source.y1;
+  Self.x2 := Source.x2;
+  Self.y2 := Source.y2;
+  Self.w := Source.w;
+  Self.h := Source.h;
+  Self.Opacity := Source.Opacity;
+  Self.KeepProportions := Source.KeepProportions;
+  Self.fInitialized := Source.isInitialized;
+  for aa in TAnchorSide do
+    Self.Anchor[aa] := Source.Anchor[aa];
+end;
+procedure DAbstractContainer.AssignTo(Dest: DAbstractContainer);
+var aa: TAnchorSide;
+begin
+  Dest.fx1 := Self.fx1;
+  Dest.fy1 := Self.fy1;
+  Dest.fx2 := Self.fx2;
+  Dest.fy2 := Self.fy2;
+  {Dest.fw := Self.fw;
+  Dest.fh := Self.fh;}
+  Dest.x1 := Self.x1;
+  Dest.y1 := Self.y1;
+  Dest.x2 := Self.x2;
+  Dest.y2 := Self.y2;
+  Dest.w := Self.w;
+  Dest.h := Self.h;
+  Dest.Opacity := Self.Opacity;
+  Dest.KeepProportions := Self.KeepProportions;
+  Dest.fInitialized := Self.isInitialized;
+  for aa in TAnchorSide do
+    Dest.Anchor[aa] := Self.Anchor[aa];
 end;
 
 
