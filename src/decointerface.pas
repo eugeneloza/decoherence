@@ -50,7 +50,7 @@ type
   strict private
     fInitialized: boolean;
     { Parent container size (cached) }
-    ax1,ax2,ay1,ay2,aw,ah: integer;
+    cx1,cx2,cy1,cy2,cw,ch: integer;
     //aScaleX,aScaleY: float;
     { Determine and cache parent container size }
     procedure GetAnchors;
@@ -88,6 +88,10 @@ type
     { Copy parameters from the Source }
     procedure Assign(Source: DAbstractContainer);
     procedure AssignTo(Dest: DAbstractContainer);
+    procedure SetFloatCoord(afx1,afy1,afx2,afy2: float);
+    procedure SetFloatSize(afx1,afy1,afWidth,afHeight: float);
+    procedure SetIntCoord(ax1,ay1,ax2,ay2: integer);
+    procedure SetIntSize(ax1,ay1,aWidth,aHeight: integer);
   end;
 
 
@@ -421,10 +425,10 @@ end;}
 procedure DAbstractContainer.GetAnchors;
 begin
   if ScaleToWindow then begin
-    ax1 := 0;
-    ay1 := 0;
-    ax2 := Window.Width;
-    ay2 := Window.Height;
+    cx1 := 0;
+    cy1 := 0;
+    cx2 := Window.Width;
+    cy2 := Window.Height;
   end else begin
     if (Anchor[asLeft].Anchor = nil) or
        (Anchor[asTop].Anchor = nil) or
@@ -435,32 +439,32 @@ begin
        end;
 
     case Anchor[asLeft].AlignTo of
-      haLeft:   ax1 := Anchor[asLeft].Anchor.x1;
-      haRight:  ax1 := Anchor[asLeft].Anchor.x2;
-      haCenter: ax1 := (Anchor[asLeft].Anchor.x1 + Anchor[asLeft].Anchor.x2) div 2;
+      haLeft:   cx1 := Anchor[asLeft].Anchor.x1;
+      haRight:  cx1 := Anchor[asLeft].Anchor.x2;
+      haCenter: cx1 := (Anchor[asLeft].Anchor.x1 + Anchor[asLeft].Anchor.x2) div 2;
       else WriteLnLog('DAbstractContainer.GetAnchors','Invalid Anchor align!')
     end;
     case Anchor[asRight].AlignTo of
-      haLeft:   ax2 := Anchor[asRight].Anchor.x1;
-      haRight:  ax2 := Anchor[asRight].Anchor.x2;
-      haCenter: ax2 := (Anchor[asRight].Anchor.x1 + Anchor[asRight].Anchor.x2) div 2;
+      haLeft:   cx2 := Anchor[asRight].Anchor.x1;
+      haRight:  cx2 := Anchor[asRight].Anchor.x2;
+      haCenter: cx2 := (Anchor[asRight].Anchor.x1 + Anchor[asRight].Anchor.x2) div 2;
       else WriteLnLog('DAbstractContainer.GetAnchors','Invalid Anchor align!')
     end;
     case Anchor[asTop].AlignTo of
-      vaTop:    ay1 := Anchor[asTop].Anchor.y1;
-      vaBottom: ay1 := Anchor[asTop].Anchor.y2;
-      vaMiddle: ay1 := (Anchor[asTop].Anchor.y1 + Anchor[asTop].Anchor.y2) div 2;
+      vaTop:    cy1 := Anchor[asTop].Anchor.y1;
+      vaBottom: cy1 := Anchor[asTop].Anchor.y2;
+      vaMiddle: cy1 := (Anchor[asTop].Anchor.y1 + Anchor[asTop].Anchor.y2) div 2;
       else WriteLnLog('DAbstractContainer.GetAnchors','Invalid Anchor align!')
     end;
     case Anchor[asBottom].AlignTo of
-      vaTop:    ay2 := Anchor[asBottom].Anchor.y1;
-      vaBottom: ay2 := Anchor[asBottom].Anchor.y2;
-      vaMiddle: ay2 := (Anchor[asBottom].Anchor.y1 + Anchor[asBottom].Anchor.y2) div 2;
+      vaTop:    cy2 := Anchor[asBottom].Anchor.y1;
+      vaBottom: cy2 := Anchor[asBottom].Anchor.y2;
+      vaMiddle: cy2 := (Anchor[asBottom].Anchor.y1 + Anchor[asBottom].Anchor.y2) div 2;
       else WriteLnLog('DAbstractContainer.GetAnchors','Invalid Anchor align!')
     end;
   end;
-  aw := ax2-ax1;
-  ah := ay2-ay1;
+  cw := cx2-cx1;
+  ch := cy2-cy1;
   {aScaleX := 1/aw;
   aScaleY := 1/ah;}
 end;
@@ -471,10 +475,10 @@ procedure DAbstractContainer.ToFloat;
 begin
   GetAnchors;
 
-  fx1 := (x1 - ax1 - Anchor[asLeft  ].Gap)/aw;
-  fx2 := (x2 - ax2 + Anchor[asRight ].Gap)/aw;
-  fy1 := (y1 - ay1 - Anchor[asTop   ].Gap)/ah;
-  fy2 := (y2 - ay2 + Anchor[asBottom].Gap)/ah;
+  fx1 := (x1 - cx1 - Anchor[asLeft  ].Gap)/cw;
+  fx2 := (x2 - cx2 + Anchor[asRight ].Gap)/cw;
+  fy1 := (y1 - cy1 - Anchor[asTop   ].Gap)/ch;
+  fy2 := (y2 - cy2 + Anchor[asBottom].Gap)/ch;
 
   fInitialized := true;
 end;
@@ -485,10 +489,10 @@ procedure DAbstractContainer.ToInteger;
 begin
   GetAnchors;
 
-  x1 := ax1 + Round(aw * fx1) + Anchor[asLeft].Gap;
-  x2 := ax2 + Round(aw * fx2) - Anchor[asRight].Gap;
-  y1 := ay1 + Round(ah * fy1) + Anchor[asTop].Gap;
-  y2 := ay2 + Round(ah * fy2) - Anchor[asBottom].Gap;
+  x1 := cx1 + Round(cw * fx1) + Anchor[asLeft].Gap;
+  x2 := cx2 + Round(cw * fx2) - Anchor[asRight].Gap;
+  y1 := cy1 + Round(ch * fy1) + Anchor[asTop].Gap;
+  y2 := cy2 + Round(ch * fy2) - Anchor[asBottom].Gap;
 
   w := x2 - x1;
   h := y2 - y1;
@@ -541,6 +545,44 @@ begin
     Dest.Anchor[aa] := Self.Anchor[aa];
 end;
 
+{----------------------------------------------------------------------------}
+
+procedure DAbstractContainer.SetFloatCoord(afx1,afy1,afx2,afy2: float);
+begin
+  fx1 := afx1;
+  fy1 := afy1;
+  fx2 := afx2;
+  fy2 := afy2;
+
+  ToInteger;
+end;
+procedure DAbstractContainer.SetFloatSize(afx1,afy1,afWidth,afHeight: float);
+begin
+  fx1 := afx1;
+  fy1 := afy1;
+  fx2 := - (1 - afWidth - afx1);
+  fy2 := - (1 - afHeight - afy1);
+
+  ToInteger;
+end;
+procedure DAbstractContainer.SetIntCoord(ax1,ay1,ax2,ay2: integer);
+begin
+  x1 := ax1;
+  y1 := ay1;
+  x2 := ax2;
+  y2 := ay2;
+
+  ToFloat;
+end;
+procedure DAbstractContainer.SetIntSize(ax1,ay1,aWidth,aHeight: integer);
+begin
+  x1 := ax1;
+  y1 := ay1;
+  x2 := ax1 + aWidth;
+  y2 := ay1 + aHeight;
+
+  ToInteger;
+end;
 
 {----------------------------------------------------------------------------}
 
