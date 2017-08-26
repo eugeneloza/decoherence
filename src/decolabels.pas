@@ -30,7 +30,7 @@ type
   { a powerful text label, converted to GLImage to be extremely fast }
   DLabel = class(DAbstractImage)
   public
-    { font to print the label }
+{    { font to print the label }
     Font: DFont;
     { shadow intensity. Shadow=0 is no shadow }
     Shadow: Float;
@@ -50,16 +50,16 @@ type
     property Text: string read GetText write SetText;
   private
     fText:  string;
-    BrokenString: DStringList;
+    BrokenString: DStringList;  }
   end;
 
 Type
   {provides a simple integer output into a label}
   DIntegerLabel = class (DLabel)
   public
-    { pointer to the value it monitors }
+ {   { pointer to the value it monitors }
     Value: Pinteger;
-    procedure Draw; override;
+    procedure Draw; override; }
   end;
 
 Type
@@ -67,8 +67,8 @@ Type
   DStringLabel = class (DLabel)
   public
     { pointer to the value it monitors }
-    value: Pstring;
-    procedure Draw; override;
+ {   value: Pstring;
+    procedure Draw; override; }
   end;
 
 Type
@@ -76,7 +76,7 @@ Type
   DFloatLabel = class (DLabel)
   public
     { pointer to the value it monitors }
-    Value: PFloat;
+ {   Value: PFloat;
     { how many digits after point are displayed?
       0 - float is rounded to integer (1.6423 -> 2)
       1 - one digit like 1.2
@@ -84,7 +84,7 @@ Type
       no more needed at the moment }
     Digits: integer;
     constructor Create(AOwner: TComponent); override;
-    procedure Draw; override;
+    procedure Draw; override;  }
   end;
 
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
@@ -96,51 +96,51 @@ uses SysUtils, CastleImages, CastleLog,
 
 {----------------------------------------------------------------------------}
 
-constructor DLabel.Create(AOwner : TComponent);
+{constructor DLabel.Create(AOwner : TComponent);
 begin
   inherited Create(AOwner);
   ScaleLabel := false;
   Shadow := 0;
-end;
+end; }
 
 {----------------------------------------------------------------------------}
 
-destructor DLabel.Destroy;
+{destructor DLabel.Destroy;
 begin
   if BrokenString <> nil then BrokenString.Clear;
   FreeAndNil(BrokenString);
   inherited
-end;
+end; }
 
 {----------------------------------------------------------------------------}
 
-procedure DLabel.SetText(const Value: string);
+{procedure DLabel.SetText(const Value: string);
 begin
   if fText <> Value then begin
     fText := Value;
     PrepareTextImage;
   end;
-end;
+end;  }
 
 {----------------------------------------------------------------------------}
 
-function DLabel.GetText: string;
+{function DLabel.GetText: string;
 begin
   Result := fText;
-end;
+end;  }
 
 {----------------------------------------------------------------------------}
 
-procedure DLabel.Rescale;
+{procedure DLabel.Rescale;
 begin
   inherited;
   {if not ScaleLabel then
     base.backwardsetsize(RealWidth,RealHeight) }
-end;
+end; }
 
 {----------------------------------------------------------------------------}
 
-procedure DLabel.PrepareTextImage;
+{procedure DLabel.PrepareTextImage;
 begin
   if BrokenString<> nil then BrokenString.Clear;
   FreeAndNil(BrokenString);
@@ -161,11 +161,11 @@ begin
 
   ImageLoaded := true;     //not good...
   RescaleImage;
-end;
+end;  }
 
 {----------------------------------------------------------------------------}
 
-procedure DLabel.RescaleImage;
+{procedure DLabel.RescaleImage;
 begin
   {$IFNDEF AllowRescale}If SourceImage = nil then Exit;{$ENDIF}
   If Self.ScaleLabel then
@@ -182,42 +182,42 @@ begin
        else
          WriteLnLog('DLabel.RescaleImage/no scale label','ERROR: base.initialized = false');
   end;
-end;
+end; }
 
 
 {=============================================================================}
 {========================= Integer label =====================================}
 {=============================================================================}
 
-procedure DIntegerLabel.Draw;
+{procedure DIntegerLabel.Draw;
 begin
   Text := IntToStr(value^);
   inherited;
-end;
+end; }
 
 {=============================================================================}
 {========================== String label =====================================}
 {=============================================================================}
 
-procedure DStringLabel.Draw;
+{procedure DStringLabel.Draw;
 begin
   Text := Value^;
   inherited;
-end;
+end; }
 
 {=============================================================================}
 {=========================== Float label =====================================}
 {=============================================================================}
 
-Constructor DFloatLabel.Create(AOwner: TComponent);
+{Constructor DFloatLabel.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   Digits := 0;
-end;
+end;  }
 
 {---------------------------------------------------------------------------}
 
-procedure DFloatLabel.Draw;
+{procedure DFloatLabel.Draw;
 begin
   case Digits of
     1: Text := IntToStr(Trunc(Value^))+'.'+IntToStr(Round(Frac(Value^)*10));
@@ -225,7 +225,7 @@ begin
     else Text := IntToStr(Round(Value^));
   end;
   inherited;
-end;
+end; }
 
 end.
 

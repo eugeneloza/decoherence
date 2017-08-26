@@ -30,7 +30,7 @@ type
   { General routines shared by images and labels }
   DAbstractImage = class(DAbstractElement)
   public
-    color: TVector4; //todo
+ {   color: TVector4; //todo
     { very simple draw procedure }
     procedure Draw; override;
     constructor Create(AOwner: TComponent); override;
@@ -51,7 +51,7 @@ type
     ScaledWidth, ScaledHeight: integer;
     { Thread-safe part of rescaling the image }
     procedure Rescale; override;
-    procedure RescaleImage; virtual;
+    procedure RescaleImage; virtual; }
   end;
 
 
@@ -67,7 +67,7 @@ type
   { most simple image type }
   DStaticImage = class(DAbstractImage)
   private
-    LoadImageThread: TLoadImageThread;
+  {  LoadImageThread: TLoadImageThread;
     { if thread is running }
     ThreadWorking: boolean;
   public
@@ -78,21 +78,21 @@ type
     { loads image in a thread }
     procedure LoadThread(const FileName:string);
     constructor Create(AOwner: TComponent); override;
-    destructor Destroy; override;
+    destructor Destroy; override;     }
   end;
 
 type
   { abstract "phased image" that moves and morphs with "phase" }
   DPhasedImage = class(DStaticImage)
   public
-    PhaseSpeed: float;   {1/seconds to scroll the full screen}
+ {   PhaseSpeed: float;   {1/seconds to scroll the full screen}
     Opacity: float;
     //constructor Create(AOwner: TComponent); override;
     procedure Load(const FileName:string); override;
   private
     LastTime: DTime;
   public
-    Phase, OpacityPhase: float;
+    Phase, OpacityPhase: float;    }
   end;
 
 type
@@ -101,18 +101,18 @@ type
   DWindImage = class(DPhasedImage)
   public
     { completely overrides the default drawing procedure }
-    procedure Draw; override;
+{    procedure Draw; override;
   private
-    procedure CyclePhase;
+    procedure CyclePhase;  }
   end;
 
 type
   { A floating image for LoadScreens }
   DFloatImage = class(DPhasedImage)
   public
-    procedure Draw; override;
+ {   procedure Draw; override;
   private
-    procedure CyclePhase;
+    procedure CyclePhase;  }
   end;
 
 Type TBarStyle = (bsVertical, bsHorizontal);
@@ -123,11 +123,11 @@ Type
   public
     { minimmum, maximum, current maximum and current position
       minimum usually is zero and automatically set in constructor }
-    Min, Max, CurrentMax, Position: float;
+ {   Min, Max, CurrentMax, Position: float;
     { vertical or horizontal style of the bar }
     Kind: TBarStyle;
     procedure Draw; override;
-    constructor Create(AOwner: TComponent); override;
+    constructor Create(AOwner: TComponent); override;    }
   end;
 
 Type TStatBarStyle = (sbHealth, sbStamina, sbConcentration, sbMetaphysics);
@@ -137,12 +137,12 @@ Type
   DStatBarImage = class(DBarImage)
   public
     { Points to the actor for who the health is displayed}
-    Target: DActor;
+  {  Target: DActor;
     { determines which value to display: Health, Stamina, Concentration or Metaphysics}
     Style: TStatBarStyle;
     procedure Update; override;
     procedure Draw; override;
-    constructor Create(AOwner: TComponent); override;
+    constructor Create(AOwner: TComponent); override;    }
   end;
 
 var LoadNewFloaterImage: boolean;
@@ -161,24 +161,24 @@ begin
 
   WritelnLog('TLoadImageThread.execute','Image thread started.');
 
-  TargetImage.Load(FileName);
-  TargetImage.Rescale;
+  //****TargetImage.Load(FileName);
+  //****TargetImage.Rescale;
 
   WritelnLog('TLoadImageThread.execute','Image thread finished.');
-  TargetImage.ThreadWorking := false;
+  //****TargetImage.ThreadWorking := false;
 end;
 
 {-----------------------------------------------------------------------------}
 
-constructor DStaticImage.Create(AOwner: TComponent);
+{constructor DStaticImage.Create(AOwner: TComponent);
 begin
   ThreadWorking := false;
   Inherited Create(AOwner);
-end;
+end;}
 
 {----------------------------------------------------------------------------}
 
-destructor DStaticImage.Destroy;
+{destructor DStaticImage.Destroy;
 begin
   if ThreadWorking then begin
     Try
@@ -188,11 +188,11 @@ begin
     end;
   end;
   inherited;
-end;
+end; }
 
 {----------------------------------------------------------------------------}
 
-procedure DStaticImage.LoadThread(const FileName: string);
+{procedure DStaticImage.LoadThread(const FileName: string);
 begin
  if not ThreadWorking then begin
    LoadImageThread := TLoadImageThread.Create(true);
@@ -205,11 +205,11 @@ begin
  end
  else
    writeLnLog('DStaticImage.LoadThread','Thread already working...');
-end;
+end; }
 
 {----------------------------------------------------------------------------}
 
-procedure DStaticImage.Load(const FileName: string);
+{procedure DStaticImage.Load(const FileName: string);
 begin
   WritelnLog('DStaticImage.LoadImage',FileName);
   SourceImage := LoadImageSafe(ApplicationData(FileName));
@@ -228,11 +228,11 @@ begin
   ScaledWidth := -1;
   ScaledHeight := -1;
   ImageLoaded := true;
-end;
+end; }
 
 {----------------------------------------------------------------------------}
 
-procedure DAbstractImage.FreeImage;
+{procedure DAbstractImage.FreeImage;
 begin
   FreeAndNil(GLImage);
   FreeAndNil(SourceImage);
@@ -248,11 +248,11 @@ begin
   ImageReady := false;
   ImageLoaded := false;
   InitGLPending := false;
-end;
+end;  }
 
 {----------------------------------------------------------------------------}
 
-procedure DAbstractImage.InitGL;
+{procedure DAbstractImage.InitGL;
 begin
   if InitGLPending then begin
     InitGLPending := false;
@@ -265,41 +265,41 @@ begin
       ImageReady := true;
     end {else WriteLnLog('DAbstractElement.InitGL','ERROR: Scaled Image is nil!');}
   end;
-end;
+end;}
 
 {----------------------------------------------------------------------------}
 
-constructor DAbstractImage.Create(AOwner: TComponent);
+{constructor DAbstractImage.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   Color := Vector4(1,1,1,1);
   InitGLPending := false;
   ImageReady := false;
   ImageLoaded := false;
-end;
+end; }
 
 {----------------------------------------------------------------------------}
 
-destructor DAbstractImage.Destroy;
+{destructor DAbstractImage.Destroy;
 begin
   FreeImage;
   inherited;
-end;
+end; }
 
 {----------------------------------------------------------------------------}
 
-procedure DAbstractImage.Rescale;
+{procedure DAbstractImage.Rescale;
 begin
   inherited;
   Base.FixProportions(RealWidth,Realheight);
 {  last.fixProportions(sourceImage.Width,sourceImage.height);
   next.fixProportions(sourceImage.Width,sourceImage.height);}
   RescaleImage;
-end;
+end; }
 
 {----------------------------------------------------------------------------}
 
-procedure DAbstractImage.RescaleImage;
+{procedure DAbstractImage.RescaleImage;
 begin
  {$IFNDEF AllowRescale}If SourceImage = nil then Exit;{$ENDIF}
  if ImageLoaded then begin
@@ -316,11 +316,11 @@ begin
    else
      WriteLnLog('DStaticImage.RescaleImage','ERROR: base.initialized = false');
  end;
-end;
+end; }
 
 {----------------------------------------------------------------------------}
 
-procedure DAbstractImage.Draw;
+{procedure DAbstractImage.Draw;
 begin
   if ImageReady then begin
     //animate
@@ -333,7 +333,7 @@ begin
   end else begin
     if InitGLPending then InitGL;
   end;
-end;
+end; }
 
 {=============================================================================}
 {========================= static image ========================================}
@@ -351,17 +351,17 @@ end;
 }
 {----------------------------------------------------------------------------}
 
-Procedure DPhasedImage.Load(const FileName:string);
+{Procedure DPhasedImage.Load(const FileName:string);
 begin
   inherited Load(filename);
   LastTime := -1;
-end;
+end; }
 
 {=============================================================================}
 {========================= wind image ========================================}
 {=============================================================================}
 
-procedure DWindImage.CyclePhase;
+{procedure DWindImage.CyclePhase;
 var PhaseShift: float;
 begin
   if Lasttime = -1 then LastTime := DecoNow;
@@ -377,11 +377,11 @@ begin
     OpacityPhase := drnd.Random;
   end;
   LastTime := DecoNow;
-end;
+end; }
 
 {----------------------------------------------------------------------------}
 
-procedure DWindImage.Draw;
+{procedure DWindImage.Draw;
 var PhaseScaled:integer;
 begin
   if ImageReady then begin
@@ -407,13 +407,13 @@ begin
     if InitGLPending then InitGL;
 //    WriteLnLog('DWindImage.Draw','ERROR: Wind image not ready to draw!');
   end;
-end;
+end; }
 
 {=============================================================================}
 {========================= float image =======================================}
 {=============================================================================}
 
-procedure DFloatImage.CyclePhase;
+{procedure DFloatImage.CyclePhase;
 var PhaseShift: float;
 begin
   if LastTime = -1 then begin
@@ -428,11 +428,11 @@ begin
     ImageLoaded := false;
   end;
   LastTime := DecoNow;
-end;
+end;  }
 
 {----------------------------------------------------------------------------}
 
-procedure DFloatImage.Draw;
+{procedure DFloatImage.Draw;
 var x: integer;
 begin
   if ImageReady then begin
@@ -448,13 +448,13 @@ begin
     if InitGLPending then InitGL;
   //   WritelnLog('DStaticImage.DrawMe','ERROR: Static Image not ready to draw!');
   end;
-end;
+end; }
 
 {=============================================================================}
 {=========================== bar image =======================================}
 {=============================================================================}
 
-procedure DBarImage.draw;
+{procedure DBarImage.draw;
 var x: integer;
 begin
   if ImageReady then begin
@@ -475,22 +475,22 @@ begin
       end;
   end else
     if InitGLPending then InitGL;
-end;
+end;   }
 
 {---------------------------------------------------------------------------}
 
-constructor DBarImage.Create(AOwner: TComponent);
+{constructor DBarImage.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   Min := 0;
   Max := 1;
   Position := 0;
   Kind := bsHorizontal;   //default for most progressbars and enemy health
-end;
+end;  }
 
 {================ Stat Bar image =========================================}
 
-procedure DStatBarImage.Update;
+{procedure DStatBarImage.Update;
   function AboveZero(const a: float): float; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
   begin
     if a > 0 then Result := a else Result := 0;
@@ -528,24 +528,24 @@ begin
                 //color := Vector4Single(1,0.5,1,1);  //purple
               end;
   end;
-end;
+end;  }
 
 {---------------------------------------------------------------------------}
 
-procedure DStatBarImage.Draw;
+{procedure DStatBarImage.Draw;
 begin
   if Target = nil then Exit; //don't draw if target is absent
   //update; //already present in parent call
   inherited Draw;
-end;
+end;  }
 
 {---------------------------------------------------------------------------}
 
-constructor DStatBarImage.Create(AOwner: TComponent);
+{constructor DStatBarImage.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   //Kind := bsVertical;   //default for player bars display
-end;
+end;  }
 
 end.
 

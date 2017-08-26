@@ -129,7 +129,7 @@ end;
   on each Window.Render, so we just need to add a GUI render here }
 Procedure WindowRender(Container : TUIContainer);
 begin
-  GUI.draw;
+  //****GUI.draw;
 end;
 
 {======================== Mouse & keyboard =================================}
@@ -168,7 +168,7 @@ begin
     end;
   end;
 //  SetGameMode(gmCharacterGeneration);
-  InitTestLevel;                         //ugly! I'll fix this soon.
+  //InitTestLevel;                         //ugly! I'll fix this soon.
 end;
 
 {--------------------------------------------------------------------------}
@@ -203,9 +203,9 @@ begin
   //this is not needed at the moment, we'll turn here a bit later when implementing drag-n-drop
   //no mouseover is detected if no ifmouseover is run, so should still be here
   if not Dragging then begin
-    tmpLink := GUI.IfMouseOver(Round(Event.Position[0]),Round(Event.Position[1]),true,true);
+    {tmpLink := GUI.IfMouseOver(Round(Event.Position[0]),Round(Event.Position[1]),true,true);
     if tmpLink <> nil then
-      WriteLnLog('doMotion','Motion caught '+tmpLink.ClassName);
+      WriteLnLog('doMotion','Motion caught '+tmpLink.ClassName);}
   end;
 
 end;
@@ -215,12 +215,12 @@ end;
 procedure LoadAndInitData;
 begin
   InitMusicManager;
-  SetGameMode(gmLoadScreen);
+  //SetGameMode(gmLoadScreen);
 
-  InitInterface;
-  InitPerks;
+  //InitInterface;
+  //InitPerks;
 
-  Load_test_level; //remake it
+  //Load_test_level; //remake it
   window.OnBeforeRender := @WindowManage;
 
   LoadCompleted := true;
@@ -261,8 +261,8 @@ begin
 
   //create GUI
   WritelnLog('ApplicationInitialize','Create interface');
-  GUI := DInterfaceContainer.create(Window);
-  GUI.Rescale;
+  //****GUI := DInterfaceContainer.create(Window);
+  //****GUI.Rescale;
 
   WritelnLog('ApplicationInitialize','Initialize interface');
   InitLoadScreen;

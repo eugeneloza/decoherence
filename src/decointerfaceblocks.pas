@@ -35,7 +35,7 @@ type
   {stores and displays every interface element related to current character}
   DCharacterSpace = class(DAbstractCompositeInterfaceElement)
   private
-    fTarget: DPlayerCharacter;
+   { fTarget: DPlayerCharacter;
     procedure settarget(value: DPlayerCharacter);
   public
     ID: integer;
@@ -50,29 +50,29 @@ type
     procedure SlideOut(Sender: DAbstractElement; x,y: integer);
     procedure doSlideIn;
     procedure doSlideOut;
-    procedure doTimeout;
+    procedure doTimeout; }
   end;
 
 type
   {presents 7 characters with health bars, portraits and characters control space }
   DPartyView = class (DAbstractCompositeInterfaceElement)
   public
-    CharacterSpace: array [0..maxparty] of DCharacterSpace;
+    {CharacterSpace: array [0..maxparty] of DCharacterSpace;
     procedure ArrangeChildren(animate: TAnimationStyle); override;
-    constructor Create(AOwner: TComponent); override;
+    constructor Create(AOwner: TComponent); override; }
   end;
 
 type
   {decorations around travel screen}
   DDecorations = class(DAbstractCompositeInterfaceElement)
   private
-    frame1left,frame1right,
+    {frame1left,frame1right,
     frame2left,frame2right,
     frame2bottomleft,frame2bottomright,
     frame3bottom : DSingleInterfaceElement;
   public
     procedure ArrangeChildren(Animate: TAnimationStyle); override;
-    constructor Create(AOwner: TComponent); override;
+    constructor Create(AOwner: TComponent); override; }
   end;
 
 
@@ -84,7 +84,7 @@ uses CastleLog;
 {=========================== Character Space =================================}
 {=============================================================================}
 
-constructor DCharacterSpace.create(AOwner: TComponent);
+{constructor DCharacterSpace.create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
 
@@ -107,11 +107,11 @@ begin
   StatBars.OnMouseLeave := @SlideOut;
   Grab(StatBars);
 
-end;
+end;}
 
 {---------------------------------------------------------------------------}
 
-procedure DCharacterSpace.ArrangeChildren(animate: TAnimationStyle);
+{procedure DCharacterSpace.ArrangeChildren(animate: TAnimationStyle);
 begin
   //inherited ArrangeChildren(animate); //not needed here as this element doesn't have a frame
   {********** INTERFACE DESIGN BY Saito00 ******************}
@@ -139,22 +139,22 @@ begin
   Slided := true;
   doSlideOut;
 
-end;
+end; }
 
 {---------------------------------------------------------------------------}
 
-procedure DCharacterSpace.SetTarget(value: DPlayerCharacter);
+{procedure DCharacterSpace.SetTarget(value: DPlayerCharacter);
 begin
   if fTarget <> Value then begin
     Self.fTarget := Value;
     StatBars.Target := Self.fTarget;
     Portrait.Target := Self.fTarget;
   end;
-end;
+end;}
 
 {---------------------------------------------------------------------------}
 
-procedure DCharacterSpace.DoSlideIn;
+{procedure DCharacterSpace.DoSlideIn;
 var myx: float;
 begin
   Slided := true;
@@ -171,11 +171,11 @@ begin
 
   Portrait.setbasesize(myx,Portrait.base.fy,Portrait.base.fw,Portrait.base.fh,1,asDefault);
   Portrait.rescale;
-end;
+end;}
 
 {---------------------------------------------------------------------------}
 
-procedure DCharacterSpace.DoSlideOut;
+{procedure DCharacterSpace.DoSlideOut;
 var myx: float;
 begin
   slided := false;
@@ -193,40 +193,40 @@ begin
 
   Portrait.setbasesize(myx,Portrait.base.fy,Portrait.base.fw,Portrait.base.fh,0,asDefault);
   Portrait.rescale;
-end;
+end;}
 
 {---------------------------------------------------------------------------}
 
-procedure DCharacterSpace.SlideIn(Sender: DAbstractElement; x,y: integer);
+{procedure DCharacterSpace.SlideIn(Sender: DAbstractElement; x,y: integer);
 begin
   if not slided then
     if MouseOverTree(x,y) then doSlideIn;
-end;
+end;}
 
 {---------------------------------------------------------------------------}
 
-procedure DCharacterSpace.slideOut(Sender: DAbstractElement; x,y: integer);
+{procedure DCharacterSpace.slideOut(Sender: DAbstractElement; x,y: integer);
 begin
   if slided then
     if not MouseOverTree(x,y) then timer.settimeout(PortraitTimeOut){doSlideOut};
   //if selected then timeout 10-30 seconds, else just doslideout
-end;
+end;}
 
 {---------------------------------------------------------------------------}
 
-procedure DCharacterSpace.doTimeout;
+{procedure DCharacterSpace.doTimeout;
 begin
   if slided then begin
     if not IsMouseOverTree then doSlideOut;
     writelnlog('timer out');
   end;
-end;
+end;}
 
 {=============================================================================}
 {============================= Party  view ===================================}
 {=============================================================================}
 
-procedure DPartyView.ArrangeChildren(animate: TAnimationStyle);
+{procedure DPartyView.ArrangeChildren(animate: TAnimationStyle);
 var i: integer;
 begin
   //inherited ArrangeChildren(animate); //not needed here as this element doesn't have a frame
@@ -241,11 +241,11 @@ begin
       CharacterSpace[i].setBaseSize(-35/800,-(40+155+180*(i div 2))/800,35/800,155/800,1,animate);
 //      CharacterSpace[i].setBaseSize(0,0,fullwidth,fullheight,1,animate);
   end;
-end;
+end;}
 
 {-----------------------------------------------------------------------------}
 
-constructor DPartyView.Create(AOwner: TComponent);
+{constructor DPartyView.Create(AOwner: TComponent);
 var i: integer;
 begin
   inherited Create(AOwner);
@@ -260,13 +260,13 @@ begin
   end;
   SetBaseSize(0,0,FullWidth,FullHeight,1,Appear_Animation);
 //  ArrangeChildren(false); //automatically arranged on TCompositeElement.setbasesize
-end;
+end;}
 
 {=============================================================================}
 {============================= Decorations ===================================}
 {=============================================================================}
 
-procedure DDecorations.ArrangeChildren(animate: TAnimationStyle);
+{procedure DDecorations.ArrangeChildren(animate: TAnimationStyle);
 var yy1,yy2: float;
 begin
   // inherited ArrangeChildren(animate); //not needed here
@@ -288,9 +288,9 @@ begin
   frame3bottom     .base.backwardsetsize(frame2bottomright.base.x1-frame2bottomleft.base.x2+22*2,-1);
   frame3bottom.AnimateTo(appear_animation);
   rescale;
-end;
+end;}
 
-constructor DDecorations.create(AOwner: TComponent);
+{constructor DDecorations.create(AOwner: TComponent);
 begin
   inherited create(AOwner);
 
@@ -316,7 +316,7 @@ begin
   frame3bottom.frame := decorationframe3_bottom;
   grab(frame3bottom);
   setbasesize(0,0,fullwidth,fullheight,1,appear_animation);
-end;
+end;}
 
 end.
 

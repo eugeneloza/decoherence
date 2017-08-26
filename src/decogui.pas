@@ -31,7 +31,7 @@ Type
   DInterfaceContainer = class(DInterfaceElement)
   public
     { just = window.height, wihdow.width. Maybe I'll deprecate it later }
-    width,height: integer;
+ {   width,height: integer;
 
     constructor create(AOwner:TComponent); override;
     destructor destroy; override;
@@ -58,7 +58,7 @@ Type
     FPS_count: Integer;
     Last_render_time: TDateTime;
   public
-    procedure MakeCharacterGenerationInterface;
+    procedure MakeCharacterGenerationInterface; }
 end;
 
 var GUI: DInterfaceContainer;
@@ -77,7 +77,7 @@ uses SysUtils, CastleLog,
 {========================== interface container ==============================}
 {=============================================================================}
 
-constructor DInterfaceContainer.create(AOwner: TComponent);
+{constructor DInterfaceContainer.create(AOwner: TComponent);
 begin
   writeLnLog('DInterfaceContainer.create','Creating interface.');
   inherited create(AOwner);
@@ -94,11 +94,11 @@ begin
 
   Width := -1;
   Height := -1;
-end;
+end; }
 
 {-----------------------------------------------------------------------------}
 
-procedure DInterfaceContainer.LoadWind;
+{procedure DInterfaceContainer.LoadWind;
 begin
   Wind1 := DWindImage.create(self);
   Wind1.phasespeed := 1/(15+drnd.Random);
@@ -112,20 +112,20 @@ begin
   Wind2.base.setsize(0,0,fullwidth,fullheight);
   Wind2.Opacity := 0.1;
   Wind2.rescale;
-end;
+end;  }
 
 {-----------------------------------------------------------------------------}
 
-destructor DInterfaceContainer.destroy;
+{destructor DInterfaceContainer.destroy;
 begin
   writeLnLog('DInterfaceContainer.destroy','Game over...');
   DestroyFonts;
   inherited;
-end;
+end;  }
 
 {-----------------------------------------------------------------------------}
 
-procedure DInterfaceContainer.rescale;
+{procedure DInterfaceContainer.rescale;
 begin
   writeLnLog('DInterfaceContainer.rescale',inttostr(window.Width)+'x'+inttostr(window.Height));
   //prevent Window from scaling too small and/or into portrait orientation
@@ -159,11 +159,11 @@ begin
 
   { rescale children }
   inherited;
-end;
+end;  }
 
 {-----------------------------------------------------------------------------}
 
-procedure DInterfaceContainer.DoLoadNewImage;
+{procedure DInterfaceContainer.DoLoadNewImage;
 begin
   if LoadScreenLabel=nil then begin
     LoadScreenLabel := DLabel.create(self);
@@ -188,11 +188,11 @@ begin
   floater.phasespeed := 1/15;
   floater.base.setsize(0,0,proportionalscale,fullheight);
   floater.LoadThread(LoadScreenFolder+GetRandomFactImage);
-end;
+end; }
 
 {-----------------------------------------------------------------------------}
 
-procedure DInterfaceContainer.FreeLoadScreen(freeWind: boolean);
+{procedure DInterfaceContainer.FreeLoadScreen(freeWind: boolean);
 begin
   freeandnil(Floater);
   freeandnil(LoadScreenLabel);
@@ -205,20 +205,20 @@ begin
    is nil in LoadScreen and defined only in Charactergeneration.
    maybe I'll do it later}
   freeandnil(background);
-end;
+end; }
 
 {==================== Drawing routines ========================================}
 
-procedure DInterfaceContainer.DrawWind; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+{procedure DInterfaceContainer.DrawWind; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
   if wind1 = nil then LoadWind;
   wind1.draw;
   wind2.draw;
-end;
+end;}
 
 {-----------------------------------------------------------------------------}
 
-procedure DInterfaceContainer.DrawLoadScreen;
+{procedure DInterfaceContainer.DrawLoadScreen;
 begin
   if (floater = nil) or (LoadNewFloaterImage) then DoLoadNewImage;
   floater.Draw;
@@ -230,11 +230,11 @@ begin
   floaterLabel.base.y1 := round((1 + 5*Floater.phase)*Window.height/17);
   floaterLabel.base.Opacity := sin(Pi*Floater.Phase);
   floaterLabel.draw;
-end;
+end; }
 
 {-----------------------------------------------------------------------------}
 
-procedure DInterfaceContainer.DrawCharacterGenerationBackground;
+{procedure DInterfaceContainer.DrawCharacterGenerationBackground;
 begin
   if background = nil then begin
     background := DStaticImage.create(self);
@@ -244,11 +244,11 @@ begin
   background.draw;
 
   DrawWind;
-end;
+end;}
 
 {------------------------------------------------------------------------------}
 
-procedure DInterfaceContainer.Draw;
+{procedure DInterfaceContainer.Draw;
 begin
   { clear the screen depending on the game mode
     in case SceneManager doesn't clear it }
@@ -269,11 +269,11 @@ begin
     Last_Render_time := decoNow;
   end else inc(FPS_count);
   FPS_label.Draw;
-end;
+end;}
 
 {======================== Interface modes creation ===========================}
 
-var interfaceReady: boolean = false; //UGLY FIX THIS AT ONCE!!!!
+{var interfaceReady: boolean = false; //UGLY FIX THIS AT ONCE!!!!
 procedure DInterfaceContainer.MakeCharacterGenerationInterface;
 var
   tmp: DPartyView;
@@ -285,7 +285,7 @@ begin
   tmp2 := DDecorations.create(self);
   GUI.grab(tmp2);
   GUI.grab(tmp);
-end;
+end;}
 
 end.
 

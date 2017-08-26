@@ -56,20 +56,20 @@ begin
 
   {$hint make through switching of game interfaces}
 
-  case LastGameMode of
+  {case LastGameMode of
     {only gmLoadScreen and gmCharacterGeneration use wind so we can release it (true) after it was used}
     gmLoadScreen: GUI.FreeLoadScreen(gm<>gmCharacterGeneration);
     gmCharacterGeneration: GUI.FreeLoadScreen(gm<>gmLoadScreen);
-  end;
+  end;}
   {no need to make Load screens because they are made automatically on demand}
   //if GM=gmLoadScreen then GUI.MakeLoadScreen;
 
   {build new interface elements for next game mode}
 
-  case GM of
+  {case GM of
     {gmLoadScreen}//built automatically when game mode is enabled (?)
     gmTravel: GUI.MakeCharacterGenerationInterface;
-  end;
+  end;}
 
   LastGameMode := CurrentGameMode;
   CurrentGameMode := GM;

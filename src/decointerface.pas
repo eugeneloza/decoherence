@@ -42,7 +42,7 @@ Type TAnimationStyle = (asNone, asDefault,
                         asFlyInLeft,asFlyOutLeft,
                         asFlyInRight,asFlyOutRight);
 
-Type
+{Type
  { Several types of frames, including with captions }
  DFrame = class(TComponent)
  public
@@ -52,13 +52,13 @@ Type
    Rectagonal: boolean;
    constructor Create(AOwner: TComponent); override;
    destructor Destroy; override;
-end;
+end;     }
 
  { constants for special scaling cases }
 const FullWidth = -10;
       FullHeight = -11;
       ProportionalScale = -12;
-type
+{type
   { Yes, that looks stupid for now. But I'll simplify it later. Maybe.
    Contains redunant data on animation with possible rescaling in mind.}
   Txywh = class(TComponent)
@@ -98,14 +98,14 @@ type
   public
     //function makecopy:Txywh;
     procedure CopyXYWH(Source: Txywh);
-  end;
+  end; }
 
 Type
   { most abstract container suitable for images, labels and interface elements
     Just defines the box and rescaling }
   DAbstractElement = class(TComponent)
   public
-    {stores current animation state, recalculated by GetAnimationState at every render}
+  {  {stores current animation state, recalculated by GetAnimationState at every render}
     CurrentAnimationState: Txywha;
     procedure GetAnimationState; virtual;
 
@@ -149,7 +149,7 @@ Type
      of the element as AnimateTo uses currentAnimationState}
     procedure AnimateTo(Animate: TAnimationStyle; Duration: float = DefaultAnimationDuration);
 
-    property ScaleToParent: boolean read fScaleToParent write SetScaleToParent default false;
+    property ScaleToParent: boolean read fScaleToParent write SetScaleToParent default false;  }
   end;
 
 {Definition of simple procedures for (mouse) events}
@@ -162,7 +162,7 @@ Type
   DSingleInterfaceElement = class(DAbstractElement)
   public
     {Higher-level element. Seldomly used in specific cases}
-    Parent: DAbstractElement;
+ {   Parent: DAbstractElement;
     {whether Interface element owns its contents? If true they'll bee freed
      on destroy // using TComponent Inheritance for now}
     //OwnsContent: boolean;
@@ -220,7 +220,7 @@ Type
     OnDrop: TXYProcedure;
     DragX, DragY: integer;
     procedure Drag(x,y: integer);
-    procedure StartDrag(x,y: integer);
+    procedure StartDrag(x,y: integer); }
   end;
 
 type DInterfaceElementsList = specialize TFPGObjectList<DSingleInterfaceElement>;
@@ -231,7 +231,7 @@ Type
     maybe should be just a few additional routines at the parent class}
   DTimer = class(TObject)
     private
-      {set automatically, date of the timer count start}
+    {  {set automatically, date of the timer count start}
       StartTime: DTime;
     public
       {if the timer is running}
@@ -244,7 +244,7 @@ Type
       {a simple way to set and run timer}
       procedure SetTimeOut(Seconds: DTime);
       {check if the timer finished and run onTimer if true}
-      procedure Update;
+      procedure Update;}
   end;
 
 Type
@@ -252,7 +252,7 @@ Type
   DInterfaceElement = class(DSingleInterfaceElement)
   public
     {if the interface element rescales each time children rescale}
-    ScaleToChildren: boolean;
+ {   ScaleToChildren: boolean;
     {list of the children of this interface element}
     Children: DInterfaceElementsList;
     {a simple timer to fire some event on time-out}
@@ -273,15 +273,15 @@ Type
     {returns self if IAmHere and runs all possible events + scans all children}
     function ifMouseOver(xx,yy: integer; RaiseEvents: boolean; AllTree: boolean): DAbstractElement; override;
     {returns true if mouse is over any "canmouseover" child of this element}
-    function MouseOverTree(xx,yy: integer): boolean;
+    function MouseOverTree(xx,yy: integer): boolean; }
   end;
 
-Var {simple outline around black box}
+{Var {simple outline around black box}
     //SimpleFrame,
     {a frame with 19px header}
     //CaptionFrame,
     {Just black background with no frame}
-    BlackFrame: DFrame;
+    BlackFrame: DFrame;    }
 
     {contains global list of all interface elements // not needed yet}
     //InterfaceList: DInterfaceElementsList;
@@ -340,11 +340,11 @@ begin
     cornerTop := 19; CornerBottom := 1; cornerLeft := 1; CornerRight := 1;            //todo: variable top line!
   end;    }
 
-  BlackFrame := DFrame.Create(Window);
+  {BlackFrame := DFrame.Create(Window);
   with BlackFrame do begin
     SourceImage := LoadImageSafe(ApplicationData(FramesFolder+'blackframe.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
     CornerTop := 0; CornerBottom := 0; CornerLeft := 0; CornerRight := 0;
-  end;
+  end;}
 
   InitCompositeInterface;
 
@@ -355,33 +355,33 @@ end;
 
 {=============================================================================}
 
-constructor DFrame.Create(AOwner: TComponent);
+{constructor DFrame.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   Rectagonal := true;
-end;
+end;}
 
-destructor DFrame.Destroy;
+{destructor DFrame.Destroy;
 begin
   FreeAndNil(SourceImage);
   inherited;
-end;
+end;}
 
 {=============================================================================}
 {=========================== Abstract element ================================}
 {=============================================================================}
 
 
-constructor Txywh.Create(AOwner: TComponent);
+{constructor Txywh.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   Parent := DAbstractElement(AOwner).Owner;
   Initialized := false;
-end;
+end;}
 
 {----------------------------------------------------------------------------}
 
-procedure Txywh.SetSize(const NewX,NewY,NewW,NewH: float);
+{procedure Txywh.SetSize(const NewX,NewY,NewW,NewH: float);
 begin
   if (Abs(NewX) > 1) or (Abs(NewY) > 1) or
      (((NewW<0) or (NewW>1)) and (not dEqual(NewW,ProportionalScale) and not dEqual(NewW,FullWidth) and not dEqual(NewW,FullHeight))) or
@@ -403,11 +403,11 @@ begin
   fh := NewH;
 
   Recalculate;
-end;
+end;}
 
 {----------------------------------------------------------------------------}
 
-procedure Txywh.GetContainerWidthHeight;{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+{procedure Txywh.GetContainerWidthHeight;{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
   {ugly fix}
   if (Parent is DInterfaceContainer) or (not ScaleToParent) then begin
@@ -433,11 +433,11 @@ begin
       cH := Window.Height;
     end;
   end;
-end;
+end;}
 
 {----------------------------------------------------------------------------}
 
-procedure Txywh.Recalculate;
+{procedure Txywh.Recalculate;
 begin
   //WriteLnLog(Parent.ClassName);
   GetContainerWidthHeight;
@@ -474,11 +474,11 @@ begin
   y2 := y1+h;
 
   Initialized := true;
-end;
+end;}
 
 {----------------------------------------------------------------------------}
 
-procedure Txywh.BackwardSetSize(const NewW,NewH: integer);
+{procedure Txywh.BackwardSetSize(const NewW,NewH: integer);
 begin
   GetContainerWidthHeight;
   if NewW>0 then begin
@@ -499,9 +499,9 @@ begin
     end;
     y2 := y1+h;
   end;
-end;
+end;}
 
-procedure Txywh.BackwardSetXYWH(const NewX,NewY,NewW,NewH: integer);
+{procedure Txywh.BackwardSetXYWH(const NewX,NewY,NewW,NewH: integer);
 begin
   GetContainerWidthHeight;
   //todo check for consistency
@@ -514,11 +514,11 @@ begin
   fw := NewW/cH;
   fh := NewH/cH;
   Initialized := true;
-end;
+end;}
 
 {----------------------------------------------------------------------------}
 
-Procedure Txywh.SubstractFrame(Frame: DFrame; AdditionalGap: integer = 0);
+{Procedure Txywh.SubstractFrame(Frame: DFrame; AdditionalGap: integer = 0);
 Begin
   If (Frame<>nil) and (Frame.Rectagonal) then begin
     x1 := x1 + Frame.CornerLeft+AdditionalGap;
@@ -537,22 +537,22 @@ Begin
     h := h - 2*AdditionalGap;
     BackwardSetXYWH(x1,y1,w,h);
   end;
-End;
+End;}
 
 {----------------------------------------------------------------------------}
 
-procedure Txywh.FixProportions(ww,hh: integer);
+{procedure Txywh.FixProportions(ww,hh: integer);
 begin
   if dEqual(fw,ProportionalScale) then
     w := Round(h*ww/hh)
   else                                 //they can't be proportional both
   if dEqual(fh,ProportionalScale) then
     h := Round(w*hh/ww);
-end;
+end;}
 
 {----------------------------------------------------------------------------}
 
-procedure Txywha.copyXYWH(Source: Txywh);
+{procedure Txywha.copyXYWH(Source: Txywh);
 begin
   x1 := Source.x1;
   y1 := Source.y1;
@@ -566,37 +566,37 @@ begin
   fh := Source.fh;
   Opacity := Source.Opacity;
   Initialized := Source.Initialized;
-end;
+end;}
 
 {============================================================================}
 
-procedure DAbstractElement.Rescale;
+{procedure DAbstractElement.Rescale;
 begin
   Base.Recalculate;
   Last.Recalculate;
   Next.Recalculate;
-end;
+end;}
 
 {----------------------------------------------------------------------------}
 
-procedure DAbstractElement.SetVisible(Value: boolean);
+{procedure DAbstractElement.SetVisible(Value: boolean);
 begin
   fVisible := Value;
-end;
+end;}
 
 {----------------------------------------------------------------------------}
 
-procedure DAbstractElement.SetScaleToParent(Value: boolean);
+{procedure DAbstractElement.SetScaleToParent(Value: boolean);
 begin
   fScaleToParent := Value;
   Base.ScaleToParent := Value;
   Last.ScaleToParent := Value;
   Next.ScaleToParent := Value;
-end;
+end;}
 
 {----------------------------------------------------------------------------}
 
-procedure DAbstractElement.AnimateTo(Animate: TAnimationStyle; Duration: float = DefaultAnimationDuration);
+{procedure DAbstractElement.AnimateTo(Animate: TAnimationStyle; Duration: float = DefaultAnimationDuration);
 var mx,my: float;
 begin
   if Animate = asNone then Exit else begin
@@ -659,48 +659,48 @@ begin
       {asFlyOutRandomSuicide}
     end;
   end;
-end;
+end;}
 
 {----------------------------------------------------------------------------}
 
-procedure DAbstractElement.SetBaseSize(const NewX,NewY,NewW,NewH,NewO: float; Animate: TAnimationStyle);
+{procedure DAbstractElement.SetBaseSize(const NewX,NewY,NewW,NewH,NewO: float; Animate: TAnimationStyle);
 begin
   GetAnimationState;
   Base.setsize(NewX,NewY,NewW,NewH);
   Base.opacity := NewO;
   AnimateTo(Animate);
   //rescale; //????
-end;
+end;}
 
 {----------------------------------------------------------------------------}
 
-procedure DAbstractElement.SetIntSize(const x1,y1,x2,y2:integer; Animate: TAnimationStyle);
+{procedure DAbstractElement.SetIntSize(const x1,y1,x2,y2:integer; Animate: TAnimationStyle);
 begin
   GetAnimationState;
   Base.BackwardSetXYWH(x1,y1,x2-x1,y2-y1);
   AnimateTo(Animate);
   //rescale; //????
-end;
+end;}
 
 {----------------------------------------------------------------------------}
 
-procedure DSingleInterfaceElement.SetBaseSize(const NewX,NewY,NewW,NewH,NewO: float; Animate: TAnimationStyle);
+{procedure DSingleInterfaceElement.SetBaseSize(const NewX,NewY,NewW,NewH,NewO: float; Animate: TAnimationStyle);
 begin
   inherited SetBaseSize(NewX,NewY,NewW,NewH,NewO,Animate);
   ResetContentSize(Animate);
-end;
+end;}
 
 {----------------------------------------------------------------------------}
 
-procedure DSingleInterfaceElement.SetIntsize(const x1,y1,x2,y2:integer; Animate: TAnimationStyle);
+{procedure DSingleInterfaceElement.SetIntsize(const x1,y1,x2,y2:integer; Animate: TAnimationStyle);
 begin
   inherited SetIntsize(x1,y1,x2,y2,Animate);
   ResetContentSize(Animate);
-end;
+end;}
 
 {----------------------------------------------------------------------------}
 
-procedure DSingleInterfaceElement.ResetContentSize(Animate: TAnimationStyle);
+{procedure DSingleInterfaceElement.ResetContentSize(Animate: TAnimationStyle);
 begin
   if (Parent<>nil) and (Parent is DInterfaceElement) and (DInterfaceElement(Parent).ScaleToChildren) then
     DInterfaceElement(Parent).RescaleToChildren(Animate);
@@ -713,11 +713,11 @@ begin
     Content.AnimateTo(Animate);
   end;
 
-end;
+end;}
 
 {----------------------------------------------------------------------------}
 
-procedure DAbstractElement.GetAnimationState;
+{procedure DAbstractElement.GetAnimationState;
 var Phase: float;
 begin
   if true then begin //todo!!!!!!!!!!!!!!!!!!!!!!!
@@ -749,17 +749,17 @@ begin
       CurrentAnimationState.Initialized := true;
     end;
   end;
-end;
+end;}
 
-procedure DAbstractElement.Update;
+{procedure DAbstractElement.Update;
 begin
   GetAnimationState;
-end;
+end;}
 
 {----------------------------------------------------------------------------}
 
 
-constructor DAbstractElement.Create(AOwner: TComponent);
+{constructor DAbstractElement.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   Visible := true;
@@ -768,11 +768,11 @@ begin
   Next := Txywha.Create(Self);
   CurrentAnimationState := Txywha.Create(Self);
   ScaleToParent := false;
-end;
+end;}
 
 {----------------------------------------------------------------------------}
 
-destructor DAbstractElement.Destroy;
+{destructor DAbstractElement.Destroy;
 begin
   //actulally this is not needed as they are owned by the class
 {  freeandnil(base);
@@ -780,13 +780,13 @@ begin
   freeandnil(next);}
 
   inherited;
-end;
+end;}
 
 {=============================================================================}
 {=================== Single interface element ===============================}
 {=============================================================================}
 
-procedure DSingleInterfaceElement.Rescale;
+{procedure DSingleInterfaceElement.Rescale;
 begin
   {$WARNING Memory Leak here}
   if Frame <> nil then FrameResize3x3;
@@ -795,11 +795,11 @@ begin
     //content.base.SubstractFrame(frame,2);
     Content.Rescale;   //todo
   end;
-end;
+end;}
 
 {----------------------------------------------------------------------------}
 
-constructor DSingleInterfaceElement.Create(AOwner: TComponent);
+{constructor DSingleInterfaceElement.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   FrameOnTop := false;
@@ -809,11 +809,11 @@ begin
   isMouseOver := false;
   CanMouseOver := false;
   CanDrag := false;
-end;
+end;}
 
 {-----------------------------------------------------------------------------}
 
-destructor DSingleInterfaceElement.Destroy;
+{destructor DSingleInterfaceElement.Destroy;
 begin
   //InterfaceList.Remove(self);
   FreeAndNil(GLFrame);
@@ -827,11 +827,11 @@ begin
   //if owns content destroy it here;
   //if OwnsContent then FreeAndNil(content);  //content usually has AOwner = self
   inherited;
-end;
+end;}
 
 {----------------------------------------------------------------------------}
 
-procedure DSingleInterfaceElement.FrameResize3x3;
+{procedure DSingleInterfaceElement.FrameResize3x3;
 var ScaledImageParts: array [0..2,0..2] of TCastleImage;
     ix,iy: integer;
     UnscaledWidth, UnscaledHeight:integer;
@@ -901,11 +901,11 @@ begin
   //FrameImage.DrawFrom(BURNER_IMAGE,0,0,base.x1,base.y1,base.w,base.h,dmMultiply);
 
   InitGLPending := true;
-end;
+end;}
 
 {----------------------------------------------------------------------------}
 
-procedure DSingleInterfaceElement.InitGL;
+{procedure DSingleInterfaceElement.InitGL;
 begin
   //content makes his own initGL on first draw
   if InitGLPending then begin
@@ -917,11 +917,11 @@ begin
       FrameReady := true;
     end;
   end;
-end;
+end;}
 
 {----------------------------------------------------------------------------}
 
-procedure DSingleInterfaceElement.DrawFrame; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+{procedure DSingleInterfaceElement.DrawFrame; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
   if Frame <> nil then begin
     if FrameReady then begin
@@ -931,18 +931,18 @@ begin
       if InitGLPending then InitGL;
     end;
   end;
-end;
+end;}
 
-procedure DSingleInterfaceElement.DrawContent; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+{procedure DSingleInterfaceElement.DrawContent; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
   //todo
   if Content <> nil then begin
     //Content.base.copyxywh(currentAnimationState);
     Content.Draw;
   end;
-end;
+end;}
 
-procedure DSingleInterfaceElement.Draw;
+{procedure DSingleInterfaceElement.Draw;
 begin
   Update;
   if not Visible then Exit;
@@ -955,11 +955,11 @@ begin
     DrawContent;
   end;
 
-end;
+end;}
 
 {========== Abstract intarface element : Mouse handling =====================}
 
-function DSingleInterfaceElement.IAmHere(xx,yy: integer): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+{function DSingleInterfaceElement.IAmHere(xx,yy: integer): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
   //get current element location... maybe, use not current animation, but "base"? Or completely ignore items being animated?
   GetAnimationState;
@@ -969,11 +969,11 @@ begin
     Result := true
   else
     Result := false;
-end;
+end;}
 
 {-----------------------------------------------------------------------------}
 
-function DSingleInterfaceElement.ifMouseOver(xx,yy: integer; RaiseEvents: boolean; AllTree: boolean): DAbstractElement;
+{function DSingleInterfaceElement.ifMouseOver(xx,yy: integer; RaiseEvents: boolean; AllTree: boolean): DAbstractElement;
 begin
   Result := nil;
   if IAmHere(xx,yy) then begin
@@ -992,9 +992,9 @@ begin
       isMouseOver := false;
     end;
   end;
-end;
+end;}
 
-function DInterfaceElement.ifMouseOver(xx,yy: integer; RaiseEvents: boolean; AllTree: boolean): DAbstractElement;
+{function DInterfaceElement.ifMouseOver(xx,yy: integer; RaiseEvents: boolean; AllTree: boolean): DAbstractElement;
 var i: integer;
     tmpLink: DAbstractElement;
 begin
@@ -1009,113 +1009,113 @@ begin
       if not AllTree then Break; // if drag-n-drop one is enough
     end;
   end;
-end;
+end;}
 
 {-----------------------------------------------------------------------------}
 
-procedure DSingleInterfaceElement.StartDrag(x,y: integer);
+{procedure DSingleInterfaceElement.StartDrag(x,y: integer);
 begin
   DragX := Base.x1 - x;
   DragY := Base.y1 - y;
-end;
+end;}
 
 
-procedure DSingleInterfaceElement.drag(x,y: integer);
+{procedure DSingleInterfaceElement.drag(x,y: integer);
 begin
   Base.x1 := DragX + x;
   Base.y1 := DragY + y;
-end;
+end;}
 
 {=============================================================================}
 {=========================== interface element ===============================}
 {=============================================================================}
 
- constructor DTimer.Create;
- begin
-   inherited;
-   Enabled := false;
-   StartTime := -1;
- end;
+{constructor DTimer.Create;
+begin
+  inherited;
+  Enabled := false;
+  StartTime := -1;
+end;}
 
 {-----------------------------------------------------------------------------}
 
-procedure DTimer.Update;
+{procedure DTimer.Update;
 begin
   if StartTime<0 then StartTime := DecoNow else
   if (DecoNow-StartTime) >= Interval then begin
     Enabled := false;
     if Assigned(onTimer) then onTimer;
   end;
-end;
+end; }
 
 {-----------------------------------------------------------------------------}
 
-procedure DTimer.SetTimeout(Seconds: DTime);
+{procedure DTimer.SetTimeout(Seconds: DTime);
 begin
   StartTime := -1;
   Enabled := true;
   Interval := Seconds;
-end;
+end;}
 
 {-----------------------------------------------------------------------------}
 
-procedure DInterfaceElement.Rescale;
+{procedure DInterfaceElement.Rescale;
 var i: integer;
 begin
   inherited;
   //{$WARNING Memory Leak here}
   for i:=0 to Children.Count-1 do Children[i].Rescale;
-end;
+end;}
 
 {-----------------------------------------------------------------------------}
 
-procedure DInterfaceElement.Update;
+{procedure DInterfaceElement.Update;
 begin
   inherited;
   if Timer.Enabled then Timer.Update;
-end;
+end; }
 
 {-----------------------------------------------------------------------------}
 
-constructor DInterfaceElement.Create(AOwner: TComponent);
+{constructor DInterfaceElement.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   if AOwner is DSingleInterfaceElement then Parent := DSingleInterfaceElement(AOwner);
   ScaleToChildren := false;
   Children := DInterfaceElementsList.Create(true);
   Timer := DTimer.Create; //maybe create timer on-demand?
-end;
+end;}
 
 {----------------------------------------------------------------------------}
 
-destructor DInterfaceElement.Destroy;
+{destructor DInterfaceElement.Destroy;
 begin
   FreeAndNil(Children);   //this should fire as recoursive because children owns elements, which in turn will fire their destructors onfree
   FreeAndNil(Timer);
   inherited;
-end;
+end;}
 
 {----------------------------------------------------------------------------}
 
-procedure DInterfaceElement.Draw;
+{procedure DInterfaceElement.Draw;
 var i: integer;
 begin
   inherited;
   for i := 0 to Children.Count-1 do Children[i].Draw;
-end;
+end;}
 
 {----------------------------------------------------------------------------}
 
-procedure DInterfaceElement.Grab(Child: DSingleInterfaceElement);
+{procedure DInterfaceElement.Grab(Child: DSingleInterfaceElement);
 begin
   Children.Add(Child);
   if (Child is DSingleInterfaceElement) then DSingleInterfaceElement(Child).Parent := Self; //not sure about this line
   //{Child.ID := }InterfaceList.Add(Child); //global ID of the element
-end;
+end;}
 
 {----------------------------------------------------------------------------}
 
-procedure DInterfaceElement.RescaleToChildren(Animate: TAnimationStyle);
+{procedure DInterfaceElement.RescaleToChildren(Animate: TAnimationStyle);
 var i: integer;
     x1,y1,x2,y2: integer;
 begin
@@ -1133,11 +1133,11 @@ begin
     Self.SetIntSize(x1,y1,x2,y2,Animate);
   end
   else WriteLnLog('DInterfaceElement.RescaleToChildren','No children for resale to');
-end;
+end;}
 
 {-----------------------------------------------------------------------}
 
-function DInterfaceElement.MouseOverTree(xx,yy: integer): boolean;
+{function DInterfaceElement.MouseOverTree(xx,yy: integer): boolean;
 var tmp: DAbstractElement;
 begin
   // maybe rewrite it using isMouseOver - the idea is still a little different
@@ -1148,7 +1148,7 @@ begin
     isMouseOverTree := false;
   //base.opacity breaks the algorithm, if transparent item is above (i.e. below) the opaque element
   Result := isMouseOverTree;
-end;
+end;}
 
 end.
 

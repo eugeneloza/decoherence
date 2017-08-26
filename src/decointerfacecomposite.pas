@@ -42,10 +42,10 @@ type
     { arranges children within base.w, base.h of this container
       basically at this level it is abstract, it just substracts the frame
       from base.w and base.h and does nothing more}
-    var cnt_x,cnt_y,cnt_w,cnt_h: float;
+{    var cnt_x,cnt_y,cnt_w,cnt_h: float;
     procedure ArrangeChildren(Animate: TAnimationStyle); virtual;
     { additionally calls ArrangeChildren }
-    procedure setbasesize(const newx,newy,neww,newh,newo: float; Animate: TAnimationStyle); override;
+    procedure setbasesize(const newx,newy,neww,newh,newo: float; Animate: TAnimationStyle); override;  }
 end;
 
 type
@@ -53,7 +53,7 @@ type
   DPlayerBars = class(DAbstractCompositeInterfaceElement)
   private
     {these are links for easier access to the children}
-    HP_bar, STA_bar, CNC_bar, MPH_bar: DSingleInterfaceElement;
+ {   HP_bar, STA_bar, CNC_bar, MPH_bar: DSingleInterfaceElement;
     {target character}
     fTarget: DActor;
     procedure settarget(value: DActor);
@@ -61,7 +61,7 @@ type
     {the character being monitored}
     property Target: DActor read ftarget write settarget;
     constructor create(AOwner: TComponent); override;
-    procedure ArrangeChildren(Animate: TAnimationStyle); override;
+    procedure ArrangeChildren(Animate: TAnimationStyle); override; }
 end;
 
 type
@@ -69,7 +69,7 @@ type
   DPlayerBarsFull = class(DAbstractCompositeInterfaceElement) //not a child of DPlayerBars!
   private
     {these are links for easier access to the children}
-    PartyBars: DPlayerBars;
+ {   PartyBars: DPlayerBars;
     NumHealth: DSingleInterfaceElement;
     NickName: DSingleInterfaceElement;
     {target character}
@@ -79,7 +79,7 @@ type
     {the character being monitored}
     property Target: DActor read fTarget write SetTarget;
     constructor Create(AOwner: TComponent); override;
-    procedure ArrangeChildren(Animate: TAnimationStyle); override;
+    procedure ArrangeChildren(Animate: TAnimationStyle); override; }
   end;
 
 type
@@ -88,7 +88,7 @@ type
   DPortrait = class(DInterfaceElement)
   public
     {this is a BUG, but I won't fix it now, it requires remaking ALL THE INTERFACE}
-    DamageOverlay: DSingleInterfaceElement;
+  {  DamageOverlay: DSingleInterfaceElement;
     DamageLabel: DSingleInterfaceElement;
   private
     fTarget: DPlayerCharacter;
@@ -97,7 +97,7 @@ type
     {Player character which portrait is displayed}
     property Target: DPlayerCharacter read ftarget write settarget;
     constructor Create(AOwner: TComponent); override;
-    procedure doHit(Dam: float; DamType: TDamageType);
+    procedure doHit(Dam: float; DamType: TDamageType);}
   end;
 
 
@@ -108,7 +108,7 @@ type
   DIntegerEdit = class(DAbstractCompositeInterfaceElement)
   private
     {sub-elements nicknames for easy access}
-    iLabel: DSingleInterfaceElement;
+ {   iLabel: DSingleInterfaceElement;
     PlusButton, MinusButton: DSingleInterfaceElement;
 
     fTarget: PInteger;
@@ -119,7 +119,7 @@ type
     constructor create(AOwner: TComponent); override;
     procedure ArrangeChildren(animate: TAnimationStyle); override;
     procedure incTarget(Sender: DAbstractElement; x,y: integer);
-    procedure decTarget(Sender: DAbstractElement; x,y: integer);
+    procedure decTarget(Sender: DAbstractElement; x,y: integer); }
   end;
 
 //  {integer with "bonus" edit}
@@ -128,7 +128,7 @@ type
   {A displayer for a single perk}
   DPerkInterfaceItem =  class (DInterfaceElement)
   private
-    PerkImage: DSingleInterfaceElement; {animated image}
+ {   PerkImage: DSingleInterfaceElement; {animated image}
     fTarget: DPerk;
     //fCharacter: DPlayerCharacter;
     procedure settarget(value: DPerk);
@@ -137,18 +137,18 @@ type
     property Target: DPerk read ftarget write settarget;
     //property Character: DPlayerCharacter read fCharacter write setcharacter;
     {proedure getSelectedStatus -----> update}
-    constructor create(AOwner: TComponent); override;
+    constructor create(AOwner: TComponent); override; }
 end;
 
 type
  {sorts in n rows and m lines the list of interface elements within self.base. Without specific data management and sorting parameters it is abstract and should parent DPerkSorter and DItemSorter}
  DAbstractSorter = class(DAbstractCompositeInterfaceElement)
    private
-
+  {
    public
      lines{,rows}: integer;
      procedure ArrangeChildren(animate: TAnimationStyle); override;
-     constructor create(AOwner: TComponent); override;
+     constructor create(AOwner: TComponent); override; }
    end;
 
 //type TPerkContainerStyle = (pcActions,pcActive,pcGlobal);
@@ -156,32 +156,32 @@ type
 type DPerksContainer = class(DAbstractSorter)
   {container for buffs-debuffs, perks and actions}
   private
-    fTarget: DPlayerCharacter;
+   { fTarget: DPlayerCharacter;
     procedure settarget(value: DPlayerCharacter);
   public
     //ContainerStyle: TPerkContainerStyle;
     property Target: DPlayerCharacter read ftarget write settarget;
     procedure MakePerksList(animate: TAnimationStyle);
-    //procedure UpdatePerksList;
+    //procedure UpdatePerksList;  }
   end;
 
 
 
 
 var HpBarImage, StaBarImage, CncBarImage, MphBarImage: TCastleImage; //todo not freed automatically!!!
-    StatBarsFrame: DFrame;
+    //StatBarsFrame: DFrame;
 
     Portrait_img: array of TCastleImage; //todo!!!
     damageOverlay_img: TCastleImage;
 
-    characterbar_top, characterbar_mid, characterbar_bottom,
+    {characterbar_top, characterbar_mid, characterbar_bottom,
     portraitframe_left, portraitframe_right,
     decorationframe1_left,decorationframe1_right,
     decorationframe2_left,decorationframe2_right,
     decorationframe2_bottomleft,decorationframe2_bottomright,
     decorationframe3_bottom
-                                                           : DFrame;
-    ActionFrame: DFrame;
+                                                           : DFrame;}
+   // ActionFrame: DFrame;
 
 
 {reads some interface-related data, like loading health bars images and decoration frames}
@@ -206,11 +206,11 @@ begin
 
   DamageOverlay_img := LoadImageSafe(ApplicationData(DamageFolder+'damageOverlay_CC0_by_EugeneLoza[GIMP].png'));
 
-  StatBarsFrame := DFrame.create(Window);
+  {StatBarsFrame := DFrame.create(Window);
   with StatBarsFrame do begin
     SourceImage := LoadImageSafe(ApplicationData(FramesFolder+'blackframe.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
     CornerTop := 0; CornerBottom := 0; cornerLeft := 0; CornerRight := 1;
-  end;
+  end;}
 
   Setlength(Portrait_img,20);
   for i := 0 to length(portrait_img)-1 do begin
@@ -230,7 +230,7 @@ begin
   end;
   {load artwork by Saito00}
 
-  portraitframe_left := DFrame.create(Window);
+  {portraitframe_left := DFrame.create(Window);
   with portraitframe_left do begin
     SourceImage := LoadImageSafe(ApplicationData(FramesFolder+'frameborder_left_CC-BY-SA_by_Saito00.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
     cornerTop := 4; CornerBottom := 4; cornerLeft := 3; CornerRight := 4;
@@ -295,33 +295,33 @@ begin
 
   ActionFrame := DFrame.create(Window);
   ActionFrame.Rectagonal := false;
-  ActionFrame.SourceImage := LoadImageSafe(ApplicationData(FramesFolder+'action_frame_CC-BY-SA_by_Saito00.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
+  ActionFrame.SourceImage := LoadImageSafe(ApplicationData(FramesFolder+'action_frame_CC-BY-SA_by_Saito00.png'),[TRGBAlphaImage]) as TRGBAlphaImage;}
 end;
 
 procedure DestroyCompositeInterface;
 var i: integer;
 begin
   writelnLog('DestroyCompositeInterface','(todo)');
-  freeAndNil(HpBarImage);
+  {freeAndNil(HpBarImage);
   freeAndNil(StaBarImage);
   freeAndNil(CncBarImage);
   freeAndNil(MphBarImage);
   FreeAndNil(damageOverlay_img);
   for i := 0 to length(portrait_img)-1 do
     freeAndNil(portrait_img[i]);
-  setlength(portrait_img,0);
+  setlength(portrait_img,0);  }
 end;
 
 {===========================================================================}
 
-procedure DAbstractCompositeInterfaceElement.setbasesize(const newx,newy,neww,newh,newo: float; animate: TAnimationStyle);
+{procedure DAbstractCompositeInterfaceElement.setbasesize(const newx,newy,neww,newh,newo: float; animate: TAnimationStyle);
 begin
   inherited setbasesize(newx,newy,neww,newh,newo,animate);
   //{$WARNING Memory Leak here}
   ArrangeChildren(animate);
-end;
+end; }
 
-procedure DAbstractCompositeInterfaceElement.ArrangeChildren(animate: TAnimationStyle);
+{procedure DAbstractCompositeInterfaceElement.ArrangeChildren(animate: TAnimationStyle);
 begin
   cnt_x := base.fx;
   cnt_y := base.fy;
@@ -336,13 +336,13 @@ begin
 
 
 
-end;
+end;}
 
 {===========================================================================}
 {=================== player bars ===========================================}
 {===========================================================================}
 
-constructor DPlayerBars.create(AOwner: TComponent);
+{constructor DPlayerBars.create(AOwner: TComponent);
 var tmp_bar: DStatBarImage;
     //tmp_element: DSingleInterfaceElement;
 begin
@@ -389,11 +389,11 @@ begin
   MPH_bar.Content := tmp_bar;
   //MPH_bar.frame := SimpleFrame;
   grab(MPH_bar);
-end;
+end;}
 
 {-----------------------------------------------------------------------------}
 
-procedure DPlayerBars.settarget(value: DActor);
+{procedure DPlayerBars.settarget(value: DActor);
 begin
   if ftarget <> value then begin
     ftarget := value;
@@ -403,11 +403,11 @@ begin
     DStatBarImage(CNC_bar.content).Target := ftarget;
     DStatBarImage(MPH_bar.content).Target := ftarget;
   end;
-end;
+end; }
 
 {---------------------------------------------------------------------------}
 
-procedure DPlayerBars.ArrangeChildren(animate: TAnimationStyle);
+{procedure DPlayerBars.ArrangeChildren(animate: TAnimationStyle);
 var scalex: float;
 begin
   inherited ArrangeChildren(animate);
@@ -427,13 +427,13 @@ begin
     MPH_bar.visible := true
   else
     MPH_bar.visible := false
-end;
+end;}
 
 {=============================================================================}
 {================ Player bars with nickname and profession ===================}
 {=============================================================================}
 
-procedure DPlayerBarsFull.settarget(value: DActor);
+{procedure DPlayerBarsFull.settarget(value: DActor);
 begin
   if fTarget <> Value then begin
     fTarget := Value;
@@ -442,11 +442,11 @@ begin
     DFloatLabel(NumHealth.Content).Value := @Value.HP;
     DStringLabel(NickName.Content).Value := @Value.nickname;
   end;
-end;
+end;}
 
 {---------------------------------------------------------------------------}
 
-constructor DPlayerBarsFull.Create(AOwner:TComponent);
+{constructor DPlayerBarsFull.Create(AOwner:TComponent);
 var tmp_flt: DFloatLabel;
     tmp_str: DStringLabel;
 begin
@@ -472,11 +472,11 @@ begin
   grab(PartyBars);
   grab(NumHealth);
   grab(NickName);
-end;
+end;}
 
 {---------------------------------------------------------------------------}
 
-Procedure DPlayerBarsFull.ArrangeChildren(animate: TAnimationStyle);
+{Procedure DPlayerBarsFull.ArrangeChildren(animate: TAnimationStyle);
 var labelspace: float;
 begin
   inherited ArrangeChildren(animate);
@@ -486,13 +486,13 @@ begin
   NickName. setbasesize(cnt_x, cnt_y+cnt_h-labelspace , cnt_w, labelspace, base.opacity, animate);
   PartyBars.setbasesize(cnt_x, cnt_y+labelspace       , cnt_w, cnt_h-2*labelspace, base.opacity, animate);
   NumHealth.setbasesize(cnt_x, cnt_y                  , cnt_w, labelspace, base.opacity, animate);
-end;
+end; }
 
 {=============================================================================}
 {========================== Character portrait ===============================}
 {=============================================================================}
 
-procedure DPortrait.settarget(value: DPlayerCharacter);
+{procedure DPortrait.settarget(value: DPlayerCharacter);
 begin
   if ftarget <> value then begin
     ftarget := value;
@@ -501,11 +501,11 @@ begin
     DStaticImage(content).Load(portrait_img[drnd.random(length(portrait_img))]);  //todo
     fTarget.onHit := @self.doHit;
   end;
-end;
+end;}
 
 {---------------------------------------------------------------------------}
 
-constructor DPortrait.create(AOwner: TComponent);
+{constructor DPortrait.create(AOwner: TComponent);
 var tmp_staticimage: DStaticImage;
     tmp_label: DLabel;
 begin
@@ -525,11 +525,11 @@ begin
   DamageLabel.content := tmp_label;
   Grab(damageLabel);
 //  DamageLabel.ScaleToParent := true;
-end;
+end;}
 
 {---------------------------------------------------------------------------}
 
-procedure DPortrait.doHit(dam: float; damtype: TDamageType);
+{procedure DPortrait.doHit(dam: float; damtype: TDamageType);
 begin
   DCharacterSpace(parent).doSlideIn;
   DCharacterSpace(parent).timer.settimeout(PortraitTimeOut);
@@ -551,7 +551,7 @@ begin
     DLabel(damageLabel.content).Text := IntToStr(Round(Dam));
     DamageLabel.Rescale;
   end;
-end;
+end;}
 
 {=============================================================================}
 {============================== Integer edit =================================}
@@ -559,29 +559,29 @@ end;
 
 //range checking should be done externally by enabling/disabling the buttons.
 
-procedure DIntegerEdit.incTarget(Sender: DAbstractElement; x,y: integer);
+{procedure DIntegerEdit.incTarget(Sender: DAbstractElement; x,y: integer);
 begin
   //remake to self.ftarget! make min/max
   {hmm... looks complex...}
   if Sender is DSingleInterfaceElement then  //fool's check
     if DSingleInterfaceElement(Sender).Parent is DIntegerEdit then    //another fool's check :)
       Inc(DIntegerEdit(DSingleInterfaceElement(Sender).Parent).Target^); //todo!!!!!!!!!
-end;
+end;}
 
 {---------------------------------------------------------------------------}
 
-procedure DIntegerEdit.decTarget(Sender: DAbstractElement; x,y: integer);
+{procedure DIntegerEdit.decTarget(Sender: DAbstractElement; x,y: integer);
 begin
   //remake to self.ftarget! make min/max
   {hmm... looks complex...}
   if Sender is DSingleInterfaceElement then  //fool's check
     if DSingleInterfaceElement(Sender).Parent is DIntegerEdit then    //another fool's check :)
       Dec(DIntegerEdit(DSingleInterfaceElement(Sender).Parent).Target^); //todo!!!!!!!!!
-end;
+end;}
 
 {---------------------------------------------------------------------------}
 
-constructor DIntegerEdit.create(AOwner: TComponent);
+{constructor DIntegerEdit.create(AOwner: TComponent);
 var tmp: DIntegerLabel;
     tmpImg: DStaticImage;
 begin
@@ -608,35 +608,35 @@ begin
   //tmpImg.LoadThread('');
   MinusButton.Content := tmpImg;
   Grab(MinusButton);
-end;
+end;}
 
 {---------------------------------------------------------------------------}
 
-procedure DIntegerEdit.SetTarget(Value: pInteger);
+{procedure DIntegerEdit.SetTarget(Value: pInteger);
 begin
   if fTarget <> Value then begin
     fTarget := Value;
     DIntegerLabel(iLabel.Content).Value := Value;
     //reset button activity
   end;
-end;
+end;}
 
 {---------------------------------------------------------------------------}
 
-procedure DIntegerEdit.ArrangeChildren(Animate: TAnimationStyle);
+{procedure DIntegerEdit.ArrangeChildren(Animate: TAnimationStyle);
 begin
   inherited ArrangeChildren(Animate);
   //todo ***
   PlusButton.SetBaseSize(cnt_x,cnt_y,cnt_h,cnt_h,1,Animate);
   MinusButton.SetBaseSize(cnt_x+cnt_w-cnt_h,cnt_y,cnt_h,cnt_h,1,Animate);
   iLabel.SetBaseSize(cnt_x+cnt_h,cnt_y,cnt_w-2*cnt_h,cnt_h,1,Animate);
-end;
+end;}
 
 {=============================================================================}
 {=========================== Perks container =================================}
 {=============================================================================}
 
-procedure DPerkInterfaceItem.settarget(value: DPerk);
+{procedure DPerkInterfaceItem.settarget(value: DPerk);
 begin
   if Value <> fTarget then begin
     fTarget := Value;
@@ -645,11 +645,11 @@ begin
     //(PerkImage.content as DStaticImage).load(fTarget.Image.SourceImage);
     //add events?
   end;
-end;
+end;}
 
 {---------------------------------------------------------------------------}
 
-constructor DPerkInterfaceItem.create(AOwner: TComponent);
+{constructor DPerkInterfaceItem.create(AOwner: TComponent);
 var tmp: DStaticImage;
 begin
   inherited create(AOwner);
@@ -657,13 +657,13 @@ begin
   tmp := DStaticImage.create(self);
   PerkImage.Content := tmp;
   Grab(PerkImage);
-end;
+end;}
 
 {=============================================================================}
 {=========================== Abstract sorter =================================}
 {=============================================================================}
 
-procedure DAbstractSorter.ArrangeChildren(animate: TAnimationStyle);
+{procedure DAbstractSorter.ArrangeChildren(animate: TAnimationStyle);
 var scale: float;
     i: integer;
 begin
@@ -671,31 +671,31 @@ begin
   scale := cnt_h/lines;
   for i := 0 to children.Count-1 do children[i].setbasesize(cnt_x+i*scale,cnt_y,scale,scale,1,animate);
   //todo : auto scrollers
-end;
+end;}
 
 {---------------------------------------------------------------------}
 
-constructor DAbstractSorter.create(AOwner: TComponent);
+{constructor DAbstractSorter.create(AOwner: TComponent);
 begin
   inherited create(AOwner);
   Lines := 1;
-end;
+end;}
 
 {=============================================================================}
 {=========================== Perks container =================================}
 {=============================================================================}
 
-procedure DPerksContainer.SetTarget(Value: DPlayerCharacter);
+{procedure DPerksContainer.SetTarget(Value: DPlayerCharacter);
 begin
   if fTarget <> Value then begin
     fTarget := Value;
     MakePerksList(asNone);
   end;
-end;
+end;}
 
 {---------------------------------------------------------------------}
 
-procedure DPerksContainer.MakePerksList(animate: TAnimationStyle);
+{procedure DPerksContainer.MakePerksList(animate: TAnimationStyle);
 var tmp: DSingleInterfaceElement;
     i: integer;
 begin
@@ -714,7 +714,7 @@ begin
       WriteLnLog('DPerksContainer.MakePerksList','ERROR: Target.Actions is empty!');
   end else
     WriteLnLog('DPerksContainer.MakePerksList','ERROR: Target is nil!');
-end;
+end;}
 
 {---------------------------------------------------------------------}
 
