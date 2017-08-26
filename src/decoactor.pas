@@ -365,7 +365,7 @@ end;
 
 procedure DActorPhysics.doGravity;
 begin
-  if InternalCamera=nil then exit;
+  if InternalCamera=nil then Exit;
   if CanMoveDir(CurrentGravityDown-Vector3(0,0,Height)) then Position := Position+CurrentGravityDown;
 end;
 
@@ -392,11 +392,13 @@ end;
 function DActorPhysics.CanMovePos(aPos: TVector3): boolean;{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 var tmp: TVector3;
 begin
+  //InternalCamera may be nil, but we skip the check for speed. Be careful.
   Result := InternalCamera.DoMoveAllowed(aPos,tmp,false)
 end;
 function DActorPhysics.CanMoveDir(aDir: TVector3): boolean;{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 var tmp: TVector3;
 begin
+  //InternalCamera may be nil, but we skip the check for speed. Be careful.
   Result := InternalCamera.DoMoveAllowed(InternalCamera.Position+aDir,tmp,false)
 end;
 
