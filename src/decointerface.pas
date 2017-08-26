@@ -105,6 +105,8 @@ type
     { Sets int width/height for scaling animations }
     procedure SetIntWidthHeight(const aWidth,aHeight: integer);
     procedure SetRealSize(const aWidth,aHeight: integer);
+    { Anchors this Container to aParent }
+    procedure AnchorTo(const aParent: DAbstractContainer; const Gap: integer = 0);
   end;
 
 type
@@ -143,10 +145,9 @@ Type
     {base state of the element. contains its coordinates and width/height}
     Base: DAbstractContainer;
     {source width/height of the element. Used to preserve proportions while scaling}
-  {  RealWidth, RealHeight: integer;
-    procedure SetBaseSize(const NewX,NewY,NewW,NewH,NewO: float; Animate: TAnimationStyle); virtual;
-    procedure SetIntSize(const x1,y1,x2,y2:integer; Animate: TAnimationStyle); virtual;
-    }
+
+    procedure SetBaseSize(const NewX,NewY,NewW,NewH,NewO: float; const Animate: TAnimationStyle = asNone); virtual;
+    //procedure SetIntSize(const x1,y1,x2,y2:integer; Animate: TAnimationStyle); virtual;
     { If the element is visible, if false then draw will not be called.
       PAY ATTENTION: if assigned to a single interface element then the animations
       and initGL will occur as they would normally. BUT if assigned to a
@@ -157,8 +158,8 @@ Type
       Important: GetAnimationState must be called before setting basesize
       of the element as AnimateTo uses currentAnimationState}
     procedure AnimateTo(const Animate: TAnimationStyle; const Duration: float = DefaultAnimationDuration);
-   constructor Create; virtual;//override;
-   destructor Destroy; override;
+    constructor Create; virtual; //override;
+    destructor Destroy; override;
   end;
 
 { Simple procedures for (mouse and time) events }
@@ -452,6 +453,24 @@ end;
 
 {----------------------------------------------------------------------------}
 
+procedure DAbstractContainer.AnchorTo(const aParent: DAbstractContainer; const Gap: integer = 0);
+begin
+  Anchor[asLeft  ].Anchor := aParent;
+  Anchor[asLeft  ].Gap := Gap;
+  Anchor[asLeft  ].AlignTo := haLeft;
+  Anchor[asRight ].Anchor := aParent;
+  Anchor[asRight ].Gap := Gap;
+  Anchor[asRight ].AlignTo := haRight;
+  Anchor[asTop   ].Anchor := aParent;
+  Anchor[asTop   ].Gap := Gap;
+  Anchor[asTop   ].AlignTo := vaTop;
+  Anchor[asBottom].Anchor := aParent;
+  Anchor[asBottom].Gap := Gap;
+  Anchor[asBottom].AlignTo := vaBottom;
+end;
+
+{----------------------------------------------------------------------------}
+
 procedure DAbstractContainer.Assign(const Source: DAbstractContainer);
 var aa: TAnchorSide;
 begin
@@ -594,23 +613,19 @@ end;
 
 {----------------------------------------------------------------------------}
 
-{procedure DAbstractElement.SetBaseSize(const NewX,NewY,NewW,NewH, float; const Animate: TAnimationStyle);
-begin                                                                                     NewO:
-  GetAnimationState;
-  Base.setsize(NewX,NewY,NewW,NewH);
-  Base.opacity := NewO;
+procedure DAbstractElement.SetBaseSize(const NewX,NewY,NewW,NewH,NewO: float; const Animate: TAnimationStyle = asNone);
+begin
+  Base.SetFloatSize(NewX,NewY,NewW,NewH);
+  Base.Opacity := NewO;
   AnimateTo(Animate);
-  //rescale; //????
-end;}
+end;
 
 {----------------------------------------------------------------------------}
 
 {procedure DAbstractElement.SetIntSize(const x1,y1,x2,y2:integer; const Animate: TAnimationStyle);
 begin
-  GetAnimationState;
   Base.BackwardSetXYWH(x1,y1,x2-x1,y2-y1);
   AnimateTo(Animate);
-  //rescale; //????
 end;}
 
 {----------------------------------------------------------------------------}
