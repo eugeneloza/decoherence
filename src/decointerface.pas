@@ -113,7 +113,7 @@ Type
   { most abstract container suitable for images, labels and interface elements
     Just defines the box and rescaling }
   DAbstractElement = class abstract(DAbstractContainer)
-  strict private
+  strict protected
     { Caches current animation state, recalculated by GetAnimationState at every render}
     procedure GetAnimationState;
   public
@@ -205,9 +205,9 @@ Type
     CanMouseOver: boolean;
     CanDrag: boolean;
     {are these coordinates in this element's box?}
-{    function IAmHere(xx,yy: integer): boolean;
+    function IAmHere(xx,yy: integer): boolean;
     {returns self if IAmHere and runs all possible events}
-    function ifMouseOver(xx,yy: integer; RaiseEvents: boolean; AllTree: boolean): DAbstractElement; virtual;}
+    function ifMouseOver(xx,yy: integer; RaiseEvents: boolean; AllTree: boolean): DAbstractElement; virtual;
   private
     {if mouse is over this element}
     isMouseOver: boolean;
@@ -220,9 +220,9 @@ Type
     OnMouseRelease: TXYProcedure;
     {dragg-n-drop routines}
     OnDrop: TXYProcedure;
- {   DragX, DragY: integer;
+    DragX, DragY: integer;
     procedure Drag(x,y: integer);
-    procedure StartDrag(x,y: integer); }
+    procedure StartDrag(x,y: integer);
   public
     constructor Create; override;
     destructor Destroy; override;
@@ -243,14 +243,14 @@ Type
     {assign given element as a child and sets its parent to self}
   {  procedure Grab(Child: DSingleInterfaceElement);
     {}
-    procedure RescaleToChildren(animate: TAnimationStyle);
+    procedure RescaleToChildren(animate: TAnimationStyle);  }
   public
     {returns last call to MouseOverTree result, may be buggy!}
     isMouseOverTree: boolean;
-    {returns self if IAmHere and runs all possible events + scans all children}
+    {returns Self if IAmHere and runs all possible events + scans all children}
     function ifMouseOver(xx,yy: integer; RaiseEvents: boolean; AllTree: boolean): DAbstractElement; override;
     {returns true if mouse is over any "canmouseover" child of this element}
-    function MouseOverTree(xx,yy: integer): boolean; }
+    function MouseOverTree(xx,yy: integer): boolean;
   public
     constructor Create; override;
     destructor Destroy; override;
@@ -818,34 +818,26 @@ end;
 procedure DSingleInterfaceElement.Update;
 begin
   inherited;
-  if Timer.Enabled then Timer.Update;
+  if (Timer<>nil) and (Timer.Enabled) then Timer.Update;
 end;
-
-{----------------------------------------------------------------------------}
-
-{procedure DSingleInterfaceElement.Draw;
-begin
-  Update;
-  if not Visible then Exit;
-end;}
 
 {==============================  Mouse handling =============================}
 
-{function DSingleInterfaceElement.IAmHere(xx,yy: integer): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+function DSingleInterfaceElement.IAmHere(xx,yy: integer): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
   //get current element location... maybe, use not current animation, but "base"? Or completely ignore items being animated?
   GetAnimationState;
-  if (xx >= CurrentAnimationState.x1) and (xx <= CurrentAnimationState.x2) and
-     (yy >= CurrentAnimationState.y1) and (yy <= CurrentAnimationState.y2)
+  if (xx >= Self.x1) and (xx <= Self.x2) and
+     (yy >= Self.y1) and (yy <= Self.y2)
   then
     Result := true
   else
     Result := false;
-end;}
+end;
 
 {-----------------------------------------------------------------------------}
 
-{function DSingleInterfaceElement.ifMouseOver(xx,yy: integer; RaiseEvents: boolean; AllTree: boolean): DAbstractElement;
+function DSingleInterfaceElement.ifMouseOver(xx,yy: integer; RaiseEvents: boolean; AllTree: boolean): DAbstractElement;
 begin
   Result := nil;
   if IAmHere(xx,yy) then begin
@@ -864,9 +856,9 @@ begin
       isMouseOver := false;
     end;
   end;
-end;}
+end;
 
-{function DInterfaceElement.ifMouseOver(xx,yy: integer; RaiseEvents: boolean; AllTree: boolean): DAbstractElement;
+function DInterfaceElement.ifMouseOver(xx,yy: integer; RaiseEvents: boolean; AllTree: boolean): DAbstractElement;
 var i: integer;
     tmpLink: DAbstractElement;
 begin
@@ -881,22 +873,20 @@ begin
       if not AllTree then Break; // if drag-n-drop one is enough
     end;
   end;
-end;}
+end;
 
 {-----------------------------------------------------------------------------}
 
-{procedure DSingleInterfaceElement.StartDrag(x,y: integer);
+procedure DSingleInterfaceElement.StartDrag(x,y: integer);
 begin
   DragX := Base.x1 - x;
   DragY := Base.y1 - y;
-end;}
-
-
-{procedure DSingleInterfaceElement.drag(x,y: integer);
+end;
+procedure DSingleInterfaceElement.Drag(x,y: integer);
 begin
   Base.x1 := DragX + x;
   Base.y1 := DragY + y;
-end;}
+end;
 
 {=============================================================================}
 {=========================== interface element ===============================}
@@ -968,7 +958,7 @@ end;}
 
 {-----------------------------------------------------------------------}
 
-{function DInterfaceElement.MouseOverTree(xx,yy: integer): boolean;
+function DInterfaceElement.MouseOverTree(xx,yy: integer): boolean;
 var tmp: DAbstractElement;
 begin
   // maybe rewrite it using isMouseOver - the idea is still a little different
@@ -979,7 +969,7 @@ begin
     isMouseOverTree := false;
   //base.opacity breaks the algorithm, if transparent item is above (i.e. below) the opaque element
   Result := isMouseOverTree;
-end;}
+end;
 
 end.
 

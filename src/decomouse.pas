@@ -25,8 +25,7 @@ interface
 uses Classes, fgl, SysUtils,
   CastleLog,
   CastleFilesUtils, CastleKeysMouse,
-  DecoInterface, DecoGui{,
-  decoglobal};
+  DecoInterface, DecoGui;
 
 type DTouch = class (TObject)
   FingerIndex: cardinal;
@@ -94,12 +93,12 @@ begin
     until (i>TouchArray.Count-1) or Found;
     WritelnLog('doMouseRelease','Caught mouse release finger='+IntToStr(FingerIndex)+' n='+IntToStr(i));
     if Found then begin
-      {if (TouchArray[i].ClickElement <> nil) then begin
+      if (TouchArray[i].ClickElement <> nil) then begin
         if Assigned(touchArray[i].ClickElement.OnMouseRelease) then
           TouchArray[i].ClickElement.OnMouseRelease(TouchArray[i].ClickElement,TouchArray[i].x0,TouchArray[i].y0);
         if Assigned(TouchArray[i].ClickElement.OnDrop) then
           TouchArray[i].ClickElement.OnDrop(TouchArray[i].ClickElement,TouchArray[i].x0,TouchArray[i].y0);
-      end;}
+      end;
       TouchArray.Remove(TouchArray[i]);
     end else
       WriteLnLog('doMouseRelease','ERROR: Touch event not found!');
@@ -119,13 +118,13 @@ begin
   NewEventTouch := DTouch.Create(Event.Position[0],Event.Position[1],FingerIndex);
 
   //catch the element which has been pressed
-  {tmpLink := GUI.IfMouseOver(Round(Event.Position[0]),Round(Event.Position[1]),true,true);
+  tmpLink := GUI.IfMouseOver(Round(Event.Position[0]),Round(Event.Position[1]),true,true);
   if (tmpLink is DSingleInterfaceElement) then begin
     NewEventTouch.ClickElement := DSingleInterfaceElement(tmpLink);
     if Assigned(NewEventTouch.ClickElement.OnMousePress) then
       NewEventTouch.ClickElement.OnMousePress(tmpLink,Round(Event.Position[0]),Round(Event.Position[1]));
     if NewEventTouch.ClickElement.CanDrag then NewEventTouch.ClickElement.StartDrag(Round(Event.Position[0]),Round(Event.Position[1]));
-  end;}
+  end;
 
   TouchArray.Add(NewEventTouch);
   WriteLnLog('doMousePress','Caught mouse press finger='+IntToStr(FingerIndex));
@@ -177,10 +176,10 @@ begin
      repeat
        if TouchArray[i].FingerIndex = Event.FingerIndex then begin
          TouchArray[i].Update(Event);
-         {if (TouchArray[i].ClickElement<>nil) and (TouchArray[i].ClickElement.CanDrag) then begin
+         if (TouchArray[i].ClickElement<>nil) and (TouchArray[i].ClickElement.CanDrag) then begin
            TouchArray[i].ClickElement.Drag(Round(Event.Position[0]),Round(Event.Position[1]));
            Result := true;
-         end; }
+         end;
          Break;
        end;
        inc(i);

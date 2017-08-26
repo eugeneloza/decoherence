@@ -96,16 +96,6 @@ begin
   end;
   LastRender := DecoNow;
 
-  Case CurrentGameMode of
-    { time flows normally in travel mode }
-    gmTravel: {TimeFlow(TimePassed)};
-    { time stops at softpause }
-    gmBattle: begin
-{                  If not pause then TimeFlow(TimePassed);
-                If not softPause then animations.freeze!}
-              end;
-    else {NOP};//no time flow;
-  end;
 end;
 
 {-------------------------------------------------------------------------}
@@ -129,7 +119,7 @@ end;
   on each Window.Render, so we just need to add a GUI render here }
 Procedure WindowRender(Container : TUIContainer);
 begin
-  //****GUI.draw;
+  GUI.draw;
 end;
 
 {======================== Mouse & keyboard =================================}
@@ -203,9 +193,9 @@ begin
   //this is not needed at the moment, we'll turn here a bit later when implementing drag-n-drop
   //no mouseover is detected if no ifmouseover is run, so should still be here
   if not Dragging then begin
-    {tmpLink := GUI.IfMouseOver(Round(Event.Position[0]),Round(Event.Position[1]),true,true);
+    tmpLink := GUI.IfMouseOver(Round(Event.Position[0]),Round(Event.Position[1]),true,true);
     if tmpLink <> nil then
-      WriteLnLog('doMotion','Motion caught '+tmpLink.ClassName);}
+      WriteLnLog('doMotion','Motion caught '+tmpLink.ClassName);
   end;
 
 end;
@@ -261,8 +251,8 @@ begin
 
   //create GUI
   WritelnLog('ApplicationInitialize','Create interface');
-  //****GUI := DInterfaceContainer.create(Window);
-  //****GUI.Rescale;
+  GUI := DInterfaceContainer.Create;
+  GUI.Rescale;
 
   WritelnLog('ApplicationInitialize','Initialize interface');
   InitLoadScreen;
@@ -271,7 +261,7 @@ begin
   {$IFDEF AllowRescale}window.OnResize := @WindowResize;{$ENDIF}
   window.OnRender := @WindowRender;
 
-  WritelnLog('ApplicationInitialize','Init finished');
+  WriteLnLog('ApplicationInitialize','Init finished');
 
   {$WARNING BUUUUUUUUUUUUUUUUUG!!!!!}
   {$DEFINE NoThreads}
@@ -315,6 +305,7 @@ Initialization
 
 Finalization
   { free all assigned memory }
+  FreeAndNil(GUI);
 
   DestroyCompositeInterface;
   //DestroyGlobal;
