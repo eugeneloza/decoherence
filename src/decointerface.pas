@@ -465,7 +465,10 @@ procedure DAbstractContainer.ToFloat;
 begin
   GetAnchors;
 
-  {...}
+  fx1 := (x1 - ax1 - Anchor[asLeft  ].Gap)/aw;
+  fx2 := (x2 - ax2 + Anchor[asRight ].Gap)/aw;
+  fy1 := (y1 - ay1 - Anchor[asTop   ].Gap)/ah;
+  fy2 := (y2 - ay2 + Anchor[asBottom].Gap)/ah;
 
   fInitialized := true;
 end;
@@ -476,11 +479,10 @@ procedure DAbstractContainer.ToInteger;
 begin
   GetAnchors;
 
-  x1 := ax1 + Round(aScaleX * fx1) + Anchor[asLeft].Gap;
-  x2 := ax2 + Round(aScaleX * fx2) + Anchor[asRight].Gap;
-  y1 := ay1 + Round(aScaleY * fy1) + Anchor[asTop].Gap;
-  y2 := ay2 + Round(aScaleY * fy2) + Anchor[asBottom].Gap;
-
+  x1 := ax1 + Round(aw * fx1) + Anchor[asLeft].Gap;
+  x2 := ax2 + Round(aw * fx2) - Anchor[asRight].Gap;
+  y1 := ay1 + Round(ah * fy1) + Anchor[asTop].Gap;
+  y2 := ay2 + Round(ah * fy2) - Anchor[asBottom].Gap;
 
   w := x2 - x1;
   h := y2 - y1;
