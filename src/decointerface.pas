@@ -43,7 +43,8 @@ Type TAnimationStyle = (asNone, asDefault,
                         asFlyInRight,asFlyOutRight);
 
 type TAnchorSide = (asLeft,asRight,asTop,asBottom);
-type TAnchorAlign = (noalign, haLeft, haRight, haCenter, vaTop, vaBottom, vaMiddle);
+type TAnchorAlign = (noAlign, haLeft, haRight, haCenter, vaTop, vaBottom, vaMiddle);
+type TProportionalScale = (psNone, psWidth, psHeight);
 
 type
   { This is an container with coordinates and size
@@ -55,7 +56,6 @@ type
     fInitialized: boolean;
     { Parent container size (cached) }
     cx1,cx2,cy1,cy2,cw,ch: integer;
-    //aScaleX,aScaleY: float;
     { Determine and cache parent container size }
     procedure GetAnchors;
     { Converts integer size to float. }
@@ -84,7 +84,8 @@ type
     { Opacity of the container }
     Opacity: float;
     { Keep proportions of the container }
-    KeepProportions: boolean;
+    RealWidth, RealHeight: integer;
+    ProportionalScale: TProportionalScale;
     { Is this Container scaled agains Anchors or Window?
       Should be True only at top-level Container (i.e. GUI Container)
       However, maybe, reintroduction or manual scaling would be prefferable? }
@@ -94,15 +95,16 @@ type
     constructor Create;
     //destructor Destroy; override;
     { Copy parameters from the Source }
-    procedure Assign(Source: DAbstractContainer);
-    procedure AssignTo(Dest: DAbstractContainer);
+    procedure Assign(const Source: DAbstractContainer);
+    procedure AssignTo(const Dest: DAbstractContainer);
     { Set container position and size }
-    procedure SetFloatCoord(afx1,afy1,afx2,afy2: float);
-    procedure SetFloatSize(afx1,afy1,afWidth,afHeight: float);
-    procedure SetIntCoord(ax1,ay1,ax2,ay2: integer);
-    procedure SetIntSize(ax1,ay1,aWidth,aHeight: integer);
+    procedure SetFloatCoord(const afx1,afy1,afx2,afy2: float);
+    procedure SetFloatSize(const afx1,afy1,afWidth,afHeight: float);
+    procedure SetIntCoord(const ax1,ay1,ax2,ay2: integer);
+    procedure SetIntSize(const ax1,ay1,aWidth,aHeight: integer);
     { Sets int width/height for scaling animations }
-    procedure SetIntWidthHeight(aWidth,aHeight: integer);
+    procedure SetIntWidthHeight(const aWidth,aHeight: integer);
+    procedure SetRealSize(const aWidth,aHeight: integer);
   end;
 
 type
@@ -131,7 +133,7 @@ Type
     Last, Next: DAbstractContainer;
     fVisible: boolean;
     {$HINT should it set visible to all children? }
-    procedure SetVisible(Value: boolean);
+    procedure SetVisible(const Value: boolean);
   public
     { these values are "strict" and unaffected by animations. Usually determines
       the basic stage and implies image rescale and init GL. }
@@ -154,7 +156,7 @@ Type
     { animates the interface element from current state to base state,
       Important: GetAnimationState must be called before setting basesize
       of the element as AnimateTo uses currentAnimationState}
-    procedure AnimateTo(Animate: TAnimationStyle; Duration: float = DefaultAnimationDuration);
+    procedure AnimateTo(const Animate: TAnimationStyle; const Duration: float = DefaultAnimationDuration);
    constructor Create; virtual;//override;
    destructor Destroy; override;
   end;
@@ -162,7 +164,7 @@ Type
 { Simple procedures for (mouse and time) events }
 //type TSimpleProcedure = procedure(sender: DAbstractElement) of Object;
 type TSimpleProcedure = procedure of Object;
-type TXYProcedure = procedure(Sender: DAbstractElement; x,y: integer) of Object;
+type TXYProcedure = procedure(const Sender: DAbstractElement; const x,y: integer) of Object;
 
 Type
   { A simple time-out mechanisms to preform some timed events on interface
@@ -180,7 +182,7 @@ Type
       onTimer: TSimpleProcedure;
       constructor Create;
       { A simple way to set and run timer }
-      procedure SetTimeOut(Seconds: DTime);
+      procedure SetTimeOut(const Seconds: DTime);
       { Check if the timer finished and run onTimer if true }
       procedure Update;
   end;
@@ -192,7 +194,7 @@ Type
   public
     { A simple timer to fire some event on time-out }
     Timer: DTimer;
-    procedure SetTimeOut(Seconds: DTime);
+    procedure SetTimeOut(const Seconds: DTime);
     procedure Update; override;
     { Higher-level element. Seldomly used in specific cases }
  {   Parent: DSingleInterfaceElement;
@@ -206,9 +208,9 @@ Type
     CanMouseOver: boolean;
     CanDrag: boolean;
     {are these coordinates in this element's box?}
-    function IAmHere(xx,yy: integer): boolean;
+    function IAmHere(const xx,yy: integer): boolean;
     {returns self if IAmHere and runs all possible events}
-    function ifMouseOver(xx,yy: integer; RaiseEvents: boolean; AllTree: boolean): DAbstractElement; virtual;
+    function ifMouseOver(const xx,yy: integer; const  RaiseEvents: boolean; const AllTree: boolean): DAbstractElement; virtual;
   private
     {if mouse is over this element}
     isMouseOver: boolean;
@@ -222,8 +224,8 @@ Type
     {dragg-n-drop routines}
     OnDrop: TXYProcedure;
     DragX, DragY: integer;
-    procedure Drag(x,y: integer);
-    procedure StartDrag(x,y: integer);
+    procedure Drag(const xx,yy: integer);
+    procedure StartDrag(const xx,yy: integer);
   public
     constructor Create; override;
     destructor Destroy; override;
@@ -242,16 +244,16 @@ Type
     procedure Rescale; override;
   public
     {assign given element as a child and sets its parent to self}
-    procedure Grab(Child: DSingleInterfaceElement);
+    procedure Grab(const Child: DSingleInterfaceElement);
     {}
     {procedure RescaleToChildren(animate: TAnimationStyle);  }
   public
     {returns last call to MouseOverTree result, may be buggy!}
     isMouseOverTree: boolean;
     {returns Self if IAmHere and runs all possible events + scans all children}
-    function ifMouseOver(xx,yy: integer; RaiseEvents: boolean; AllTree: boolean): DAbstractElement; override;
+    function ifMouseOver(const xx,yy: integer; const RaiseEvents: boolean; const AllTree: boolean): DAbstractElement; override;
     {returns true if mouse is over any "canmouseover" child of this element}
-    function MouseOverTree(xx,yy: integer): boolean;
+    function MouseOverTree(const xx,yy: integer): boolean;
   public
     constructor Create; override;
     destructor Destroy; override;
@@ -282,7 +284,7 @@ begin
     gap := 0;
   end;
   Opacity := 1;
-  KeepProportions := false;
+  ProportionalScale := psNone;
 end;
 
 {destructor DAbstractContainer.Destroy;
@@ -337,6 +339,7 @@ begin
   ch := cy2-cy1;
   {aScaleX := 1/aw;
   aScaleY := 1/ah;}
+
 end;
 
 {----------------------------------------------------------------------------}
@@ -356,6 +359,7 @@ end;
 {----------------------------------------------------------------------------}
 
 procedure DAbstractContainer.FloatToInteger;
+var Ratio: float;
 begin
   GetAnchors;
 
@@ -367,12 +371,26 @@ begin
   w := x2 - x1;
   h := y2 - y1;
 
+  {inefficient}
+  case ProportionalScale of
+    psWidth:  begin
+                Ratio := RealWidth/RealHeight;
+                w := Round(h*Ratio);
+                x2 := x1 + w;
+              end;
+    psHeight: begin
+                Ratio := RealHeight/RealWidth;
+                h := Round(w*Ratio);
+                y2 := y1 + h;
+              end;
+  end;
+
   fInitialized := true;
 end;
 
 {----------------------------------------------------------------------------}
 
-procedure DAbstractContainer.SetFloatCoord(afx1,afy1,afx2,afy2: float);
+procedure DAbstractContainer.SetFloatCoord(const afx1,afy1,afx2,afy2: float);
 begin
   fx1 := afx1;
   fy1 := afy1;
@@ -381,7 +399,7 @@ begin
 
   FloatToInteger;
 end;
-procedure DAbstractContainer.SetFloatSize(afx1,afy1,afWidth,afHeight: float);
+procedure DAbstractContainer.SetFloatSize(const afx1,afy1,afWidth,afHeight: float);
 begin
   fx1 := afx1;
   fy1 := afy1;
@@ -390,7 +408,7 @@ begin
 
   FloatToInteger;
 end;
-procedure DAbstractContainer.SetIntCoord(ax1,ay1,ax2,ay2: integer);
+procedure DAbstractContainer.SetIntCoord(const ax1,ay1,ax2,ay2: integer);
 begin
   x1 := ax1;
   y1 := ay1;
@@ -399,7 +417,7 @@ begin
 
   IntegerToFloat;
 end;
-procedure DAbstractContainer.SetIntSize(ax1,ay1,aWidth,aHeight: integer);
+procedure DAbstractContainer.SetIntSize(const ax1,ay1,aWidth,aHeight: integer);
 begin
   x1 := ax1;
   y1 := ay1;
@@ -411,7 +429,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DAbstractContainer.SetIntWidthHeight(aWidth,aHeight: integer);
+procedure DAbstractContainer.SetIntWidthHeight(const aWidth,aHeight: integer);
 begin
   x1 := x1 + (w-aWidth) div 2;
   x2 := x2 - (w-aWidth) div 2;
@@ -426,7 +444,15 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DAbstractContainer.Assign(Source: DAbstractContainer);
+procedure DAbstractContainer.SetRealSize(const aWidth,aHeight: integer);
+begin
+  RealWidth := aWidth;
+  RealHeight := aHeight;
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DAbstractContainer.Assign(const Source: DAbstractContainer);
 var aa: TAnchorSide;
 begin
   Self.fx1 := Source.fx1;
@@ -441,13 +467,15 @@ begin
   Self.y2 := Source.y2;
   Self.w := Source.w;
   Self.h := Source.h;
+  Self.RealWidth := Source.RealWidth;
+  Self.RealHeight := Source.RealHeight;
   Self.Opacity := Source.Opacity;
-  Self.KeepProportions := Source.KeepProportions;
+  Self.ProportionalScale := Source.ProportionalScale;
   Self.fInitialized := Source.isInitialized;
   for aa in TAnchorSide do
     Self.Anchor[aa] := Source.Anchor[aa];
 end;
-procedure DAbstractContainer.AssignTo(Dest: DAbstractContainer);
+procedure DAbstractContainer.AssignTo(const Dest: DAbstractContainer);
 var aa: TAnchorSide;
 begin
   Dest.fx1 := Self.fx1;
@@ -462,8 +490,10 @@ begin
   Dest.y2 := Self.y2;
   Dest.w := Self.w;
   Dest.h := Self.h;
+  Dest.RealWidth := Self.RealWidth;
+  Dest.RealHeight := Self.RealHeight;
   Dest.Opacity := Self.Opacity;
-  Dest.KeepProportions := Self.KeepProportions;
+  Dest.ProportionalScale := Self.ProportionalScale;
   Dest.fInitialized := Self.isInitialized;
   for aa in TAnchorSide do
     Dest.Anchor[aa] := Self.Anchor[aa];
@@ -483,14 +513,14 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DAbstractElement.SetVisible(Value: boolean);
+procedure DAbstractElement.SetVisible(const Value: boolean);
 begin
   fVisible := Value;
 end;
 
 {----------------------------------------------------------------------------}
 
-procedure DAbstractElement.AnimateTo(Animate: TAnimationStyle; Duration: float = DefaultAnimationDuration);
+procedure DAbstractElement.AnimateTo(const Animate: TAnimationStyle; const Duration: float = DefaultAnimationDuration);
 var mx,my: float;
 begin
   if Animate = asNone then Exit else begin
@@ -564,8 +594,8 @@ end;
 
 {----------------------------------------------------------------------------}
 
-{procedure DAbstractElement.SetBaseSize(const NewX,NewY,NewW,NewH,NewO: float; Animate: TAnimationStyle);
-begin
+{procedure DAbstractElement.SetBaseSize(const NewX,NewY,NewW,NewH, float; const Animate: TAnimationStyle);
+begin                                                                                     NewO:
   GetAnimationState;
   Base.setsize(NewX,NewY,NewW,NewH);
   Base.opacity := NewO;
@@ -575,7 +605,7 @@ end;}
 
 {----------------------------------------------------------------------------}
 
-{procedure DAbstractElement.SetIntSize(const x1,y1,x2,y2:integer; Animate: TAnimationStyle);
+{procedure DAbstractElement.SetIntSize(const x1,y1,x2,y2:integer; const Animate: TAnimationStyle);
 begin
   GetAnimationState;
   Base.BackwardSetXYWH(x1,y1,x2-x1,y2-y1);
@@ -585,7 +615,7 @@ end;}
 
 {----------------------------------------------------------------------------}
 
-{procedure DSingleInterfaceElement.SetBaseSize(const NewX,NewY,NewW,NewH,NewO: float; Animate: TAnimationStyle);
+{procedure DSingleInterfaceElement.SetBaseSize(const NewX,NewY,NewW,NewH,NewO: float; const Animate: TAnimationStyle);
 begin
   inherited SetBaseSize(NewX,NewY,NewW,NewH,NewO,Animate);
   ResetContentSize(Animate);
@@ -593,7 +623,7 @@ end;}
 
 {----------------------------------------------------------------------------}
 
-{procedure DSingleInterfaceElement.SetIntsize(const x1,y1,x2,y2:integer; Animate: TAnimationStyle);
+{procedure DSingleInterfaceElement.SetIntsize(const x1,y1,x2,y2:integer; const Animate: TAnimationStyle);
 begin
   inherited SetIntsize(x1,y1,x2,y2,Animate);
   ResetContentSize(Animate);
@@ -698,7 +728,7 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-procedure DTimer.SetTimeout(Seconds: DTime);
+procedure DTimer.SetTimeout(const Seconds: DTime);
 begin
   StartTime := -1;
   Enabled := true;
@@ -725,7 +755,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DSingleInterfaceElement.SetTimeOut(Seconds: DTime);
+procedure DSingleInterfaceElement.SetTimeOut(const Seconds: DTime);
 begin
   if Timer = nil then Timer := DTimer.Create;
   Timer.SetTimeOut(Seconds);
@@ -741,7 +771,7 @@ end;
 
 {==============================  Mouse handling =============================}
 
-function DSingleInterfaceElement.IAmHere(xx,yy: integer): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+function DSingleInterfaceElement.IAmHere(const xx,yy: integer): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
   //get current element location... maybe, use not current animation, but "base"? Or completely ignore items being animated?
   GetAnimationState;
@@ -755,7 +785,7 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-function DSingleInterfaceElement.ifMouseOver(xx,yy: integer; RaiseEvents: boolean; AllTree: boolean): DAbstractElement;
+function DSingleInterfaceElement.ifMouseOver(const xx,yy: integer; const RaiseEvents: boolean; const AllTree: boolean): DAbstractElement;
 begin
   Result := nil;
   if IAmHere(xx,yy) then begin
@@ -776,7 +806,7 @@ begin
   end;
 end;
 
-function DInterfaceElement.ifMouseOver(xx,yy: integer; RaiseEvents: boolean; AllTree: boolean): DAbstractElement;
+function DInterfaceElement.ifMouseOver(const xx,yy: integer; const RaiseEvents: boolean; const AllTree: boolean): DAbstractElement;
 var i: integer;
     tmpLink: DAbstractElement;
 begin
@@ -795,15 +825,15 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-procedure DSingleInterfaceElement.StartDrag(x,y: integer);
+procedure DSingleInterfaceElement.StartDrag(const xx,yy: integer);
 begin
-  DragX := Base.x1 - x;
-  DragY := Base.y1 - y;
+  DragX := Base.x1 - xx;
+  DragY := Base.y1 - yy;
 end;
-procedure DSingleInterfaceElement.Drag(x,y: integer);
+procedure DSingleInterfaceElement.Drag(const xx,yy: integer);
 begin
-  Base.x1 := DragX + x;
-  Base.y1 := DragY + y;
+  Base.x1 := DragX + xx;
+  Base.y1 := DragY + yy;
 end;
 
 {=============================================================================}
@@ -845,7 +875,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DInterfaceElement.Grab(Child: DSingleInterfaceElement);
+procedure DInterfaceElement.Grab(const Child: DSingleInterfaceElement);
 begin
   Children.Add(Child);
   //if (Child is DSingleInterfaceElement) then DSingleInterfaceElement(Child).Parent := Self; //not sure about this line
@@ -854,7 +884,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-{procedure DInterfaceElement.RescaleToChildren(Animate: TAnimationStyle);
+{procedure DInterfaceElement.RescaleToChildren(const Animate: TAnimationStyle);
 var i: integer;
     x1,y1,x2,y2: integer;
 begin
@@ -876,7 +906,7 @@ end;}
 
 {-----------------------------------------------------------------------}
 
-function DInterfaceElement.MouseOverTree(xx,yy: integer): boolean;
+function DInterfaceElement.MouseOverTree(const xx,yy: integer): boolean;
 var tmp: DAbstractElement;
 begin
   // maybe rewrite it using isMouseOver - the idea is still a little different
