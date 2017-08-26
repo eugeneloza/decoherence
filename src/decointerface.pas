@@ -120,7 +120,7 @@ Type
     { changes the scale of the element relative to current window size }
     procedure Rescale; virtual;
     { draw the element / as abstract as it might be :) }
-    procedure Draw; virtual; abstract;
+    procedure Draw; virtual;
     { updates the data of the class with current external data,
       here it just gets the current animation state }
     procedure Update; virtual;
@@ -148,7 +148,7 @@ Type
       and initGL will occur as they would normally. BUT if assigned to a
       composite parent element, its children WILL NOT do anything like this and
       will be frozen until visible=true. Maybe I'll fix this some day. }
-    property Visible: boolean read fVisible write SetVisible;
+    property isVisible: boolean read fVisible write SetVisible;
     { animates the interface element from current state to base state,
       Important: GetAnimationState must be called before setting basesize
       of the element as AnimateTo uses currentAnimationState}
@@ -185,16 +185,16 @@ Type
   end;
 
 Type
-  { Fully-featured Interface Element with Mouse/Touch support }
+  { Fully-featured Interface Element with Mouse/Touch support
+    It lacks only "Children" to be used }
   DSingleInterfaceElement = class abstract(DAbstractElement)
   public
     {a simple timer to fire some event on time-out}
     Timer: DTimer;
     procedure SetTimeOut(Seconds: DTime);
+    procedure Update; override;
     {Higher-level element. Seldomly used in specific cases}
  {   Parent: DSingleInterfaceElement;
-    procedure Draw; override;
-    procedure Rescale; override;
     //also resizes content and frame
     procedure SetBaseSize(const NewX,NewY,NewW,NewH,NewO: float; Animate: TAnimationStyle); override;
     procedure SetIntSize(const x1,y1,x2,y2:integer; Animate: TAnimationStyle); override;
@@ -213,14 +213,14 @@ Type
     isMouseOver: boolean;
   public
     {events}
- {   OnMouseEnter: TXYProcedure;
+    OnMouseEnter: TXYProcedure;
     OnMouseLeave: TXYProcedure;
     OnMouseOver: TXYProcedure;
     OnMousePress: TXYProcedure;
     OnMouseRelease: TXYProcedure;
     {dragg-n-drop routines}
     OnDrop: TXYProcedure;
-    DragX, DragY: integer;
+ {   DragX, DragY: integer;
     procedure Drag(x,y: integer);
     procedure StartDrag(x,y: integer); }
   public
@@ -234,18 +234,14 @@ Type
   {An interface element, that can contain "children"}
   DInterfaceElement = class(DSingleInterfaceElement)
   public
-    {if the interface element rescales each time children rescale}
- {   ScaleToChildren: boolean;
+
     {list of the children of this interface element}
     Children: DInterfaceElementsList;
     procedure Draw; override;
-    constructor Create(AOwner: TComponent); override;
-    destructor Destroy; override;
     procedure Rescale; override;
-    procedure Update; override;
   public
     {assign given element as a child and sets its parent to self}
-    procedure Grab(Child: DSingleInterfaceElement);
+  {  procedure Grab(Child: DSingleInterfaceElement);
     {}
     procedure RescaleToChildren(animate: TAnimationStyle);
   public
@@ -255,6 +251,9 @@ Type
     function ifMouseOver(xx,yy: integer; RaiseEvents: boolean; AllTree: boolean): DAbstractElement; override;
     {returns true if mouse is over any "canmouseover" child of this element}
     function MouseOverTree(xx,yy: integer): boolean; }
+  public
+    constructor Create; override;
+    destructor Destroy; override;
   end;
 
 {Var {simple outline around black box}
@@ -720,9 +719,19 @@ begin
    //Self.fInitialized := false;
 end;
 
+{----------------------------------------------------------------------------}
+
 procedure DAbstractElement.Update;
 begin
   GetAnimationState;
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DAbstractElement.Draw;
+begin
+  Update;
+  if not isVisible then Exit;
 end;
 
 {----------------------------------------------------------------------------}
@@ -780,19 +789,6 @@ end;
 
 {============================================================================}
 
-{procedure DSingleInterfaceElement.Rescale;
-begin
-  {$WARNING Memory Leak here}
-  if Frame <> nil then FrameResize3x3;
-  if Content <> nil then begin
-    //content.base.copyxywh(base);
-    //content.base.SubstractFrame(frame,2);
-    Content.Rescale;   //todo
-  end;
-end;}
-
-{----------------------------------------------------------------------------}
-
 constructor DSingleInterfaceElement.Create;
 begin
   inherited;
@@ -819,13 +815,21 @@ end;
 
 {----------------------------------------------------------------------------}
 
+procedure DSingleInterfaceElement.Update;
+begin
+  inherited;
+  if Timer.Enabled then Timer.Update;
+end;
+
+{----------------------------------------------------------------------------}
+
 {procedure DSingleInterfaceElement.Draw;
 begin
   Update;
   if not Visible then Exit;
 end;}
 
-{========== Abstract intarface element : Mouse handling =====================}
+{==============================  Mouse handling =============================}
 
 {function DSingleInterfaceElement.IAmHere(xx,yy: integer): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
@@ -898,52 +902,38 @@ end;}
 {=========================== interface element ===============================}
 {=============================================================================}
 
+constructor DInterfaceElement.Create;
+begin
+  inherited;
+  Children := DInterfaceElementsList.Create(true);
+end;
 
+{----------------------------------------------------------------------------}
 
-{-----------------------------------------------------------------------------}
+destructor DInterfaceElement.Destroy;
+begin
+  //this should fire as recoursive because children owns elements, which in turn will fire their destructors onfree
+  FreeAndNil(Children);
+  inherited;
+end;
 
-{procedure DInterfaceElement.Rescale;
+{----------------------------------------------------------------------------}
+
+procedure DInterfaceElement.Rescale;
 var i: integer;
 begin
   inherited;
-  //{$WARNING Memory Leak here}
   for i:=0 to Children.Count-1 do Children[i].Rescale;
-end;}
+end;
 
 {-----------------------------------------------------------------------------}
 
-{procedure DInterfaceElement.Update;
-begin
-  inherited;
-  if Timer.Enabled then Timer.Update;
-end; }
-
-{-----------------------------------------------------------------------------}
-
-{constructor DInterfaceElement.Create(AOwner: TComponent);
-begin
-  inherited Create(AOwner);
-  if AOwner is DSingleInterfaceElement then Parent := DSingleInterfaceElement(AOwner);
-  ScaleToChildren := false;
-  Children := DInterfaceElementsList.Create(true);
-end;}
-
-{----------------------------------------------------------------------------}
-
-{destructor DInterfaceElement.Destroy;
-begin
-  FreeAndNil(Children);   //this should fire as recoursive because children owns elements, which in turn will fire their destructors onfree
-  inherited;
-end;}
-
-{----------------------------------------------------------------------------}
-
-{procedure DInterfaceElement.Draw;
+procedure DInterfaceElement.Draw;
 var i: integer;
 begin
   inherited;
   for i := 0 to Children.Count-1 do Children[i].Draw;
-end;}
+end;
 
 {----------------------------------------------------------------------------}
 
