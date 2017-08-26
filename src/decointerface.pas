@@ -24,7 +24,7 @@ interface
 
 uses
   Classes, fgl,
-  CastleVectors, CastleImages, CastleGLImages,
+  {CastleVectors, }CastleImages, CastleGLImages,
   DecoGlobal, DecoTime;
 
 const InterfaceScalingMethod: TResizeInterpolation = riBilinear;  //to quickly change it. Maybe will be a variable some day to support older PCs.
@@ -118,7 +118,7 @@ type
 Type
   { most abstract container for interface elements
     Defines size, scaling and animation state }
-  DAbstractElement = class abstract(DAbstractContainer)
+  DAbstractElement = class abstract(TObject)
   strict protected
     { Caches current animation state, recalculated by GetAnimationState at every render}
     procedure GetAnimationState;
@@ -143,7 +143,7 @@ Type
     AnimationDuration: DTime;
     AnimationCurve: TAnimationCurve;
     {base state of the element. contains its coordinates and width/height}
-    Base: DAbstractContainer;
+    Current, Base: DAbstractContainer;
     {source width/height of the element. Used to preserve proportions while scaling}
 
     procedure SetBaseSize(const NewX,NewY,NewW,NewH,NewO: float; const Animate: TAnimationStyle = asNone); virtual;
@@ -547,7 +547,7 @@ begin
     AnimationDuration := Duration;
 
     GetAnimationState;
-    Last.Assign(Self);   //to current animation state
+    Last.Assign(Current);   //to current animation state
     Next.Assign(Base);
     case Animate of
       {just grabs some previous locations and animates the item from there to base
@@ -661,22 +661,22 @@ begin
         //acLinear: ; //<- change nothing.
         acSquare: if Phase<0.5 then Phase := Sqr(2*Phase)/2 else Phase := 1 - Sqr(2*(1-Phase))/2;
       end;
-      Self.x1 := Last.x1+Round((Next.x1-Last.x1)*Phase);
-      Self.y1 := Last.y1+Round((Next.y1-Last.y1)*Phase);
-      Self.x2 := Last.x2+Round((Next.x2-Last.x2)*Phase);
-      Self.y2 := Last.y2+Round((Next.y2-Last.y2)*Phase);
-      Self.Opacity := Last.Opacity+((Next.opacity-Last.Opacity)*Phase);
+      Current.x1 := Last.x1+Round((Next.x1-Last.x1)*Phase);
+      Current.y1 := Last.y1+Round((Next.y1-Last.y1)*Phase);
+      Current.x2 := Last.x2+Round((Next.x2-Last.x2)*Phase);
+      Current.y2 := Last.y2+Round((Next.y2-Last.y2)*Phase);
+      Current.Opacity := Last.Opacity+((Next.opacity-Last.Opacity)*Phase);
       //we don't need scale back to float, as it's not a basic animation state
     end else begin
       {should be "next" here}
-      Self.x1 := Base.x1;
-      Self.x2 := Base.x2;
-      Self.y1 := Base.y1;
-      Self.y2 := Base.y2;
-      Self.Opacity := Base.Opacity;
+      Current.x1 := Base.x1;
+      Current.x2 := Base.x2;
+      Current.y1 := Base.y1;
+      Current.y2 := Base.y2;
+      Current.Opacity := Base.Opacity;
     end;
-    Self.w := Self.x2 - Self.x1;
-    Self.h := Self.y2 - Self.y1;
+    Current.w := Current.x2 - Current.x1;
+    Current.h := Current.y2 - Current.y1;
     //Self.fInitialized := true;
  end else
    //Self.fInitialized := false;
@@ -707,15 +707,17 @@ begin
   Base := DAbstractContainer.Create;
   Last := DAbstractContainer.Create;
   Next := DAbstractContainer.Create;
+  Current := DAbstractContainer.Create;
 end;
 
 {----------------------------------------------------------------------------}
 
 destructor DAbstractElement.Destroy;
 begin
-  freeandnil(Base);
-  freeandnil(Last);
-  freeandnil(Next);
+  FreeAndNil(Base);
+  FreeAndNil(Last);
+  FreeAndNil(Next);
+  FreeAndNIl(Current);
   inherited;
 end;
 
@@ -788,10 +790,8 @@ end;
 
 function DSingleInterfaceElement.IAmHere(const xx,yy: integer): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
-  //get current element location... maybe, use not current animation, but "base"? Or completely ignore items being animated?
-  GetAnimationState;
-  if (xx >= Self.x1) and (xx <= Self.x2) and
-     (yy >= Self.y1) and (yy <= Self.y2)
+  if (xx >= base.x1) and (xx <= base.x2) and
+     (yy >= base.y1) and (yy <= base.y2)
   then
     Result := true
   else
