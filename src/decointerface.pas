@@ -42,6 +42,34 @@ Type TAnimationStyle = (asNone, asDefault,
                         asFlyInLeft,asFlyOutLeft,
                         asFlyInRight,asFlyOutRight);
 
+type TAnchorSide = (asLeft,asRight,asTop,asBottom);
+type TAnchorAlign = (noalign, haLeft, haRight, haCenter, vaTop, vaBottom, vaMiddle);
+
+type
+  DAbstractContainer = class abstract(TObject)
+  strict private
+    {container size}
+    ax1,ax2,ay1,ay2: integer;
+    procedure GetAnchors;
+    { Converts float to integer and vice versa. }
+    //procedure ToFloat;
+    //procedure ToInteger;
+  public
+    type
+      DAnchor = record
+        Anchor: DAbstractContainer;
+        Align: TAnchorAlign;
+      end;
+  public
+    Anchor: array[TAnchorSide] of DAnchor;
+  public
+    fx,fy,fw,fh: float;
+    x1,y1,x2,y2,w,h: integer;
+    Opacity: float;
+  end;
+
+
+
 {Type
  { Several types of frames, including with captions }
  DFrame = class(TComponent)
@@ -368,8 +396,55 @@ begin
 end;}
 
 {=============================================================================}
-{=========================== Abstract element ================================}
+{========================== Abstract container ===============================}
 {=============================================================================}
+
+{constructor DAbstractContainer.Create;
+begin
+  //inherited;
+end;
+
+destructor DAbstractContainer.Destroy;
+begin
+  inherited;
+end;}
+
+procedure DAbstractContainer.GetAnchors;
+begin
+  if (Anchor[asLeft].Anchor = nil) or
+     (Anchor[asTop].Anchor = nil) or
+     (Anchor[asRight].Anchor = nil) or
+     (Anchor[asBottom].Anchor = nil) then begin
+       WriteLnLog('DAbstractContainer.GetAnchors','Anchor is Nil!');
+       Exit;
+     end;
+
+  case Anchor[asLeft].Align of
+    haLeft:   ax1 := Anchor[asLeft].Anchor.x1;
+    haRight:  ax1 := Anchor[asLeft].Anchor.x2;
+    haCenter: ax1 := (Anchor[asLeft].Anchor.x1 + Anchor[asLeft].Anchor.x2) div 2;
+    else WriteLnLog('DAbstractContainer.GetAnchors','Invalid Anchor align!')
+  end;
+  case Anchor[asRight].Align of
+    haLeft:   ax2 := Anchor[asRight].Anchor.x1;
+    haRight:  ax2 := Anchor[asRight].Anchor.x2;
+    haCenter: ax2 := (Anchor[asRight].Anchor.x1 + Anchor[asRight].Anchor.x2) div 2;
+    else WriteLnLog('DAbstractContainer.GetAnchors','Invalid Anchor align!')
+  end;
+  case Anchor[asTop].Align of
+    vaTop:    ay1 := Anchor[asTop].Anchor.y1;
+    vaBottom: ay1 := Anchor[asTop].Anchor.y2;
+    vaMiddle: ay1 := (Anchor[asTop].Anchor.y1 + Anchor[asTop].Anchor.y2) div 2;
+    else WriteLnLog('DAbstractContainer.GetAnchors','Invalid Anchor align!')
+  end;
+  case Anchor[asBottom].Align of
+    vaTop:    ay2 := Anchor[asBottom].Anchor.y1;
+    vaBottom: ay2 := Anchor[asBottom].Anchor.y2;
+    vaMiddle: ay2 := (Anchor[asBottom].Anchor.y1 + Anchor[asBottom].Anchor.y2) div 2;
+    else WriteLnLog('DAbstractContainer.GetAnchors','Invalid Anchor align!')
+  end;
+end;
+
 
 
 {constructor Txywh.Create(AOwner: TComponent);
