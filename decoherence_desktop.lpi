@@ -4,6 +4,7 @@
     <Version Value="10"/>
     <General>
       <Flags>
+        <MainUnitHasUsesSectionForAllUnits Value="False"/>
         <MainUnitHasCreateFormStatements Value="False"/>
         <MainUnitHasTitleStatement Value="False"/>
       </Flags>
@@ -106,7 +107,7 @@
         <PackageName Value="castle_base"/>
       </Item2>
     </RequiredPackages>
-    <Units Count="41">
+    <Units Count="42">
       <Unit0>
         <Filename Value="decoherence_desktop.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -295,6 +296,11 @@
         <Filename Value="src/version.inc"/>
         <IsPartOfProject Value="True"/>
       </Unit40>
+      <Unit41>
+        <Filename Value="src/decointerfaceloader.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoInterfaceLoader"/>
+      </Unit41>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

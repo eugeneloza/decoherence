@@ -39,7 +39,7 @@ uses Classes, SysUtils,
      DecoLevel, DecoAbstractWorld,
      DecoSound,
      DecoLoadScreen, DecoPerks, DecoBody,
-     DecoInterfaceComposite,
+     DecoInterfaceLoader,
      DecoPlayerCharacter, DecoLoad3d,
      DecoNavigation, DecoGlobal, DecoTranslation, DecoGamemode, DecoTime;
 

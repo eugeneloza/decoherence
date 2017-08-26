@@ -46,8 +46,10 @@ type TAnchorSide = (asLeft,asRight,asTop,asBottom);
 type TAnchorAlign = (noalign, haLeft, haRight, haCenter, vaTop, vaBottom, vaMiddle);
 
 type
-  { This is an abstract container with coordinates and size
-    Capable of rescaling / copying itself }
+  { This is an container with coordinates and size
+    Capable of rescaling / copying itself
+    As abstract as it seems, it's also used as animation state,
+    So, constructing it as standalone should be possible }
   DAbstractContainer = class(TObject)
   strict private
     fInitialized: boolean;
@@ -110,8 +112,8 @@ type
   TAnimationCurve = (acsLinear, acSquare);
 
 Type
-  { most abstract container suitable for images, labels and interface elements
-    Just defines the box and rescaling }
+  { most abstract container for interface elements
+    Defines size, scaling and animation state }
   DAbstractElement = class abstract(DAbstractContainer)
   strict protected
     { Caches current animation state, recalculated by GetAnimationState at every render}
@@ -163,37 +165,36 @@ type TSimpleProcedure = procedure of Object;
 type TXYProcedure = procedure(Sender: DAbstractElement; x,y: integer) of Object;
 
 Type
-  { a simple time-out mechanisms to preform some timed events on interface
-    elements /
-    maybe should be just a few additional routines at the parent class}
+  { A simple time-out mechanisms to preform some timed events on interface
+    elements }
   DTimer = class(TObject)
     private
-      {set automatically, date of the timer count start}
+      { Set automatically, date of the timer count start }
       StartTime: DTime;
     public
-      {if the timer is running}
+      { If the timer is running }
       Enabled: boolean;
-      {how long (in seconds) will it take the timer to fire}
+      { How long (in seconds) will it take the timer to fire }
       Interval: DTime;
-      {action to preform}
+      { Action to preform }
       onTimer: TSimpleProcedure;
       constructor Create;
-      {a simple way to set and run timer}
+      { A simple way to set and run timer }
       procedure SetTimeOut(Seconds: DTime);
-      {check if the timer finished and run onTimer if true}
+      { Check if the timer finished and run onTimer if true }
       procedure Update;
   end;
 
 Type
   { Fully-featured Interface Element with Mouse/Touch support
-    It lacks only "Children" to be used }
+    It lacks only "Children" or specific "Draw" to be used }
   DSingleInterfaceElement = class abstract(DAbstractElement)
   public
-    {a simple timer to fire some event on time-out}
+    { A simple timer to fire some event on time-out }
     Timer: DTimer;
     procedure SetTimeOut(Seconds: DTime);
     procedure Update; override;
-    {Higher-level element. Seldomly used in specific cases}
+    { Higher-level element. Seldomly used in specific cases }
  {   Parent: DSingleInterfaceElement;
     //also resizes content and frame
     procedure SetBaseSize(const NewX,NewY,NewW,NewH,NewO: float; Animate: TAnimationStyle); override;
@@ -241,9 +242,9 @@ Type
     procedure Rescale; override;
   public
     {assign given element as a child and sets its parent to self}
-  {  procedure Grab(Child: DSingleInterfaceElement);
+    procedure Grab(Child: DSingleInterfaceElement);
     {}
-    procedure RescaleToChildren(animate: TAnimationStyle);  }
+    {procedure RescaleToChildren(animate: TAnimationStyle);  }
   public
     {returns last call to MouseOverTree result, may be buggy!}
     isMouseOverTree: boolean;
@@ -256,96 +257,13 @@ Type
     destructor Destroy; override;
   end;
 
-{Var {simple outline around black box}
-    //SimpleFrame,
-    {a frame with 19px header}
-    //CaptionFrame,
-    {Just black background with no frame}
-    BlackFrame: DFrame;    }
+{contains global list of all interface elements // not needed yet}
+//var InterfaceList: DInterfaceElementsList;
 
-    {contains global list of all interface elements // not needed yet}
-    //InterfaceList: DInterfaceElementsList;
-
-    {this is a thrash can for interface elements to dispose them off safely
-     after "suicide animation" has finished}
-    //GarbageThrash: DInterfaceElementsList;
-
-{initializes "burner" image to bake some pattern over the interface images,
- mostly used for frames}
-//procedure Init_burner_image;
-{reads some interface-related data, like loading frames images}
-procedure InitInterface;
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
-uses SysUtils, CastleLog, castleFilesUtils,
-  DecoGui {this is horrible},
-  DecoInterfaCecomposite, DecoInputOutput;
-
-{-------------------- BURNER IMAGE --------------------------------------------}
-
-(*var BURNER_IMAGE_UNSCALED,BURNER_IMAGE:TCastleImage;  //todo: not freed automatically!!!!
-procedure Init_burner_image;
-begin
-  {$IFNDEF AllowRescale}if BURNER_IMAGE<>nil then exit;{$ENDIF}
-  WriteLnLog('Init_burner_image','started');
-  if BURNER_IMAGE_UNSCALED = nil then
-    BURNER_IMAGE_UNSCALED := LoadImageSafe(ApplicationData(InterfaceFolder+'burner/burner_Pattern_203_CC0_by_Nobiax_diffuse.png'), [TRGBImage]) as TRGBImage;
-  if (BURNER_IMAGE=nil) or (BURNER_IMAGE.height <> window.height) or (BURNER_IMAGE.width <> window.width) then begin
-    FreeAndNil(BURNER_IMAGE);
-    BURNER_IMAGE := BURNER_IMAGE_UNSCALED.MakeCopy;
-    BURNER_IMAGE.Resize(window.width, window.height, riBilinear);
-  end;
-  {$IFNDEF AllowRescale}FreeAndNil(BURNER_IMAGE_UNSCALED);{$ENDIF}
-
-  WriteLnLog('Init_burner_image','finished');
-end; *)
-
-{-------------------- INIT INTERFACE ------------------------------------------}
-
-procedure InitInterface;
-begin
-  WriteLnLog('InitInterface','started');
-  //Init_burner_image;
-
-{  SimpleFrame := DFrame.create(Window);
-  with SimpleFrame do begin
-    SourceImage := LoadImageSafe(ApplicationData(FramesFolder+'frame.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
-    cornerTop := 1; CornerBottom := 1; cornerLeft := 1; CornerRight := 1;
-  end;
-
-  CaptionFrame := DFrame.create(Window);
-  with CaptionFrame do begin
-    SourceImage := LoadImageSafe(ApplicationData(FramesFolder+'frame_caption.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
-    cornerTop := 19; CornerBottom := 1; cornerLeft := 1; CornerRight := 1;            //todo: variable top line!
-  end;    }
-
-  {BlackFrame := DFrame.Create(Window);
-  with BlackFrame do begin
-    SourceImage := LoadImageSafe(ApplicationData(FramesFolder+'blackframe.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
-    CornerTop := 0; CornerBottom := 0; CornerLeft := 0; CornerRight := 0;
-  end;}
-
-  InitCompositeInterface;
-
-  //InterfaceList := DInterfaceElementsList.create(false);
-
-  WriteLnLog('InitInterface','finished');
-end;
-
-{=============================================================================}
-
-{constructor DFrame.Create(AOwner: TComponent);
-begin
-  inherited Create(AOwner);
-  Rectagonal := true;
-end;}
-
-{destructor DFrame.Destroy;
-begin
-  FreeAndNil(SourceImage);
-  inherited;
-end;}
+uses SysUtils, CastleLog;
 
 {=============================================================================}
 {========================== Abstract Container ===============================}
@@ -927,12 +845,12 @@ end;
 
 {----------------------------------------------------------------------------}
 
-{procedure DInterfaceElement.Grab(Child: DSingleInterfaceElement);
+procedure DInterfaceElement.Grab(Child: DSingleInterfaceElement);
 begin
   Children.Add(Child);
-  if (Child is DSingleInterfaceElement) then DSingleInterfaceElement(Child).Parent := Self; //not sure about this line
+  //if (Child is DSingleInterfaceElement) then DSingleInterfaceElement(Child).Parent := Self; //not sure about this line
   //{Child.ID := }InterfaceList.Add(Child); //global ID of the element
-end;}
+end;
 
 {----------------------------------------------------------------------------}
 

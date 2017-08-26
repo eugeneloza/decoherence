@@ -185,6 +185,19 @@ begin
 end;
 
 
+
+{constructor DFrame.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  Rectagonal := true;
+end;}
+
+{destructor DFrame.Destroy;
+begin
+  FreeAndNil(SourceImage);
+  inherited;
+end;}
+
 {procedure DSingleInterfaceElement.FrameResize3x3;
 var ScaledImageParts: array [0..2,0..2] of TCastleImage;
     ix,iy: integer;
