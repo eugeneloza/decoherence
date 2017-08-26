@@ -26,6 +26,8 @@ uses Classes,
   DecoInterface, DecoActor,
   DecoGlobal, DecoTime;
 
+const InterfaceScalingMethod: TResizeInterpolation = riBilinear;  //to quickly change it. Maybe will be a variable some day to support older PCs.
+
 type
   { General routines shared by images and labels }
   DAbstractImage = class(DAbstractElement)

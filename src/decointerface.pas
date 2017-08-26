@@ -23,11 +23,8 @@ unit DecoInterface;
 interface
 
 uses
-  Classes, fgl,
-  {CastleVectors, }CastleImages, CastleGLImages,
+  fgl,
   DecoGlobal, DecoTime;
-
-const InterfaceScalingMethod: TResizeInterpolation = riBilinear;  //to quickly change it. Maybe will be a variable some day to support older PCs.
 
 const DefaultAnimationDuration = 0.3; {in seconds}
 
@@ -92,7 +89,7 @@ type
     ScaleToWindow: boolean;
     { If this Container ready to be used? }
     property isInitialized: boolean read fInitialized;
-    constructor Create;
+    constructor Create; //virtual;
     //destructor Destroy; override;
     { Copy parameters from the Source }
     procedure Assign(const Source: DAbstractContainer);
@@ -265,7 +262,6 @@ Type
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-
 uses SysUtils, CastleLog;
 
 {=============================================================================}
@@ -282,7 +278,7 @@ begin
   for aa in TAnchorSide do with Anchor[aa] do begin
     Anchor := nil;
     AlignTo := noalign;
-    gap := 0;
+    Gap := 0;
   end;
   Opacity := 1;
   ProportionalScale := psNone;
@@ -338,9 +334,6 @@ begin
   end;
   cw := cx2-cx1;
   ch := cy2-cy1;
-  {aScaleX := 1/aw;
-  aScaleY := 1/ah;}
-
 end;
 
 {----------------------------------------------------------------------------}
@@ -528,6 +521,7 @@ begin
   Base.FloatToInteger;
   Last.FloatToInteger;
   Next.FloatToInteger;
+  //not setting Current here as it is automatically determined in GetCurrentAnimationState without any scaling
 end;
 
 {----------------------------------------------------------------------------}
@@ -677,9 +671,9 @@ begin
     end;
     Current.w := Current.x2 - Current.x1;
     Current.h := Current.y2 - Current.y1;
-    //Self.fInitialized := true;
+    //Current.fInitialized := true;
  end else
-   //Self.fInitialized := false;
+   //Current.fInitialized := false;
 end;
 
 {----------------------------------------------------------------------------}
@@ -790,8 +784,8 @@ end;
 
 function DSingleInterfaceElement.IAmHere(const xx,yy: integer): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
-  if (xx >= base.x1) and (xx <= base.x2) and
-     (yy >= base.y1) and (yy <= base.y2)
+  if (xx >= Base.x1) and (xx <= Base.x2) and
+     (yy >= Base.y1) and (yy <= Base.y2)
   then
     Result := true
   else
