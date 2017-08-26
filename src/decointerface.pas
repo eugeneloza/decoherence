@@ -48,24 +48,40 @@ type TAnchorAlign = (noalign, haLeft, haRight, haCenter, vaTop, vaBottom, vaMidd
 type
   DAbstractContainer = class abstract(TObject)
   strict private
-    {container size}
-    ax1,ax2,ay1,ay2: integer;
+    fInitialized: boolean;
+    { Parent container size (cached) }
+    ax1,ax2,ay1,ay2,aw,ah: integer;
+    aScaleX,aScaleY: float;
+    { Determine and cache parent container size }
     procedure GetAnchors;
     { Converts float to integer and vice versa. }
-    //procedure ToFloat;
-    //procedure ToInteger;
+    procedure ToFloat;
+    procedure ToInteger;
   public
     type
       DAnchor = record
         Anchor: DAbstractContainer;
-        Align: TAnchorAlign;
+        AlignTo: TAnchorAlign;
+        Gap: integer;
       end;
   public
     Anchor: array[TAnchorSide] of DAnchor;
   public
-    fx,fy,fw,fh: float;
+    { Float size of the Container }
+    fx1,fy1,fx2,fy2,fw,fh: float;
+    { Real size of the Container }
     x1,y1,x2,y2,w,h: integer;
+    { Opacity of the container }
     Opacity: float;
+    { Keep proportions of the container }
+    KeepProportions: boolean;
+    { Is this Container scaled agains Anchors or Window?
+      Should be True only at top-level Container (i.e. GUI Container)
+      However, maybe, reintroduction or manual scaling would be prefferable? }
+    ScaleToWindow: boolean;
+    { If this Container ready to be used? }
+    property isInitialized: boolean read fInitialized;
+    constructor Create;
   end;
 
 
@@ -83,29 +99,12 @@ type
 end;     }
 
  { constants for special scaling cases }
-const FullWidth = -10;
+{const FullWidth = -10;
       FullHeight = -11;
-      ProportionalScale = -12;
+      ProportionalScale = -12;}
 {type
-  { Yes, that looks stupid for now. But I'll simplify it later. Maybe.
-   Contains redunant data on animation with possible rescaling in mind.}
   Txywh = class(TComponent)
-  private
-    //looks ugly, but needed for scale-to-parent function properly
-    parent: TComponent;
-    {even uglier, scale to content/window}
-    ScaleToParent: boolean;
-    {container width-height, yes, it's ugly}
-    cW,cH: integer;
-    procedure GetContainerWidthHeight;{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
   public
-    //Property x1: integer get x1 set setx;  Setx -> set fx recalculate ffx
-    { integer "box" }
-    x1,y1,x2,y2,w,h: integer;
-    { float }
-    fx,fy,fw,fh: float;
-    Opacity: float;
-    Initialized: boolean;
     { assign float and convert to Integer }
     procedure SetSize(const NewX,NewY,NewW,NewH: float);
     { get integer and convert to float / for fixed-size objects }
@@ -119,14 +118,7 @@ const FullWidth = -10;
     { provides for proportional width/height scaling for some images }
     procedure FixProportions(ww,hh: integer);
   end;
-
-type
-  { to make copies }
-  Txywha = class(Txywh)
-  public
-    //function makecopy:Txywh;
-    procedure CopyXYWH(Source: Txywh);
-  end; }
+}
 
 Type
   { most abstract container suitable for images, labels and interface elements
@@ -399,60 +391,103 @@ end;}
 {========================== Abstract container ===============================}
 {=============================================================================}
 
-{constructor DAbstractContainer.Create;
+constructor DAbstractContainer.Create;
+var aa: TAnchorSide;
 begin
   //inherited;
+  ScaleToWindow := false;
+  fInitialized := false;
+  {this is redundant}
+  for aa in TAnchorSide do with Anchor[aa] do begin
+    Anchor := nil;
+    AlignTo := noalign;
+    gap := 0;
+  end;
+  Opacity := 1;
+  KeepProportions := false;
 end;
 
-destructor DAbstractContainer.Destroy;
+{destructor DAbstractContainer.Destroy;
 begin
   inherited;
 end;}
 
 procedure DAbstractContainer.GetAnchors;
 begin
-  if (Anchor[asLeft].Anchor = nil) or
-     (Anchor[asTop].Anchor = nil) or
-     (Anchor[asRight].Anchor = nil) or
-     (Anchor[asBottom].Anchor = nil) then begin
-       WriteLnLog('DAbstractContainer.GetAnchors','Anchor is Nil!');
-       Exit;
-     end;
+  if ScaleToWindow then begin
+    ax1 := 0;
+    ay1 := 0;
+    ax2 := Window.Width;
+    ay2 := Window.Height;
+  end else begin
+    if (Anchor[asLeft].Anchor = nil) or
+       (Anchor[asTop].Anchor = nil) or
+       (Anchor[asRight].Anchor = nil) or
+       (Anchor[asBottom].Anchor = nil) then begin
+         WriteLnLog('DAbstractContainer.GetAnchors','Anchor is Nil!');
+         Exit;
+       end;
 
-  case Anchor[asLeft].Align of
-    haLeft:   ax1 := Anchor[asLeft].Anchor.x1;
-    haRight:  ax1 := Anchor[asLeft].Anchor.x2;
-    haCenter: ax1 := (Anchor[asLeft].Anchor.x1 + Anchor[asLeft].Anchor.x2) div 2;
-    else WriteLnLog('DAbstractContainer.GetAnchors','Invalid Anchor align!')
+    case Anchor[asLeft].AlignTo of
+      haLeft:   ax1 := Anchor[asLeft].Anchor.x1;
+      haRight:  ax1 := Anchor[asLeft].Anchor.x2;
+      haCenter: ax1 := (Anchor[asLeft].Anchor.x1 + Anchor[asLeft].Anchor.x2) div 2;
+      else WriteLnLog('DAbstractContainer.GetAnchors','Invalid Anchor align!')
+    end;
+    case Anchor[asRight].AlignTo of
+      haLeft:   ax2 := Anchor[asRight].Anchor.x1;
+      haRight:  ax2 := Anchor[asRight].Anchor.x2;
+      haCenter: ax2 := (Anchor[asRight].Anchor.x1 + Anchor[asRight].Anchor.x2) div 2;
+      else WriteLnLog('DAbstractContainer.GetAnchors','Invalid Anchor align!')
+    end;
+    case Anchor[asTop].AlignTo of
+      vaTop:    ay1 := Anchor[asTop].Anchor.y1;
+      vaBottom: ay1 := Anchor[asTop].Anchor.y2;
+      vaMiddle: ay1 := (Anchor[asTop].Anchor.y1 + Anchor[asTop].Anchor.y2) div 2;
+      else WriteLnLog('DAbstractContainer.GetAnchors','Invalid Anchor align!')
+    end;
+    case Anchor[asBottom].AlignTo of
+      vaTop:    ay2 := Anchor[asBottom].Anchor.y1;
+      vaBottom: ay2 := Anchor[asBottom].Anchor.y2;
+      vaMiddle: ay2 := (Anchor[asBottom].Anchor.y1 + Anchor[asBottom].Anchor.y2) div 2;
+      else WriteLnLog('DAbstractContainer.GetAnchors','Invalid Anchor align!')
+    end;
   end;
-  case Anchor[asRight].Align of
-    haLeft:   ax2 := Anchor[asRight].Anchor.x1;
-    haRight:  ax2 := Anchor[asRight].Anchor.x2;
-    haCenter: ax2 := (Anchor[asRight].Anchor.x1 + Anchor[asRight].Anchor.x2) div 2;
-    else WriteLnLog('DAbstractContainer.GetAnchors','Invalid Anchor align!')
-  end;
-  case Anchor[asTop].Align of
-    vaTop:    ay1 := Anchor[asTop].Anchor.y1;
-    vaBottom: ay1 := Anchor[asTop].Anchor.y2;
-    vaMiddle: ay1 := (Anchor[asTop].Anchor.y1 + Anchor[asTop].Anchor.y2) div 2;
-    else WriteLnLog('DAbstractContainer.GetAnchors','Invalid Anchor align!')
-  end;
-  case Anchor[asBottom].Align of
-    vaTop:    ay2 := Anchor[asBottom].Anchor.y1;
-    vaBottom: ay2 := Anchor[asBottom].Anchor.y2;
-    vaMiddle: ay2 := (Anchor[asBottom].Anchor.y1 + Anchor[asBottom].Anchor.y2) div 2;
-    else WriteLnLog('DAbstractContainer.GetAnchors','Invalid Anchor align!')
-  end;
+  aw := ax2-ax1;
+  ah := ay2-ay1;
+  aScaleX := 1/aw;
+  aScaleY := 1/ah;
 end;
 
+{----------------------------------------------------------------------------}
 
-
-{constructor Txywh.Create(AOwner: TComponent);
+procedure DAbstractContainer.ToFloat;
 begin
-  inherited Create(AOwner);
-  Parent := DAbstractElement(AOwner).Owner;
-  Initialized := false;
-end;}
+  GetAnchors;
+
+  {...}
+
+  fInitialized := true;
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DAbstractContainer.ToInteger;
+begin
+  GetAnchors;
+
+  x1 := ax1 + Round(aScaleX * fx1) + Anchor[asLeft].Gap;
+  x2 := ax2 + Round(aScaleX * fx2) + Anchor[asRight].Gap;
+  y1 := ay1 + Round(aScaleY * fy1) + Anchor[asTop].Gap;
+  y2 := ay2 + Round(aScaleY * fy2) + Anchor[asBottom].Gap;
+
+
+  w := x2 - x1;
+  h := y2 - y1;
+
+  fInitialized := true;
+end;
+
 
 {----------------------------------------------------------------------------}
 
@@ -478,77 +513,6 @@ begin
   fh := NewH;
 
   Recalculate;
-end;}
-
-{----------------------------------------------------------------------------}
-
-{procedure Txywh.GetContainerWidthHeight;{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
-begin
-  {ugly fix}
-  if (Parent is DInterfaceContainer) or (not ScaleToParent) then begin
-    cW := Window.Width;
-    cH := Window.Height;
-  end else begin
-    {detect "container" size}
-    if (Parent is DAbstractElement) then begin
-      if (Parent as DAbstractElement).CurrentAnimationState.Initialized then begin
-        cW := (Parent as DAbstractElement).CurrentAnimationState.w;
-        cH := (Parent as DAbstractElement).CurrentAnimationState.h;
-      end else if (Parent as DAbstractElement).Base.Initialized then begin
-        cW := (Parent as DAbstractElement).Base.w;
-        cH := (Parent as DAbstractElement).Base.h;
-      end else begin
-        WriteLnLog('Txywh.GetContainerWidthHeight','WARNING: '+Parent.ClassName+'.Base is not initialized, falling back to Window.Height/Width');
-        cW := Window.Width;
-        cH := Window.Height;
-      end;
-    end else begin
-      WriteLnLog('Txywh.GetContainerWidthHeight','WARNING: '+Parent.ClassName+' is not DAbstractElement, falling back to Window.Height/Width');
-      cW := Window.Width;
-      cH := Window.Height;
-    end;
-  end;
-end;}
-
-{----------------------------------------------------------------------------}
-
-{procedure Txywh.Recalculate;
-begin
-  //WriteLnLog(Parent.ClassName);
-  GetContainerWidthHeight;
-
-  { convert float to integer }
-
-  if fx >= 0 then
-    x1 := Round(cH*fx)
-  else
-    x1 := cW + Round(cH*fx);
-
-  if fy >= 0 then
-    y1 := Round(cH*fy)     // turn over y-axis?
-  else
-    y1 := cH + Round(cH*fy);
-
-  if dEqual(fw,FullWidth) then begin
-    w := cW;
-    x1 := 0
-  end
-  else
-  if dEqual(fw,FullHeight) then
-    w := cH
-  else
-    w := Round(cH*fw);
-
-  if dEqual(fh,FullHeight) then begin
-    h := cH;
-    y1 := 0
-  end else
-    h := Round(cH*fh);
-
-  x2 := x1+w;
-  y2 := y1+h;
-
-  Initialized := true;
 end;}
 
 {----------------------------------------------------------------------------}
