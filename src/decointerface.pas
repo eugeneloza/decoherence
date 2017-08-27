@@ -190,14 +190,14 @@ Type
     It lacks only "Children" or specific "Draw" to be used }
   DSingleInterfaceElement = class abstract(DAbstractElement)
   public
+    { Higher-level element. Yet unused, maybe never. }
+    Parent: DSingleInterfaceElement;
     { A simple timer to fire some event on time-out }
     Timer: DTimer;
     procedure SetTimeOut(const Seconds: DTime);
     procedure Update; override;
-    { Higher-level element. Seldomly used in specific cases }
- {   Parent: DSingleInterfaceElement;
     //also resizes content and frame
-    procedure SetBaseSize(const NewX,NewY,NewW,NewH,NewO: float; Animate: TAnimationStyle); override;
+ {   procedure SetBaseSize(const NewX,NewY,NewW,NewH,NewO: float; Animate: TAnimationStyle); override;
     procedure SetIntSize(const x1,y1,x2,y2:integer; Animate: TAnimationStyle); override;
 }
   {* Mouse routines *}
@@ -887,7 +887,7 @@ end;
 procedure DInterfaceElement.Grab(const Child: DSingleInterfaceElement);
 begin
   Children.Add(Child);
-  //if (Child is DSingleInterfaceElement) then DSingleInterfaceElement(Child).Parent := Self; //not sure about this line
+  if (Child is DSingleInterfaceElement) then DSingleInterfaceElement(Child).Parent := Self;
   //{Child.ID := }InterfaceList.Add(Child); //global ID of the element
 end;
 

@@ -29,51 +29,62 @@ uses Classes,
 const InterfaceScalingMethod: TResizeInterpolation = riBilinear;  //to quickly change it. Maybe will be a variable some day to support older PCs.
 
 type
-  { General routines shared by images and labels }
-  DAbstractImage = class(DAbstractElement)
-  public
- {   color: TVector4; //todo
-    { very simple draw procedure }
-    procedure Draw; override;
-    constructor Create(AOwner: TComponent); override;
-    destructor Destroy; override;
-    { initialize GL image. NOT THREAD SAFE! }
-    procedure InitGL;{ override;}
-    { frees an image without freeing the whole instance }
-    procedure FreeImage;
-//  private
-  public
+  { General routines shared by images, frames and labels }
+  DAbstractImage = class(DSingleInterfaceElement)
+  protected
     GLImage: TGLImage;
     ImageReady, ImageLoaded: boolean;
     { keeps from accidentally re-initializing GL }
     InitGLPending: boolean;
     SourceImage: TCastleImage;  //todo scale Source Image for max screen resolution ?
     ScaledImage: TCastleImage;
+  public
+    Color: TVector4; //todo
+    { initialize GL image.}
+    procedure InitGL;
+    { frees an image without freeing the whole instance }
+    procedure FreeImage;
+  public
     {due to a little bug I have to define these separately}
-    ScaledWidth, ScaledHeight: integer;
+    //ScaledWidth, ScaledHeight: integer;
     { Thread-safe part of rescaling the image }
     procedure Rescale; override;
-    procedure RescaleImage; virtual; }
+    { Scales the image to Base.size }
+    procedure RescaleImage; virtual; abstract;
+
+    constructor Create; override;
+    destructor Destroy; override;
   end;
 
-  {Type
-   { Several types of frames, including with captions }
-   DFrame = class(TComponent)
-   public
-     SourceImage: TRGBAlphaImage;
-     {frame borders}
-     CornerTop, CornerBottom, CornerLeft, CornerRight: integer;
-     Rectagonal: boolean;
-     constructor Create(AOwner: TComponent); override;
-     destructor Destroy; override;
-     {Resizes the element's frame to fit base size}
-     procedure FrameResize3x3;
-     procedure DrawFrame;
+type
+ { 3x3 scaled image (i.e. frames) }
+ DFrame = class(DAbstractImage)
+ public
+{   SourceImage: TRGBAlphaImage;
+   {frame borders}
+   CornerTop, CornerBottom, CornerLeft, CornerRight: integer;
+   Rectagonal: boolean;
+   constructor Create(AOwner: TComponent); override;
+   destructor Destroy; override;
+   {Resizes the element's frame to fit base size}
+   procedure FrameResize3x3;
+   procedure DrawFrame;}
 
-  end;     }
+end;
+
+type
+  {Simple image capable of drawing}
+  DSimpleImage = class abstract(DAbstractImage)
+  public
+    { very simple draw procedure }
+    procedure Draw; override;
+    //procedure RescaleImage;
+  end;
 
 
-type TLoadImageThread = class(TThread)
+type
+  {}
+  TLoadImageThread = class(TThread)
   public
     Target: DAbstractImage;
     FileName: String;
@@ -87,10 +98,10 @@ type
   private
   {  LoadImageThread: TLoadImageThread;
     { if thread is running }
-    ThreadWorking: boolean;
+    ThreadWorking: boolean;   }
   public
     { loads image in realtime }
-    procedure Load(const FileName: string); virtual;
+ {   procedure Load(const FileName: string); virtual;
     procedure Load(const CopyImage: TCastleImage);
     procedure Afterload; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
     { loads image in a thread }
@@ -102,15 +113,15 @@ type
 type
   { abstract "phased image" that moves and morphs with "phase" }
   DPhasedImage = class(DStaticImage)
+  private
+    LastTime: DTime;
+  protected
+    Phase, OpacityPhase: float;
   public
  {   PhaseSpeed: float;   {1/seconds to scroll the full screen}
     Opacity: float;
     //constructor Create(AOwner: TComponent); override;
-    procedure Load(const FileName:string); override;
-  private
-    LastTime: DTime;
-  public
-    Phase, OpacityPhase: float;    }
+    procedure Load(const FileName:string); override; }
   end;
 
 type
@@ -163,8 +174,7 @@ Type
     constructor Create(AOwner: TComponent); override;    }
   end;
 
-var LoadNewFloaterImage: boolean;
-
+//var LoadNewFloaterImage: boolean;
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
@@ -172,21 +182,74 @@ implementation
 uses SysUtils, CastleLog, CastleFilesUtils,
   DecoInputOutput;
 
-procedure TLoadImageThread.execute;
-var TargetImage: DSTaticImage;
+{=============================================================================}
+{============================= Abstract Image ================================}
+{=============================================================================}
+
+procedure DAbstractImage.FreeImage;
 begin
-  TargetImage := Target as DStaticImage;
+  FreeAndNil(GLImage);
+  FreeAndNil(SourceImage);
 
-  WritelnLog('TLoadImageThread.execute','Image thread started.');
+  {BUG: I still need to free ScaledImage - while it's owned by GLImage
+   DAMN IT. The link may be obsolete after FreeAndNil(GLImage)!
+   Looks like I always set ScaledImage := nil after sucessfuly assigning it,
+   but should keep an eye on it!}
+  FreeAndNil(ScaledImage); //scaledImage is automatically freed by GlImage
 
-  //****TargetImage.Load(FileName);
-  //****TargetImage.Rescale;
-
-  WritelnLog('TLoadImageThread.execute','Image thread finished.');
-  //****TargetImage.ThreadWorking := false;
+  ImageReady := false;
+  ImageLoaded := false;
+  InitGLPending := false;
 end;
 
+{----------------------------------------------------------------------------}
 
+procedure DAbstractImage.InitGL;
+begin
+  if InitGLPending then begin
+    InitGLPending := false;
+    if ScaledImage<>nil then begin
+      FreeAndNil(GLImage);
+      {ScaledWidth := ScaledImage.Width;      //not yet needed, maybe set RealWidth...
+      ScaledHeight := ScaledImage.Height;}
+      GLImage := TGLImage.Create(ScaledImage,true,true);
+      ScaledImage := nil;
+      ImageReady := true;
+    end else WriteLnLog('DAbstractElement.InitGL','ERROR: Scaled Image is nil!');
+  end;
+end;
+
+{----------------------------------------------------------------------------}
+
+constructor DAbstractImage.Create;
+begin
+  inherited;
+  Color := Vector4(1,1,1,1);
+  InitGLPending := false;
+  ImageReady := false;
+  ImageLoaded := false;
+end;
+
+{----------------------------------------------------------------------------}
+
+destructor DAbstractImage.Destroy;
+begin
+  FreeImage;
+  inherited;
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DAbstractImage.Rescale;
+begin
+  inherited;
+  //Base.FixProportions(RealWidth,Realheight); //should be done by proportional scale?
+  RescaleImage;
+end;
+
+{=============================================================================}
+{============================== Frame Image ==================================}
+{=============================================================================}
 
 {constructor DFrame.Create(AOwner: TComponent);
 begin
@@ -283,6 +346,63 @@ begin
     end;
   end;
 end;}
+
+
+{=============================================================================}
+{======================== Simple image =======================================}
+{=============================================================================}
+
+procedure DSimpleImage.Draw;
+begin
+  if ImageReady then begin
+    inherited;
+    GLImage.Color := Vector4(1,1,1,Current.Opacity); //todo
+    GLIMage.Draw(Current.x1,Current.y1,Current.w,Current.h); //todo
+  end else begin
+    if InitGLPending then InitGL;
+  end;
+end;
+
+{-----------------------------------------------------------------------------}
+
+{procedure DSimpleImage.RescaleImage;
+begin
+ {$IFNDEF AllowRescale}If SourceImage = nil then Exit;{$ENDIF}
+ if ImageLoaded then begin
+   if Base.Initialized then
+   {this is not optimal, however, required in case content has been changed}
+    {if (ScaledWidth <> base.w) or (ScaledHeight <> base.h) then} begin
+      ImageReady := false;
+      FreeAndNil(GLImage);
+      ScaledImage := SourceImage.CreateCopy as TCastleImage;
+      {$IFNDEF AllowRescale}FreeAndNil(SourceImage);{$ENDIF}
+      ScaledImage.Resize(Base.w,Base.h,InterfaceScalingMethod);
+      InitGLPending := true;
+    end
+   else
+     WriteLnLog('DStaticImage.RescaleImage','ERROR: base.initialized = false');
+ end;
+end; }
+
+
+{=============================================================================}
+{======================== static image =======================================}
+{=============================================================================}
+
+procedure TLoadImageThread.execute;
+var TargetImage: DSTaticImage;
+begin
+  TargetImage := Target as DStaticImage;
+
+  WritelnLog('TLoadImageThread.execute','Image thread started.');
+
+  //****TargetImage.Load(FileName);
+  //****TargetImage.Rescale;
+
+  WritelnLog('TLoadImageThread.execute','Image thread finished.');
+  //****TargetImage.ThreadWorking := false;
+end;
+
 {-----------------------------------------------------------------------------}
 
 {constructor DStaticImage.Create(AOwner: TComponent);
@@ -344,116 +464,6 @@ begin
   ScaledHeight := -1;
   ImageLoaded := true;
 end; }
-
-{----------------------------------------------------------------------------}
-
-{procedure DAbstractImage.FreeImage;
-begin
-  FreeAndNil(GLImage);
-  FreeAndNil(SourceImage);
-
-  //scaledImage is automatically freed by GlImage
-  {$WARNING BUG: why Scaled image is not freed automatically?????}
-  {BUG: I still need to free ScaledImage - while it's owned by GLImage
-   DAMN IT. The link may be obsolete after FreeAndNil(GLImage)!
-   Looks like I always set ScaledImage := nil after sucessfuly assigning it,
-   but should keep an eye on it!}
-  FreeAndNil(ScaledImage);
-
-  ImageReady := false;
-  ImageLoaded := false;
-  InitGLPending := false;
-end;  }
-
-{----------------------------------------------------------------------------}
-
-{procedure DAbstractImage.InitGL;
-begin
-  if InitGLPending then begin
-    InitGLPending := false;
-    {if ScaledImage<>nil then} begin
-      FreeAndNil(GLImage);
-      ScaledWidth := ScaledImage.Width;
-      ScaledHeight := ScaledImage.Height;
-      GLImage := TGLImage.Create(ScaledImage,true,true);
-      ScaledImage := nil;
-      ImageReady := true;
-    end {else WriteLnLog('DAbstractElement.InitGL','ERROR: Scaled Image is nil!');}
-  end;
-end;}
-
-{----------------------------------------------------------------------------}
-
-{constructor DAbstractImage.Create(AOwner: TComponent);
-begin
-  inherited Create(AOwner);
-  Color := Vector4(1,1,1,1);
-  InitGLPending := false;
-  ImageReady := false;
-  ImageLoaded := false;
-end; }
-
-{----------------------------------------------------------------------------}
-
-{destructor DAbstractImage.Destroy;
-begin
-  FreeImage;
-  inherited;
-end; }
-
-{----------------------------------------------------------------------------}
-
-{procedure DAbstractImage.Rescale;
-begin
-  inherited;
-  Base.FixProportions(RealWidth,Realheight);
-{  last.fixProportions(sourceImage.Width,sourceImage.height);
-  next.fixProportions(sourceImage.Width,sourceImage.height);}
-  RescaleImage;
-end; }
-
-{----------------------------------------------------------------------------}
-
-{procedure DAbstractImage.RescaleImage;
-begin
- {$IFNDEF AllowRescale}If SourceImage = nil then Exit;{$ENDIF}
- if ImageLoaded then begin
-   if Base.Initialized then
-   {this is not optimal, however, required in case content has been changed}
-    {if (ScaledWidth <> base.w) or (ScaledHeight <> base.h) then} begin
-      ImageReady := false;
-      FreeAndNil(GLImage);
-      ScaledImage := SourceImage.CreateCopy as TCastleImage;
-      {$IFNDEF AllowRescale}FreeAndNil(SourceImage);{$ENDIF}
-      ScaledImage.Resize(Base.w,Base.h,InterfaceScalingMethod);
-      InitGLPending := true;
-    end
-   else
-     WriteLnLog('DStaticImage.RescaleImage','ERROR: base.initialized = false');
- end;
-end; }
-
-{----------------------------------------------------------------------------}
-
-{procedure DAbstractImage.Draw;
-begin
-  if ImageReady then begin
-    //animate
-    Update;
-
-    if not Visible then Exit;
-
-    GLImage.Color := Vector4(1,1,1,CurrentAnimationState.Opacity); //todo
-    GLIMage.Draw(CurrentAnimationState.x1,CurrentAnimationState.y1,CurrentAnimationState.w,CurrentAnimationState.h); //todo
-  end else begin
-    if InitGLPending then InitGL;
-  end;
-end; }
-
-{=============================================================================}
-{========================= static image ========================================}
-{=============================================================================}
-
 
 {=============================================================================}
 {======================== phased image =======================================}
