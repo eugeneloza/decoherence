@@ -119,14 +119,14 @@ Type
   strict protected
     { Caches current animation state, recalculated by GetAnimationState at every render}
     procedure GetAnimationState;
+    { updates the data of the class with current external data,
+      here it just gets the current animation state }
+    procedure Update; virtual;
   public
     { changes the scale of the element relative to current window size }
     procedure Rescale; virtual;
     { draw the element / as abstract as it might be :) }
     procedure Draw; virtual;
-    { updates the data of the class with current external data,
-      here it just gets the current animation state }
-    procedure Update; virtual;
   strict private
     { Last and Next animation states. }
     Last, Next: DAbstractContainer;
@@ -687,8 +687,8 @@ end;
 
 procedure DAbstractElement.Draw;
 begin
-  Update;
   if not isVisible then Exit;
+  Update;
 end;
 
 {----------------------------------------------------------------------------}

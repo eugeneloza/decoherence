@@ -39,7 +39,7 @@ type
     SourceImage: TCastleImage;  //todo scale Source Image for max screen resolution ?
     ScaledImage: TCastleImage;
   public
-    Color: TVector4; //todo
+    //Color: TVector4; //todo
     { initialize GL image.}
     procedure InitGL;
     { frees an image without freeing the whole instance }
@@ -94,35 +94,39 @@ type
 
 type
   { abstract "phased image" that moves and morphs with "phase" }
-  DPhasedImage = class(DStaticImage)
+  DPhasedImage = class abstract(DStaticImage)
   private
     LastTime: DTime;
-  protected
-    Phase, OpacityPhase: float;
+  strict protected
+    Phase, OpacityPhase,PhaseShift: float;
+    procedure CyclePhase; virtual;
+    procedure Update; override;
   public
     PhaseSpeed: float;   {1/seconds to scroll the full screen}
- {   Opacity: float;
-    procedure Load(const FileName:string); override; }
+    procedure Load(const URL: string); override;
   end;
 
 type
-  { Wind and smoke effects used in different situations }
-  //todo might be descendant of DStaticImage
+  { Wind effect used in different situations
+    warning: phased images are scaled relative to Window }
   DWindImage = class(DPhasedImage)
+  strict protected
+    procedure CyclePhase; override;
   public
     { completely overrides the default drawing procedure }
-{    procedure Draw; override;
-  private
-    procedure CyclePhase;  }
+    procedure Draw; override;
   end;
 
+type TImageProcedure = procedure(const Sender: DPhasedImage) of Object;
 type
-  { A floating image for LoadScreens }
+  { A floating image for LoadScreens
+    warning: phased images are scaled relative to Window }
   DFloatImage = class(DPhasedImage)
+  strict protected
+    procedure CyclePhase; override;
   public
- {   procedure Draw; override;
-  private
-    procedure CyclePhase;  }
+    onCycleFinish: TImageProcedure;
+    procedure Draw; override;
   end;
 
 Type TBarStyle = (bsVertical, bsHorizontal);
@@ -204,7 +208,7 @@ end;
 constructor DAbstractImage.Create;
 begin
   inherited;
-  Color := Vector4(1,1,1,1);
+  //Color := Vector4(1,1,1,1);
   InitGLPending := false;
   ImageReady := false;
   ImageLoaded := false;
@@ -338,9 +342,6 @@ end;
 {======================== static image =======================================}
 {=============================================================================}
 
-
-
-
 {procedure TLoadImageThread.execute;
 var TargetImage: DSTaticImage;
 begin
@@ -414,55 +415,65 @@ end;
 {=============================================================================}
 {======================== phased image =======================================}
 {=============================================================================}
-{
-constructor DPhasedImage.Create(AOwner: TComponent);
+
+Procedure DPhasedImage.Load(const URL:string);
 begin
-  inherited;
+  inherited Load(URL);
+  LastTime := -1;
 end;
-}
+
 {----------------------------------------------------------------------------}
 
-{Procedure DPhasedImage.Load(const FileName:string);
+procedure DPhasedImage.CyclePhase;
 begin
-  inherited Load(filename);
-  LastTime := -1;
-end; }
+  if Lasttime = -1 then begin
+    LastTime := DecoNow;
+    Phase := 0;
+  end;
+  PhaseShift := (DecoNow-LastTime)*PhaseSpeed;
+  LastTime := DecoNow;
+  Phase += PhaseShift*(1+0.1*drnd.Random);
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DPhasedImage.Update;
+begin
+  inherited;
+  CyclePhase;
+end;
 
 {=============================================================================}
 {========================= wind image ========================================}
 {=============================================================================}
 
-{procedure DWindImage.CyclePhase;
-var PhaseShift: float;
+procedure DWindImage.CyclePhase;
 begin
-  if Lasttime = -1 then LastTime := DecoNow;
-  PhaseShift := (DecoNow-LastTime)*PhaseSpeed;
-  if PhaseShift < 0.5 then begin
-    Phase -= PhaseShift*(1+0.1*drnd.Random);
-    if Phase<0 then Phase += 1;
-    OpacityPhase -= PhaseShift/2*(1+0.2*drnd.Random);
-    if OpacityPhase<0 then OpacityPhase += 1;
-  end else begin
+  inherited;
+  if Phase>1 then Phase -= 1;
+  OpacityPhase += PhaseShift/2*(1+0.2*drnd.Random);
+  if OpacityPhase>1 then OpacityPhase -= 1;
+
+  if PhaseShift > 0.5 then begin
     //if pause was too long reinitialize with random phases.
     Phase := drnd.Random;
     OpacityPhase := drnd.Random;
   end;
-  LastTime := DecoNow;
-end; }
+end;
 
 {----------------------------------------------------------------------------}
 
-{procedure DWindImage.Draw;
+procedure DWindImage.Draw;
 var PhaseScaled:integer;
 begin
+  //inherited; <-------- this render is different
   if ImageReady then begin
-    CyclePhase;
+    Update;
 
-    if not Visible then Exit;
+    GLImage.Color := Vector4(1,1,1,1);
+    GLImage.Color[3] := Current.Opacity + Current.Opacity/4 * Sin(2*Pi*OpacityPhase);
 
-    Color[3] := Opacity + Opacity/4 * Sin(2*Pi*OpacityPhase);
-    GLImage.Color := Color;
-    PhaseScaled := Round(Phase*Window.Width);
+    PhaseScaled := Round((1-Phase)*Window.Width);
 
     //draw first part of the image
     GLImage.Draw(PhaseScaled,0,
@@ -474,52 +485,42 @@ begin
                  PhaseScaled,Window.Height,
                  Window.Width-PhaseScaled,0,
                  PhaseScaled,Window.Height);
-  end else begin
+  end else
     if InitGLPending then InitGL;
-//    WriteLnLog('DWindImage.Draw','ERROR: Wind image not ready to draw!');
-  end;
-end; }
+end;
 
 {=============================================================================}
 {========================= float image =======================================}
 {=============================================================================}
 
-{procedure DFloatImage.CyclePhase;
-var PhaseShift: float;
+procedure DFloatImage.CyclePhase;
 begin
-  if LastTime = -1 then begin
-    LastTime := DecoNow;
-    Phase := 0;
-  end;
-  PhaseShift := (DecoNow-LastTime)*PhaseSpeed;
-  Phase += PhaseShift*(1+0.1*drnd.Random);
+  inherited;
   if Phase > 1 then begin
     Phase := 1;
-    LoadNewFloaterImage := true;
     ImageLoaded := false;
+    if Assigned(onCycleFinish) then onCycleFinish(Self);
   end;
-  LastTime := DecoNow;
-end;  }
+end;
 
 {----------------------------------------------------------------------------}
 
-{procedure DFloatImage.Draw;
+procedure DFloatImage.Draw;
 var x: integer;
 begin
+  //inherited; <-------- this render is different
+
   if ImageReady then begin
-    CyclePhase;
+    Update;
 
-    if not Visible then Exit;
+    GLImage.Color := Vector4(1,1,1,1);
+    GLImage.Color[3] := Current.Opacity*Sin(Pi*Phase);
 
-    Color[3] := Opacity*Sin(Pi*Phase);
-    GLImage.Color := Color;
     x := Round((Window.Width-Base.w)*Phase);
     GLImage.Draw(x,0);
-  end else begin
+  end else
     if InitGLPending then InitGL;
-  //   WritelnLog('DStaticImage.DrawMe','ERROR: Static Image not ready to draw!');
-  end;
-end; }
+end;
 
 {=============================================================================}
 {=========================== bar image =======================================}
