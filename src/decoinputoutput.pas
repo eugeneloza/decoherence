@@ -16,17 +16,37 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 {---------------------------------------------------------------------------}
 
 { Ensure thread-safety of input/output functions (hopefully) }
-unit decoinputoutput;
+unit DecoInputOutput;
 
 {$INCLUDE compilerconfig.inc}
 interface
 
-uses
+uses Classes,
   CastleImages,
   CastleXMLUtils, DOM,
   X3DNodes,
   CastleSoundEngine, CastleTimeUtils,
   CastleResources, CastleCreatures;
+
+type
+  ILoadObject = interface
+  ['{E1F8DD90-7A47-43DC-902D-4125D5DE67D1}']
+    procedure Load(const URL: string);
+    function ThreadLocked: boolean;
+    procedure LockThread;
+    procedure UnlockThread;
+  end;
+
+type
+  {}
+  DLoadThread = class(TThread)
+  public
+    Source: ILoadObject;
+    URL: string;
+  protected
+    procedure Execute; override;
+  end;
+
 
 type
   {enable thread-safe loading of resources}
@@ -45,6 +65,8 @@ type
     procedure PrepareSafe;
   end;
 
+procedure LoadThread(Source: ILoadObject; URL: string);
+
 {safe wrapper for CastleImages.LoadImage, overloaded}
 function LoadImageSafe(const URL: String): TCastleImage;
 function LoadImageSafe(const URL: string;
@@ -58,13 +80,41 @@ function Load3DSafe(const URL: string): TX3DRootNode;
 function LoadBufferSafe(const URL: string; out Duration: TFloatTime): TSoundBuffer;
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-uses SyncObjs, SysUtils, x3dload;
+uses SyncObjs, SysUtils, x3dload,
+  CastleLog;
+
+procedure LoadThread(Source: ILoadObject; URL: string);
+var LoadThread: DLoadThread;
+begin
+  if Source.ThreadLocked then begin
+    WriteLnLog('DecoInputOutput>LoadThread','Thread is already running, abort');
+    Exit;
+  end;
+  Source.LockThread;
+  LoadThread := DLoadThread.Create(true);
+  LoadThread.Source := Source;
+  LoadThread.URL := URL;
+  LoadThread.FreeOnTerminate := true;
+  LoadThread.Priority := tpLower;
+  LoadThread.Start;
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DLoadThread.Execute;
+begin
+  Source.Load(URL);
+  Source.UnlockThread;
+end;
+
+{============================================================================}
+{====================== SAFE LOADING (WITH LOCKS) ==========================}
+{============================================================================}
 
 //{$WARNING: Maybe, I'm using CriticalSection in a wrong way?}
 var
   {a lock to ensure no simultaneous HDD access}
   HDD_Lock: TCriticalSection;
-
 
 function LoadImageSafe(const URL: String): TCastleImage;
 begin

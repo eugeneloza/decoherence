@@ -44,12 +44,12 @@ uses Classes, SysUtils,
      DecoNavigation, DecoGlobal, DecoTranslation, DecoGamemode, DecoTime;
 
 type
-  DLoadThread = class(TAbstractThread)
+  DLoadGameThread = class(TAbstractThread)
   protected
     procedure Execute; override;
   end;
 
-var LoadThread: DLoadThread;
+var LoadThread: DLoadGameThread;
 
 {==========================================================================}
 {==========================================================================}
@@ -216,7 +216,7 @@ begin
   LoadCompleted := true;
 end;
 
-procedure DLoadThread.execute;
+procedure DLoadGameThread.execute;
 begin
   LoadAndInitData;
 end;

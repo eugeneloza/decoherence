@@ -24,7 +24,7 @@ interface
 uses Classes,
   CastleVectors, CastleGLImages, CastleImages,
   DecoInterface, DecoActor,
-  DecoGlobal, DecoTime;
+  DecoInputOutput, DecoGlobal, DecoTime;
 
 const InterfaceScalingMethod: TResizeInterpolation = riBilinear;  //to quickly change it. Maybe will be a variable some day to support older PCs.
 
@@ -74,33 +74,25 @@ type
     procedure RescaleImage; override;
   end;
 
-
-type
-  {}
-  TLoadImageThread = class(TThread)
-  public
-    Target: DAbstractImage;
-    FileName: String;
-  protected
-    procedure Execute; override;
-  end;
-
 type
   { most simple image type }
-  DStaticImage = class(DAbstractImage)
+  DStaticImage = class(DAbstractImage, ILoadObject)
   private
   {  LoadImageThread: TLoadImageThread;
-    { if thread is running }
-    ThreadWorking: boolean;   }
+    { if thread is running }}
+    fThreadWorking: boolean;
   public
     { loads image in realtime }
- {   procedure Load(const FileName: string); virtual;
+    procedure Load(const URL: string); virtual;
     procedure Load(const CopyImage: TCastleImage);
+    function ThreadLocked: boolean;
+    procedure LockThread;
+    procedure UnlockThread;
     procedure Afterload; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
     { loads image in a thread }
-    procedure LoadThread(const FileName:string);
-    constructor Create(AOwner: TComponent); override;
-    destructor Destroy; override;     }
+{    procedure LoadThread(const FileName:string);}
+    constructor Create; override;
+    destructor Destroy; override;
   end;
 
 type
@@ -111,9 +103,8 @@ type
   protected
     Phase, OpacityPhase: float;
   public
- {   PhaseSpeed: float;   {1/seconds to scroll the full screen}
-    Opacity: float;
-    //constructor Create(AOwner: TComponent); override;
+    PhaseSpeed: float;   {1/seconds to scroll the full screen}
+ {   Opacity: float;
     procedure Load(const FileName:string); override; }
   end;
 
@@ -172,8 +163,7 @@ Type
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
-uses SysUtils, CastleLog, CastleFilesUtils,
-  DecoInputOutput;
+uses SysUtils, CastleLog, CastleFilesUtils;
 
 {=============================================================================}
 {============================= Abstract Image ================================}
@@ -245,7 +235,7 @@ end;
 procedure DAbstractImage.Draw;
 begin
   if ImageReady then begin
-    inherited;
+    inherited; //calls update and checks if the image is visible
     GLImage.Color := Vector4(1,1,1,Current.Opacity); //todo
     GLIMage.Draw(Current.x1,Current.y1,Current.w,Current.h); //todo
   end else begin
@@ -351,7 +341,21 @@ end;
 {======================== static image =======================================}
 {=============================================================================}
 
-procedure TLoadImageThread.execute;
+function DStaticImage.ThreadLocked: boolean;
+begin
+ Result := fThreadWorking;
+end;
+procedure DStaticImage.LockThread;
+begin
+  fThreadWorking := true;
+end;
+procedure DStaticImage.UnlockThread;
+begin
+  fThreadWorking := true;
+end;
+
+
+{procedure TLoadImageThread.execute;
 var TargetImage: DSTaticImage;
 begin
   TargetImage := Target as DStaticImage;
@@ -363,31 +367,9 @@ begin
 
   WritelnLog('TLoadImageThread.execute','Image thread finished.');
   //****TargetImage.ThreadWorking := false;
-end;
-
-{-----------------------------------------------------------------------------}
-
-{constructor DStaticImage.Create(AOwner: TComponent);
-begin
-  ThreadWorking := false;
-  Inherited Create(AOwner);
 end;}
 
-{----------------------------------------------------------------------------}
-
-{destructor DStaticImage.Destroy;
-begin
-  if ThreadWorking then begin
-    Try
-      LoadImageThread.Terminate;
-    finally
-      FreeAndNil(LoadImageThread); //redundant, as freeonterminate=true?
-    end;
-  end;
-  inherited;
-end; }
-
-{----------------------------------------------------------------------------}
+{-----------------------------------------------------------------------------}
 
 {procedure DStaticImage.LoadThread(const FileName: string);
 begin
@@ -406,10 +388,10 @@ end; }
 
 {----------------------------------------------------------------------------}
 
-{procedure DStaticImage.Load(const FileName: string);
+procedure DStaticImage.Load(const URL: string);
 begin
-  WritelnLog('DStaticImage.LoadImage',FileName);
-  SourceImage := LoadImageSafe(ApplicationData(FileName));
+  WritelnLog('DStaticImage.LoadImage',URL);
+  SourceImage := LoadImageSafe({ApplicationData(URL)}URL);
   AfterLoad;
 end;
 procedure DStaticImage.Load(const CopyImage: TCastleImage);
@@ -420,12 +402,34 @@ begin
 end;
 procedure DStaticImage.AfterLoad;
 begin
-  RealWidth := SourceImage.Width;
-  RealHeight := SourceImage.Height;
-  ScaledWidth := -1;
-  ScaledHeight := -1;
+  Base.RealWidth := SourceImage.Width;
+  Base.RealHeight := SourceImage.Height;
+  {ScaledWidth := -1;
+  ScaledHeight := -1;}
   ImageLoaded := true;
-end; }
+end;
+
+{----------------------------------------------------------------------------}
+
+constructor DStaticImage.Create;
+begin
+  inherited;
+  fThreadWorking := false;
+end;
+
+{----------------------------------------------------------------------------}
+
+destructor DStaticImage.Destroy;
+begin
+  {if ThreadWorking then begin
+    Try
+      LoadImageThread.Terminate;
+    finally
+      FreeAndNil(LoadImageThread); //redundant, as freeonterminate=true?
+    end;
+  end;}
+  inherited;
+end;
 
 {=============================================================================}
 {======================== phased image =======================================}

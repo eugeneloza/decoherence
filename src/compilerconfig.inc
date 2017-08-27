@@ -23,16 +23,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 {$H+} //AnsiStrings
 {$J-} //non-writeable constants
 
-{write heap trace to file or to log?}
+{ Write heap trace to file or to log? }
 //{$DEFINE HEAP_FILE}
 
-{Not using interfaces yet (and maybe will never use them). But let it be here for now}
+{ Use simple corba interfaces }
 {$interfaces corba}
 
-{I should try using cmem some day. They say in some cases it may +30% speed and -50% RAM usage. However, I didn't test it yet.}
+{ I should try using cmem some day. They say in some cases it may +30% speed and -50% RAM usage. However, I didn't test it yet. }
 //{$DEFINE useCMEM}
 
-{convenient global range-checking on/off. Redundand, as compiler mode already does that?}
+{ Convenient global range-checking on/off. Redundand, as compiler mode already does that? }
 {$IFNDEF RELEASE}
 {$R+}{$Q+}
 {$ELSE}
@@ -41,27 +41,27 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 
 {======================== ENGINE-SPECIFIC DIRECTIVES =========================}
 
-{inline code? Just in case of bugs...
- e.g. freepascal debugger doesn't show line numbers in inlined code}
+{ Inline code? Just in case of bugs...
+  e.g. freepascal debugger doesn't show line numbers in inlined code }
 {$define SUPPORTS_INLINE}
 
-{gzip or not gzip, that is the answer. This one deprecated as it seems I've fixed gzip-input problem}
+{ Gzip or not gzip, that is the answer. }
 {$DEFINE gzipdata}
 
-{If we attach additional Switch Nodes to 3d world management}
+{ If we attach additional Switch Nodes to 3d world management }
 {$DEFINE UseSwitches}
 
-{fix a windows encoding bug}
+{ Fix a windows encoding bug }
 {$IFDEF Windows}{$DEFINE UTF8Encode}{$ENDIF}
 
 {======================== GAME-SPECIFIC DIRECTIVES =========================}
 
-{defines fullscreen mode}
+{ Defines fullscreen mode }
 //{$DEFINE Fullscreen}
 
-{automatically no rescale in fullscreen and Android modes}
+{ Automatically no rescale in fullscreen and Android modes }
 {$IFNDEF Android}{$IFNDEF Fullscreen}{$DEFINE AllowRescale}{$ENDIF}{$ENDIF}
 
-{undefine rescale to save memory}
+{ Undefine rescale to save memory. Temporary. }
 {$UNDEF AllowRescale}
 
