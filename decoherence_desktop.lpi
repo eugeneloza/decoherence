@@ -233,6 +233,7 @@
       <Unit26>
         <Filename Value="src/decothread.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoThread"/>
       </Unit26>
       <Unit27>
         <Filename Value="src/deconavigation.pas"/>
@@ -251,6 +252,7 @@
       <Unit30>
         <Filename Value="src/decoinputoutput.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoInputOutput"/>
       </Unit30>
       <Unit31>
         <Filename Value="src/decosound.pas"/>

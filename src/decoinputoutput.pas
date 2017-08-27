@@ -29,14 +29,27 @@ uses Classes,
   CastleResources, CastleCreatures;
 
 type
+  { I don't like this implementation. Most of the routines will be absolutely
+    identical for all the classes... very redundant.}
   ILoadObject = interface
   ['{E1F8DD90-7A47-43DC-902D-4125D5DE67D1}']
+    { procedure describing what to be run }
     procedure Load(const URL: string);
+
+    {$IFDEF ThreadLoad}
+    { is Thread running? }
     function ThreadLocked: boolean;
+    { report that thread has started }
     procedure LockThread;
+    { report that thread has stopped }
     procedure UnlockThread;
+    { source object grabs a thread to terminate it in destructor }
+    procedure GrabThread(aThread: TThread);
+    {$ENDIF}
   end;
 
+
+{$IFDEF ThreadLoad}
 type
   {}
   DLoadThread = class(TThread)
@@ -46,7 +59,7 @@ type
   protected
     procedure Execute; override;
   end;
-
+{$ENDIF}
 
 type
   {enable thread-safe loading of resources}
@@ -57,7 +70,7 @@ type
   end;
 
 type
-  {$HINT not working}
+  {not working}
   {enable thread-safe loading of creature resources}
   TCreatureResourceHelper = class helper for TCreatureResource
   public
@@ -83,6 +96,15 @@ implementation
 uses SyncObjs, SysUtils, x3dload,
   CastleLog;
 
+{$IFDEF ThreadLoad}
+procedure DLoadThread.Execute;
+begin
+  Source.Load(URL);
+  Source.UnlockThread;
+end;
+
+{----------------------------------------------------------------------------}
+
 procedure LoadThread(Source: ILoadObject; URL: string);
 var LoadThread: DLoadThread;
 begin
@@ -92,26 +114,26 @@ begin
   end;
   Source.LockThread;
   LoadThread := DLoadThread.Create(true);
+  Source.GrabThread(LoadThread);
   LoadThread.Source := Source;
   LoadThread.URL := URL;
   LoadThread.FreeOnTerminate := true;
   LoadThread.Priority := tpLower;
   LoadThread.Start;
 end;
-
-{----------------------------------------------------------------------------}
-
-procedure DLoadThread.Execute;
+{$ELSE}
+procedure LoadThread(Source: ILoadObject; URL: string);
 begin
   Source.Load(URL);
-  Source.UnlockThread;
 end;
+{$ENDIF}
+
+
 
 {============================================================================}
 {====================== SAFE LOADING (WITH LOCKS) ==========================}
 {============================================================================}
 
-//{$WARNING: Maybe, I'm using CriticalSection in a wrong way?}
 var
   {a lock to ensure no simultaneous HDD access}
   HDD_Lock: TCriticalSection;
@@ -208,7 +230,7 @@ procedure TCreatureResourceHelper.PrepareSafe;
 begin
   HDD_Lock.Acquire;
   try
-    {$HINT not working}
+    {not working}
     prepare;
   finally
     HDD_Lock.Release;

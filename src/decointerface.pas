@@ -24,7 +24,7 @@ interface
 
 uses
   fgl,
-  DecoGlobal, DecoTime;
+  DecoGlobal, DecoTime, DecoThread;
 
 const DefaultAnimationDuration = 0.3; {in seconds}
 
@@ -115,7 +115,7 @@ type
 Type
   { most abstract container for interface elements
     Defines size, scaling and animation state }
-  DAbstractElement = class abstract(TObject)
+  DAbstractElement = class abstract(DThreadedObject)
   strict protected
     { Caches current animation state, recalculated by GetAnimationState at every render}
     procedure GetAnimationState;

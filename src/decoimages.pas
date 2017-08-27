@@ -85,9 +85,6 @@ type
     { loads image in realtime }
     procedure Load(const URL: string); virtual;
     procedure Load(const CopyImage: TCastleImage);
-    function ThreadLocked: boolean;
-    procedure LockThread;
-    procedure UnlockThread;
     procedure Afterload; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
     { loads image in a thread }
 {    procedure LoadThread(const FileName:string);}
@@ -341,18 +338,7 @@ end;
 {======================== static image =======================================}
 {=============================================================================}
 
-function DStaticImage.ThreadLocked: boolean;
-begin
- Result := fThreadWorking;
-end;
-procedure DStaticImage.LockThread;
-begin
-  fThreadWorking := true;
-end;
-procedure DStaticImage.UnlockThread;
-begin
-  fThreadWorking := true;
-end;
+
 
 
 {procedure TLoadImageThread.execute;
@@ -421,13 +407,7 @@ end;
 
 destructor DStaticImage.Destroy;
 begin
-  {if ThreadWorking then begin
-    Try
-      LoadImageThread.Terminate;
-    finally
-      FreeAndNil(LoadImageThread); //redundant, as freeonterminate=true?
-    end;
-  end;}
+
   inherited;
 end;
 
