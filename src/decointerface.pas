@@ -113,6 +113,7 @@ type
     { Anchors this Container to aParent }
     procedure AnchorFrom(const aParent: DAbstractContainer; const Gap: integer = 0);
     { Anchors aChild to this Container  }
+    procedure AnchorChild(const aChild: DAbstractContainer; const Gap: integer = 0);
   end;
 
 type
@@ -491,6 +492,22 @@ begin
   Anchor[asBottom].Gap := Gap;
   Anchor[asBottom].AlignTo := vaBottom;
   OpacityAnchor := aParent;
+end;
+procedure DAbstractContainer.AnchorChild(const aChild: DAbstractContainer; const Gap: integer = 0);
+begin
+  aChild.Anchor[asLeft  ].Anchor := Self;
+  aChild.Anchor[asLeft  ].Gap := Gap;
+  aChild.Anchor[asLeft  ].AlignTo := haLeft;
+  aChild.Anchor[asRight ].Anchor := Self;
+  aChild.Anchor[asRight ].Gap := Gap;
+  aChild.Anchor[asRight ].AlignTo := haRight;
+  aChild.Anchor[asTop   ].Anchor := Self;
+  aChild.Anchor[asTop   ].Gap := Gap;
+  aChild.Anchor[asTop   ].AlignTo := vaTop;
+  aChild.Anchor[asBottom].Anchor := Self;
+  aChild.Anchor[asBottom].Gap := Gap;
+  aChild.Anchor[asBottom].AlignTo := vaBottom;
+  aChild.OpacityAnchor := Self;
 end;
 
 {----------------------------------------------------------------------------}
