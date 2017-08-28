@@ -59,7 +59,9 @@ Type DFont = class(TTextureFont)
   function StringToImage(const s: string): TGrayscaleAlphaImage;
 end;
 
-var CharHealthFont, CharNickNameFont: DFont;
+var DefaultFont: DFont;
+
+    CharHealthFont, CharNickNameFont: DFont;
     LoadScreenFont: DFont;
     PlayerDamageFont: DFont;
     DebugFont: DFont;
@@ -76,6 +78,7 @@ var {$IFNDEF Android}MyCharSet: TUnicodeCharList;{$ENDIF}
 
 procedure SetFonts;
 begin
+  DefaultFont := RegularFont16;
   DebugFont := RegularFont12;
 
   CharHealthFont := RegularFont12;
@@ -223,7 +226,7 @@ begin
       Result.Add(NewString);
       i1 := i_break+1;
     end;
-    Inc(i2);
+    inc(i2);
   end;
   NewString := DString.Create;
   NewString.Value := Copy(s,i1,i2-i1);

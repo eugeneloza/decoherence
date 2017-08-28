@@ -28,29 +28,28 @@ uses Classes,
 
 type
   { a powerful text label, converted to GLImage to be extremely fast }
-  DLabel = class(DAbstractImage)
+  DLabel = class(DSimpleImage)
+  strict private
+    fText: string;
+    BrokenString: DStringList;
+  private
+    procedure PrepareTextImage;
+    procedure SetText(const Value: string);
+    function GetText: string;
   public
-{    { font to print the label }
+    { font to print the label }
     Font: DFont;
     { shadow intensity. Shadow=0 is no shadow }
     Shadow: Float;
     { whether the label final image is scaled or remains 1:1 for clear text}
     ScaleLabel: boolean;
-    constructor Create(AOwner: TComponent); override;
+    constructor Create; override;
     destructor Destroy; override;
-    procedure Rescale; override;
+    //procedure Rescale; override;
     procedure RescaleImage; override;
-    //procedure draw; override;
-  private
-    procedure PrepareTextImage;
-    procedure SetText(const value: string);
-    function GetText: string;
   public
     { text at the label }
     property Text: string read GetText write SetText;
-  private
-    fText:  string;
-    BrokenString: DStringList;  }
   end;
 
 Type
@@ -96,135 +95,135 @@ uses SysUtils, CastleImages, CastleLog,
 
 {----------------------------------------------------------------------------}
 
-{constructor DLabel.Create(AOwner : TComponent);
+constructor DLabel.Create;
 begin
-  inherited Create(AOwner);
+  inherited Create;
   ScaleLabel := false;
   Shadow := 0;
-end; }
+  Font := DefaultFont;
+  //fText := ''; //autoinitialized
+end;
 
 {----------------------------------------------------------------------------}
 
-{destructor DLabel.Destroy;
+destructor DLabel.Destroy;
 begin
-  if BrokenString <> nil then BrokenString.Clear;
   FreeAndNil(BrokenString);
-  inherited
-end; }
+  inherited Destroy;
+end;
 
 {----------------------------------------------------------------------------}
 
-{procedure DLabel.SetText(const Value: string);
+procedure DLabel.SetText(const Value: string);
 begin
   if fText <> Value then begin
     fText := Value;
     PrepareTextImage;
   end;
-end;  }
+end;
 
 {----------------------------------------------------------------------------}
 
-{function DLabel.GetText: string;
+function DLabel.GetText: string;
 begin
   Result := fText;
-end;  }
+end;
 
 {----------------------------------------------------------------------------}
 
 {procedure DLabel.Rescale;
 begin
-  inherited;
-  {if not ScaleLabel then
-    base.backwardsetsize(RealWidth,RealHeight) }
-end; }
+  inherited Rescale;
+  {rescale image will fire before this line, so we'll need to override it there}
+  //if not ScaleLabel then Base.ResetToReal;
+end;  }
 
 {----------------------------------------------------------------------------}
 
-{procedure DLabel.PrepareTextImage;
+procedure DLabel.PrepareTextImage;
 begin
-  if BrokenString<> nil then BrokenString.Clear;
+  ImageReady := false;
+  ImageLoaded := false;
+
   FreeAndNil(BrokenString);
-  BrokenString := Font.BreakStings(Text,Base.w);
+  BrokenString := Font.BreakStings(fText, Base.w);
   FreeImage;
-
-  // for i := 0 to brokenString.count-1 do writeLnLog('',inttostr(brokenstring[i].height));
-
-//  SourceImage := nil; // let it be as a safeguard here. I don't want to freeannil GImage before it is instantly created to avoid sigsegvs
 
   if Shadow = 0 then
     SourceImage := Font.BrokenStringToImage(BrokenString)
   else
     SourceImage := Font.BrokenStringToImageWithShadow(BrokenString,Shadow,3);
 
-  RealHeight := SourceImage.Height;
-  RealWidth := SourceImage.Width;
+  Base.RealHeight := SourceImage.Height;
+  Base.RealWidth := SourceImage.Width;
 
-  ImageLoaded := true;     //not good...
-  RescaleImage;
-end;  }
+  ImageLoaded := true;
+
+  Rescale;
+end;
 
 {----------------------------------------------------------------------------}
 
-{procedure DLabel.RescaleImage;
+procedure DLabel.RescaleImage;
 begin
   {$IFNDEF AllowRescale}If SourceImage = nil then Exit;{$ENDIF}
   If Self.ScaleLabel then
-    inherited //rescale this label as a simple image to fit "base size"
+    inherited RescaleImage //rescale this label as a simple image to fit "base size"
   else begin
     //don't rescale this label to provide sharp font
     if ImageLoaded then
-       if Base.Initialized then begin
+       if Base.isInitialized then begin
           ScaledImage := SourceImage.MakeCopy;
-          Base.BackwardSetSize(RealWidth,RealHeight);
+          Base.ResetToReal;
           InitGLPending := true;
           {$IFNDEF AllowRescale}FreeAndNil(SourceImage);{$ENDIF}
         end
        else
          WriteLnLog('DLabel.RescaleImage/no scale label','ERROR: base.initialized = false');
   end;
-end; }
+end;
 
 
 {=============================================================================}
 {========================= Integer label =====================================}
 {=============================================================================}
 
-{procedure DIntegerLabel.Draw;
+{procedure DIntegerLabel.Update;
 begin
+  inherited Update;
   Text := IntToStr(value^);
-  inherited;
 end; }
 
 {=============================================================================}
 {========================== String label =====================================}
 {=============================================================================}
 
-{procedure DStringLabel.Draw;
+{procedure DStringLabel.Update;
 begin
+  inherited Update;
   Text := Value^;
-  inherited;
 end; }
 
 {=============================================================================}
 {=========================== Float label =====================================}
 {=============================================================================}
 
-{Constructor DFloatLabel.Create(AOwner: TComponent);
+{Constructor DFloatLabel.Create;
 begin
-  inherited Create(AOwner);
+  inherited Create;
   Digits := 0;
 end;  }
 
 {---------------------------------------------------------------------------}
 
-{procedure DFloatLabel.Draw;
+{procedure DFloatLabel.Update;
 begin
+  inherited Update;
   case Digits of
     1: Text := IntToStr(Trunc(Value^))+'.'+IntToStr(Round(Frac(Value^)*10));
     2: Text := IntToStr(Trunc(Value^))+'.'+IntToStr(Round(Frac(Value^)*100));
     else Text := IntToStr(Round(Value^));
   end;
-  inherited;
 end; }
 
 end.

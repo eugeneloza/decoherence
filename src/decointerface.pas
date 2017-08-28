@@ -101,6 +101,7 @@ type
     procedure SetIntSize(const ax1,ay1,aWidth,aHeight: integer);
     { Sets int width/height for scaling animations }
     procedure SetIntWidthHeight(const aWidth,aHeight: integer);
+    procedure ResetToReal;
     procedure SetRealSize(const aWidth,aHeight: integer);
     { Anchors this Container to aParent }
     procedure AnchorTo(const aParent: DAbstractContainer; const Gap: integer = 0);
@@ -425,6 +426,7 @@ end;
 
 procedure DAbstractContainer.SetIntWidthHeight(const aWidth,aHeight: integer);
 begin
+  {$hint or based on anchors? }
   x1 := x1 + (w-aWidth) div 2;
   x2 := x2 - (w-aWidth) div 2;
   y1 := y1 + (h-aHeight) div 2;
@@ -434,6 +436,13 @@ begin
   h := aHeight;
 
   IntegerToFloat; //not needed here?
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DAbstractContainer.ResetToReal;
+begin
+  SetIntWidthHeight(RealWidth,RealHeight);
 end;
 
 {----------------------------------------------------------------------------}
