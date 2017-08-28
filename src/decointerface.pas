@@ -156,7 +156,7 @@ Type
       Important: GetAnimationState must be called before setting basesize
       of the element as AnimateTo uses currentAnimationState}
     procedure AnimateTo(const Animate: TAnimationStyle; const Duration: float = DefaultAnimationDuration);
-    constructor Create; virtual; //override;
+    constructor Create; override;
     destructor Destroy; override;
   end;
 

@@ -40,9 +40,9 @@ type
     procedure UnlockThread;
     { source object grabs a thread to terminate it in destructor }
     procedure GrabThread(aThread: TThread);
-    constructor Create; virtual; // override;
     destructor Destroy; override;
     {$ENDIF}
+    constructor Create; virtual; // override;
   end;
 
 type
@@ -95,6 +95,7 @@ end;
 
 {-----------------------------------------------------------------------------}
 
+{$IFDEF ThreadLoad}
 function DThreadedObject.ThreadLocked: boolean;
 begin
  Result := fThreadWorking;
@@ -126,6 +127,12 @@ begin
   end;
   inherited Destroy;
 end;
+{$ELSE}
+constructor DThreadedObject.Create;
+begin
+  //just empty constructor, no threads used
+end;
+{$ENDIF}
 
 end.
 

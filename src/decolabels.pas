@@ -56,9 +56,9 @@ Type
   {provides a simple integer output into a label}
   DIntegerLabel = class (DLabel)
   public
- {   { pointer to the value it monitors }
+    { pointer to the value it monitors }
     Value: Pinteger;
-    procedure Draw; override; }
+    procedure Update; override;
   end;
 
 Type
@@ -66,24 +66,24 @@ Type
   DStringLabel = class (DLabel)
   public
     { pointer to the value it monitors }
- {   value: Pstring;
-    procedure Draw; override; }
+    value: Pstring;
+    procedure Update; override;
   end;
 
 Type
-  {provides a simple float output into a label}
+  { Provides a simple float output into a label }
   DFloatLabel = class (DLabel)
   public
     { pointer to the value it monitors }
- {   Value: PFloat;
+    Value: PFloat;
     { how many digits after point are displayed?
       0 - float is rounded to integer (1.6423 -> 2)
       1 - one digit like 1.2
       2 - two digits like 1.03
       no more needed at the moment }
     Digits: integer;
-    constructor Create(AOwner: TComponent); override;
-    procedure Draw; override;  }
+    constructor Create; override;
+    procedure Update; override;
   end;
 
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
@@ -188,35 +188,35 @@ end;
 {========================= Integer label =====================================}
 {=============================================================================}
 
-{procedure DIntegerLabel.Update;
+procedure DIntegerLabel.Update;
 begin
   inherited Update;
   Text := IntToStr(value^);
-end; }
+end;
 
 {=============================================================================}
 {========================== String label =====================================}
 {=============================================================================}
 
-{procedure DStringLabel.Update;
+procedure DStringLabel.Update;
 begin
   inherited Update;
   Text := Value^;
-end; }
+end;
 
 {=============================================================================}
 {=========================== Float label =====================================}
 {=============================================================================}
 
-{Constructor DFloatLabel.Create;
+Constructor DFloatLabel.Create;
 begin
   inherited Create;
   Digits := 0;
-end;  }
+end;
 
 {---------------------------------------------------------------------------}
 
-{procedure DFloatLabel.Update;
+procedure DFloatLabel.Update;
 begin
   inherited Update;
   case Digits of
@@ -224,7 +224,7 @@ begin
     2: Text := IntToStr(Trunc(Value^))+'.'+IntToStr(Round(Frac(Value^)*100));
     else Text := IntToStr(Round(Value^));
   end;
-end; }
+end;
 
 end.
 
