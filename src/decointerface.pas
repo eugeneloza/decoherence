@@ -53,6 +53,8 @@ type
     fInitialized: boolean;
     { Parent container size (cached) }
     cx1,cx2,cy1,cy2,cw,ch: integer;
+    { Parent container opacity }
+    co: float;
     { Determine and cache parent container size }
     procedure GetAnchors;
     { Converts integer size to float. }
@@ -62,6 +64,7 @@ type
       should be public only for animation states. }
     procedure FloatToInteger;
   public
+    OpacityAnchor: DAbstractContainer;
     type
       DAnchor = record
         { Anchor to which element }
@@ -78,8 +81,10 @@ type
     fx1,fy1,fx2,fy2{,fw,fh}: float;
     { Real size of the Container }
     x1,y1,x2,y2,w,h: integer;
-    { Opacity of the container }
-    Opacity: float;
+    { Base value of the opacity of the container }
+    BaseOpacity: float;
+    { Opacity of the container multiplied by Anchor's opacity }
+    CurrentOpacity: float;
     { Keep proportions of the container }
     RealWidth, RealHeight: integer;
     ProportionalScale: TProportionalScale;
@@ -96,15 +101,18 @@ type
     procedure AssignTo(const Dest: DAbstractContainer);
     { Set container position and size }
     procedure SetFloatCoord(const afx1,afy1,afx2,afy2: float);
+    procedure SetFloatFull(const afx1,afy1,afx2,afy2,aOpacity: float);
     procedure SetFloatSize(const afx1,afy1,afWidth,afHeight: float);
     procedure SetIntCoord(const ax1,ay1,ax2,ay2: integer);
+    procedure SetIntFull(const ax1,ay1,ax2,ay2: integer; const aOpacity: float);
     procedure SetIntSize(const ax1,ay1,aWidth,aHeight: integer);
     { Sets int width/height for scaling animations }
     procedure SetIntWidthHeight(const aWidth,aHeight: integer);
     procedure ResetToReal;
     procedure SetRealSize(const aWidth,aHeight: integer);
     { Anchors this Container to aParent }
-    procedure AnchorTo(const aParent: DAbstractContainer; const Gap: integer = 0);
+    procedure AnchorFrom(const aParent: DAbstractContainer; const Gap: integer = 0);
+    { Anchors aChild to this Container  }
   end;
 
 type
@@ -281,14 +289,10 @@ begin
     AlignTo := noalign;
     Gap := 0;
   end;
-  Opacity := 1;
+  OpacityAnchor := nil;
+  BaseOpacity := 1;
   ProportionalScale := psNone;
 end;
-
-{destructor DAbstractContainer.Destroy;
-begin
-  inherited Destroy;
-end;}
 
 {----------------------------------------------------------------------------}
 
@@ -299,11 +303,13 @@ begin
     cy1 := 0;
     cx2 := Window.Width;
     cy2 := Window.Height;
+    co  := 1;
   end else begin
     if (Anchor[asLeft].Anchor = nil) or
        (Anchor[asTop].Anchor = nil) or
        (Anchor[asRight].Anchor = nil) or
-       (Anchor[asBottom].Anchor = nil) then begin
+       (Anchor[asBottom].Anchor = nil) or
+       (OpacityAnchor = nil) then begin
          WriteLnLog('DAbstractContainer.GetAnchors','Anchor is Nil!');
          Exit;
        end;
@@ -332,6 +338,7 @@ begin
       vaMiddle: cy2 := (Anchor[asBottom].Anchor.y1 + Anchor[asBottom].Anchor.y2) div 2;
       else WriteLnLog('DAbstractContainer.GetAnchors','Invalid Anchor align!')
     end;
+    co := OpacityAnchor.CurrentOpacity;
   end;
   cw := cx2-cx1;
   ch := cy2-cy1;
@@ -342,6 +349,8 @@ end;
 procedure DAbstractContainer.IntegerToFloat;
 begin
   GetAnchors;
+
+  CurrentOpacity := BaseOpacity * co;
 
   fx1 := (x1 - cx1 - Anchor[asLeft  ].Gap)/cw;
   fx2 := (x2 - cx2 + Anchor[asRight ].Gap)/cw;
@@ -357,6 +366,8 @@ procedure DAbstractContainer.FloatToInteger;
 var Ratio: float;
 begin
   GetAnchors;
+
+  CurrentOpacity := BaseOpacity * co;
 
   x1 := cx1 + Round(cw * fx1) + Anchor[asLeft].Gap;
   x2 := cx2 + Round(cw * fx2) - Anchor[asRight].Gap;
@@ -394,6 +405,11 @@ begin
 
   FloatToInteger;
 end;
+procedure DAbstractContainer.SetFloatFull(const  afx1,afy1,afx2,afy2,aOpacity: float);
+begin
+  BaseOpacity := aOpacity;
+  SetFloatCoord(afx1,afy1,afx2,afy2);
+end;
 procedure DAbstractContainer.SetFloatSize(const afx1,afy1,afWidth,afHeight: float);
 begin
   fx1 := afx1;
@@ -411,6 +427,11 @@ begin
   y2 := ay2;
 
   IntegerToFloat;
+end;
+procedure DAbstractContainer.SetIntFull(const ax1,ay1,ax2,ay2: integer; const aOpacity: float);
+begin
+  BaseOpacity := aOpacity;
+  SetIntCoord(ax1,ay1,ax2,ay2);
 end;
 procedure DAbstractContainer.SetIntSize(const ax1,ay1,aWidth,aHeight: integer);
 begin
@@ -455,7 +476,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DAbstractContainer.AnchorTo(const aParent: DAbstractContainer; const Gap: integer = 0);
+procedure DAbstractContainer.AnchorFrom(const aParent: DAbstractContainer; const Gap: integer = 0);
 begin
   Anchor[asLeft  ].Anchor := aParent;
   Anchor[asLeft  ].Gap := Gap;
@@ -469,6 +490,7 @@ begin
   Anchor[asBottom].Anchor := aParent;
   Anchor[asBottom].Gap := Gap;
   Anchor[asBottom].AlignTo := vaBottom;
+  OpacityAnchor := aParent;
 end;
 
 {----------------------------------------------------------------------------}
@@ -490,11 +512,13 @@ begin
   Self.h := Source.h;
   Self.RealWidth := Source.RealWidth;
   Self.RealHeight := Source.RealHeight;
-  Self.Opacity := Source.Opacity;
+  Self.BaseOpacity := Source.BaseOpacity;
   Self.ProportionalScale := Source.ProportionalScale;
   Self.fInitialized := Source.isInitialized;
+  Self.ScaleToWindow := Source.ScaleToWindow;
   for aa in TAnchorSide do
     Self.Anchor[aa] := Source.Anchor[aa];
+  Self.OpacityAnchor := Source.OpacityAnchor;
 end;
 procedure DAbstractContainer.AssignTo(const Dest: DAbstractContainer);
 var aa: TAnchorSide;
@@ -513,11 +537,13 @@ begin
   Dest.h := Self.h;
   Dest.RealWidth := Self.RealWidth;
   Dest.RealHeight := Self.RealHeight;
-  Dest.Opacity := Self.Opacity;
+  Dest.BaseOpacity := Self.BaseOpacity;
   Dest.ProportionalScale := Self.ProportionalScale;
   Dest.fInitialized := Self.isInitialized;
+  Dest.ScaleToWindow := Self.ScaleToWindow;
   for aa in TAnchorSide do
     Dest.Anchor[aa] := Self.Anchor[aa];
+  Dest.OpacityAnchor := Self.OpacityAnchor;
 end;
 
 {============================================================================}
@@ -545,29 +571,33 @@ end;
 procedure DAbstractElement.AnimateTo(const Animate: TAnimationStyle; const Duration: float = DefaultAnimationDuration);
 var mx,my: float;
 begin
-  if Animate = asNone then Exit else begin
+  begin
+    GetAnimationState;
+    Last.Assign(Current);   //to current animation state
+    {$WARNING Base may be "last" animation state, not "next"!}
+    Next.Assign(Base);
+
+    if Animate = asNone then Exit;
+
     AnimationStart := -1;
     AnimationDuration := Duration;
 
-    GetAnimationState;
-    Last.Assign(Current);   //to current animation state
-    Next.Assign(Base);
     case Animate of
       {just grabs some previous locations and animates the item from there to base
        requires that CurrentAnimationState is initialized... TODO}
       //asDefault: Last.Assign(Self);
       {fades in/out element}
-      asFadeIn:  Last.Opacity := 0;
-      asFadeOut: Next.Opacity := 0;
+      asFadeIn:  Last.BaseOpacity := 0;
+      asFadeOut: Next.BaseOpacity := 0;
       {asFadeOutSuicide}
       {zooms in/out element}
       asZoomIn:  begin
                    Last.SetIntWidthHeight(1,1);
-                   Last.Opacity := 0;
+                   Last.BaseOpacity := 0;
                  end;
       asZoomOut: begin
                    Next.SetIntWidthHeight(1,1);
-                   Next.Opacity := 0;
+                   Next.BaseOpacity := 0;
                  end;
 
       {asZoomOutSuicide}
@@ -618,8 +648,7 @@ end;
 
 procedure DAbstractElement.SetBaseSize(const NewX,NewY,NewW,NewH,NewO: float; const Animate: TAnimationStyle = asNone);
 begin
-  Base.SetFloatSize(NewX,NewY,NewW,NewH);
-  Base.Opacity := NewO;
+  Base.SetFloatFull(NewX,NewY,NewW,NewH,NewO);
   AnimateTo(Animate);
 end;
 
@@ -629,10 +658,10 @@ procedure DAbstractElement.GetAnimationState;
 var Phase: float;
 begin
   if Base.isInitialized then begin
+    if AnimationStart<0 then AnimationStart := DecoNow;
     if (Last.isInitialized) and (Next.isInitialized) and
-      ((Animationstart<0) or (DecoNow-AnimationStart < AnimationDuration)) then begin
+      ((DecoNow-AnimationStart < AnimationDuration)) then begin
       //if this is start of the animation - init time
-      if AnimationStart<0 then AnimationStart := DecoNow;
       //determine animation time passed
       Phase := (DecoNow-AnimationStart)/AnimationDuration;
       //determine animation phase
@@ -640,25 +669,22 @@ begin
         //acLinear: ; //<- change nothing.
         acSquare: if Phase<0.5 then Phase := Sqr(2*Phase)/2 else Phase := 1 - Sqr(2*(1-Phase))/2;
       end;
-      Current.x1 := Last.x1+Round((Next.x1-Last.x1)*Phase);
-      Current.y1 := Last.y1+Round((Next.y1-Last.y1)*Phase);
-      Current.x2 := Last.x2+Round((Next.x2-Last.x2)*Phase);
-      Current.y2 := Last.y2+Round((Next.y2-Last.y2)*Phase);
-      Current.Opacity := Last.Opacity+((Next.opacity-Last.Opacity)*Phase);
+      Current.Assign(Next);
+      Current.SetFloatFull( Last.fx1+(Next.fx1-Last.fx1)*Phase,
+                            Last.fy1+(Next.fy1-Last.fy1)*Phase,
+                            Last.fx2+(Next.fx2-Last.fx2)*Phase,
+                            Last.fy2+(Next.fy2-Last.fy2)*Phase,
+                            Last.BaseOpacity+((Next.BaseOpacity-Last.BaseOpacity)*Phase));
       //we don't need scale back to float, as it's not a basic animation state
     end else begin
-      {should be "next" here}
-      Current.x1 := Base.x1;
-      Current.x2 := Base.x2;
-      Current.y1 := Base.y1;
-      Current.y2 := Base.y2;
-      Current.Opacity := Base.Opacity;
+      Current.Assign(Base);
+      Current.SetFloatFull( Base.fx1,
+                            Base.fy1,
+                            Base.fx2,
+                            Base.fy2,
+                            Base.BaseOpacity);
     end;
-    Current.w := Current.x2 - Current.x1;
-    Current.h := Current.y2 - Current.y1;
-    //Current.fInitialized := true;
- end else
-   //Current.fInitialized := false;
+ end;
 end;
 
 {----------------------------------------------------------------------------}

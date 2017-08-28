@@ -226,7 +226,7 @@ procedure DAbstractImage.Update;
 begin
   inherited Update;
   GLImage.Color := InterfaceColor;
-  GLImage.Color[3] := Current.Opacity;
+  GLImage.Color[3] := Current.CurrentOpacity;
 end;
 
 {----------------------------------------------------------------------------}
@@ -423,7 +423,7 @@ begin
     if not isVisible then Exit;
     Update;
 
-    GLImage.Color[3] := Current.Opacity + Current.Opacity/4 * Sin(2*Pi*OpacityPhase);
+    GLImage.Color[3] := Current.CurrentOpacity + Current.CurrentOpacity/4 * Sin(2*Pi*OpacityPhase);
 
     PhaseScaled := Round((1-Phase)*Window.Width);
 
@@ -474,7 +474,7 @@ begin
     if not isVisible then Exit;
     Update;
 
-    GLImage.Color[3] := Current.Opacity*Sin(Pi*Phase);
+    GLImage.Color[3] := Current.CurrentOpacity*Sin(Pi*Phase);
 
     x := Round((Window.Width-Base.w)*Phase);
     GLImage.Draw(x,0);
