@@ -99,30 +99,32 @@ type
 
 type
   { Wind effect used in different situations
-    warning: phased images are scaled relative to Window }
+    warning: wind images are scaled relative to Window }
   DWindImage = class(DPhasedImage)
   strict protected
     procedure CyclePhase; override;
   public
     { completely overrides the default drawing procedure }
     procedure Draw; override;
+    constructor Create; Override;
   end;
 
 type TImageProcedure = procedure(const Sender: DPhasedImage) of Object;
 type
   { A floating image for LoadScreens
-    warning: phased images are scaled relative to Window }
+    warning: floater images are scaled relative to Window }
   DFloatImage = class(DPhasedImage)
   strict protected
     procedure CyclePhase; override;
   public
     onCycleFinish: TImageProcedure;
     procedure Draw; override;
+    constructor Create; Override;
   end;
 
-Type TBarStyle = (bsVertical, bsHorizontal);
+type TBarStyle = (bsVertical, bsHorizontal);
 
-Type
+type
   { Generic bar used for progress bars and health bars }
   DBarImage = class(DStaticImage)
   public
@@ -135,9 +137,9 @@ Type
     constructor Create; override;
   end;
 
-Type TStatBarStyle = (sbHealth, sbStamina, sbConcentration, sbMetaphysics);
+type TStatBarStyle = (sbHealth, sbStamina, sbConcentration, sbMetaphysics);
 
-Type
+type
   { bar to display health for mobs and primary 4 stats for player characters }
   DStatBarImage = class(DBarImage)
   public
@@ -231,11 +233,11 @@ end;
 
 procedure DAbstractImage.Draw;
 begin
+  if not ImageReady then InitGL;
   if ImageReady then begin
+    if not isVisible then Exit;
     Update; //calls update and checks if the image is visible
     GLIMage.Draw(Current.x1,Current.y1,Current.w,Current.h); //todo
-  end else begin
-    if InitGLPending then InitGL;
   end;
 end;
 
@@ -388,6 +390,14 @@ end;
 {========================= wind image ========================================}
 {=============================================================================}
 
+constructor DWindImage.Create;
+begin
+  inherited Create;
+  Base.ScaleToWindow := true;
+end;
+
+{----------------------------------------------------------------------------}
+
 procedure DWindImage.CyclePhase;
 begin
   inherited CyclePhase;
@@ -408,6 +418,7 @@ procedure DWindImage.Draw;
 var PhaseScaled:integer;
 begin
   //inherited Draw; <-------- this render is different
+  if not ImageReady then InitGL;
   if ImageReady then begin
     if not isVisible then Exit;
     Update;
@@ -426,13 +437,20 @@ begin
                  PhaseScaled,Window.Height,
                  Window.Width-PhaseScaled,0,
                  PhaseScaled,Window.Height);
-  end else
-    if InitGLPending then InitGL;
+  end;
 end;
 
 {=============================================================================}
 {========================= float image =======================================}
 {=============================================================================}
+
+constructor DFloatImage.Create;
+begin
+  inherited Create;
+  Base.ScaleToWindow := true;
+end;
+
+{----------------------------------------------------------------------------}
 
 procedure DFloatImage.CyclePhase;
 begin
@@ -450,6 +468,7 @@ procedure DFloatImage.Draw;
 var x: integer;
 begin
   //inherited Draw; <-------- this render is different
+  if not ImageReady then InitGL;
 
   if ImageReady then begin
     if not isVisible then Exit;
@@ -459,8 +478,7 @@ begin
 
     x := Round((Window.Width-Base.w)*Phase);
     GLImage.Draw(x,0);
-  end else
-    if InitGLPending then InitGL;
+  end;
 end;
 
 {=============================================================================}
@@ -471,6 +489,8 @@ procedure DBarImage.Draw;
 var x: integer;
 begin
   //inherited Draw; <-------- this render is different
+
+  if not ImageReady then InitGL;
 
   if ImageReady then begin
     if not isVisible then Exit;
@@ -487,8 +507,7 @@ begin
       x := Round(Base.w * Position/(Max-Min));
       GLImage.Draw(Base.x1,Base.y1,x,Base.h);
     end;
-  end else
-    if InitGLPending then InitGL;
+  end;
 end;
 
 {---------------------------------------------------------------------------}

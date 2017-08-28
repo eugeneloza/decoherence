@@ -24,7 +24,7 @@ interface
 
 uses Classes,
   DecoImages, DecoFont,
-  DecoGlobal;
+  DecoGlobal, DecoTime;
 
 type
   { a powerful text label, converted to GLImage to be extremely fast }
@@ -52,7 +52,7 @@ type
     property Text: string read GetText write SetText;
   end;
 
-Type
+type
   {provides a simple integer output into a label}
   DIntegerLabel = class (DLabel)
   public
@@ -61,7 +61,7 @@ Type
     procedure Update; override;
   end;
 
-Type
+type
   {provides a simple string output into a label}
   DStringLabel = class (DLabel)
   public
@@ -70,7 +70,7 @@ Type
     procedure Update; override;
   end;
 
-Type
+type
   { Provides a simple float output into a label }
   DFloatLabel = class (DLabel)
   public
@@ -82,8 +82,19 @@ Type
       2 - two digits like 1.03
       no more needed at the moment }
     Digits: integer;
-    constructor Create; override;
     procedure Update; override;
+    constructor Create; override;
+  end;
+
+type
+
+  DFPSLabel = class(DLabel)
+  strict private
+    FPScount: Integer;
+    LastRenderTime: DTime;
+  public
+    procedure CountFPS;
+    constructor Create; override;
   end;
 
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
@@ -224,6 +235,37 @@ begin
     2: Text := IntToStr(Trunc(Value^))+'.'+IntToStr(Round(Frac(Value^)*100));
     else Text := IntToStr(Round(Value^));
   end;
+end;
+
+{=============================================================================}
+{============================ FPS label ======================================}
+{=============================================================================}
+
+constructor DFPSLabel.Create;
+begin
+  inherited Create;
+  FPSCount := 0;
+  LastRenderTime := -1;
+
+  Base.ScaleToWindow := true;
+  Shadow := 0;
+  Font := DebugFont;
+  SetBaseSize(0,0,0.05,0.05,1,asNone);
+  //Text := '';
+end;
+
+{---------------------------------------------------------------------------}
+
+procedure DFPSLabel.CountFPS;
+begin
+  if LastRenderTime < 0 then LastRenderTime := DecoNow;
+
+  if (DecoNow - LastRenderTime >= 1) then begin
+      Text := Inttostr(FPSCount){+' '+inttostr(round(Window.Fps.RealTime))};
+      FPSCount := 0;
+      LastRenderTime := DecoNow;
+  end else inc(FPSCount);
+  Draw;
 end;
 
 end.

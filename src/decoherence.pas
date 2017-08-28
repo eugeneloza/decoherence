@@ -119,7 +119,7 @@ end;
   on each Window.Render, so we just need to add a GUI render here }
 Procedure WindowRender(Container : TUIContainer);
 begin
-  GUI.draw;
+  GUI.Draw;
 end;
 
 {======================== Mouse & keyboard =================================}
@@ -205,13 +205,13 @@ end;
 procedure LoadAndInitData;
 begin
   InitMusicManager;
-  //SetGameMode(gmLoadScreen);
+  SetGameMode(gmLoadScreen);
 
-  //InitInterface;
-  //InitPerks;
+  InitInterface;
+  InitPerks;
 
   //Load_test_level; //remake it
-  window.OnBeforeRender := @WindowManage;
+  Window.OnBeforeRender := @WindowManage;
 
   LoadCompleted := true;
 end;
@@ -247,7 +247,6 @@ begin
 
   WritelnLog('ApplicationInitialize','Initialize fonts');
   InitializeFonts;      //load fonts
-  //InitGlobal;           //start random
 
   //create GUI
   WritelnLog('ApplicationInitialize','Create interface');

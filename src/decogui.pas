@@ -22,28 +22,26 @@ unit DecoGui;
 
 interface
 
-uses classes,
-  decointerface, decoimages, decolabels,
-  decofont,
-  decoglobal;
+uses Classes,
+  DecoInterface, DecoImages, DecoLabels, DecoFont,
+  DecoGlobal;
 
 Type
   DInterfaceContainer = class(DInterfaceElement)
+  private
+    FPSLabel: DFPSLAbel;
   public
-    { just = window.height, wihdow.width. Maybe I'll deprecate it later }
- {   width,height: integer;
-
-    constructor create(AOwner:TComponent); override;
-    destructor destroy; override;
+    constructor Create; override;
+    destructor Destroy; override;
     procedure Rescale; override;
-    procedure draw; override;
+    procedure Draw; override;
 
-    procedure FreeLoadScreen(freeWind: boolean);
+{    procedure FreeLoadScreen(freeWind: boolean);
   private
     { wind images to provide background }
-    wind1,wind2: DWindImage;
-    floater: DFloatImage;
-    background: DStaticImage;
+    Wind1,Wind2: DWindImage;
+    Floater: DFloatImage;
+    Background: DStaticImage;
     LoadScreenLabel, FloaterLabel: DLabel;
     procedure DoLoadNewImage;
     procedure LoadWind;
@@ -53,10 +51,6 @@ Type
     { draw CharacterGeneration background elements }
     procedure DrawCharacterGenerationBackground;
     procedure DrawWind;
-  strict private
-    FPS_label: DLabel;
-    FPS_count: Integer;
-    Last_render_time: TDateTime;
   public
     procedure MakeCharacterGenerationInterface; }
 end;
@@ -68,33 +62,24 @@ implementation
 
 uses SysUtils, CastleLog,
   CastleGLUtils, CastleColors,
-  DecoLoadScreen,
+  {DecoLoadScreen,}
   DecoInterfaceComposite, DecoInterfaceBlocks,
   {DecoPlayerCharacter,}
-  Decogamemode, DecoTime;
+  DecoGameMode, DecoTime;
 
 {=============================================================================}
 {========================== interface container ==============================}
 {=============================================================================}
 
-{constructor DInterfaceContainer.create(AOwner: TComponent);
+constructor DInterfaceContainer.Create;
 begin
   writeLnLog('DInterfaceContainer.create','Creating interface.');
-  inherited create(AOwner);
+  inherited Create;
 
-  base.setsize(0,0,fullwidth,fullheight);
+  Base.ScaleToWindow := true;
 
-  Last_render_time := DecoNow;
-  FPS_count := 0;
-  FPS_Label := DLabel.create(Self);
-  FPS_Label.Setbasesize(0,0,0.05,0.05,1,asNone);
-  FPS_Label.Shadow := 0;
-  FPS_Label.Font := DebugFont;
-  FPS_Label.text := 'x';
-
-  Width := -1;
-  Height := -1;
-end; }
+  FPSLabel := DFPSLAbel.Create;
+end;
 
 {-----------------------------------------------------------------------------}
 
@@ -116,32 +101,32 @@ end;  }
 
 {-----------------------------------------------------------------------------}
 
-{destructor DInterfaceContainer.destroy;
+destructor DInterfaceContainer.Destroy;
 begin
-  writeLnLog('DInterfaceContainer.destroy','Game over...');
-  DestroyFonts;
-  inherited;
-end;  }
+  WriteLnLog('DInterfaceContainer.destroy','Game over...');
+  { Free special elements that are not freed automatically (are not Children) }
+  FreeAndNil(FPSLabel);
+  inherited Destroy;
+end;
 
 {-----------------------------------------------------------------------------}
 
-{procedure DInterfaceContainer.rescale;
+procedure DInterfaceContainer.Rescale;
 begin
   writeLnLog('DInterfaceContainer.rescale',inttostr(window.Width)+'x'+inttostr(window.Height));
-  //prevent Window from scaling too small and/or into portrait orientation
+  inherited Rescale;
+
+  { THIS ROUTINE IS NOT YET IMPLEMENTED IN CASTLE GAME ENGINE
+    see https://github.com/castle-engine/castle-engine/issues/36 }
+{ //prevent Window from scaling too small and/or into portrait orientation
   if window.width < window.height then begin
-    // BUG HERE! DOESN'T WORK AS EXPECTED (at least in Linux) !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     writeLnLog('DInterfaceContainer.rescale','ERROR: Only landscape orientation supported!');
     window.width := window.height+10;
   end;
-  width := window.Width;
-  height := window.Height;
-  //rescale "base" for some routines to work correctly
-  base.setsize(0,0,fullwidth,fullheight);
+  //rescale "base" for some routines to work correctly}
+  //base.setsize(0,0,fullwidth,fullheight);
 
-  { rescale special elements }
-  if fps_label <> nil then fps_label.Rescale;
-
+  {
   if (CurrentGameMode=gmLoadScreen) or (CurrentGameMode=gmCharacterGeneration) then begin
     if wind1 <> nil then wind1.rescale;
     if wind2 <> nil then wind2.rescale;
@@ -153,13 +138,11 @@ begin
   end;
 
   if background <> nil then background.rescale; //todo maybe just check show/hide
+  }
 
-  { rescale burner image }
-  //Init_burner_image;
-
-  { rescale children }
-  inherited;
-end;  }
+  { rescale special elements }
+  if FPSLabel <> nil then FPSLabel.Rescale;
+end;
 
 {-----------------------------------------------------------------------------}
 
@@ -248,28 +231,21 @@ end;}
 
 {------------------------------------------------------------------------------}
 
-{procedure DInterfaceContainer.Draw;
+procedure DInterfaceContainer.Draw;
 begin
   { clear the screen depending on the game mode
     in case SceneManager doesn't clear it }
   if GameModeNeedsClearingScreen then RenderContext.Clear([cbColor], Black);
+  inherited Draw;
 
   //some drawing for specific gamemodes
   // if CurrentGameMode = gmCharacterScreen then DrawCharacterScreenBackground
-  if CurrentGameMode = gmCharacterGeneration then DrawCharacterGenerationBackground else
-  if CurrentGameMode = gmLoadScreen then DrawLoadScreen;
+{  if CurrentGameMode = gmCharacterGeneration then DrawCharacterGenerationBackground else
+  if CurrentGameMode = gmLoadScreen then DrawLoadScreen;}
 
-  //draw the interface {children}
-  inherited draw;
-
-  //draw FPS label
-  if (decoNow-Last_render_time >= 1) then begin
-    FPS_label.text := Inttostr(FPS_count){+' '+inttostr(round(Window.Fps.RealTime))};
-    FPS_count := 0;
-    Last_Render_time := decoNow;
-  end else inc(FPS_count);
-  FPS_label.Draw;
-end;}
+  { draw special elements }
+  FPSLabel.CountFPS;
+end;
 
 {======================== Interface modes creation ===========================}
 

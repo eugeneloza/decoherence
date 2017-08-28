@@ -625,30 +625,6 @@ end;
 
 {----------------------------------------------------------------------------}
 
-{procedure DAbstractElement.SetIntSize(const x1,y1,x2,y2:integer; const Animate: TAnimationStyle);
-begin
-  Base.BackwardSetXYWH(x1,y1,x2-x1,y2-y1);
-  AnimateTo(Animate);
-end;}
-
-{----------------------------------------------------------------------------}
-
-{procedure DSingleInterfaceElement.SetBaseSize(const NewX,NewY,NewW,NewH,NewO: float; const Animate: TAnimationStyle);
-begin
-  inherited SetBaseSize(NewX,NewY,NewW,NewH,NewO,Animate);
-  ResetContentSize(Animate);
-end;}
-
-{----------------------------------------------------------------------------}
-
-{procedure DSingleInterfaceElement.SetIntsize(const x1,y1,x2,y2:integer; const Animate: TAnimationStyle);
-begin
-  inherited SetIntsize(x1,y1,x2,y2,Animate);
-  ResetContentSize(Animate);
-end;}
-
-{----------------------------------------------------------------------------}
-
 procedure DAbstractElement.GetAnimationState;
 var Phase: float;
 begin

@@ -73,7 +73,7 @@ begin
     CornerTop := 0; CornerBottom := 0; CornerLeft := 0; CornerRight := 0;
   end;}
 
-  InitCompositeInterface;
+  //InitCompositeInterface;
 
   WriteLnLog('InitInterface','finished');
 end;
