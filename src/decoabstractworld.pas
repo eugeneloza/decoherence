@@ -119,9 +119,9 @@ implementation
 
 uses SysUtils, Classes, CastleLog;
 
-constructor DAbstractWorld.create;
+constructor DAbstractWorld.Create;
 begin
-  inherited;
+  inherited Create;
   WriteLnLog('DAbstractWorld.create','Creating the World');
   {we create an non-initialized random (i.e. initialized by a stupid constant integer)
   Just to make sure we don't waste any time (<1ms) on initialization now}
@@ -138,7 +138,7 @@ begin
   FreeAndNil(RNDM);
   FreeAndNil(Nav);
   FreeAndNil(Weenies);
-  inherited;
+  inherited Destroy;
 end;
 
 {------------------------------------------------------------------------------}

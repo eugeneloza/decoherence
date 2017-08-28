@@ -124,7 +124,7 @@ uses SysUtils, CastleLog;
 
 constructor DAbstractGenerator.Create;
 begin
-  inherited;
+  //inherited Create;
   {we create an non-initialized random (i.e. initialized by a stupid constant integer)
   Just to make sure we don't waste any time (<1ms) on initialization now}
   RNDM := TCastleRandom.Create(1);
@@ -135,7 +135,7 @@ end;
 destructor DAbstractGenerator.Destroy;
 begin
   FreeAndNil(RNDM);
-  inherited;
+  inherited Destroy;
 end;
 
 {-----------------------------------------------------------------------------}

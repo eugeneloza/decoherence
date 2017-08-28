@@ -25,7 +25,7 @@ interface
 uses Classes, CastleRandom, fgl, CastleVectors, CastleCameras,
   CastleResources, CastleCreatures,
   DecoNavigationNetwork,
-  DecoStats, DecoPerks, DecoBody,
+  DecoStats, DecoPerks, decoactorbody,
   DecoGlobal, DecoTime;
 
 type TDamageType = (dtHealth);
@@ -353,9 +353,9 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-constructor DCoordActor.create;
+constructor DCoordActor.Create;
 begin
-  inherited;
+  inherited Create;
   LastNav := UnitinializedNav;
 end;
 
@@ -373,7 +373,7 @@ end;
 
 constructor DActorPhysics.Create;
 begin
-  inherited;
+  inherited Create;
   Height := 0;
   CurrentGravityDown := Vector3(0,0,1);
 end;
@@ -383,7 +383,7 @@ end;
 procedure DActorPhysics.Manage;
 begin
   CurrentGravityDown := -DeltaTLocal*CurrentWorld.GetGravity(Position)*CurrentWorld.GravityAcceleration;
-  inherited;
+  inherited Manage;
   doGravity;
 end;
 
@@ -408,7 +408,7 @@ end;
 
 constructor DBasicActor.Create;
 begin
-  inherited;
+  inherited Create;
   Nickname := 'abc';
   //setting some values to avoid uncertainity
   SetMaxMaxHP(100);
@@ -426,7 +426,7 @@ destructor DBasicActor.Destroy;
 begin
   FreeAndNil(DefenseRandom);
   FreeAndNil(AttackRandom);
-  inherited;
+  inherited Destroy;
 end;
 
 {----------------------------------------------------------------------------}
@@ -635,7 +635,7 @@ end;
 
 constructor DActorBody.Create;
 begin
-  inherited;
+  inherited Create;
   {$warning dummy, should set LastTime here}
 end;
 
@@ -645,7 +645,7 @@ destructor DActorBody.Destroy;
 begin
   Window.SceneManager.Items.Remove(Body); //looks afwul
   FreeAndNil(Body);
-  inherited;
+  inherited Destroy;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -839,7 +839,7 @@ end;
 
 constructor DActor.Create;
 begin
-  inherited;
+  inherited Create;
   Actions := DPerksList.Create(false);
 end;
 
@@ -848,7 +848,7 @@ end;
 destructor DActor.Destroy;
 begin
   FreeAndNil(Actions);
-  inherited;
+  inherited Destroy;
 end;
 
 {===========================================================================}
@@ -884,7 +884,7 @@ end;
 
 constructor DMonster.Create;
 begin
-  inherited;
+  inherited Create;
   Self.onHit := @Self.doHit;
   Faction := fHostile;
 end;

@@ -124,7 +124,7 @@ uses SysUtils, CastleLog, Math,
 
 constructor DParty.create(AOwner: TComponent);
 begin
-  inherited Create(AOwner);
+  Inherited Create(AOwner);
   Character := DCharList.Create(true);
   CameraMan := DCameraMan.Create;
   isAccelerating := false;
@@ -379,7 +379,7 @@ end;
 
 constructor DPlayerCharacter.Create;
 begin
-  inherited;
+  inherited Create;
   Faction := fPlayer;
 end;
 
@@ -394,14 +394,14 @@ end;
 
 destructor DPlayerCharacter.Destroy;
 begin
-  Inherited;
+  Inherited Destroy;
 end;
 
 {============================================================================}
 
 constructor DCameraMan.Create;
 begin
-  inherited;
+  inherited Create;
   ResetUp;
   theta := 0;
   phi := 0;

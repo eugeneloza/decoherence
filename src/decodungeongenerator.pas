@@ -1393,7 +1393,7 @@ end;
 destructor DGeneratorMap.Destroy;
 begin
   FreeAndNil(Dock);
-  inherited;
+  inherited Destroy;
 end;
 
 {========================= OTHER ROUTINES ===================================}
@@ -1494,7 +1494,7 @@ end;
 
 constructor DDungeonGeneratorParameters.Create;
 begin
-  inherited;
+  inherited Create;
   TilesList := TStringList.Create;
   FirstSteps := TFirstStepsArray.Create;
 end;
@@ -1503,7 +1503,7 @@ end;
 
 constructor DDungeonGenerator.Create;
 begin
-  inherited;
+  inherited Create;
   Map := DGeneratorMap.Create;
   Tiles := TGeneratorTileList.Create(true);
   Parameters := DDungeonGeneratorParameters.Create;
@@ -1534,7 +1534,7 @@ begin
   FreeAndNil(Tiles);
   FreeAndNil(Parameters);
   FreeLists;
-  inherited;
+  inherited Destroy;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -1544,7 +1544,7 @@ begin
   FreeAndNil(TilesList);
   FreeAndNil(FirstSteps);
 
-  inherited;
+  inherited Destroy;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -1554,7 +1554,7 @@ begin
   FreeNeighboursMap(tmpNeighboursMap);
   FreeNeighboursMap(NeighboursMap);
   FreeGroups(Groups);
-  inherited;
+  inherited Destroy;
 end;
 
 {============================ FREEING ROUTINES ==============================}

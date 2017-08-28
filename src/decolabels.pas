@@ -142,15 +142,6 @@ end;
 
 {----------------------------------------------------------------------------}
 
-{procedure DLabel.Rescale;
-begin
-  inherited Rescale;
-  {rescale image will fire before this line, so we'll need to override it there}
-  //if not ScaleLabel then Base.ResetToReal;
-end;  }
-
-{----------------------------------------------------------------------------}
-
 procedure DLabel.PrepareTextImage;
 begin
   ImageReady := false;

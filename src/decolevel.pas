@@ -16,7 +16,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 {---------------------------------------------------------------------------}
 
 { Temporary unit "loads" a game level and sets up the camera }
-unit decolevel;
+unit DecoLevel;
 
 {$INCLUDE compilerconfig.inc}
 
@@ -41,8 +41,8 @@ var LoadCompleted: boolean = false;
 implementation
 uses CastleFilesUtils,
   DecoPlayerCharacter,
-  DecoBody,
-  decogamemode;
+  DecoActorBody,
+  DecoGameMode;
 
 procedure Generate3DWorld;
 var GENERATOR: D3dDungeonGenerator;

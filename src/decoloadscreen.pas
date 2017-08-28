@@ -16,13 +16,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 {---------------------------------------------------------------------------}
 
 { This unit operates LoadScreens: loads and manages facts and loadscreen images }
-unit decoloadscreen;
+unit DecoLoadScreen;
 
 {$INCLUDE compilerconfig.inc}
 interface
 
 uses fgl,
-  decotranslation;
+  DecoTranslation;
 
 type
   {link to image file}
@@ -44,10 +44,10 @@ type
     frequency: integer;
     {list of compatible loadscreen images. It's inefficient to store them
      "many copies" here... but that's for some optimization I might do later}
-    compatibility: TLoadImageList;
+    Compatibility: TLoadImageList;
     (* TODO: REQUIREMENTS: some facts may appear only after the fact has been
        discovered in-game. Not done yet. *)
-    destructor destroy; override;
+    destructor Destroy; override;
 end;
 
 Type TFactList = specialize TFPGObjectList<DFact>;
@@ -76,8 +76,8 @@ implementation
 
 uses SysUtils, CastleLog, CastleFilesUtils,
   DOM, CastleXMLUtils,
-  decofont,
-  decoglobal, decoinputoutput;
+  DecoFont,
+  DecoGlobal, DecoInputOutput;
 
 var LastFact: integer = -1;
     CurrentFact: DFact = nil;      //looks ugly! Maybe I should remake it?
@@ -165,10 +165,10 @@ end;
 
 {---------------------------------------------------------------------------}
 
-destructor DFact.destroy;
+destructor DFact.Destroy;
 begin
-  FreeAndNil(compatibility);
-  inherited;
+  FreeAndNil(Compatibility);
+  inherited Destroy;
 end;
 
 {---------------------------------------------------------------------------}

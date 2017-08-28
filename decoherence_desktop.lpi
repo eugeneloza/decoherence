@@ -140,6 +140,7 @@
       <Unit6>
         <Filename Value="src/decoloadscreen.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoLoadScreen"/>
       </Unit6>
       <Unit7>
         <Filename Value="src/decofont.pas"/>
@@ -198,10 +199,12 @@
       <Unit18>
         <Filename Value="src/decoraceprofession.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoRaceProfession"/>
       </Unit18>
       <Unit19>
         <Filename Value="src/decoload3d.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoLoad3d"/>
       </Unit19>
       <Unit20>
         <Filename Value="src/decodungeontiles.pas"/>
@@ -224,6 +227,7 @@
       <Unit24>
         <Filename Value="src/decodungeonworld.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoDungeonWorld"/>
       </Unit24>
       <Unit25>
         <Filename Value="src/decoabstractgenerator.pas"/>
@@ -257,6 +261,7 @@
       <Unit31>
         <Filename Value="src/decosound.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoSound"/>
       </Unit31>
       <Unit32>
         <Filename Value="src/decoloadembedded.pas"/>
@@ -276,9 +281,9 @@
         <UnitName Value="DecoNavigationNetwork"/>
       </Unit35>
       <Unit36>
-        <Filename Value="src/decobody.pas"/>
+        <Filename Value="src/decoactorbody.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="DecoBody"/>
+        <UnitName Value="DecoActorBody"/>
       </Unit36>
       <Unit37>
         <Filename Value="src/decotranslation.pas"/>

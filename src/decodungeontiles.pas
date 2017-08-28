@@ -381,10 +381,10 @@ begin
     FreeAndNil(img[jz]);
 end;
 
-destructor DMap.destroy;
+destructor DMap.Destroy;
 begin
   FreeMinimap;
-  inherited;
+  inherited Destroy;
 end;
 
 {----------------------------------------------------------------------------}

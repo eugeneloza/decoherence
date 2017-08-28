@@ -108,7 +108,7 @@ End;
 
 constructor DPerk.Create;
 begin
-  inherited;
+  inherited Create;
   //Image := DStaticImage.create(self);
 end;
 
@@ -116,7 +116,7 @@ end;
 
 destructor DPerk.Destroy;
 begin
-  inherited;
+  inherited Destroy;
 
 end;
 
@@ -124,7 +124,7 @@ end;
 
 constructor DMultiPerk.Create;
 begin
-  inherited;
+  inherited Create;
   Children := DPerksList.Create;
 end;
 
@@ -133,7 +133,7 @@ end;
 destructor DMultiPerk.Destroy;
 begin
   FreeAndNil(Children);
-  inherited;
+  inherited Destroy;
 end;
 
 {---------------------------------------------------------------------------}

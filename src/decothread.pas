@@ -114,6 +114,7 @@ begin
 end;
 constructor DThreadedObject.Create;
 begin
+  //Inherited Create;
   fThreadWorking := false;
 end;
 destructor DThreadedObject.Destroy;
@@ -130,6 +131,7 @@ end;
 {$ELSE}
 constructor DThreadedObject.Create;
 begin
+  //inherited Create;
   //just empty constructor, no threads used
 end;
 {$ENDIF}

@@ -16,21 +16,20 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 {---------------------------------------------------------------------------}
 
 {contains basic descriptions for each race and profession}
-unit decoraceprofession;
+unit DecoRaceProfession;
 
 {$INCLUDE compilerconfig.inc}
 
 interface
-Uses classes, decoperks, decostats,
-  decoglobal;
+uses Classes, DecoPerks, DecoStats,
+  DecoGlobal;
 
 //Type TRaceCompatibility = (rcNo, rcFull, rcLimited);
 
-Type
+type
   {At this moment there is no difference between race and profession in data they store, only processing is different}
   DRaceProfession = class(TComponent)
-  Private
-  Public
+  public
     {Stats and bonuses}
     Stats, bonus: DStats;
     {Sum of bonuses and stats, only needed for profession to quickly discern between 1-bonus and 2-bonus professions}
@@ -40,35 +39,37 @@ Type
     Shortname: string[3];
     {Extended description of the race/profession}
     Description: string;
-    Constructor create(AOwner: TComponent); override;
-    Destructor destroy; override;
-  End;
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+  end;
 
-Var races, professions: array of DRaceProfession;
+  { make them generic lists }
+var Races, Professions: array of DRaceProfession;
 
 {Loads data for all in-game races and professions}
-Procedure LoadRaceProfessionData;
+procedure LoadRaceProfessionData;
 {Checks compatibility of the race and profession in 0..1 range; returns "-1" if and  race combination is impossible}
-Function CheckCompatibiliyGeneration(const race, profession: DRaceProfession): Float;
-Implementation
-Uses SysUtils;
+function CheckCompatibiliyGeneration(const race, profession: DRaceProfession): Float;
+{+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
+implementation
+uses SysUtils;
 
-Procedure LoadRaceProfessionData;
+procedure LoadRaceProfessionData;
 var i: integer;
-Begin
+begin
   {Todo: load from file}
   SetLength(races,1);
   Races[0] := DRaceProfession.create(Window);
-  With races[0] do begin
+  with races[0] do begin
     Name := '';
     Shortname := '';
     Description := '';
     Stats.value[st_str] := 12; bonus.value[st_str] := 0;
     //...
-  End;
+  end;
   SetLength(professions,1);
   Professions[0] := DRaceProfession.create(Window);
-  With professions[0] do begin
+  with professions[0] do begin
     Name := '';
     Shortname := '';
     Description := '';
@@ -76,65 +77,65 @@ Begin
     //...
     {Calculate bonus sum for profession}
     BonusSum := 0;
-    For i := 0 to maxstats do inc(BonusSum,bonus.value[i]);
+    for i := 0 to maxstats do inc(BonusSum,bonus.value[i]);
     StatsSum := 0;
-    For i := 0 to maxstats do inc(StatsSum,stats.value[i]);
-  End;
-End;
+    for i := 0 to maxstats do inc(StatsSum,stats.value[i]);
+  end;
+end;
 
-Constructor DRaceProfession.create(AOwner: TComponent);
-Begin
-  Inherited create(AOwner);
+constructor DRaceProfession.create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
   Stats := DStats.create(true);
   Bonus := DStats.create(true);
-End;
+end;
 
 Destructor DRaceProfession.destroy;
-Begin
-  freeandnil(stats);
-  freeandnil(bonus);
-  Inherited;
-End;
+begin
+  FreeAndNil(Stats);
+  FreeAndNil(Bonus);
+  inherited Destroy;
+end;
 
-Function CheckCompatibiliyGeneration(const race, profession: DRaceProfession): Float;
-Var //flg: boolean;
+function CheckCompatibiliyGeneration(const race, profession: DRaceProfession): Float;
+var //flg: boolean;
     i, diffbonus, diffstats: integer;
-Begin
+begin
   Diffbonus := 0;
-  For i := 0 to maxstats do if race.bonus.value[i]<profession.bonus.value[i] then inc(diffbonus);
-  If diffbonus > profession.bonusSum then result := -1 else begin
-    Diffstats := 0;
-    For i := 0 to maxstats do if race.stats.value[i] < profession.stats.value[i] then inc(diffstats, profession.stats.value[i] - race.stats.value[i]);
-    If diffbonus > 0 then result := 0.5 else result := 1;
+  for i := 0 to MaxStats do if Race.Bonus.Value[i]<Profession.Bonus.Value[i] then inc(DiffBonus);
+  if diffbonus > Profession.BonusSum then Result := -1 else begin
+    DiffStats := 0;
+    for i := 0 to MaxStats do if Race.Stats.Value[i] < Profession.Stats.value[i] then inc(DiffStats, Profession.Stats.Value[i] - Race.Stats.Value[i]);
+    if DiffBonus > 0 then Result := 0.5 else Result := 1;
     Result := result*(1-diffstats/profession.statsSum);
-  End
+  end
 {  ....
 
   If profession.bonussum = 1 then begin
     //Check stats requirements
     Flg := true;
-    For i := 0 to maxstats do begin
+    for i := 0 to maxstats do begin
       If race.stats[i] < profession.stats[i] then flg := false;
       break;
-    End;
-    If flg then Result := rcFull else result := rcLimited;
-  End else begin
+    end;
+    if flg then Result := rcFull else result := rcLimited;
+  end else begin
     //Check bonus requirements
     Diff := 0;
-    For i := 0 to maxstats do
-      If (race.bonus[i] = 0) and  (profession. bonus[i] > 0) then inc(diff);
+    for i := 0 to maxstats do
+      if (race.bonus[i] = 0) and  (profession. bonus[i] > 0) then inc(diff);
 
     If diff > 1 then Result := rcNo else begin
       //Check stats requirements --- make this a procedure.
       Flg := true;
-      For i := 0 to maxstats do begin
+      for i := 0 to maxstats do begin
         If race.stats[i] < profession.stats[i] then flg := false;
       break;
-      End;
-      If flg then Result := rcFull else result := rcLimited;
-    End;
-  End;}
-End;
+      end;
+      if flg then Result := rcFull else Result := rcLimited;
+    end;
+  end;}
+end;
 // Float! <0 - impossible 0..1 - compatible
 
 end.

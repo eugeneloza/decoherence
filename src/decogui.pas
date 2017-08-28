@@ -238,11 +238,6 @@ begin
   if GameModeNeedsClearingScreen then RenderContext.Clear([cbColor], Black);
   inherited Draw;
 
-  //some drawing for specific gamemodes
-  // if CurrentGameMode = gmCharacterScreen then DrawCharacterScreenBackground
-{  if CurrentGameMode = gmCharacterGeneration then DrawCharacterGenerationBackground else
-  if CurrentGameMode = gmLoadScreen then DrawLoadScreen;}
-
   { draw special elements }
   FPSLabel.CountFPS;
 end;

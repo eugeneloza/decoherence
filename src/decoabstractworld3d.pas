@@ -139,7 +139,7 @@ type
     ObjectsAppear, ObjectsVanish,
     GroupsAppear, GroupsVanish: TIndexList;
 
-    constructor Create; {override;}
+    constructor Create; //virtual;{override;}
     destructor Destroy; override;
   protected
     {actually preforms the requested task}
@@ -170,7 +170,7 @@ implementation
 
 uses SysUtils, DecoLoad3d, CastleLog,
   DecoNavigationNetwork, DecoPlayerCharacter,
-  DecoBody,
+  DecoActorBody,
   CastleSceneCore;
 
 {============================ DAbstractWorld3D =============================}
@@ -178,7 +178,7 @@ uses SysUtils, DecoLoad3d, CastleLog,
 
 constructor DAppearVanishManagerThread.Create;
 begin
-  inherited;
+  //inherited Create;
   ObjectsAppear := TIndexList.Create;
   ObjectsVanish := TIndexList.Create;
   GroupsAppear  := TIndexList.Create;
@@ -187,13 +187,13 @@ end;
 
 {--------------------------------------------------------------------------}
 
-destructor DAppearVanishManagerThread.destroy;
+destructor DAppearVanishManagerThread.Destroy;
 begin
   FreeAndNil(ObjectsAppear);
   FreeAndNil(ObjectsVanish);
   FreeAndNil(GroupsAppear);
   FreeAndNil(GroupsVanish);
-  inherited;
+  inherited Destroy;
 end;
 
 {--------------------------------------------------------------------------}
@@ -252,7 +252,7 @@ end;
 
 constructor DAbstractWorldManaged.Create;
 begin
-  inherited;
+  inherited Create;
   AppearVanishManager := DAppearVanishManagerThread.Create;
   AppearVanishManager.Priority := tpNormal;  {$HINT maybe use tpLower}
 end;
@@ -261,8 +261,8 @@ end;
 
 destructor DAbstractWorldManaged.Destroy;
 begin
-  freeandnil(AppearVanishManager);
-  inherited;
+  FreeAndNil(AppearVanishManager);
+  inherited Destroy;
 end;
 
 
@@ -317,7 +317,7 @@ end;
 procedure DAbstractWorld3d.Activate;
 var  i: integer;
 begin
-  inherited;
+  inherited Activate;
   Window.SceneManager.Items.Clear;
   Window.SceneManager.Items.Add(Navigation);
   Window.SceneManager.MainScene := Navigation;
@@ -478,7 +478,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-destructor DAbstractWorld3d.destroy;
+destructor DAbstractWorld3d.Destroy;
 begin
   //free 3d-related lists
   FreeAndNil(WorldScenes);
@@ -488,7 +488,7 @@ begin
   FreeAndNil(WorldElements3d); //owns children, so will free them automatically
   FreeAndNil(WorldElementsURL);
   FreeAndNil(Actors);           //owns children, so will free them automatically (! might conflict);
-  inherited;
+  inherited Destroy;
 end;
 
 {=============================== OTHER ROUTINES ===============================}

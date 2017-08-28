@@ -38,7 +38,7 @@ uses Classes, SysUtils,
      DecoGui, DecoInterface, DecoMouse, DecoFont,
      DecoLevel, DecoAbstractWorld,
      DecoSound,
-     DecoLoadScreen, DecoPerks, DecoBody,
+     DecoLoadScreen, DecoPerks, decoactorbody,
      DecoInterfaceLoader,
      DecoPlayerCharacter, DecoLoad3d,
      DecoNavigation, DecoGlobal, DecoTranslation, DecoGamemode, DecoTime;

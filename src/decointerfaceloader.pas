@@ -73,7 +73,7 @@ begin
     CornerTop := 0; CornerBottom := 0; CornerLeft := 0; CornerRight := 0;
   end;}
 
-  //InitCompositeInterface;
+  InitCompositeInterface;
 
   WriteLnLog('InitInterface','finished');
 end;
@@ -81,6 +81,7 @@ end;
 procedure InitCompositeInterface;
 var i: integer;
     s: string;
+    fname: string;
 begin
   HpBarImage := LoadImageSafe(ApplicationData(ProgressBarFolder+'hp_bar_CC-BY-SA_by_Saito00.png'));
   StaBarImage := LoadImageSafe(ApplicationData(ProgressBarFolder+'en_bar_CC-BY-SA_by_Saito00.png'));
@@ -99,16 +100,21 @@ begin
   for i := 0 to length(portrait_img)-1 do begin
     s := IntToStr(i+1);
     if i+1<10 then s := '0'+s;
+    fName := PortraitFolder+'UNKNOWN_p'+s+'.jpg';
     try
-      Portrait_img[i] := LoadImageSafe(ApplicationData(PortraitFolder+'UNKNOWN_p'+s+'.jpg'));
+      Portrait_img[i] := LoadImageSafe(ApplicationData(fName));
     except
-      { If the UNKNOWN_p* does not exist, load the placeholder portrait.
+      { If the file does not exist, load the placeholder portrait.
         This is signalled by EFOpenError now, although in the future LoadImage may re-raise
         it as some EImageLoadError descendant. }
-      on EFOpenError do
+      on EFOpenError do begin
         Portrait_img[i] := LoadImageSafe(ApplicationData(PortraitFolder+'placeholder.png'));
-      on EImageLoadError do
+        WriteLnLog('DecoInterfaceLoader>InitCompositeInterface','ERROR loading portrait '+fName);
+      end;
+      on EImageLoadError do begin
         Portrait_img[i] := LoadImageSafe(ApplicationData(PortraitFolder+'placeholder.png'));
+        WriteLnLog('DecoInterfaceLoader>InitCompositeInterface','ERROR loading portrait '+fName);
+      end;
     end;
   end;
   {load artwork by Saito00}
@@ -185,14 +191,14 @@ procedure DestroyCompositeInterface;
 var i: integer;
 begin
   writelnLog('DestroyCompositeInterface','(todo)');
-  {freeAndNil(HpBarImage);
-  freeAndNil(StaBarImage);
-  freeAndNil(CncBarImage);
-  freeAndNil(MphBarImage);
+  FreeAndNil(HpBarImage);
+  FreeAndNil(StaBarImage);
+  FreeAndNil(CncBarImage);
+  FreeAndNil(MphBarImage);
   FreeAndNil(damageOverlay_img);
-  for i := 0 to length(portrait_img)-1 do
-    freeAndNil(portrait_img[i]);
-  setlength(portrait_img,0);  }
+  for i := 0 to Length(Portrait_img)-1 do
+    FreeAndNil(Portrait_img[i]);
+  Portrait_img := nil;
 end;
 
 

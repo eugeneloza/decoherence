@@ -17,7 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 
 { contains definitions for most abstract World entity }
 
-unit decodungeonworld;
+unit DecoDungeonWorld;
 
 {$INCLUDE compilerconfig.inc}
 interface
@@ -25,7 +25,7 @@ interface
 uses Classes, fgl, CastleVectors,
   X3DNodes, CastleScene,
   DecoDungeonGenerator, DecoAbstractGenerator, DecoAbstractWorld3d,
-  decodungeontiles,
+  DecoDungeonTiles,
   DecoNavigationNetwork,
   DecoGlobal;
 
@@ -122,14 +122,14 @@ end;
 
 procedure DDungeonWorld.Manage(Position: TVector3);
 begin
-  inherited;
+  inherited Manage(Position);
   if FirstRender then begin
     {$warning reset all tiles visibility here}
     LastRender := decoNow; //GetNow or ResetNowThread
     FirstRender := false;
   end;
 
-  if UpdatePlayerCoordinates(position[0],position[1],position[2]) then
+  if UpdatePlayerCoordinates(Position[0],Position[1],Position[2]) then
     ManageTiles;
 end;
 
@@ -176,7 +176,7 @@ end;
 
 procedure DDungeonWorld.Activate;
 begin
-  inherited;
+  inherited Activate;
   {$WARNING todo}
   CurrentParty.TeleportTo(Weenies[0].NavId);
 
@@ -207,7 +207,7 @@ end;
 
 constructor DDungeonWorld.Create;
 begin
-  inherited;
+  inherited Create;
   px  := UninitializedCoordinate;
   py  := UninitializedCoordinate;
   pz  := UninitializedCoordinate;
@@ -227,7 +227,7 @@ begin
   FreeAndNil(Groups);
   FreeNeighboursMap(Neighbours);
 
-  inherited;
+  inherited Destroy;
 end;
 
 end.

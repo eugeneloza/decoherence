@@ -17,14 +17,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 
 { x3d file loading and basic processing routines.
   The unit name is not good, should change it to something more informative}
-unit decoload3d;
+unit DecoLoad3d;
 
 {$INCLUDE compilerconfig.inc}
 
 interface
 
 uses X3DNodes, fgl,
-  decoglobal;
+  DecoGlobal;
 
 Type
   TMaterialList = specialize TFPGObjectList<TMaterialNode>;
@@ -42,8 +42,8 @@ Type
       property Ambient: float read fAmbient;
       { set Ambient Intensity for all models }
       procedure SetAmbientIntensity(v: float);
-      constructor create;
-      destructor destroy; override;
+      constructor Create;
+      destructor Destroy; override;
   end;
 
 var AmbientIntensity: DMaterialContainer;
@@ -113,23 +113,23 @@ end;
 
 function LoadBlenderX3D(URL: string): TX3DRootNode;
 begin
-  writeLnLog('LoadBlenderX3D','Reading file '+URL);
+  WriteLnLog('LoadBlenderX3D','Reading file '+URL);
   if TextureProperties = nil then MakeDefaultTextureProperties;
-  result := load3DSafe(URL);
+  Result := load3DSafe(URL);
   AddMaterial(result);
 end;
 
 {=================== Ambient Intensity List ==========================}
 
-constructor DMaterialContainer.create;
+constructor DMaterialContainer.Create;
 begin
   Value := TMaterialList.create(false);
   fAmbient := 0;
 end;
-destructor DMaterialContainer.destroy;
+destructor DMaterialContainer.Destroy;
 begin
   FreeAndNil(Value);
-  inherited;
+  inherited Destroy;
 end;
 procedure DMaterialContainer.SetAmbientIntensity(v: float);
 var i: TMaterialNode;
@@ -139,7 +139,7 @@ begin
 end;
 
 initialization
-  AmbientIntensity := DMaterialContainer.create;
+  AmbientIntensity := DMaterialContainer.Create;
 
 finalization
   FreeAndNil(TextureProperties); //WATCH OUT FOR SIGSEGVS here!

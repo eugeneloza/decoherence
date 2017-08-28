@@ -32,19 +32,20 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 
   Of course only specially composed tracks that have the same rhythm
   and harmony can be smoothly synchronized.}
-unit decosound;
+unit DecoSound;
 
 {$INCLUDE compilerconfig.inc}
 interface
-uses classes, fgl,
-  CastleSoundEngine, CastleTimeUtils;
+uses Classes, fgl,
+  CastleSoundEngine, CastleTimeUtils,
+  DecoThread;
 
 type
   {thread that actually loads the sound file}
   DSoundLoadThread = class(TThread)
   public
     {refrence to DSoundFile / Why can't I make a cyclic refernce?}
-    parent: TObject; //DSoundFile
+    Parent: TObject; //DSoundFile
   protected
     {loads the file}
     procedure Execute; override;
@@ -52,19 +53,19 @@ type
 
 type
   {store and manage music track}
-  DSoundFile = class
+  DSoundFile = class (DThreadedObject)
   private
     {thread to load the sound file. Auto freed on terminate. Sets isLoaded flag}
-    LoadThread: DSoundLoadThread;
-    ThreadWorking: boolean;
+    //LoadThread: DSoundLoadThread;
+    //ThreadWorking: boolean;
     {full URL of the sound file}
     fURL: string;
     fisLoaded: boolean;
   public
     {reference to the sound buffer of this file}
-    buffer: TSoundBuffer;
+    Buffer: TSoundBuffer;
     {duration of the loaded file}
-    duration: TFloatTime;
+    Duration: TFloatTime;
 
     {if the file is loaded and ready to play}
     property isLoaded: boolean read fisLoaded default false;
@@ -73,9 +74,9 @@ type
     procedure Load(URL: string);
     procedure LoadFinished;
 
-    constructor create;
-    constructor create(URL: string);
-    destructor destroy; override;
+    constructor Create; override;
+    constructor Create(URL: string); virtual;
+    destructor Destroy; override;
   end;
 
 type
@@ -105,11 +106,11 @@ type
     {softly stop the music with a fade-out}
     procedure FadeOut;
     {manage the music / should be called each frame}
-    procedure manage;
+    procedure Manage;
     {sets current music "gain", move to private?}
-    procedure setGain(value: single);
-    constructor create;
-    constructor create(URL: string);
+    procedure SetGain(value: single);
+    constructor Create; override;
+    constructor Create(URL: string); override;
   end;
 
 {situation differentiator. Best if assigned to const mysituation = 0.
@@ -132,10 +133,10 @@ type
 
 type
   {the most abstract features of the playlist}
-  DAbstractPlaylist = class
+  DAbstractPlaylist = class(TObject)
     public
       {manage the playlist (loading, start, stop, fade)}
-      procedure manage; virtual; abstract;
+      procedure Manage; virtual; abstract;
     end;
 
 type
@@ -147,8 +148,8 @@ type
     {load all tracks in the URLs list}
     //procedure LoadAll; // this is wrong in every way!
 
-    constructor create; virtual;
-    destructor destroy; override;
+    constructor Create; virtual;
+    destructor Destroy; override;
   end;
 
 type
@@ -157,14 +158,14 @@ type
   DSequentialPlaylist = class(DPlayList)
     protected
       {tracks of this playlist}
-      tracks: TTrackList;  {$hint it looks wrong! Only 2 (now playing & fading + there might be >1 fading) tracks are needed at every moment of time}
+      Tracks: TTrackList;  {$hint it looks wrong! Only 2 (now playing & fading + there might be >1 fading) tracks are needed at every moment of time}
       {number of the previous track, stored not to repeat that track again if possible}
       PreviousTrack: integer;
     public
       {(prepare to) load the next random track from the playlist}
       procedure LoadNext;
-      constructor create; override;
-      destructor destroy; override;
+      constructor Create; override;
+      destructor Destroy; override;
     end;
 
 {"tension" of the current track which determines which of the synchronized
@@ -177,10 +178,10 @@ type
    BeatList is optional, but recommended that fades will happen on beats change}
   DSyncPlaylist = class(DPlayList)
     private
-      tensionchanged: boolean;
-      ftension: TTension;
-      procedure settension(value: TTension);
-      function gettrack(newtension: TTension): integer;
+      TensionChanged: boolean;
+      fTension: TTension;
+      procedure SetTension(value: TTension);
+      function GetTrack(newtension: TTension): integer;
     protected
       {list of tracks in the playlist. All the tracks are horizontally synchronized
        and MUST have the same rhythm,
@@ -188,16 +189,16 @@ type
        On the other hand, playing together with MultiSyncPlaylist in case the
        tension changes only on situation change, then the tracks must only have
        the same beat, and can be unblendable between one another}
-      tracks: TLoopTrackList;
+      Tracks: TLoopTrackList;
     public
       {current music tension. It's a good idea to keep this value in 0..1 range,
        however it's not mandatory}
-      property tension: TTension read ftension write settension;
+      property Tension: TTension read fTension write SetTension;
 
-      procedure manage; override;
+      procedure Manage; override;
 
-      constructor create; override;
-      destructor destroy; override;
+      constructor Create; override;
+      destructor Destroy; override;
     end;
 
 type
@@ -211,25 +212,25 @@ type
    situation changes should blend flawlessly.}
   DMultiSyncPlaylist = class(DAbstractPlaylist)
     private
-      fsituation: TSituation;
-      situationchanged: boolean;
-      procedure setsituation(value: TSituation);
+      fSituation: TSituation;
+      SituationChanged: boolean;
+      procedure SetSituation(value: TSituation);
     public
       {vertically synchronized synchronized playlists :)
        You have to manage their blendability based on possible situation change,
        e.g. an incoming nuke might happen only on enemy's turn, there's no need
        to blend it with player's turn.}
-      playlists: array of DSyncPlaylist;
+      PlayLists: array of DSyncPlaylist;
       {}
-      property situation: TSituation read fsituation write setsituation;
-      procedure manage; override;
+      property Situation: TSituation read fsituation write setsituation;
+      procedure Manage; override;
     end;
 
 
 type
   {Manages all the playlists, currently played music and ambience
    also tries to merge playlists (not implemented yet)}
-  DMusicManager = class
+  DMusicManager = class(TObject)
   private
     {current ambient track, just plays continuously}
     Ambient: DLoopMusicTrack;
@@ -242,24 +243,24 @@ type
      so while MusicManager tries its best to make it as quick as possible,
      the requested change usually won't be immediate,
      especially in case of an unexpected change}
-    procedure manage;
+    procedure Manage;
 
-    constructor create;
-    destructor destroy; override;
+    constructor Create; virtual;//override
+    destructor Destroy; override;
   end;
 
 var
   {global music manager}
   Music: DMusicManager;
 
-procedure initMusicManager;
-procedure freeMusicManager;
+procedure InitMusicManager;
+procedure FreeMusicManager;
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 uses SysUtils, CastleLog, castleFilesUtils,
   CastleVectors,
-  decoInputOutput, //used for safe threaded loading of sound buffer
-  decoglobal, DecoTime;      //used for random
+  DecoInputOutput, //used for safe threaded loading of sound buffer
+  DecoGlobal, DecoTime;      //used for random
 
 {========================== TMusicLoadThread ===============================}
 
@@ -271,18 +272,17 @@ end;
 
 {============================= DSoundFile ==================================}
 
-constructor DSoundFile.create;
+constructor DSoundFile.Create;
 begin
-  inherited;
+  inherited Create;
   buffer := 0;
   duration := -1;
-  ThreadWorking := false;
 end;
-constructor DSoundFile.create(URL: string);
+constructor DSoundFile.Create(URL: string);
 begin
-  self.create;
+  Self.Create;
   fURL := URL;
-  self.Load;
+  Self.Load;
 end;
 
 {---------------------------------------------------------------------------}
@@ -290,44 +290,36 @@ end;
 procedure DSoundFile.Load(URL :string);
 begin
   fURL := URL;
-  self.Load;
+  Self.Load;
 end;
 procedure DSoundFile.Load;
 begin
   if fURL='' then begin
-    writeLnLog('DSoundFile.Load','ERROR: No valid URL provided. Exiting...');
-    exit;
+    WriteLnLog('DSoundFile.Load','ERROR: No valid URL provided. Exiting...');
+    Exit;
   end;
-  if not ThreadWorking then begin
-    LoadThread := DSoundLoadThread.Create(true);
+  if not ThreadLocked then begin
+    {LoadThread := DSoundLoadThread.Create(true);
     LoadThread.Priority := tpLower;
     LoadThread.parent := self;
     LoadThread.FreeOnTerminate := true;
     LoadThread.Start;
-    ThreadWorking := true;
+    ThreadWorking := true; }
   end
   else
-     writeLnLog('DSoundFile.Load','Thread already working...');
+     WriteLnLog('DSoundFile.Load','Thread already working...');
 end;
 procedure DSoundFile.LoadFinished;
 begin
   fisLoaded := true;
-  ThreadWorking := false;
 end;
 
 {---------------------------------------------------------------------------}
 
-destructor DSoundFile.destroy;
+destructor DSoundFile.Destroy;
 begin
-  soundengine.FreeBuffer(buffer);
-  if ThreadWorking then begin
-    Try
-      LoadThread.Terminate;
-    finally
-      FreeAndNil(LoadThread); //redundant, as freeonterminate=true?
-    end;
-  end;
-  inherited;
+  SoundEngine.FreeBuffer(Buffer);
+  inherited Destroy;
 end;
 
 {========================== DMusicTrack ==================================}
@@ -360,14 +352,14 @@ end;
 
 {---------------------------------------------------------------------------}
 
-constructor DMusicTrack.create;
+constructor DMusicTrack.Create;
 begin
-  inherited;
+  inherited Create;
   FadeStart := -1;
 end;
 constructor DMusicTrack.create(URL: string);
 begin
-  Inherited create(URL);
+  inherited Create(URL);
   FadeStart := -1;
 end;
 
@@ -398,18 +390,18 @@ end;
 
 {============================ DPlaylist ================================}
 
-constructor DPlaylist.create;
+constructor DPlaylist.Create;
 begin
-  Inherited;
-  URLs := TStringList.create;
+  //inherited Create;
+  URLs := TStringList.Create;
 end;
 
 {---------------------------------------------------------------------------}
 
-destructor DPlayList.destroy;
+destructor DPlayList.Destroy;
 begin
   FreeAndNil(URLs);
-  Inherited;
+  inherited Destroy;
 end;
 
 {---------------------------------------------------------------------------}
@@ -441,17 +433,17 @@ end;
 
 {---------------------------------------------------------------------------}
 
-constructor DSequentialPlaylist.create;
+constructor DSequentialPlaylist.Create;
 begin
-  inherited;
+  inherited Create;
   PreviousTrack := -1;
-  tracks := TTrackList.create;
+  Tracks := TTrackList.Create;
 end;
 
-destructor DSequentialPlaylist.destroy;
+destructor DSequentialPlaylist.Destroy;
 begin
-  freeandnil(tracks);
-  inherited;
+  freeandnil(Tracks);
+  inherited Destroy;
 end;
 
 {---------------------------------------------------------------------------}
@@ -488,18 +480,18 @@ end;
 
 {---------------------------------------------------------------------------}
 
-constructor DSyncPlaylist.create;
+constructor DSyncPlaylist.Create;
 begin
-  inherited;
-  tracks := TLoopTrackList.create;
+  inherited Create;
+  Tracks := TLoopTrackList.Create;
 end;
 
 {---------------------------------------------------------------------------}
 
-destructor DSyncPlaylist.destroy;
+destructor DSyncPlaylist.Destroy;
 begin
-  freeandnil(tracks);
-  inherited;
+  FreeAndNil(Tracks);
+  inherited Destroy;
 end;
 
 {---------------------------------------------------------------------------}
@@ -544,7 +536,7 @@ end;
 
 procedure initMusicManager;
 begin
-  Music := DMusicManager.create;
+  Music := DMusicManager.Create;
 end;
 
 {---------------------------------------------------------------------------}
