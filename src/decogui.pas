@@ -76,7 +76,7 @@ begin
   writeLnLog('DInterfaceContainer.create','Creating interface.');
   inherited Create;
 
-  Base.ScaleToWindow := true;
+  Base.AnchorToWindow := true;
 
   FPSLabel := DFPSLAbel.Create;
 end;

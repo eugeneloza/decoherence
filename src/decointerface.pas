@@ -64,7 +64,6 @@ type
       should be public only for animation states. }
     procedure FloatToInteger;
   public
-    OpacityAnchor: DAbstractContainer;
     type
       DAnchor = record
         { Anchor to which element }
@@ -77,6 +76,11 @@ type
   public
     { Anchors of this container }
     Anchor: array[TAnchorSide] of DAnchor;
+    OpacityAnchor: DAbstractContainer;
+    { Is this Container scaled agains Anchors or Window?
+      Should be True only at top-level Container (i.e. GUI Container)
+      However, maybe, reintroduction or manual scaling would be prefferable? }
+    AnchorToWindow: boolean;
     { Float size of the Container }
     fx1,fy1,fx2,fy2{,fw,fh}: float;
     { Real size of the Container }
@@ -88,10 +92,6 @@ type
     { Keep proportions of the container }
     RealWidth, RealHeight: integer;
     ProportionalScale: TProportionalScale;
-    { Is this Container scaled agains Anchors or Window?
-      Should be True only at top-level Container (i.e. GUI Container)
-      However, maybe, reintroduction or manual scaling would be prefferable? }
-    ScaleToWindow: boolean;
     { If this Container ready to be used? }
     property isInitialized: boolean read fInitialized;
     constructor Create; //virtual;
@@ -114,6 +114,8 @@ type
     procedure AnchorFrom(const aParent: DAbstractContainer; const Gap: integer = 0);
     { Anchors aChild to this Container  }
     procedure AnchorChild(const aChild: DAbstractContainer; const Gap: integer = 0);
+    { do these two Containers have equal anchors? }
+    function AnchorsEqual(const aCompare: DAbstractContainer): boolean;
   end;
 
 type
@@ -282,7 +284,7 @@ constructor DAbstractContainer.Create;
 var aa: TAnchorSide;
 begin
   //inherited Create;
-  ScaleToWindow := false;
+  AnchorToWindow := false;
   fInitialized := false;
   {this is redundant}
   for aa in TAnchorSide do with Anchor[aa] do begin
@@ -299,7 +301,7 @@ end;
 
 procedure DAbstractContainer.GetAnchors;
 begin
-  if ScaleToWindow then begin
+  if AnchorToWindow then begin
     cx1 := 0;
     cy1 := 0;
     cx2 := Window.Width;
@@ -532,7 +534,7 @@ begin
   Self.BaseOpacity := Source.BaseOpacity;
   Self.ProportionalScale := Source.ProportionalScale;
   Self.fInitialized := Source.isInitialized;
-  Self.ScaleToWindow := Source.ScaleToWindow;
+  Self.AnchorToWindow := Source.AnchorToWindow;
   for aa in TAnchorSide do
     Self.Anchor[aa] := Source.Anchor[aa];
   Self.OpacityAnchor := Source.OpacityAnchor;
@@ -557,10 +559,27 @@ begin
   Dest.BaseOpacity := Self.BaseOpacity;
   Dest.ProportionalScale := Self.ProportionalScale;
   Dest.fInitialized := Self.isInitialized;
-  Dest.ScaleToWindow := Self.ScaleToWindow;
+  Dest.AnchorToWindow := Self.AnchorToWindow;
   for aa in TAnchorSide do
     Dest.Anchor[aa] := Self.Anchor[aa];
   Dest.OpacityAnchor := Self.OpacityAnchor;
+end;
+
+{----------------------------------------------------------------------------}
+
+function DAbstractContainer.AnchorsEqual(const aCompare: DAbstractContainer): boolean;
+begin
+  { we don't care to which part of Parent we Anchor?
+    Or should we? }
+  if (AnchorToWindow          = aCompare.AnchorToWindow) and
+     (Anchor[asLeft  ].Anchor = aCompare.Anchor[asLeft  ].Anchor) and
+     (Anchor[asRight ].Anchor = aCompare.Anchor[asRight ].Anchor) and
+     (Anchor[asTop   ].Anchor = aCompare.Anchor[asTop   ].Anchor) and
+     (Anchor[asBottom].Anchor = aCompare.Anchor[asBottom].Anchor) and
+     (OpacityAnchor           = aCompare.OpacityAnchor) then
+    Result := true
+  else
+    Result := false;
 end;
 
 {============================================================================}
@@ -630,11 +649,11 @@ begin
                        if Animate=asFlyInRandom then begin
                          Last.fx1 := mx;
                          Last.fy1 := my;
-                         Last.ScaleToWindow := true;
+                         Last.AnchorToWindow := true;
                        end else begin
                          Next.fx2 := mx;
                          Next.fy2 := my;
-                         Next.ScaleToWindow := true;
+                         Next.AnchorToWindow := true;
                        end;
                      end;
       asFlyInTop,asFlyOutTop,asFlyInBottom,asFlyOutBottom,asFlyInLeft,asFlyOutLeft,asFlyInRight,asFlyOutRight: begin
@@ -649,11 +668,11 @@ begin
                        if (Animate=asFlyInLeft) or (Animate=asFlyInRight) or (Animate=asFlyInTop) or (Animate=asFlyInBottom) then begin
                          Last.fx1 := mx;
                          Last.fy1 := my;
-                         Last.ScaleToWindow := true;
+                         Last.AnchorToWindow := true;
                        end else begin
                          Next.fx2 := mx;
                          Next.fy2 := my;
-                         Next.ScaleToWindow := true;
+                         Next.AnchorToWindow := true;
                        end;
                      end;
       {asFlyOutRandomSuicide}

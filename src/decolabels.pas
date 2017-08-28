@@ -238,7 +238,7 @@ begin
   FPSCount := 0;
   LastRenderTime := -1;
 
-  Base.ScaleToWindow := true;
+  Base.AnchorToWindow := true;
   Shadow := 0;
   Font := DebugFont;
   SetBaseSize(0,0,0.05,0.05,1,asNone);

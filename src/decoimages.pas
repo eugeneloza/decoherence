@@ -91,6 +91,7 @@ type
   strict protected
     Phase, OpacityPhase,PhaseShift: float;
     procedure CyclePhase; virtual;
+  public
     procedure Update; override;
   public
     PhaseSpeed: float;   {1/seconds to scroll the full screen}
@@ -393,7 +394,7 @@ end;
 constructor DWindImage.Create;
 begin
   inherited Create;
-  Base.ScaleToWindow := true;
+  Base.AnchorToWindow := true;
 end;
 
 {----------------------------------------------------------------------------}
@@ -447,7 +448,7 @@ end;
 constructor DFloatImage.Create;
 begin
   inherited Create;
-  Base.ScaleToWindow := true;
+  Base.AnchorToWindow := true;
 end;
 
 {----------------------------------------------------------------------------}
