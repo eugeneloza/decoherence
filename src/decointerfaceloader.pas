@@ -22,7 +22,7 @@ unit DecoInterfaceLoader;
 {$INCLUDE compilerconfig.inc}
 
 interface
-uses CastleImages,
+uses CastleImages, CastleVectors,
   DecoImages;
 
 
@@ -43,6 +43,8 @@ var HpBarImage, StaBarImage, CncBarImage, MphBarImage: TCastleImage; //todo not 
                                                          : DFrame;}
   Portrait_img: array of TCastleImage; //todo!!!
   damageOverlay_img: TCastleImage;
+  { a GL shade color imposed on all interface elements }
+  InterfaceColor: TVector4;
 
 
 
@@ -62,6 +64,8 @@ uses Classes, SysUtils, CastleLog, CastleFilesUtils,
 procedure InitInterface;
 begin
   WriteLnLog('InitInterface','started');
+
+  InterfaceColor := Vector4(1,1,1,1);
 
   {BlackFrame := DFrame.Create(Window);
   with BlackFrame do begin

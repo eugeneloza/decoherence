@@ -40,6 +40,7 @@ type
     procedure UnlockThread;
     { source object grabs a thread to terminate it in destructor }
     procedure GrabThread(aThread: TThread);
+    constructor Create; virtual; // override;
     destructor Destroy; override;
     {$ENDIF}
   end;
@@ -110,6 +111,10 @@ procedure DThreadedObject.GrabThread(aThread: TThread);
 begin
   fThread := aThread;
 end;
+constructor DThreadedObject.Create;
+begin
+  fThreadWorking := false;
+end;
 destructor DThreadedObject.Destroy;
 begin
   if fThreadWorking then begin
@@ -119,7 +124,7 @@ begin
       FreeAndNil(fThread); //redundant, as freeonterminate=true?
     end;
   end;
-  inherited;
+  inherited Destroy;
 end;
 
 end.

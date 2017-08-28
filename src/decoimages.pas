@@ -39,19 +39,17 @@ type
     SourceImage: TCastleImage;  //todo scale Source Image for max screen resolution ?
     ScaledImage: TCastleImage;
   public
-    //Color: TVector4; //todo
     { initialize GL image.}
     procedure InitGL;
     { frees an image without freeing the whole instance }
     procedure FreeImage;
   public
-    {due to a little bug I have to define these separately}
-    //ScaledWidth, ScaledHeight: integer;
     { Thread-safe part of rescaling the image }
     procedure Rescale; override;
     { Scales the image to Base.size }
     procedure RescaleImage; virtual; abstract;
     procedure Draw; override;
+    procedure Update; override;
 
     constructor Create; override;
     destructor Destroy; override;
@@ -78,18 +76,11 @@ type
   { most simple image type }
   DStaticImage = class(DAbstractImage, ILoadObject)
   private
-  {  LoadImageThread: TLoadImageThread;
-    { if thread is running }}
-    fThreadWorking: boolean;
+    procedure Afterload; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
   public
     { loads image in realtime }
     procedure Load(const URL: string); virtual;
     procedure Load(const CopyImage: TCastleImage);
-    procedure Afterload; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
-    { loads image in a thread }
-{    procedure LoadThread(const FileName:string);}
-    constructor Create; override;
-    destructor Destroy; override;
   end;
 
 type
@@ -137,11 +128,11 @@ Type
   public
     { minimmum, maximum, current maximum and current position
       minimum usually is zero and automatically set in constructor }
- {   Min, Max, CurrentMax, Position: float;
+    Min, Max, CurrentMax, Position: float;
     { vertical or horizontal style of the bar }
     Kind: TBarStyle;
     procedure Draw; override;
-    constructor Create(AOwner: TComponent); override;    }
+    constructor Create; override;
   end;
 
 Type TStatBarStyle = (sbHealth, sbStamina, sbConcentration, sbMetaphysics);
@@ -151,20 +142,19 @@ Type
   DStatBarImage = class(DBarImage)
   public
     { Points to the actor for who the health is displayed}
-  {  Target: DActor;
+    Target: DActor;
     { determines which value to display: Health, Stamina, Concentration or Metaphysics}
     Style: TStatBarStyle;
     procedure Update; override;
-    procedure Draw; override;
-    constructor Create(AOwner: TComponent); override;    }
   end;
 
-//var LoadNewFloaterImage: boolean;
+{animated image}
+
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-
-uses SysUtils, CastleLog, CastleFilesUtils;
+uses SysUtils, CastleLog, CastleFilesUtils,
+  DecoInterfaceLoader;
 
 {=============================================================================}
 {============================= Abstract Image ================================}
@@ -194,8 +184,6 @@ begin
     InitGLPending := false;
     if ScaledImage<>nil then begin
       FreeAndNil(GLImage);
-      {ScaledWidth := ScaledImage.Width;      //not yet needed, maybe set RealWidth...
-      ScaledHeight := ScaledImage.Height;}
       GLImage := TGLImage.Create(ScaledImage,true,true);
       ScaledImage := nil;
       ImageReady := true;
@@ -207,8 +195,7 @@ end;
 
 constructor DAbstractImage.Create;
 begin
-  inherited;
-  //Color := Vector4(1,1,1,1);
+  inherited Create;
   InitGLPending := false;
   ImageReady := false;
   ImageLoaded := false;
@@ -219,16 +206,25 @@ end;
 destructor DAbstractImage.Destroy;
 begin
   FreeImage;
-  inherited;
+  inherited Destroy;
 end;
 
 {----------------------------------------------------------------------------}
 
 procedure DAbstractImage.Rescale;
 begin
-  inherited;
+  inherited Rescale;
   //Base.FixProportions(RealWidth,Realheight); //should be done by proportional scale?
   RescaleImage;
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DAbstractImage.Update;
+begin
+  inherited Update;
+  GLImage.Color := InterfaceColor;
+  GLImage.Color[3] := Current.Opacity;
 end;
 
 {----------------------------------------------------------------------------}
@@ -236,8 +232,7 @@ end;
 procedure DAbstractImage.Draw;
 begin
   if ImageReady then begin
-    inherited; //calls update and checks if the image is visible
-    GLImage.Color := Vector4(1,1,1,Current.Opacity); //todo
+    Update; //calls update and checks if the image is visible
     GLIMage.Draw(Current.x1,Current.y1,Current.w,Current.h); //todo
   end else begin
     if InitGLPending then InitGL;
@@ -309,9 +304,6 @@ begin
   for ix := 0 to 2 do
     for iy := 0 to 2 do FreeAndNil(ScaledImageParts[ix,iy]);
 
-  //and burn the burner
-  //FrameImage.DrawFrom(BURNER_IMAGE,0,0,base.x1,base.y1,base.w,base.h,dmMultiply);
-
   InitGLPending := true;
 end;
 
@@ -342,39 +334,6 @@ end;
 {======================== static image =======================================}
 {=============================================================================}
 
-{procedure TLoadImageThread.execute;
-var TargetImage: DSTaticImage;
-begin
-  TargetImage := Target as DStaticImage;
-
-  WritelnLog('TLoadImageThread.execute','Image thread started.');
-
-  //****TargetImage.Load(FileName);
-  //****TargetImage.Rescale;
-
-  WritelnLog('TLoadImageThread.execute','Image thread finished.');
-  //****TargetImage.ThreadWorking := false;
-end;}
-
-{-----------------------------------------------------------------------------}
-
-{procedure DStaticImage.LoadThread(const FileName: string);
-begin
- if not ThreadWorking then begin
-   LoadImageThread := TLoadImageThread.Create(true);
-   LoadImageThread.Target := Self;
-   LoadImageThread.FileName := FileName;
-   LoadImageThread.FreeOnTerminate := true;
-   LoadImageThread.Priority := tpLower;
-   ThreadWorking := true;
-   LoadImageThread.Start;
- end
- else
-   writeLnLog('DStaticImage.LoadThread','Thread already working...');
-end; }
-
-{----------------------------------------------------------------------------}
-
 procedure DStaticImage.Load(const URL: string);
 begin
   WritelnLog('DStaticImage.LoadImage',URL);
@@ -391,25 +350,7 @@ procedure DStaticImage.AfterLoad;
 begin
   Base.RealWidth := SourceImage.Width;
   Base.RealHeight := SourceImage.Height;
-  {ScaledWidth := -1;
-  ScaledHeight := -1;}
   ImageLoaded := true;
-end;
-
-{----------------------------------------------------------------------------}
-
-constructor DStaticImage.Create;
-begin
-  inherited;
-  fThreadWorking := false;
-end;
-
-{----------------------------------------------------------------------------}
-
-destructor DStaticImage.Destroy;
-begin
-
-  inherited;
 end;
 
 {=============================================================================}
@@ -439,7 +380,7 @@ end;
 
 procedure DPhasedImage.Update;
 begin
-  inherited;
+  inherited Update;
   CyclePhase;
 end;
 
@@ -449,8 +390,8 @@ end;
 
 procedure DWindImage.CyclePhase;
 begin
-  inherited;
-  if Phase>1 then Phase -= 1;
+  inherited CyclePhase;
+  if Phase > 1 then Phase -= 1;
   OpacityPhase += PhaseShift/2*(1+0.2*drnd.Random);
   if OpacityPhase>1 then OpacityPhase -= 1;
 
@@ -466,11 +407,11 @@ end;
 procedure DWindImage.Draw;
 var PhaseScaled:integer;
 begin
-  //inherited; <-------- this render is different
+  //inherited Draw; <-------- this render is different
   if ImageReady then begin
+    if not isVisible then Exit;
     Update;
 
-    GLImage.Color := Vector4(1,1,1,1);
     GLImage.Color[3] := Current.Opacity + Current.Opacity/4 * Sin(2*Pi*OpacityPhase);
 
     PhaseScaled := Round((1-Phase)*Window.Width);
@@ -495,7 +436,7 @@ end;
 
 procedure DFloatImage.CyclePhase;
 begin
-  inherited;
+  inherited CyclePhase;
   if Phase > 1 then begin
     Phase := 1;
     ImageLoaded := false;
@@ -508,12 +449,12 @@ end;
 procedure DFloatImage.Draw;
 var x: integer;
 begin
-  //inherited; <-------- this render is different
+  //inherited Draw; <-------- this render is different
 
   if ImageReady then begin
+    if not isVisible then Exit;
     Update;
 
-    GLImage.Color := Vector4(1,1,1,1);
     GLImage.Color[3] := Current.Opacity*Sin(Pi*Phase);
 
     x := Round((Window.Width-Base.w)*Phase);
@@ -526,50 +467,50 @@ end;
 {=========================== bar image =======================================}
 {=============================================================================}
 
-{procedure DBarImage.draw;
+procedure DBarImage.Draw;
 var x: integer;
 begin
-  if ImageReady then begin
-    Update;
+  //inherited Draw; <-------- this render is different
 
-    if not Visible then Exit;
-      GLImage.Color := Color;
-      if Max = Min then begin
-        writeLnLog('DBarImage.draw','ERROR: Division by zero!');
-        Exit;
-      end;
-      if Kind = bsVertical then begin
-        x := Round(Base.h * Position/(Max-Min));
-        GLImage.Draw(Base.x1,Base.y1,Base.w,x);
-      end else begin
-        x := Round(Base.w * Position/(Max-Min));
-        GLImage.Draw(Base.x1,Base.y1,x,Base.h);
-      end;
+  if ImageReady then begin
+    if not isVisible then Exit;
+    Update; //calls update and checks if the image is visible
+
+    if Max = Min then begin
+      writeLnLog('DBarImage.draw','ERROR: Division by zero!');
+      Exit;
+    end;
+    if Kind = bsVertical then begin
+      x := Round(Base.h * Position/(Max-Min));
+      GLImage.Draw(Base.x1,Base.y1,Base.w,x);
+    end else begin
+      x := Round(Base.w * Position/(Max-Min));
+      GLImage.Draw(Base.x1,Base.y1,x,Base.h);
+    end;
   end else
     if InitGLPending then InitGL;
-end;   }
+end;
 
 {---------------------------------------------------------------------------}
 
-{constructor DBarImage.Create(AOwner: TComponent);
+constructor DBarImage.Create;
 begin
-  inherited Create(AOwner);
+  inherited Create;
   Min := 0;
   Max := 1;
   Position := 0;
-  Kind := bsHorizontal;   //default for most progressbars and enemy health
-end;  }
+  Kind := bsHorizontal;
+end;
 
 {================ Stat Bar image =========================================}
 
-{procedure DStatBarImage.Update;
+procedure DStatBarImage.Update;
   function AboveZero(const a: float): float; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
   begin
     if a > 0 then Result := a else Result := 0;
   end;
 begin
   if Target = nil then Exit; //don't waste time if target isn't present
-
   inherited Update;
 
   Min := 0;
@@ -579,45 +520,25 @@ begin
                 Max := Target.MaxMaxHp;
                 CurrentMax := AboveZero(Target.MaxHp);
                 Position := AboveZero(Target.Hp);
-                //color := Vector4Single(1,0,0,1);  //red  ? maybe green->red?
               end;
     sbStamina: begin
                 Max := Target.MaxMaxSta;
                 CurrentMax := AboveZero(Target.MaxSta);
                 Position := AboveZero(Target.Sta);
-                //color := Vector4Single(1,1,0,1);  //yellow
               end;
     sbConcentration: begin
                 Max := Target.MaxMaxCNC;
                 CurrentMax := AboveZero(Target.MaxCNC);
                 Position := AboveZero(Target.CNC);
-                //color := Vector4Single(0,1,1,1);  //cyan
               end;
     sbMetaphysics: begin
                 Max := Target.MaxMaxMph;
                 CurrentMax := AboveZero(Target.MaxMph);
                 Position := AboveZero(Target.Mph);
-                //color := Vector4Single(1,0.5,1,1);  //purple
               end;
   end;
-end;  }
+end;
 
-{---------------------------------------------------------------------------}
-
-{procedure DStatBarImage.Draw;
-begin
-  if Target = nil then Exit; //don't draw if target is absent
-  //update; //already present in parent call
-  inherited Draw;
-end;  }
-
-{---------------------------------------------------------------------------}
-
-{constructor DStatBarImage.Create(AOwner: TComponent);
-begin
-  inherited Create(AOwner);
-  //Kind := bsVertical;   //default for player bars display
-end;  }
 
 end.
 

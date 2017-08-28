@@ -271,7 +271,7 @@ uses SysUtils, CastleLog;
 constructor DAbstractContainer.Create;
 var aa: TAnchorSide;
 begin
-  //inherited;
+  //inherited Create;
   ScaleToWindow := false;
   fInitialized := false;
   {this is redundant}
@@ -286,7 +286,7 @@ end;
 
 {destructor DAbstractContainer.Destroy;
 begin
-  inherited;
+  inherited Destroy;
 end;}
 
 {----------------------------------------------------------------------------}
@@ -695,7 +695,7 @@ end;
 
 constructor DAbstractElement.Create;
 begin
-  inherited;
+  inherited Create;
   fVisible := true;
   AnimationCurve := acSquare;
   Base := DAbstractContainer.Create;
@@ -712,7 +712,7 @@ begin
   FreeAndNil(Last);
   FreeAndNil(Next);
   FreeAndNIl(Current);
-  inherited;
+  inherited Destroy;
 end;
 
 {=============================================================================}
@@ -721,7 +721,7 @@ end;
 
 constructor DTimer.Create;
 begin
-  inherited;
+  inherited Create;
   Enabled := false;
   StartTime := -1;
 end;
@@ -750,7 +750,7 @@ end;
 
 constructor DSingleInterfaceElement.Create;
 begin
-  inherited;
+  inherited Create;
   isMouseOver := false;
   CanMouseOver := false;
   CanDrag := false;
@@ -761,7 +761,7 @@ end;
 destructor DSingleInterfaceElement.Destroy;
 begin
   FreeAndNil(Timer);
-  inherited;
+  inherited Destroy;
 end;
 
 {----------------------------------------------------------------------------}
@@ -776,7 +776,7 @@ end;
 
 procedure DSingleInterfaceElement.Update;
 begin
-  inherited;
+  inherited Update;
   if (Timer<>nil) and (Timer.Enabled) then Timer.Update;
 end;
 
@@ -851,7 +851,7 @@ end;
 
 constructor DInterfaceElement.Create;
 begin
-  inherited;
+  inherited Create;
   Children := DInterfaceElementsList.Create(true);
 end;
 
@@ -861,7 +861,7 @@ destructor DInterfaceElement.Destroy;
 begin
   //this should fire as recoursive because children owns elements, which in turn will fire their destructors onfree
   FreeAndNil(Children);
-  inherited;
+  inherited Destroy;
 end;
 
 {----------------------------------------------------------------------------}
@@ -869,7 +869,7 @@ end;
 procedure DInterfaceElement.Rescale;
 var i: integer;
 begin
-  inherited;
+  inherited Rescale;
   for i:=0 to Children.Count-1 do Children[i].Rescale;
 end;
 
@@ -878,7 +878,7 @@ end;
 procedure DInterfaceElement.Draw;
 var i: integer;
 begin
-  inherited;
+  inherited Draw;
   for i := 0 to Children.Count-1 do Children[i].Draw;
 end;
 
