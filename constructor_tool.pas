@@ -22,9 +22,7 @@ program constructor_tool;
 {$INCLUDE compilerconfig.inc}
 
 uses
-  {$IFDEF UNIX}{$IFDEF UseCThreads}
-  cthreads,
-  {$ENDIF}{$ENDIF}
+  {$IFDEF UNIX}cthreads,{$ENDIF}
   Interfaces, // this includes the LCL widgetset
   Forms, castle_base, castle_window, castle_components, constructor_mainunit,
   constructor_facts, constructor_global, decotranslation,

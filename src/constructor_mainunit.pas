@@ -88,7 +88,7 @@ end;
 
 procedure TMainForm.DetectLanguageSelect;
 begin
-  inherited;
+  inherited DetectLanguageSelect;
   ConstructorLanguage := MyLanguage;
 end;
 
