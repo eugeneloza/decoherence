@@ -63,12 +63,21 @@ type
     constructor Create; override;
     destructor Destroy; override;
   end;
-  
+
+type
+  { An extension to TCastleImage }
+  DRectagonalFrame = class(TObject)
+  public
+    SourceImage: TCastleImage;
+    { Frame borders }
+    CornerTop, CornerBottom, CornerLeft, CornerRight: integer;
+  end;
+
 type
   { 3x3 scaled image (i.e. frames) }
   DFrameImage = class(DAbstractImage)
   public
-    CornerTop, CornerBottom, CornerLeft, CornerRight: integer;
+    Frame: DRectagonalFrame;
     procedure RescaleImage; override;
     { todo: maybe not scale the image, but draw3x3 by OpenGl features? 
           or return the use of burner (e.g. noise) overlay }
@@ -265,6 +274,7 @@ var ScaledImageParts: array [0..2,0..2] of TCastleImage;
     UnscaledWidth, UnscaledHeight: integer;
     SourceXs, SourceYs, DestXs, DestYs: TVector4Integer;
 begin
+  //inherited; <------ this procedure works completely different
   ImageReady := false;
   FreeAndNil(GLImage);
   FreeAndNil(ScaledImage); //redundant, but let it be here
@@ -275,32 +285,33 @@ begin
   UnscaledHeight := ScaledImage.Height;
 
   {check if minimal frame size is larger than the requested frame size}
-  if CornerLeft+CornerRight+1 > Base.w then begin
-    WriteLnLog('DAbstractInterfaceElement.FrameResize3x3','Reset backwards base.w = '+IntToStr(Base.w)+' / cornerLeft+cornerRight = '+IntToStr(CornerLeft+CornerRight));
-    Base.w := CornerLeft+CornerRight+1;
+  {$warning disabled}
+  if Frame.CornerLeft+Frame.CornerRight+1 > Base.w then begin
+    WriteLnLog('DAbstractInterfaceElement.FrameResize3x3','Reset backwards base.w = '+IntToStr(Base.w)+' / cornerLeft+cornerRight = '+IntToStr(Frame.CornerLeft+Frame.CornerRight));
+    Base.w := Frame.CornerLeft+Frame.CornerRight+1;
     //Base.BackwardSetSize(Base.w,-1);
   end;
-  if CornerTop+CornerBottom+1 > Base.h then begin
-    WriteLnLog('DAbstractInterfaceElement.FrameResize3x3','Reset backwards base.h = '+inttostr(base.h)+' / cornerTop+cornerBottom = '+inttostr(cornerTop+cornerBottom));
-    Base.h := CornerTop+CornerBottom+1;
+  if Frame.CornerTop+Frame.CornerBottom+1 > Base.h then begin
+    WriteLnLog('DAbstractInterfaceElement.FrameResize3x3','Reset backwards base.h = '+IntToStr(Base.h)+' / cornerTop+cornerBottom = '+inttostr(Frame.CornerTop+Frame.CornerBottom));
+    Base.h := Frame.CornerTop+Frame.CornerBottom+1;
     //Base.BackwardSetSize(-1,Base.h);
   end;
 
   SourceXs[0] := 0;
-  SourceXs[1] := CornerLeft;
-  SourceXs[2] := UnscaledWidth-CornerRight;
+  SourceXs[1] := Frame.CornerLeft;
+  SourceXs[2] := UnscaledWidth-Frame.CornerRight;
   SourceXs[3] := UnscaledWidth;
   SourceYs[0] := 0;
-  SourceYs[1] := cornerBottom;
-  SourceYs[2] := UnscaledHeight-CornerTop;
+  SourceYs[1] := Frame.cornerBottom;
+  SourceYs[2] := UnscaledHeight-Frame.CornerTop;
   SourceYs[3] := UnscaledHeight;
   DestXs[0] := 0;
-  DestXs[1] := CornerLeft;
-  DestXs[2] := Base.w-CornerRight;
+  DestXs[1] := Frame.CornerLeft;
+  DestXs[2] := Base.w-Frame.CornerRight;
   DestXs[3] := Base.w;
   DestYs[0] := 0;
-  DestYs[1] := CornerBottom;
-  DestYs[2] := Base.h-CornerTop;
+  DestYs[1] := Frame.CornerBottom;
+  DestYs[2] := Base.h-Frame.CornerTop;
   DestYs[3] := Base.h;
 
   for ix := 0 to 2 do
