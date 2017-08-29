@@ -50,7 +50,7 @@ const atIdle = 'idle';
 const AnimationExtension = '.castle-anim-frames';
 
 type
-  {}
+  { Not working yet... }
   DAnimation = class(T3DResourceAnimation)
   public
     {loads animation from HDD
@@ -76,17 +76,18 @@ type
       we follow their specification of "single" time management for now.
       At the moment it is absolutely identical to our implementation of time }
     Time: Single;
+    { Move Actor's time forward }
     procedure AdvanceTime(SecondsPassed: single);{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
   public
     { Name of current and next animation }
     CurrentAnimationName, NextAnimationName: string;
 
-    { reference to the spawning body resource }
+    { Reference to the spawning body resource }
     Resource: DBodyResource;
     { Coefficient to slow the time. E.g. 0.9 will slow time by 10% for this
       actor's body animations }
     SlowTimeRate: float;
-    { resets the current playing animation }
+    { Resets the current playing animation }
     procedure ResetAnimation;
 
 

@@ -32,11 +32,18 @@ type
   { General routines shared by images, frames and labels }
   DAbstractImage = class(DSingleInterfaceElement)
   protected
+    { is SourceImage loaded ? }
+    ImageLoaded: boolean;
+    { is Image element initialized as GL image? }
     GLImage: TGLImage;
-    ImageReady, ImageLoaded: boolean;
-    { keeps from accidentally re-initializing GL }
+    { Is ScaledImage prepared to be initialized as GL image? }
     InitGLPending: boolean;
-    SourceImage: TCastleImage;  //todo scale Source Image for max screen resolution ?
+    { is Image ready to be drawn on screen (loaded, scaled and GL initialized) ? }
+    ImageReady: boolean;
+    { image loaded from a file/copied elsewhere
+          in some cases (when no further scaling needed) it is freed after rescaling }
+    SourceImage: TCastleImage;
+    { scaled image, set to nil after GL initialized }
     ScaledImage: TCastleImage;
   public
     { initialize GL image.}
@@ -48,32 +55,35 @@ type
     procedure Rescale; override;
     { Scales the image to Base.size }
     procedure RescaleImage; virtual; abstract;
+    { very simple draw procedure,
+          checks if GL is initialized and initializes it if necessary }
     procedure Draw; override;
     procedure Update; override;
 
     constructor Create; override;
     destructor Destroy; override;
   end;
-
+  
 type
   { 3x3 scaled image (i.e. frames) }
   DFrameImage = class(DAbstractImage)
   public
     CornerTop, CornerBottom, CornerLeft, CornerRight: integer;
     procedure RescaleImage; override;
-    {todo: maybe not scale the image, but draw3x3 by OpenGl features?}
+    { todo: maybe not scale the image, but draw3x3 by OpenGl features? 
+          or return the use of burner (e.g. noise) overlay }
   end;
 
 type
-  { Simple image rescalied by stretch }
+  { Simple image rescaled by stretch }
   DSimpleImage = class abstract(DAbstractImage)
   public
-    { very simple draw procedure }
     procedure RescaleImage; override;
   end;
 
 type
-  { most simple image type }
+  { most simple ready-to-use image type, just a static image
+      capable of loading from a file }
   DStaticImage = class(DAbstractImage, ILoadObject)
   private
     procedure Afterload; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
@@ -89,12 +99,14 @@ type
   private
     LastTime: DTime;
   strict protected
+    {current phases of the image}
     Phase, OpacityPhase,PhaseShift: float;
     procedure CyclePhase; virtual;
   public
     procedure Update; override;
   public
-    PhaseSpeed: float;   {1/seconds to scroll the full screen}
+    { 1/seconds to scroll the full screen }
+    PhaseSpeed: float;   
     procedure Load(const URL: string); override;
   end;
 
@@ -118,6 +130,7 @@ type
   strict protected
     procedure CyclePhase; override;
   public
+    { Call back after one cycle is finished, usually it should call re-loading of the image }
     onCycleFinish: TImageProcedure;
     procedure Draw; override;
     constructor Create; Override;

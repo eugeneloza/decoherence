@@ -28,8 +28,8 @@ uses
 
 const DefaultAnimationDuration = 0.3; {in seconds}
 
-{animation style of the object. asDefault means "animate from previous state",
- presuming that there was some "previous state"}
+{ Animation style of the object. asDefault means "animate from previous state",
+  presuming that there was some "previous state"}
 Type TAnimationStyle = (asNone, asDefault,
                         asFadeIn, asFadeOut,// asFadeOutSuicide,
                         asZoomIn, asZoomOut,// asZoomOutSuicide,
@@ -38,9 +38,11 @@ Type TAnimationStyle = (asNone, asDefault,
                         asFlyInBottom,asFlyOutBottom,
                         asFlyInLeft,asFlyOutLeft,
                         asFlyInRight,asFlyOutRight);
-
+{ Type of this Anchor }
 type TAnchorSide = (asLeft,asRight,asTop,asBottom);
+{ Which part of Parent does this Anchor align to? }
 type TAnchorAlign = (noAlign, haLeft, haRight, haCenter, vaTop, vaBottom, vaMiddle);
+{ Which part of the image is fitted to maintain proportions }
 type TProportionalScale = (psNone, psWidth, psHeight);
 
 type
@@ -57,6 +59,8 @@ type
     co: float;
     { Determine and cache parent container size }
     procedure GetAnchors;
+    { Anchor this Container to Window }
+    procedure GetWindowAnchor;{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
     { Converts integer size to float. }
     procedure IntegerToFloat;
   public
@@ -65,6 +69,7 @@ type
     procedure FloatToInteger;
   public
     type
+      { Specifies Anchor object, Anchor type, and additional gap }
       DAnchor = record
         { Anchor to which element }
         Anchor: DAbstractContainer;
@@ -76,6 +81,8 @@ type
   public
     { Anchors of this container }
     Anchor: array[TAnchorSide] of DAnchor;
+    { Parent's opacity is multiplied by this Container opacity,
+      May be nil }
     OpacityAnchor: DAbstractContainer;
     { Is this Container scaled agains Anchors or Window?
       Should be True only at top-level Container (i.e. GUI Container)
@@ -91,6 +98,7 @@ type
     CurrentOpacity: float;
     { Keep proportions of the container }
     RealWidth, RealHeight: integer;
+    { Should this Container scale proportionaly? }
     ProportionalScale: TProportionalScale;
     { If this Container ready to be used? }
     property isInitialized: boolean read fInitialized;
@@ -108,6 +116,7 @@ type
     procedure SetIntSize(const ax1,ay1,aWidth,aHeight: integer);
     { Sets int width/height for scaling animations }
     procedure SetIntWidthHeight(const aWidth,aHeight: integer);
+    { Resets width and height to their "real" values, e.g. for elements that are not scaled }
     procedure ResetToReal;
     procedure SetRealSize(const aWidth,aHeight: integer);
     { Anchors this Container to aParent }
@@ -206,6 +215,7 @@ Type
     Parent: DSingleInterfaceElement;
     { A simple timer to fire some event on time-out }
     Timer: DTimer;
+    { Activate and initialize timer }
     procedure SetTimeOut(const Seconds: DTime);
     procedure Update; override;
     //also resizes content and frame
@@ -214,24 +224,24 @@ Type
 }
   {* Mouse routines *}
   public
-    {if this element is active (clickable)}
+    { If this element is active (clickable) }
     CanMouseOver: boolean;
     CanDrag: boolean;
-    {are these coordinates in this element's box?}
+    { Are these coordinates in this element's box? }
     function IAmHere(const xx,yy: integer): boolean;
-    {returns self if IAmHere and runs all possible events}
+    { Returns self if IAmHere and runs all possible events }
     function ifMouseOver(const xx,yy: integer; const  RaiseEvents: boolean; const AllTree: boolean): DAbstractElement; virtual;
   private
-    {if mouse is over this element}
+    { If mouse is over this element }
     isMouseOver: boolean;
   public
-    {events}
+    { Mouse/touch Events }
     OnMouseEnter: TXYProcedure;
     OnMouseLeave: TXYProcedure;
     OnMouseOver: TXYProcedure;
     OnMousePress: TXYProcedure;
     OnMouseRelease: TXYProcedure;
-    {dragg-n-drop routines}
+    { Dragg-n-drop routines }
     OnDrop: TXYProcedure;
     DragX, DragY: integer;
     procedure Drag(const xx,yy: integer);
@@ -244,10 +254,9 @@ Type
 type DInterfaceElementsList = specialize TFPGObjectList<DSingleInterfaceElement>;
 
 Type
-  {An interface element, that can contain "children"}
+  { An interface element, that can contain "Children" }
   DInterfaceElement = class(DSingleInterfaceElement)
   public
-
     {list of the children of this interface element}
     Children: DInterfaceElementsList;
     procedure Draw; override;
@@ -299,50 +308,56 @@ end;
 
 {----------------------------------------------------------------------------}
 
+procedure DAbstractContainer.GetWindowAnchor;{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+begin
+  cx1 := 0;
+  cy1 := 0;
+  cx2 := Window.Width;
+  cy2 := Window.Height;
+end;
+
 procedure DAbstractContainer.GetAnchors;
 begin
-  if AnchorToWindow then begin
-    cx1 := 0;
-    cy1 := 0;
-    cx2 := Window.Width;
-    cy2 := Window.Height;
-    co  := 1;
-  end else begin
+  if AnchorToWindow then
+    GetWindowAnchor
+  else begin
     if (Anchor[asLeft].Anchor = nil) or
        (Anchor[asTop].Anchor = nil) or
        (Anchor[asRight].Anchor = nil) or
-       (Anchor[asBottom].Anchor = nil) or
-       (OpacityAnchor = nil) then begin
+       (Anchor[asBottom].Anchor = nil) then begin
          WriteLnLog('DAbstractContainer.GetAnchors','Anchor is Nil!');
-         Exit;
-       end;
-
-    case Anchor[asLeft].AlignTo of
-      haLeft:   cx1 := Anchor[asLeft].Anchor.x1;
-      haRight:  cx1 := Anchor[asLeft].Anchor.x2;
-      haCenter: cx1 := (Anchor[asLeft].Anchor.x1 + Anchor[asLeft].Anchor.x2) div 2;
-      else WriteLnLog('DAbstractContainer.GetAnchors','Invalid Anchor align!')
-    end;
-    case Anchor[asRight].AlignTo of
-      haLeft:   cx2 := Anchor[asRight].Anchor.x1;
-      haRight:  cx2 := Anchor[asRight].Anchor.x2;
-      haCenter: cx2 := (Anchor[asRight].Anchor.x1 + Anchor[asRight].Anchor.x2) div 2;
-      else WriteLnLog('DAbstractContainer.GetAnchors','Invalid Anchor align!')
-    end;
-    case Anchor[asTop].AlignTo of
-      vaTop:    cy1 := Anchor[asTop].Anchor.y1;
-      vaBottom: cy1 := Anchor[asTop].Anchor.y2;
-      vaMiddle: cy1 := (Anchor[asTop].Anchor.y1 + Anchor[asTop].Anchor.y2) div 2;
-      else WriteLnLog('DAbstractContainer.GetAnchors','Invalid Anchor align!')
-    end;
-    case Anchor[asBottom].AlignTo of
-      vaTop:    cy2 := Anchor[asBottom].Anchor.y1;
-      vaBottom: cy2 := Anchor[asBottom].Anchor.y2;
-      vaMiddle: cy2 := (Anchor[asBottom].Anchor.y1 + Anchor[asBottom].Anchor.y2) div 2;
-      else WriteLnLog('DAbstractContainer.GetAnchors','Invalid Anchor align!')
-    end;
-    co := OpacityAnchor.CurrentOpacity;
+         GetWindowAnchor;
+    end else begin
+      case Anchor[asLeft].AlignTo of
+        haLeft:   cx1 := Anchor[asLeft].Anchor.x1;
+        haRight:  cx1 := Anchor[asLeft].Anchor.x2;
+        haCenter: cx1 := (Anchor[asLeft].Anchor.x1 + Anchor[asLeft].Anchor.x2) div 2;
+        else WriteLnLog('DAbstractContainer.GetAnchors','Invalid Anchor align!')
+      end;
+      case Anchor[asRight].AlignTo of
+        haLeft:   cx2 := Anchor[asRight].Anchor.x1;
+        haRight:  cx2 := Anchor[asRight].Anchor.x2;
+        haCenter: cx2 := (Anchor[asRight].Anchor.x1 + Anchor[asRight].Anchor.x2) div 2;
+        else WriteLnLog('DAbstractContainer.GetAnchors','Invalid Anchor align!')
+      end;
+      case Anchor[asTop].AlignTo of
+        vaTop:    cy1 := Anchor[asTop].Anchor.y1;
+        vaBottom: cy1 := Anchor[asTop].Anchor.y2;
+        vaMiddle: cy1 := (Anchor[asTop].Anchor.y1 + Anchor[asTop].Anchor.y2) div 2;
+        else WriteLnLog('DAbstractContainer.GetAnchors','Invalid Anchor align!')
+      end;
+      case Anchor[asBottom].AlignTo of
+        vaTop:    cy2 := Anchor[asBottom].Anchor.y1;
+        vaBottom: cy2 := Anchor[asBottom].Anchor.y2;
+        vaMiddle: cy2 := (Anchor[asBottom].Anchor.y1 + Anchor[asBottom].Anchor.y2) div 2;
+        else WriteLnLog('DAbstractContainer.GetAnchors','Invalid Anchor align!')
+      end;
+    end;  
   end;
+  if (OpacityAnchor <> nil) then
+    co := OpacityAnchor.CurrentOpacity
+  else
+    co := 1;
   cw := cx2-cx1;
   ch := cy2-cy1;
 end;

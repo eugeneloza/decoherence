@@ -38,14 +38,19 @@ type
     Will be used in some remote future for Actors behaviour on global map }
   DSimpleActor = class abstract(TObject)
   private
+    { Last Nav, where the Actor was standing }
     LastNav: TNavID;
   public
+    { Faction this Actor belongs to }
     Faction: TFaction;
-    constructor create; virtual; // override;
+    { Teleport this Actor to aNav }
     procedure TeleportTo(aNav: TNavID); virtual;
+    { Procedures preformed on this actor every frame }
     procedure Manage; virtual; //it'll do something useful some day...
+    constructor Create; virtual; // override;
   end;
 
+{ List of DSimpleActors }
 type TActorList = specialize TFPGObjectList<DSimpleActor>;
 
 type
@@ -56,14 +61,16 @@ type
   private
     procedure FixZeroDirection; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
   public
-    {position, direction and rotate_to_direction of the Body}
+    { Position, direction and rotate_to_direction of the Body }
     Position,Direction: TVector3;
+    { Instantly move Actor to aPosition or aNav }
     procedure TeleportTo(aPosition: TVector3);
     procedure TeleportTo(aPosition, aDirection: TVector3);
     procedure TeleportTo(aNav: TNavID); override;
   protected
+    { What position/direction this Actor moves to }
     toPos,toDir: TVector3;
-    {initializes direction with a random value}
+    { Initializes direction with a random value}
     procedure GetRandomDirection;
     {rotates the body}
     procedure doRotate;
@@ -83,10 +90,14 @@ type
   protected
     { DActorPhysics does not set the camera, but uses it! It's defined in descendants}
     InternalCamera: TWalkCamera;
+    { Is movement to this direction or position is allowed? }
     function CanMovePos(aPos: TVector3): boolean;{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
     function CanMoveDir(aDir: TVector3): boolean;{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
   public
+    { Height of this actor, usually should be zero,
+          Mostly needed for player's camera height }
     Height: float;
+    { Determine gravity influence on this Actor }
     procedure doGravity;
     procedure Manage; override;
     constructor Create; override;
@@ -96,6 +107,7 @@ type
   { Actor with a rendered body and corresponding management routines }
   DActorBody = class abstract (DActorPhysics)
   protected
+    { AI of this actor, determines orders for actors and choice of targets }
     procedure doAI; virtual; abstract;
   private
     {shows or hides body of this actor}
@@ -171,15 +183,16 @@ Type
     procedure ResetMPH;
     procedure ResetAll;
 
-    {hit equals to consume+drain}
+    { Hit equals to consume+drain }
     procedure Hit(Damage: float; Skill: float); //=consumeHP
-    {returns true if healed or false if nothing to heal}
+    { Returns true if healed or false if nothing to heal }
     function Heal(Value: float; Skill: float): boolean; //=restoreHP
+    { Abstract action preformed on Actor's death }
     Procedure Die; virtual; abstract;
 
-    {"consumption" procedures return true if success and false if failed,
-     "restoration" procedures return true if something has been restored,
-     "drain" procedures can drain values below zero}
+    { "consumption" procedures return true if success and false if failed,
+      "restoration" procedures return true if something has been restored,
+      "drain" procedures can drain values below zero }
     function ConsumeSTA(Consumption: float; Skill: float): boolean;
     function RestoreSTA(Restoration: float; Skill: float): boolean;
     procedure DrainSTA(Drain: float;        Skill: float);
@@ -199,9 +212,9 @@ Type
     Stats, MaxStats: DStats;
 
   public
-    {three-letter nickname for short display}
+    { Three-letter nickname for short display}
     Nickname: string;
-    { these are randoms for the actor: defense gives his defense rolls,
+    { These are randoms for the actor: defense gives his defense rolls,
       Attack provides for attack rolls
       All non-important random rolls are taken by global DRND }
     DefenseRandom,AttackRandom: TCastleRandom;
@@ -214,6 +227,7 @@ type
   { Actor with actions and target }
   DActor = class(DBasicActor)
   const
+    { temporary }
     CombatRange = 10;
   private
     fTarget, fTargetGroup: DCoordActor;
@@ -221,16 +235,21 @@ type
     procedure GetEnemyTarget;
     procedure RequestSoftPause;
   protected
+    { Look at fTarget }
     procedure LookAt;
+    { Look at aPosition }
     procedure LookAt(aPosition: TVector3);
+    { Can this Actor see another Actor? }
     function CanSee(a1: DCoordActor): boolean;
+    { temp }
     procedure PerformAction(doAction: DMultiPerk);
   public
+    { List of actions for this Actor }
     Actions: DPerksList;
-    {used for AI and preforming actions
-     if target is nil any valid target is selected}
+    { Used for AI and preforming actions
+     if target is nil any valid target is selected }
     property Target: DCoordActor read GetTarget write fTarget;
-    {rests all stats and removes all effects}
+    { Rests all stats and removes all effects }
     procedure RecoverAll;
     constructor Create; override;
     destructor Destroy; override;
@@ -242,6 +261,7 @@ type
   DMonster = class(DActor)
   protected
     procedure doAI; override;
+    { Call-back to react to external damage }
     procedure doHit(Dam: float; Damtype: TDamageType);
   public
     //procedure Manage; override;
@@ -278,7 +298,7 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-constructor DSimpleActor.create;
+constructor DSimpleActor.Create;
 begin
   //nothing to create yet
 end;
