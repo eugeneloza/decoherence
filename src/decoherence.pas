@@ -17,7 +17,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 
 { Core file of the game }
 unit Decoherence;
-
 {$INCLUDE compilerconfig.inc}
 
 interface
@@ -57,12 +56,14 @@ var LoadThread: DLoadGameThread;
 {$IFDEF AllowRescale}
 { this procedure is mostly needed for Desktops in windowed mode
   and in normal situations should be called only once }
+{$PUSH}{$WARN 5024 off : Parameter "$1" not used}
 Procedure WindowResize(Container : TUIContainer);
 begin
   if (window.width<>GUI.width) or (window.height<>GUI.height) then begin
     GUI.rescale;
   end;
 end;
+{$POP}
 {$ENDIF}
 
 function NiceDate: string;
@@ -102,6 +103,7 @@ end;
 
 { this is a management procedure that takes place before
   WindowRender }
+{$PUSH}{$WARN 5024 off : Parameter "$1" not used}
 procedure WindowManage(Container : TUIContainer);
 begin
   if CurrentParty <> nil then begin
@@ -112,18 +114,23 @@ begin
   if Music <> nil then Music.Manage;
   ProcessTimeEvents;
 end;
+{$POP}
+
 
 {-------------------------------------------------------------------------}
 
 { generic rendering procedure. 3D world is rendered automatically
   on each Window.Render, so we just need to add a GUI render here }
+{$PUSH}{$WARN 5024 off : Parameter "$1" not used}
 Procedure WindowRender(Container : TUIContainer);
 begin
   GUI.Draw;
 end;
+{$POP}
 
 {======================== Mouse & keyboard =================================}
 
+{$PUSH}{$WARN 5024 off : Parameter "$1" not used}
 procedure doPress(Container: TUIContainer; const Event: TInputPressRelease);
 begin
   // todo Joystick
@@ -160,9 +167,11 @@ begin
 //  SetGameMode(gmCharacterGeneration);
   //InitTestLevel;                         //ugly! I'll fix this soon.
 end;
+{$POP}
 
 {--------------------------------------------------------------------------}
 
+{$PUSH}{$WARN 5024 off : Parameter "$1" not used}
 procedure doRelease(Container: TUIContainer; const Event: TInputPressRelease);
 begin
   if Event.EventType = itMouseButton then begin
@@ -177,9 +186,11 @@ begin
     end;
   end;
 end;
+{$POP}
 
 {--------------------------------------------------------------------------}
 
+{$PUSH}{$WARN 5024 off : Parameter "$1" not used}
 procedure doMotion(Container: TUIContainer; const Event: TInputMotion);
 var
     tmpLink: DAbstractElement;
@@ -199,6 +210,7 @@ begin
   end;
 
 end;
+{$POP}
 
 {======================= initialization routines ==============================}
 
