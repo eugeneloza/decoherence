@@ -42,7 +42,6 @@ type
     { shadow intensity. Shadow=0 is no shadow }
     Shadow: Float;
     { whether the label final image is scaled or remains 1:1 for clear text}
-    ScaleLabel: boolean;
     constructor Create; override;
     destructor Destroy; override;
     //procedure Rescale; override;
@@ -109,7 +108,7 @@ uses SysUtils, CastleImages, CastleLog,
 constructor DLabel.Create;
 begin
   inherited Create;
-  ScaleLabel := false;
+  Base.ScaleItem := false;
   Shadow := 0;
   Font := DefaultFont;
   //fText := ''; //autoinitialized
@@ -156,8 +155,8 @@ begin
   else
     SourceImage := Font.BrokenStringToImageWithShadow(BrokenString,Shadow,3);
 
-  Base.RealHeight := SourceImage.Height;
-  Base.RealWidth := SourceImage.Width;
+  Base.SetRealSize(SourceImage.Width,SourceImage.Height);
+  Base.ScaleItem := false;
 
   ImageLoaded := true;
 
@@ -169,14 +168,13 @@ end;
 procedure DLabel.RescaleImage;
 begin
   {$IFNDEF AllowRescale}If SourceImage = nil then Exit;{$ENDIF}
-  If Self.ScaleLabel then
+  If Base.ScaleItem then
     inherited RescaleImage //rescale this label as a simple image to fit "base size"
   else begin
     //don't rescale this label to provide sharp font
     if ImageLoaded then
        if Base.isInitialized then begin
           ScaledImage := SourceImage.MakeCopy;
-          Base.ResetToReal;
           InitGLPending := true;
           {$IFNDEF AllowRescale}FreeAndNil(SourceImage);{$ENDIF}
         end

@@ -63,6 +63,8 @@ type
     procedure GetWindowAnchor;{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
     { Converts integer size to float. }
     procedure IntegerToFloat;
+    { Resets x2,y2,w,h to fit RealWidth,RealHeight This suggest use of only Left anchor! }
+    procedure AdjustToRealSize;{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
   public
     { Converts float size to integer.
       should be public only for animation states. }
@@ -98,6 +100,8 @@ type
     CurrentOpacity: float;
     { Keep proportions of the container }
     RealWidth, RealHeight: integer;
+    { Can this item be scaled? Otherwise its w, h is always RealWidth, RealHeight}
+    ScaleItem: boolean;
     { Should this Container scale proportionaly? }
     ProportionalScale: TProportionalScale;
     { If this Container ready to be used? }
@@ -304,6 +308,7 @@ begin
   OpacityAnchor := nil;
   BaseOpacity := 1;
   ProportionalScale := psNone;
+  ScaleItem := true;
 end;
 
 {----------------------------------------------------------------------------}
@@ -380,6 +385,16 @@ end;
 
 {----------------------------------------------------------------------------}
 
+procedure DAbstractContainer.AdjustToRealSize;{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+begin
+  x2 := x1 + RealWidth;
+  y2 := y1 + RealHeight;
+  w := RealWidth;
+  h := RealHeight;
+end;
+
+{----------------------------------------------------------------------------}
+
 procedure DAbstractContainer.FloatToInteger;
 var Ratio: float;
 begin
@@ -388,26 +403,26 @@ begin
   CurrentOpacity := BaseOpacity * co;
 
   x1 := cx1 + Round(cw * fx1) + Anchor[asLeft].Gap;
-  x2 := cx2 + Round(cw * fx2) - Anchor[asRight].Gap;
   y1 := cy1 + Round(ch * fy1) + Anchor[asTop].Gap;
-  y2 := cy2 + Round(ch * fy2) - Anchor[asBottom].Gap;
-
-  w := x2 - x1;
-  h := y2 - y1;
-
-  {inefficient}
-  case ProportionalScale of
-    psWidth:  begin
-                Ratio := RealWidth/RealHeight;
-                w := Round(h*Ratio);
-                x2 := x1 + w;
-              end;
-    psHeight: begin
-                Ratio := RealHeight/RealWidth;
-                h := Round(w*Ratio);
-                y2 := y1 + h;
-              end;
-  end;
+  if ScaleItem then begin
+    x2 := cx2 + Round(cw * fx2) - Anchor[asRight].Gap;
+    y2 := cy2 + Round(ch * fy2) - Anchor[asBottom].Gap;
+    w := x2 - x1;
+    h := y2 - y1;
+    {inefficient}
+    case ProportionalScale of
+      psWidth:  begin
+                  Ratio := RealWidth/RealHeight;
+                  w := Round(h*Ratio);
+                  x2 := x1 + w;
+                end;
+      psHeight: begin
+                  Ratio := RealHeight/RealWidth;
+                  h := Round(w*Ratio);
+                  y2 := y1 + h;
+                end;
+    end;
+  end else AdjustToRealSize;
 
   fInitialized := true;
 end;
@@ -441,8 +456,12 @@ procedure DAbstractContainer.SetIntCoord(const ax1,ay1,ax2,ay2: integer);
 begin
   x1 := ax1;
   y1 := ay1;
-  x2 := ax2;
-  y2 := ay2;
+  if ScaleItem then begin
+    x2 := ax2;
+    y2 := ay2;
+    w := x2 - x1;
+    h := y2 - y1;
+  end else AdjustToRealSize;
 
   IntegerToFloat;
 end;
@@ -453,29 +472,15 @@ begin
 end;
 procedure DAbstractContainer.SetIntSize(const ax1,ay1,aWidth,aHeight: integer);
 begin
-  x1 := ax1;
-  y1 := ay1;
-  x2 := ax1 + aWidth;
-  y2 := ay1 + aHeight;
-
-  IntegerToFloat;
+  SetIntCoord(ax1,ay1,ax1 + aWidth,ay1 + aHeight);
 end;
 
 {----------------------------------------------------------------------------}
 
 procedure DAbstractContainer.SetIntWidthHeight(const aWidth,aHeight: integer);
 begin
-  {$hint Now they're scaled against last x1y1 position, it's not right }
-  w := aWidth;
-  h := aHeight;
-
-  x1 := x1;//x1 + (w-aWidth) div 2;
-  x2 := x1+w;//x2 - (w-aWidth) div 2;
-  y1 := y1;//y1 + (h-aHeight) div 2;
-  y2 := y1+h;//y2 - (h-aHeight) div 2;
-
-
-  IntegerToFloat; //not needed here?
+  {not sure about this}
+  SetIntSize(x1,y1,aWidth,aHeight);
 end;
 
 {----------------------------------------------------------------------------}
@@ -545,9 +550,11 @@ begin
   Self.y2 := Source.y2;
   Self.w := Source.w;
   Self.h := Source.h;
+  Self.ScaleItem := Source.ScaleItem;
   Self.RealWidth := Source.RealWidth;
   Self.RealHeight := Source.RealHeight;
   Self.BaseOpacity := Source.BaseOpacity;
+  Self.CurrentOpacity := Source.CurrentOpacity;
   Self.ProportionalScale := Source.ProportionalScale;
   Self.fInitialized := Source.isInitialized;
   Self.AnchorToWindow := Source.AnchorToWindow;
@@ -570,9 +577,11 @@ begin
   Dest.y2 := Self.y2;
   Dest.w := Self.w;
   Dest.h := Self.h;
+  Dest.ScaleItem := Self.ScaleItem;
   Dest.RealWidth := Self.RealWidth;
   Dest.RealHeight := Self.RealHeight;
   Dest.BaseOpacity := Self.BaseOpacity;
+  Dest.CurrentOpacity := Self.CurrentOpacity;
   Dest.ProportionalScale := Self.ProportionalScale;
   Dest.fInitialized := Self.isInitialized;
   Dest.AnchorToWindow := Self.AnchorToWindow;
@@ -727,6 +736,8 @@ begin
                             Last.fx2+(Next.fx2-Last.fx2)*Phase,
                             Last.fy2+(Next.fy2-Last.fy2)*Phase,
                             Last.BaseOpacity+((Next.BaseOpacity-Last.BaseOpacity)*Phase));
+      {during the animation, the Element is always scaled}
+      Current.ScaleItem := true;
       //we don't need scale back to float, as it's not a basic animation state
     end else begin
       Current.Assign(Base);
