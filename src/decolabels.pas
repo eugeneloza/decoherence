@@ -31,24 +31,25 @@ type
   DLabel = class(DSimpleImage)
   strict private
     fText: string;
+    { a set of strings each no longer than "x" }
     BrokenString: DStringList;
   private
+    { converts string (Text) into an image }
     procedure PrepareTextImage;
+    { change the current Text and call Prepare Text Image if needed }
     procedure SetText(const Value: string);
-    function GetText: string;
   public
     { font to print the label }
     Font: DFont;
     { shadow intensity. Shadow=0 is no shadow }
     Shadow: Float;
-    { whether the label final image is scaled or remains 1:1 for clear text}
     constructor Create; override;
     destructor Destroy; override;
     //procedure Rescale; override;
     procedure RescaleImage; override;
   public
     { text at the label }
-    property Text: string read GetText write SetText;
+    property Text: string read fText write SetText;
   end;
 
 type
@@ -86,12 +87,16 @@ type
   end;
 
 type
-
+  { Debug label that counts FPS
+      Practically it just increases FPS by 1 each CountFPS call
+      and changes displayed value approx once per second }
   DFPSLabel = class(DLabel)
   strict private
     FPScount: Integer;
     LastRenderTime: DTime;
   public
+    { Call this each frame instead of Draw,
+         Draw is automatically called here }
     procedure CountFPS;
     constructor Create; override;
   end;
@@ -130,13 +135,6 @@ begin
     fText := Value;
     PrepareTextImage;
   end;
-end;
-
-{----------------------------------------------------------------------------}
-
-function DLabel.GetText: string;
-begin
-  Result := fText;
 end;
 
 {----------------------------------------------------------------------------}
