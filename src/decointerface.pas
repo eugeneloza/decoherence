@@ -465,14 +465,15 @@ end;
 
 procedure DAbstractContainer.SetIntWidthHeight(const aWidth,aHeight: integer);
 begin
-  {$hint or based on anchors? }
-  x1 := x1 + (w-aWidth) div 2;
-  x2 := x2 - (w-aWidth) div 2;
-  y1 := y1 + (h-aHeight) div 2;
-  y2 := y2 - (h-aHeight) div 2;
-
+  {$hint Now they're scaled against last x1y1 position, it's not right }
   w := aWidth;
   h := aHeight;
+
+  x1 := x1;//x1 + (w-aWidth) div 2;
+  x2 := x1+w;//x2 - (w-aWidth) div 2;
+  y1 := y1;//y1 + (h-aHeight) div 2;
+  y2 := y1+h;//y2 - (h-aHeight) div 2;
+
 
   IntegerToFloat; //not needed here?
 end;
