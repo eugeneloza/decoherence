@@ -172,9 +172,13 @@ begin
     //don't rescale this label to provide sharp font
     if ImageLoaded then
        if Base.isInitialized then begin
+          {$IFDEF AllowRescale}
           ScaledImage := SourceImage.MakeCopy;
+          {$ELSE}
+          ScaledImage := SourceImage;
+          SourceImage := nil;
+          {$ENDIF}
           InitGLPending := true;
-          {$IFNDEF AllowRescale}FreeAndNil(SourceImage);{$ENDIF}
         end
        else
          WriteLnLog('DLabel.RescaleImage/no scale label','ERROR: base.initialized = false');
