@@ -68,9 +68,13 @@ type
   { An extension to TCastleImage }
   DRectagonalFrame = class(TObject)
   public
-    SourceImage: TCastleImage;
+    FrameImage: TCastleImage;
     { Frame borders }
     CornerTop, CornerBottom, CornerLeft, CornerRight: integer;
+    destructor Destroy; override;
+    constructor Create;
+    constructor Create(const filename: string; const cTop,cBottom,cLeft,CRight: integer);
+    procedure Load(const FileName: string; const cTop,cBottom,cLeft,CRight: integer);
   end;
 
 type
@@ -267,6 +271,39 @@ end;
 {=============================================================================}
 {============================== Frame Image ==================================}
 {=============================================================================}
+
+destructor DRectagonalFrame.Destroy;
+begin
+  FreeAndNil(FrameImage);
+  inherited Destroy;
+end;
+
+{----------------------------------------------------------------------------}
+
+constructor DRectagonalFrame.Create;
+begin
+
+end;
+
+{----------------------------------------------------------------------------}
+
+constructor DRectagonalFrame.Create(const FileName: string; const cTop,cBottom,cLeft,CRight: integer);
+begin
+  Load(FileName, cTop,cBottom,cLeft,CRight);
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DRectagonalFrame.Load(const FileName: string; const cTop,cBottom,cLeft,CRight: integer);
+begin
+  FrameImage := LoadImageSafe(ApplicationData(FramesFolder+FileName),[TRGBAlphaImage]) as TRGBAlphaImage;
+  CornerTop := cTop;
+  CornerBottom := cBottom;
+  CornerLeft := cLeft;
+  CornerRight := cRight;
+end;
+
+{----------------------------------------------------------------------------}
 
 procedure DFrameImage.RescaleImage;
 var ScaledImageParts: array [0..2,0..2] of TCastleImage;

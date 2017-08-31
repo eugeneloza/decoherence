@@ -240,7 +240,7 @@ begin
   Base.AnchorToWindow := true;
   Base.ScaleItem := false;
   Base.SetRealSize(100,100);
-  SetBaseSize(0,0,0.05,0.05,1.0);
+  SetBaseSize(0,0,0.05,0.05,1.0,asNone);
 
   Shadow := 0;
   Font := DebugFont;

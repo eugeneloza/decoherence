@@ -28,12 +28,8 @@ uses CastleImages, CastleVectors,
 
 var HpBarImage, StaBarImage, CncBarImage, MphBarImage: TCastleImage; //todo not freed automatically!!!
     //StatBarsFrame: DFrame;
-{  {simple outline around black box}
-    //SimpleFrame,
-    {a frame with 19px header}
-    //CaptionFrame,
-    {Just black background with no frame}
-    BlackFrame: DFrame;    }
+  { Just black background with no frame }
+  BlackFrame: DRectagonalFrame;
   {characterbar_top, characterbar_mid, characterbar_bottom,
   portraitframe_left, portraitframe_right,
   decorationframe1_left,decorationframe1_right,
@@ -45,8 +41,6 @@ var HpBarImage, StaBarImage, CncBarImage, MphBarImage: TCastleImage; //todo not 
   damageOverlay_img: TCastleImage;
   { a GL shade color imposed on all interface elements }
   InterfaceColor: TVector4;
-
-
 
 {reads some interface-related data, like loading frames images}
 procedure InitInterface;
@@ -67,11 +61,7 @@ begin
 
   InterfaceColor := Vector4(1,1,1,1);
 
-  {BlackFrame := DFrame.Create(Window);
-  with BlackFrame do begin
-    SourceImage := LoadImageSafe(ApplicationData(FramesFolder+'blackframe.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
-    CornerTop := 0; CornerBottom := 0; CornerLeft := 0; CornerRight := 0;
-  end;}
+  BlackFrame := DRectagonalFrame.Create('blackframe.png',0,0,0,1);
 
   InitCompositeInterface;
 
