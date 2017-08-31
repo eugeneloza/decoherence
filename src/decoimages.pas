@@ -73,7 +73,7 @@ type
     CornerTop, CornerBottom, CornerLeft, CornerRight: integer;
     destructor Destroy; override;
     constructor Create;
-    constructor Create(const filename: string; const cTop,cBottom,cLeft,CRight: integer);
+    constructor Create(const FileName: string; const cTop,cBottom,cLeft,CRight: integer);
     procedure Load(const FileName: string; const cTop,cBottom,cLeft,CRight: integer);
   end;
 
@@ -182,7 +182,7 @@ type
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-uses SysUtils, CastleLog, CastleFilesUtils,
+uses SysUtils, fgl, CastleLog, CastleFilesUtils,
   DecoInterfaceLoader;
 
 {=============================================================================}
@@ -280,15 +280,20 @@ end;
 
 {----------------------------------------------------------------------------}
 
+type TFrameThrash = specialize TFPGObjectList<DRectagonalFrame>;
+var FrameThrash: TFrameThrash;
+
 constructor DRectagonalFrame.Create;
 begin
-
+  if FrameThrash = nil then FrameThrash := TFrameThrash.Create(true);
+  FrameThrash.Add(Self);
 end;
 
 {----------------------------------------------------------------------------}
 
 constructor DRectagonalFrame.Create(const FileName: string; const cTop,cBottom,cLeft,CRight: integer);
 begin
+  Create;
   Load(FileName, cTop,cBottom,cLeft,CRight);
 end;
 
@@ -620,6 +625,8 @@ begin
   end;
 end;
 
+finalization
+FreeAndNil(FrameThrash);
 
 end.
 
