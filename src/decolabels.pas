@@ -154,7 +154,6 @@ begin
     SourceImage := Font.BrokenStringToImageWithShadow(BrokenString,Shadow,3);
 
   Base.SetRealSize(SourceImage.Width,SourceImage.Height);
-  Base.ScaleItem := false;
 
   ImageLoaded := true;
 
@@ -239,9 +238,12 @@ begin
   LastRenderTime := -1;
 
   Base.AnchorToWindow := true;
+  Base.ScaleItem := false;
+  Base.SetRealSize(100,100);
+  SetBaseSize(0,0,0.05,0.05,1.0);
+
   Shadow := 0;
   Font := DebugFont;
-  SetBaseSize(0,0,0.05,0.05,1,asNone);
   //Text := '';
 end;
 
@@ -252,9 +254,9 @@ begin
   if LastRenderTime < 0 then LastRenderTime := DecoNow;
 
   if (DecoNow - LastRenderTime >= 1) then begin
-      Text := Inttostr(FPSCount){+' '+inttostr(round(Window.Fps.RealTime))};
-      FPSCount := 0;
-      LastRenderTime := DecoNow;
+    Text := IntToStr(FPSCount){+' '+inttostr(round(Window.Fps.RealTime))};
+    FPSCount := 0;
+    LastRenderTime := DecoNow;
   end else inc(FPSCount);
   Draw;
 end;
