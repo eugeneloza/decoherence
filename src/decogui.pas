@@ -50,7 +50,7 @@ uses SysUtils, CastleLog,
   CastleGLUtils, CastleColors,
   {DecoLoadScreen,}
   DecoInterfaceComposite, DecoInterfaceBlocks,
-  {DecoPlayerCharacter,}
+  {DecoPlayerCharacter,} DecoInterfaceLoader,
   DecoGameMode, DecoTime;
 
 {=============================================================================}
@@ -117,8 +117,10 @@ end;
 procedure DInterfaceContainer.tmpInterface;
 var tmp: DInterfaceElement;
 begin
-  tmp := DWindElement.Create;
-  Grab(tmp)
+  tmp := DFramedElement.Create({HpBarImage,}DecorationFrame3_Bottom);
+  tmp.SetBaseSize(0,0,1,1);
+  tmp.Rescale;
+  Grab(tmp);
 end;
 
 end.
