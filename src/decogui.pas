@@ -81,7 +81,7 @@ end;
 
 procedure DInterfaceContainer.Rescale;
 begin
-  writeLnLog('DInterfaceContainer.rescale',inttostr(window.Width)+'x'+inttostr(window.Height));
+  WriteLnLog('DInterfaceContainer.rescale',inttostr(window.Width)+'x'+inttostr(window.Height));
   inherited Rescale;
 
   { THIS ROUTINE IS NOT YET IMPLEMENTED IN CASTLE GAME ENGINE
@@ -100,60 +100,6 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-procedure DInterfaceContainer.tmpInterface;
-var tmp: DInterfaceElement;
-begin
-  tmp := DWindElement.Create;
-  Grab(tmp)
-end;
-
-{-----------------------------------------------------------------------------}
-
-{procedure DInterfaceContainer.DoLoadNewImage;
-begin
-  if LoadScreenLabel=nil then begin
-    LoadScreenLabel := DLabel.create(self);
-    LoadScreenLabel.setbasesize(1/17,-2/17,10/17,10/17,1,asNone);
-    LoadScreenLabel.Shadow := 1;
-    LoadScreenLabel.Font := LoadScreenFont;
-  end;
-  LoadScreenLabel.text := LoadScreenMainText;
-
-  if floaterLabel = nil then begin
-    FloaterLabel := DLabel.create(self);
-    floaterLabel.Font := LoadScreenFont;
-    floaterLabel.Shadow := 1;
-  end;
-  floaterLabel.setbasesize(-11/17,1/17,10/17,10/17,0,asNone); //need to reset it each new fact, because w is reset to realwidth after text initialize
-  floaterLabel.text := GetRandomFact;
-
-  if floater = nil then floater := DFloatImage.create(self);
-  floater.FreeImage;
-  LoadNewFloaterImage := false;
-  floater.opacity := 0.8;
-  floater.phasespeed := 1/15;
-  floater.base.setsize(0,0,proportionalscale,fullheight);
-  floater.LoadThread(LoadScreenFolder+GetRandomFactImage);
-end; }
-
-{-----------------------------------------------------------------------------}
-
-{procedure DInterfaceContainer.DrawLoadScreen;
-begin
-  if (floater = nil) or (LoadNewFloaterImage) then DoLoadNewImage;
-  floater.Draw;
-
-  DrawWind;
-
-  LoadScreenLabel.Draw;
-
-  floaterLabel.base.y1 := round((1 + 5*Floater.phase)*Window.height/17);
-  floaterLabel.base.Opacity := sin(Pi*Floater.Phase);
-  floaterLabel.draw;
-end; }
-
-{-----------------------------------------------------------------------------}
-
 procedure DInterfaceContainer.Draw;
 begin
   { clear the screen depending on the game mode
@@ -163,6 +109,17 @@ begin
 
   { draw special elements }
   FPSLabel.CountFPS;
+end;
+
+{===========================================================================}
+{==================== INTERFACE MODES ======================================}
+{===========================================================================}
+
+procedure DInterfaceContainer.tmpInterface;
+var tmp: DInterfaceElement;
+begin
+  tmp := DWindElement.Create;
+  Grab(tmp)
 end;
 
 end.
