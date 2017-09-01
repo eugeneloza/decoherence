@@ -255,7 +255,7 @@ begin
   Window.OnPress := @doPress;
   Window.onRelease := @doRelease;
   Window.OnMotion := @doMotion;
-  Application.LimitFPS := 60;
+  //Application.LimitFPS := 60;
 
   WritelnLog('ApplicationInitialize','Initialize fonts');
   InitializeFonts;      //load fonts

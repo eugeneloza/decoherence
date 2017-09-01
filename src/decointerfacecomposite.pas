@@ -39,13 +39,12 @@ type
     each child will define its own arrange method }
   DAbstractCompositeInterfaceElement = class(DInterfaceElement)
   public
-    { arranges children within base.w, base.h of this container
+    { arranges children within this container
       basically at this level it is abstract, it just substracts the frame
       from base.w and base.h and does nothing more}
-{    var cnt_x,cnt_y,cnt_w,cnt_h: float;
-    procedure ArrangeChildren(Animate: TAnimationStyle); virtual;
+    //procedure ArrangeChildren(const Animate: TAnimationStyle); virtual;
     { additionally calls ArrangeChildren }
-    procedure setbasesize(const newx,newy,neww,newh,newo: float; Animate: TAnimationStyle); override;  }
+    //procedure SetBaseSize(const newx,newy,neww,newh,newo: float; const Animate: TAnimationStyle); override;
 end;
 
 type
@@ -175,12 +174,11 @@ uses SysUtils, CastleLog, {castleVectors,}
 
 {===========================================================================}
 
-{procedure DAbstractCompositeInterfaceElement.setbasesize(const newx,newy,neww,newh,newo: float; animate: TAnimationStyle);
+{procedure DAbstractCompositeInterfaceElement.setbasesize(const NewX,NewY,NewW,NewH,NewO: float; const Animate: TAnimationStyle);
 begin
-  inherited setbasesize(newx,newy,neww,newh,newo,animate);
-  //{$WARNING Memory Leak here}
-  ArrangeChildren(animate);
-end; }
+  inherited SetBaseSize(NewX,NewY,NewW,NewH,NewO,Animate);
+  ArrangeChildren(Animate);
+end;}
 
 {procedure DAbstractCompositeInterfaceElement.ArrangeChildren(animate: TAnimationStyle);
 begin
