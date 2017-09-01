@@ -119,6 +119,7 @@ type
     procedure CyclePhase; virtual;
   public
     procedure Update; override;
+    procedure ResetPhase;
   public
     { 1/seconds to scroll the full screen }
     PhaseSpeed: float;   
@@ -139,7 +140,7 @@ type
     constructor Create; Override;
   end;
 
-type TImageProcedure = procedure(const Sender: DPhasedImage) of Object;
+type TImageProcedure = procedure of Object;
 type
   { A floating image for LoadScreens
     warning: floater images are scaled relative to Window }
@@ -428,21 +429,29 @@ begin
   Base.RealWidth := SourceImage.Width;
   Base.RealHeight := SourceImage.Height;
   ImageLoaded := true;
+  ImageReady := false;
 end;
 
 {=============================================================================}
 {======================== phased image =======================================}
 {=============================================================================}
 
+procedure DPhasedImage.ResetPhase;
+begin
+  LastTime := -1;
+end;
+
+{----------------------------------------------------------------------------}
+
 procedure DPhasedImage.Load(const URL:string);
 begin
   inherited Load(URL);
-  LastTime := -1;
+  ResetPhase;
 end;
 procedure DPhasedImage.Load(const CopyImage: TCastleImage);
 begin
   inherited Load(CopyImage);
-  LastTime := -1;
+  ResetPhase;
 end;
 
 {----------------------------------------------------------------------------}
@@ -541,7 +550,7 @@ begin
   if Phase > 1 then begin
     Phase := 1;
     ImageLoaded := false;
-    if Assigned(onCycleFinish) then onCycleFinish(Self);
+    if Assigned(onCycleFinish) then onCycleFinish;
   end;
 end;
 
@@ -556,6 +565,8 @@ begin
   if ImageReady then begin
     if not isVisible then Exit;
     Update;
+
+    if not ImageReady then Exit; //image has been reloaded! //BUG
 
     GLImage.Color[3] := Current.CurrentOpacity*Sin(Pi*Phase);
 

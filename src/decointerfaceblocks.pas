@@ -39,6 +39,7 @@ type
     Floater: DFloatImage;
     FloaterLabel: DPhasedLabel;
   public
+    procedure ReloadFact;
     constructor Create; override;
   end;
 
@@ -89,7 +90,8 @@ type
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-uses CastleLog, CastleFilesUtils;
+uses CastleLog, CastleFilesUtils,
+  DecoLoadScreen;
 
 constructor DLoadScreen.Create;
 begin
@@ -99,26 +101,25 @@ begin
 
   Floater := DFloatImage.Create;
   Grab(Floater);
-  Floater.Load(ApplicationData('interface/loadscreen/Milky_Way_2005_CC0_by_NASA_[glow,crop].jpg'));
+//  Floater.Load(ApplicationData('interface/loadscreen/Milky_Way_2005_CC0_by_NASA_[glow,crop].jpg'));
   Floater.SetBaseSize(0,0,1,1);
-  Floater.Rescale;
+  Floater.onCycleFinish := @ReloadFact;
 
   Wind := DWindElement.Create;
   Grab(Wind);
 
   FloaterLabel := DPhasedLabel.Create;
-  FloaterLabel.SetBaseSize(0,0,0.3,1);
-  FloaterLabel.Text := 'alalala';
+  //FloaterLabel.Text := 'alalala';
   Grab(FloaterLabel);
+
+  ReloadFact;
 end;
 
-{procedure DInterfaceContainer.DrawLoadScreen;
-begin
-  if (floater = nil) or (LoadNewFloaterImage) then DoLoadNewImage;
-end; }
+{---------------------------------------------------------------------------}
 
-{procedure DInterfaceContainer.DoLoadNewImage;
+procedure DLoadScreen.ReloadFact;
 begin
+{
   if LoadScreenLabel=nil then begin
     LoadScreenLabel := DLabel.create(self);
     LoadScreenLabel.setbasesize(1/17,-2/17,10/17,10/17,1,asNone);
@@ -126,21 +127,19 @@ begin
     LoadScreenLabel.Font := LoadScreenFont;
   end;
   LoadScreenLabel.text := LoadScreenMainText;
+}
 
-  if floaterLabel = nil then begin
-    FloaterLabel := DLabel.create(self);
-    floaterLabel.Font := LoadScreenFont;
-    floaterLabel.Shadow := 1;
-  end;
-  floaterLabel.setbasesize(-11/17,1/17,10/17,10/17,0,asNone); //need to reset it each new fact, because w is reset to realwidth after text initialize
-  floaterLabel.text := GetRandomFact;
+  FloaterLabel.SetBaseSize(0,2/3,0.3,1); //need to reset it each time
+  FloaterLabel.Base.w := Round(0.9 * Window.Width/3); //BUG
+  FloaterLabel.Text := GetRandomFact;
+  FloaterLabel.ResetPhase;
 
-  if floater = nil then floater := DFloatImage.create(self);
-  floater.FreeImage;
-  LoadNewFloaterImage := false;
+  Floater.FreeImage;
+  Floater.Load(ApplicationData(LoadScreenFolder+GetRandomFactImage));
+  Floater.ResetPhase;
+  Floater.Rescale;
 
-  floater.LoadThread(LoadScreenFolder+GetRandomFactImage);
-end; }
+end;
 
 {=============================================================================}
 {=========================== Character Space =================================}

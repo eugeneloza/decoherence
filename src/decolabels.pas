@@ -42,7 +42,7 @@ type
     { Font to print the label }
     Font: DFont;
     { Shadow intensity. Shadow=0 is no shadow (strictly) }
-    Shadow: Float;
+    ShadowIntensity: Float;
     { Shadow length in pixels }
     ShadowLength: integer;
     constructor Create; override;
@@ -117,6 +117,7 @@ type
   public
     procedure Update; override;
     procedure Draw; override;
+    procedure ResetPhase;
     constructor Create; override;
   public
     { 1/seconds to scroll the full screen }
@@ -134,7 +135,7 @@ constructor DLabel.Create;
 begin
   inherited Create;
   Base.ScaleItem := false;
-  Shadow := 0;
+  ShadowIntensity := 0;
   ShadowLength := 3;
   Font := DefaultFont;
   //fText := ''; //autoinitialized
@@ -169,10 +170,10 @@ begin
   BrokenString := Font.BreakStings(fText, Base.w);
   FreeImage;
 
-  if Shadow = 0 then
+  if ShadowIntensity = 0 then
     SourceImage := Font.BrokenStringToImage(BrokenString)
   else
-    SourceImage := Font.BrokenStringToImageWithShadow(BrokenString,Shadow,ShadowLength);
+    SourceImage := Font.BrokenStringToImageWithShadow(BrokenString,ShadowIntensity,ShadowLength);
 
   Base.SetRealSize(SourceImage.Width,SourceImage.Height);
 
@@ -263,7 +264,7 @@ begin
   Base.SetRealSize(100,100);
   SetBaseSize(0,0,0.05,0.05,1.0,asNone);
 
-  Shadow := 0;
+  //ShadowIntensity := 0;
   Font := DebugFont;
   //Text := '';
 end;
@@ -289,9 +290,16 @@ end;
 constructor DPhasedLabel.Create;
 begin
   inherited Create;
-  LastTime := -1;
+  ResetPhase;
   PhaseSpeed := 0.1;
-  Self.Shadow := 1.0;
+  Self.ShadowIntensity := 1.0;
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DPhasedLabel.ResetPhase;
+begin
+  LastTime := -1;
 end;
 
 {----------------------------------------------------------------------------}

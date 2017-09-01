@@ -413,11 +413,13 @@ begin
     {inefficient}
     case ProportionalScale of
       psWidth:  begin
+                  if RealHeight = 0 then Exit;
                   Ratio := RealWidth/RealHeight;
                   w := Round(h*Ratio);
                   x2 := x1 + w;
                 end;
       psHeight: begin
+                  if RealWidth = 0 then Exit;
                   Ratio := RealHeight/RealWidth;
                   h := Round(w*Ratio);
                   y2 := y1 + h;

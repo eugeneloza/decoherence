@@ -85,7 +85,7 @@ function GetRandomFact: string;
 var newFact: integer;
 begin
   repeat
-    NewFact := drnd.random(facts.Count);
+    NewFact := drnd.random(Facts.Count);
   until (NewFact <> LastFact) and (drnd.random < 1/facts[newFact].frequency);
   inc(facts[newFact].frequency,7);      //todo balance facts frequency, now chance is 1,1/8,1/15,1/22...
   result := facts[newFact].value;

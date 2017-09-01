@@ -259,12 +259,12 @@ begin
   //create GUI
   WritelnLog('ApplicationInitialize','Create interface');
   InitInterface;
+  InitLoadScreen;
   GUI := DInterfaceContainer.Create;
   GUI.Rescale;
   GUI.tmpInterface;
 
   WritelnLog('ApplicationInitialize','Initialize interface');
-  InitLoadScreen;
 
   //finally we're ready to show game loading screen
   {$IFDEF AllowRescale}window.OnResize := @WindowResize;{$ENDIF}
