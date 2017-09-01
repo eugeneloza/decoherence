@@ -86,13 +86,11 @@ begin
 
   { THIS ROUTINE IS NOT YET IMPLEMENTED IN CASTLE GAME ENGINE
     see https://github.com/castle-engine/castle-engine/issues/36 }
-{ //prevent Window from scaling too small and/or into portrait orientation
-  if window.width < window.height then begin
+  //prevent Window from scaling too small and/or into portrait orientation
+  {if window.width < window.height then begin
     writeLnLog('DInterfaceContainer.rescale','ERROR: Only landscape orientation supported!');
     window.width := window.height+10;
-  end;
-  //rescale "base" for some routines to work correctly}
-  //base.setsize(0,0,fullwidth,fullheight);
+  end;}
 
   { rescale special elements }
   if FPSLabel <> nil then FPSLabel.Rescale;
@@ -105,6 +103,7 @@ begin
   { clear the screen depending on the game mode
     in case SceneManager doesn't clear it }
   if GameModeNeedsClearingScreen then RenderContext.Clear([cbColor], Black);
+
   inherited Draw;
 
   { draw special elements }

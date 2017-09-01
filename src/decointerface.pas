@@ -168,7 +168,7 @@ Type
     Current, Base: DAbstractContainer;
     {source width/height of the element. Used to preserve proportions while scaling}
 
-    procedure SetBaseSize(const NewX,NewY,NewW,NewH,NewO: float; const Animate: TAnimationStyle = asNone); virtual;
+    procedure SetBaseSize(const NewX,NewY,NewW,NewH: float;NewO: float=1; const Animate: TAnimationStyle = asNone); virtual;
     //procedure SetIntSize(const x1,y1,x2,y2:integer; Animate: TAnimationStyle); virtual;
     { If the element is visible, if false then draw will not be called.
       PAY ATTENTION: if assigned to a single interface element then the animations
@@ -363,6 +363,7 @@ begin
     co := OpacityAnchor.CurrentOpacity
   else
     co := 1;
+
   cw := cx2-cx1;
   ch := cy2-cy1;
 end;
@@ -405,8 +406,8 @@ begin
   x1 := cx1 + Round(cw * fx1) + Anchor[asLeft].Gap;
   y1 := cy1 + Round(ch * fy1) + Anchor[asTop].Gap;
   if ScaleItem then begin
-    x2 := cx2 + Round(cw * fx2) - Anchor[asRight].Gap;
-    y2 := cy2 + Round(ch * fy2) - Anchor[asBottom].Gap;
+    x2 := cx1 + Round(cw * fx2) - Anchor[asRight].Gap;
+    y2 := cy1 + Round(ch * fy2) - Anchor[asBottom].Gap;
     w := x2 - x1;
     h := y2 - y1;
     {inefficient}
@@ -707,7 +708,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DAbstractElement.SetBaseSize(const NewX,NewY,NewW,NewH,NewO: float; const Animate: TAnimationStyle = asNone);
+procedure DAbstractElement.SetBaseSize(const NewX,NewY,NewW,NewH: float;NewO: float=1; const Animate: TAnimationStyle = asNone);
 begin
   Base.SetFloatFull(NewX,NewY,NewW,NewH,NewO);
   AnimateTo(Animate);
