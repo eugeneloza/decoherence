@@ -98,7 +98,7 @@ begin
         WriteLnLog('DecoInterfaceLoader>InitCompositeInterface','ERROR loading portrait '+fName);
       end;
       on EImageLoadError do begin
-        Portrait_img[i] := LoadImageSafe(ApplicationData(PortraitFolder+'placeholder.png'));
+        Portrait_Img[i] := LoadImageSafe(ApplicationData(PortraitFolder+'placeholder.png'));
         WriteLnLog('DecoInterfaceLoader>InitCompositeInterface','ERROR loading portrait '+fName);
       end;
     end;

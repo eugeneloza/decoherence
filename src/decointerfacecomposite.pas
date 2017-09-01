@@ -28,11 +28,33 @@ interface
 
 uses
   CastleImages,
-  DecoInterface,
-  DecoActor, DecoPlayerCharacter, DecoPerks,
+  DecoInterface, DecoImages, DecoLabels,
+  //DecoActor, DecoPlayerCharacter, DecoPerks,
   DecoGlobal;
 
 const PortraitTimeOut = 1; {seconds}
+
+type
+  {}
+  DFramedElement = class(DInterfaceElement)
+  public
+    {}
+    Frame: DFrameImage;
+    constructor Create; override;
+    constructor Create(const aFrame: DRectagonalFrame);
+    //destructor Destroy; override;
+  end;
+
+type
+  {}
+  DFramedImage = class(DFramedElement)
+  public
+    {}
+    Image: DStaticImage;
+    constructor Create; override;
+    constructor Create(const aImage: TCastleImage; const aFrame: DRectagonalFrame);
+  end;
+
 
 type
   { wrapper for composite Interface elements with ArrangeChildren procedure
@@ -168,11 +190,45 @@ type DPerksContainer = class(DAbstractSorter)
 
 implementation
 uses SysUtils, CastleLog, {castleVectors,}
-   DecoFont, DecoImages, DecoLabels,
+   DecoFont,
    DecoInterfaceBlocks,
    DecoInputOutput, DecoInterfaceLoader;
 
 {===========================================================================}
+{======================== D Framed Element =================================}
+{===========================================================================}
+
+constructor DFramedElement.Create;
+begin
+  inherited Create;
+  Frame := DFrameImage.Create;
+  Grab(Frame);
+end;
+constructor DFramedElement.Create(const aFrame: DRectagonalFrame);
+begin
+  Create;
+  Frame.Frame := aFrame;
+end;
+
+{-----------------------------------------------------------------------------}
+
+constructor DFramedImage.Create;
+begin
+  inherited Create;
+  Image := DStaticImage.Create;
+  Grab(Image);
+end;
+constructor DFramedImage.Create(const aImage: TCastleImage; const aFrame: DRectagonalFrame);
+begin
+  Create;
+  Frame.Frame := aFrame;
+  Image.Load(aImage);
+end;
+
+{===========================================================================}
+{===========================================================================}
+{===========================================================================}
+
 
 {procedure DAbstractCompositeInterfaceElement.setbasesize(const NewX,NewY,NewW,NewH,NewO: float; const Animate: TAnimationStyle);
 begin
