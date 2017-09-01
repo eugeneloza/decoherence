@@ -78,9 +78,11 @@ type
   end;
 
 type
-  { 3x3 scaled image (i.e. frames) }
+  { 3x3 scaled image (i.e. frames),
+    Careful, it doesn't use SourceImage }
   DFrameImage = class(DAbstractImage)
   public
+    {}
     Frame: DRectagonalFrame;
     procedure RescaleImage; override;
     { todo: maybe not scale the image, but draw3x3 by OpenGl features? 
@@ -322,6 +324,8 @@ begin
   FreeAndNil(GLImage);
   FreeAndNil(ScaledImage); //redundant, but let it be here
 
+  SourceImage := Frame.FrameImage.CreateCopy as TRGBAlphaImage; //ugly bugfix!
+
   ScaledImage := SourceImage.CreateCopy as TRGBAlphaImage;
 
   UnscaledWidth := ScaledImage.Width;
@@ -373,6 +377,8 @@ begin
 
   for ix := 0 to 2 do
     for iy := 0 to 2 do FreeAndNil(ScaledImageParts[ix,iy]);
+
+  FreeAndNil(SourceImage); //ugly bugfix!
 
   InitGLPending := true;
 end;
