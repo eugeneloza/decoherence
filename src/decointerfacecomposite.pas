@@ -212,8 +212,8 @@ constructor DFramedElement.Create;
 begin
   inherited Create;
   Frame := DFrameImage.Create;
-  Frame.Base.AnchorTo(Self.Current,0);
-  Frame.SetBaseSize(0,0,1,1,1.0,asNone);
+  Frame.Base.AnchorTo(Self.Current);
+  Frame.SetBaseSize(0,0,1,1);
   Grab(Frame);
 end;
 constructor DFramedElement.Create(const aFrame: DRectagonalFrame);
@@ -234,12 +234,12 @@ constructor DFramedImage.Create(const aImage: TCastleImage; const aFrame: DRecta
 begin
   Create;
   Frame.Frame := aFrame;
-  Image.Base.AnchorTo(Frame.Current,0);
+  Image.Base.AnchorTo(Frame.Current);
   Image.Base.Anchor[asLeft].Gap := Frame.Frame.CornerLeft;
   Image.Base.Anchor[asRight].Gap := Frame.Frame.CornerRight;
   Image.Base.Anchor[asTop].Gap := Frame.Frame.CornerTop;
   Image.Base.Anchor[asBottom].Gap := Frame.Frame.CornerBottom;
-  Image.SetBaseSize(0,0,1,1,1.0,asNone);
+  Image.SetBaseSize(0,0,1,1);
   Image.Load(aImage);
 end;
 

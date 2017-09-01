@@ -324,7 +324,7 @@ begin
   FreeAndNil(GLImage);
   FreeAndNil(ScaledImage); //redundant, but let it be here
 
-  SourceImage := Frame.FrameImage.CreateCopy as TRGBAlphaImage; //ugly bugfix!
+  SourceImage := Frame.FrameImage.CreateCopy as TRGBAlphaImage; //ugly bugfix! It's actually dangerous to just assign SourceImage to FrameImage
 
   ScaledImage := SourceImage.CreateCopy as TRGBAlphaImage;
 

@@ -616,9 +616,19 @@ procedure DAbstractElement.Rescale;
 begin
   {set animation states to changed container size}
   Base.FloatToInteger;
-  Last.FloatToInteger;
-  Next.FloatToInteger;
-  //not setting Current here as it is automatically determined in GetCurrentAnimationState without any scaling
+
+  {Rescale Last and Next if they're initialized or just copy Base to avoid bugs}
+  if Last.isInitialized then
+    Last.FloatToInteger
+  else
+    Last.Assign(Base);
+
+  if Next.isInitialized then
+    Next.FloatToInteger
+  else
+    Next.Assign(Base);
+
+  GetAnimationState; //Get Self.Current (required to scale Anchored elements accordingly!)
 end;
 
 {----------------------------------------------------------------------------}
@@ -945,7 +955,7 @@ procedure DInterfaceElement.Rescale;
 var i: integer;
 begin
   inherited Rescale;
-  for i:=0 to Children.Count-1 do Children[i].Rescale;
+  for i := 0 to Children.Count-1 do Children[i].Rescale;
 end;
 
 {-----------------------------------------------------------------------------}

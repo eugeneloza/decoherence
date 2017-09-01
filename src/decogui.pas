@@ -117,8 +117,8 @@ end;
 procedure DInterfaceContainer.tmpInterface;
 var tmp: DInterfaceElement;
 begin
-  tmp := DFramedElement.Create({HpBarImage,}DecorationFrame3_Bottom);
-  tmp.SetBaseSize(0,0,1,1);
+  tmp := DFramedImage.Create(HpBarImage,DecorationFrame3_Bottom);
+  tmp.SetBaseSize(0.1,0.1,0.5,0.5);
   tmp.Rescale;
   Grab(tmp);
 end;

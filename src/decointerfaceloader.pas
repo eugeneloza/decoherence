@@ -114,7 +114,7 @@ begin
   DecorationFrame2_Right := DRectagonalFrame.Create('frame_2_right_CC-BY-SA_by_Saito00.png',6,9,6,2);
   DecorationFrame2_Bottomleft := DRectagonalFrame.Create('frame_2_bottomleft_CC-BY-SA_by_Saito00.png',6,2,0,9);
   DecorationFrame2_Bottomright := DRectagonalFrame.Create('frame_2_bottomright_CC-BY-SA_by_Saito00.png',6,2,9,0);
-  DecorationFrame3_Bottom := DRectagonalFrame.Create('frame_3_bottom_CC-BY-SA_by_Saito00.png',10,9,23,23);
+  DecorationFrame3_Bottom := DRectagonalFrame.Create('frame_3_bottom_CC-BY-SA_by_Saito00.png',10,10,23,23);
 
   Characterbar_Top := DRectagonalFrame.Create('character_bar_top_CC-BY-SA_by_Saito00.png',5,5,4,4);
   Characterbar_Mid := DRectagonalFrame.Create('character_bar_mid_CC-BY-SA_by_Saito00.png',0,0,4,4);
