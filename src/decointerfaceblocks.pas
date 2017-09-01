@@ -26,10 +26,21 @@ interface
 uses Classes,
   CastleControls,
   DecoInterface, DecoInterfaCecomposite,
+  DecoImages, DecoLabels,
   DecoPlayerCharacter,
   DecoGlobal;
 
 const appear_animation = asFadeIn;
+
+type
+  DLoadScreen = class(DInterfaceElement)
+  private
+    Wind: DWindElement;
+    Floater: DFloatImage;
+    FloaterLabel: DPhasedLabel;
+  public
+    constructor Create; override;
+  end;
 
 type
   {stores and displays every interface element related to current character}
@@ -78,7 +89,28 @@ type
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-uses CastleLog;
+uses CastleLog, CastleFilesUtils;
+
+constructor DLoadScreen.Create;
+begin
+  inherited Create;
+  Base.AnchorToWindow := true;
+  SetBaseSize(0,0,1,1);
+
+  Floater := DFloatImage.Create;
+  Grab(Floater);
+  Floater.Load(ApplicationData('interface/loadscreen/Milky_Way_2005_CC0_by_NASA_[glow,crop].jpg'));
+  Floater.SetBaseSize(0,0,1,1);
+  Floater.Rescale;
+
+  Wind := DWindElement.Create;
+  Grab(Wind);
+
+  FloaterLabel := DPhasedLabel.Create;
+  FloaterLabel.SetBaseSize(0,0,0.3,1);
+  FloaterLabel.Text := 'alalala';
+  Grab(FloaterLabel);
+end;
 
 {procedure DInterfaceContainer.DrawLoadScreen;
 begin

@@ -449,7 +449,7 @@ end;
 
 procedure DPhasedImage.CyclePhase;
 begin
-  if LastTime = -1 then begin
+  if LastTime < 0 then begin
     LastTime := DecoNow;
     Phase := 0;
   end;
@@ -529,6 +529,8 @@ constructor DFloatImage.Create;
 begin
   inherited Create;
   Base.AnchorToWindow := true;
+  Base.ProportionalScale := psWidth;
+  PhaseSpeed := 0.1;
 end;
 
 {----------------------------------------------------------------------------}

@@ -39,10 +39,12 @@ type
     { change the current Text and call Prepare Text Image if needed }
     procedure SetText(const Value: string);
   public
-    { font to print the label }
+    { Font to print the label }
     Font: DFont;
-    { shadow intensity. Shadow=0 is no shadow }
+    { Shadow intensity. Shadow=0 is no shadow (strictly) }
     Shadow: Float;
+    { Shadow length in pixels }
+    ShadowLength: integer;
     constructor Create; override;
     destructor Destroy; override;
     //procedure Rescale; override;
@@ -105,7 +107,7 @@ type
   { A Label that appears, moves up 1/3 of the screen and vanishes
     Used for LoadScreen,
     Actually it's a copy of DecoImages>DPhasedImage very similar to DWindImage }
-  DPhasedLabel = class abstract(DLabel)
+  DPhasedLabel = class(DLabel)
   private
     LastTime: DTime;
   strict protected
@@ -115,6 +117,7 @@ type
   public
     procedure Update; override;
     procedure Draw; override;
+    constructor Create; override;
   public
     { 1/seconds to scroll the full screen }
     PhaseSpeed: float;
@@ -132,6 +135,7 @@ begin
   inherited Create;
   Base.ScaleItem := false;
   Shadow := 0;
+  ShadowLength := 3;
   Font := DefaultFont;
   //fText := ''; //autoinitialized
 end;
@@ -168,7 +172,7 @@ begin
   if Shadow = 0 then
     SourceImage := Font.BrokenStringToImage(BrokenString)
   else
-    SourceImage := Font.BrokenStringToImageWithShadow(BrokenString,Shadow,3);
+    SourceImage := Font.BrokenStringToImageWithShadow(BrokenString,Shadow,ShadowLength);
 
   Base.SetRealSize(SourceImage.Width,SourceImage.Height);
 
@@ -282,10 +286,20 @@ end;
 {========================== Phased label =====================================}
 {=============================================================================}
 
+constructor DPhasedLabel.Create;
+begin
+  inherited Create;
+  LastTime := -1;
+  PhaseSpeed := 0.1;
+  Self.Shadow := 1.0;
+end;
+
+{----------------------------------------------------------------------------}
+
 procedure DPhasedLabel.CyclePhase;
 var PhaseShift: float;
 begin
-  if LastTime = -1 then begin
+  if LastTime < 0 then begin
     LastTime := DecoNow;
     Phase := 0;
   end;
@@ -322,7 +336,7 @@ begin
     GLImage.Color[3] := Current.CurrentOpacity*Sin(Pi*Phase);
 
     y := round((1 + 5*Phase)*Window.height/17);
-    GLImage.Draw(Window.Width div 2, y);
+    GLImage.Draw(2*Window.Width div 3, y);
   end;
 end;
 

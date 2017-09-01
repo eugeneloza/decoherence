@@ -23,7 +23,7 @@ unit DecoGui;
 interface
 
 uses Classes,
-  DecoInterface, DecoImages, DecoLabels, {DecoFont, }
+  DecoInterface, DecoLabels,
   DecoGlobal;
 
 Type
@@ -48,9 +48,8 @@ implementation
 
 uses SysUtils, CastleLog,
   CastleGLUtils, CastleColors,
-  {DecoLoadScreen,}
   DecoInterfaceComposite, DecoInterfaceBlocks,
-  {DecoPlayerCharacter,} DecoInterfaceLoader,
+  DecoInterfaceLoader,
   DecoGameMode, DecoTime;
 
 {=============================================================================}
@@ -117,9 +116,7 @@ end;
 procedure DInterfaceContainer.tmpInterface;
 var tmp: DInterfaceElement;
 begin
-  tmp := DFramedImage.Create(HpBarImage,DecorationFrame3_Bottom);
-  tmp.SetBaseSize(0.1,0.1,0.5,0.5);
-  tmp.Rescale;
+  tmp := DLoadScreen.Create;
   Grab(tmp);
 end;
 

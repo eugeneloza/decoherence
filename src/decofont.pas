@@ -179,20 +179,20 @@ end;
 function DFont.BrokenStringToImageWithShadow(const s: DStringList; ShadowStrength: float; ShadowLength : integer): TGrayscaleAlphaImage;
 var DummyImage,ShadowImage : TGrayscaleAlphaImage;
     Iteration,i : integer;
-    P : Pvector2byte;
+    p : PVector2byte;
 begin
   DummyImage := BrokenStringToImage(s);
-  if (ShadowStrength>0) and (ShadowLength>0) then begin
+  if (ShadowStrength > 0) and (ShadowLength > 0) then begin
     Result := TGrayscaleAlphaImage.Create(DummyImage.Width+ShadowLength,DummyImage.Height+ShadowLength);//dummyImage.MakeCopy as TGrayscaleAlphaImage;
     Result.Clear(Vector2Byte(0,0));
     ShadowImage := DummyImage.MakeCopy as TGrayscaleAlphaImage;
     for Iteration := 1 to ShadowLength do begin
-      P := ShadowImage.GrayscaleAlphaPixels;
-      for i :=  1 to ShadowImage.Width * ShadowImage.Height * ShadowImage.Depth do
+      p := ShadowImage.Pixels;
+      for i := 0 to ShadowImage.Width * ShadowImage.Height * ShadowImage.Depth-1 do
         begin
           p^[1] := Round(p^[1] * ShadowStrength / Sqr(Iteration));
           p^[0] := 0;        //shadow color intensity might be specified here... or even an RGB color if make Shadow a TRGBAlphaImage
-          Inc(P);
+          Inc(p);
         end;
       Result.DrawFrom(ShadowImage,Iteration,ShadowLength-Iteration,dmBlendSmart);
     end;
