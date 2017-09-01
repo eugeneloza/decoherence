@@ -124,7 +124,7 @@ type
     procedure ResetToReal;
     procedure SetRealSize(const aWidth,aHeight: integer);
     { Anchors this Container to aParent }
-    procedure AnchorFrom(const aParent: DAbstractContainer; const Gap: integer = 0);
+    procedure AnchorTo(const aParent: DAbstractContainer; const Gap: integer = 0);
     { Anchors aChild to this Container  }
     procedure AnchorChild(const aChild: DAbstractContainer; const Gap: integer = 0);
     { do these two Containers have equal anchors? }
@@ -500,7 +500,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DAbstractContainer.AnchorFrom(const aParent: DAbstractContainer; const Gap: integer = 0);
+procedure DAbstractContainer.AnchorTo(const aParent: DAbstractContainer; const Gap: integer = 0);
 begin
   Anchor[asLeft  ].Anchor := aParent;
   Anchor[asLeft  ].Gap := Gap;
