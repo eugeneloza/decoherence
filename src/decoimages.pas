@@ -103,7 +103,7 @@ type
   public
     { loads image in realtime }
     procedure Load(const URL: string); virtual;
-    procedure Load(const CopyImage: TCastleImage);
+    procedure Load(const CopyImage: TCastleImage); virtual;
   end;
 
 type
@@ -121,6 +121,7 @@ type
     { 1/seconds to scroll the full screen }
     PhaseSpeed: float;   
     procedure Load(const URL: string); override;
+    procedure Load(const CopyImage: TCastleImage); override;
   end;
 
 type
@@ -426,9 +427,14 @@ end;
 {======================== phased image =======================================}
 {=============================================================================}
 
-Procedure DPhasedImage.Load(const URL:string);
+procedure DPhasedImage.Load(const URL:string);
 begin
   inherited Load(URL);
+  LastTime := -1;
+end;
+procedure DPhasedImage.Load(const CopyImage: TCastleImage);
+begin
+  inherited Load(CopyImage);
   LastTime := -1;
 end;
 

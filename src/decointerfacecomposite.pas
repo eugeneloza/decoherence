@@ -55,6 +55,16 @@ type
     constructor Create(const aImage: TCastleImage; const aFrame: DRectagonalFrame);
   end;
 
+type
+  {}
+  DWindElement = class(DInterfaceElement)
+  private
+    {}
+    Wind1, Wind2: DWindImage;
+  public
+    constructor Create; override;
+  end;
+
 
 type
   { wrapper for composite Interface elements with ArrangeChildren procedure
@@ -190,8 +200,8 @@ type DPerksContainer = class(DAbstractSorter)
 
 implementation
 uses SysUtils, CastleLog, {castleVectors,}
-   DecoFont,
-   DecoInterfaceBlocks,
+   //DecoFont,
+   //DecoInterfaceBlocks,
    DecoInputOutput, DecoInterfaceLoader;
 
 {===========================================================================}
@@ -226,9 +236,28 @@ begin
 end;
 
 {===========================================================================}
-{===========================================================================}
+{====================== D Wind Element =====================================}
 {===========================================================================}
 
+constructor DWindElement.Create;
+begin
+  inherited Create;
+  Wind1 := DWindImage.Create;
+  Wind2 := DWindImage.Create;
+  Grab(Wind1);
+  Grab(Wind2);
+
+  Wind1.Load(WindImage1);
+  Wind2.Load(WindImage2);
+  Wind1.PhaseSpeed := 1/(15+drnd.Random);
+  Wind2.PhaseSpeed := 1/(10+drnd.Random);
+  Wind1.SetBaseSize(0,0,1,1,0.1,asNone);
+  Wind2.SetBaseSize(0,0,1,1,0.1,asNone);
+end;
+
+{===========================================================================}
+{===========================================================================}
+{===========================================================================}
 
 {procedure DAbstractCompositeInterfaceElement.setbasesize(const NewX,NewY,NewW,NewH,NewO: float; const Animate: TAnimationStyle);
 begin

@@ -27,6 +27,8 @@ uses CastleImages, CastleVectors,
 
 
 var HpBarImage, StaBarImage, CncBarImage, MphBarImage: TCastleImage; //todo not freed automatically!!!
+    WindImage1,WindImage2: TCastleImage;
+
   { Just black background with no frame }
   BlackFrame: DRectagonalFrame;
 
@@ -46,8 +48,6 @@ var HpBarImage, StaBarImage, CncBarImage, MphBarImage: TCastleImage; //todo not 
 
 {reads some interface-related data, like loading frames images}
 procedure InitInterface;
-{reads some interface-related data, like loading health bars images and decoration frames}
-procedure InitCompositeInterface;
 procedure DestroyCompositeInterface;
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
@@ -58,23 +58,19 @@ uses Classes, SysUtils, CastleLog, CastleFilesUtils,
 {-------------------- INIT INTERFACE ------------------------------------------}
 
 procedure InitInterface;
+var i: integer;
+    s: string;
+    fName: string;
 begin
   WriteLnLog('InitInterface','started');
+
+  WindImage1 := LoadImageSafe(ApplicationData(WindFolder+'WindClouds1_GIMP.jpg'));
+  WindImage2 := LoadImageSafe(ApplicationData(WindFolder+'WindClouds2_GIMP.jpg'));
 
   InterfaceColor := Vector4(1,1,1,1);
 
   BlackFrame := DRectagonalFrame.Create('blackframe.png',0,0,0,1);
 
-  InitCompositeInterface;
-
-  WriteLnLog('InitInterface','finished');
-end;
-
-procedure InitCompositeInterface;
-var i: integer;
-    s: string;
-    fName: string;
-begin
   HpBarImage := LoadImageSafe(ApplicationData(ProgressBarFolder+'hp_bar_CC-BY-SA_by_Saito00.png'));
   StaBarImage := LoadImageSafe(ApplicationData(ProgressBarFolder+'en_bar_CC-BY-SA_by_Saito00.png'));
   CncBarImage := LoadImageSafe(ApplicationData(ProgressBarFolder+'m_bar_CC-BY-SA_by_Saito00.png'));
@@ -120,12 +116,19 @@ begin
   Characterbar_Top := DRectagonalFrame.Create('character_bar_top_CC-BY-SA_by_Saito00.png',5,5,4,4);
   Characterbar_Mid := DRectagonalFrame.Create('character_bar_mid_CC-BY-SA_by_Saito00.png',0,0,4,4);
   Characterbar_Bottom := DRectagonalFrame.Create('character_bar_bottom_CC-BY-SA_by_Saito00.png',5,5,4,4);
+
+  WriteLnLog('InitInterface','finished');
 end;
+
+{----------------------------------------------------------------------------}
 
 procedure DestroyCompositeInterface;
 var i: integer;
 begin
-  WritelnLog('DestroyCompositeInterface','(todo)');
+  WritelnLog('DestroyInterface','(todo)');
+  FreeAndNil(WindImage1);
+  FreeAndNil(WindImage2);
+
   FreeAndNil(HpBarImage);
   FreeAndNil(StaBarImage);
   FreeAndNil(CncBarImage);

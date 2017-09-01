@@ -38,13 +38,10 @@ Type
 
 {    procedure FreeLoadScreen(freeWind: boolean);
   private
-    { wind images to provide background }
-    Wind1,Wind2: DWindImage;
     Floater: DFloatImage;
     Background: DStaticImage;
     LoadScreenLabel, FloaterLabel: DLabel;
     procedure DoLoadNewImage;
-    procedure LoadWind;
 
     { draw loadscreen elements }
     procedure DrawLoadScreen;
@@ -83,24 +80,6 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-{procedure DInterfaceContainer.LoadWind;
-begin
-  Wind1 := DWindImage.create(self);
-  Wind1.phasespeed := 1/(15+drnd.Random);
-  Wind1.Load(WindFolder+'WindClouds1_GIMP.jpg');
-  Wind1.Opacity:=0.1;
-  Wind1.base.setsize(0,0,fullwidth,fullheight);
-  Wind1.rescale;
-  Wind2 := DWindImage.create(self);
-  Wind2.phasespeed := 1/(10+drnd.Random);
-  Wind2.Load(WindFolder+'WindClouds2_GIMP.jpg');
-  Wind2.base.setsize(0,0,fullwidth,fullheight);
-  Wind2.Opacity := 0.1;
-  Wind2.rescale;
-end;  }
-
-{-----------------------------------------------------------------------------}
-
 destructor DInterfaceContainer.Destroy;
 begin
   WriteLnLog('DInterfaceContainer.destroy','Game over...');
@@ -127,10 +106,6 @@ begin
   //base.setsize(0,0,fullwidth,fullheight);
 
   {
-  if (CurrentGameMode=gmLoadScreen) or (CurrentGameMode=gmCharacterGeneration) then begin
-    if wind1 <> nil then wind1.rescale;
-    if wind2 <> nil then wind2.rescale;
-  end;
   if CurrentGameMode=gmLoadScreen then begin
     if floater <> nil then floater.rescale;
     if floaterLabel <> nil then floaterlabel.rescale;
