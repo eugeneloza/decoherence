@@ -97,7 +97,7 @@ type
 type
   { most simple ready-to-use image type, just a static image
       capable of loading from a file }
-  DStaticImage = class(DAbstractImage, ILoadObject)
+  DStaticImage = class(DSimpleImage, ILoadObject)
   private
     procedure Afterload; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
   public
