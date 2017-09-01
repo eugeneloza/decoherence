@@ -38,6 +38,7 @@ type
     Wind: DWindElement;
     Floater: DFloatImage;
     FloaterLabel: DPhasedLabel;
+    MainLabel: DLabel;
   public
     procedure ReloadFact;
     constructor Create; override;
@@ -90,7 +91,7 @@ type
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-uses CastleLog, CastleFilesUtils,
+uses CastleLog, CastleFilesUtils, DecoFont,
   DecoLoadScreen;
 
 constructor DLoadScreen.Create;
@@ -109,8 +110,16 @@ begin
   Grab(Wind);
 
   FloaterLabel := DPhasedLabel.Create;
-  //FloaterLabel.Text := 'alalala';
+  FloaterLabel.Font := LoadScreenFont;
   Grab(FloaterLabel);
+
+  MainLabel := DLabel.Create;
+  MainLabel.Base.AnchorToWindow := true;
+  MainLabel.Font := LoadScreenFont;
+  MainLabel.ShadowIntensity := 1;
+  Grab(MainLabel);
+
+  Rescale;
 
   ReloadFact;
 end;
@@ -119,15 +128,9 @@ end;
 
 procedure DLoadScreen.ReloadFact;
 begin
-{
-  if LoadScreenLabel=nil then begin
-    LoadScreenLabel := DLabel.create(self);
-    LoadScreenLabel.setbasesize(1/17,-2/17,10/17,10/17,1,asNone);
-    LoadScreenLabel.Shadow := 1;
-    LoadScreenLabel.Font := LoadScreenFont;
-  end;
-  LoadScreenLabel.text := LoadScreenMainText;
-}
+  MainLabel.SetBaseSize(0.03,0.8,0.4,1);
+  MainLabel.Base.w := Round(Window.Width/3); //BUG
+  MainLabel.text := LoadScreenMainText;
 
   FloaterLabel.SetBaseSize(0,2/3,0.3,1); //need to reset it each time
   FloaterLabel.Base.w := Round(0.9 * Window.Width/3); //BUG

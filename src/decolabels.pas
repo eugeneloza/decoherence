@@ -290,6 +290,7 @@ end;
 constructor DPhasedLabel.Create;
 begin
   inherited Create;
+  Base.AnchorToWindow := true;
   ResetPhase;
   PhaseSpeed := 0.1;
   Self.ShadowIntensity := 1.0;
