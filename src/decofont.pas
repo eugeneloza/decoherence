@@ -68,7 +68,7 @@ var DefaultFont: DFont;
 
 procedure InitializeFonts;
 procedure DestroyFonts;
-
+{+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
 var {$IFNDEF Android}MyCharSet: TUnicodeCharList;{$ENDIF}

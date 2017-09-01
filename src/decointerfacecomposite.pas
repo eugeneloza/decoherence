@@ -267,12 +267,6 @@ end;
 {===========================================================================}
 {===========================================================================}
 
-{procedure DAbstractCompositeInterfaceElement.setbasesize(const NewX,NewY,NewW,NewH,NewO: float; const Animate: TAnimationStyle);
-begin
-  inherited SetBaseSize(NewX,NewY,NewW,NewH,NewO,Animate);
-  ArrangeChildren(Animate);
-end;}
-
 {procedure DAbstractCompositeInterfaceElement.ArrangeChildren(animate: TAnimationStyle);
 begin
   cnt_x := base.fx;

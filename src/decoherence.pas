@@ -34,10 +34,10 @@ uses Classes, SysUtils,
 
      DecoThread, DecoThrash,
 
-     DecoGui, DecoInterface, DecoMouse, DecoFont,
+     DecoGui, DecoInterface, DecoMouse,
      DecoLevel, DecoAbstractWorld,
      DecoSound,
-     DecoLoadScreen, DecoPerks, decoactorbody,
+     DecoLoadScreen, DecoPerks, DecoActorBody,
      DecoInterfaceLoader,
      DecoPlayerCharacter, DecoLoad3d,
      DecoNavigation, DecoGlobal, DecoTranslation, DecoGamemode, DecoTime;
@@ -219,7 +219,6 @@ begin
   InitMusicManager;
   SetGameMode(gmLoadScreen);
 
-  InitInterface;
   InitPerks;
 
   //Load_test_level; //remake it
@@ -257,20 +256,19 @@ begin
   Window.OnMotion := @doMotion;
   //Application.LimitFPS := 60;
 
-  WritelnLog('ApplicationInitialize','Initialize fonts');
-  InitializeFonts;      //load fonts
-
   //create GUI
   WritelnLog('ApplicationInitialize','Create interface');
+  InitInterface;
   GUI := DInterfaceContainer.Create;
   GUI.Rescale;
+  GUI.tmpInterface;
 
   WritelnLog('ApplicationInitialize','Initialize interface');
   InitLoadScreen;
 
-  //finally (fonts, random and facts loaded), we're ready to show game loading screen
+  //finally we're ready to show game loading screen
   {$IFDEF AllowRescale}window.OnResize := @WindowResize;{$ENDIF}
-  window.OnRender := @WindowRender;
+  Window.OnRender := @WindowRender;
 
   WriteLnLog('ApplicationInitialize','Init finished');
 
@@ -318,15 +316,14 @@ Finalization
   { free all assigned memory }
   FreeAndNil(GUI);
 
-  DestroyCompositeInterface;
   //DestroyGlobal;
   FreeLoadScreen;
   FreePerks;
-  DestroyFonts;
   FreeWorld;
   FreeMusicManager;
   FreeParty;
   FreeCreatures;
+  FreeInterface;
   //FreeTextureProperties;
   WriteLnLog('Finalization','Bye...');
 end.

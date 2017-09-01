@@ -48,11 +48,12 @@ var HpBarImage, StaBarImage, CncBarImage, MphBarImage: TCastleImage; //todo not 
 
 {reads some interface-related data, like loading frames images}
 procedure InitInterface;
-procedure DestroyCompositeInterface;
+procedure FreeInterface;
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 uses Classes, SysUtils, CastleLog, CastleFilesUtils,
+  DecoFont,
   DecoInputOutput, DecoGlobal;
 
 {-------------------- INIT INTERFACE ------------------------------------------}
@@ -62,6 +63,8 @@ var i: integer;
     s: string;
     fName: string;
 begin
+  InitializeFonts;      //load fonts
+
   WriteLnLog('InitInterface','started');
 
   WindImage1 := LoadImageSafe(ApplicationData(WindFolder+'WindClouds1_GIMP.jpg'));
@@ -122,7 +125,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DestroyCompositeInterface;
+procedure FreeInterface;
 var i: integer;
 begin
   WritelnLog('DestroyInterface','(todo)');
@@ -137,6 +140,8 @@ begin
   for i := 0 to Length(Portrait_Img)-1 do
     FreeAndNil(Portrait_Img[i]);
   Portrait_Img := nil;
+
+  DestroyFonts;
 end;
 
 

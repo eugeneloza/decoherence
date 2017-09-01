@@ -23,33 +23,22 @@ unit DecoGui;
 interface
 
 uses Classes,
-  DecoInterface, DecoImages, DecoLabels, DecoFont,
+  DecoInterface, DecoImages, DecoLabels, {DecoFont, }
   DecoGlobal;
 
 Type
+  { GUI container, manages all other GUI elements }
   DInterfaceContainer = class(DInterfaceElement)
   private
+    { This label is separate from all the GUI and managed separately }
     FPSLabel: DFPSLAbel;
   public
-    constructor Create; override;
-    destructor Destroy; override;
     procedure Rescale; override;
     procedure Draw; override;
-
-{    procedure FreeLoadScreen(freeWind: boolean);
-  private
-    Floater: DFloatImage;
-    Background: DStaticImage;
-    LoadScreenLabel, FloaterLabel: DLabel;
-    procedure DoLoadNewImage;
-
-    { draw loadscreen elements }
-    procedure DrawLoadScreen;
-    { draw CharacterGeneration background elements }
-    procedure DrawCharacterGenerationBackground;
-    procedure DrawWind;
+    constructor Create; override;
+    destructor Destroy; override;
   public
-    procedure MakeCharacterGenerationInterface; }
+    procedure tmpInterface;
 end;
 
 var GUI: DInterfaceContainer;
@@ -105,18 +94,17 @@ begin
   //rescale "base" for some routines to work correctly}
   //base.setsize(0,0,fullwidth,fullheight);
 
-  {
-  if CurrentGameMode=gmLoadScreen then begin
-    if floater <> nil then floater.rescale;
-    if floaterLabel <> nil then floaterlabel.rescale;
-    if LoadScreenLabel <> nil then LoadScreenLabel.rescale;
-  end;
-
-  if background <> nil then background.rescale; //todo maybe just check show/hide
-  }
-
   { rescale special elements }
   if FPSLabel <> nil then FPSLabel.Rescale;
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DInterfaceContainer.tmpInterface;
+var tmp: DInterfaceElement;
+begin
+  tmp := DWindElement.Create;
+  Grab(tmp)
 end;
 
 {-----------------------------------------------------------------------------}
@@ -150,32 +138,6 @@ end; }
 
 {-----------------------------------------------------------------------------}
 
-{procedure DInterfaceContainer.FreeLoadScreen(freeWind: boolean);
-begin
-  freeandnil(Floater);
-  freeandnil(LoadScreenLabel);
-  freeandnil(floaterLabel);
-  if freeWind then begin
-    freeandnil(wind1);
-    freeandnil(wind2);
-  end;
-  {I'll just put it here to avoid making another procedure... as background
-   is nil in LoadScreen and defined only in Charactergeneration.
-   maybe I'll do it later}
-  freeandnil(background);
-end; }
-
-{==================== Drawing routines ========================================}
-
-{procedure DInterfaceContainer.DrawWind; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
-begin
-  if wind1 = nil then LoadWind;
-  wind1.draw;
-  wind2.draw;
-end;}
-
-{-----------------------------------------------------------------------------}
-
 {procedure DInterfaceContainer.DrawLoadScreen;
 begin
   if (floater = nil) or (LoadNewFloaterImage) then DoLoadNewImage;
@@ -192,20 +154,6 @@ end; }
 
 {-----------------------------------------------------------------------------}
 
-{procedure DInterfaceContainer.DrawCharacterGenerationBackground;
-begin
-  if background = nil then begin
-    background := DStaticImage.create(self);
-    background.LoadThread(BackgroundsFolder+'spaceship-1548838_1280_CC0_by_JAKO5D_[gmic].jpg');
-    background.setbasesize(0,0,fullwidth,fullheight,1,asNone);
-  end;
-  background.draw;
-
-  DrawWind;
-end;}
-
-{------------------------------------------------------------------------------}
-
 procedure DInterfaceContainer.Draw;
 begin
   { clear the screen depending on the game mode
@@ -216,22 +164,6 @@ begin
   { draw special elements }
   FPSLabel.CountFPS;
 end;
-
-{======================== Interface modes creation ===========================}
-
-{var interfaceReady: boolean = false; //UGLY FIX THIS AT ONCE!!!!
-procedure DInterfaceContainer.MakeCharacterGenerationInterface;
-var
-  tmp: DPartyView;
-  tmp2: DDecorations;
-begin
-  if interfaceReady then exit;
-  interfaceReady := true;
-  tmp := DPartyView.create(self);
-  tmp2 := DDecorations.create(self);
-  GUI.grab(tmp2);
-  GUI.grab(tmp);
-end;}
 
 end.
 
