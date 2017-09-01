@@ -467,6 +467,7 @@ constructor DWindImage.Create;
 begin
   inherited Create;
   Base.AnchorToWindow := true;
+  SetBaseSize(0,0,1,1,0.1);
 end;
 
 {----------------------------------------------------------------------------}

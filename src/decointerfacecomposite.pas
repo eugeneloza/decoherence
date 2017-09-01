@@ -250,6 +250,9 @@ end;
 constructor DWindElement.Create;
 begin
   inherited Create;
+  Base.AnchorToWindow := true;
+  SetBaseSize(0,0,1,1);
+
   Wind1 := DWindImage.Create;
   Wind2 := DWindImage.Create;
   Grab(Wind1);
@@ -259,8 +262,8 @@ begin
   Wind2.Load(WindImage2);
   Wind1.PhaseSpeed := 1/(15+drnd.Random);
   Wind2.PhaseSpeed := 1/(10+drnd.Random);
-  Wind1.SetBaseSize(0,0,1,1,0.1,asNone);
-  Wind2.SetBaseSize(0,0,1,1,0.1,asNone);
+
+  Rescale;
 end;
 
 {===========================================================================}
