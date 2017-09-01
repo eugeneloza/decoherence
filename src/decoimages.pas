@@ -115,7 +115,7 @@ type
     LastTime: DTime;
   strict protected
     {current phases of the image}
-    Phase, OpacityPhase,PhaseShift: float;
+    Phase, PhaseShift: float; //we need to store PhaseShift for override CyclePhase procedure
     procedure CyclePhase; virtual;
   public
     procedure Update; override;
@@ -131,6 +131,7 @@ type
     warning: wind images are scaled relative to Window }
   DWindImage = class(DPhasedImage)
   strict protected
+    OpacityPhase: float;
     procedure CyclePhase; override;
   public
     { completely overrides the default drawing procedure }
@@ -448,7 +449,7 @@ end;
 
 procedure DPhasedImage.CyclePhase;
 begin
-  if Lasttime = -1 then begin
+  if LastTime = -1 then begin
     LastTime := DecoNow;
     Phase := 0;
   end;

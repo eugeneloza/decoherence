@@ -83,15 +83,6 @@ uses CastleLog;
 {procedure DInterfaceContainer.DrawLoadScreen;
 begin
   if (floater = nil) or (LoadNewFloaterImage) then DoLoadNewImage;
-  floater.Draw;
-
-  DrawWind;
-
-  LoadScreenLabel.Draw;
-
-  floaterLabel.base.y1 := round((1 + 5*Floater.phase)*Window.height/17);
-  floaterLabel.base.Opacity := sin(Pi*Floater.Phase);
-  floaterLabel.draw;
 end; }
 
 {procedure DInterfaceContainer.DoLoadNewImage;
@@ -115,9 +106,7 @@ begin
   if floater = nil then floater := DFloatImage.create(self);
   floater.FreeImage;
   LoadNewFloaterImage := false;
-  floater.opacity := 0.8;
-  floater.phasespeed := 1/15;
-  floater.base.setsize(0,0,proportionalscale,fullheight);
+
   floater.LoadThread(LoadScreenFolder+GetRandomFactImage);
 end; }
 

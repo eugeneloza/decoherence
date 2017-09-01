@@ -101,10 +101,27 @@ type
     constructor Create; override;
   end;
 
+type
+  { A Label that appears, moves up 1/3 of the screen and vanishes
+    Used for LoadScreen,
+    Actually it's a copy of DecoImages>DPhasedImage very similar to DWindImage }
+  DPhasedLabel = class abstract(DLabel)
+  private
+    LastTime: DTime;
+  strict protected
+    {current phases of the Label}
+    Phase, OpacityPhase: float; //we need to store PhaseShift for override CyclePhase procedure
+    procedure CyclePhase; //virtual;
+  public
+    procedure Update; override;
+    procedure Draw; override;
+  public
+    { 1/seconds to scroll the full screen }
+    PhaseSpeed: float;
+  end;
+
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
-
 implementation
-
 uses SysUtils, CastleImages, CastleLog,
   DecoInterface;
 
@@ -259,6 +276,54 @@ begin
     LastRenderTime := DecoNow;
   end else inc(FPSCount);
   Draw;
+end;
+
+{=============================================================================}
+{========================== Phased label =====================================}
+{=============================================================================}
+
+procedure DPhasedLabel.CyclePhase;
+var PhaseShift: float;
+begin
+  if LastTime = -1 then begin
+    LastTime := DecoNow;
+    Phase := 0;
+  end;
+  PhaseShift := (DecoNow-LastTime)*PhaseSpeed;
+  LastTime := DecoNow;
+  Phase += PhaseShift*(1+0.1*drnd.Random);
+  if Phase > 1 then Phase := 1;
+
+  OpacityPhase += PhaseShift/2*(1+0.2*drnd.Random);
+  if OpacityPhase>1 then OpacityPhase := 1;
+  {not sure about this... but let it be this way for now}
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DPhasedLabel.Update;
+begin
+  inherited Update;
+  CyclePhase;
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DPhasedLabel.Draw;
+var y: integer;
+begin
+  //inherited Draw; <-------- this render is different
+  if not ImageReady then InitGL;
+
+  if ImageReady then begin
+    if not isVisible then Exit;
+    Update;
+
+    GLImage.Color[3] := Current.CurrentOpacity*Sin(Pi*Phase);
+
+    y := round((1 + 5*Phase)*Window.height/17);
+    GLImage.Draw(Window.Width div 2, y);
+  end;
 end;
 
 end.
