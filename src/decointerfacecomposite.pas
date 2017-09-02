@@ -35,6 +35,13 @@ uses
 const PortraitTimeOut = 1; {seconds}
 
 type
+  DFrameAnchorHelper = class helper for DAbstractContainer
+  public
+    { Anchor this element to a DFrameImage and set all Gaps correctly }
+    procedure AnchorToFrame(aFrame: DFrameImage);
+  end;
+
+type
   { An element or an element group surrounded by a rectagonal frame }
   DFramedElement = class(DInterfaceElement)
   public
@@ -62,6 +69,23 @@ type
     {}
     Wind1, Wind2: DWindImage;
   public
+    constructor Create; override;
+  end;
+
+type
+  {}
+  DFramedBar = class(DFramedElement)
+  private
+    fTarget: DBasicActor;
+    fStyle: TStatBarStyle;
+    procedure SetTarget(Value: DBasicActor);
+    procedure SetStyle(Value: TStatBarStyle);
+  public
+    {}
+    Bar: DStatBarImage;
+    {}
+    property Target: DBasicActor read fTarget write SetTarget;
+    property Style: TStatBarStyle read fStyle write SetStyle;
     constructor Create; override;
   end;
 
@@ -189,6 +213,15 @@ uses SysUtils, CastleLog, {castleVectors,}
    //DecoInterfaceBlocks,
    DecoInputOutput, DecoInterfaceLoader;
 
+procedure DFrameAnchorHelper.AnchorToFrame(aFrame: DFrameImage);
+begin
+  AnchorTo(aFrame.Current);
+  Anchor[asLeft].Gap := aFrame.Frame.CornerLeft;
+  Anchor[asRight].Gap := aFrame.Frame.CornerRight;
+  Anchor[asTop].Gap := aFrame.Frame.CornerTop;
+  Anchor[asBottom].Gap := aFrame.Frame.CornerBottom;
+end;
+
 {===========================================================================}
 {======================== D Framed Element =================================}
 {===========================================================================}
@@ -213,17 +246,13 @@ constructor DFramedImage.Create;
 begin
   inherited Create;
   Image := DStaticImage.Create;
+  Image.Base.AnchorToFrame(Frame);
   Grab(Image);
 end;
 constructor DFramedImage.Create(const aImage: TCastleImage; const aFrame: DRectagonalFrame);
 begin
   Create;
   Frame.Frame := aFrame;
-  Image.Base.AnchorTo(Frame.Current);
-  Image.Base.Anchor[asLeft].Gap := Frame.Frame.CornerLeft;
-  Image.Base.Anchor[asRight].Gap := Frame.Frame.CornerRight;
-  Image.Base.Anchor[asTop].Gap := Frame.Frame.CornerTop;
-  Image.Base.Anchor[asBottom].Gap := Frame.Frame.CornerBottom;
   Image.SetBaseSize(0,0,1,1);
   Image.Load(aImage);
 end;
@@ -252,10 +281,37 @@ begin
 end;
 
 {===========================================================================}
-{===========================================================================}
+{===================== Framed bar ==========================================}
 {===========================================================================}
 
+procedure DFramedBar.SetTarget(Value: DBasicActor);
+begin
+  if fTarget<>Value then begin
+    fTarget := Value;
+    Bar.Target := Value;
+  end;
+end;
 
+{-----------------------------------------------------------------------------}
+
+procedure DFramedBar.SetStyle(Value: TStatBarStyle);
+begin
+  if fStyle<>Value then begin
+    fStyle := Value;
+    Bar.Style := Value;
+  end;
+end;
+
+{-----------------------------------------------------------------------------}
+
+constructor DFramedBar.Create;
+begin
+  inherited Create;
+  Bar := DStatBarImage.Create;
+  Bar.Base.AnchorToFrame(Frame);
+  Bar.SetBaseSize(0,0,1,1);
+  Grab(Bar);
+end;
 
 {===========================================================================}
 {===================== Stat bars ===========================================}

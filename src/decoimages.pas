@@ -177,7 +177,7 @@ type
   DStatBarImage = class(DBarImage)
   public
     { Points to the actor for who the health is displayed}
-    Target: DActor;
+    Target: DBasicActor;
     { determines which value to display: Health, Stamina, Concentration or Metaphysics}
     Style: TStatBarStyle;
     procedure Update; override;
