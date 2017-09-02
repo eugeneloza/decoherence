@@ -42,13 +42,6 @@ uses Classes, SysUtils,
      DecoPlayerCharacter, DecoLoad3d,
      DecoNavigation, DecoGlobal, DecoTranslation, DecoGamemode, DecoTime;
 
-type
-  DLoadGameThread = class(TAbstractThread)
-  protected
-    procedure Execute; override;
-  end;
-
-var LoadThread: DLoadGameThread;
 
 {==========================================================================}
 {==========================================================================}
@@ -227,6 +220,14 @@ begin
   LoadCompleted := true;
 end;
 
+type
+  DLoadGameThread = class(TAbstractThread)
+  protected
+    procedure Execute; override;
+  end;
+
+var LoadThread: DLoadGameThread;
+
 procedure DLoadGameThread.execute;
 begin
   LoadAndInitData;
@@ -272,15 +273,19 @@ begin
 
   WriteLnLog('ApplicationInitialize','Init finished');
 
-  {$WARNING BUUUUUUUUUUUUUUUUUG!!!!!}
-  {$DEFINE NoThreads}
-  {$IFDEF Linux}{$IFNDEF RELEASE}{$DEFINE NoThreads}{$ENDIF}{$ENDIF}
-  {$IFNDEF NoThreads}
-  LoadThread := DLoadThread.create(false);
+  LoadThread := DLoadGameThread.Create(true);
   LoadThread.Priority := tpNormal;
   LoadThread.FreeOnTerminate := true;
+  {$WARNING BUUUUUUUUUUUUUUUUUG!!!!!}
+
+  {$DEFINE NoThreads}
+  {$IFDEF Linux}{$IFNDEF RELEASE}{$DEFINE NoThreads}{$ENDIF}{$ENDIF}
+
+  {$IFNDEF NoThreads}
+  LoadThread.Start;
   {$ELSE}
-  LoadAndInitData;
+  LoadThread.Execute;
+  FreeAndNil(LoadThread);
   {$ENDIF}
 end;
 

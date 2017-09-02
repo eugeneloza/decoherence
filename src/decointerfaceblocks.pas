@@ -103,7 +103,6 @@ begin
 
   Floater := DFloatImage.Create;
   Grab(Floater);
-//  Floater.Load(ApplicationData('interface/loadscreen/Milky_Way_2005_CC0_by_NASA_[glow,crop].jpg'));
   Floater.SetBaseSize(0,0,1,1);
   Floater.onCycleFinish := @ReloadFact;
 
@@ -139,9 +138,7 @@ begin
   FloaterLabel.ResetPhase;
 
   LoadThread(Floater,ApplicationData(LoadScreenFolder+GetRandomFactImage));
-  //-Floater.Load(ApplicationData(LoadScreenFolder+GetRandomFactImage));
   Floater.ResetPhase;
-  //Floater.Rescale;
 
 end;
 

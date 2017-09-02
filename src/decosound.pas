@@ -266,8 +266,8 @@ uses SysUtils, CastleLog, castleFilesUtils,
 
 procedure DSoundLoadThread.Execute;
 begin
- (parent as DSoundFile).buffer := LoadBufferSafe((parent as DSoundFile).fURL,(parent as DSoundFile).duration);
- (parent as DSoundFile).LoadFinished;
+ (Parent as DSoundFile).Buffer := LoadBufferSafe((parent as DSoundFile).fURL,(parent as DSoundFile).duration);
+ (Parent as DSoundFile).LoadFinished;
 end;
 
 {============================= DSoundFile ==================================}
@@ -328,7 +328,7 @@ procedure DMusicTrack.Start;
 begin
   if not isLoaded then begin
     WriteLnLog('DMusicTrack.Start','ERROR: Music is not loaded!');
-    exit;
+    Exit;
   end;
   fCurrent := SoundEngine.PlaySound(self.buffer, false, fLoop, 10, fgain, 0, 1, TVector3.Zero);
   if fCurrent = nil then WriteLnLog('DMusicTrack.Start','ERROR: Unable to allocate music!');
@@ -378,10 +378,10 @@ end;
 
 {---------------------------------------------------------------------------}
 
-procedure DMusicTrack.setGain(value: single);
+procedure DMusicTrack.setGain(Value: single);
 begin
   if Assigned(fCurrent) and fCurrent.PlayingOrPaused then
-    fCurrent.Gain := value
+    fCurrent.Gain := Value
   else begin
     //fGain := value;
     WriteLnLog('DMusicTrack.setGain','Warning: Setting gain of a non-playing music track...');
@@ -420,12 +420,12 @@ end;}
 {---------------------------------------------------------------------------}
 
 procedure DSequentialPlaylist.LoadNext;
-var newTrack: integer;
+var NewTrack: integer;
 begin
   if URLs.Count=1 then PreviousTrack := -1; //if only one track is available, then forget about shuffling
   //shuffle tracks, but don't repeat the previous one
   repeat
-    newTrack := drnd.Random(URLs.Count);
+    NewTrack := drnd.Random(URLs.Count);
   until NewTrack<>PreviousTrack;
   {$hint process silence here}
   //load here
@@ -442,7 +442,7 @@ end;
 
 destructor DSequentialPlaylist.Destroy;
 begin
-  freeandnil(Tracks);
+  FreeAndNil(Tracks);
   inherited Destroy;
 end;
 
@@ -534,15 +534,17 @@ end;
 
 {============================ other routines ===============================}
 
-procedure initMusicManager;
+procedure InitMusicManager;
 begin
+  WriteLnLog('DecoSount.InitMusicManager','Creating music manager...');
   Music := DMusicManager.Create;
 end;
 
 {---------------------------------------------------------------------------}
 
-procedure freeMusicManager;
+procedure FreeMusicManager;
 begin
+  WriteLnLog('DecoSount.FreeMusicManager','Freeing music manager...');
   FreeAndNil(Music);
 end;
 

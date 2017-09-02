@@ -93,16 +93,9 @@ procedure InitPerks;
 procedure FreePerks;
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 Implementation
-uses SysUtils, CastleWindow;
+uses SysUtils, {CastleWindow,} CastleLog;
 
-procedure InitPerks;
-var TmpPerk: DPerk;
-Begin
-  Perks := DPerksList.create(true);
-  TmpPerk := DPerk.create;
-  //TmpPerk.image.LoadThread(PerksFolder+'crossed-swords.png');
-  Perks.add(TmpPerk);
-End;
+
 
 {---------------------------------------------------------------------------}
 
@@ -136,10 +129,23 @@ begin
   inherited Destroy;
 end;
 
+{============================================================================}
+
+procedure InitPerks;
+var TmpPerk: DPerk;
+begin
+  WriteLnLog('DecoPerks.InitPerks','Loading perks...');
+  Perks := DPerksList.create(true);
+  TmpPerk := DPerk.create;
+  //TmpPerk.image.LoadThread(PerksFolder+'crossed-swords.png');
+  Perks.add(TmpPerk);
+end;
+
 {---------------------------------------------------------------------------}
 
 procedure FreePerks;
 begin
+  WriteLnLog('DecoPerks.FreePerks','Freeing perks...');
   FreeAndNil(Perks);
 end;
 
