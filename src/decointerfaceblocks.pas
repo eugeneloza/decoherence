@@ -46,7 +46,7 @@ type
 
 type
   {stores and displays every interface element related to current character}
-  DCharacterSpace = class(DAbstractCompositeInterfaceElement)
+  DCharacterSpace = class(DInterfaceElement)
   private
    { fTarget: DPlayerCharacter;
     procedure settarget(value: DPlayerCharacter);
@@ -68,7 +68,7 @@ type
 
 type
   {presents 7 characters with health bars, portraits and characters control space }
-  DPartyView = class (DAbstractCompositeInterfaceElement)
+  DPartyView = class (DInterfaceElement)
   public
     {CharacterSpace: array [0..maxparty] of DCharacterSpace;
     procedure ArrangeChildren(animate: TAnimationStyle); override;
@@ -77,7 +77,7 @@ type
 
 type
   {decorations around travel screen}
-  DDecorations = class(DAbstractCompositeInterfaceElement)
+  DDecorations = class(DInterfaceElement)
   private
     {frame1left,frame1right,
     frame2left,frame2right,
@@ -138,8 +138,6 @@ begin
   FloaterLabel.ResetPhase;
 
   LoadThread(Floater,ApplicationData(LoadScreenFolder+GetRandomFactImage));
-  Floater.ResetPhase;
-
 end;
 
 {=============================================================================}

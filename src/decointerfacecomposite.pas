@@ -29,7 +29,7 @@ interface
 uses
   CastleImages,
   DecoInterface, DecoImages, DecoLabels,
-  //DecoActor, DecoPlayerCharacter, DecoPerks,
+  DecoActor, DecoPlayerCharacter, DecoPerks,
   DecoGlobal;
 
 const PortraitTimeOut = 1; {seconds}
@@ -65,39 +65,24 @@ type
     constructor Create; override;
   end;
 
-
 type
-  { wrapper for composite Interface elements with ArrangeChildren procedure
-    each child will define its own arrange method }
-  DAbstractCompositeInterfaceElement = class(DInterfaceElement)
-  public
-    { arranges children within this container
-      basically at this level it is abstract, it just substracts the frame
-      from base.w and base.h and does nothing more}
-    //procedure ArrangeChildren(const Animate: TAnimationStyle); virtual;
-    { additionally calls ArrangeChildren }
-    //procedure SetBaseSize(const newx,newy,neww,newh,newo: float; const Animate: TAnimationStyle); override;
-end;
-
-type
-  {HP,STA,CNC and MPH vertical bars for a player character}
-  DPlayerBars = class(DAbstractCompositeInterfaceElement)
+  { HP,STA,CNC and MPH vertical bars for a player character }
+  DStatBars = class(DInterfaceElement)
   private
     {these are links for easier access to the children}
- {   HP_bar, STA_bar, CNC_bar, MPH_bar: DSingleInterfaceElement;
+  {  HP_bar, STA_bar, CNC_bar, MPH_bar: DSingleInterfaceElement;  }
     {target character}
-    fTarget: DActor;
-    procedure settarget(value: DActor);
+    fTarget: DBasicActor; //we don't need anything "higher" than this
+    procedure SetTarget(Value: DBasicActor);
   public
     {the character being monitored}
-    property Target: DActor read ftarget write settarget;
-    constructor create(AOwner: TComponent); override;
-    procedure ArrangeChildren(Animate: TAnimationStyle); override; }
+    property Target: DBasicActor read fTarget write SetTarget;
+    constructor Create; override;
 end;
 
 type
   {Nickname + PlayerBars + NumericHP}
-  DPlayerBarsFull = class(DAbstractCompositeInterfaceElement) //not a child of DPlayerBars!
+  DPlayerBarsFull = class(DInterfaceElement) //not a child of DPlayerBars!
   private
     {these are links for easier access to the children}
  {   PartyBars: DPlayerBars;
@@ -131,7 +116,7 @@ type
     procedure doHit(Dam: float; DamType: TDamageType);}
   end;
 
-
+{
 //todo: float label is identical except pointeger -> pfloat
 type
   { a simple editor for an integer variable featuring plus and minus
@@ -139,7 +124,7 @@ type
   DIntegerEdit = class(DAbstractCompositeInterfaceElement)
   private
     {sub-elements nicknames for easy access}
- {   iLabel: DSingleInterfaceElement;
+    iLabel: DSingleInterfaceElement;
     PlusButton, MinusButton: DSingleInterfaceElement;
 
     fTarget: PInteger;
@@ -150,9 +135,9 @@ type
     constructor create(AOwner: TComponent); override;
     procedure ArrangeChildren(animate: TAnimationStyle); override;
     procedure incTarget(Sender: DAbstractElement; x,y: integer);
-    procedure decTarget(Sender: DAbstractElement; x,y: integer); }
+    procedure decTarget(Sender: DAbstractElement; x,y: integer);
   end;
-
+}
 //  {integer with "bonus" edit}
 
 type
@@ -173,7 +158,7 @@ end;
 
 type
  {sorts in n rows and m lines the list of interface elements within self.base. Without specific data management and sorting parameters it is abstract and should parent DPerkSorter and DItemSorter}
- DAbstractSorter = class(DAbstractCompositeInterfaceElement)
+ DAbstractSorter = class(DInterfaceElement)
    private
   {
    public
@@ -270,33 +255,16 @@ end;
 {===========================================================================}
 {===========================================================================}
 
-{procedure DAbstractCompositeInterfaceElement.ArrangeChildren(animate: TAnimationStyle);
-begin
-  cnt_x := base.fx;
-  cnt_y := base.fy;
-  cnt_w := base.fw;
-  cnt_h := base.fh;
-  if (frame <> nil) and (frame.Rectagonal) then begin
-    cnt_x += frame.cornerLeft/Window.Height;
-    cnt_y += frame.cornerBottom/Window.height;
-    cnt_w -= (frame.cornerLeft+frame.cornerRight)/Window.Height;
-    cnt_h -= (frame.cornerTop+frame.cornerBottom)/Window.Height;
-  end;
 
-
-
-end;}
 
 {===========================================================================}
-{=================== player bars ===========================================}
+{===================== Stat bars ===========================================}
 {===========================================================================}
 
-{constructor DPlayerBars.create(AOwner: TComponent);
-var tmp_bar: DStatBarImage;
-    //tmp_element: DSingleInterfaceElement;
+constructor DStatBars.Create;
 begin
-  inherited create(AOwner);
-  frame := BlackFrame;
+  inherited Create;
+{  frame := BlackFrame;
 
   //or make parent nil? as they are freed by freeing children? Keep an eye out for troubles...
   HP_bar := DSingleInterfaceElement.create(self);
@@ -337,22 +305,22 @@ begin
   MPH_bar.frame := StatBarsFrame;
   MPH_bar.Content := tmp_bar;
   //MPH_bar.frame := SimpleFrame;
-  grab(MPH_bar);
-end;}
+  grab(MPH_bar);}
+end;
 
 {-----------------------------------------------------------------------------}
 
-{procedure DPlayerBars.settarget(value: DActor);
+procedure DStatBars.Settarget(Value: DBasicActor);
 begin
-  if ftarget <> value then begin
-    ftarget := value;
+  if fTarget <> Value then begin
+    fTarget := Value;
     //and copy the target to all children
-    DStatBarImage(HP_bar.content).Target := ftarget;
-    DStatBarImage(STA_bar.content).Target := ftarget;
-    DStatBarImage(CNC_bar.content).Target := ftarget;
-    DStatBarImage(MPH_bar.content).Target := ftarget;
+    {DStatBarImage(HP_bar.content).Target := fTarget;
+    DStatBarImage(STA_bar.content).Target := fTarget;
+    DStatBarImage(CNC_bar.content).Target := fTarget;
+    DStatBarImage(MPH_bar.content).Target := fTarget; }
   end;
-end; }
+end;
 
 {---------------------------------------------------------------------------}
 
@@ -379,7 +347,7 @@ begin
 end;}
 
 {=============================================================================}
-{================ Player bars with nickname and profession ===================}
+{=============== Player bars with nickname and health label ==================}
 {=============================================================================}
 
 {procedure DPlayerBarsFull.settarget(value: DActor);

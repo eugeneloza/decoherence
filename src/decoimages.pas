@@ -90,7 +90,8 @@ type
   end;
 
 type
-  { Simple image rescaled by stretch }
+  { Simple image rescaled by stretch
+    Base for images and labels (uses RescaleImage) }
   DSimpleImage = class abstract(DAbstractImage)
   public
     procedure RescaleImage; override;
