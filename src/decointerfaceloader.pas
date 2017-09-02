@@ -78,6 +78,7 @@ begin
   StaBarImage := LoadImageSafe(ApplicationData(ProgressBarFolder+'en_bar_CC-BY-SA_by_Saito00.png'));
   CncBarImage := LoadImageSafe(ApplicationData(ProgressBarFolder+'m_bar_CC-BY-SA_by_Saito00.png'));
   MphBarImage := LoadImageSafe(ApplicationData(ProgressBarFolder+'mph_bar_CC-BY-SA_by_Saito00.png'));
+  StatBarsFrame := DRectagonalFrame.Create('blackframe.png',0,0,0,1);
 
   DamageOverlay_Img := LoadImageSafe(ApplicationData(DamageFolder+'damageOverlay_CC0_by_EugeneLoza[GIMP].png'));
 
@@ -103,7 +104,6 @@ begin
     end;
   end;
 
-  StatBarsFrame := DRectagonalFrame.Create('blackframe.png',0,0,0,1);
 
   {load artwork by Saito00}
   PortraitFrame_Left := DRectagonalFrame.Create('frameborder_left_CC-BY-SA_by_Saito00.png',4,4,3,4);

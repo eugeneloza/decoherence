@@ -90,6 +90,13 @@ type
   end;
 
 type
+  DFrameAnchorHelper = class helper for DAbstractContainer
+  public
+    { Anchor this element to a DFrameImage and set all Gaps correctly }
+    procedure AnchorToFrame(aFrame: DFrameImage);
+  end;
+
+type
   { Simple image rescaled by stretch
     Base for images and labels (uses RescaleImage) }
   DSimpleImage = class abstract(DAbstractImage)
@@ -384,6 +391,17 @@ begin
   FreeAndNil(SourceImage); //ugly bugfix!
 
   InitGLPending := true;
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DFrameAnchorHelper.AnchorToFrame(aFrame: DFrameImage);
+begin
+  AnchorTo(aFrame.Current);
+  Anchor[asLeft].Gap := aFrame.Frame.CornerLeft;
+  Anchor[asRight].Gap := aFrame.Frame.CornerRight;
+  Anchor[asTop].Gap := aFrame.Frame.CornerTop;
+  Anchor[asBottom].Gap := aFrame.Frame.CornerBottom;
 end;
 
 {=============================================================================}

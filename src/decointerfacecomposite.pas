@@ -35,14 +35,9 @@ uses
 const PortraitTimeOut = 1; {seconds}
 
 type
-  DFrameAnchorHelper = class helper for DAbstractContainer
-  public
-    { Anchor this element to a DFrameImage and set all Gaps correctly }
-    procedure AnchorToFrame(aFrame: DFrameImage);
-  end;
-
-type
-  { An element or an element group surrounded by a rectagonal frame }
+  { An element or an element group surrounded by a rectagonal frame
+    Warning: changing frame.frame won't anchor content to the frame!
+    Should Anchor it manually }
   DFramedElement = class(DInterfaceElement)
   public
     {}
@@ -53,7 +48,7 @@ type
   end;
 
 type
-  {}
+  { ... }
   DFramedImage = class(DFramedElement)
   public
     {}
@@ -85,16 +80,17 @@ type
     Bar: DStatBarImage;
     {}
     property Target: DBasicActor read fTarget write SetTarget;
+    {}
     property Style: TStatBarStyle read fStyle write SetStyle;
     constructor Create; override;
   end;
 
 type
   { HP,STA,CNC and MPH vertical bars for a player character }
-  DStatBars = class(DInterfaceElement)
+  DStatBars = class(DFramedElement)
   private
     {these are links for easier access to the children}
-  {  HP_bar, STA_bar, CNC_bar, MPH_bar: DSingleInterfaceElement;  }
+    HP_bar, STA_bar, CNC_bar, MPH_bar: DFramedBar;
     {target character}
     fTarget: DBasicActor; //we don't need anything "higher" than this
     procedure SetTarget(Value: DBasicActor);
@@ -213,14 +209,7 @@ uses SysUtils, CastleLog, {castleVectors,}
    //DecoInterfaceBlocks,
    DecoInputOutput, DecoInterfaceLoader;
 
-procedure DFrameAnchorHelper.AnchorToFrame(aFrame: DFrameImage);
-begin
-  AnchorTo(aFrame.Current);
-  Anchor[asLeft].Gap := aFrame.Frame.CornerLeft;
-  Anchor[asRight].Gap := aFrame.Frame.CornerRight;
-  Anchor[asTop].Gap := aFrame.Frame.CornerTop;
-  Anchor[asBottom].Gap := aFrame.Frame.CornerBottom;
-end;
+
 
 {===========================================================================}
 {======================== D Framed Element =================================}
@@ -307,6 +296,7 @@ end;
 constructor DFramedBar.Create;
 begin
   inherited Create;
+  Frame.Frame := StatBarsFrame;
   Bar := DStatBarImage.Create;
   Bar.Base.AnchorToFrame(Frame);
   Bar.SetBaseSize(0,0,1,1);
@@ -320,10 +310,11 @@ end;
 constructor DStatBars.Create;
 begin
   inherited Create;
-{  frame := BlackFrame;
+
+  Frame.Frame := BlackFrame;
 
   //or make parent nil? as they are freed by freeing children? Keep an eye out for troubles...
-  HP_bar := DSingleInterfaceElement.create(self);
+{  HP_bar := DFramedBar.create(self);
   tmp_bar := DStatBarImage.create(HP_bar);
   tmp_bar.Load(HpBarImage);
   tmp_bar.Style := sbHealth;
@@ -333,7 +324,7 @@ begin
   //HP_bar.frame := SimpleFrame;
   grab(HP_bar);
 
-  STA_bar := DSingleInterfaceElement.create(self);
+  STA_bar := DFramedBar.create(self);
   tmp_bar := DStatBarImage.create(STA_bar);
   tmp_bar.Load(StaBarImage);
   tmp_bar.Style := sbStamina;
@@ -343,7 +334,7 @@ begin
   //STA_bar.frame := SimpleFrame;
   grab(STA_bar);
 
-  CNC_bar := DSingleInterfaceElement.create(self);
+  CNC_bar := DFramedBar.create(self);
   tmp_bar := DStatBarImage.create(CNC_bar);
   tmp_bar.Load(CncBarImage);
   tmp_bar.Style := sbConcentration;
@@ -353,7 +344,7 @@ begin
   //STA_bar.frame := SimpleFrame;
   grab(CNC_bar);
 
-  MPH_bar := DSingleInterfaceElement.create(self);
+  MPH_bar := DFramedBar.create(self);
   tmp_bar := DStatBarImage.create(MPH_bar);
   tmp_bar.Load(MphBarImage);
   tmp_bar.Style := sbMetaphysics;
@@ -361,7 +352,7 @@ begin
   MPH_bar.frame := StatBarsFrame;
   MPH_bar.Content := tmp_bar;
   //MPH_bar.frame := SimpleFrame;
-  grab(MPH_bar);}
+  grab(MPH_bar);                 }
 end;
 
 {-----------------------------------------------------------------------------}
@@ -371,10 +362,10 @@ begin
   if fTarget <> Value then begin
     fTarget := Value;
     //and copy the target to all children
-    {DStatBarImage(HP_bar.content).Target := fTarget;
-    DStatBarImage(STA_bar.content).Target := fTarget;
-    DStatBarImage(CNC_bar.content).Target := fTarget;
-    DStatBarImage(MPH_bar.content).Target := fTarget; }
+    HP_bar.Target := fTarget;
+    STA_bar.Target := fTarget;
+    CNC_bar.Target := fTarget;
+    MPH_bar.Target := fTarget;
   end;
 end;
 
