@@ -313,46 +313,29 @@ begin
 
   Frame.Frame := BlackFrame;
 
-  //or make parent nil? as they are freed by freeing children? Keep an eye out for troubles...
-{  HP_bar := DFramedBar.create(self);
-  tmp_bar := DStatBarImage.create(HP_bar);
-  tmp_bar.Load(HpBarImage);
-  tmp_bar.Style := sbHealth;
-  tmp_bar.Kind := bsVertical;
-  HP_bar.Content := tmp_bar;
-  HP_bar.frame := StatBarsFrame;
-  //HP_bar.frame := SimpleFrame;
-  grab(HP_bar);
+  HP_bar := DFramedBar.Create;
+  HP_bar.Bar.Load(HpBarImage);
+  HP_bar.Style := sbHealth;
+  HP_bar.Bar.Kind := bsVertical;
+  Grab(HP_bar);
 
-  STA_bar := DFramedBar.create(self);
-  tmp_bar := DStatBarImage.create(STA_bar);
-  tmp_bar.Load(StaBarImage);
-  tmp_bar.Style := sbStamina;
-  tmp_bar.Kind := bsVertical;
-  STA_bar.frame := StatBarsFrame;
-  STA_bar.Content := tmp_bar;
-  //STA_bar.frame := SimpleFrame;
-  grab(STA_bar);
+  STA_bar := DFramedBar.Create;
+  STA_bar.Bar.Load(StaBarImage);
+  STA_bar.Style := sbStamina;
+  STA_bar.Bar.Kind := bsVertical;
+  Grab(STA_bar);
 
-  CNC_bar := DFramedBar.create(self);
-  tmp_bar := DStatBarImage.create(CNC_bar);
-  tmp_bar.Load(CncBarImage);
-  tmp_bar.Style := sbConcentration;
-  tmp_bar.Kind := bsVertical;
-  CNC_bar.frame := StatBarsFrame;
-  CNC_bar.Content := tmp_bar;
-  //STA_bar.frame := SimpleFrame;
-  grab(CNC_bar);
+  CNC_bar := DFramedBar.Create;
+  CNC_bar.Bar.Load(CncBarImage);
+  CNC_bar.Style := sbConcentration;
+  CNC_bar.Bar.Kind := bsVertical;
+  Grab(CNC_bar);
 
-  MPH_bar := DFramedBar.create(self);
-  tmp_bar := DStatBarImage.create(MPH_bar);
-  tmp_bar.Load(MphBarImage);
-  tmp_bar.Style := sbMetaphysics;
-  tmp_bar.Kind := bsVertical;
-  MPH_bar.frame := StatBarsFrame;
-  MPH_bar.Content := tmp_bar;
-  //MPH_bar.frame := SimpleFrame;
-  grab(MPH_bar);                 }
+  MPH_bar := DFramedBar.Create;
+  MPH_bar.Bar.Load(MphBarImage);
+  MPH_bar.Style := sbMetaphysics;
+  MPH_bar.Bar.Kind := bsVertical;
+  Grab(MPH_bar);
 end;
 
 {-----------------------------------------------------------------------------}

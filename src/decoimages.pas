@@ -177,7 +177,7 @@ type
     constructor Create; override;
   end;
 
-type TStatBarStyle = (sbHealth, sbStamina, sbConcentration, sbMetaphysics);
+type TStatBarStyle = (sbNone, sbHealth, sbStamina, sbConcentration, sbMetaphysics);
 
 type
   { bar to display health for mobs and primary 4 stats for player characters }
@@ -672,6 +672,7 @@ begin
                 CurrentMax := AboveZero(Target.MaxMph);
                 Position := AboveZero(Target.Mph);
               end;
+    else WriteLnLog('DStatBarImage.Update','ERROR: Undefined Stat Bar Style');
   end;
 end;
 
