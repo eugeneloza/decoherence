@@ -414,15 +414,19 @@ end;
 
 procedure DStaticImage.Load(const URL: string);
 begin
-  WritelnLog('DStaticImage.LoadImage',URL);
-  SourceImage := LoadImageSafe({ApplicationData(URL)}URL);
+  FreeImage;
+  WriteLnLog('DStaticImage.LoadImage',URL);
+  SourceImage := LoadImageSafe(URL);
   AfterLoad;
+  Rescale;
 end;
 procedure DStaticImage.Load(const CopyImage: TCastleImage);
 begin
-  WritelnLog('DStaticImage.LoadImage','Copying image from '+CopyImage.ClassName);
+  FreeImage;
+  WriteLnLog('DStaticImage.LoadImage','Copying image from '+CopyImage.ClassName);
   SourceImage := CopyImage.MakeCopy;
   AfterLoad;
+  Rescale;
 end;
 procedure DStaticImage.AfterLoad;
 begin

@@ -92,7 +92,8 @@ type
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 uses CastleLog, CastleFilesUtils, DecoFont,
-  DecoLoadScreen;
+  DecoLoadScreen,
+  DecoInputOutput;
 
 constructor DLoadScreen.Create;
 begin
@@ -129,7 +130,7 @@ end;
 procedure DLoadScreen.ReloadFact;
 begin
   MainLabel.SetBaseSize(0.03,0.8,0.4,1);
-  MainLabel.Base.w := Round(Window.Width/3); //BUG
+  MainLabel.Base.w := Round(Window.Width/2); //BUG
   MainLabel.text := LoadScreenMainText;
 
   FloaterLabel.SetBaseSize(0,2/3,0.3,1); //need to reset it each time
@@ -137,10 +138,10 @@ begin
   FloaterLabel.Text := GetRandomFact;
   FloaterLabel.ResetPhase;
 
-  Floater.FreeImage;
-  Floater.Load(ApplicationData(LoadScreenFolder+GetRandomFactImage));
+  LoadThread(Floater,ApplicationData(LoadScreenFolder+GetRandomFactImage));
+  //-Floater.Load(ApplicationData(LoadScreenFolder+GetRandomFactImage));
   Floater.ResetPhase;
-  Floater.Rescale;
+  //Floater.Rescale;
 
 end;
 

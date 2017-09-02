@@ -106,7 +106,7 @@ begin
 end;
 procedure DThreadedObject.UnlockThread;
 begin
-  fThreadWorking := true;
+  fThreadWorking := false;
 end;
 procedure DThreadedObject.GrabThread(aThread: TThread);
 begin

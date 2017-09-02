@@ -78,7 +78,8 @@ type
     procedure PrepareSafe;
   end;
 
-procedure LoadThread(Source: ILoadObject; URL: string);
+{}
+procedure LoadThread(const Source: ILoadObject; const URL: string);
 
 {safe wrapper for CastleImages.LoadImage, overloaded}
 function LoadImageSafe(const URL: String): TCastleImage;
@@ -105,7 +106,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure LoadThread(Source: ILoadObject; URL: string);
+procedure LoadThread(const Source: ILoadObject; const URL: string);
 var LoadThread: DLoadThread;
 begin
   if Source.ThreadLocked then begin
