@@ -35,29 +35,6 @@ uses
 const PortraitTimeOut = 1; {seconds}
 
 type
-  { An element or an element group surrounded by a rectagonal frame
-    Warning: changing frame.frame won't anchor content to the frame!
-    Should Anchor it manually }
-  DFramedElement = class(DInterfaceElement)
-  public
-    {}
-    Frame: DFrameImage;
-    constructor Create; override;
-    constructor Create(const aFrame: DRectagonalFrame);
-    //destructor Destroy; override;
-  end;
-
-type
-  { ... }
-  DFramedImage = class(DFramedElement)
-  public
-    {}
-    Image: DStaticImage;
-    constructor Create; override;
-    constructor Create(const aImage: TCastleImage; const aFrame: DRectagonalFrame);
-  end;
-
-type
   {}
   DWindElement = class(DInterfaceElement)
   private
@@ -66,6 +43,39 @@ type
   public
     constructor Create; override;
   end;
+
+type
+  {}
+  DCompositeElement = class(DInterfaceElement)
+  public
+    {}
+    procedure ArrangeChildren; virtual; abstract;
+  end;
+
+type
+  { An element or an element group surrounded by a rectagonal frame
+    Warning: changing frame.frame won't anchor content to the frame!
+    Should Anchor it manually }
+  DFramedElement = class(DCompositeElement)
+  public
+    {}
+    Frame: DFrameImage;
+    procedure ArrangeChildren; override;
+    constructor Create; override;
+    constructor Create(const aFrame: DRectagonalFrame);
+  end;
+
+type
+  { ... }
+  DFramedImage = class(DFramedElement)
+  public
+    {}
+    Image: DStaticImage;
+    procedure ArrangeChildren; override;
+    constructor Create; override;
+    constructor Create(const aImage: TCastleImage; const aFrame: DRectagonalFrame);
+  end;
+
 
 type
   {}
@@ -82,6 +92,7 @@ type
     property Target: DBasicActor read fTarget write SetTarget;
     {}
     property Style: TStatBarStyle read fStyle write SetStyle;
+    procedure ArrangeChildren; override;
     constructor Create; override;
   end;
 
@@ -96,6 +107,7 @@ type
     procedure SetTarget(Value: DBasicActor);
   public
     {the character being monitored}
+    procedure ArrangeChildren; override;
     property Target: DBasicActor read fTarget write SetTarget;
     constructor Create; override;
 end;
@@ -121,7 +133,7 @@ type
 type
   { character portrait. Some day it might be replaced for TUIContainer of
     the 3d character face :) Only 2D inanimated image for now... }
-  DPortrait = class(DInterfaceElement)
+  DPortrait = class(DFramedElement)
   public
     {this is a BUG, but I won't fix it now, it requires remaking ALL THE INTERFACE}
   {  DamageOverlay: DSingleInterfaceElement;
@@ -162,7 +174,7 @@ type
 
 type
   {A displayer for a single perk}
-  DPerkInterfaceItem =  class (DInterfaceElement)
+  DPerkInterfaceItem =  class (DFramedElement)
   private
  {   PerkImage: DSingleInterfaceElement; {animated image}
     fTarget: DPerk;
@@ -178,7 +190,7 @@ end;
 
 type
  {sorts in n rows and m lines the list of interface elements within self.base. Without specific data management and sorting parameters it is abstract and should parent DPerkSorter and DItemSorter}
- DAbstractSorter = class(DInterfaceElement)
+ DAbstractSorter = class(DCompositeElement)
    private
   {
    public
@@ -209,43 +221,6 @@ uses SysUtils, CastleLog, {castleVectors,}
    //DecoInterfaceBlocks,
    DecoInputOutput, DecoInterfaceLoader;
 
-
-
-{===========================================================================}
-{======================== D Framed Element =================================}
-{===========================================================================}
-
-constructor DFramedElement.Create;
-begin
-  inherited Create;
-  Frame := DFrameImage.Create;
-  Frame.Base.AnchorTo(Self.Current);
-  Frame.SetBaseSize(0,0,1,1);
-  Grab(Frame);
-end;
-constructor DFramedElement.Create(const aFrame: DRectagonalFrame);
-begin
-  Create;
-  Frame.Frame := aFrame;
-end;
-
-{-----------------------------------------------------------------------------}
-
-constructor DFramedImage.Create;
-begin
-  inherited Create;
-  Image := DStaticImage.Create;
-  Image.Base.AnchorToFrame(Frame);
-  Grab(Image);
-end;
-constructor DFramedImage.Create(const aImage: TCastleImage; const aFrame: DRectagonalFrame);
-begin
-  Create;
-  Frame.Frame := aFrame;
-  Image.SetBaseSize(0,0,1,1);
-  Image.Load(aImage);
-end;
-
 {===========================================================================}
 {====================== D Wind Element =====================================}
 {===========================================================================}
@@ -267,6 +242,59 @@ begin
   Wind2.PhaseSpeed := 1/(10+drnd.Random);
 
   Rescale;
+end;
+
+{===========================================================================}
+{======================== D Framed Element =================================}
+{===========================================================================}
+
+constructor DFramedElement.Create;
+begin
+  inherited Create;
+  Frame := DFrameImage.Create;
+  Grab(Frame);
+  ArrangeChildren;
+end;
+constructor DFramedElement.Create(const aFrame: DRectagonalFrame);
+begin
+  Create;
+  Frame.Frame := aFrame;
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DFramedElement.ArrangeChildren;
+begin
+  Frame.Base.AnchorTo(Self.Current);
+  Frame.SetBaseSize(0,0,1,1);
+end;
+
+{-----------------------------------------------------------------------------}
+
+constructor DFramedImage.Create;
+begin
+  inherited Create;
+  Image := DStaticImage.Create;
+  Grab(Image);
+  ArrangeChildren;
+end;
+constructor DFramedImage.Create(const aImage: TCastleImage; const aFrame: DRectagonalFrame);
+begin
+  inherited Create
+  Frame.Frame := aFrame;
+  Image := DStaticImage.Create;
+  Image.Load(aImage);
+  Grab(Image);
+  ArrangeChildren;
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DFramedElement.ArrangeChildren;
+begin
+  inherited ArrangeChildren;
+  Image.Base.AnchorToFrame(Frame);
+  Image.SetBaseSize(0,0,1,1);
 end;
 
 {===========================================================================}
@@ -298,9 +326,17 @@ begin
   inherited Create;
   Frame.Frame := StatBarsFrame;
   Bar := DStatBarImage.Create;
+  Grab(Bar);
+  ArrangeChildren;
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DFramedBar.ArrangeChildren;
+begin
+  inherited ArrangeChildren;
   Bar.Base.AnchorToFrame(Frame);
   Bar.SetBaseSize(0,0,1,1);
-  Grab(Bar);
 end;
 
 {===========================================================================}
@@ -336,6 +372,21 @@ begin
   MPH_bar.Style := sbMetaphysics;
   MPH_bar.Bar.Kind := bsVertical;
   Grab(MPH_bar);
+
+  ArrangeChildren;
+
+  Rescale;
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DStatBars.ArrangeChildren;
+begin
+  HP_bar.Base.AnchorToFrame(Frame);
+  STA_bar.Base.AnchorToFrame(Frame);
+  CNC_bar.Base.AnchorToFrame(Frame);
+  MPH_bar.Base.AnchorToFrame(Frame);
+
 end;
 
 {-----------------------------------------------------------------------------}
