@@ -50,6 +50,8 @@ type
   public
     {}
     procedure ArrangeChildren; virtual; abstract;
+    procedure SpawnChildren; virtual; abstract;
+    constructor Create; override;
   end;
 
 type
@@ -57,10 +59,14 @@ type
     Warning: changing frame.frame won't anchor content to the frame!
     Should Anchor it manually }
   DFramedElement = class(DCompositeElement)
+  private
+    fFrame: DFrameImage;
+    procedure SetFrame(Value: DFrameImage);
   public
     {}
-    Frame: DFrameImage;
+    property Frame: DFrameImage read fFrame write SetFrame;
     procedure ArrangeChildren; override;
+    procedure SpawnChildren; override;
     constructor Create; override;
     constructor Create(const aFrame: DRectagonalFrame);
   end;
@@ -72,6 +78,7 @@ type
     {}
     Image: DStaticImage;
     procedure ArrangeChildren; override;
+    procedure SpawnChildren; override;
     constructor Create; override;
     constructor Create(const aImage: TCastleImage; const aFrame: DRectagonalFrame);
   end;
@@ -93,6 +100,7 @@ type
     {}
     property Style: TStatBarStyle read fStyle write SetStyle;
     procedure ArrangeChildren; override;
+    procedure SpawnChildren; override;
     constructor Create; override;
   end;
 
@@ -106,8 +114,9 @@ type
     fTarget: DBasicActor; //we don't need anything "higher" than this
     procedure SetTarget(Value: DBasicActor);
   public
-    {the character being monitored}
+    procedure SpawnChildren; override;
     procedure ArrangeChildren; override;
+    {the character being monitored}
     property Target: DBasicActor read fTarget write SetTarget;
     constructor Create; override;
 end;
@@ -244,21 +253,50 @@ begin
   Rescale;
 end;
 
+
+{===========================================================================}
+{======================== CompositeElement =================================}
+{===========================================================================}
+
+constructor DCompositeElement.Create;
+begin
+  inherited Create;
+  SpawnChildren;
+  ArrangeChildren;
+end;
+
 {===========================================================================}
 {======================== D Framed Element =================================}
 {===========================================================================}
 
 constructor DFramedElement.Create;
 begin
+  {emm... why can't I just omit Constructor?}
   inherited Create;
-  Frame := DFrameImage.Create;
-  Grab(Frame);
-  ArrangeChildren;
 end;
+
 constructor DFramedElement.Create(const aFrame: DRectagonalFrame);
 begin
   Create;
   Frame.Frame := aFrame;
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DFramedElement.SetFrame(Value: DFrameImage);
+begin
+  if fFrame<>Value then begin
+    fFrame := Value;
+    ArrangeChildren;
+  end
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DFramedElement.SpawnChildren;
+begin
+  Frame := DFrameImage.Create;
+  Grab(Frame);
 end;
 
 {-----------------------------------------------------------------------------}
@@ -269,28 +307,33 @@ begin
   Frame.SetBaseSize(0,0,1,1);
 end;
 
-{-----------------------------------------------------------------------------}
+{=============================================================================}
 
 constructor DFramedImage.Create;
 begin
+  {emm... why can't I just omit Constructor?}
   inherited Create;
-  Image := DStaticImage.Create;
-  Grab(Image);
-  ArrangeChildren;
 end;
+
 constructor DFramedImage.Create(const aImage: TCastleImage; const aFrame: DRectagonalFrame);
 begin
-  inherited Create
+  inherited Create;
   Frame.Frame := aFrame;
-  Image := DStaticImage.Create;
   Image.Load(aImage);
-  Grab(Image);
-  ArrangeChildren;
 end;
 
 {-----------------------------------------------------------------------------}
 
-procedure DFramedElement.ArrangeChildren;
+procedure DFramedImage.SpawnChildren;
+begin
+  inherited SpawnChildren;
+  Image := DStaticImage.Create;
+  Grab(Image);
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DFramedImage.ArrangeChildren;
 begin
   inherited ArrangeChildren;
   Image.Base.AnchorToFrame(Frame);
@@ -325,9 +368,15 @@ constructor DFramedBar.Create;
 begin
   inherited Create;
   Frame.Frame := StatBarsFrame;
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DFramedBar.SpawnChildren;
+begin
+  inherited SpawnChildren;
   Bar := DStatBarImage.Create;
   Grab(Bar);
-  ArrangeChildren;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -346,9 +395,14 @@ end;
 constructor DStatBars.Create;
 begin
   inherited Create;
-
   Frame.Frame := BlackFrame;
+  Rescale;
+end;
 
+{-----------------------------------------------------------------------------}
+
+procedure DStatBars.SpawnChildren;
+begin
   HP_bar := DFramedBar.Create;
   HP_bar.Bar.Load(HpBarImage);
   HP_bar.Style := sbHealth;
@@ -372,21 +426,30 @@ begin
   MPH_bar.Style := sbMetaphysics;
   MPH_bar.Bar.Kind := bsVertical;
   Grab(MPH_bar);
-
-  ArrangeChildren;
-
-  Rescale;
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure DStatBars.ArrangeChildren;
+var ScaleX: float;
 begin
-  HP_bar.Base.AnchorToFrame(Frame);
+  inherited ArrangeChildren;
+  HP_bar. Base.AnchorToFrame(Frame);
   STA_bar.Base.AnchorToFrame(Frame);
   CNC_bar.Base.AnchorToFrame(Frame);
   MPH_bar.Base.AnchorToFrame(Frame);
 
+  if fTarget.MaxMaxMPH > 0 then begin
+    ScaleX := 1/4;
+    MPH_bar.isVisible := true;
+  end else begin
+    ScaleX := 1/3;
+    MPH_bar.isVisible := false;
+  end;
+  HP_bar. SetBaseSize(       0,0,ScaleX,1);
+  STA_bar.SetBaseSize(  ScaleX,0,ScaleX,1);
+  CNC_bar.SetBaseSize(2*ScaleX,0,ScaleX,1);
+  MPH_bar.SetBaseSize(3*ScaleX,0,ScaleX,1);
 end;
 
 {-----------------------------------------------------------------------------}
@@ -400,32 +463,9 @@ begin
     STA_bar.Target := fTarget;
     CNC_bar.Target := fTarget;
     MPH_bar.Target := fTarget;
+    ArrangeChildren; //in case fTarget has different set of stats
   end;
 end;
-
-{---------------------------------------------------------------------------}
-
-{procedure DPlayerBars.ArrangeChildren(animate: TAnimationStyle);
-var scalex: float;
-begin
-  inherited ArrangeChildren(animate);
-
-  if not base.initialized then begin
-    writeLnLog('DPlayerBars.ArrangeChildren','ERROR: Base is not initialized!');
-    exit;
-  end;
-
-  {metaphysics bar is displayed only if the character is known to posess metaphysic skills}
-  if ftarget.maxmaxmph > 0 then scalex := cnt_w/4 else scalex := cnt_w/3;
-  HP_bar. setbasesize(cnt_x         , cnt_y, scalex, cnt_h, base.opacity, animate);
-  STA_bar.setbasesize(cnt_x+  scalex, cnt_y, scalex, cnt_h, base.opacity, animate);
-  CNC_bar.setbasesize(cnt_x+2*scalex, cnt_y, scalex, cnt_h, base.opacity, animate);
-  MPH_bar.setbasesize(cnt_x+3*scalex, cnt_y, scalex, cnt_h, base.opacity, animate);
-  if ftarget.maxmaxmph > 0 then
-    MPH_bar.visible := true
-  else
-    MPH_bar.visible := false
-end;}
 
 {=============================================================================}
 {=============== Player bars with nickname and health label ==================}
