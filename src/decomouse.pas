@@ -150,7 +150,7 @@ begin
   Camera.Cursor := mcForceNone; {do it only once}
   WindowCenter := Vector2(Window.Width div 2, Window.Height div 2);
   if not TVector2.PerfectlyEquals(Event.Position,WindowCenter) then begin
-    CurrentParty.InputMouse(Event.Position - WindowCenter);
+    Player.InputMouse(Event.Position - WindowCenter);
     doMouseLook := false;
     Window.MousePosition := WindowCenter;
   end else

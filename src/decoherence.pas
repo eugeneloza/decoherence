@@ -99,8 +99,8 @@ end;
 {$PUSH}{$WARN 5024 off : Parameter "$1" not used}
 procedure WindowManage(Container : TUIContainer);
 begin
-  if CurrentParty <> nil then begin
-    CurrentParty.Manage;
+  if Player <> nil then begin
+    Player.Manage;
     if CurrentWorld <> nil then CurrentWorld.Manage(Camera.Position);
   end;
 
@@ -137,7 +137,7 @@ begin
     case Event.key of
        K_P,K_PrintScreen:                //k_printscreen doesn't work in x-window system if assigned to some external program like scrot
                          Window.SaveScreen('deco_'+NiceDate+'.jpg');
-       K_r: CurrentParty.Rest;
+       K_r: Player.CurrentParty.Rest;
        k_i: if AmbientIntensity.Ambient = 0 then
                AmbientIntensity.SetAmbientIntensity(3)
             else
@@ -148,12 +148,12 @@ begin
 
     end;
 
-    if (CurrentGameMode=gmTravel) and (CurrentParty<>nil) then begin
+    if (CurrentGameMode=gmTravel) and (Player<>nil) then begin
      case Event.key of
-        k_W: CurrentParty.InputMove(mdForward);
-        k_S: CurrentParty.InputMove(mdBack);
-        k_A: CurrentParty.InputMove(mdLeft);
-        k_D: CurrentParty.InputMove(mdRight);
+        k_W: Player.InputMove(mdForward);
+        k_S: Player.InputMove(mdBack);
+        k_A: Player.InputMove(mdLeft);
+        k_D: Player.InputMove(mdRight);
      end;
     end;
   end;
@@ -172,10 +172,10 @@ begin
   end else
   if Event.EventType = itKey then begin
     case Event.key of
-      k_W: CurrentParty.InputRelease(mdForward);
-      k_S: CurrentParty.InputRelease(mdBack);
-      k_A: CurrentParty.InputRelease(mdLeft);
-      k_D: CurrentParty.InputRelease(mdRight);
+      k_W: Player.InputRelease(mdForward);
+      k_S: Player.InputRelease(mdBack);
+      k_A: Player.InputRelease(mdLeft);
+      k_D: Player.InputRelease(mdRight);
     end;
   end;
 end;
@@ -326,7 +326,7 @@ Finalization
   FreePerks;
   FreeWorld;
   FreeMusicManager;
-  FreeParty;
+  FreePlayer;
   FreeCreatures;
   FreeInterface;
   //FreeTextureProperties;

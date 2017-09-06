@@ -29,14 +29,14 @@ uses Classes, fgl, CastleVectors,
 
 const MaxParty = 6; {0..6 = 7 characters}
 
-{
+
   {Stores the perk's image. Generally we don't use perks directly as static images,
    but static images provide a convenient routine to load the image in a thread
    so let it be this way for now. Theoretically, it's better to make a separate
    object that handles perks and items images and allows just rescaling them
    correctly - to save memory. But it is not the issue for now.}
-  Image: DStaticImage;
-}
+  //Image: DStaticImage;
+
 
 type
   { Extension of DCoordActor with Up vector required for Camera to work properly }
@@ -73,7 +73,7 @@ type
   { Physical manifestation of Player in the world
     including camera
     party characters }
-  DParty = class (TComponent)
+  DParty = class(TObject)
   private
     { Some day these will become variables / todo }
     { Speed in meters per second }
@@ -105,19 +105,34 @@ type
     { Puts the party to sleep // all the parties available? }
     procedure Rest;
 
-    constructor Create(AOwner: TComponent); override;
+    constructor Create; //override;
     destructor Destroy; override;
   public
     { generates a temporary party / todo }
     procedure tmpParty;
   private
-    { movepress may be not discrete for gamepad! remake to 0..1 or -1..1 }
-    MovePress: array [TMoveDirection] of boolean;
     { move to DActor}
     Acceleration, MoveSpeed: TVector3;
-    isAccelerating: boolean;
     procedure doMove1;
     procedure doMove2;
+  end;
+
+{ A list of player's parties }
+type DPartyList = specialize TFPGObjectList<DParty>;
+
+
+type
+  {}
+  DPlayerControl = class(TObject)
+  public
+    {}
+    Parties: DPartyList;
+    {}
+    CurrentParty: DParty;
+  private
+    isAccelerating: boolean;
+    { movepress may be not discrete for gamepad! remake to 0..1 or -1..1 }
+    MovePress: array [TMoveDirection] of boolean;
     { Resets all move input controllers }
     procedure ResetMoveInput;
   public
@@ -131,31 +146,30 @@ type
     procedure InputMouse(Delta: TVector2);
     { Stop all movement }
     procedure Stop;
+  public
+    { Should be called each frame to process Camera stuff }
+    procedure Manage;
+    constructor Create;
+    destructor Destroy; override;
   end;
 
-{ A list of player's parties }
-type DPartyList = specialize TFPGObjectList<DParty>;
+var Player: DPlayerControl;
 
-var Parties: DPartyList;
-    CurrentParty: DParty;
-
-
-{ Temporary to free the partyList }
-procedure FreeParty;
+{ Temporary to init/free the PlayerControl }
+procedure InitPlayer;
+procedure FreePlayer;
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-uses SysUtils, CastleLog, Math,
+uses SysUtils, Math, CastleLog,
   DecoNavigation, DecoAbstractWorld, DecoAbstractWorld3d,
   DecoMouse,
   DecoGameMode, DecoTime;
 
-constructor DParty.create(AOwner: TComponent);
+constructor DParty.Create;
 begin
-  Inherited Create(AOwner);
+  //inherited Create;
   Character := DCharList.Create(true);
   CameraMan := DCameraMan.Create;
-  isAccelerating := false;
-  ResetMoveInput;
 end;
 
 {----------------------------------------------------------------------------}
@@ -273,58 +287,6 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DParty.InputMove(MoveDir: TMoveDirection);
-begin
-  MovePress[MoveDir] := true;
-  isAccelerating := MovePress[mdForward] or
-                    MovePress[mdBack] or
-                    MovePress[mdLeft] or
-                    MovePress[mdRight];
-end;
-
-procedure DParty.InputRelease(MoveDir: TMoveDirection);
-begin
-  MovePress[MoveDir] := false;
-  isAccelerating := MovePress[mdForward] or
-                    MovePress[mdBack] or
-                    MovePress[mdLeft] or
-                    MovePress[mdRight];
-end;
-
-procedure DParty.ResetMoveInput;
-begin
-  MovePress[mdForward] := false;
-  MovePress[mdBack] := false;
-  MovePress[mdLeft] := false;
-  MovePress[mdRight] := false;
-end;
-
-{----------------------------------------------------------------------------}
-
-procedure DParty.InputMouse(Delta: TVector2);
-var TraverseAxis: TVector3;
-    UpVector,ForwardVector: TVector3;
-begin
-  {based on CastleCameras implementation}
-  UpVector := Vector3(0,0,1);
-  ForwardVector := Vector3(1,0,0);
-  {rotate horizontal}
-  CameraMan.Phi += -Delta[0]*MouseSensivity;
-  if CameraMan.Phi> Pi then CameraMan.Phi -= 2*Pi else
-  if CameraMan.Phi<-Pi then CameraMan.Phi += 2*Pi;
-  CameraMan.Theta += Delta[1]*MouseSensivity;
-  if CameraMan.Theta> Pi/3 then CameraMan.Theta :=  Pi/3 else
-  if CameraMan.Theta<-Pi/3 then CameraMan.Theta := -Pi/3;
-
-  CameraMan.Up := UpVector;
-  CameraMan.Direction := RotatePointAroundAxisRad(CameraMan.Phi, ForwardVector, UpVector);
-  TraverseAxis := TVector3.CrossProduct(CameraMan.Direction, UpVector);
-  CameraMan.Direction := RotatePointAroundAxisRad(CameraMan.Theta, CameraMan.Direction, TraverseAxis);
-  CameraMan.Up := RotatePointAroundAxisRad(CameraMan.Theta, CameraMan.Up, TraverseAxis);
-end;
-
-{----------------------------------------------------------------------------}
-
 procedure DParty.doMove1;
 var MoveVector: TVector3;
   function Right90(var v: TVector3): TVector3; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
@@ -343,10 +305,11 @@ begin
   MoveVector := CameraMan.Direction;
   MoveVector[2] := 0;
   Acceleration := TVector3.Zero;
-  if MovePress[mdForward] then Acceleration += MoveVector;
-  if MovePress[mdBack]    then Acceleration += -MoveVector;
-  if MovePress[mdLeft]    then Acceleration += Left90(MoveVector);
-  if MovePress[mdRight]   then Acceleration += Right90(MoveVector);
+
+  if Player.MovePress[mdForward] then Acceleration += MoveVector;
+  if Player.MovePress[mdBack]    then Acceleration += -MoveVector;
+  if Player.MovePress[mdLeft]    then Acceleration += Left90(MoveVector);
+  if Player.MovePress[mdRight]   then Acceleration += Right90(MoveVector);
   Acceleration.Normalize;
 end;
 
@@ -377,7 +340,7 @@ begin
   FixedFriction := Friction*DeltaTLocal;
   if FixedFriction > 1 then FixedFriction := 1;
   MoveSpeed := (1-FixedFriction)*MoveSpeed+FixedFriction*Acceleration;
-  if not isAccelerating then Acceleration := TVector3.Zero;
+  if not Player.isAccelerating then Acceleration := TVector3.Zero;
 
   {todo: extremely ugly wall/stairs sliding algorithm }
   if not TryDirection(0,0) then
@@ -385,13 +348,6 @@ begin
   if not TryDirection(0,Pi/2) then
   if not TryDirection(0,-Pi/2) then ;
 
-end;
-
-{----------------------------------------------------------------------------}
-
-procedure DParty.Stop;
-begin
-  isAccelerating := false;
 end;
 
 {======================== DPlayerCharacter ==================================}
@@ -444,9 +400,107 @@ end;
 
 {============================================================================}
 
-procedure FreeParty;
+constructor DPlayerControl.Create;
+begin
+  //inherited Create;
+  Parties := DPartyList.Create(true);
+  isAccelerating := false;
+  CurrentParty := DParty.Create;
+  CurrentParty.tmpParty;
+  Parties.Add(CurrentParty);
+  ResetMoveInput;
+end;
+
+{----------------------------------------------------------------------------}
+
+destructor DPlayerControl.Destroy;
 begin
   FreeAndNil(Parties);
+  inherited Destroy;
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DPlayerControl.InputMouse(Delta: TVector2);
+var TraverseAxis: TVector3;
+    UpVector,ForwardVector: TVector3;
+begin
+  with CurrentParty do begin
+    {based on CastleCameras implementation}
+    UpVector := Vector3(0,0,1);
+    ForwardVector := Vector3(1,0,0);
+    {rotate horizontal}
+    CameraMan.Phi += -Delta[0]*MouseSensivity;
+    if CameraMan.Phi> Pi then CameraMan.Phi -= 2*Pi else
+    if CameraMan.Phi<-Pi then CameraMan.Phi += 2*Pi;
+    CameraMan.Theta += Delta[1]*MouseSensivity;
+    if CameraMan.Theta> Pi/3 then CameraMan.Theta :=  Pi/3 else
+    if CameraMan.Theta<-Pi/3 then CameraMan.Theta := -Pi/3;
+
+    CameraMan.Up := UpVector;
+    CameraMan.Direction := RotatePointAroundAxisRad(CameraMan.Phi, ForwardVector, UpVector);
+    TraverseAxis := TVector3.CrossProduct(CameraMan.Direction, UpVector);
+    CameraMan.Direction := RotatePointAroundAxisRad(CameraMan.Theta, CameraMan.Direction, TraverseAxis);
+    CameraMan.Up := RotatePointAroundAxisRad(CameraMan.Theta, CameraMan.Up, TraverseAxis);
+  end;
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DPlayerControl.Manage;
+begin
+  {todo}
+  CurrentParty.Manage;
+end;
+
+
+{----------------------------------------------------------------------------}
+
+procedure DPlayerControl.InputMove(MoveDir: TMoveDirection);
+begin
+  MovePress[MoveDir] := true;
+  isAccelerating := MovePress[mdForward] or
+                    MovePress[mdBack] or
+                    MovePress[mdLeft] or
+                    MovePress[mdRight];
+end;
+
+procedure DPlayerControl.InputRelease(MoveDir: TMoveDirection);
+begin
+  MovePress[MoveDir] := false;
+  isAccelerating := MovePress[mdForward] or
+                    MovePress[mdBack] or
+                    MovePress[mdLeft] or
+                    MovePress[mdRight];
+end;
+
+procedure DPlayerControl.ResetMoveInput;
+begin
+  MovePress[mdForward] := false;
+  MovePress[mdBack] := false;
+  MovePress[mdLeft] := false;
+  MovePress[mdRight] := false;
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DPlayerControl.Stop;
+begin
+  isAccelerating := false;
+end;
+
+{============================================================================}
+
+procedure InitPlayer;
+begin
+  Player := DPlayerControl.Create;
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure FreePlayer;
+begin
+  FreeAndNil(Player);
 end;
 
 end.
