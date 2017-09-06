@@ -123,20 +123,22 @@ end;
 
 type
   {Nickname + PlayerBars + NumericHP}
-  DPlayerBarsFull = class(DInterfaceElement) //not a child of DPlayerBars!
+  DPlayerBarsFull = class(DCompositeElement) //not a child of DPlayerBars!
   private
     {these are links for easier access to the children}
- {   PartyBars: DPlayerBars;
-    NumHealth: DSingleInterfaceElement;
-    NickName: DSingleInterfaceElement;
+    PartyBars: DStatBars;
+    NumHealth: DFloatLabel;
+    NickName: DStringLabel;
     {target character}
-    fTarget: DActor;
-    procedure SetTarget(Value: DActor);
+    fTarget: DBasicActor;
+    procedure SetTarget(Value: DBasicActor);
   public
     {the character being monitored}
-    property Target: DActor read fTarget write SetTarget;
-    constructor Create(AOwner: TComponent); override;
-    procedure ArrangeChildren(Animate: TAnimationStyle); override; }
+    property Target: DBasicActor read fTarget write SetTarget;
+    procedure SpawnChildren; override;
+    procedure ArrangeChildren; override;
+    //constructor Create(AOwner: TComponent); override;
+    //procedure ArrangeChildren(Animate: TAnimationStyle); override; }
   end;
 
 type
@@ -146,14 +148,14 @@ type
   public
     {this is a BUG, but I won't fix it now, it requires remaking ALL THE INTERFACE}
   {  DamageOverlay: DSingleInterfaceElement;
-    DamageLabel: DSingleInterfaceElement;
+    DamageLabel: DSingleInterfaceElement;  }
   private
     fTarget: DPlayerCharacter;
-    procedure SetTarget(value: DPlayerCharacter);
+    procedure SetTarget(Value: DPlayerCharacter);
   public
     {Player character which portrait is displayed}
-    property Target: DPlayerCharacter read ftarget write settarget;
-    constructor Create(AOwner: TComponent); override;
+    property Target: DPlayerCharacter read fTarget write SetTarget;
+   { constructor Create(AOwner: TComponent); override;
     procedure doHit(Dam: float; DamType: TDamageType);}
   end;
 
@@ -226,7 +228,7 @@ type DPerksContainer = class(DAbstractSorter)
 
 implementation
 uses SysUtils, CastleLog, {castleVectors,}
-   //DecoFont,
+   DecoFont,
    //DecoInterfaceBlocks,
    DecoInputOutput, DecoInterfaceLoader;
 
@@ -395,8 +397,8 @@ end;
 constructor DStatBars.Create;
 begin
   inherited Create;
-  Frame.Frame := BlackFrame;
-  Rescale;
+  Frame.Frame := Characterbar_mid;
+  Rescale; //<---------- UGLY
 end;
 
 {-----------------------------------------------------------------------------}
@@ -471,75 +473,70 @@ end;
 {=============== Player bars with nickname and health label ==================}
 {=============================================================================}
 
-{procedure DPlayerBarsFull.settarget(value: DActor);
+procedure DPlayerBarsFull.SetTarget(Value: DBasicActor);
 begin
   if fTarget <> Value then begin
     fTarget := Value;
     //and copy the target to all children
     PartyBars.Target := Value;
-    DFloatLabel(NumHealth.Content).Value := @Value.HP;
-    DStringLabel(NickName.Content).Value := @Value.nickname;
+    NumHealth.Target := @Value.HP;
+    NickName.Target  := @Value.Nickname;
   end;
-end;}
+end;
 
 {---------------------------------------------------------------------------}
 
-{constructor DPlayerBarsFull.Create(AOwner:TComponent);
-var tmp_flt: DFloatLabel;
-    tmp_str: DStringLabel;
+procedure DPlayerBarsFull.SpawnChildren;
 begin
-  inherited create(AOwner);
-  PartyBars := DPlayerBars.Create(Self);
-  NumHealth := DSingleInterfaceElement.Create(Self);
-  NickName  := DSingleInterfaceElement.Create(Self);
+  //inherited SpawnChildren;  <----- nothing to inherit
+  PartyBars := DStatBars.Create;
+  NumHealth := DFloatLabel.Create;
+  NickName  := DStringLabel.Create;
 
-  PartyBars.frame := Characterbar_mid;
-  NickName.frame  := Characterbar_top;
-  NumHealth.frame := Characterbar_bottom;
+  //NickName.frame  := Characterbar_top;
+  //NumHealth.frame := Characterbar_bottom;
 
-  tmp_flt := DFloatLabel.create(NumHealth);
-  tmp_flt.Digits := 0;
-  tmp_flt.ScaleLabel := false;
-  tmp_flt.Font := CharHealthFont;
-  NumHealth.Content := tmp_flt;
-  tmp_str := DStringLabel.create(NickName);
-  tmp_str.ScaleLabel := true;
-  tmp_str.Font := CharNickNameFont;
-  NickName.content := tmp_str;
+  NumHealth.Digits := 0;
+  NumHealth.Base.ScaleItem := false;
+  NumHealth.Font := CharHealthFont;
+
+  NickName.Base.ScaleItem := false;
+  NickName.Font := CharNickNameFont;
 
   grab(PartyBars);
   grab(NumHealth);
   grab(NickName);
-end;}
+end;
 
 {---------------------------------------------------------------------------}
 
-{Procedure DPlayerBarsFull.ArrangeChildren(animate: TAnimationStyle);
-var labelspace: float;
+procedure DPlayerBarsFull.ArrangeChildren;
+const LabelSpace = 23/800;
 begin
-  inherited ArrangeChildren(animate);
+  //inherited ArrangeChildren;  <------- nothing to inherit
+
   {********** INTERFACE DESIGN BY Saito00 ******************}
 
-  labelspace := 23/800;
-  NickName. setbasesize(cnt_x, cnt_y+cnt_h-labelspace , cnt_w, labelspace, base.opacity, animate);
-  PartyBars.setbasesize(cnt_x, cnt_y+labelspace       , cnt_w, cnt_h-2*labelspace, base.opacity, animate);
-  NumHealth.setbasesize(cnt_x, cnt_y                  , cnt_w, labelspace, base.opacity, animate);
-end; }
+  //NickName. setbasesize(0, cnt_y+cnt_h-labelspace , 1, labelspace);
+  //PartyBars.setbasesize(0, cnt_y+labelspace       , 1, cnt_h-2*labelspace);
+  //NumHealth.setbasesize(0, cnt_y                  , 1, labelspace);
+
+end;
 
 {=============================================================================}
 {========================== Character portrait ===============================}
 {=============================================================================}
 
-{procedure DPortrait.settarget(value: DPlayerCharacter);
+procedure DPortrait.SetTarget(Value: DPlayerCharacter);
 begin
-  if ftarget <> value then begin
-    ftarget := value;
-    DStaticImage(content).freeImage;
-    WriteLnLog('DPortrait.settarget','Load from portrait');
-    DStaticImage(content).Load(portrait_img[drnd.random(length(portrait_img))]);  //todo
-    fTarget.onHit := @self.doHit;
+  if fTarget <> Value then begin
+    fTarget := value;
+    //DStaticImage(content).FreeImage;
+    WriteLnLog('DPortrait.SetTarget','Load from portrait');
+    //DStaticImage(content).Load(Portrait_img[drnd.Random(Length(Portrait_img))]);  //todo
+    //fTarget.onHit := @Self.doHit;
   end;
-end;}
+end;
 
 {---------------------------------------------------------------------------}
 

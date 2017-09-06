@@ -15,7 +15,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 
 {---------------------------------------------------------------------------}
 
-{ Works with different types of labels }
+{ Different types of labels
+  All labels are rendered as images to boost performance. }
 unit DecoLabels;
 
 {$INCLUDE compilerconfig.inc}
@@ -59,7 +60,7 @@ type
   DIntegerLabel = class (DLabel)
   public
     { pointer to the value it monitors }
-    Value: Pinteger;
+    Target: Pinteger;
     procedure Update; override;
   end;
 
@@ -68,7 +69,7 @@ type
   DStringLabel = class (DLabel)
   public
     { pointer to the value it monitors }
-    value: Pstring;
+    Target: Pstring;
     procedure Update; override;
   end;
 
@@ -77,7 +78,7 @@ type
   DFloatLabel = class (DLabel)
   public
     { pointer to the value it monitors }
-    Value: PFloat;
+    Target: PFloat;
     { how many digits after point are displayed?
       0 - float is rounded to integer (1.6423 -> 2)
       1 - one digit like 1.2
@@ -214,7 +215,7 @@ end;
 procedure DIntegerLabel.Update;
 begin
   inherited Update;
-  Text := IntToStr(value^);
+  Text := IntToStr(Target^);
 end;
 
 {=============================================================================}
@@ -224,7 +225,7 @@ end;
 procedure DStringLabel.Update;
 begin
   inherited Update;
-  Text := Value^;
+  Text := Target^;
 end;
 
 {=============================================================================}
@@ -243,9 +244,9 @@ procedure DFloatLabel.Update;
 begin
   inherited Update;
   case Digits of
-    1: Text := IntToStr(Trunc(Value^))+'.'+IntToStr(Round(Frac(Value^)*10));
-    2: Text := IntToStr(Trunc(Value^))+'.'+IntToStr(Round(Frac(Value^)*100));
-    else Text := IntToStr(Round(Value^));
+    1: Text := IntToStr(Trunc(Target^))+'.'+IntToStr(Round(Frac(Target^)*10));
+    2: Text := IntToStr(Trunc(Target^))+'.'+IntToStr(Round(Frac(Target^)*100));
+    else Text := IntToStr(Round(Target^));
   end;
 end;
 
@@ -262,9 +263,8 @@ begin
   Base.AnchorToWindow := true;
   Base.ScaleItem := false;
   Base.SetRealSize(100,100);
-  SetBaseSize(0,0,0.05,0.05,1.0,asNone);
+  SetBaseSize(0,0,0.05,0.05);
 
-  //ShadowIntensity := 0;
   Font := DebugFont;
   //Text := '';
 end;
