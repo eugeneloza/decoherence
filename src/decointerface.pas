@@ -271,7 +271,7 @@ Type
     {}
     {procedure RescaleToChildren(animate: TAnimationStyle);  }
   public
-    {returns last call to MouseOverTree result, may be buggy!}
+    {returns last (cached) call to MouseOverTree result, may be invalid!}
     isMouseOverTree: boolean;
     {returns Self if IAmHere and runs all possible events + scans all children}
     function ifMouseOver(const xx,yy: integer; const RaiseEvents: boolean; const AllTree: boolean): DAbstractElement; override;

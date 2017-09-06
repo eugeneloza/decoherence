@@ -39,12 +39,17 @@ const MaxParty = 6; {0..6 = 7 characters}
 }
 
 type
-  {extension of DCoordActor with Up vector required for camera to work properly}
+  { Extension of DCoordActor with Up vector required for Camera to work properly }
   DCameraMan = class(DActorPhysics)
   public
+    { CameraMan reqruies different handling of "up" vector }
     Up: TVector3;
-    theta,phi: float;
+    { Rotations of the CameraMan, required for smoother camera rotations }
+    Theta, Phi: float;
+    { Sets Up to GravityUp }
     procedure ResetUp;
+    { Resets Theta and Phi to match CameraMan.Direction
+          Also zeroes mouse coordinate shift }
     procedure ResetAngles;
     constructor Create; override;
   end;
@@ -53,14 +58,15 @@ type
   {player character - the most complex actor available :)}
   DPlayerCharacter = class(DActor)
   public
-    Procedure Die; override;
+    procedure Die; override;
     constructor Create; override;
     destructor Destroy; override;
 end;
 
-{list of the party characters}
+{ List of the party characters, a bit better than DActorList }
 type DCharList = specialize TFPGObjectList<DPlayerCharacter>;
 
+{ todo: remake it }
 type TMoveDirection = (mdForward,mdBack,mdLeft,mdRight);
 
 type
@@ -69,51 +75,72 @@ type
     party characters }
   DParty = class (TComponent)
   private
-    const Speed = 10; {meters per second}
-    const Friction = 40; {~meters per second, 0 never stops}
-    const AngularFriction = 40; {~radians per second, rather hard to explain :) adds some inertion to camera, the higher this value the faster is rotation}
+    { Some day these will become variables / todo }
+    { Speed in meters per second }
+    const Speed = 10;
+    { Speed fade ratio, in ~meters per second^2, 0 never stops }
+    const Friction = 40;
+    { Rotation fade ratio. ~radians per second, rather hard to explain :) adds some inertion to camera, the higher this value the faster is rotation}
+    const AngularFriction = 40;
+    { Mouse sensivity }
     const MouseSensivity = 1/1800;
   private
-    {updates game camera with CameraMan coordinates}
+    { Updates game camera with CameraMan coordinates }
     procedure UpdateCamera;
+    { Teleports characters of this Group to rally point }
     procedure CollectCharacters;
   public
+    { An imaginary Actor "holding" the camera }
     CameraMan: DCameraMan;
+    { Is camera initialized? }
     CameraInitialized: boolean;
+    { Characters in this Party }
     Character: DCharList;
-    {generates a temporary party}
-    procedure tmpParty;
+    { Should be called each frame to process Camera stuff }
     procedure Manage;
-    constructor Create(AOwner: TComponent); override;
-    destructor Destroy; override;
+    { Teleports party to some Position or Nav }
     procedure TeleportTo(aPosition, aDirection: TVector3);
     procedure TeleportTo(aNav: TNavId; aDirection: TVector3);
     procedure TeleportTo(aNav: TNavId);
+    { Puts the party to sleep // all the parties available? }
     procedure Rest;
+
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+  public
+    { generates a temporary party / todo }
+    procedure tmpParty;
   private
-    {movepress may be not discrete for gamepad! remake to 0..1 or -1..1}
+    { movepress may be not discrete for gamepad! remake to 0..1 or -1..1 }
     MovePress: array [TMoveDirection] of boolean;
-    Acceleration,MoveSpeed: TVector3;
+    { move to DActor}
+    Acceleration, MoveSpeed: TVector3;
     isAccelerating: boolean;
     procedure doMove1;
     procedure doMove2;
+    { Resets all move input controllers }
     procedure ResetMoveInput;
   public
+    { is MouseLook active (Desktop only) or DragLook is used }
     MouseLook: boolean;
+    { Move in Direction pressed }
     procedure InputMove(MoveDir: TMoveDirection);
+    { Move in Direction released }
     procedure InputRelease(MoveDir: TMoveDirection);
+    { Mouse moved }
     procedure InputMouse(Delta: TVector2);
+    { Stop all movement }
     procedure Stop;
   end;
 
-{a list of player's parties}
+{ A list of player's parties }
 type DPartyList = specialize TFPGObjectList<DParty>;
 
 var Parties: DPartyList;
     CurrentParty: DParty;
 
 
-{temporary to free the partyList}
+{ Temporary to free the partyList }
 procedure FreeParty;
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
@@ -145,7 +172,7 @@ begin
     NewMember.DrainMPH(DRND.Random(80),1);
     NewMember.DrainSTA(DRND.Random(80),1);
 
-    if (Perks=nil) or (Perks.Count=0) then WriteLnLog('CreateTestParty','FATAL ERROR: Perks is empty!');
+    if (Perks = nil) or (Perks.Count = 0) then WriteLnLog('CreateTestParty','FATAL ERROR: Perks is empty!');
     NewMember.Actions.Add(Perks[0]);
 
     Character.Add(NewMember);
@@ -326,8 +353,7 @@ end;
 {----------------------------------------------------------------------------}
 
 procedure DParty.doMove2;
-var NewPosGravity,tmp: TVector3;
-    FixedFriction: float;
+var FixedFriction: float;
   function TryDirection(climb,slide: float): boolean;
   var NewPosAdjusted, NewPosHeightAdjusted, ProposedDir: TVector3;
   begin
@@ -353,19 +379,12 @@ begin
   MoveSpeed := (1-FixedFriction)*MoveSpeed+FixedFriction*Acceleration;
   if not isAccelerating then Acceleration := TVector3.Zero;
 
+  {todo: extremely ugly wall/stairs sliding algorithm }
   if not TryDirection(0,0) then
   if not TryDirection(1,0) then
   if not TryDirection(0,Pi/2) then
   if not TryDirection(0,-Pi/2) then ;
 
-  {gravity...}
-  {NewPos := CameraMan.Position;
-  NewPos[2] := NewPos[2]-0.1;
-  if Camera.DoMoveAllowed(NewPosGravity,tmp,false) then
-    CameraMan.Position := NewPosGravity; }
-
-
-  {use body here, including body.gravity}
 end;
 
 {----------------------------------------------------------------------------}
@@ -394,7 +413,7 @@ end;
 
 destructor DPlayerCharacter.Destroy;
 begin
-  Inherited Destroy;
+  inherited Destroy;
 end;
 
 {============================================================================}

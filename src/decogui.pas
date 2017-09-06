@@ -58,7 +58,7 @@ uses SysUtils, CastleLog,
 
 constructor DInterfaceContainer.Create;
 begin
-  writeLnLog('DInterfaceContainer.create','Creating interface.');
+  WriteLnLog('DInterfaceContainer.create','Creating interface.');
   inherited Create;
 
   Base.AnchorToWindow := true;
