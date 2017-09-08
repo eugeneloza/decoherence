@@ -142,15 +142,20 @@ type
     constructor Create; override;
   end;
 
+type
+  DStatValue = record
+    Current, Max, MaxMax: float;
+  end;
+
 Type
   { basic actor. With stats }
   DBasicActor = class abstract(DActorBody)
   private
-    fHP,fMaxHP,fMaxMaxHP: float;
+    fHP: DStatValue;
     { maybe, move all non-HP to deco player character? }
-    fSTA,fMaxSTA,fMaxMaxSTA: float;
-    fCNC,fMaxCNC,fMaxMaxCNC: float;
-    fMPH,fMaxMPH,fMaxMaxMPH: float;
+    fSTA: DStatValue;
+    fCNC: DStatValue;
+    fMPH: DStatValue;
     Procedure SetHP(Value: float);
     Procedure SetMaxHP(Value: float);
     Procedure SetMaxMaxHP(Value: float);
@@ -165,21 +170,21 @@ Type
     Procedure SetMaxMaxMPH(Value: float);
   public
     { getters and setters }
-    Property HP: float read fHP write SetHP;
-    Property MaxHP: float read fMaxHP write SetMaxHP;
-    Property MaxMaxHP: float read fMaxMaxHP write SetMaxMaxHP;
+    Property HP: float read fHP.Current write SetHP;
+    Property MaxHP: float read fHP.Max write SetMaxHP;
+    Property MaxMaxHP: float read fHP.MaxMax write SetMaxMaxHP;
     procedure ResetHP;
-    Property STA: float read fSTA write SetSTA;
-    Property MaxSTA: float read fMaxSTA write SetMaxSTA;
-    Property MaxMaxSTA: float read fMaxMaxSTA write SetMaxMaxSTA;
+    Property STA: float read fSTA.Current write SetSTA;
+    Property MaxSTA: float read fSTA.Max write SetMaxSTA;
+    Property MaxMaxSTA: float read fSTA.MaxMax write SetMaxMaxSTA;
     procedure ResetSTA;
-    Property CNC: float read fCNC write SetCNC;
-    Property MaxCNC: float read fMaxCNC write SetMaxCNC;
-    Property MaxMaxCNC: float read fMaxMaxCNC write SetMaxMaxCNC;
+    Property CNC: float read fCNC.Current write SetCNC;
+    Property MaxCNC: float read fCNC.Max write SetMaxCNC;
+    Property MaxMaxCNC: float read fCNC.MaxMax write SetMaxMaxCNC;
     procedure ResetCNC;
-    Property MPH: float read fMPH write SetMPH;
-    Property MaxMPH: float read fMaxMPH write SetMaxMPH;
-    Property MaxMaxMPH: float read fMaxMaxMPH write SetMaxMaxMPH;
+    Property MPH: float read fMPH.Current write SetMPH;
+    Property MaxMPH: float read fMPH.Max write SetMaxMPH;
+    Property MaxMaxMPH: float read fMPH.MaxMax write SetMaxMaxMPH;
     procedure ResetMPH;
     procedure ResetAll;
 
@@ -187,6 +192,7 @@ Type
     procedure Hit(Damage: float; Skill: float); //=consumeHP
     { Returns true if healed or false if nothing to heal }
     function Heal(Value: float; Skill: float): boolean; //=restoreHP
+
     { Abstract action preformed on Actor's death }
     Procedure Die; virtual; abstract;
 
@@ -453,96 +459,96 @@ end;
 
 Procedure DBasicActor.SetHP(Value: float);
 begin
-  If Value < fMaxHP then fHP := Value else fHP := fMaxHP;
-  If Value < 0 then Die;     {$HINT clinical death state}
+  If Value < fHP.Max then fHP.Current := Value else fHP.Current := fHP.Max;
+  If fHP.Current < 0 then Die;
 end;
 Procedure DBasicActor.SetMaxHP(Value: float);
 begin
-  If Value < fMaxMaxHP then fMaxHP := Value else fMaxHP := fMaxMaxHP;
-  If Value < 0 then Die;
+  If Value < fHP.MaxMax then fHP.Max := Value else fHP.Max := fHP.MaxMax;
+  If fHP.Max < 0 then Die;
 end;
 Procedure DBasicActor.SetMaxMaxHP(Value: float);
 begin
-  if MaxMaxHP < Value then Heal(Value-fMaxMaxHP,1);
-  fMaxMaxHP := Value;
-  If Value < 0 then Die;
+  if fHP.MaxMax < Value then Heal(Value-fHP.MaxMax,1);
+  fHP.MaxMax := Value;
+  If fHP.MaxMax < 0 then Die;
 end;
 procedure DBasicActor.ResetHP;
 begin
-  fMaxHP := fMaxMaxHP;
-  fHP := fMaxHP;
+  fHP.Max := fHP.MaxMax;
+  fHP.Current := fHP.Max;
 end;
 
 {---------------------------------------------------------------------------}
 
 Procedure DBasicActor.SetSTA(Value: float);
 begin
-  If Value < fMaxSTA then fSTA := Value else fSTA := fMaxSTA;
-  If Value < 0 then {EXAUSTED STATE};
+  If Value < fSTA.Max then fSTA.Current := Value else fSTA.Current := fSTA.Max;
+  If fSTA.Current < 0 then {EXAUSTED STATE};
 end;
 Procedure DBasicActor.SetMaxSTA(Value: float);
 begin
-  If Value < fMaxMaxSTA then fMaxSTA := Value else fMaxSTA := fMaxMaxSTA;
-  If Value < 0 then {EXAUSTED STATE};
+  If Value < fSTA.MaxMax then fSTA.Max := Value else fSTA.Max := fSTA.MaxMax;
+  If fSTA.Max < 0 then {EXAUSTED STATE};
 end;
 Procedure DBasicActor.SetMaxMaxSTA(Value: float);
 begin
-  if MaxMaxSTA < Value then RestoreSTA(Value-fMaxMaxSTA,1);
-  fMaxMaxSTA := Value;
-  If Value < 0 then {EXAUSTED STATE};
+  if fSTA.MaxMax < Value then RestoreSTA(Value-fSTA.MaxMax,1);
+  fSTA.MaxMax := Value;
+  If fSTA.MaxMax < 0 then {EXAUSTED STATE};
 end;
 procedure DBasicActor.ResetSTA;
 begin
-  fMaxSTA := fMaxMaxSTA;
-  fSTA := fMaxSTA;
+  fSTA.Max := fSTA.MaxMax;
+  fSTA.Current := fSTA.Max;
 end;
 
 {-----------------------------------------------------------------------------}
 
 Procedure DBasicActor.SetCNC(Value: float);
 begin
-  If Value < fMaxCNC then fCNC := Value else fCNC := fMaxCNC;
-  If Value < 0 then {BURN-OUT STATE};
+  If Value < fCNC.Max then fCNC.Current := Value else fCNC.Current := fCNC.Max;
+  If fCNC.Current < 0 then {BURN-OUT STATE};
 end;
 Procedure DBasicActor.SetMaxCNC(Value: float);
 begin
-  If Value < fMaxMaxCNC then fMaxCNC := Value else fMaxCNC := fMaxMaxCNC;
-  If Value < 0 then {BURN-OUT STATE};
+  If Value < fCNC.MaxMax then fCNC.Max := Value else fCNC.Max := fCNC.MaxMax;
+  If fCNC.Max < 0 then {BURN-OUT STATE};
 end;
 Procedure DBasicActor.SetMaxMaxCNC(Value: float);
 begin
-  if MaxMaxCNC < Value then RestoreCNC(Value-fMaxMaxCNC,1);
-  fMaxMaxCNC := Value;
-  If Value < 0 then {BURN-OUT STATE};
+  if fCNC.MaxMax < Value then RestoreCNC(Value-fCNC.MaxMax,1);
+  fCNC.MaxMax := Value;
+  If fCNC.MaxMax < 0 then {BURN-OUT STATE};
 end;
 procedure DBasicActor.ResetCNC;
 begin
-  fMaxCNC := fMaxMaxCNC;
-  fCNC := fMaxCNC;
+  fCNC.Max := fCNC.MaxMax;
+  fCNC.Current := fCNC.Max;
 end;
 
 {---------------------------------------------------------------------------}
 
 Procedure DBasicActor.SetMPH(Value: float);
 begin
-  If Value < fMaxMPH then fMPH := Value else fMPH := fmaxMPH;
-  If Value < 0 then {* STATE};
+  If Value < fMPH.Max then fMPH.Current := Value else fMPH.Current := fMPH.Max;
+  If fMPH.Current < 0 then {* STATE};
 end;
 Procedure DBasicActor.SetMaxMPH(Value: float);
 begin
-  If Value < fMaxmaxMPH then fMaxMPH := Value else fMaxMPH := fMaxmaxMPH;
-  If Value < 0 then {* STATE};
+  If Value < fMPH.MaxMax then fMPH.Max := Value else fMPH.Max := fMPH.MaxMax;
+  If fMPH.Max < 0 then {* STATE};
 end;
 Procedure DBasicActor.SetMaxMaxMPH(Value: float);
 begin
-  if MaxMaxMPH < Value then RestoreMPH(Value-fMaxMaxMPH,1);
-  fMaxMaxMPH := Value;
-  If Value < 0 then {* STATE};
+  if fMPH.MaxMax < Value then RestoreMPH(Value-fMPH.MaxMax,1);
+  fMPH.MaxMax := Value;
+  If fMPH.MaxMax < 0 then {* STATE};
 end;
 procedure DBasicActor.ResetMPH;
 begin
-  fMaxMPH := fMaxMaxMPH;
-  fMPH := fMaxMPH;
+  fMPH.Max := fMPH.MaxMax;
+  fMPH.Current := fMPH.Max;
 end;
 
 {---------------------------------------------------------------------------}
