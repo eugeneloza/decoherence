@@ -93,7 +93,7 @@ type
   DFrameAnchorHelper = class helper for DAbstractContainer
   public
     { Anchor this element to a DFrameImage and set all Gaps correctly }
-    procedure AnchorToFrame(aFrame: DFrameImage);
+    procedure AnchorToFrame(const aFrame: DFrameImage);
   end;
 
 type
@@ -177,16 +177,12 @@ type
     constructor Create; override;
   end;
 
-type TStatBarStyle = (sbNone, sbHealth, sbStamina, sbConcentration, sbMetaphysics);
-
 type
-  { bar to display health for mobs and primary 4 stats for player characters }
+  { Bar to display health for mobs and primary 4 stats for player characters }
   DStatBarImage = class(DBarImage)
   public
-    { Points to the actor for who the health is displayed}
-    Target: DBasicActor;
-    { determines which value to display: Health, Stamina, Concentration or Metaphysics}
-    Style: TStatBarStyle;
+    { Actor stat for display }
+    Target: PStatValue;
     procedure Update; override;
   end;
 
@@ -395,7 +391,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DFrameAnchorHelper.AnchorToFrame(aFrame: DFrameImage);
+procedure DFrameAnchorHelper.AnchorToFrame(const aFrame: DFrameImage);
 begin
   AnchorTo(aFrame.Current);
   Anchor[asLeft].Gap := aFrame.Frame.CornerLeft;
@@ -650,30 +646,9 @@ begin
   inherited Update;
 
   Min := 0;
-  //maybe pointers will be better? Still, it doesn't look inefficient;
-  case Style of
-    sbHealth: begin
-                Max := Target.MaxMaxHp;
-                CurrentMax := AboveZero(Target.MaxHp);
-                Position := AboveZero(Target.Hp);
-              end;
-    sbStamina: begin
-                Max := Target.MaxMaxSta;
-                CurrentMax := AboveZero(Target.MaxSta);
-                Position := AboveZero(Target.Sta);
-              end;
-    sbConcentration: begin
-                Max := Target.MaxMaxCNC;
-                CurrentMax := AboveZero(Target.MaxCNC);
-                Position := AboveZero(Target.CNC);
-              end;
-    sbMetaphysics: begin
-                Max := Target.MaxMaxMph;
-                CurrentMax := AboveZero(Target.MaxMph);
-                Position := AboveZero(Target.Mph);
-              end;
-    else WriteLnLog('DStatBarImage.Update','ERROR: Undefined Stat Bar Style');
-  end;
+  Max := Target^.MaxMax;
+  CurrentMax := AboveZero(Target^.Max);
+  Position := AboveZero(Target^.Current)
 end;
 
 finalization

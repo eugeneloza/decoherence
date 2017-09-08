@@ -29,7 +29,7 @@ uses Classes, CastleRandom, fgl, CastleVectors, CastleCameras,
   DecoGlobal, DecoTime;
 
 type TDamageType = (dtHealth);
-type TDamageProcedure = procedure (Dam: float; Damtype: TDamageType) of Object;
+type TDamageProcedure = procedure (const Dam: float; const Damtype: TDamageType) of Object;
 
 type TFaction = (fPlayer, fHostile);
 
@@ -44,7 +44,7 @@ type
     { Faction this Actor belongs to }
     Faction: TFaction;
     { Teleport this Actor to aNav }
-    procedure TeleportTo(aNav: TNavID); virtual;
+    procedure TeleportTo(const aNav: TNavID); virtual;
     { Procedures preformed on this actor every frame }
     procedure Manage; virtual; //it'll do something useful some day...
     constructor Create; virtual; // override;
@@ -64,9 +64,9 @@ type
     { Position, direction and rotate_to_direction of the Body }
     Position,Direction: TVector3;
     { Instantly move Actor to aPosition or aNav }
-    procedure TeleportTo(aPosition: TVector3);
-    procedure TeleportTo(aPosition, aDirection: TVector3);
-    procedure TeleportTo(aNav: TNavID); override;
+    procedure TeleportTo(const aPosition: TVector3);
+    procedure TeleportTo(const aPosition, aDirection: TVector3);
+    procedure TeleportTo(const aNav: TNavID); override;
   protected
     { What position/direction this Actor moves to }
     toPos,toDir: TVector3;
@@ -91,8 +91,8 @@ type
     { DActorPhysics does not set the camera, but uses it! It's defined in descendants}
     InternalCamera: TWalkCamera;
     { Is movement to this direction or position is allowed? }
-    function CanMovePos(aPos: TVector3): boolean;{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
-    function CanMoveDir(aDir: TVector3): boolean;{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+    function CanMovePos(const aPos: TVector3): boolean;{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+    function CanMoveDir(const aDir: TVector3): boolean;{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
   public
     { Height of this actor, usually should be zero,
           Mostly needed for player's camera height }
@@ -111,11 +111,11 @@ type
     procedure doAI; virtual; abstract;
   private
     {shows or hides body of this actor}
-    procedure SetVisible(value: boolean);
+    procedure SetVisible(const value: boolean);
     {reads visibility of this Actor's body}
     function GetVisible: boolean;
     {creates a body}
-    procedure SpawnBodyHere(SpawnBody: DBodyResource);
+    procedure SpawnBodyHere(const SpawnBody: DBodyResource);
   public
     { 3D body of this Actor, it may be nil (in case the body is unloaded from
       RAM or belongs to an body-less entity, like Player's character at the moment }
@@ -126,17 +126,17 @@ type
     { Shows or hides the actor's body}
     property Visible: boolean read GetVisible write SetVisible;
     { Spawns a body for the Actor, overriden in children to spawn attributes}
-    procedure Spawn(aNav: TNavID; SpawnBody: DBodyResource);
-    procedure Spawn(aPosition: TVector3; SpawnBody: DBodyResource); virtual;
+    procedure Spawn(const aNav: TNavID; const SpawnBody: DBodyResource);
+    procedure Spawn(const aPosition: TVector3; const SpawnBody: DBodyResource); virtual;
     { Manages this actor, e.g. preforms AI,
       called each frame}
     procedure Manage; override;
     { Forces immediate change of the animation }
-    procedure ForceAnimation(at: TAnimationType);
-    procedure ForceAnimation(at: string);
+    procedure ForceAnimation(const at: TAnimationType);
+    procedure ForceAnimation(const at: string);
     { Softly changes the animation (when the current animation cycle ends) }
-    procedure Animation(at: TAnimationType);
-    procedure Animation(at: string);
+    procedure Animation(const at: TAnimationType);
+    procedure Animation(const at: string);
 
     destructor Destroy; override;
     constructor Create; override;
@@ -146,6 +146,7 @@ type
   DStatValue = record
     Current, Max, MaxMax: float;
   end;
+  PStatValue = ^DStatValue;
 
 Type
   { basic actor. With stats }
@@ -156,18 +157,18 @@ Type
     fSTA: DStatValue;
     fCNC: DStatValue;
     fMPH: DStatValue;
-    Procedure SetHP(Value: float);
-    Procedure SetMaxHP(Value: float);
-    Procedure SetMaxMaxHP(Value: float);
-    Procedure SetSTA(Value: float);
-    Procedure SetMaxSTA(Value: float);
-    Procedure SetMaxMaxSTA(Value: float);
-    Procedure SetCNC(Value: float);
-    Procedure SetMaxCNC(Value: float);
-    Procedure SetMaxMaxCNC(Value: float);
-    Procedure SetMPH(Value: float);
-    Procedure SetMaxMPH(Value: float);
-    Procedure SetMaxMaxMPH(Value: float);
+    Procedure SetHP(const Value: float);
+    Procedure SetMaxHP(const Value: float);
+    Procedure SetMaxMaxHP(const Value: float);
+    Procedure SetSTA(const Value: float);
+    Procedure SetMaxSTA(const Value: float);
+    Procedure SetMaxMaxSTA(const Value: float);
+    Procedure SetCNC(const Value: float);
+    Procedure SetMaxCNC(const Value: float);
+    Procedure SetMaxMaxCNC(const Value: float);
+    Procedure SetMPH(const Value: float);
+    Procedure SetMaxMPH(const Value: float);
+    Procedure SetMaxMaxMPH(const Value: float);
   public
     { getters and setters }
     Property HP: float read fHP.Current write SetHP;
@@ -188,10 +189,15 @@ Type
     procedure ResetMPH;
     procedure ResetAll;
 
+    function HPRef : PStatValue;
+    function STARef: PStatValue;
+    function CNCRef: PStatValue;
+    function MPHRef: PStatValue;
+
     { Hit equals to consume+drain }
-    procedure Hit(Damage: float; Skill: float); //=consumeHP
+    procedure Hit(const Damage: float; const Skill: float); //=consumeHP
     { Returns true if healed or false if nothing to heal }
-    function Heal(Value: float; Skill: float): boolean; //=restoreHP
+    function Heal(const Value: float; const Skill: float): boolean; //=restoreHP
 
     { Abstract action preformed on Actor's death }
     Procedure Die; virtual; abstract;
@@ -199,15 +205,15 @@ Type
     { "consumption" procedures return true if success and false if failed,
       "restoration" procedures return true if something has been restored,
       "drain" procedures can drain values below zero }
-    function ConsumeSTA(Consumption: float; Skill: float): boolean;
-    function RestoreSTA(Restoration: float; Skill: float): boolean;
-    procedure DrainSTA(Drain: float;        Skill: float);
-    function ConsumeCNC(Consumption: float; Skill: float): boolean;
-    function RestoreCNC(Restoration: float; Skill: float): boolean;
-    procedure DrainCNC(Drain: float;        Skill: float);
-    function ConsumeMPH(Consumption: float; Skill: float): boolean;
-    function RestoreMPH(Restoration: float; Skill: float): boolean;
-    procedure DrainMPH(Drain: float;        Skill: float);
+    function ConsumeSTA(const Consumption: float; const Skill: float): boolean;
+    function RestoreSTA(const Restoration: float; const Skill: float): boolean;
+    procedure DrainSTA(const Drain: float;        const Skill: float);
+    function ConsumeCNC(const Consumption: float; const Skill: float): boolean;
+    function RestoreCNC(const Restoration: float; const Skill: float): boolean;
+    procedure DrainCNC(const Drain: float;        const Skill: float);
+    function ConsumeMPH(const Consumption: float; const Skill: float): boolean;
+    function RestoreMPH(const Restoration: float; const Skill: float): boolean;
+    procedure DrainMPH(const Drain: float;        const Skill: float);
   public
     { events }
     onHit: TDamageProcedure;
@@ -244,11 +250,11 @@ type
     { Look at fTarget }
     procedure LookAt;
     { Look at aPosition }
-    procedure LookAt(aPosition: TVector3);
+    procedure LookAt(const aPosition: TVector3);
     { Can this Actor see another Actor? }
-    function CanSee(a1: DCoordActor): boolean;
+    function CanSee(const a1: DCoordActor): boolean;
     { temp }
-    procedure PerformAction(doAction: DMultiPerk);
+    procedure PerformAction(const doAction: DMultiPerk);
   public
     { List of actions for this Actor }
     Actions: DPerksList;
@@ -268,7 +274,7 @@ type
   protected
     procedure doAI; override;
     { Call-back to react to external damage }
-    procedure doHit(Dam: float; Damtype: TDamageType);
+    procedure doHit(const Dam: float; const Damtype: TDamageType);
   public
     //procedure Manage; override;
     constructor Create; override;
@@ -288,7 +294,7 @@ uses SysUtils, CastleLog,
 {====================== SIMPLE ACTOR =======================================}
 {===========================================================================}
 
-procedure DSimpleActor.TeleportTo(aNav: TNavID);
+procedure DSimpleActor.TeleportTo(const aNav: TNavID);
 begin
   if LastNav<>UnitinializedNav then CurrentWorld.ReleaseNav(LastNav);
   CurrentWorld.BlockNav(aNav);
@@ -343,20 +349,20 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-procedure DCoordActor.TeleportTo(aPosition: TVector3);
+procedure DCoordActor.TeleportTo(const aPosition: TVector3);
 begin
   GetRandomDirection;
   Position := aPosition;
   toPos := Position;
 end;
-procedure DCoordActor.TeleportTo(aPosition, aDirection: TVector3);
+procedure DCoordActor.TeleportTo(const aPosition, aDirection: TVector3);
 begin
   Direction := aDirection;
   toDir := Direction;
   Position := aPosition;
   toPos := Position;
 end;
-procedure DCoordActor.TeleportTo(aNav: TNavID);
+procedure DCoordActor.TeleportTo(const aNav: TNavID);
 begin
   inherited TeleportTo(aNav);
   TeleportTo(CurrentWorld.NavToVector3(aNav));
@@ -415,13 +421,13 @@ end;
 
 {----------------------------------------------------------------------------}
 
-function DActorPhysics.CanMovePos(aPos: TVector3): boolean;{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+function DActorPhysics.CanMovePos(const aPos: TVector3): boolean;{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 var tmp: TVector3;
 begin
   //InternalCamera may be nil, but we skip the check for speed. Be careful.
   Result := InternalCamera.DoMoveAllowed(aPos,tmp,false)
 end;
-function DActorPhysics.CanMoveDir(aDir: TVector3): boolean;{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+function DActorPhysics.CanMoveDir(const aDir: TVector3): boolean;{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 var tmp: TVector3;
 begin
   //InternalCamera may be nil, but we skip the check for speed. Be careful.
@@ -457,17 +463,17 @@ end;
 
 {----------------------------------------------------------------------------}
 
-Procedure DBasicActor.SetHP(Value: float);
+Procedure DBasicActor.SetHP(const Value: float);
 begin
   If Value < fHP.Max then fHP.Current := Value else fHP.Current := fHP.Max;
   If fHP.Current < 0 then Die;
 end;
-Procedure DBasicActor.SetMaxHP(Value: float);
+Procedure DBasicActor.SetMaxHP(const Value: float);
 begin
   If Value < fHP.MaxMax then fHP.Max := Value else fHP.Max := fHP.MaxMax;
   If fHP.Max < 0 then Die;
 end;
-Procedure DBasicActor.SetMaxMaxHP(Value: float);
+Procedure DBasicActor.SetMaxMaxHP(const Value: float);
 begin
   if fHP.MaxMax < Value then Heal(Value-fHP.MaxMax,1);
   fHP.MaxMax := Value;
@@ -481,17 +487,17 @@ end;
 
 {---------------------------------------------------------------------------}
 
-Procedure DBasicActor.SetSTA(Value: float);
+Procedure DBasicActor.SetSTA(const Value: float);
 begin
   If Value < fSTA.Max then fSTA.Current := Value else fSTA.Current := fSTA.Max;
   If fSTA.Current < 0 then {EXAUSTED STATE};
 end;
-Procedure DBasicActor.SetMaxSTA(Value: float);
+Procedure DBasicActor.SetMaxSTA(const Value: float);
 begin
   If Value < fSTA.MaxMax then fSTA.Max := Value else fSTA.Max := fSTA.MaxMax;
   If fSTA.Max < 0 then {EXAUSTED STATE};
 end;
-Procedure DBasicActor.SetMaxMaxSTA(Value: float);
+Procedure DBasicActor.SetMaxMaxSTA(const Value: float);
 begin
   if fSTA.MaxMax < Value then RestoreSTA(Value-fSTA.MaxMax,1);
   fSTA.MaxMax := Value;
@@ -505,17 +511,17 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-Procedure DBasicActor.SetCNC(Value: float);
+Procedure DBasicActor.SetCNC(const Value: float);
 begin
   If Value < fCNC.Max then fCNC.Current := Value else fCNC.Current := fCNC.Max;
   If fCNC.Current < 0 then {BURN-OUT STATE};
 end;
-Procedure DBasicActor.SetMaxCNC(Value: float);
+Procedure DBasicActor.SetMaxCNC(const Value: float);
 begin
   If Value < fCNC.MaxMax then fCNC.Max := Value else fCNC.Max := fCNC.MaxMax;
   If fCNC.Max < 0 then {BURN-OUT STATE};
 end;
-Procedure DBasicActor.SetMaxMaxCNC(Value: float);
+Procedure DBasicActor.SetMaxMaxCNC(const Value: float);
 begin
   if fCNC.MaxMax < Value then RestoreCNC(Value-fCNC.MaxMax,1);
   fCNC.MaxMax := Value;
@@ -529,17 +535,17 @@ end;
 
 {---------------------------------------------------------------------------}
 
-Procedure DBasicActor.SetMPH(Value: float);
+Procedure DBasicActor.SetMPH(const Value: float);
 begin
   If Value < fMPH.Max then fMPH.Current := Value else fMPH.Current := fMPH.Max;
   If fMPH.Current < 0 then {* STATE};
 end;
-Procedure DBasicActor.SetMaxMPH(Value: float);
+Procedure DBasicActor.SetMaxMPH(const Value: float);
 begin
   If Value < fMPH.MaxMax then fMPH.Max := Value else fMPH.Max := fMPH.MaxMax;
   If fMPH.Max < 0 then {* STATE};
 end;
-Procedure DBasicActor.SetMaxMaxMPH(Value: float);
+Procedure DBasicActor.SetMaxMaxMPH(const Value: float);
 begin
   if fMPH.MaxMax < Value then RestoreMPH(Value-fMPH.MaxMax,1);
   fMPH.MaxMax := Value;
@@ -563,14 +569,33 @@ end;
 
 {---------------------------------------------------------------------------}
 
-Procedure DBasicActor.Hit(Damage: float; Skill: float);
+function DBasicActor.HPRef : PStatValue;
+begin
+  Result := @fHP;
+end;
+function DBasicActor.STARef: PStatValue;
+begin
+  Result := @fSTA;
+end;
+function DBasicActor.CNCRef: PStatValue;
+begin
+  Result := @fCNC;
+end;
+function DBasicActor.MPHRef: PStatValue;
+begin
+  Result := @fMPH;
+end;
+
+{---------------------------------------------------------------------------}
+
+Procedure DBasicActor.Hit(const Damage: float; const Skill: float);
 begin
   SetHP(HP-Damage);
   SetmaxHP(MaxHP-Damage*Skill); // todo
   if Assigned(Self.onHit) then Self.onHit(Damage, dtHealth);
 end;
 
-function DBasicActor.Heal(Value: float; Skill: float): boolean;
+function DBasicActor.Heal(const Value: float; const Skill: float): boolean;
 begin
   if (HP < MaxHP) or ((MaxHP < MaxMaxHP) and (Skill > 0)) then begin
     SetHP(HP+Value);
@@ -582,7 +607,7 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-function DBasicActor.ConsumeSTA(Consumption: float; Skill: float): boolean;
+function DBasicActor.ConsumeSTA(const Consumption: float; const Skill: float): boolean;
 begin
   if (STA > Consumption) then begin
     SetSTA(STA-Consumption);
@@ -590,7 +615,7 @@ begin
     Result := true;
   end else Result := false;
 end;
-function DBasicActor.RestoreSTA(Restoration: float; Skill: float): boolean;
+function DBasicActor.RestoreSTA(const Restoration: float; const Skill: float): boolean;
 begin
   if (STA < MaxSTA) or ((MaxSTA < MaxMaxSTA) and (Skill > 0)) then begin
     SetSTA(STA+Restoration);
@@ -599,7 +624,7 @@ begin
   end else
     Result := false;
 end;
-procedure DBasicActor.DrainSTA(Drain: float; Skill: float);
+procedure DBasicActor.DrainSTA(const Drain: float; const Skill: float);
 begin
  SetSTA(STA-Drain);
  SetMaxSTA(MaxSTA-Drain*Skill); // todo
@@ -607,7 +632,7 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-function DBasicActor.ConsumeCNC(Consumption: float; Skill: float): boolean;
+function DBasicActor.ConsumeCNC(const Consumption: float; const Skill: float): boolean;
 begin
   if (CNC > Consumption) then begin
     SetCNC(CNC-Consumption);
@@ -615,7 +640,7 @@ begin
     Result := true;
   end else Result := false;
 end;
-function DBasicActor.RestoreCNC(Restoration: float; Skill: float): boolean;
+function DBasicActor.RestoreCNC(const Restoration: float; const Skill: float): boolean;
 begin
   if (CNC < MaxCNC) or ((MaxCNC < MaxMaxCNC) and (Skill > 0)) then begin
     SetCNC(CNC+Restoration);
@@ -624,7 +649,7 @@ begin
   end else
     Result := false;
 end;
-procedure DBasicActor.DrainCNC(Drain: float; Skill: float);
+procedure DBasicActor.DrainCNC(const Drain: float; const Skill: float);
 begin
   SetCNC(CNC-Drain);
   SetMaxCNC(MaxCNC-Drain*Skill); // todo
@@ -632,7 +657,7 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-function DBasicActor.ConsumeMPH(Consumption: float; Skill: float): boolean;
+function DBasicActor.ConsumeMPH(const Consumption: float; const Skill: float): boolean;
 begin
   if (MPH > Consumption) then begin
     SetMPH(MPH-Consumption);
@@ -640,7 +665,7 @@ begin
     Result := true;
   end else Result := false;
 end;
-function DBasicActor.RestoreMPH(Restoration: float; Skill: float): boolean;
+function DBasicActor.RestoreMPH(const Restoration: float; const Skill: float): boolean;
 begin
   if (MPH < MaxMPH) or ((MaxMPH < MaxMaxMPH) and (Skill > 0)) then begin
     SetMPH(MPH+Restoration);
@@ -649,7 +674,7 @@ begin
   end else
     Result := false;
 end;
-procedure DBasicActor.DrainMPH(Drain: float; Skill: float);
+procedure DBasicActor.DrainMPH(const Drain: float; const Skill: float);
 begin
   SetMPH(MPH-Drain);
   SetMaxMPH(MaxMPH-Drain*Skill); // todo
@@ -676,7 +701,7 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-procedure DActorBody.SpawnBodyHere(SpawnBody: DBodyResource);
+procedure DActorBody.SpawnBodyHere(const SpawnBody: DBodyResource);
 begin
   Body := DBody.Create(nil);   //No one owns Body, so we'll free it manually in DActor.destroy
   //SpawnBody.CreateCreature(Window.SceneManager.Items, Position, Direction);
@@ -692,12 +717,12 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-procedure DActorBody.Spawn(aNav: TNavID; SpawnBody: DBodyResource);
+procedure DActorBody.Spawn(const aNav: TNavID; const SpawnBody: DBodyResource);
 begin
   TeleportTo(aNav);
   SpawnBodyHere(SpawnBody);
 end;
-procedure DActorBody.Spawn(aPosition: TVector3; SpawnBody: DBodyResource);
+procedure DActorBody.Spawn(const aPosition: TVector3; const SpawnBody: DBodyResource);
 begin
   TeleportTo(aPosition);
   SpawnBodyHere(SpawnBody);
@@ -705,7 +730,7 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-procedure DActorBody.SetVisible(Value: boolean);
+procedure DActorBody.SetVisible(const Value: boolean);
 begin
   Body.Exists := Value;
 end;
@@ -716,21 +741,21 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-procedure DActorBody.ForceAnimation(at: TAnimationType);
+procedure DActorBody.ForceAnimation(const at: TAnimationType);
 begin
   Body.CurrentAnimationName := AnimationToString(at);
   Body.ResetAnimation;
 end;
-procedure DActorBody.ForceAnimation(at: string);
+procedure DActorBody.ForceAnimation(const at: string);
 begin
   Body.CurrentAnimationName := at;
   Body.ResetAnimation;
 end;
-procedure DActorBody.Animation(at: TAnimationType);
+procedure DActorBody.Animation(const at: TAnimationType);
 begin
   Body.NextAnimationName := AnimationToString(at);
 end;
-procedure DActorBody.Animation(at: string);
+procedure DActorBody.Animation(const at: string);
 begin
   Body.NextAnimationName := at;
 end;
@@ -770,7 +795,7 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-function isEnemyFaction(f1,f2: TFaction): boolean;
+function isEnemyFaction(const f1,f2: TFaction): boolean;
 begin
   //todo
   if f1<>f2 then Result := true else Result := false;
@@ -814,7 +839,7 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-function DActor.CanSee(a1: DCoordActor): boolean;
+function DActor.CanSee(const a1: DCoordActor): boolean;
 begin
   if (TVector3.DotProduct(Self.Direction,(a1.Position-Self.Position))>0)
      then Result := true else Result := false;
@@ -822,7 +847,7 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-procedure DActor.PerformAction(doAction: DMultiPerk);
+procedure DActor.PerformAction(const doAction: DMultiPerk);
 begin
   if fTarget = nil then begin
     WriteLnLog('DActor.PreformAction','ERROR: Action was requested but no target specified...');
@@ -845,7 +870,7 @@ begin
   else
     WriteLnLog('DActor.LookAt','Warning: trying to look at a nil target...');
 end;
-procedure DActor.LookAt(aPosition: TVector3);
+procedure DActor.LookAt(const aPosition: TVector3);
 begin
   toDir := aPosition - Position;
   toDir[2] := 0;  //cut-off z component
@@ -917,7 +942,7 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-procedure DMonster.doHit(Dam: float; Damtype: TDamageType);
+procedure DMonster.doHit(const Dam: float; const Damtype: TDamageType);
 begin
   if Self.HP > 0 then
     Self.ForceAnimation(atHurt)

@@ -88,17 +88,13 @@ type
   {}
   DFramedBar = class(DFramedElement)
   private
-    fTarget: DBasicActor;
-    fStyle: TStatBarStyle;
-    procedure SetTarget(Value: DBasicActor);
-    procedure SetStyle(Value: TStatBarStyle);
+    fTarget: PStatValue;
+    procedure SetTarget(const Value: PStatValue);
   public
     {}
     Bar: DStatBarImage;
     {}
-    property Target: DBasicActor read fTarget write SetTarget;
-    {}
-    property Style: TStatBarStyle read fStyle write SetStyle;
+    property Target: PStatValue read fTarget write SetTarget;
     procedure ArrangeChildren; override;
     procedure SpawnChildren; override;
     constructor Create; override;
@@ -112,7 +108,7 @@ type
     HP_bar, STA_bar, CNC_bar, MPH_bar: DFramedBar;
     {target character}
     fTarget: DBasicActor; //we don't need anything "higher" than this
-    procedure SetTarget(Value: DBasicActor);
+    procedure SetTarget(const Value: DBasicActor);
   public
     procedure SpawnChildren; override;
     procedure ArrangeChildren; override;
@@ -126,9 +122,10 @@ type
   DPlayerBarsFull = class(DCompositeElement) //not a child of DPlayerBars!
   private
     {these are links for easier access to the children}
-    PartyBars: DStatBars;
+    PlayerBars: DStatBars;
     NumHealth: DFloatLabel;
     NickName: DStringLabel;
+    HealthFramed, NickFramed: DFramedElement;
     {target character}
     fTarget: DBasicActor;
     procedure SetTarget(Value: DBasicActor);
@@ -137,8 +134,6 @@ type
     property Target: DBasicActor read fTarget write SetTarget;
     procedure SpawnChildren; override;
     procedure ArrangeChildren; override;
-    //constructor Create(AOwner: TComponent); override;
-    //procedure ArrangeChildren(Animate: TAnimationStyle); override; }
   end;
 
 type
@@ -346,21 +341,11 @@ end;
 {===================== Framed bar ==========================================}
 {===========================================================================}
 
-procedure DFramedBar.SetTarget(Value: DBasicActor);
+procedure DFramedBar.SetTarget(const Value: PStatValue);
 begin
-  if fTarget<>Value then begin
+  if fTarget <> Value then begin
     fTarget := Value;
     Bar.Target := Value;
-  end;
-end;
-
-{-----------------------------------------------------------------------------}
-
-procedure DFramedBar.SetStyle(Value: TStatBarStyle);
-begin
-  if fStyle<>Value then begin
-    fStyle := Value;
-    Bar.Style := Value;
   end;
 end;
 
@@ -407,25 +392,21 @@ procedure DStatBars.SpawnChildren;
 begin
   HP_bar := DFramedBar.Create;
   HP_bar.Bar.Load(HpBarImage);
-  HP_bar.Style := sbHealth;
   HP_bar.Bar.Kind := bsVertical;
   Grab(HP_bar);
 
   STA_bar := DFramedBar.Create;
   STA_bar.Bar.Load(StaBarImage);
-  STA_bar.Style := sbStamina;
   STA_bar.Bar.Kind := bsVertical;
   Grab(STA_bar);
 
   CNC_bar := DFramedBar.Create;
   CNC_bar.Bar.Load(CncBarImage);
-  CNC_bar.Style := sbConcentration;
   CNC_bar.Bar.Kind := bsVertical;
   Grab(CNC_bar);
 
   MPH_bar := DFramedBar.Create;
   MPH_bar.Bar.Load(MphBarImage);
-  MPH_bar.Style := sbMetaphysics;
   MPH_bar.Bar.Kind := bsVertical;
   Grab(MPH_bar);
 end;
@@ -456,15 +437,15 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-procedure DStatBars.Settarget(Value: DBasicActor);
+procedure DStatBars.SetTarget(const Value: DBasicActor);
 begin
   if fTarget <> Value then begin
     fTarget := Value;
     //and copy the target to all children
-    HP_bar.Target := fTarget;
-    STA_bar.Target := fTarget;
-    CNC_bar.Target := fTarget;
-    MPH_bar.Target := fTarget;
+    HP_bar.Target := fTarget.HPRef;
+    STA_bar.Target := fTarget.STARef;
+    CNC_bar.Target := fTarget.CNCRef;
+    MPH_bar.Target := fTarget.MPHRef;
     ArrangeChildren; //in case fTarget has different set of stats
   end;
 end;
@@ -478,9 +459,9 @@ begin
   if fTarget <> Value then begin
     fTarget := Value;
     //and copy the target to all children
-    PartyBars.Target := Value;
-    NumHealth.Target := @Value.HP;
-    NickName.Target  := @Value.Nickname;
+    PlayerBars.Target := Value;
+    NumHealth.Target  := @Value.HP;
+    NickName.Target   := @Value.Nickname;
   end;
 end;
 
@@ -489,23 +470,24 @@ end;
 procedure DPlayerBarsFull.SpawnChildren;
 begin
   //inherited SpawnChildren;  <----- nothing to inherit
-  PartyBars := DStatBars.Create;
+  PlayerBars := DStatBars.Create;
   NumHealth := DFloatLabel.Create;
   NickName  := DStringLabel.Create;
 
-  //NickName.frame  := Characterbar_top;
-  //NumHealth.frame := Characterbar_bottom;
+  NickName.Base.ScaleItem := false;
+  NickName.Font := CharNickNameFont;
+  NickFramed := DFramedElement.Create(Characterbar_top);
+  NickFramed.Grab(NickName);
 
   NumHealth.Digits := 0;
   NumHealth.Base.ScaleItem := false;
   NumHealth.Font := CharHealthFont;
+  HealthFramed := DFramedElement.Create(Characterbar_bottom);
+  HealthFramed.Grab(NumHealth);
 
-  NickName.Base.ScaleItem := false;
-  NickName.Font := CharNickNameFont;
-
-  grab(PartyBars);
-  grab(NumHealth);
-  grab(NickName);
+  Grab(PlayerBars);
+  Grab(HealthFramed);
+  Grab(NickFramed);
 end;
 
 {---------------------------------------------------------------------------}
@@ -515,12 +497,20 @@ const LabelSpace = 23/800;
 begin
   //inherited ArrangeChildren;  <------- nothing to inherit
 
+  //anchor stuff to their frames
+  NickName.Base.AnchorToFrame(NickFramed.Frame);
+  NumHealth.Base.AnchorToFrame(HealthFramed.Frame);
+  //PlayerBars has a frame of its own
+
+  //anchor frames to parent
+
+
   {********** INTERFACE DESIGN BY Saito00 ******************}
 
-  //NickName. setbasesize(0, cnt_y+cnt_h-labelspace , 1, labelspace);
-  //PartyBars.setbasesize(0, cnt_y+labelspace       , 1, cnt_h-2*labelspace);
-  //NumHealth.setbasesize(0, cnt_y                  , 1, labelspace);
-
+  {NickName.  setbasesize(0, cnt_y+cnt_h-labelspace , 1, labelspace);
+  PlayerBars.setbasesize(0, cnt_y+labelspace       , 1, cnt_h-2*labelspace);
+  NumHealth. setbasesize(0, cnt_y                  , 1, labelspace);
+  }
 end;
 
 {=============================================================================}
