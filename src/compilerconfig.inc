@@ -68,3 +68,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 { Undefine rescale to save memory. Temporary. }
 {$UNDEF AllowRescale}
 
+{======================= SOME DEBUG STUFF ==================================}
+
+{$WARN 2005 off : Comment level $1 found}

@@ -18,7 +18,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 { Creates large interface blocks for different game situations containing
   large amounts of interface elements and composite interface elements }
 unit DecoInterfaceBlocks;
-
 {$INCLUDE compilerconfig.inc}
 
 interface

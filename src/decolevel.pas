@@ -29,7 +29,6 @@ uses
   SysUtils,
 
   DecoAbstractWorld, decodungeonworld, DecoDungeonGenerator,
-  DecoActor,
   DecoNavigation, decoglobal;
 
 procedure load_test_level;

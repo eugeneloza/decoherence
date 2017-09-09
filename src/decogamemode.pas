@@ -54,8 +54,6 @@ begin
 
   {release interface elements used by previous game mode}
 
-  {$hint make through switching of game interfaces}
-
   {case LastGameMode of
     {only gmLoadScreen and gmCharacterGeneration use wind so we can release it (true) after it was used}
     gmLoadScreen: GUI.FreeLoadScreen(gm<>gmCharacterGeneration);
