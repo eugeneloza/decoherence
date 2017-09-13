@@ -52,6 +52,11 @@ var { analogue to Now function, but a fast-access variable, representing
     SoftPause: float = 0.0;
     SoftPauseCoefficient: float = 1.0;
 
+    LocalTimeFlowSpeed: float = 1.0;
+
+{ Advance time for the frame }
+procedure doTime;
+
 { Gets CastleTimeUtils.Timer value from some "starting point" in a thread-safe way }
 function GetNow: DTime; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 
@@ -62,10 +67,37 @@ function GetNow: DTime; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 function GetNowThread: DTime; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 { Forces initialization of the threaded timer value. }
 function ForceGetNowThread: DTime; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
-
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 uses SysUtils, Classes{$IFDEF Windows}, SyncObjs{$ENDIF};
+
+var LastGlobalTime: DTime = -1;
+const LocalTimeRestoreSpeed = 1/2; {requires 2 seconds to restore to normal time speed}
+procedure doTime;
+begin
+  DecoNow := GetNow;
+  If LastGlobalTime = -1 then LastGlobalTime := DecoNow;
+  DeltaT := DecoNow - LastGlobalTime;
+
+  if SoftPause < deltaT then begin
+    SoftPause := -1;
+    DeltaTLocal := DeltaT * LocalTimeFlowSpeed;
+    DecoNowLocal := DecoNowLocal + DeltaTLocal;
+    //if local time is slowed, then accelerate it softly
+    if LocalTimeFlowSpeed<1 then begin
+      LocalTimeFlowSpeed += LocalTimeRestoreSpeed*DeltaT;
+      if LocalTimeFlowSpeed>1 then LocalTimeFlowSpeed := 1;
+    end;
+  end else begin
+    //if softpause is issued, then don't perform any actions in local time
+    SoftPause -= DeltaT;
+    DeltaTLocal := 0;
+    LocalTimeFlowSpeed := 0; //THIS IS NOT VERY CORRECT, as softpause may be issued by menus, not by actions only
+  end;
+  LastGlobalTime := DecoNow;
+end;
+
+{================================= TIMERS ===================================}
 
 {$IFDEF Windows}
 {************************* WINDOWS TIME **************************************}

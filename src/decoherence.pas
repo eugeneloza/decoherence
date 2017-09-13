@@ -73,39 +73,19 @@ end;
 
 {-------------------------------------------------------------------------}
 
-var LastRender: DTime = -1;
-procedure ProcessTimeEvents;
-begin
-  DecoNow := GetNow;
-  If LastRender = -1 then LastRender := DecoNow;
-  DeltaT := DecoNow - LastRender;
-
-  if SoftPause < deltaT then begin
-    SoftPause := -1;
-    DeltaTLocal := DeltaT;
-    DecoNowLocal := DecoNowLocal + DeltaTLocal;
-  end else begin
-    SoftPause -= DeltaT;
-    DeltaTLocal := 0;
-  end;
-  LastRender := DecoNow;
-
-end;
-
-{-------------------------------------------------------------------------}
-
 { this is a management procedure that takes place before
   WindowRender }
 {$PUSH}{$WARN 5024 off : Parameter "$1" not used}
 procedure WindowManage(Container : TUIContainer);
 begin
+  doTime; {advance time for this frame}
+
   if Player <> nil then begin
     Player.Manage;
     if CurrentWorld <> nil then CurrentWorld.Manage(Camera.Position);
   end;
 
   if Music <> nil then Music.Manage;
-  ProcessTimeEvents;
 end;
 {$POP}
 
