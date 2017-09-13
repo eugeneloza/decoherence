@@ -160,6 +160,7 @@
       <Unit10>
         <Filename Value="src/decolevel.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoLevel"/>
       </Unit10>
       <Unit11>
         <Filename Value="src/decogamemode.pas"/>
