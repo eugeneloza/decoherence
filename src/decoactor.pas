@@ -838,8 +838,7 @@ procedure DActor.RequestSoftPause;
 begin
   {$warning todo}
   {$hint and player in THIS battle}
-  if PlayerInBattle then
-    SoftPause := 2*SoftPauseCoefficient; {request 0.5 seconds of pause for animation}
+  if PlayerInBattle then RequestSoftPauseByAction(1);
 end;
 
 {-----------------------------------------------------------------------------}
@@ -859,7 +858,7 @@ begin
     Exit;
   end;
 
-  if (fTarget is DBasicActor) and ((Position-fTarget.Position).Length<self.CombatRange) then begin
+  if (fTarget is DBasicActor) and ((Position-fTarget.Position).Length < Self.CombatRange) then begin
     Self.Animation(atAttack);
     Self.RequestSoftPause;
     DBasicActor(fTarget).Hit(10,1);

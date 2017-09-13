@@ -57,6 +57,8 @@ var { analogue to Now function, but a fast-access variable, representing
 { Advance time for the frame }
 procedure doTime;
 
+procedure RequestSoftPauseByAction(Pause: DTime);
+
 { Gets CastleTimeUtils.Timer value from some "starting point" in a thread-safe way }
 function GetNow: DTime; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 
@@ -92,9 +94,16 @@ begin
     //if softpause is issued, then don't perform any actions in local time
     SoftPause -= DeltaT;
     DeltaTLocal := 0;
-    LocalTimeFlowSpeed := 0; //THIS IS NOT VERY CORRECT, as softpause may be issued by menus, not by actions only
   end;
   LastGlobalTime := DecoNow;
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure RequestSoftPauseByAction(Pause: DTime);
+begin
+  SoftPause := Pause*SoftPauseCoefficient; {request 1 seconds of pause for animation}
+  LocalTimeFlowSpeed := 0; {and slow down local time for next ~2 seconds}
 end;
 
 {================================= TIMERS ===================================}

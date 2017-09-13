@@ -92,7 +92,7 @@ begin
   end;}
 
   { rescale special elements }
-  if FPSLabel <> nil then FPSLabel.Rescale;
+  FPSLabel.Rescale;
 end;
 
 {-----------------------------------------------------------------------------}
