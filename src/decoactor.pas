@@ -41,6 +41,8 @@ type
     { Last Nav, where the Actor was standing }
     LastNav: TNavID;
   public
+    {}
+    isPlayer: boolean;
     { Faction this Actor belongs to }
     Faction: TFaction;
     { Teleport this Actor to aNav }
@@ -275,6 +277,7 @@ type
     procedure doAI; override;
     { Call-back to react to external damage }
     procedure doHit(const Dam: float; const Damtype: TDamageType);
+    procedure Die; override;
   public
     //procedure Manage; override;
     constructor Create; override;
@@ -312,6 +315,8 @@ end;
 
 constructor DSimpleActor.Create;
 begin
+  //inherited; <------ nothing to inherit
+  isPlayer := false;
   //nothing to create yet
 end;
 
@@ -946,11 +951,18 @@ procedure DMonster.doHit(const Dam: float; const Damtype: TDamageType);
 begin
   if Self.HP > 0 then
     Self.ForceAnimation(atHurt)
-  else
-    Self.ForceAnimation(atDie);
+
   //and show numeric representation of Dam
   //? and negative status applied ?
 end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DMonster.Die;
+begin
+  Self.ForceAnimation(atDie);
+end;
+
 
 
 
