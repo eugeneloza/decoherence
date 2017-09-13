@@ -56,6 +56,17 @@ type
 type TActorList = specialize TFPGObjectList<DSimpleActor>;
 
 type
+  {}
+  DActorGroup = class(TObject) //maybe class(DSimpleActor);
+  public
+    {}
+    Members: TActorList;
+    constructor Create; //override;
+    destructor Destroy; override;
+  end;
+
+
+type
   { Actor with full World coordinates,
     Mostly needed as a Target for AI
     and Base for Player camera mangement }
@@ -159,35 +170,35 @@ Type
     fSTA: DStatValue;
     fCNC: DStatValue;
     fMPH: DStatValue;
-    Procedure SetHP(const Value: float);
-    Procedure SetMaxHP(const Value: float);
-    Procedure SetMaxMaxHP(const Value: float);
-    Procedure SetSTA(const Value: float);
-    Procedure SetMaxSTA(const Value: float);
-    Procedure SetMaxMaxSTA(const Value: float);
-    Procedure SetCNC(const Value: float);
-    Procedure SetMaxCNC(const Value: float);
-    Procedure SetMaxMaxCNC(const Value: float);
-    Procedure SetMPH(const Value: float);
-    Procedure SetMaxMPH(const Value: float);
-    Procedure SetMaxMaxMPH(const Value: float);
+    procedure SetHP(const Value: float);
+    procedure SetMaxHP(const Value: float);
+    procedure SetMaxMaxHP(const Value: float);
+    procedure SetSTA(const Value: float);
+    procedure SetMaxSTA(const Value: float);
+    procedure SetMaxMaxSTA(const Value: float);
+    procedure SetCNC(const Value: float);
+    procedure SetMaxCNC(const Value: float);
+    procedure SetMaxMaxCNC(const Value: float);
+    procedure SetMPH(const Value: float);
+    procedure SetMaxMPH(const Value: float);
+    procedure SetMaxMaxMPH(const Value: float);
   public
     { getters and setters }
-    Property HP: float read fHP.Current write SetHP;
-    Property MaxHP: float read fHP.Max write SetMaxHP;
-    Property MaxMaxHP: float read fHP.MaxMax write SetMaxMaxHP;
+    property HP: float read fHP.Current write SetHP;
+    property MaxHP: float read fHP.Max write SetMaxHP;
+    property MaxMaxHP: float read fHP.MaxMax write SetMaxMaxHP;
     procedure ResetHP;
-    Property STA: float read fSTA.Current write SetSTA;
-    Property MaxSTA: float read fSTA.Max write SetMaxSTA;
-    Property MaxMaxSTA: float read fSTA.MaxMax write SetMaxMaxSTA;
+    property STA: float read fSTA.Current write SetSTA;
+    property MaxSTA: float read fSTA.Max write SetMaxSTA;
+    property MaxMaxSTA: float read fSTA.MaxMax write SetMaxMaxSTA;
     procedure ResetSTA;
-    Property CNC: float read fCNC.Current write SetCNC;
-    Property MaxCNC: float read fCNC.Max write SetMaxCNC;
-    Property MaxMaxCNC: float read fCNC.MaxMax write SetMaxMaxCNC;
+    property CNC: float read fCNC.Current write SetCNC;
+    property MaxCNC: float read fCNC.Max write SetMaxCNC;
+    property MaxMaxCNC: float read fCNC.MaxMax write SetMaxMaxCNC;
     procedure ResetCNC;
-    Property MPH: float read fMPH.Current write SetMPH;
-    Property MaxMPH: float read fMPH.Max write SetMaxMPH;
-    Property MaxMaxMPH: float read fMPH.MaxMax write SetMaxMaxMPH;
+    property MPH: float read fMPH.Current write SetMPH;
+    property MaxMPH: float read fMPH.Max write SetMaxMPH;
+    property MaxMaxMPH: float read fMPH.MaxMax write SetMaxMaxMPH;
     procedure ResetMPH;
     procedure ResetAll;
 
@@ -202,7 +213,7 @@ Type
     function Heal(const Value: float; const Skill: float): boolean; //=restoreHP
 
     { Abstract action preformed on Actor's death }
-    Procedure Die; virtual; abstract;
+    procedure Die; virtual; abstract;
 
     { "consumption" procedures return true if success and false if failed,
       "restoration" procedures return true if something has been restored,
@@ -231,7 +242,7 @@ Type
     { These are randoms for the actor: defense gives his defense rolls,
       Attack provides for attack rolls
       All non-important random rolls are taken by global DRND }
-    DefenseRandom,AttackRandom: TCastleRandom;
+    DefenseRandom, AttackRandom: TCastleRandom;
   public
     destructor Destroy; override;
     constructor Create; override;
@@ -277,8 +288,8 @@ type
     procedure doAI; override;
     { Call-back to react to external damage }
     procedure doHit(const Dam: float; const Damtype: TDamageType);
-    procedure Die; override;
   public
+    procedure Die; override;
     //procedure Manage; override;
     constructor Create; override;
   end;
@@ -299,7 +310,7 @@ uses SysUtils, CastleLog,
 
 procedure DSimpleActor.TeleportTo(const aNav: TNavID);
 begin
-  if LastNav<>UnitinializedNav then CurrentWorld.ReleaseNav(LastNav);
+  if LastNav <> UnitinializedNav then CurrentWorld.ReleaseNav(LastNav);
   CurrentWorld.BlockNav(aNav);
   LastNav := aNav;
 end;
@@ -327,7 +338,7 @@ end;
 procedure DCoordActor.GetRandomDirection;
 var rDir: float;
 begin
-  rDir := drnd.Random*2*Pi;
+  rDir := drnd.Random * 2*Pi;
   Direction := Vector3(sin(rDir),cos(rDir),0);
   toDir := Direction;
 end;
@@ -402,8 +413,8 @@ end;
 
 procedure DActorPhysics.doGravity;
 begin
-  if InternalCamera=nil then Exit;
-  if CanMoveDir(CurrentGravityDown-Vector3(0,0,Height)) then Position := Position+CurrentGravityDown;
+  if InternalCamera = nil then Exit;
+  if CanMoveDir(CurrentGravityDown - Vector3(0,0,Height)) then Position := Position + CurrentGravityDown;
 end;
 
 {----------------------------------------------------------------------------}
@@ -419,7 +430,7 @@ end;
 
 procedure DActorPhysics.Manage;
 begin
-  CurrentGravityDown := -DeltaTLocal*CurrentWorld.GetGravity(Position)*CurrentWorld.GravityAcceleration;
+  CurrentGravityDown := -DeltaTLocal * CurrentWorld.GetGravity(Position) * CurrentWorld.GravityAcceleration;
   inherited Manage;
   doGravity;
 end;
@@ -430,13 +441,13 @@ function DActorPhysics.CanMovePos(const aPos: TVector3): boolean;{$IFDEF SUPPORT
 var tmp: TVector3;
 begin
   //InternalCamera may be nil, but we skip the check for speed. Be careful.
-  Result := InternalCamera.DoMoveAllowed(aPos,tmp,false)
+  Result := InternalCamera.DoMoveAllowed(aPos, tmp, false)
 end;
 function DActorPhysics.CanMoveDir(const aDir: TVector3): boolean;{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 var tmp: TVector3;
 begin
   //InternalCamera may be nil, but we skip the check for speed. Be careful.
-  Result := InternalCamera.DoMoveAllowed(InternalCamera.Position+aDir,tmp,false)
+  Result := InternalCamera.DoMoveAllowed(InternalCamera.Position + aDir, tmp, false)
 end;
 
 {===========================================================================}
@@ -480,7 +491,7 @@ begin
 end;
 Procedure DBasicActor.SetMaxMaxHP(const Value: float);
 begin
-  if fHP.MaxMax < Value then Heal(Value-fHP.MaxMax,1);
+  if fHP.MaxMax < Value then Heal(Value - fHP.MaxMax,1);
   fHP.MaxMax := Value;
   If fHP.MaxMax < 0 then Die;
 end;
@@ -504,7 +515,7 @@ begin
 end;
 Procedure DBasicActor.SetMaxMaxSTA(const Value: float);
 begin
-  if fSTA.MaxMax < Value then RestoreSTA(Value-fSTA.MaxMax,1);
+  if fSTA.MaxMax < Value then RestoreSTA(Value - fSTA.MaxMax,1);
   fSTA.MaxMax := Value;
   If fSTA.MaxMax < 0 then {EXAUSTED STATE};
 end;
@@ -595,16 +606,16 @@ end;
 
 Procedure DBasicActor.Hit(const Damage: float; const Skill: float);
 begin
-  SetHP(HP-Damage);
-  SetmaxHP(MaxHP-Damage*Skill); // todo
+  SetHP(HP - Damage);
+  SetmaxHP(MaxHP - Damage * Skill); // todo
   if Assigned(Self.onHit) then Self.onHit(Damage, dtHealth);
 end;
 
 function DBasicActor.Heal(const Value: float; const Skill: float): boolean;
 begin
   if (HP < MaxHP) or ((MaxHP < MaxMaxHP) and (Skill > 0)) then begin
-    SetHP(HP+Value);
-    SetMaxHP(MaxHP+Value*Skill); // todo
+    SetHP(HP + Value);
+    SetMaxHP(MaxHP + Value * Skill); // todo
     Result := true;
   end else
     Result := false;
@@ -615,24 +626,24 @@ end;
 function DBasicActor.ConsumeSTA(const Consumption: float; const Skill: float): boolean;
 begin
   if (STA > Consumption) then begin
-    SetSTA(STA-Consumption);
-    SetMaxSTA(MaxSTA-Consumption*Skill); // todo
+    SetSTA(STA - Consumption);
+    SetMaxSTA(MaxSTA - Consumption * Skill); // todo
     Result := true;
   end else Result := false;
 end;
 function DBasicActor.RestoreSTA(const Restoration: float; const Skill: float): boolean;
 begin
   if (STA < MaxSTA) or ((MaxSTA < MaxMaxSTA) and (Skill > 0)) then begin
-    SetSTA(STA+Restoration);
-    SetMaxSTA(MaxSTA+Restoration*Skill); // todo
+    SetSTA(STA + Restoration);
+    SetMaxSTA(MaxSTA + Restoration * Skill); // todo
     Result := true;
   end else
     Result := false;
 end;
 procedure DBasicActor.DrainSTA(const Drain: float; const Skill: float);
 begin
- SetSTA(STA-Drain);
- SetMaxSTA(MaxSTA-Drain*Skill); // todo
+ SetSTA(STA - Drain);
+ SetMaxSTA(MaxSTA - Drain * Skill); // todo
 end;
 
 {-----------------------------------------------------------------------------}
@@ -640,24 +651,24 @@ end;
 function DBasicActor.ConsumeCNC(const Consumption: float; const Skill: float): boolean;
 begin
   if (CNC > Consumption) then begin
-    SetCNC(CNC-Consumption);
-    SetMaxCNC(MaxCNC-Consumption*Skill); // todo
+    SetCNC(CNC - Consumption);
+    SetMaxCNC(MaxCNC - Consumption * Skill); // todo
     Result := true;
   end else Result := false;
 end;
 function DBasicActor.RestoreCNC(const Restoration: float; const Skill: float): boolean;
 begin
   if (CNC < MaxCNC) or ((MaxCNC < MaxMaxCNC) and (Skill > 0)) then begin
-    SetCNC(CNC+Restoration);
-    SetMaxCNC(MaxCNC+Restoration*Skill); // todo
+    SetCNC(CNC + Restoration);
+    SetMaxCNC(MaxCNC + Restoration * Skill); // todo
     Result := true;
   end else
     Result := false;
 end;
 procedure DBasicActor.DrainCNC(const Drain: float; const Skill: float);
 begin
-  SetCNC(CNC-Drain);
-  SetMaxCNC(MaxCNC-Drain*Skill); // todo
+  SetCNC(CNC - Drain);
+  SetMaxCNC(MaxCNC - Drain*Skill); // todo
 end;
 
 {-----------------------------------------------------------------------------}
@@ -665,24 +676,24 @@ end;
 function DBasicActor.ConsumeMPH(const Consumption: float; const Skill: float): boolean;
 begin
   if (MPH > Consumption) then begin
-    SetMPH(MPH-Consumption);
-    SetMaxMPH(MaxMPH-Consumption*Skill); // todo
+    SetMPH(MPH - Consumption);
+    SetMaxMPH(MaxMPH - Consumption * Skill); // todo
     Result := true;
   end else Result := false;
 end;
 function DBasicActor.RestoreMPH(const Restoration: float; const Skill: float): boolean;
 begin
   if (MPH < MaxMPH) or ((MaxMPH < MaxMaxMPH) and (Skill > 0)) then begin
-    SetMPH(MPH+Restoration);
-    SetMaxMPH(MaxMPH+Restoration*Skill); // todo
+    SetMPH(MPH + Restoration);
+    SetMaxMPH(MaxMPH + Restoration * Skill); // todo
     Result := true;
   end else
     Result := false;
 end;
 procedure DBasicActor.DrainMPH(const Drain: float; const Skill: float);
 begin
-  SetMPH(MPH-Drain);
-  SetMaxMPH(MaxMPH-Drain*Skill); // todo
+  SetMPH(MPH - Drain);
+  SetMaxMPH(MaxMPH - Drain*Skill); // todo
 end;
 
 {===========================================================================}
@@ -822,9 +833,9 @@ begin
   e := nil;
   for a in DAbstractWorld3d(CurrentWorld).Actors do
   {$hint dummy, actually this is wrong, as "target" may be a friendly unit, e.g. to heal, or in case of control loss}
-  if (a<>Self) and (a is DBasicACtor) and isEnemy(Self,a) and CanSee(DCoordActor(a)) and (DBasicActor(a).HP>0) then begin
+  if (a <> Self) and (a is DBasicACtor) and isEnemy(Self, a) and CanSee(DCoordActor(a)) and (DBasicActor(a).HP > 0) then begin
     d := (DCoordActor(a).Position - Self.Position).Length;
-    if (d<Self.CombatRange) and ((d_min<d) or (d_min<0)) then begin
+    if (d < Self.CombatRange) and ((d_min < d) or (d_min < 0)) then begin
       d_min := d;
       e := a;
     end;
@@ -918,11 +929,11 @@ begin
   if fTarget<>nil then
     if ((fTarget.Position - Position).Length < Self.CombatRange) and (CanSee(fTarget)) then LookAt;
 
-  if SoftPause>0 then exit;
+  if SoftPause>0 then Exit;
 
   if fTarget<>nil then
     //tmp
-    if drnd.Random<0.005 then Self.PerformAction(nil);
+    if (drnd.Random<0.005) and CanSee(fTarget) then Self.PerformAction(nil);
 
   //if drnd.Random<0.006 then self.Animation(atAttack);
   //if drnd.Random<0.002 then self.ForceAnimation(atDie);
@@ -962,8 +973,20 @@ begin
   Self.ForceAnimation(atDie);
 end;
 
+{===========================================================================}
+{========================== ACTOR GROUP ====================================}
+{===========================================================================}
 
+constructor DActorGroup.Create;
+begin
+  inherited Create; //<------- actually may be unneeded if parent is TObject
+  Members := TActorList.Create(false);
+end;
 
+destructor DActorGroup.Destroy;
+begin
+  FreeAndNil(Members)
+end;
 
 end.
 

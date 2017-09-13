@@ -58,6 +58,7 @@ type
   {player character - the most complex actor available :)}
   DPlayerCharacter = class(DActor)
   public
+    procedure doAI; override;//not sure, maybe, move AI higher? Or player will use AI?
     procedure Die; override;
     constructor Create; override;
     destructor Destroy; override;
@@ -70,10 +71,8 @@ type DCharList = specialize TFPGObjectList<DPlayerCharacter>;
 type TMoveDirection = (mdForward,mdBack,mdLeft,mdRight);
 
 type
-  { Physical manifestation of Player in the world
-    including camera
-    party characters }
-  DParty = class(TObject)
+  { }
+  DParty = class(DActorGroup)
   private
     { Some day these will become variables / todo }
     { Speed in meters per second }
@@ -228,8 +227,8 @@ begin
   if CameraInitialized then begin
     aFriction := AngularFriction*DeltaT;
     if aFriction>1 then aFriction := 1;
-    Camera.Direction := (1-aFriction)*Camera.Direction+aFriction*CameraMan.Direction;
-    Camera.Up := (1-aFriction)*Camera.Up + aFriction*CameraMan.Up;
+    Camera.Direction := (1-aFriction) * Camera.Direction + aFriction*CameraMan.Direction;
+    Camera.Up := (1-aFriction) * Camera.Up + aFriction*CameraMan.Up;
   end else begin
     Camera.Direction := CameraMan.Direction;
     Camera.Up := CameraMan.Up;
@@ -364,6 +363,14 @@ end;
 Procedure DPlayerCharacter.Die;
 begin
   WriteLnLog('DPlayerCharacter.die','Character has entered clinical death state');
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DPlayerCharacter.doAI;
+begin
+  //inherited doAI; <---------- player characters have unique AI
+  //just do nothing for now;
 end;
 
 {----------------------------------------------------------------------------}

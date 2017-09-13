@@ -42,7 +42,7 @@ var { analogue to Now function, but a fast-access variable, representing
       works ~200 times faster than SysUtils.Now so should be used anywhere possible
       Updated once per frame}
     DecoNow: DTime;
-    deltaT: DTime;
+    DeltaT: DTime;
     { analogue to Now function, but a fast-access variable, representing
       current in-game time (time where actions take place)
       Updated once per frame }
@@ -51,13 +51,12 @@ var { analogue to Now function, but a fast-access variable, representing
 
     SoftPause: float = 0.0;
     SoftPauseCoefficient: float = 1.0;
-
     LocalTimeFlowSpeed: float = 1.0;
 
 { Advance time for the frame }
 procedure doTime;
 
-procedure RequestSoftPauseByAction(Pause: DTime);
+procedure RequestSoftPauseByAction(PauseSeconds: DTime);
 
 { Gets CastleTimeUtils.Timer value from some "starting point" in a thread-safe way }
 function GetNow: DTime; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
@@ -86,9 +85,9 @@ begin
     DeltaTLocal := DeltaT * LocalTimeFlowSpeed;
     DecoNowLocal := DecoNowLocal + DeltaTLocal;
     //if local time is slowed, then accelerate it softly
-    if LocalTimeFlowSpeed<1 then begin
+    if LocalTimeFlowSpeed < 1 then begin
       LocalTimeFlowSpeed += LocalTimeRestoreSpeed*DeltaT;
-      if LocalTimeFlowSpeed>1 then LocalTimeFlowSpeed := 1;
+      if LocalTimeFlowSpeed > 1 then LocalTimeFlowSpeed := 1;
     end;
   end else begin
     //if softpause is issued, then don't perform any actions in local time
@@ -100,9 +99,9 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure RequestSoftPauseByAction(Pause: DTime);
+procedure RequestSoftPauseByAction(PauseSeconds: DTime);
 begin
-  SoftPause := Pause*SoftPauseCoefficient; {request 1 seconds of pause for animation}
+  SoftPause := PauseSeconds*SoftPauseCoefficient; {request PauseSeconds seconds of pause for some animations}
   LocalTimeFlowSpeed := 0; {and slow down local time for next ~2 seconds}
 end;
 
