@@ -196,6 +196,10 @@ begin
 
   //Load_test_level; //remake it
   Window.OnBeforeRender := @WindowManage;
+  //Assign window events
+  Window.OnPress := @doPress;
+  Window.onRelease := @doRelease;
+  Window.OnMotion := @doMotion;
 
   LoadCompleted := true;
 end;
@@ -231,10 +235,6 @@ begin
   WritelnLog('Allow rescale',{$IFDEF AllowRescale}'ON'{$ELSE}'OFF'{$ENDIF});
   WritelnLog('ApplicationInitialize','Init');
 
-  //Assign window events
-  Window.OnPress := @doPress;
-  Window.onRelease := @doRelease;
-  Window.OnMotion := @doMotion;
   //Application.LimitFPS := 60;
 
   //create GUI
@@ -254,14 +254,14 @@ begin
   WriteLnLog('ApplicationInitialize','Init finished');
 
   LoadThread := DLoadGameThread.Create(true);
-  LoadThread.Priority := tpNormal;
-  LoadThread.FreeOnTerminate := true;
   {$WARNING BUUUUUUUUUUUUUUUUUG!!!!!}
 
   {$DEFINE NoThreads}
   {$IFDEF Linux}{$IFNDEF RELEASE}{$DEFINE NoThreads}{$ENDIF}{$ENDIF}
 
   {$IFNDEF NoThreads}
+  LoadThread.Priority := tpNormal;
+  LoadThread.FreeOnTerminate := true;
   LoadThread.Start;
   {$ELSE}
   LoadThread.Execute;
@@ -282,7 +282,7 @@ Initialization
 
   SetLoadingImage;
 
-  Window := TCastleWindowTouch.create(Application);
+  Window := TCastleWindowTouch.Create(Application);
 
   Window.DoubleBuffer := true;//true;             //what's the difference? speed? memory?
 
