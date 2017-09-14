@@ -61,7 +61,7 @@ type
   DFramedElement = class(DCompositeElement)
   private
     fFrame: DFrameImage;
-    procedure SetFrame(Value: DFrameImage);
+    procedure SetFrame(const Value: DFrameImage);
   public
     {}
     property Frame: DFrameImage read fFrame write SetFrame;
@@ -128,7 +128,7 @@ type
     HealthFramed, NickFramed: DFramedElement;
     {target character}
     fTarget: DBasicActor;
-    procedure SetTarget(Value: DBasicActor);
+    procedure SetTarget(const Value: DBasicActor);
   public
     {the character being monitored}
     property Target: DBasicActor read fTarget write SetTarget;
@@ -140,18 +140,22 @@ type
   { character portrait. Some day it might be replaced for TUIContainer of
     the 3d character face :) Only 2D inanimated image for now... }
   DPortrait = class(DFramedElement)
-  public
-    {this is a BUG, but I won't fix it now, it requires remaking ALL THE INTERFACE}
-  {  DamageOverlay: DSingleInterfaceElement;
-    DamageLabel: DSingleInterfaceElement;  }
+  private
+    {}
+    Portrait: DPlayerPortrait;
+    {}
+    DamageOverlay: DStaticImage; //static at this moment
+    {}
+    DamageLabel: DDamageLabel;
   private
     fTarget: DPlayerCharacter;
-    procedure SetTarget(Value: DPlayerCharacter);
+    procedure SetTarget(const Value: DPlayerCharacter);
   public
     {Player character which portrait is displayed}
     property Target: DPlayerCharacter read fTarget write SetTarget;
-   { constructor Create(AOwner: TComponent); override;
-    procedure doHit(Dam: float; DamType: TDamageType);}
+    procedure doHit(const Dam: float; const DamType: TDamageType);
+    procedure SpawnChildren; override;
+    procedure ArrangeChildren; override;
   end;
 
 {
@@ -280,7 +284,7 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-procedure DFramedElement.SetFrame(Value: DFrameImage);
+procedure DFramedElement.SetFrame(const Value: DFrameImage);
 begin
   if fFrame<>Value then begin
     fFrame := Value;
@@ -454,7 +458,7 @@ end;
 {=============== Player bars with nickname and health label ==================}
 {=============================================================================}
 
-procedure DPlayerBarsFull.SetTarget(Value: DBasicActor);
+procedure DPlayerBarsFull.SetTarget(const Value: DBasicActor);
 begin
   if fTarget <> Value then begin
     fTarget := Value;
@@ -502,6 +506,7 @@ begin
   NumHealth.Base.AnchorToFrame(HealthFramed.Frame);
   //PlayerBars has a frame of its own
 
+
   //anchor frames to parent
 
 
@@ -517,46 +522,44 @@ end;
 {========================== Character portrait ===============================}
 {=============================================================================}
 
-procedure DPortrait.SetTarget(Value: DPlayerCharacter);
+procedure DPortrait.SetTarget(const Value: DPlayerCharacter);
 begin
   if fTarget <> Value then begin
     fTarget := value;
     //DStaticImage(content).FreeImage;
     WriteLnLog('DPortrait.SetTarget','Load from portrait');
     //DStaticImage(content).Load(Portrait_img[drnd.Random(Length(Portrait_img))]);  //todo
-    //fTarget.onHit := @Self.doHit;
+    fTarget.onHit := @Self.doHit;
+    ArrangeChildren;
   end;
 end;
 
 {---------------------------------------------------------------------------}
 
-{constructor DPortrait.create(AOwner: TComponent);
-var tmp_staticimage: DStaticImage;
-    tmp_label: DLabel;
+procedure DPortrait.SpawnChildren;
 begin
-  inherited create(AOwner);
-  content := DStaticImage.create(self);
-
-  DamageOverlay := DSingleInterfaceElement.create(self);
-  tmp_staticimage := DStaticImage.create(self);
-  DamageOverlay.content := tmp_staticimage;
+  inherited SpawnChildren;
+  Portrait:= DPlayerPortrait.Create;
+  Grab(Portrait);
+  DamageOverlay:= DStaticImage.Create;
   Grab(DamageOverlay);
-//  DamageOverlay.ScaleToParent := true;
-
-  DamageLabel := DSingleInterfaceElement.create(self);
-  tmp_label := DLabel.create(self);
-  tmp_label.ScaleLabel := false;
-  tmp_label.Font := PlayerDamageFont;
-  DamageLabel.content := tmp_label;
-  Grab(damageLabel);
-//  DamageLabel.ScaleToParent := true;
-end;}
+  DamageLabel:= DDamageLabel.Create;
+  Grab(DamageLabel);
+end;
 
 {---------------------------------------------------------------------------}
 
-{procedure DPortrait.doHit(dam: float; damtype: TDamageType);
+procedure DPortrait.ArrangeChildren;
 begin
-  DCharacterSpace(parent).doSlideIn;
+  inherited ArrangeChildren;
+  //todo
+end;
+
+{---------------------------------------------------------------------------}
+
+procedure DPortrait.doHit(const dam: float; const damtype: TDamageType);
+begin
+  {DCharacterSpace(parent).doSlideIn;
   DCharacterSpace(parent).timer.settimeout(PortraitTimeOut);
   (damageOverlay.content as DStaticImage).FreeImage;
   case damtype of
@@ -575,8 +578,8 @@ begin
     DamageLabel.Content.AnimateTo(asFadeIn);
     DLabel(damageLabel.content).Text := IntToStr(Round(Dam));
     DamageLabel.Rescale;
-  end;
-end;}
+  end;}
+end;
 
 {=============================================================================}
 {============================== Integer edit =================================}

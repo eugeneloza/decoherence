@@ -90,6 +90,13 @@ type
   end;
 
 type
+  {}
+  DDamageLabel = class(DFloatLabel)
+  public
+    //does nothing yet.
+  end;
+
+type
   { Debug label that counts FPS
       Practically it just increases FPS by 1 each CountFPS call
       and changes displayed value approx once per second }

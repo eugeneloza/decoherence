@@ -25,6 +25,7 @@ interface
 uses Classes, fgl, CastleVectors,
   DecoActor, DecoRaceProfession, DecoPerks,
   DecoNavigationNetwork,
+  DecoImages,
   DecoGlobal;
 
 const MaxParty = 6; {0..6 = 7 characters}
@@ -53,6 +54,9 @@ type
     procedure ResetAngles;
     constructor Create; override;
   end;
+
+{ at this point portraits are static }
+type DPlayerPortrait = DStaticImage;
 
 type
   {player character - the most complex actor available :)}
