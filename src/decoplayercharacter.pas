@@ -75,7 +75,8 @@ type DCharList = specialize TFPGObjectList<DPlayerCharacter>;
 type TMoveDirection = (mdForward,mdBack,mdLeft,mdRight);
 
 type
-  { }
+  {Player party containing and managing a group of a few characters (no less than one)
+     in a more convenient and extended way DActorGroup does}
   DParty = class(DActorGroup)
   private
     { Some day these will become variables / todo }
@@ -125,12 +126,13 @@ type DPartyList = specialize TFPGObjectList<DParty>;
 
 
 type
-  {}
+  {Container for all player parties
+     together with basic mouse/touch/keyboard input handle}
   DPlayerControl = class(TObject)
   public
-    {}
+    {A list of player's parties (should contain at least 1 record)}
     Parties: DPartyList;
-    {}
+    {Reference to current player party (the one controlled by the player at the moment)}
     CurrentParty: DParty;
   private
     isAccelerating: boolean;

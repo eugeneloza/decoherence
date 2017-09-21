@@ -90,10 +90,10 @@ type
   end;
 
 type
-  {}
+  {A label to display damage over player character portrait or over other actors models}
   DDamageLabel = class(DFloatLabel)
   public
-    //does nothing yet.
+    //does nothing yet. Should consist of "two labels" one for integer and one for flot part with different font size
   end;
 
 type

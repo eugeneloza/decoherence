@@ -41,7 +41,7 @@ type
     { Last Nav, where the Actor was standing }
     LastNav: TNavID;
   public
-    {}
+    {if this entity is a player character?}
     isPlayer: boolean;
     { Faction this Actor belongs to }
     Faction: TFaction;
@@ -56,10 +56,10 @@ type
 type TActorList = specialize TFPGObjectList<DSimpleActor>;
 
 type
-  {}
+  {A group of actors, that can manage it's Members}
   DActorGroup = class(TObject) //maybe class(DSimpleActor);
   public
-    {}
+    {a list of actors in this ActorGroup}
     Members: TActorList;
     constructor Create; //override;
     destructor Destroy; override;
