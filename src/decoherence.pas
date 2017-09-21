@@ -264,6 +264,7 @@ begin
   LoadThread.FreeOnTerminate := true;
   LoadThread.Start;
   {$ELSE}
+  LoadThread.FreeOnTerminate := false;
   LoadThread.Execute;
   FreeAndNil(LoadThread);
   {$ENDIF}

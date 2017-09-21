@@ -159,6 +159,7 @@ begin
   GenerateButton.Enabled := false;
   FreeAndNil(DungeonMap);
   GENERATOR := D3dDungeonGenerator.Create;
+  GENERATOR.FreeOnTerminate := false; //important on Windows
   //GENERATOR.load('');
   FreeAndNil(Generator.parameters); //purge autocreated parameters
   GENERATOR.parameters := GetMapParameters;  //will be autofreed by GENERATOR destructor
