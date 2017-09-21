@@ -33,7 +33,8 @@ uses
   DecoGlobal;
 
 {$IFNDEF Android}
-const NormalFontFile = 'LinBiolinum_R_G.ttf';
+const NormalFontFile = 'Xolonium-Regular.ttf';
+const BoldFontFile = 'Xolonium-Bold.ttf';
 {$ENDIF}
 
 const dLineBreak = sLineBreak;
