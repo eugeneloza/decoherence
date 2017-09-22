@@ -83,6 +83,21 @@ type
     constructor Create(const aImage: TCastleImage; const aFrame: DRectagonalFrame);
   end;
 
+type
+  { ... }
+  DHealthLabel = class(DFramedElement)
+  private
+    fTarget: DBasicActor; //we don't need anything "higher" than this
+    procedure SetTarget(const Value: DBasicActor);
+  public
+    {}
+    Lab: DFloatLabel;
+    {the character being monitored}
+    property Target: DBasicActor read fTarget write SetTarget;
+    procedure ArrangeChildren; override;
+    procedure SpawnChildren; override;
+  end;
+
 
 type
   {}
@@ -339,6 +354,36 @@ begin
   inherited ArrangeChildren;
   Image.Base.AnchorToFrame(Frame);
   Image.SetBaseSize(0,0,1,1);
+end;
+
+{=============================================================================}
+
+procedure DHealthLabel.SpawnChildren;
+begin
+  inherited SpawnChildren;
+  Lab := DFloatLabel.Create;
+  Lab.Digits := 0;
+  Grab(Lab);
+  Frame.Frame := Characterbar_Bottom;
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DHealthLabel.ArrangeChildren;
+begin
+  inherited ArrangeChildren;
+  Lab.Base.AnchorToFrame(Frame);
+  Lab.SetBaseSize(0,0,1,1);
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DHealthLabel.SetTarget(const Value: DBasicActor);
+begin
+  if fTarget <> Value then begin
+    fTarget := Value;
+    Lab.Target := @Value.HP;
+  end;
 end;
 
 {===========================================================================}
