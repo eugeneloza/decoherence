@@ -444,17 +444,25 @@ begin
   Rescale;
 end;
 procedure DStaticImage.AfterLoad;
+var FATAL_ERROR: boolean = false;
 begin
   try
     Base.RealWidth := SourceImage.Width;
     Base.RealHeight := SourceImage.Height;
   except
-    on E: Exception do begin
-                         //WriteLnLog('DStaticImage.AfterLoad','FATAL: Image has been freed before load completed. ABORT. '+E.Message);
-                         FreeImage;
-                         Exit;
+    on E: Exception do
+    begin
+      FATAL_ERROR := true;
+      FreeImage;
     end;
   end;
+  if FATAL_ERROR then
+  begin
+    {well... this never happens. Seems like the procedure is over on Exception}
+    WriteLnLog('DStaticImage.AfterLoad','FATAL: Image has been freed before load completed. ABORT. '{+E.Message});
+    Exit;
+  end;
+
   ImageLoaded := true;
   ImageReady := false;
 end;
