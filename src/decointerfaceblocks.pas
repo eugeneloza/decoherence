@@ -127,12 +127,12 @@ end;
 
 procedure DLoadScreen.ReloadFact;
 begin
-  MainLabel.SetBaseSize(0.03,0.8,0.4,1);
-  MainLabel.Base.w := Round(Window.Width/2); //BUG
+  MainLabel.SetBaseSize(0.03,0.8,0.4,0.1);
+  //MainLabel.Base.w := Round(Window.Width/2); //BUG
   MainLabel.text := LoadScreenMainText;
 
-  FloaterLabel.SetBaseSize(0,2/3,0.3,1); //need to reset it each time
-  FloaterLabel.Base.w := Round(0.9 * Window.Width/3); //BUG
+  FloaterLabel.SetBaseSize(0,2/3,0.3,0.1); //need to reset it each time
+  //FloaterLabel.Base.w := Round(0.9 * Window.Width/3); //BUG
   FloaterLabel.Text := GetRandomFact;
   FloaterLabel.ResetPhase;
 

@@ -115,6 +115,7 @@ type
     procedure SetFloatCoord(const afx1,afy1,afx2,afy2: float);
     procedure SetFloatFull(const afx1,afy1,afx2,afy2,aOpacity: float);
     procedure SetFloatSize(const afx1,afy1,afWidth,afHeight: float);
+    procedure SetFloatSizeFull(const afx1,afy1,afWidth,afHeight,aOpacity: float);
     procedure SetIntCoord(const ax1,ay1,ax2,ay2: integer);
     procedure SetIntFull(const ax1,ay1,ax2,ay2: integer; const aOpacity: float);
     procedure SetIntSize(const ax1,ay1,aWidth,aHeight: integer);
@@ -406,6 +407,7 @@ begin
   x1 := cx1 + Round(cw * fx1) + Anchor[asLeft].Gap;
   y1 := cy1 + Round(ch * fy1) + Anchor[asTop].Gap;
   if ScaleItem then begin
+    {$HINT this may leave x2,y2,w,h uninitialized}
     x2 := cx1 + Round(cw * fx2) - Anchor[asRight].Gap;
     y2 := cy1 + Round(ch * fy2) - Anchor[asBottom].Gap;
     w := x2 - x1;
@@ -450,10 +452,15 @@ procedure DAbstractContainer.SetFloatSize(const afx1,afy1,afWidth,afHeight: floa
 begin
   fx1 := afx1;
   fy1 := afy1;
-  fx2 := - (1 - afWidth - afx1);
-  fy2 := - (1 - afHeight - afy1);
+  fx2 := afx1+afWidth;//- (1 - afWidth - afx1);
+  fy2 := afy1+afHeight;//- (1 - afHeight - afy1);
 
   FloatToInteger;
+end;
+procedure DAbstractContainer.SetFloatSizeFull(const afx1,afy1,afWidth,afHeight,aOpacity: float);
+begin
+  BaseOpacity := aOpacity;
+  SetFloatSize(afx1,afy1,afWidth,afHeight);
 end;
 procedure DAbstractContainer.SetIntCoord(const ax1,ay1,ax2,ay2: integer);
 begin
@@ -722,7 +729,7 @@ end;
 
 procedure DAbstractElement.SetBaseSize(const NewX,NewY,NewW,NewH: float;NewO: float=1; const Animate: TAnimationStyle = asNone);
 begin
-  Base.SetFloatFull(NewX,NewY,NewW,NewH,NewO);
+  Base.SetFloatSizeFull(NewX,NewY,NewW,NewH,NewO);
   AnimateTo(Animate);
 end;
 

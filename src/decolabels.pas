@@ -170,9 +170,24 @@ end;
 {----------------------------------------------------------------------------}
 
 procedure DLabel.PrepareTextImage;
+var tmpflg: boolean;
 begin
   ImageReady := false;
   ImageLoaded := false;
+
+  if Base.w = 0 then begin
+    {an ugly bugfix that leaves item uninitialized if not scaled completely
+     important for scaling labels, as the label "width" is a parameter}
+    tmpflg := Base.ScaleItem;
+    Base.ScaleItem := true;
+    Base.FloatToInteger;
+    Base.ScaleItem := tmpflg;
+    WriteLnLog('DLabel.PrepareTextImage','Warning! Label width is not initialized! Trying to w='+inttostr(Base.w));
+    {WriteLnLog('fx1',floatToStr(base.fx1));
+    WriteLnLog('fx2',floatToStr(base.fx2));
+    WriteLnLog('fy1',floatToStr(base.fy1));
+    WriteLnLog('fy2',floatToStr(base.fy2));}
+  end;
 
   FreeAndNil(BrokenString);
   BrokenString := Font.BreakStings(fText, Base.w);
