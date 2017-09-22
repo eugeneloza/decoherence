@@ -98,6 +98,21 @@ type
     procedure SpawnChildren; override;
   end;
 
+type
+  { ... }
+  DNameLabel = class(DFramedElement)
+  private
+    fTarget: DBasicActor; //we don't need anything "higher" than this
+    procedure SetTarget(const Value: DBasicActor);
+  public
+    {}
+    Lab: DStringLabel;
+    {the character being monitored}
+    property Target: DBasicActor read fTarget write SetTarget;
+    procedure ArrangeChildren; override;
+    procedure SpawnChildren; override;
+  end;
+
 
 type
   {}
@@ -383,6 +398,35 @@ begin
   if fTarget <> Value then begin
     fTarget := Value;
     Lab.Target := @Value.HP;
+  end;
+end;
+
+{=============================================================================}
+
+procedure DNameLabel.SpawnChildren;
+begin
+  inherited SpawnChildren;
+  Lab := DStringLabel.Create;
+  Grab(Lab);
+  Frame.Frame := Characterbar_Top;
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DNameLabel.ArrangeChildren;
+begin
+  inherited ArrangeChildren;
+  Lab.Base.AnchorToFrame(Frame);
+  Lab.SetBaseSize(0,0,1,1);
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DNameLabel.SetTarget(const Value: DBasicActor);
+begin
+  if fTarget <> Value then begin
+    fTarget := Value;
+    Lab.Target := @Value.Nickname;
   end;
 end;
 
