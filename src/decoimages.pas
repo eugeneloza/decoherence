@@ -445,8 +445,16 @@ begin
 end;
 procedure DStaticImage.AfterLoad;
 begin
-  Base.RealWidth := SourceImage.Width;
-  Base.RealHeight := SourceImage.Height;
+  try
+    Base.RealWidth := SourceImage.Width;
+    Base.RealHeight := SourceImage.Height;
+  except
+    on E: Exception do begin
+                         //WriteLnLog('DStaticImage.AfterLoad','FATAL: Image has been freed before load completed. ABORT. '+E.Message);
+                         FreeImage;
+                         Exit;
+    end;
+  end;
   ImageLoaded := true;
   ImageReady := false;
 end;
