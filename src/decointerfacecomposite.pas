@@ -153,7 +153,7 @@ type
   private
     {these are links for easier access to the children}
     PlayerBars: DStatBars;
-    NumHealth: DHealthLabel;
+    Health: DHealthLabel;
     NickName: DNameLabel;
     {target character}
     fTarget: DBasicActor;
@@ -554,7 +554,7 @@ begin
     fTarget := Value;
     //and copy the target to all children
     PlayerBars.Target := Value;
-    NumHealth.Target  := Value;
+    Health.Target  := Value;
     NickName.Target   := Value;
   end;
 end;
@@ -565,11 +565,11 @@ procedure DPlayerBarsFull.SpawnChildren;
 begin
   //inherited SpawnChildren;  <----- nothing to inherit
   PlayerBars := DStatBars.Create;
-  NumHealth := DHealthLabel.Create;
+  Health := DHealthLabel.Create;
   NickName  := DNameLabel.Create;
 
   Grab(PlayerBars);
-  Grab(NumHealth);
+  Grab(Health);
   Grab(NickName);
 end;
 
@@ -580,7 +580,13 @@ const LabelSpace = 23/800;
 begin
   //inherited ArrangeChildren;  <------- nothing to inherit
 
-
+  NickName.Base.AnchorTo(Self.Base); //AnchorToFrame(Frame);
+  NickName.Base.Anchor[asBottom].AlignTo := noAlign;
+  Health.Base.AnchorTo(Self.Base); //AnchorToFrame(Frame);
+  Health.Base.Anchor[asTop].AlignTo := noAlign;
+  PlayerBars.Base.AnchorTo(Self.Base); //AnchorToFrame(Frame);
+  PlayerBars.Base.Anchor[asTop].Anchor := NickName.Base;
+  PlayerBars.Base.Anchor[asBottom].Anchor := Health.Base;
 
   {********** INTERFACE DESIGN BY Saito00 ******************}
 
