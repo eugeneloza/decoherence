@@ -62,7 +62,7 @@ end;
 
 var DefaultFont: DFont;
 
-    CharHealthFont, CharNickNameFont: DFont;
+    PlayerHealthFont, PlayerNameFont: DFont;
     LoadScreenFont: DFont;
     PlayerDamageFont: DFont;
     DebugFont: DFont;
@@ -82,8 +82,8 @@ begin
   DefaultFont := RegularFont16;
   DebugFont := RegularFont12;
 
-  CharHealthFont := RegularFont12;
-  CharNickNameFont := RegularFont12;
+  PlayerHealthFont := RegularFont12;
+  PlayerNameFont := RegularFont12;
 
   LoadScreenFont := RegularFont16;
 

@@ -153,9 +153,8 @@ type
   private
     {these are links for easier access to the children}
     PlayerBars: DStatBars;
-    NumHealth: DFloatLabel;
-    NickName: DStringLabel;
-    HealthFramed, NickFramed: DFramedElement;
+    NumHealth: DHealthLabel;
+    NickName: DNameLabel;
     {target character}
     fTarget: DBasicActor;
     procedure SetTarget(const Value: DBasicActor);
@@ -376,8 +375,9 @@ end;
 procedure DHealthLabel.SpawnChildren;
 begin
   inherited SpawnChildren;
-  Lab := DFloatLabel.Create;
+  Lab := DFloatLabel.Create; //scale=false
   Lab.Digits := 0;
+  Lab.Font := PlayerHealthFont;
   Grab(Lab);
   Frame.Frame := Characterbar_Bottom;
 end;
@@ -406,7 +406,8 @@ end;
 procedure DNameLabel.SpawnChildren;
 begin
   inherited SpawnChildren;
-  Lab := DStringLabel.Create;
+  Lab := DStringLabel.Create;  //scale=false
+  Lab.Font := PlayerNameFont;
   Grab(Lab);
   Frame.Frame := Characterbar_Top;
 end;
@@ -553,8 +554,8 @@ begin
     fTarget := Value;
     //and copy the target to all children
     PlayerBars.Target := Value;
-    NumHealth.Target  := @Value.HP;
-    NickName.Target   := @Value.Nickname;
+    NumHealth.Target  := Value;
+    NickName.Target   := Value;
   end;
 end;
 
@@ -564,23 +565,12 @@ procedure DPlayerBarsFull.SpawnChildren;
 begin
   //inherited SpawnChildren;  <----- nothing to inherit
   PlayerBars := DStatBars.Create;
-  NumHealth := DFloatLabel.Create;
-  NickName  := DStringLabel.Create;
-
-  NickName.Base.ScaleItem := false;
-  NickName.Font := CharNickNameFont;
-  NickFramed := DFramedElement.Create(Characterbar_top);
-  NickFramed.Grab(NickName);
-
-  NumHealth.Digits := 0;
-  NumHealth.Base.ScaleItem := false;
-  NumHealth.Font := CharHealthFont;
-  HealthFramed := DFramedElement.Create(Characterbar_bottom);
-  HealthFramed.Grab(NumHealth);
+  NumHealth := DHealthLabel.Create;
+  NickName  := DNameLabel.Create;
 
   Grab(PlayerBars);
-  Grab(HealthFramed);
-  Grab(NickFramed);
+  Grab(NumHealth);
+  Grab(NickName);
 end;
 
 {---------------------------------------------------------------------------}
@@ -590,13 +580,6 @@ const LabelSpace = 23/800;
 begin
   //inherited ArrangeChildren;  <------- nothing to inherit
 
-  //anchor stuff to their frames
-  NickName.Base.AnchorToFrame(NickFramed.Frame);
-  NumHealth.Base.AnchorToFrame(HealthFramed.Frame);
-  //PlayerBars has a frame of its own
-
-
-  //anchor frames to parent
 
 
   {********** INTERFACE DESIGN BY Saito00 ******************}
