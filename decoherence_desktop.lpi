@@ -107,7 +107,7 @@
         <PackageName Value="castle_base"/>
       </Item2>
     </RequiredPackages>
-    <Units Count="42">
+    <Units Count="43">
       <Unit0>
         <Filename Value="decoherence_desktop.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -309,6 +309,11 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="DecoInterfaceLoader"/>
       </Unit41>
+      <Unit42>
+        <Filename Value="src/decoimageprocess.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoImageProcess"/>
+      </Unit42>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
