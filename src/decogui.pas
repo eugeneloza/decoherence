@@ -38,7 +38,9 @@ Type
     constructor Create; override;
     destructor Destroy; override;
   public
-    procedure tmpInterface;
+    {}
+    procedure LoadScreen;
+    procedure PartyInterface;
 end;
 
 var GUI: DInterfaceContainer;
@@ -113,11 +115,15 @@ end;
 {==================== INTERFACE MODES ======================================}
 {===========================================================================}
 
-procedure DInterfaceContainer.tmpInterface;
-var tmp: DInterfaceElement;
+procedure DInterfaceContainer.LoadScreen;
 begin
-  tmp := DLoadScreen.Create;
-  Grab(tmp);
+  Self.Clear;
+  Grab(DLoadScreen.Create);
+end;
+
+procedure DInterfaceContainer.PartyInterface;
+begin
+  Self.Clear; //make it more optimal?
 end;
 
 end.

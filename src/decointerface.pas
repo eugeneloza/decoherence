@@ -269,6 +269,8 @@ Type
   public
     {assign given element as a child and sets its parent to self}
     procedure Grab(const Child: DSingleInterfaceElement);
+    { removes and frees all children }
+    procedure Clear;
     {}
     {procedure RescaleToChildren(animate: TAnimationStyle);  }
   public
@@ -983,6 +985,13 @@ begin
   Children.Add(Child);
   if (Child is DSingleInterfaceElement) then DSingleInterfaceElement(Child).Parent := Self;
   //{Child.ID := }InterfaceList.Add(Child); //global ID of the element
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DInterfaceElement.Clear;
+begin
+  Children.Clear;
 end;
 
 {----------------------------------------------------------------------------}

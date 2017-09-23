@@ -138,7 +138,7 @@ begin
     end;
   end;
 //  SetGameMode(gmCharacterGeneration);
-  //InitTestLevel;                         //ugly! I'll fix this soon.
+  InitTestLevel;                         //ugly! I'll fix this soon.
 end;
 {$POP}
 
@@ -194,7 +194,7 @@ begin
 
   InitPerks;
 
-  //Load_test_level; //remake it
+  Load_test_level; //remake it
   Window.OnBeforeRender := @WindowManage;
   //Assign window events
   Window.OnPress := @doPress;
@@ -243,7 +243,7 @@ begin
   InitLoadScreen;
   GUI := DInterfaceContainer.Create;
   GUI.Rescale;
-  GUI.tmpInterface;
+  GUI.PartyInterface;
 
   WritelnLog('ApplicationInitialize','Initialize interface');
 
