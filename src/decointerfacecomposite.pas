@@ -85,6 +85,26 @@ type
 
 type
   { ... }
+  DButton = class(DFramedElement)
+  private
+    {
+      used only to check if the image=Value}
+    OldImage: TCastleImage;
+    {}
+    Image_out,Image_over: DStaticImage;
+    procedure SetImage(Value: TCastleImage);
+    procedure MouseOver(const Sender: DAbstractElement; const x,y: integer);
+    procedure MouseLeave(const Sender: DAbstractElement; const x,y: integer);
+  public
+    property Image: TCastleImage write SetImage;
+    procedure ArrangeChildren; override;
+    procedure SpawnChildren; override;
+    constructor Create; override;
+    constructor Create(const aImage: TCastleImage; const aFrame: DRectagonalFrame);
+  end;
+
+type
+  { ... }
   DHealthLabel = class(DFramedElement)
   private
     fTarget: DBasicActor; //we don't need anything "higher" than this
@@ -256,7 +276,7 @@ type DPerksContainer = class(DAbstractSorter)
 
 implementation
 uses SysUtils, CastleLog, {castleVectors,}
-   DecoFont,
+   DecoFont, DecoImageProcess,
    //DecoInterfaceBlocks,
    DecoInputOutput, DecoInterfaceLoader;
 
@@ -368,6 +388,68 @@ begin
   inherited ArrangeChildren;
   Image.Base.AnchorToFrame(Frame);
   Image.SetBaseSize(0,0,1,1);
+end;
+
+{=============================================================================}
+
+constructor DButton.Create;
+begin
+  inherited Create;
+  OldImage := nil;
+end;
+
+constructor DButton.Create(const aImage: TCastleImage; const aFrame: DRectagonalFrame);
+begin
+  inherited Create;
+  OldImage := nil;
+  Frame.Frame := aFrame;
+  SetImage(aImage);
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DButton.SetImage(Value: TCastleImage);
+begin
+  Image_out.Load(Value);
+  Image_over.Load(Brighter(Value,1.2));
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DButton.SpawnChildren;
+begin
+  inherited SpawnChildren;
+  Image_out := DStaticImage.Create;
+  Image_over := DStaticImage.Create;
+  Grab(Image_out);
+  Grab(Image_over);
+  Self.OnMouseOver := @Self.MouseOver;
+  Self.OnMouseLeave := @Self.MouseLeave;
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DButton.MouseOver(const Sender: DAbstractElement; const x,y: integer);
+begin
+  Image_out.AnimateTo(asFadeOut);
+  Image_over.AnimateTo(asFadeIn);
+end;
+
+procedure DButton.MouseLeave(const Sender: DAbstractElement; const x,y: integer);
+begin
+  Image_out.AnimateTo(asFadeIn);
+  Image_over.AnimateTo(asFadeOut);
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DButton.ArrangeChildren;
+begin
+  inherited ArrangeChildren;
+  Image_out.Base.AnchorToFrame(Frame);
+  Image_out.SetBaseSize(0,0,1,1);
+  Image_over.Base.AnchorToFrame(Frame);
+  Image_over.SetBaseSize(0,0,1,1);
 end;
 
 {=============================================================================}
@@ -582,9 +664,9 @@ begin
 
   NickName.Base.AnchorTo(Self.Base); //AnchorToFrame(Frame);
   NickName.Base.Anchor[asBottom].AlignTo := noAlign;
-  Health.Base.AnchorTo(Self.Base); //AnchorToFrame(Frame);
+  Health.Base.AnchorTo(Self.Base);
   Health.Base.Anchor[asTop].AlignTo := noAlign;
-  PlayerBars.Base.AnchorTo(Self.Base); //AnchorToFrame(Frame);
+  PlayerBars.Base.AnchorTo(Self.Base);
   PlayerBars.Base.Anchor[asTop].Anchor := NickName.Base;
   PlayerBars.Base.Anchor[asBottom].Anchor := Health.Base;
 
