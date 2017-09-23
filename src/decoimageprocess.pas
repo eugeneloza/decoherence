@@ -46,10 +46,14 @@ begin
   end;
 end;
 
+{------------------------------------------------------------------------}
+
 function Clamp255(a: integer): byte;
 begin
   if a<255 then Result := a else Result := 255;
 end;
+
+{------------------------------------------------------------------------}
 
 function Brighter(const aImage: TCastleImage; const mult: float = 1.2): TCastleImage;
 var IMG: TRGBAlphaImage;
@@ -68,6 +72,36 @@ begin
   end;
   Result := IMG;
 end;
+
+{------------------------------------------------------------------------}
+
+(*var BURNER_IMAGE_UNSCALED,BURNER_IMAGE:TCastleImage;  //todo: not freed automatically!!!!
+procedure Init_burner_image;
+begin
+  {$IFNDEF AllowRescale}if BURNER_IMAGE<>nil then exit;{$ENDIF}
+  WriteLnLog('Init_burner_image','started');
+  if BURNER_IMAGE_UNSCALED = nil then
+    BURNER_IMAGE_UNSCALED := LoadImage(ApplicationData(InterfaceFolder+'burner/burner_Pattern_203_CC0_by_Nobiax_diffuse.png'), [TRGBImage]) as TRGBImage;
+  if (BURNER_IMAGE=nil) or (BURNER_IMAGE.height <> window.height) or (BURNER_IMAGE.width <> window.width) then begin
+    FreeAndNil(BURNER_IMAGE);
+    BURNER_IMAGE := BURNER_IMAGE_UNSCALED.MakeCopy;
+    BURNER_IMAGE.Resize(window.width, window.height, riBilinear);
+  end;
+  {$IFNDEF AllowRescale}FreeAndNil(BURNER_IMAGE_UNSCALED);{$ENDIF}
+
+  WriteLnLog('Init_burner_image','finished');
+end;
+
+{working directly on image!}
+procedure Burn(const aImage: TCastleImage; const x,y,w,h: integer);
+begin
+  aImage.DrawFrom(BURNER_IMAGE,0,0,x,y,w,h,dmMultiply);
+end;
+procedure Burn(const aImage: TCastleImage; const Container: DAbstractContainer);
+begin
+  aImage.DrawFrom(BURNER_IMAGE,0,0,container.x1,container.y1,container.w,container.h,dmMultiply);
+end;
+*)
 
 end.
 
