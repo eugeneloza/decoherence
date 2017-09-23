@@ -446,6 +446,7 @@ end;
 procedure DStaticImage.AfterLoad;
 begin
   try
+    if (SourceImage = nil) or (SourceImage.IsEmpty) then raise Exception.Create('Image is not loaded!');
     Base.RealWidth := SourceImage.Width;
     Base.RealHeight := SourceImage.Height;
   except
