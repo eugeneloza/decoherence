@@ -68,6 +68,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 { Undefine rescale to save memory. Temporary. }
 {$UNDEF AllowRescale}
 
+{======================= EXPERIMENTAL ======================================}
+
+{ A burner image is applied to frames and some other interface elements }
+//{$DEFINE BurnerImage}
+
 {======================= SOME DEBUG STUFF ==================================}
 
 {$WARN 2005 off : Comment level $1 found}

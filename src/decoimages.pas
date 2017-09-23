@@ -192,7 +192,7 @@ type
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 uses SysUtils, fgl, CastleLog, CastleFilesUtils,
-  DecoInterfaceLoader;
+  {$IFDEF BurnerImage}DecoImageProcess,{$ENDIF} DecoInterfaceLoader;
 
 {=============================================================================}
 {============================= Abstract Image ================================}
@@ -380,6 +380,10 @@ begin
   ScaledImage.Clear(Vector4byte(0,0,0,0));
   for ix := 0 to 2 do
     for iy := 0 to 2 do ScaledImage.DrawFrom(ScaledImageParts[ix,iy],DestXs[ix],DestYs[iy],0,0,DestXs[ix+1]-DestXs[ix],DestYs[iy+1]-DestYs[iy],dmBlendSmart);
+
+  {$IFDEF BurnerImage}
+  Burn(ScaledImage,Base);
+  {$ENDIF}
 
   for ix := 0 to 2 do
     for iy := 0 to 2 do FreeAndNil(ScaledImageParts[ix,iy]);

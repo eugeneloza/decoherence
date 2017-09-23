@@ -53,7 +53,7 @@ procedure FreeInterface;
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 uses Classes, SysUtils, CastleLog, CastleFilesUtils,
-  DecoFont,
+  DecoFont, {$IFDEF BurnerImage}DecoImageProcess,{$ENDIF}
   DecoInputOutput, DecoGlobal;
 
 {-------------------- INIT INTERFACE ------------------------------------------}
@@ -64,6 +64,7 @@ var i: integer;
     fName: string;
 begin
   InitializeFonts;      //load fonts
+  {$IFDEF BurnerImage}InitBurnerImage{$ENDIF}
 
   WriteLnLog('InitInterface','started');
 

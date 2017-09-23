@@ -27,6 +27,14 @@ uses CastleImages,
 {
  creates a copy of the image!}
 function Brighter(const aImage: TCastleImage; const mult: float = 1.2): TCastleImage;
+
+{$IFDEF BurnerImage}
+{ Load Burner image and scale it }
+procedure InitBurnerImage;
+{ Burn the image (works directly on image, no copy!)}
+procedure Burn(const aImage: TCastleImage; const x,y,w,h: integer);
+procedure Burn(const aImage: TCastleImage; const Container: DAbstractContainer);
+{$ENDIF}
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 uses CastleLog, CastleVectors;
@@ -75,8 +83,9 @@ end;
 
 {------------------------------------------------------------------------}
 
-(*var BURNER_IMAGE_UNSCALED,BURNER_IMAGE:TCastleImage;  //todo: not freed automatically!!!!
-procedure Init_burner_image;
+{$IFDEF BurnerImage}
+var BURNER_IMAGE_UNSCALED,BURNER_IMAGE:TCastleImage;  //todo: not freed automatically!!!!
+procedure InitBurnerImage;
 begin
   {$IFNDEF AllowRescale}if BURNER_IMAGE<>nil then exit;{$ENDIF}
   WriteLnLog('Init_burner_image','started');
@@ -101,7 +110,7 @@ procedure Burn(const aImage: TCastleImage; const Container: DAbstractContainer);
 begin
   aImage.DrawFrom(BURNER_IMAGE,0,0,container.x1,container.y1,container.w,container.h,dmMultiply);
 end;
-*)
+{$ENDIF}
 
 end.
 
