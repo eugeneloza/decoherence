@@ -133,9 +133,8 @@ type
     procedure SpawnChildren; override;
   end;
 
-
 type
-  {}
+  { ... }
   DFramedBar = class(DFramedElement)
   private
     fTarget: PStatValue;
@@ -168,7 +167,7 @@ type
 end;
 
 type
-  {Nickname + PlayerBars + NumericHP}
+  { Nickname + PlayerBars + NumericHP }
   DPlayerBarsFull = class(DCompositeElement) //not a child of DPlayerBars!
   private
     {these are links for easier access to the children}
@@ -181,6 +180,20 @@ type
   public
     {the character being monitored}
     property Target: DBasicActor read fTarget write SetTarget;
+    procedure SpawnChildren; override;
+    procedure ArrangeChildren; override;
+  end;
+
+type
+  { Decorations around travel screen
+    Are drawn "in background" with player's info overlay }
+  DDecorations = class(DCompositeElement)
+  private
+    {frame1left,frame1right,
+    frame2left,frame2right,
+    frame2bottomleft,frame2bottomright,
+    frame3bottom : DSingleInterfaceElement;}
+  public
     procedure SpawnChildren; override;
     procedure ArrangeChildren; override;
   end;
@@ -316,7 +329,7 @@ begin
 end;
 
 {===========================================================================}
-{======================== D Framed Element =================================}
+{========================== Framed Element =================================}
 {===========================================================================}
 
 constructor DFramedElement.Create;
@@ -357,7 +370,9 @@ begin
   Frame.SetBaseSize(0,0,1,1);
 end;
 
-{=============================================================================}
+{===========================================================================}
+{=========================== Framed Image =================================}
+{===========================================================================}
 
 constructor DFramedImage.Create;
 begin
@@ -390,7 +405,10 @@ begin
   Image.SetBaseSize(0,0,1,1);
 end;
 
-{=============================================================================}
+{===========================================================================}
+{=========================== Framed Button =================================}
+{===========================================================================}
+
 
 constructor DButton.Create;
 begin
@@ -452,7 +470,10 @@ begin
   Image_over.SetBaseSize(0,0,1,1);
 end;
 
-{=============================================================================}
+{===========================================================================}
+{=========================== Health Label ==================================}
+{===========================================================================}
+
 
 procedure DHealthLabel.SpawnChildren;
 begin
@@ -483,7 +504,10 @@ begin
   end;
 end;
 
-{=============================================================================}
+{===========================================================================}
+{============================ Name Label ===================================}
+{===========================================================================}
+
 
 procedure DNameLabel.SpawnChildren;
 begin
@@ -658,7 +682,6 @@ end;
 {---------------------------------------------------------------------------}
 
 procedure DPlayerBarsFull.ArrangeChildren;
-const LabelSpace = 23/800;
 begin
   //inherited ArrangeChildren;  <------- nothing to inherit
 
@@ -672,10 +695,69 @@ begin
 
   {********** INTERFACE DESIGN BY Saito00 ******************}
 
-  {NickName.  setbasesize(0, cnt_y+cnt_h-labelspace , 1, labelspace);
+  {const LabelSpace = 23/800;
+
+  NickName.  setbasesize(0, cnt_y+cnt_h-labelspace , 1, labelspace);
   PlayerBars.setbasesize(0, cnt_y+labelspace       , 1, cnt_h-2*labelspace);
   NumHealth. setbasesize(0, cnt_y                  , 1, labelspace);
   }
+end;
+
+{=============================================================================}
+{========================== PARTY DECORATIONS ================================}
+{=============================================================================}
+
+procedure DDecorations.ArrangeChildren;
+//var yy1,yy2: float;
+begin
+  //inherited ArrangeChildren; <------ Nothing to inherit
+
+  {********** INTERFACE DESIGN BY Saito00 ******************}
+{  yy1 := (20+45+180*(maxparty div 2+1)-22)/800;
+  yy2 := (20+45+180*(maxparty div 2+1)-22-27)/800;
+  frame1left.       setbasesize(       0, -yy1,  50/800,   yy1, 1, appear_animation);
+  frame2left.       setbasesize(       0,    0,   9/800, 1-yy2, 1, appear_animation);
+
+  yy1 := (20+45+180*(maxparty div 2)-22)/800;
+  yy2 := (20+45+180*(maxparty div 2)-22-27)/800;
+  frame1right.      setbasesize( -50/800, -yy1,  50/800,   yy1, 1, appear_animation);
+  frame2right.      setbasesize(  -9/800,    0,   9/800, 1-yy2, 1, appear_animation);
+
+  frame2bottomleft. setbasesize(   9/800,    0, 300/800,  9/800, 1, appear_animation);
+  frame2bottomright.setbasesize(-309/800,    0, 297/800,  9/800, 1, appear_animation);   //???? SCALING ?????
+  //todo: make frame3 scaled by content // maybe put it into a separate block?
+  frame3bottom     .setbasesize( 280/800,    0, 300/800, 62/800, 1, appear_animation);
+  frame3bottom     .base.backwardsetsize(frame2bottomright.base.x1-frame2bottomleft.base.x2+22*2,-1);
+  frame3bottom.AnimateTo(appear_animation);
+  rescale; }
+end;
+
+procedure DDecorations.SpawnChildren;
+begin
+  //inherited SpawnChildren; <---- nothing to inherit
+
+{  frame1left := DSingleInterfaceElement.create(self);
+  frame1left.frame := decorationframe1_left;
+  grab(frame1left);
+  frame1right := DSingleInterfaceElement.create(self);
+  frame1right.frame := decorationframe1_right;
+  grab(frame1right);
+  frame2left := DSingleInterfaceElement.create(self);
+  frame2left.frame := decorationframe2_left;
+  grab(frame2left);
+  frame2right := DSingleInterfaceElement.create(self);
+  frame2right.frame := decorationframe2_right;
+  grab(frame2right);
+  frame2bottomleft := DSingleInterfaceElement.create(self);
+  frame2bottomleft.frame := decorationframe2_bottomleft;
+  grab(frame2bottomleft);
+  frame2bottomright := DSingleInterfaceElement.create(self);
+  frame2bottomright.frame := decorationframe2_bottomright;
+  grab(frame2bottomright);
+  frame3bottom := DSingleInterfaceElement.create(self);
+  frame3bottom.frame := decorationframe3_bottom;
+  grab(frame3bottom);
+  setbasesize(0,0,fullwidth,fullheight,1,appear_animation);}
 end;
 
 {=============================================================================}

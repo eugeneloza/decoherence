@@ -74,20 +74,6 @@ type
     constructor Create(AOwner: TComponent); override; }
   end;
 
-type
-  {decorations around travel screen}
-  DDecorations = class(DInterfaceElement)
-  private
-    {frame1left,frame1right,
-    frame2left,frame2right,
-    frame2bottomleft,frame2bottomright,
-    frame3bottom : DSingleInterfaceElement;
-  public
-    procedure ArrangeChildren(Animate: TAnimationStyle); override;
-    constructor Create(AOwner: TComponent); override; }
-  end;
-
-
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 uses CastleLog, CastleFilesUtils, DecoFont,
@@ -319,62 +305,6 @@ begin
   end;
   SetBaseSize(0,0,FullWidth,FullHeight,1,Appear_Animation);
 //  ArrangeChildren(false); //automatically arranged on TCompositeElement.setbasesize
-end;}
-
-{=============================================================================}
-{============================= Decorations ===================================}
-{=============================================================================}
-
-{procedure DDecorations.ArrangeChildren(animate: TAnimationStyle);
-var yy1,yy2: float;
-begin
-  // inherited ArrangeChildren(animate); //not needed here
-  {********** INTERFACE DESIGN BY Saito00 ******************}
-  yy1 := (20+45+180*(maxparty div 2+1)-22)/800;
-  yy2 := (20+45+180*(maxparty div 2+1)-22-27)/800;
-  frame1left.       setbasesize(       0, -yy1,  50/800,   yy1, 1, appear_animation);
-  frame2left.       setbasesize(       0,    0,   9/800, 1-yy2, 1, appear_animation);
-
-  yy1 := (20+45+180*(maxparty div 2)-22)/800;
-  yy2 := (20+45+180*(maxparty div 2)-22-27)/800;
-  frame1right.      setbasesize( -50/800, -yy1,  50/800,   yy1, 1, appear_animation);
-  frame2right.      setbasesize(  -9/800,    0,   9/800, 1-yy2, 1, appear_animation);
-
-  frame2bottomleft. setbasesize(   9/800,    0, 300/800,  9/800, 1, appear_animation);
-  frame2bottomright.setbasesize(-309/800,    0, 297/800,  9/800, 1, appear_animation);   //???? SCALING ?????
-  //todo: make frame3 scaled by content // maybe put it into a separate block?
-  frame3bottom     .setbasesize( 280/800,    0, 300/800, 62/800, 1, appear_animation);
-  frame3bottom     .base.backwardsetsize(frame2bottomright.base.x1-frame2bottomleft.base.x2+22*2,-1);
-  frame3bottom.AnimateTo(appear_animation);
-  rescale;
-end;}
-
-{constructor DDecorations.create(AOwner: TComponent);
-begin
-  inherited create(AOwner);
-
-  frame1left := DSingleInterfaceElement.create(self);
-  frame1left.frame := decorationframe1_left;
-  grab(frame1left);
-  frame1right := DSingleInterfaceElement.create(self);
-  frame1right.frame := decorationframe1_right;
-  grab(frame1right);
-  frame2left := DSingleInterfaceElement.create(self);
-  frame2left.frame := decorationframe2_left;
-  grab(frame2left);
-  frame2right := DSingleInterfaceElement.create(self);
-  frame2right.frame := decorationframe2_right;
-  grab(frame2right);
-  frame2bottomleft := DSingleInterfaceElement.create(self);
-  frame2bottomleft.frame := decorationframe2_bottomleft;
-  grab(frame2bottomleft);
-  frame2bottomright := DSingleInterfaceElement.create(self);
-  frame2bottomright.frame := decorationframe2_bottomright;
-  grab(frame2bottomright);
-  frame3bottom := DSingleInterfaceElement.create(self);
-  frame3bottom.frame := decorationframe3_bottom;
-  grab(frame3bottom);
-  setbasesize(0,0,fullwidth,fullheight,1,appear_animation);
 end;}
 
 end.

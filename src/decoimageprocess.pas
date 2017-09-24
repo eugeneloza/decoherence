@@ -24,8 +24,8 @@ interface
 uses CastleImages,
   DecoGlobal;
 
-{
- creates a copy of the image!}
+{ ...
+ warning: creates a copy of the image!}
 function Brighter(const aImage: TCastleImage; const mult: float = 1.2): TCastleImage;
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation

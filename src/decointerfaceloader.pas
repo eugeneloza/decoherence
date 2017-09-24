@@ -64,7 +64,9 @@ var i: integer;
     fName: string;
 begin
   InitializeFonts;      //load fonts
-  {$IFDEF BurnerImage}InitBurnerImage{$ENDIF}
+  {$IFDEF BurnerImage}
+  InitBurnerImage;
+  {$ENDIF}
 
   WriteLnLog('InitInterface','started');
 
