@@ -738,28 +738,28 @@ end;
 {---------------------------------------------------------------------------}
 
 procedure DPartyDecorations.ArrangeChildren;
-//var yy1,yy2: float;
+var yy1,yy2: float;
 begin
   //inherited ArrangeChildren; <------ Nothing to inherit
 
   {********** INTERFACE DESIGN BY Saito00 ******************}
-{  yy1 := (20+45+180*(maxparty div 2+1)-22)/800;
-  yy2 := (20+45+180*(maxparty div 2+1)-22-27)/800;
-  frame1left.       setbasesize(       0, -yy1,  50/800,   yy1, 1, appear_animation);
-  frame2left.       setbasesize(       0,    0,   9/800, 1-yy2, 1, appear_animation);
+  yy1 := (20+45+180*(MaxParty div 2+1)-22)/800;
+  yy2 := (20+45+180*(MaxParty div 2+1)-22-27)/800;
+  Frame1Left.       SetBaseSize(       0, 1-yy1,  50/800,   yy1);
+  Frame2Left.       SetBaseSize(       0,    0,   9/800, 1-yy2);
 
-  yy1 := (20+45+180*(maxparty div 2)-22)/800;
-  yy2 := (20+45+180*(maxparty div 2)-22-27)/800;
-  frame1right.      setbasesize( -50/800, -yy1,  50/800,   yy1, 1, appear_animation);
-  frame2right.      setbasesize(  -9/800,    0,   9/800, 1-yy2, 1, appear_animation);
+  yy1 := (20+45+180*(MaxParty div 2)-22)/800;
+  yy2 := (20+45+180*(MaxParty div 2)-22-27)/800;
+  Frame1Right.      SetBaseSize( 1-50/800, 1-yy1,  50/800,   yy1);
+  Frame2Right.      SetBaseSize( 1 -9/800,    0,   9/800, 1-yy2);
 
-  frame2bottomleft. setbasesize(   9/800,    0, 300/800,  9/800, 1, appear_animation);
-  frame2bottomright.setbasesize(-309/800,    0, 297/800,  9/800, 1, appear_animation);   //???? SCALING ?????
+  Frame2BottomLeft. SetBaseSize(   9/800,    0, 300/800,  9/800);
+  Frame2BottomRight.SetBaseSize(1-309/800,    0, 297/800,  9/800);   //???? SCALING ?????
   //todo: make frame3 scaled by content // maybe put it into a separate block?
-  frame3bottom     .setbasesize( 280/800,    0, 300/800, 62/800, 1, appear_animation);
-  frame3bottom     .base.backwardsetsize(frame2bottomright.base.x1-frame2bottomleft.base.x2+22*2,-1);
-  frame3bottom.AnimateTo(appear_animation);
-  rescale; }
+  Frame3Bottom     .SetBaseSize( 280/800,    0, 300/800, 62/800);
+  //Frame3Bottom     .base.backwardsetsize(frame2bottomright.base.x1-frame2bottomleft.base.x2+22*2,-1);
+  //Frame3Bottom.AnimateTo(appear_animation);
+  Rescale; //BUG?
 end;
 
 
