@@ -148,6 +148,8 @@ Type
     { updates the data of the class with current external data,
       here it just gets the current animation state }
     procedure Update; virtual;
+    { Sets this interface element size to full screen and aligns it to Window }
+    procedure SetFullScreen;
   public
     { changes the scale of the element relative to current window size }
     procedure Rescale; virtual;
@@ -777,6 +779,14 @@ end;
 procedure DAbstractElement.Update;
 begin
   GetAnimationState;
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DAbstractElement.SetFullScreen;
+begin
+  Base.AnchorToWindow := true;
+  SetBaseSize(0,0,1,1);
 end;
 
 {----------------------------------------------------------------------------}

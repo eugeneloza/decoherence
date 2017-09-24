@@ -32,7 +32,7 @@ uses Classes,
 const appear_animation = asFadeIn;
 
 type
-  DLoadScreen = class(DInterfaceElement)
+  DLoadScreen = class(DCompositeElement)
   private
     Wind: DWindElement;
     Floater: DFloatImage;
@@ -40,7 +40,8 @@ type
     MainLabel: DLabel;
   public
     procedure ReloadFact;
-    constructor Create; override;
+    procedure SpawnChildren; override;
+    procedure ArrangeChildren; override;
   end;
 
 type
@@ -80,31 +81,37 @@ uses CastleLog, CastleFilesUtils, DecoFont,
   DecoLoadScreen,
   DecoInputOutput;
 
-constructor DLoadScreen.Create;
+procedure DLoadScreen.SpawnChildren;
 begin
-  inherited Create;
-  Base.AnchorToWindow := true;
-  SetBaseSize(0,0,1,1);
+  //inherited SpawnChildren; <------ nothing to inherit
+  SetFullScreen;
 
   Floater := DFloatImage.Create;
   Grab(Floater);
-  Floater.SetBaseSize(0,0,1,1);
-  Floater.onCycleFinish := @ReloadFact;
 
   Wind := DWindElement.Create;
   Grab(Wind);
 
   FloaterLabel := DPhasedLabel.Create;
-  FloaterLabel.Font := LoadScreenFont;
   Grab(FloaterLabel);
 
   MainLabel := DLabel.Create;
+  Grab(MainLabel);
+end;
+
+{---------------------------------------------------------------------------}
+
+procedure DLoadScreen.ArrangeChildren;
+begin
+  //inherited ArrangeChildren; <------ nothing to inherit
+  Floater.SetBaseSize(0,0,1,1);
+  Floater.onCycleFinish := @ReloadFact;
+
+  FloaterLabel.Font := LoadScreenFont;
+
   MainLabel.Base.AnchorToWindow := true;
   MainLabel.Font := LoadScreenFont;
   MainLabel.ShadowIntensity := 1;
-  Grab(MainLabel);
-
-  Rescale;
 
   ReloadFact;
 end;
