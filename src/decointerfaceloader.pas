@@ -53,7 +53,7 @@ procedure FreeInterface;
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 uses Classes, SysUtils, CastleLog, CastleFilesUtils,
-  DecoFont, {$IFDEF BurnerImage}DecoImageProcess,{$ENDIF}
+  DecoFont, {$IFDEF BurnerImage}DecoBurner,{$ENDIF}
   DecoInputOutput, DecoGlobal;
 
 {-------------------- INIT INTERFACE ------------------------------------------}

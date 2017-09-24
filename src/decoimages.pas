@@ -192,7 +192,7 @@ type
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 uses SysUtils, fgl, CastleLog, CastleFilesUtils,
-  {$IFDEF BurnerImage}DecoImageProcess,{$ENDIF} DecoInterfaceLoader;
+  {$IFDEF BurnerImage}DecoBurner,{$ENDIF} DecoInterfaceLoader;
 
 {=============================================================================}
 {============================= Abstract Image ================================}
