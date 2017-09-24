@@ -21,7 +21,7 @@ unit Decoherence;
 
 interface
 
-const Version={$INCLUDE version.inc};
+const Version = {$INCLUDE version.inc};
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
@@ -50,7 +50,7 @@ uses Classes, SysUtils,
 { this procedure is mostly needed for Desktops in windowed mode
   and in normal situations should be called only once }
 {$PUSH}{$WARN 5024 off : Parameter "$1" not used}
-Procedure WindowResize(Container : TUIContainer);
+Procedure WindowResize(Container: TUIContainer);
 begin
   if (window.width<>GUI.width) or (window.height<>GUI.height) then begin
     GUI.rescale;
@@ -76,7 +76,7 @@ end;
 { this is a management procedure that takes place before
   WindowRender }
 {$PUSH}{$WARN 5024 off : Parameter "$1" not used}
-procedure WindowManage(Container : TUIContainer);
+procedure WindowManage(Container: TUIContainer);
 begin
   doTime; {advance time for this frame}
 
@@ -95,7 +95,7 @@ end;
 { generic rendering procedure. 3D world is rendered automatically
   on each Window.Render, so we just need to add a GUI render here }
 {$PUSH}{$WARN 5024 off : Parameter "$1" not used}
-Procedure WindowRender(Container : TUIContainer);
+Procedure WindowRender(Container: TUIContainer);
 begin
   GUI.Draw;
 end;
@@ -195,8 +195,9 @@ begin
   InitPerks;
 
   Load_test_level; //remake it
-  Window.OnBeforeRender := @WindowManage;
+
   //Assign window events
+  Window.OnBeforeRender := @WindowManage;
   Window.OnPress := @doPress;
   Window.onRelease := @doRelease;
   Window.OnMotion := @doMotion;
@@ -250,7 +251,7 @@ begin
   WritelnLog('ApplicationInitialize','Initialize interface');
 
   //finally we're ready to show game loading screen
-  {$IFDEF AllowRescale}window.OnResize := @WindowResize;{$ENDIF}
+  {$IFDEF AllowRescale}Window.OnResize := @WindowResize;{$ENDIF}
   Window.OnRender := @WindowRender;
 
   WriteLnLog('ApplicationInitialize','Init finished');

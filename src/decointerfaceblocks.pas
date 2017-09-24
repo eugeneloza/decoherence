@@ -18,6 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 { Creates large interface blocks for different game situations containing
   large amounts of interface elements and composite interface elements }
 unit DecoInterfaceBlocks;
+
 {$INCLUDE compilerconfig.inc}
 
 interface
@@ -121,11 +122,9 @@ end;
 procedure DLoadScreen.ReloadFact;
 begin
   MainLabel.SetBaseSize(0.03,0.8,0.4,0.1);
-  //MainLabel.Base.w := Round(Window.Width/2); //BUG
   MainLabel.text := LoadScreenMainText;
 
   FloaterLabel.SetBaseSize(0,2/3,0.3,0.1); //need to reset it each time
-  //FloaterLabel.Base.w := Round(0.9 * Window.Width/3); //BUG
   FloaterLabel.Text := GetRandomFact;
   FloaterLabel.ResetPhase;
 
@@ -136,9 +135,9 @@ end;
 {=========================== Character Space =================================}
 {=============================================================================}
 
-{constructor DCharacterSpace.create(AOwner: TComponent);
+{constructor DCharacterSpace.Create;
 begin
-  inherited Create(AOwner);
+  inherited Create;
 
   Timer.onTimer := @Self.doTimeout;
 
@@ -163,7 +162,7 @@ end;}
 
 {---------------------------------------------------------------------------}
 
-{procedure DCharacterSpace.ArrangeChildren(animate: TAnimationStyle);
+{procedure DCharacterSpace.ArrangeChildren;
 begin
   //inherited ArrangeChildren(animate); //not needed here as this element doesn't have a frame
   {********** INTERFACE DESIGN BY Saito00 ******************}

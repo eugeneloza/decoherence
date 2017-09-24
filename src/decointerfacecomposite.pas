@@ -187,12 +187,12 @@ type
 type
   { Decorations around travel screen
     Are drawn "in background" with player's info overlay }
-  DDecorations = class(DCompositeElement)
+  DPartyDecorations = class(DCompositeElement)
   private
-    {frame1left,frame1right,
-    frame2left,frame2right,
-    frame2bottomleft,frame2bottomright,
-    frame3bottom : DSingleInterfaceElement;}
+    Frame1Left,Frame1Right,
+    Frame2Left,Frame2Right,
+    Frame2BottomLeft,Frame2BottomRight,
+    Frame3Bottom : DFrameImage;
   public
     procedure SpawnChildren; override;
     procedure ArrangeChildren; override;
@@ -300,8 +300,7 @@ uses SysUtils, CastleLog, {castleVectors,}
 constructor DWindElement.Create;
 begin
   inherited Create;
-  Base.AnchorToWindow := true;
-  SetBaseSize(0,0,1,1);
+  SetFullScreen;
 
   Wind1 := DWindImage.Create;
   Wind2 := DWindImage.Create;
@@ -340,6 +339,7 @@ end;
 
 constructor DFramedElement.Create(const aFrame: DRectagonalFrame);
 begin
+  //nothing inherited here
   Create;
   Frame.Frame := aFrame;
 end;
@@ -707,7 +707,37 @@ end;
 {========================== PARTY DECORATIONS ================================}
 {=============================================================================}
 
-procedure DDecorations.ArrangeChildren;
+procedure DPartyDecorations.SpawnChildren;
+begin
+  //inherited SpawnChildren; <---- nothing to inherit
+  SetFullScreen;
+
+  Frame1Left := DFrameImage.Create;
+  Frame1Left.Frame := DecorationFrame1_Left;
+  Grab(Frame1Left);
+  Frame1Right := DFrameImage.Create;
+  Frame1Right.Frame := DecorationFrame1_Right;
+  Grab(Frame1Right);
+  Frame2Left := DFrameImage.Create;
+  Frame2Left.Frame := DecorationFrame2_Left;
+  Grab(Frame2Left);
+  Frame2Right := DFrameImage.Create;
+  Frame2Right.Frame := DecorationFrame2_Right;
+  Grab(Frame2Right);
+  Frame2BottomLeft := DFrameImage.Create;
+  Frame2BottomLeft.Frame := DecorationFrame2_BottomLeft;
+  Grab(Frame2BottomLeft);
+  Frame2BottomRight := DFrameImage.Create;
+  Frame2BottomRight.Frame := DecorationFrame2_BottomRight;
+  Grab(Frame2BottomRight);
+  Frame3Bottom := DFrameImage.Create;
+  Frame3Bottom.Frame := DecorationFrame3_Bottom;
+  Grab(Frame3Bottom);
+end;
+
+{---------------------------------------------------------------------------}
+
+procedure DPartyDecorations.ArrangeChildren;
 //var yy1,yy2: float;
 begin
   //inherited ArrangeChildren; <------ Nothing to inherit
@@ -732,33 +762,7 @@ begin
   rescale; }
 end;
 
-procedure DDecorations.SpawnChildren;
-begin
-  //inherited SpawnChildren; <---- nothing to inherit
 
-{  frame1left := DSingleInterfaceElement.create(self);
-  frame1left.frame := decorationframe1_left;
-  grab(frame1left);
-  frame1right := DSingleInterfaceElement.create(self);
-  frame1right.frame := decorationframe1_right;
-  grab(frame1right);
-  frame2left := DSingleInterfaceElement.create(self);
-  frame2left.frame := decorationframe2_left;
-  grab(frame2left);
-  frame2right := DSingleInterfaceElement.create(self);
-  frame2right.frame := decorationframe2_right;
-  grab(frame2right);
-  frame2bottomleft := DSingleInterfaceElement.create(self);
-  frame2bottomleft.frame := decorationframe2_bottomleft;
-  grab(frame2bottomleft);
-  frame2bottomright := DSingleInterfaceElement.create(self);
-  frame2bottomright.frame := decorationframe2_bottomright;
-  grab(frame2bottomright);
-  frame3bottom := DSingleInterfaceElement.create(self);
-  frame3bottom.frame := decorationframe3_bottom;
-  grab(frame3bottom);
-  setbasesize(0,0,fullwidth,fullheight,1,appear_animation);}
-end;
 
 {=============================================================================}
 {========================== Character portrait ===============================}

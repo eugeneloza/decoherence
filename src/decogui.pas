@@ -40,6 +40,7 @@ Type
   public
     {}
     procedure LoadScreen;
+    {}
     procedure PartyInterface;
 end;
 
@@ -82,7 +83,8 @@ end;
 
 procedure DInterfaceContainer.Rescale;
 begin
-  WriteLnLog('DInterfaceContainer.rescale',inttostr(window.Width)+'x'+inttostr(window.Height));
+  WriteLnLog('DInterfaceContainer.rescale', IntToStr(Window.Width) + 'x' +
+                                            IntToStr(Window.Height));
   inherited Rescale;
 
   { THIS ROUTINE IS NOT YET IMPLEMENTED IN CASTLE GAME ENGINE
@@ -121,9 +123,12 @@ begin
   Grab(DLoadScreen.Create);
 end;
 
+{-----------------------------------------------------------------------------}
+
 procedure DInterfaceContainer.PartyInterface;
 begin
   Self.Clear; //make it more optimal?
+  Grab(DPartyDecorations.Create);
 end;
 
 end.
