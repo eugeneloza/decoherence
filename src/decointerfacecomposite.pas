@@ -35,21 +35,22 @@ uses
 const PortraitTimeOut = 1; {seconds}
 
 type
-  {}
+  { Draws two cycling wind images overlaying each other, moving with different speed }
   DWindElement = class(DInterfaceElement)
   private
-    {}
+    { images to render }
     Wind1, Wind2: DWindImage;
   public
     constructor Create; override;
   end;
 
 type
-  {}
+  { Element with "ArrangeChildren" and "SpawnChildren" methods }
   DCompositeElement = class(DInterfaceElement)
   public
-    {}
+    { Arranges children elements within this container }
     procedure ArrangeChildren; virtual; abstract;
+    { Creates (spawns) elements in this container }
     procedure SpawnChildren; virtual; abstract;
     constructor Create; override;
   end;
@@ -60,10 +61,11 @@ type
     Should Anchor it manually }
   DFramedElement = class(DCompositeElement)
   private
+    { Frame image }
     fFrame: DFrameImage;
     procedure SetFrame(const Value: DFrameImage);
   public
-    {}
+    { Frame image around the element }
     property Frame: DFrameImage read fFrame write SetFrame;
     procedure ArrangeChildren; override;
     procedure SpawnChildren; override;
@@ -72,10 +74,10 @@ type
   end;
 
 type
-  { ... }
+  { Image within a frame }
   DFramedImage = class(DFramedElement)
   public
-    {}
+    { The image interface element }
     Image: DStaticImage;
     procedure ArrangeChildren; override;
     procedure SpawnChildren; override;
@@ -84,18 +86,21 @@ type
   end;
 
 type
-  { ... }
-  DButton = class(DFramedElement)
+  { A clickable button with automatic highlighting by mouseover
+       Click should be managed in children elements }
+  DButton = class abstract(DFramedElement)
   private
-    {
+    { Link to the button image
       used only to check if the image=Value}
     OldImage: TCastleImage;
-    {}
+    { Two images for "mouse out" and "mouse over" states }
     Image_out,Image_over: DStaticImage;
     procedure SetImage(Value: TCastleImage);
+    { mouse over and mouse out events }
     procedure MouseOver(const Sender: DAbstractElement; const x,y: integer);
     procedure MouseLeave(const Sender: DAbstractElement; const x,y: integer);
   public
+    { button image }
     property Image: TCastleImage write SetImage;
     procedure ArrangeChildren; override;
     procedure SpawnChildren; override;
@@ -104,45 +109,47 @@ type
   end;
 
 type
-  { ... }
+  { A text label in a frame, displaying player's health }
   DHealthLabel = class(DFramedElement)
   private
+    { target Actor }
     fTarget: DBasicActor; //we don't need anything "higher" than this
     procedure SetTarget(const Value: DBasicActor);
   public
-    {}
+    { Label that would display the health number }
     Lab: DFloatLabel;
-    {the character being monitored}
+    { the character being monitored }
     property Target: DBasicActor read fTarget write SetTarget;
     procedure ArrangeChildren; override;
     procedure SpawnChildren; override;
   end;
 
 type
-  { ... }
+  { Label, containing character's nickname, framed }
   DNameLabel = class(DFramedElement)
   private
+    { target Actor }
     fTarget: DBasicActor; //we don't need anything "higher" than this
     procedure SetTarget(const Value: DBasicActor);
   public
-    {}
+    { Label that displays character's nickname }
     Lab: DStringLabel;
-    {the character being monitored}
+    { the character being monitored }
     property Target: DBasicActor read fTarget write SetTarget;
     procedure ArrangeChildren; override;
     procedure SpawnChildren; override;
   end;
 
 type
-  { ... }
+  { A statbar within a frame }
   DFramedBar = class(DFramedElement)
   private
     fTarget: PStatValue;
     procedure SetTarget(const Value: PStatValue);
   public
-    {}
+    { Displayed statbar image }
     Bar: DStatBarImage;
-    {}
+    { Character's stat to be monitored }
     property Target: PStatValue read fTarget write SetTarget;
     procedure ArrangeChildren; override;
     procedure SpawnChildren; override;
@@ -210,11 +217,13 @@ type
     {}
     DamageLabel: DDamageLabel;
   private
+    { Player character }
     fTarget: DPlayerCharacter;
     procedure SetTarget(const Value: DPlayerCharacter);
   public
-    {Player character which portrait is displayed}
+    { Player character which portrait is displayed }
     property Target: DPlayerCharacter read fTarget write SetTarget;
+    { Call-back for character being hit }
     procedure doHit(const Dam: float; const DamType: TDamageType);
     procedure SpawnChildren; override;
     procedure ArrangeChildren; override;
@@ -230,7 +239,7 @@ type
     {sub-elements nicknames for easy access}
     iLabel: DSingleInterfaceElement;
     PlusButton, MinusButton: DSingleInterfaceElement;
-
+    { target value }
     fTarget: PInteger;
     procedure settarget(value: PInteger);
   public
@@ -302,11 +311,13 @@ begin
   inherited Create;
   SetFullScreen;
 
+  //create wind image containers
   Wind1 := DWindImage.Create;
   Wind2 := DWindImage.Create;
   Grab(Wind1);
   Grab(Wind2);
 
+  //load (copy) wind images
   Wind1.Load(WindImage1);
   Wind2.Load(WindImage2);
   Wind1.PhaseSpeed := 1/(15+drnd.Random);
@@ -441,6 +452,7 @@ begin
   Image_over := DStaticImage.Create;
   Grab(Image_out);
   Grab(Image_over);
+  //assign button mouse over/out events
   Self.OnMouseOver := @Self.MouseOver;
   Self.OnMouseLeave := @Self.MouseLeave;
 end;
@@ -738,31 +750,31 @@ end;
 {---------------------------------------------------------------------------}
 
 procedure DPartyDecorations.ArrangeChildren;
-var yy1,yy2: float;
+const yscale = 1/800;
+      xscale = 1/1200;
+var yy1, yy2: float;
 begin
   //inherited ArrangeChildren; <------ Nothing to inherit
 
   {********** INTERFACE DESIGN BY Saito00 ******************}
-  yy1 := (20+45+180*(MaxParty div 2+1)-22)/800;
-  yy2 := (20+45+180*(MaxParty div 2+1)-22-27)/800;
-  Frame1Left.       SetBaseSize(       0, 1-yy1,  50/800,   yy1);
-  Frame2Left.       SetBaseSize(       0,    0,   9/800, 1-yy2);
+  yy1 := (20+45+180*(MaxParty div 2+1)-22)*yscale;
+  yy2 := (20+45+180*(MaxParty div 2+1)-22-27)*yscale;
+  Frame1Left.       SetBaseSize(       0, 1-yy1,  50*xscale,   yy1);
+  Frame2Left.       SetBaseSize(       0,    0,   9*xscale, 1-yy2);
 
-  yy1 := (20+45+180*(MaxParty div 2)-22)/800;
-  yy2 := (20+45+180*(MaxParty div 2)-22-27)/800;
-  Frame1Right.      SetBaseSize( 1-50/800, 1-yy1,  50/800,   yy1);
-  Frame2Right.      SetBaseSize( 1 -9/800,    0,   9/800, 1-yy2);
+  yy1 := (20+45+180*(MaxParty div 2)-22)*yscale;
+  yy2 := (20+45+180*(MaxParty div 2)-22-27)*yscale;
+  Frame1Right.      SetBaseSize( 1-50*xscale, 1-yy1,  50*xscale,   yy1);
+  Frame2Right.      SetBaseSize( 1 -9*xscale,    0,   9*xscale, 1-yy2);
 
-  Frame2BottomLeft. SetBaseSize(   9/800,    0, 300/800,  9/800);
-  Frame2BottomRight.SetBaseSize(1-309/800,    0, 297/800,  9/800);   //???? SCALING ?????
+  Frame2BottomLeft. SetBaseSize(   9*xscale,    0, 300*xscale,  9*yscale);
+  Frame2BottomRight.SetBaseSize(1-309*xscale,    0, 297*xscale,  9*yscale);   //???? SCALING ?????
   //todo: make frame3 scaled by content // maybe put it into a separate block?
-  Frame3Bottom     .SetBaseSize( 280/800,    0, 300/800, 62/800);
+  Frame3Bottom     .SetBaseSize( 280*xscale,    0, 300*xscale, 62*yscale);
   //Frame3Bottom     .base.backwardsetsize(frame2bottomright.base.x1-frame2bottomleft.base.x2+22*2,-1);
   //Frame3Bottom.AnimateTo(appear_animation);
   Rescale; //BUG?
 end;
-
-
 
 {=============================================================================}
 {========================== Character portrait ===============================}

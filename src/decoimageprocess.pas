@@ -24,7 +24,7 @@ interface
 uses CastleImages,
   DecoGlobal;
 
-{ ...
+{ Makes the image brighter (default 20%)
  warning: creates a copy of the image!}
 function Brighter(const aImage: TCastleImage; const mult: float = 1.2): TCastleImage;
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
@@ -36,12 +36,12 @@ begin
   Result := true;
   if (aImage=nil) or (aImage.isEmpty) then begin
     Result := false;
-    WriteLnLog('DecoImageProcess>','FATAL: Image is nil');
+    WriteLnLog('DecoImageProcess>CheckImageValid','FATAL: Image is nil');
     Exit;
   end;
   if not (aImage is TRGBAlphaImage) then begin
     Result := false;
-    WriteLnLog('DecoImageProcess>','FATAL: Image type '+aImage.ClassName+' is not supported for operation.');
+    WriteLnLog('DecoImageProcess>CheckImageValid','FATAL: Image type '+aImage.ClassName+' is not supported for operation.');
     Exit;
   end;
 end;
@@ -50,6 +50,7 @@ end;
 
 function Clamp255(a: integer): byte;
 begin
+  { maybe, make it "softer"? It'll require knowing "max" (which is actually mult*255 = 255+20% default)}
   if a<255 then Result := a else Result := 255;
 end;
 
@@ -68,6 +69,7 @@ begin
     p^[1] := Clamp255(Round(p^[1]*mult));
     p^[2] := Clamp255(Round(p^[2]*mult));
     {no alpha processing?}
+    //p^[3]
     Inc(p,IMG.PixelSize);
   end;
   Result := IMG;

@@ -25,19 +25,19 @@ interface
 //uses SysUtils;
 
 type
-  {enumerates all available languages. To add another language, first step
-   is to add it to this unit}
+  { Enumerates all available languages. To add another language, first step
+   is to add it to this unit }
   TLanguage = (Language_English, Language_Russian);
 
 var
-  {current game language}
-  CurrentLanguage: TLanguage = Language_Russian;//Language_Russian;
+  { Current game language }
+  CurrentLanguage: TLanguage = Language_Russian;
 
-{Provides a name for the current language directory without backslashes}
+{ Provides a name for the current language directory without backslashes }
 function LanguageDir(Lang: TLanguage): string;
-{Says the language name in English}
+{ Says the language name in English }
 function SayLanguage(Lang: TLanguage): string;
-{Displays a "Loading..." image for the language}
+{ Displays a "Loading..." image for the language }
 procedure SetLoadingImage;
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
@@ -52,7 +52,7 @@ begin
   case Lang of
     Language_English: Result := 'ENG/';
     Language_Russian: Result := 'RUS/';
-    else raise Exception.Create('Unknown Language in decotranslation.LanguageDir!');
+    else raise Exception.Create('Unknown Language in DecoTranslation.LanguageDir!');
   end;
   Result := GetScenarioFolder + TextFolder + Result;
 end;
