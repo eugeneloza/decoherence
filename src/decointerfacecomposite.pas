@@ -47,6 +47,8 @@ type
 type
   { Element with "ArrangeChildren" and "SpawnChildren" methods }
   DCompositeElement = class(DInterfaceElement)
+  strict protected
+    isSpawned: boolean;
   public
     { Arranges children elements within this container }
     procedure ArrangeChildren; virtual; abstract;
@@ -69,8 +71,6 @@ type
     property Frame: DFrameImage read fFrame write SetFrame;
     procedure ArrangeChildren; override;
     procedure SpawnChildren; override;
-    constructor Create; override;
-    constructor Create(const aFrame: DRectagonalFrame);
   end;
 
 type
@@ -81,8 +81,6 @@ type
     Image: DStaticImage;
     procedure ArrangeChildren; override;
     procedure SpawnChildren; override;
-    constructor Create; override;
-    constructor Create(const aImage: TCastleImage; const aFrame: DRectagonalFrame);
   end;
 
 type
@@ -104,8 +102,6 @@ type
     property Image: TCastleImage write SetImage;
     procedure ArrangeChildren; override;
     procedure SpawnChildren; override;
-    constructor Create; override;
-    constructor Create(const aImage: TCastleImage; const aFrame: DRectagonalFrame);
   end;
 
 type
@@ -153,7 +149,6 @@ type
     property Target: PStatValue read fTarget write SetTarget;
     procedure ArrangeChildren; override;
     procedure SpawnChildren; override;
-    constructor Create; override;
   end;
 
 type
@@ -170,7 +165,6 @@ type
     procedure ArrangeChildren; override;
     {the character being monitored}
     property Target: DBasicActor read fTarget write SetTarget;
-    constructor Create; override;
 end;
 
 type
@@ -191,7 +185,7 @@ type
     procedure ArrangeChildren; override;
   end;
 
-type
+{type
   { Decorations around travel screen
     Are drawn "in background" with player's info overlay }
   DPartyDecorations = class(DCompositeElement)
@@ -203,7 +197,7 @@ type
   public
     procedure SpawnChildren; override;
     procedure ArrangeChildren; override;
-  end;
+  end;}
 
 type
   { character portrait. Some day it might be replaced for TUIContainer of
@@ -245,7 +239,6 @@ type
   public
     {integer to change}
     property Target: Pinteger read ftarget write settarget;
-    constructor create(AOwner: TComponent); override;
     procedure ArrangeChildren(animate: TAnimationStyle); override;
     procedure incTarget(Sender: DAbstractElement; x,y: integer);
     procedure decTarget(Sender: DAbstractElement; x,y: integer);
@@ -265,8 +258,7 @@ type
   public
     property Target: DPerk read ftarget write settarget;
     //property Character: DPlayerCharacter read fCharacter write setcharacter;
-    {proedure getSelectedStatus -----> update}
-    constructor create(AOwner: TComponent); override; }
+    {proedure getSelectedStatus -----> update}}
 end;
 
 type
@@ -277,7 +269,7 @@ type
    public
      lines{,rows}: integer;
      procedure ArrangeChildren(animate: TAnimationStyle); override;
-     constructor create(AOwner: TComponent); override; }
+     }
    end;
 
 //type TPerkContainerStyle = (pcActions,pcActive,pcGlobal);
@@ -333,29 +325,16 @@ end;
 
 constructor DCompositeElement.Create;
 begin
+  isSpawned := false;
   inherited Create;
   SpawnChildren;
+  isSpawned := true;
   ArrangeChildren;
 end;
 
 {===========================================================================}
 {========================== Framed Element =================================}
 {===========================================================================}
-
-constructor DFramedElement.Create;
-begin
-  {emm... why can't I just omit Constructor?}
-  inherited Create;
-end;
-
-constructor DFramedElement.Create(const aFrame: DRectagonalFrame);
-begin
-  //nothing inherited here
-  Create;
-  Frame.Frame := aFrame;
-end;
-
-{-----------------------------------------------------------------------------}
 
 procedure DFramedElement.SetFrame(const Value: DFrameImage);
 begin
@@ -377,6 +356,8 @@ end;
 
 procedure DFramedElement.ArrangeChildren;
 begin
+  if not isSpawned then Exit;
+  //inherited ArrangeChildren;
   Frame.Base.AnchorTo(Self.Current);
   Frame.SetBaseSize(0,0,1,1);
 end;
@@ -384,21 +365,6 @@ end;
 {===========================================================================}
 {=========================== Framed Image =================================}
 {===========================================================================}
-
-constructor DFramedImage.Create;
-begin
-  {emm... why can't I just omit Constructor?}
-  inherited Create;
-end;
-
-constructor DFramedImage.Create(const aImage: TCastleImage; const aFrame: DRectagonalFrame);
-begin
-  inherited Create;
-  Frame.Frame := aFrame;
-  Image.Load(aImage);
-end;
-
-{-----------------------------------------------------------------------------}
 
 procedure DFramedImage.SpawnChildren;
 begin
@@ -411,6 +377,7 @@ end;
 
 procedure DFramedImage.ArrangeChildren;
 begin
+  if not isSpawned then Exit;
   inherited ArrangeChildren;
   Image.Base.AnchorToFrame(Frame);
   Image.SetBaseSize(0,0,1,1);
@@ -419,23 +386,6 @@ end;
 {===========================================================================}
 {=========================== Framed Button =================================}
 {===========================================================================}
-
-
-constructor DButton.Create;
-begin
-  inherited Create;
-  OldImage := nil;
-end;
-
-constructor DButton.Create(const aImage: TCastleImage; const aFrame: DRectagonalFrame);
-begin
-  inherited Create;
-  OldImage := nil;
-  Frame.Frame := aFrame;
-  SetImage(aImage);
-end;
-
-{-----------------------------------------------------------------------------}
 
 procedure DButton.SetImage(Value: TCastleImage);
 begin
@@ -475,6 +425,7 @@ end;
 
 procedure DButton.ArrangeChildren;
 begin
+  if not isSpawned then Exit;
   inherited ArrangeChildren;
   Image_out.Base.AnchorToFrame(Frame);
   Image_out.SetBaseSize(0,0,1,1);
@@ -501,6 +452,7 @@ end;
 
 procedure DHealthLabel.ArrangeChildren;
 begin
+  if not isSpawned then Exit;
   inherited ArrangeChildren;
   Lab.Base.AnchorToFrame(Frame);
   Lab.SetBaseSize(0,0,1,1);
@@ -534,6 +486,7 @@ end;
 
 procedure DNameLabel.ArrangeChildren;
 begin
+  if not isSpawned then Exit;
   inherited ArrangeChildren;
   Lab.Base.AnchorToFrame(Frame);
   Lab.SetBaseSize(0,0,1,1);
@@ -563,17 +516,10 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-constructor DFramedBar.Create;
-begin
-  inherited Create;
-  Frame.Frame := StatBarsFrame;
-end;
-
-{-----------------------------------------------------------------------------}
-
 procedure DFramedBar.SpawnChildren;
 begin
   inherited SpawnChildren;
+  Frame.Frame := StatBarsFrame;
   Bar := DStatBarImage.Create;
   Grab(Bar);
 end;
@@ -582,6 +528,7 @@ end;
 
 procedure DFramedBar.ArrangeChildren;
 begin
+  if not isSpawned then Exit;
   inherited ArrangeChildren;
   Bar.Base.AnchorToFrame(Frame);
   Bar.SetBaseSize(0,0,1,1);
@@ -591,17 +538,11 @@ end;
 {===================== Stat bars ===========================================}
 {===========================================================================}
 
-constructor DStatBars.Create;
-begin
-  inherited Create;
-  Frame.Frame := Characterbar_mid;
-  Rescale; //<---------- UGLY
-end;
-
-{-----------------------------------------------------------------------------}
-
 procedure DStatBars.SpawnChildren;
 begin
+  inherited SpawnChildren;
+  Frame.Frame := Characterbar_mid;
+
   HP_bar := DFramedBar.Create;
   HP_bar.Bar.Load(HpBarImage);
   HP_bar.Bar.Kind := bsVertical;
@@ -628,7 +569,9 @@ end;
 procedure DStatBars.ArrangeChildren;
 var ScaleX: float;
 begin
+  if not isSpawned then Exit;
   inherited ArrangeChildren;
+
   HP_bar. Base.AnchorToFrame(Frame);
   STA_bar.Base.AnchorToFrame(Frame);
   CNC_bar.Base.AnchorToFrame(Frame);
@@ -695,7 +638,8 @@ end;
 
 procedure DPlayerBarsFull.ArrangeChildren;
 begin
-  //inherited ArrangeChildren;  <------- nothing to inherit
+  if not isSpawned then Exit;
+  //inherited ArrangeChildren;
 
   NickName.Base.AnchorTo(Self.Base); //AnchorToFrame(Frame);
   NickName.Base.Anchor[asBottom].AlignTo := noAlign;
@@ -719,7 +663,7 @@ end;
 {========================== PARTY DECORATIONS ================================}
 {=============================================================================}
 
-procedure DPartyDecorations.SpawnChildren;
+{procedure DPartyDecorations.SpawnChildren;
 begin
   //inherited SpawnChildren; <---- nothing to inherit
   SetFullScreen;
@@ -745,16 +689,16 @@ begin
   Frame3Bottom := DFrameImage.Create;
   Frame3Bottom.Frame := DecorationFrame3_Bottom;
   Grab(Frame3Bottom);
-end;
+end;                  }
 
 {---------------------------------------------------------------------------}
 
-procedure DPartyDecorations.ArrangeChildren;
+{procedure DPartyDecorations.ArrangeChildren;
 const yscale = 1/800;
       xscale = 1/1200;
 var yy1, yy2: float;
 begin
-  //inherited ArrangeChildren; <------ Nothing to inherit
+  inherited ArrangeChildren;
 
   {********** INTERFACE DESIGN BY Saito00 ******************}
   yy1 := (20+45+180*(MaxParty div 2+1)-22)*yscale;
@@ -774,7 +718,7 @@ begin
   //Frame3Bottom     .base.backwardsetsize(frame2bottomright.base.x1-frame2bottomleft.base.x2+22*2,-1);
   //Frame3Bottom.AnimateTo(appear_animation);
   Rescale; //BUG?
-end;
+end;}
 
 {=============================================================================}
 {========================== Character portrait ===============================}
@@ -809,6 +753,7 @@ end;
 
 procedure DPortrait.ArrangeChildren;
 begin
+  if not isSpawned then Exit;
   inherited ArrangeChildren;
   //todo
 end;
