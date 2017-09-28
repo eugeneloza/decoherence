@@ -55,6 +55,7 @@ type
     fInitialized: boolean;
     { Parent container size (cached) }
     cx1,cx2,cy1,cy2,cw,ch: integer;
+    cValid: boolean;
     { Parent container opacity }
     co: float;
     { Determine and cache parent container size }
@@ -371,6 +372,7 @@ begin
 
   cw := cx2-cx1;
   ch := cy2-cy1;
+  if (cw>0) and (ch>0) then cValid := true else cValid := false;
 end;
 
 {----------------------------------------------------------------------------}
@@ -386,7 +388,10 @@ begin
   fy1 := (y1 - cy1 - Anchor[asTop   ].Gap)/ch;
   fy2 := (y2 - cy2 + Anchor[asBottom].Gap)/ch;
 
-  fInitialized := true;
+  if cValid then
+    fInitialized := true
+  else
+    fInitialized := false
 end;
 
 {----------------------------------------------------------------------------}
@@ -433,7 +438,10 @@ begin
     end;
   end else AdjustToRealSize;
 
-  fInitialized := true;
+  if cValid then
+    fInitialized := true
+  else
+    fInitialized := false
 end;
 
 {----------------------------------------------------------------------------}

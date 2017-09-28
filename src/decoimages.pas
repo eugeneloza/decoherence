@@ -397,6 +397,10 @@ end;
 
 procedure DFrameAnchorHelper.AnchorToFrame(const aFrame: DFrameImage);
 begin
+  if aFrame = nil then begin
+    WriteLnLog('DFrameAnchorHelper.AnchorToFrame','ERROR: Frame is nil!');
+    Exit;
+  end;
   AnchorTo(aFrame.Current);
   Anchor[asLeft].Gap := aFrame.Frame.CornerLeft;
   Anchor[asRight].Gap := aFrame.Frame.CornerRight;
