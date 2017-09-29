@@ -82,6 +82,7 @@ type
         Gap: integer;
       end;
   public
+    Owner: TObject;
     { Anchors of this container }
     Anchor: array[TAnchorSide] of DAnchor;
     { Parent's opacity is multiplied by this Container opacity,
@@ -336,32 +337,32 @@ begin
        (Anchor[asTop].Anchor = nil) or
        (Anchor[asRight].Anchor = nil) or
        (Anchor[asBottom].Anchor = nil) then begin
-         WriteLnLog('DAbstractContainer.GetAnchors','Anchor is Nil!');
+         WriteLnLog('DAbstractContainer.GetAnchors','Anchor is Nil! in '+Owner.ClassName);
          GetWindowAnchor;
     end else begin
       case Anchor[asLeft].AlignTo of
         haLeft:   cx1 := Anchor[asLeft].Anchor.x1;
         haRight:  cx1 := Anchor[asLeft].Anchor.x2;
         haCenter: cx1 := (Anchor[asLeft].Anchor.x1 + Anchor[asLeft].Anchor.x2) div 2;
-        else WriteLnLog('DAbstractContainer.GetAnchors','Invalid Anchor align!')
+        else WriteLnLog('DAbstractContainer.GetAnchors','Invalid Anchor align! in '+Owner.ClassName)
       end;
       case Anchor[asRight].AlignTo of
         haLeft:   cx2 := Anchor[asRight].Anchor.x1;
         haRight:  cx2 := Anchor[asRight].Anchor.x2;
         haCenter: cx2 := (Anchor[asRight].Anchor.x1 + Anchor[asRight].Anchor.x2) div 2;
-        else WriteLnLog('DAbstractContainer.GetAnchors','Invalid Anchor align!')
+        else WriteLnLog('DAbstractContainer.GetAnchors','Invalid Anchor align! in '+Owner.ClassName)
       end;
       case Anchor[asTop].AlignTo of
         vaTop:    cy1 := Anchor[asTop].Anchor.y1;
         vaBottom: cy1 := Anchor[asTop].Anchor.y2;
         vaMiddle: cy1 := (Anchor[asTop].Anchor.y1 + Anchor[asTop].Anchor.y2) div 2;
-        else WriteLnLog('DAbstractContainer.GetAnchors','Invalid Anchor align!')
+        else WriteLnLog('DAbstractContainer.GetAnchors','Invalid Anchor align! in '+Owner.ClassName)
       end;
       case Anchor[asBottom].AlignTo of
         vaTop:    cy2 := Anchor[asBottom].Anchor.y1;
         vaBottom: cy2 := Anchor[asBottom].Anchor.y2;
         vaMiddle: cy2 := (Anchor[asBottom].Anchor.y1 + Anchor[asBottom].Anchor.y2) div 2;
-        else WriteLnLog('DAbstractContainer.GetAnchors','Invalid Anchor align!')
+        else WriteLnLog('DAbstractContainer.GetAnchors','Invalid Anchor align! in '+Owner.ClassName)
       end;
     end;  
   end;
@@ -813,9 +814,13 @@ begin
   fVisible := true;
   AnimationCurve := acSquare;
   Base := DAbstractContainer.Create;
+  Base.Owner := Self;
   Last := DAbstractContainer.Create;
+  Last.Owner := Self;
   Next := DAbstractContainer.Create;
+  Next.Owner := Self;
   Current := DAbstractContainer.Create;
+  Current.Owner := Self;
 end;
 
 {----------------------------------------------------------------------------}
