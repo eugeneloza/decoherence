@@ -52,6 +52,8 @@ type
     So, constructing it as standalone should be possible }
   DAbstractContainer = class(TObject)
   strict private
+    { Owner of this Container (for displaying debug info) }
+    Owner: TObject;
     fInitialized: boolean;
     { Parent container size (cached) }
     cx1,cx2,cy1,cy2,cw,ch: integer;
@@ -82,7 +84,6 @@ type
         Gap: integer;
       end;
   public
-    Owner: TObject;
     { Anchors of this container }
     Anchor: array[TAnchorSide] of DAnchor;
     { Parent's opacity is multiplied by this Container opacity,
@@ -108,7 +109,7 @@ type
     ProportionalScale: TProportionalScale;
     { If this Container ready to be used? }
     property isInitialized: boolean read fInitialized;
-    constructor Create; //virtual;
+    constructor Create(aOwner: TObject); //virtual;
     //destructor Destroy; override;
     { Copy parameters from the Source }
     procedure Assign(const Source: DAbstractContainer);
@@ -300,10 +301,12 @@ uses SysUtils, CastleLog;
 {========================== Abstract Container ===============================}
 {=============================================================================}
 
-constructor DAbstractContainer.Create;
+constructor DAbstractContainer.Create(aOwner: TObject);
 var aa: TAnchorSide;
 begin
   //inherited Create;
+  Owner := aOwner;
+
   AnchorToWindow := false;
   fInitialized := false;
   {this is redundant}
@@ -813,14 +816,10 @@ begin
   inherited Create;
   fVisible := true;
   AnimationCurve := acSquare;
-  Base := DAbstractContainer.Create;
-  Base.Owner := Self;
-  Last := DAbstractContainer.Create;
-  Last.Owner := Self;
-  Next := DAbstractContainer.Create;
-  Next.Owner := Self;
-  Current := DAbstractContainer.Create;
-  Current.Owner := Self;
+  Base := DAbstractContainer.Create(Self);
+  Last := DAbstractContainer.Create(Self);
+  Next := DAbstractContainer.Create(Self);
+  Current := DAbstractContainer.Create(Self);
 end;
 
 {----------------------------------------------------------------------------}
