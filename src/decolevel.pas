@@ -32,7 +32,7 @@ uses
   DecoNavigation, decoglobal;
 
 procedure load_test_level;
-Procedure InitTestLevel;
+procedure InitTestLevel;
 
 var LoadCompleted: boolean = false;
 
@@ -76,12 +76,11 @@ begin
   WritelnLog('load_test_level','Finished');
 end;
 
-Procedure InitTestLevel;
+procedure InitTestLevel;
 begin
   if not LoadCompleted then Exit;
   if not LoadedLevel then begin
      WritelnLog('InitTestLevel','Init');
-     SetGameMode(gmTravel);
      LoadedLevel := true;
      CurrentWorld.Activate;
      Window.TouchInterface := {$IFDEF Android}tiCtlWalkDragRotate{$ELSE}tiNone{$ENDIF};

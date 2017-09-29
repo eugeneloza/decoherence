@@ -245,8 +245,7 @@ begin
   GUI := DInterfaceContainer.Create;
   GUI.Rescale;
 
-  GUI.PartyInterface;
-  //GUI.LoadScreen;
+  GUI.LoadScreen;
 
   WritelnLog('ApplicationInitialize','Initialize interface');
 

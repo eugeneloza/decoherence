@@ -23,7 +23,7 @@ unit DecoGui;
 interface
 
 uses Classes,
-  DecoInterface, DecoLabels,
+  DecoInterface, DecoLabels, DecoPlayerCharacter,
   DecoGlobal;
 
 Type
@@ -126,9 +126,14 @@ end;
 {-----------------------------------------------------------------------------}
 
 procedure DInterfaceContainer.PartyInterface;
+var tmp: DPlayerBarsFull;
 begin
   Self.Clear; //make it more optimal?
-  Grab(DPartyDecorations.Create);
+  tmp := DPlayerBarsFull.Create;
+  tmp.Base.AnchorToWindow := true;
+  tmp.SetBaseSize(0,0,0.1,0.1);
+  tmp.Target := Player.CurrentParty.Character[0];
+  Grab(tmp);
 end;
 
 end.
