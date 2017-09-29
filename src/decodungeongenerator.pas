@@ -369,7 +369,7 @@ implementation
 
 uses SysUtils, CastleFilesUtils, CastleImages, CastleVectors,
   DOM, CastleXMLUtils,
-  DecoInputOutput, DecoTime, DecoLog;
+  DecoHDD, DecoTime, DecoLog;
 
 {========================= GENERATION ALGORITHM ==============================}
 

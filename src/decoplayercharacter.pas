@@ -167,7 +167,7 @@ procedure FreePlayer;
 implementation
 uses SysUtils, Math,
   DecoNavigation, DecoAbstractWorld, DecoAbstractWorld3d,
-  DecoMouse,
+  DecoInput,
   DecoGameMode, DecoTime, DecoLog;
 
 constructor DParty.Create;

@@ -259,7 +259,7 @@ procedure FreeMusicManager;
 implementation
 uses SysUtils, castleFilesUtils,
   CastleVectors,
-  DecoInputOutput, //used for safe threaded loading of sound buffer
+  DecoHDD, //used for safe threaded loading of sound buffer
   DecoGlobal, DecoTime, DecoLog;      //used for random
 
 {========================== TMusicLoadThread ===============================}

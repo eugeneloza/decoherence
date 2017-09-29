@@ -120,7 +120,7 @@ procedure FreeCreatures;
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 uses SysUtils, CastleFilesUtils,
-  DecoInputOutput, DecoLog;
+  DecoHDD, DecoLog;
 
 function AnimationEnd(at: TAnimationType): TAnimationEnd;
 begin

@@ -77,7 +77,7 @@ implementation
 uses SysUtils, CastleFilesUtils,
   DOM, CastleXMLUtils,
   DecoFont,
-  DecoGlobal, DecoInputOutput, DecoLog;
+  DecoGlobal, DecoHDD, DecoLog;
 
 var LastFact: integer = -1;
     CurrentFact: DFact = nil;      //looks ugly! Maybe I should remake it?

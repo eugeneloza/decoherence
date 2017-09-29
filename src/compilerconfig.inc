@@ -45,7 +45,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
   e.g. freepascal debugger doesn't show line numbers in inlined code }
 {$DEFINE SUPPORTS_INLINE}
 
-{ Use thread for loading stuff in DecoInputOutput? }
+{ Use thread for loading stuff in DecoHDD? }
 {$DEFINE ThreadLoad}
 
 { Gzip or not gzip, that is the answer. }

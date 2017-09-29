@@ -168,7 +168,7 @@ function InvertAngle(Angle: TAngle): TAngle; {$IFDEF SUPPORTS_INLINE}inline;{$EN
 implementation
 uses SysUtils, CastleURIUtils,
   DOM, CastleXMLUtils,
-  DecoInputOutput, DecoLog;
+  DecoHDD, DecoLog;
 
 function TileKindToStr(Value: TTileKind): string;
 begin

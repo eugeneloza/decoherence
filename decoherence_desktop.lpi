@@ -157,9 +157,9 @@
         <UnitName Value="DecoLabels"/>
       </Unit8>
       <Unit9>
-        <Filename Value="src/decomouse.pas"/>
+        <Filename Value="src/decoinput.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="DecoMouse"/>
+        <UnitName Value="DecoInput"/>
       </Unit9>
       <Unit10>
         <Filename Value="src/decolevel.pas"/>
@@ -214,6 +214,7 @@
       <Unit20>
         <Filename Value="src/decodungeontiles.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoDungeonTiles"/>
       </Unit20>
       <Unit21>
         <Filename Value="src/decoabstractworld.pas"/>
@@ -260,9 +261,9 @@
         <UnitName Value="DecoNodeParser"/>
       </Unit29>
       <Unit30>
-        <Filename Value="src/decoinputoutput.pas"/>
+        <Filename Value="src/decohdd.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="DecoInputOutput"/>
+        <UnitName Value="DecoHDD"/>
       </Unit30>
       <Unit31>
         <Filename Value="src/decosound.pas"/>

@@ -292,7 +292,7 @@ implementation
 uses SysUtils,
    DecoFont, DecoImageProcess,
    //DecoInterfaceBlocks,
-   DecoInputOutput, DecoInterfaceLoader, DecoLog;
+   DecoHDD, DecoInterfaceLoader, DecoLog;
 
 {===========================================================================}
 {====================== D Wind Element =====================================}

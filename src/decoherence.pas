@@ -31,7 +31,7 @@ uses Classes, SysUtils,
 
      DecoThread, DecoThrash,
 
-     DecoGui, DecoInterface, DecoMouse,
+     DecoGui, DecoInterface, DecoInput,
      DecoLevel, DecoAbstractWorld,
      DecoSound,
      DecoLoadScreen, DecoPerks, DecoActorBody,
@@ -264,10 +264,10 @@ Initialization
 
   {$IFNDEF AllowRescale}window.ResizeAllowed := raOnlyAtOpen;{$ENDIF}
   {$IFDEF Fullscreen}
-    Window.fullscreen := true;
+    Window.FullScreen := true;
   {$ELSE}
-    Window.width := 1024;
-    Window.height := 600;
+    Window.Width := 1024;
+    Window.Height := 600;
   {$ENDIF}
 
   Application.MainWindow  :=  Window;

@@ -80,7 +80,7 @@ type
 implementation
 uses CastleFilesUtils, DecoFont,
   DecoLoadScreen,
-  DecoInputOutput, DecoLog;
+  DecoHDD, DecoLog;
 
 procedure DLoadScreen.SpawnChildren;
 begin

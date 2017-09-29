@@ -55,7 +55,7 @@ function LoadBlenderX3D(URL: string): TX3DRootNode;
 implementation
 
 uses SysUtils, {StrUtils,} CastleVectors,
-  DecoInputOutput, DecoLog;
+  DecoHDD, DecoLog;
 
 var TextureProperties: TTexturePropertiesNode;
 
