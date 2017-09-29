@@ -25,77 +25,75 @@ interface
 
 const Version = {$INCLUDE version.inc};
 
-{ Constants for logging verbosity level }
-const Log0 = 1; //this is the most important message
-const LogError = 1;
-const LogVerbose = 20; //this is very unimportant message
-const LogTemp = 1;
+{ --- HIGHEST LEVEL --- }
 
-const LogInit = 5;
-const LogInit2 = LogInit+1;
-const LogInitError = LogError;
+const LogError = true;
 
-const LogInitSound = LogInit2;
-const LogInitCharacters = LogInit2;
-const LogInitPlayer = LogInit2;
-const LogInitData = LogInit2;
-
-const LogInterfaceError = LogError;
-const LogInitInterface = LogInit2;
-const LogInterfaceInfo = LogVerbose-1;
-const LogInterfaceGLError = LogError;
-const LogInterfaceScaleHint = LogVerbose;
-const LogInterfaceSceleError = LogError+2;
-
-{errors}
-const LogLabelError = LogInterfaceError;
-const LogThreadError = LogError;
-const LogAnimationError = LogError;
-
-const LogNavigationError = LogError;
-const LogSoundError = LogError;
-const LogParserError = LogError;
-
-{soft errors}
-const Log3DLoadSoftError = LogError+5;
-
-{World}
-const LogWorldInitSoftError = 5;
-const LogWorldInit = LogInit2;
-const LogWorldError = LogError;
-const LogGenerateWorld = LogWorldInit;
-
-{Mouse}
-const LogMouseInfo = LogVerbose;
-const LogMouseError = LogError;
-const LogMouseSoftError = LogMouseError+2;
-
-{Constructor}
-const LogConstructorInfo = LogVerbose;
+const LogInitError        = LogError;
 const LogConstructorError = LogError;
+const LogThreadError      = LogError;
+const LogAnimationError   = LogError;
+const LogNavigationError  = LogError;
+const LogSoundError       = LogError;
+const LogParserError      = LogError;
+const LogWorldError       = LogError;
+const LogMouseError       = LogError;
+const LogActorError       = LogError;
 
+const LogInterfaceError   = LogError;
+const LogInterfaceGLError = LogError;
 
-{Actor}
-const LogActorError = LogError;
+const LogLabelError          = LogInterfaceError;
+const LogInterfaceSceleError = LogInterfaceError;
 
-var Verbosity: integer = 100;
+const LogTemp = true;
+
+{ --- MEDIUM LEVEL --- }
+
+const LogInit = true;
+const LogInit2 = true;
+
+const LogInitSound      = LogInit2;
+const LogInitCharacters = LogInit2;
+const LogInitPlayer     = LogInit2;
+const LogInitData       = LogInit2;
+const LogInitInterface  = LogInit2;
+const LogWorldInit      = LogInit2;
+
+const LogGenerateWorld      = LogWorldInit;
+const LogWorldInitSoftError = LogInitInterface;
+
+const LogMouseSoftError = LogInit2;
+
+{ --- LOWEST LEVEL --- }
+
+const LogVerbose = true;
+
+const LogInterfaceInfo      = LogVerbose;
+const LogInterfaceScaleHint = LogVerbose;
+const Log3DLoadSoftError    = LogVerbose;
+const LogMouseInfo          = LogVerbose;
+
+const LogConstructorInfo    = LogVerbose;
+
+var doLog: boolean = true;
 
 { Initializes Castle Log and display basic info }
 procedure InitLog;
 { Writes a log string
   should be used like dLog(1, Self,prefix,message)
   Self = nil inside a procedure }
-procedure dLog(const LogLevel: integer; const aObj: TObject; const aPrefix, aMessage: string);
+procedure dLog(const LogLevel: boolean; const aObj: TObject; const aPrefix, aMessage: string);
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 uses CastleLog,
   DecoTime;
 
-procedure dLog(const LogLevel: integer; const aObj: TObject; const aPrefix, aMessage: string);
+procedure dLog(const LogLevel: boolean; const aObj: TObject; const aPrefix, aMessage: string);
 var objName: string;
 begin
-  if Verbosity <= 0 then Exit;
-  if Verbosity >= LogLevel then begin
+  if not doLog then Exit;
+  if LogLevel then begin
     if aObj<>nil then objName := ' in '+aObj.ClassName else objName := '';
     WriteLnLog(aPrefix+objName,aMessage)
   end;  
@@ -105,7 +103,7 @@ end;
 
 procedure InitLog;
 begin
-  if Verbosity <= 0 then Exit;
+  if not doLog then Exit;
   //initialize the log
   {$IFDEF Android}
   InitializeLog;

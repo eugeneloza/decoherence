@@ -287,6 +287,6 @@ Finalization
   FreeCreatures;
   FreeInterface;
   //FreeTextureProperties;
-  dLog(Log0,nil,'Finalization','Bye...');
+  dLog(LogInit,nil,'Finalization','Bye...');
 end.
 
