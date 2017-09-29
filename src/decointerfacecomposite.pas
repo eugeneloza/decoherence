@@ -577,7 +577,7 @@ begin
   CNC_bar.Base.AnchorToFrame(Frame);
   MPH_bar.Base.AnchorToFrame(Frame);
 
-  if fTarget.MaxMaxMPH > 0 then begin
+  if (fTarget <> nil) and (fTarget.MaxMaxMPH > 0) then begin
     ScaleX := 1/4;
     MPH_bar.isVisible := true;
   end else begin
