@@ -16,7 +16,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 {---------------------------------------------------------------------------}
 
 { Map parameters editor and testing tool }
-unit constructor_map;
+unit Constructor_Map;
 
 {$INCLUDE compilerconfig.inc}
 interface
@@ -24,7 +24,8 @@ interface
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
   ExtCtrls, CheckLst, ComCtrls, CastleControl, CastleControls,
-  constructor_global, decodungeontiles, decodungeongenerator;
+  Constructor_Global,
+  DecoDungeonTiles, DecoDungeonGenerator;
 
 type
   TMapEditor = class(TWriterForm)
@@ -112,9 +113,9 @@ var
 implementation
 {$R *.lfm}
 
-uses {StrUtils, }CastleLog, castleimages, castlevectors,
+uses CastleImages, CastleVectors,
   DOM, CastleXMLUtils,
-  decoglobal;
+  DecoGlobal, DecoLog;
 
 
 {-------------------------------------------------------------------------}
@@ -477,10 +478,10 @@ begin
     f := ConstructorData(GetScenarioFolder+MapsFolder+filename+'.xml',ToGameFolder);
   URLWriteXML(XMLdoc, f);
 
-  WriteLnLog('TMapEditor.SaveMap','File Written: '+f);
+  dLog(LogConstructorInfo,Self,'TMapEditor.SaveMap','File Written: '+f);
 
   FreeAndNil(XMLdoc);
-  freeandnil(GParam);
+  FreeAndNil(GParam);
 end;
 
 {------------------------------------------------------------------------------}
@@ -497,7 +498,7 @@ procedure TMapEditor.ReadMapsList;
 begin
   FreeAndNil(MapsList);
   MapsList := GetFilesList(GetScenarioFolder+MapsFolder,'xml');
-  WriteLnLog('TMapEditor.ReadTilesList','Maps found = '+inttostr(MapsList.count));
+  dLog(LogConstructorInfo,Self,'TMapEditor.ReadTilesList','Maps found = '+inttostr(MapsList.count));
 end;
 
 {------------------------------------------------------------------------------}
@@ -506,7 +507,7 @@ procedure TMapEditor.ReadTilesList;
 begin
   FreeAndNil(TilesList);
   TilesList := GetFilesList(TilesFolder,'map');
-  WriteLnLog('TMapEditor.GetTileList','Tiles found = '+inttostr(TilesList.count));
+  dLog(LogConstructorInfo,Self,'TMapEditor.GetTileList','Tiles found = '+inttostr(TilesList.count));
 end;
 
 {------------------------------------------------------------------------}

@@ -33,33 +33,34 @@ procedure Burn(const aImage: TCastleImage; const Container: DAbstractContainer);
 {$ENDIF}
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
+uses DecoLog;
 
 {$IFDEF BurnerImage}
-var BURNER_IMAGE_UNSCALED,BURNER_IMAGE:TCastleImage;  //todo: not freed automatically!!!!
+var BurnerImageUnscaled,BurnerImage:TCastleImage;  //todo: not freed automatically!!!!
 procedure InitBurnerImage;
 begin
-  {$IFNDEF AllowRescale}if BURNER_IMAGE<>nil then exit;{$ENDIF}
-  WriteLnLog('Init_burner_image','started');
-  if BURNER_IMAGE_UNSCALED = nil then
-    BURNER_IMAGE_UNSCALED := LoadImage(ApplicationData(InterfaceFolder+'burner/burner_Pattern_203_CC0_by_Nobiax_diffuse.png'), [TRGBImage]) as TRGBImage;
-  if (BURNER_IMAGE=nil) or (BURNER_IMAGE.height <> window.height) or (BURNER_IMAGE.width <> window.width) then begin
-    FreeAndNil(BURNER_IMAGE);
-    BURNER_IMAGE := BURNER_IMAGE_UNSCALED.MakeCopy;
-    BURNER_IMAGE.Resize(window.width, window.height, riBilinear);
+  {$IFNDEF AllowRescale}if BurnerImage<>nil then exit;{$ENDIF}
+  dLog(LogInitInterface,nil,'InitBurnerImage','Started');
+  if BurnerImageUnscaled = nil then
+    BurnerImageUnscaled := LoadImage(ApplicationData(InterfaceFolder+'burner/burner_Pattern_203_CC0_by_Nobiax_diffuse.png'), [TRGBImage]) as TRGBImage;
+  if (BurnerImage=nil) or (BurnerImage.height <> window.height) or (BurnerImage.width <> window.width) then begin
+    FreeAndNil(BurnerImage);
+    BurnerImage := BurnerImageUnscaled.MakeCopy;
+    BurnerImage.Resize(window.width, window.height, riBilinear);
   end;
-  {$IFNDEF AllowRescale}FreeAndNil(BURNER_IMAGE_UNSCALED);{$ENDIF}
+  {$IFNDEF AllowRescale}FreeAndNil(BurnerImageUnscaled);{$ENDIF}
 
-  WriteLnLog('Init_burner_image','finished');
+  dLog(LogInitInterface,nil,'InitBurnerImage','Finished');
 end;
 
 {working directly on image!}
 procedure Burn(const aImage: TCastleImage; const x,y,w,h: integer);
 begin
-  aImage.DrawFrom(BURNER_IMAGE,0,0,x,y,w,h,dmMultiply);
+  aImage.DrawFrom(BurnerImage,0,0,x,y,w,h,dmMultiply);
 end;
 procedure Burn(const aImage: TCastleImage; const Container: DAbstractContainer);
 begin
-  aImage.DrawFrom(BURNER_IMAGE,0,0,container.x1,container.y1,container.w,container.h,dmMultiply);
+  aImage.DrawFrom(BurnerImage,0,0,Container.x1,Container.y1,Container.w,Container.h,dmMultiply);
 end;
 {$ENDIF}
 

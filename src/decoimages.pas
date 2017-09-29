@@ -191,8 +191,8 @@ type
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-uses SysUtils, fgl, CastleLog, CastleFilesUtils,
-  {$IFDEF BurnerImage}DecoBurner,{$ENDIF} DecoInterfaceLoader;
+uses SysUtils, fgl, CastleFilesUtils,
+  {$IFDEF BurnerImage}DecoBurner,{$ENDIF} DecoInterfaceLoader, DecoLog;
 
 {=============================================================================}
 {============================= Abstract Image ================================}
@@ -225,7 +225,7 @@ begin
       GLImage := TGLImage.Create(ScaledImage,true,true);
       ScaledImage := nil;
       ImageReady := true;
-    end else WriteLnLog('DAbstractElement.InitGL','ERROR: Scaled Image is nil!');
+    end else dLog(LogInterfaceGLError,Self,'DAbstractElement.InitGL','ERROR: Scaled Image is nil!');
   end;
 end;
 
@@ -340,12 +340,12 @@ begin
   {check if minimal frame size is larger than the requested frame size}
   {$warning disabled}
   if Frame.CornerLeft+Frame.CornerRight+1 > Base.w then begin
-    WriteLnLog('DAbstractInterfaceElement.FrameResize3x3','Reset backwards base.w = '+IntToStr(Base.w)+' / cornerLeft+cornerRight = '+IntToStr(Frame.CornerLeft+Frame.CornerRight));
+    dLog(LogInterfaceScaleHint,Self,'DAbstractInterfaceElement.FrameResize3x3','Reset backwards base.w = '+IntToStr(Base.w)+' / cornerLeft+cornerRight = '+IntToStr(Frame.CornerLeft+Frame.CornerRight));
     Base.w := Frame.CornerLeft+Frame.CornerRight+1;
     //Base.BackwardSetSize(Base.w,-1);
   end;
   if Frame.CornerTop+Frame.CornerBottom+1 > Base.h then begin
-    WriteLnLog('DAbstractInterfaceElement.FrameResize3x3','Reset backwards base.h = '+IntToStr(Base.h)+' / cornerTop+cornerBottom = '+inttostr(Frame.CornerTop+Frame.CornerBottom));
+    dLog(LogInterfaceScaleHint,Self,'DAbstractInterfaceElement.FrameResize3x3','Reset backwards base.h = '+IntToStr(Base.h)+' / cornerTop+cornerBottom = '+inttostr(Frame.CornerTop+Frame.CornerBottom));
     Base.h := Frame.CornerTop+Frame.CornerBottom+1;
     //Base.BackwardSetSize(-1,Base.h);
   end;
@@ -398,7 +398,7 @@ end;
 procedure DFrameAnchorHelper.AnchorToFrame(const aFrame: DFrameImage);
 begin
   if aFrame = nil then begin
-    WriteLnLog('DFrameAnchorHelper.AnchorToFrame','ERROR: Frame is nil!');
+    dLog(LogInterfaceError,Self,'DFrameAnchorHelper.AnchorToFrame','ERROR: Frame is nil!');
     Exit;
   end;
   AnchorTo(aFrame.Current);
@@ -426,7 +426,7 @@ begin
      InitGLPending := true;
    end
    else
-     WriteLnLog('DSimpleImage.RescaleImage','ERROR: Base.Initialized = false');
+     dLog(LogInterfaceSceleError,Self,'DSimpleImage.RescaleImage','ERROR: Base.Initialized = false');
  end;
 end;
 
@@ -438,7 +438,7 @@ end;
 procedure DStaticImage.Load(const URL: string);
 begin
   FreeImage;
-  WriteLnLog('DStaticImage.LoadImage',URL);
+  dLog(LogInitInterface,Self,'DStaticImage.LoadImage',URL);
   SourceImage := LoadImageSafe(URL);
   AfterLoad;
   Rescale;
@@ -446,7 +446,7 @@ end;
 procedure DStaticImage.Load(const CopyImage: TCastleImage);
 begin
   FreeImage;
-  WriteLnLog('DStaticImage.LoadImage','Copying image from '+CopyImage.ClassName);
+  dLog(LogInitInterface,Self,'DStaticImage.LoadImage','Copying image from '+CopyImage.ClassName);
   SourceImage := CopyImage.MakeCopy;
   AfterLoad;
   Rescale;
@@ -460,7 +460,7 @@ begin
   except
     on E: Exception do
     begin
-      WriteLnLog('DStaticImage.AfterLoad','FATAL: Image has been freed before load completed. ABORT. '{+E.Message});
+      dLog(LogInitError,Self,'DStaticImage.AfterLoad','FATAL: Image has been freed before load completed. ABORT. '{+E.Message});
       FreeImage;
       Exit;
     end;
@@ -629,7 +629,7 @@ begin
     Update; //calls update and checks if the image is visible
 
     if Max = Min then begin
-      writeLnLog('DBarImage.draw','ERROR: Division by zero!');
+      dLog(LogInterfaceError,Self,'DBarImage.draw','ERROR: Division by zero!');
       Exit;
     end;
     if Kind = bsVertical then begin

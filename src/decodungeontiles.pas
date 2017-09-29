@@ -16,13 +16,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 {---------------------------------------------------------------------------}
 
 { Contains definition for a dungeon tile and loading/parsing procedures }
-unit decodungeontiles;
+unit DecoDungeonTiles;
 
 {$INCLUDE compilerconfig.inc}
 interface
 
-uses classes, castleImages,
-  decoglobal;
+uses Classes, CastleImages,
+  DecoGlobal;
 
 const TileScale = 2;
 
@@ -142,19 +142,19 @@ end;
     //TilesList: TStringList;
 
 { convert TTileKind to a string for saving }
-function TileKindToStr(value: TTileKind): string;
+function TileKindToStr(Value: TTileKind): string;
 { convert a string to TTileKind for loading }
-function StrToTileKind(value: string): TTileKind;
+function StrToTileKind(Value: string): TTileKind;
 
-function TileFaceToStr(value: TTileFace): string;
-function StrToTileFace(value: string): TTileFace;
-function AngleToStr(value: TAngle): string;
-function StrToAngle(value: string): TAngle;
+function TileFaceToStr(Value: TTileFace): string;
+function StrToTileFace(Value: string): TTileFace;
+function AngleToStr(Value: TAngle): string;
+function StrToAngle(Value: string): TAngle;
 
 {check if this tile is Passable - in a safe way}
-function isPassable(value: TTileFace): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
-function isLookable(value: TTileFace): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
-function isPassable(value: TTileKind): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+function isPassable(Value: TTileFace): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+function isLookable(Value: TTileFace): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+function isPassable(Value: TTileKind): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 {determine x/y shifts introduced by current Angle}
 function a_dx(Angle: TAngle): integer; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 function a_dy(Angle: Tangle): integer; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
@@ -166,8 +166,9 @@ function InvertAngle(Angle: TAngle): TAngle; {$IFDEF SUPPORTS_INLINE}inline;{$EN
 
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-uses SysUtils, CastleURIUtils, CastleLog,
-  DOM, CastleXMLUtils, DecoInputOutput;
+uses SysUtils, CastleURIUtils,
+  DOM, CastleXMLUtils,
+  DecoInputOutput, DecoLog;
 
 function TileKindToStr(Value: TTileKind): string;
 begin
@@ -202,7 +203,7 @@ begin
     tfNone: Result := 'none';
     tfWall: Result := 'wall';
     tfFree..high(TTileFace): Result := IntToStr(Value);
-    else raise Exception.Create('Unknown TTileFace value in TileFaceToStr');
+    else raise Exception.Create('Unknown TTileFace Value in TileFaceToStr');
   end;
 end;
 function StrToTileFace(Value: string): TTileFace;
@@ -216,7 +217,7 @@ end;
 
 {---------------------------------------------------------------------------}
 
-function AngleToStr(value: TAngle): string;
+function AngleToStr(Value: TAngle): string;
 begin
   case Value of
     aTop:    Result := 'top';
@@ -321,7 +322,7 @@ var TileDOC: TXMLDocument;
 begin
   //inherited;
   TileName := DeleteURIExt(ExtractURIName(URL));
-  WriteLnLog('DTileMap.Load',URL);
+  dLog(LogInitData,Self,'DTileMap.Load',URL);
 
   {todo: clear the tile with base = tkInacceptible
    and check that all tile elements are loaded and give an error otherwise

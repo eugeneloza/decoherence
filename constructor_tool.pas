@@ -16,17 +16,18 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 {---------------------------------------------------------------------------}
 
 { Editor for all game data }   
-program constructor_tool;
+program Constructor_Tool;
 
 {$IFDEF Windows}{$APPTYPE Console}{$ENDIF}
 {$INCLUDE compilerconfig.inc}
 
 uses
-  {$IFDEF UNIX}cthreads,{$ENDIF}
+  {$IFDEF UNIX}cThreads,{$ENDIF}
   Interfaces, // this includes the LCL widgetset
-  Forms, castle_base, castle_window, castle_components, constructor_mainunit,
-  constructor_facts, constructor_global, decotranslation,
-  constructor_tiles, constructor_map, constructor_placeholders;
+  Forms, Castle_Base, Castle_Window, Castle_Components,
+  Constructor_MainUnit,
+  Constructor_Facts, Constructor_Global, DecoTranslation,
+  Constructor_Tiles, Constructor_Map, Constructor_Placeholders;
 
 {$R *.res}
 

@@ -93,11 +93,7 @@ procedure InitPerks;
 procedure FreePerks;
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 Implementation
-uses SysUtils, {CastleWindow,} CastleLog;
-
-
-
-{---------------------------------------------------------------------------}
+uses SysUtils, DecoLog;
 
 constructor DPerk.Create;
 begin
@@ -134,7 +130,7 @@ end;
 procedure InitPerks;
 var TmpPerk: DPerk;
 begin
-  WriteLnLog('DecoPerks.InitPerks','Loading perks...');
+  dLog(LogInitCharacters,nil,'DecoPerks.InitPerks','Loading perks...');
   Perks := DPerksList.create(true);
   TmpPerk := DPerk.create;
   //TmpPerk.image.LoadThread(PerksFolder+'crossed-swords.png');
@@ -145,7 +141,7 @@ end;
 
 procedure FreePerks;
 begin
-  WriteLnLog('DecoPerks.FreePerks','Freeing perks...');
+  dLog(LogInitCharacters,nil,'DecoPerks.FreePerks','Freeing perks...');
   FreeAndNil(Perks);
 end;
 

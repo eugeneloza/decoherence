@@ -168,10 +168,11 @@ type
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
-uses SysUtils, DecoLoad3d, CastleLog,
+uses SysUtils, DecoLoad3d,
   DecoNavigationNetwork, DecoPlayerCharacter,
   DecoActorBody,
-  CastleSceneCore;
+  CastleSceneCore,
+  DecoLog;
 
 {============================ DAbstractWorld3D =============================}
 {================================ MANAGE ===================================}
@@ -348,7 +349,7 @@ begin
         Replacement := CopyTransform(Slot);
         //rotate
         //AddRecoursive(Replacement, GetPlaceholder(Parsed)); //plus symmetry groups
-        //WriteLnLog(Parsed.placeholder);
+        //dLog(Parsed.placeholder);
         Dest.FdChildren.Add(Replacement);
       end;
     end;
@@ -408,7 +409,7 @@ begin
   WorldScenes := TSceneList.Create(true); //list owns the scenes and will free them accordingly
   for i := 0 to WorldRoots.Count-1 do begin
     Scene := TCastleScene.Create(nil); //List will free the scenes, not freeing them automatically
-    Scene.ShadowMaps := Shadow_maps_enabled;  {?????}
+    Scene.ShadowMaps := ShadowMapsEnabled;  {?????}
     Scene.Spatial := [ssRendering, ssDynamicCollisions];
     Scene.ProcessEvents := true;
     Scene.Load(WorldRoots[i],true);
@@ -424,7 +425,7 @@ var i: integer;
     a: DMonster;
 begin
   if Actors <> nil then begin
-    WriteLnLog('DAbstractWorld3d.SpawnActors','WARNING: Actors is not nil, freeing...');
+    dLog(LogWorldInitSoftError,Self,'DAbstractWorld3d.SpawnActors','WARNING: Actors is not nil, freeing...');
     FreeAndNil(Actors);
   end;
   Actors := TActorList.Create(true);

@@ -296,12 +296,12 @@ type
 
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-uses SysUtils, CastleLog,
+uses SysUtils,
   CastleFilesUtils, DecoInputOutput,
 
   DecoAbstractWorld, DecoAbstractWorld3D,
   CastleScene,
-  DecoGameMode;
+  DecoGameMode, DecoLog;
 
 
 {===========================================================================}
@@ -395,7 +395,7 @@ begin
       toDir := Direction
     else
       toDir := Vector3(0,1,0);
-    WriteLnLog('DActor.LookAt','ERROR: Direction is zero!');
+    dLog(LogActorError,Self,'DActor.LookAt','ERROR: Direction is zero!');
   end;
 end;
 
@@ -805,7 +805,7 @@ function DActor.GetTarget: DCoordActor;
 begin
   if fTarget = nil then
     GetEnemyTarget; //todo
-    //WriteLnLog('DActor.GetTarget','Warning: Autoselecting target not implemented yet...');
+    //dLog(LogActorError,Self,'DActor.GetTarget','Warning: Autoselecting target not implemented yet...');
   Result := fTarget;
 end;
 
@@ -865,7 +865,7 @@ end;
 procedure DActor.PerformAction(const doAction: DMultiPerk);
 begin
   if fTarget = nil then begin
-    WriteLnLog('DActor.PreformAction','ERROR: Action was requested but no target specified...');
+    dLog(LogActorError,Self,'DActor.PreformAction','ERROR: Action was requested but no target specified...');
     Exit;
   end;
 
@@ -873,7 +873,7 @@ begin
     Self.Animation(atAttack);
     Self.RequestSoftPause;
     DBasicActor(fTarget).Hit(10,1);
-  end else WriteLnLog('DActor.PreformAction','ERROR: Trying to preform action on invalid actor...');
+  end else dLog(LogActorError,Self,'DActor.PreformAction','ERROR: Trying to preform action on invalid actor...');
 end;
 
 {-----------------------------------------------------------------------------}
@@ -883,7 +883,7 @@ begin
   if fTarget<>nil then
     LookAt(Target.Position)
   else
-    WriteLnLog('DActor.LookAt','Warning: trying to look at a nil target...');
+    dLog(LogActorError,Self,'DActor.LookAt','Warning: trying to look at a nil target...');
 end;
 procedure DActor.LookAt(const aPosition: TVector3);
 begin

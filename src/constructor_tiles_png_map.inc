@@ -1,4 +1,4 @@
-{this is a write-and-forget procedure. So moved it to an external file.
+﻿{this is a write-and-forget procedure. So moved it to an external file.
  Do not change it if its working. Not worth it.
  TODO: BUT IT ISN'T WORKING AS EXPECTED}
 
@@ -32,7 +32,7 @@ var PNG_tileset, PNG_up, PNG_down, PNG_updown, PNG_map: TRGBAlphaImage;
 
 begin
  if (not isTileLoaded) or (TileM=nil) then begin
-   WriteLnLog('TDungeonTilesEditor.MakePNGMap','No tile loaded. Aborting');
+   dLog(LogConstructorError,Self,'TDungeonTilesEditor.MakePNGMap','No tile loaded. Aborting');
    exit;
  end;
 

@@ -26,22 +26,23 @@ uses CastleImages,
 
 { Makes the image brighter (default 20%)
  warning: creates a copy of the image!}
-function Brighter(const aImage: TCastleImage; const mult: float = 1.2): TCastleImage;
+function Brighter(const aImage: TCastleImage; const Mult: float = 1.2): TCastleImage;
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-uses CastleLog, CastleVectors;
+uses CastleVectors,
+  DecoLog;
 
 function CheckImageValid(aImage: TCastleImage): boolean;
 begin
   Result := true;
   if (aImage=nil) or (aImage.isEmpty) then begin
     Result := false;
-    WriteLnLog('DecoImageProcess>CheckImageValid','FATAL: Image is nil');
+    dLog(LogInterfaceError,aImage,'DecoImageProcess>CheckImageValid','FATAL: Image is nil');
     Exit;
   end;
   if not (aImage is TRGBAlphaImage) then begin
     Result := false;
-    WriteLnLog('DecoImageProcess>CheckImageValid','FATAL: Image type '+aImage.ClassName+' is not supported for operation.');
+    dLog(LogInterfaceError,nil,'DecoImageProcess>CheckImageValid','FATAL: Image type '+aImage.ClassName+' is not supported for operation.');
     Exit;
   end;
 end;
@@ -56,7 +57,7 @@ end;
 
 {------------------------------------------------------------------------}
 
-function Brighter(const aImage: TCastleImage; const mult: float = 1.2): TCastleImage;
+function Brighter(const aImage: TCastleImage; const Mult: float = 1.2): TCastleImage;
 var IMG: TRGBAlphaImage;
   p: PVector4byte;
   i: integer;
@@ -65,12 +66,12 @@ begin
   IMG := aImage.MakeCopy as TRGBAlphaImage;
   p := IMG.Pixels;
   for i := 0 to (IMG.Size div IMG.PixelSize) do begin
-    p^[0] := Clamp255(Round(p^[0]*mult));
-    p^[1] := Clamp255(Round(p^[1]*mult));
-    p^[2] := Clamp255(Round(p^[2]*mult));
+    p^[0] := Clamp255(Round(p^[0]*Mult));
+    p^[1] := Clamp255(Round(p^[1]*Mult));
+    p^[2] := Clamp255(Round(p^[2]*Mult));
     {no alpha processing?}
     //p^[3]
-    Inc(p,IMG.PixelSize);
+    inc(p,IMG.PixelSize);
   end;
   Result := IMG;
 end;

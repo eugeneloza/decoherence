@@ -34,8 +34,8 @@ var Camera: TWalkCamera;
 procedure InitNavigation;
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-uses  CastleFilesUtils, CastleLog,
-  x3dLoad;
+uses  CastleFilesUtils, x3dLoad,
+  DecoLog;
 
 var Nav: TKambiNavigationInfoNode;
     NavRoot: TX3DRootNode;
@@ -45,14 +45,14 @@ var Nav: TKambiNavigationInfoNode;
 
 procedure InitNavigation;
 begin
-  WritelnLog('deconavigation.InitNavigation','Initialize navigation');
-  camera := TWalkCamera.create(Window);
+  dLog(LogInitPlayer,nil,'DecoNavigation.InitNavigation','Initialize navigation');
+  Camera := TWalkCamera.Create(Window);
   {z-up orientation}
-  camera.Gravity := false;
-  camera.PreferredHeight := PlayerHeight;
-  camera.MouseDragMode := mdRotate;
+  Camera.Gravity := false;
+  Camera.PreferredHeight := PlayerHeight;
+  Camera.MouseDragMode := mdRotate;
 
-  camera.Input := [];  //-----  completely disable camera
+  Camera.Input := [];  //-----  completely disable camera
 
   NavRoot := TX3DRootNode.create;
 
@@ -68,9 +68,9 @@ begin
   NavLight.FdShadows.Value := false;
 
   //and create a respective navigation node
-  nav := TKambiNavigationInfoNode.Create;
-  nav.FdHeadLightNode.Value := NavLight;
-  nav.FdHeadlight.Value := true;
+  Nav := TKambiNavigationInfoNode.Create;
+  Nav.FdHeadLightNode.Value := NavLight;
+  Nav.FdHeadlight.Value := true;
 
   NavRoot.FdChildren.Add(Nav);
 
@@ -79,7 +79,7 @@ begin
   {this is a temporary "addition" of a screen shader,
    should be replaced for something more useful some time later}
   {Shaders := TSwitchNode.create;}
-  ScreenEffect := load3D(ApplicationData('shaders/empty.x3dv'));
+  ScreenEffect := Load3D(ApplicationData('shaders/empty.x3dv'));
   {Shaders.fdChildren.add(screenEffect.FdChildren[0]);
   ScreenEffect := load3D(ApplicationData('shaders/edgedetect.x3dv'));
   Shaders.fdChildren.add(screenEffect.FdChildren[0]);
@@ -92,7 +92,7 @@ begin
   Navigation := TCastleScene.Create(Window);
   Navigation.Spatial := [{ssRendering, ssDynamicCollisions}];
   Navigation.ProcessEvents := true;
-  Navigation.ShadowMaps := Shadow_maps_enabled;
+  Navigation.ShadowMaps := ShadowMapsEnabled;
   Navigation.Load(NavRoot,true);
 
 end;

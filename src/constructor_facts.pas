@@ -16,7 +16,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 {---------------------------------------------------------------------------}
 
 { Editor for loadscreens: facts and images }
-unit constructor_facts;
+unit Constructor_Facts;
 
 {$INCLUDE compilerconfig.inc}
 interface
@@ -76,7 +76,7 @@ implementation
 {$R *.lfm}
 
 uses DOM, CastleXMLUtils,
-  CastleLog, decoglobal;
+  DecoGlobal, DecoLog;
 
 {-----------------------------------------------------------------------------}
 
@@ -99,7 +99,7 @@ begin
       decoloadscreen.Facts := nil;
     except
       freeandnil(decoloadscreen.Facts);
-      writeLnLog('TFactsEditor.LoadMe','Exception reading '+CurrentFile);
+      dLog(LogConstructorError,Self,'TFactsEditor.LoadMe','Exception reading '+CurrentFile);
     end;
   end;
 
@@ -117,10 +117,10 @@ begin
     finally
       FindClose(Rec);
     end;
-    WriteLnLog('TFactsEditor.LoadMe','Images loaded = '+inttostr(LoadImages.count));
+    dLog(LogConstructorInfo,Self,'TFactsEditor.LoadMe','Images loaded = '+inttostr(LoadImages.count));
   end
   else
-    WriteLnLog('TFactsEditor.LoadMe','ERROR: Unable to load LoadScreen images');
+    dLog(LogConstructorError,Self,'TFactsEditor.LoadMe','ERROR: Unable to load LoadScreen images');
 
 
   {for L in TLanguage do if Facts[L]<>nil then
@@ -173,7 +173,7 @@ var XMLdoc: TXMLDocument;
 begin
   for L in TLanguage do
     if Facts[L] = nil then
-      WriteLnLog('TFactsEditor.WriteMe','LANGUAGE IS NIL!')
+      dLog(LogConstructorError,Self,'TFactsEditor.WriteMe','LANGUAGE IS NIL!')
     else begin
       XMLdoc := TXMLDocument.Create;
       RootNode := XMLdoc.CreateElement('FactsList');
@@ -201,7 +201,7 @@ begin
       else
         f := ConstructorData(LanguageDir(L)+'facts.xml',ToGameFolder);
       URLWriteXML(XMLdoc, f);
-      WriteLnLog('TFactsEditor.WriteMe','File Written: '+f);
+      dLog(LogConstructorInfo,Self,'TFactsEditor.WriteMe','File Written: '+f);
 
       FreeAndNil(XMLdoc);
     end;
@@ -253,7 +253,7 @@ procedure TFactsEditor.AddFactButtonClick(Sender: TObject);
 var NewFact: DFact;
     L: TLanguage;
 begin
-  WriteLnLog('TFactsEditor.AddFactButtonClick','Creating a new empty fact');
+  dLog(LogConstructorInfo,Self,'TFactsEditor.AddFactButtonClick','Creating a new empty fact');
   for L in TLanguage do begin
     NewFact := DFact.create;
     NewFact.compatibility := TLoadImageList.create(true);

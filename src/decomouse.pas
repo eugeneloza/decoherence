@@ -23,7 +23,6 @@ unit DecoMouse;
 interface
 
 uses Classes, fgl, SysUtils,
-  CastleLog,
   CastleFilesUtils, CastleKeysMouse,
   DecoInterface, DecoGui;
 
@@ -51,8 +50,8 @@ procedure CenterMouseCursor;
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 uses CastleVectors,
-  DecoNavigation,
-  DecoGlobal, DecoPlayerCharacter;
+  DecoNavigation, DecoPlayerCharacter,
+  DecoGlobal, DecoLog;
 
 constructor DTouch.Create(const xx,yy: single; const Finger: integer);
 begin
@@ -91,7 +90,7 @@ begin
     Repeat
       if TouchArray[i].FingerIndex = FingerIndex then Found := true else inc(i);
     until (i>TouchArray.Count-1) or Found;
-    WritelnLog('doMouseRelease','Caught mouse release finger='+IntToStr(FingerIndex)+' n='+IntToStr(i));
+    dLog(LogMouseInfo,nil,'doMouseRelease','Caught mouse release finger='+IntToStr(FingerIndex)+' n='+IntToStr(i));
     if Found then begin
       if (TouchArray[i].ClickElement <> nil) then begin
         if Assigned(touchArray[i].ClickElement.OnMouseRelease) then
@@ -101,9 +100,9 @@ begin
       end;
       TouchArray.Remove(TouchArray[i]);
     end else
-      WriteLnLog('doMouseRelease','ERROR: Touch event not found!');
+      dLog(LogMouseError,nil,'doMouseRelease','ERROR: Touch event not found!');
  end else
-   WriteLnLog('doMouseRelease','ERROR: Touch event list is empty!');
+   dLog(LogMouseError,nil,'doMouseRelease','ERROR: Touch event list is empty!');
 
 end;
 
@@ -127,7 +126,7 @@ begin
   end;
 
   TouchArray.Add(NewEventTouch);
-  WriteLnLog('doMousePress','Caught mouse press finger='+IntToStr(FingerIndex));
+  dLog(LogMouseInfo,nil,'doMousePress','Caught mouse press finger='+IntToStr(FingerIndex));
 end;
 
 {----------------------------------------------------------------------------}
@@ -142,7 +141,7 @@ begin
     Cursor := mcDefault;}
   if Camera = nil then begin
     if CameraWarning then begin
-      WriteLnLog('DecoMouse>doMouseLook','Warning: Camera is not initialized for MouseLook');
+      dLog(LogMouseSoftError,nil,'DecoMouse>doMouseLook','Warning: Camera is not initialized for MouseLook');
       CameraWarning := false;
     end;
     Exit;

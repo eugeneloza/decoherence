@@ -53,14 +53,14 @@ var { analogue to Now function, but a fast-access variable, representing
     SoftPauseCoefficient: float = 1.0;
     LocalTimeFlowSpeed: float = 1.0;
 
+{ Returns a nice date and time as a string (e.g. for naming files) }
+function NiceDate: string;
 { Advance time for the frame }
 procedure doTime;
-
+{}
 procedure RequestSoftPauseByAction(PauseSeconds: DTime);
-
 { Gets CastleTimeUtils.Timer value from some "starting point" in a thread-safe way }
 function GetNow: DTime; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
-
 {$HINT maybe use raw integer for these values? That'll give approx +0.5% speed, but will require converting FPS_goal to integer}
 { This is a less accurate but accelerated (~130 times) version
   of the timer by using threads. Should be used after ForceGetNowThread.
@@ -71,6 +71,20 @@ function ForceGetNowThread: DTime; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 uses SysUtils, Classes{$IFDEF Windows}, SyncObjs{$ENDIF};
+
+function NiceDate: string;
+var s: string;
+    i: integer;
+begin
+  s := DateTimeToAtStr(Now); //only place where I'm using SysUtils.Now
+  Result := '';
+  for i := 1 to Length(s) do
+    if Copy(s,i,1) = ' ' then Result += '_' else
+    if Copy(s,i,1) = ':' then Result += '-' else
+    Result += Copy(s,i,1);
+end;
+  
+{----------------------------------------------------------------------------}  
 
 var LastGlobalTime: DTime = -1;
 const LocalTimeRestoreSpeed = 1/2; {requires 2 seconds to restore to normal time speed}

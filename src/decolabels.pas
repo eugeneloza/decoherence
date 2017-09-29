@@ -134,8 +134,8 @@ type
 
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-uses SysUtils, CastleImages, CastleLog,
-  DecoInterface;
+uses SysUtils, CastleImages,
+  DecoInterface, DecoLog;
 
 {----------------------------------------------------------------------------}
 
@@ -182,11 +182,7 @@ begin
     Base.ScaleItem := true;
     Base.FloatToInteger;
     Base.ScaleItem := tmpflg;
-    WriteLnLog('DLabel.PrepareTextImage','Warning! Label width is not initialized! Trying to w='+inttostr(Base.w));
-    {WriteLnLog('fx1',floatToStr(base.fx1));
-    WriteLnLog('fx2',floatToStr(base.fx2));
-    WriteLnLog('fy1',floatToStr(base.fy1));
-    WriteLnLog('fy2',floatToStr(base.fy2));}
+    dLog(LogLabelError,Self,'DLabel.PrepareTextImage','Warning! Label width is not initialized! Trying to w='+IntToStr(Base.w));
   end;
 
   FreeAndNil(BrokenString);
@@ -225,7 +221,7 @@ begin
           InitGLPending := true;
         end
        else
-         WriteLnLog('DLabel.RescaleImage/no scale label','ERROR: base.initialized = false');
+         dLog(LogLabelError,Self,'DLabel.RescaleImage/no scale label','ERROR: Base.Initialized = false');
   end;
 end;
 

@@ -119,8 +119,8 @@ procedure tmpLoadKnightCreature;
 procedure FreeCreatures;
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-uses SysUtils, CastleLog, CastleFilesUtils,
-  DecoInputOutput;
+uses SysUtils, CastleFilesUtils,
+  DecoInputOutput, DecoLog;
 
 function AnimationEnd(at: TAnimationType): TAnimationEnd;
 begin
@@ -130,7 +130,7 @@ begin
     atAttack: Result := aeIdle;
     atHurt:   Result := aeIdle;
     atDie:    Result := aeStop;
-    else WriteLnLog('DecoBody.AnimationEnd','ERROR: Unknown animation '+AnimationToString(at));
+    else dLog(LogAnimationError,nil,'DecoBody.AnimationEnd','ERROR: Unknown animation '+AnimationToString(at));
   end;
 end;
 function AnimationEnd(at: string): TAnimationEnd;
@@ -152,7 +152,7 @@ begin
     atAttack: Result := 'attack';
     atHurt:   Result := 'hurt';
     atDie:    Result := 'die';
-    else WriteLnLog('DecoBody.AnimationEnd','ERROR: Unknown animation ');
+    else dLog(LogAnimationError,nil,'DecoBody.AnimationEnd','ERROR: Unknown animation '+AnimationToString(at));
   end;
 end;
 
@@ -269,10 +269,12 @@ begin
   tmpKnightCreature.Prepare(nil);
 end;
 
+{---------------------------------------------------------------------------}
+
 procedure FreeCreatures;
 begin
   //tmpKnightCreature.Animations.clear;
-  WriteLnLog('FreeCreatures','Freeing creature resources...');
+  dLog(LogInitData,nil,'FreeCreatures','Freeing creature resources...');
   //FreeAndNil(tmpKnightCreature);
 end;
 

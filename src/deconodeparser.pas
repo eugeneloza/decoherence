@@ -16,33 +16,33 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 {---------------------------------------------------------------------------}
 
 { contains definitions for 3d World entity }
-unit deconodeparser;
+unit DecoNodeParser;
 
 {$INCLUDE compilerconfig.inc}
 interface
 
 uses X3DNodes,
-  decoglobal;
+  DecoGlobal;
 
 type
   {information on the node name parsing}
   DNodeInfo = record
     {does this node collide with the actors? (default=false)}
-    collision: boolean;
+    Collision: boolean;
     {is this node visible? (default=true)}
-    visible: boolean;
+    Visible: boolean;
     {random chance to be placed (default=1.0)}
-    rand: float;
+    Rand: float;
     {symmetry group / autoassigned; -1 is no symmetry}
-    symmetry: integer;
+    Symmetry: integer;
     {possible deviation angle in radians (default = 0.0)}
-    deviationangle: float;
+    Deviationangle: float;
     {placeholder marker}
-    placeholder: string;
+    Placeholder: string;
     {name marker}
-    name: string;
+    Name: string;
     {trigeger marker name}
-    trigger: string;
+    Trigger: string;
   end;
 
 {temporary?
@@ -52,7 +52,7 @@ function IsPlaceholder(node: TX3DNode): boolean;
 function ParseNode(node: TX3DNode): DNodeInfo;
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-uses strutils, CastleLog;
+uses StrUtils, DecoLog;
 
 {eeeem? there should have been this procedure in System unit?}
 function StrToInt(v: string): integer;
@@ -61,8 +61,8 @@ begin
   if v='' then
     Result :=0
   else begin
-    val(v,Result,e);
-    if e<>0 then WriteLnLog('deconodeparser.StrToInt','Invalid integer: '+v);
+    Val(v, Result, e);
+    if e<>0 then dLog(LogParserError,nil,'DecoNodeParser.StrToInt','Invalid integer: '+v);
   end;
 end;
 
@@ -107,88 +107,86 @@ const CollisionSymbol = '*';  //visible=true, collision=true (default is visible
   TriggerMarker = '/trigger=';  //attaches a trigger to the node
   SeparatorMarker = ';'; //marks the end of a trigger/name string value
 
-function ParseNode(node: TX3DNode): DNodeInfo;
+function ParseNode(Node: TX3DNode): DNodeInfo;
 var NameLength: integer; //for optimization
-  function GetMarker(marker: string): string;
+  function GetMarker(Marker: string): string;
   var i: integer;
       s: string;
-      finish: boolean;
+      Finish: boolean;
   begin
-    i := AnsiIndexText(node.X3DName,marker);
-    result := '';
+    i := AnsiIndexText(Node.X3DName,marker);
+    Result := '';
     if i>=0 then begin
-      i += length(marker)-1; //skip the marker
+      i += Length(Marker)-1; //skip the marker
       repeat
         inc(i);
-        s := copy(node.X3DName,i,1); //copy a char
-        finish := (s=ParameterMarker) or (s=SeparatorMarker);
-        if not finish then
-          result := result + s;
-      until finish or (i>=NameLength);
+        s := Copy(Node.X3DName,i,1); //copy a char
+        Finish := (s = ParameterMarker) or (s = SeparatorMarker);
+        if not Finish then
+          Result := Result + s;
+      until Finish or (i >= NameLength);
     end;
   end;
   function GetPlaceholder: string;
   var j: integer;
       s: string;
-      finish: boolean;
+      Finish: boolean;
   begin
     j := -1;
-    if (copy(node.X3DName,1,1) = PlaceHolderMarker) then j := 1; //start of the placeholder signature
-    if (copy(node.X3DName,2,1) = PlaceHolderMarker) then j := 2;
-    result := '';
+    if (Copy(Node.X3DName,1,1) = PlaceHolderMarker) then j := 1; //start of the placeholder signature
+    if (Copy(Node.X3DName,2,1) = PlaceHolderMarker) then j := 2;
+    Result := '';
     if j>0 then begin
       repeat
         inc(j);
-        s := copy(node.X3DName,j,1); //copy a char
-        finish := (s=PlaceHolderEndMarker);
-        if not finish then
-          result := result + s;
-      until finish or (j>=NameLength);
-      if s<>PlaceHolderEndMarker then begin
-        WriteLnLog('ParseNode.GetPlaceholder','ERROR: Could not find end of the placeholder: '+node.X3DName);
+        s := Copy(Node.X3DName,j,1); //copy a char
+        Finish := (s=PlaceHolderEndMarker);
+        if not Finish then
+          Result := Result + s;
+      until Finish or (j >= NameLength);
+      if s <> PlaceHolderEndMarker then begin
+        dLog(LogParserError,Node,'ParseNode.GetPlaceholder','ERROR: Could not find end of the placeholder: '+Node.X3DName);
         //result := '';
       end;
     end;
   end;
 
 begin
-  with Result do begin
-    //parse visible/collision state
-    visible := true;
-    collision := false;
-    if (copy(node.X3DName,1,1) = CollisionSymbol) then collision := true;
-    if (copy(node.X3DName,1,1) = InvisibleCollision) then begin
-      visible := false;
-      collision := true;
-    end;
-    //parse placeholder name
-    NameLength := length(node.X3DName);
-    placeholder := getPlaceholder;
-    //parse parameters
-    if AnsiContainsText(node.X3DName,ParameterMarker) then begin
-      if GetMarker(RandomMarker)<>'' then
-        rand := StrToInt(GetMarker(RandomMarker))/100
-      else
-        rand := 1;
-      Symmetry := StrToInt(GetMarker(SymmetryMarker));
-      deviationangle := StrToInt(GetMarker(AngleDeviationMarker))/180*Pi;
-      name := GetMarker(NameMarker);
-      trigger := GetMarker(TriggerMarker);
-    end;
+  //parse visible/collision state
+  Result.Visible := true;
+  Result.Collision := false;
+  if (Copy(Node.X3DName,1,1) = CollisionSymbol) then Result.Collision := true;
+  if (Copy(Node.X3DName,1,1) = InvisibleCollision) then begin
+    Result.Visible := false;
+    Result.Collision := true;
+  end;
+  //parse placeholder name
+  NameLength := Length(Node.X3DName);
+  Result.Placeholder := GetPlaceholder;
+  //parse parameters
+  if AnsiContainsText(Node.X3DName,ParameterMarker) then begin
+    if GetMarker(RandomMarker)<>'' then
+      Result.Rand := StrToInt(GetMarker(RandomMarker))/100
+    else
+      Result.Rand := 1;
+    Result.Symmetry := StrToInt(GetMarker(SymmetryMarker));
+    Result.DeviationAngle := StrToInt(GetMarker(AngleDeviationMarker))/180*Pi;
+    Result.Name := GetMarker(NameMarker);
+    Result.Trigger := GetMarker(TriggerMarker);
   end;
 end;
 
 {------------------------------------------------------------------------------}
 
-function IsPlaceholder(node: TX3DNode): boolean;
+function IsPlaceholder(Node: TX3DNode): boolean;
 begin
   Result := false;
   //at this moment only TransformNodes can be placeholders!
-  if not (node is TTransformNode) then exit;
+  if not (Node is TTransformNode) then exit;
 
-  if (copy(node.X3DName,1,1) = PlaceHolderMarker) or
-     (copy(node.X3DName,2,1) = PlaceHolderMarker) then
-    result := true;
+  if (Copy(Node.X3DName,1,1) = PlaceHolderMarker) or
+     (Copy(Node.X3DName,2,1) = PlaceHolderMarker) then
+    Result := true;
 end;
 
 

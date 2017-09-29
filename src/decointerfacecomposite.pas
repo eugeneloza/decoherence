@@ -289,10 +289,10 @@ type DPerksContainer = class(DAbstractSorter)
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 
 implementation
-uses SysUtils, CastleLog, {castleVectors,}
+uses SysUtils,
    DecoFont, DecoImageProcess,
    //DecoInterfaceBlocks,
-   DecoInputOutput, DecoInterfaceLoader;
+   DecoInputOutput, DecoInterfaceLoader, DecoLog;
 
 {===========================================================================}
 {====================== D Wind Element =====================================}
@@ -729,7 +729,7 @@ begin
   if fTarget <> Value then begin
     fTarget := value;
     //DStaticImage(content).FreeImage;
-    WriteLnLog('DPortrait.SetTarget','Load from portrait');
+    dLog(LogInitInterface,Self,'DPortrait.SetTarget','Load from portrait');
     //DStaticImage(content).Load(Portrait_img[drnd.Random(Length(Portrait_img))]);  //todo
     fTarget.onHit := @Self.doHit;
     ArrangeChildren;
@@ -942,9 +942,9 @@ begin
       end;
       ArrangeChildren(animate);
     end else
-      WriteLnLog('DPerksContainer.MakePerksList','ERROR: Target.Actions is empty!');
+      dLog(LogInterfaceError,Self,'DPerksContainer.MakePerksList','ERROR: Target.Actions is empty!');
   end else
-    WriteLnLog('DPerksContainer.MakePerksList','ERROR: Target is nil!');
+    dLog(LogInterfaceError,Self,'DPerksContainer.MakePerksList','ERROR: Target is nil!');
 end;}
 
 {---------------------------------------------------------------------}

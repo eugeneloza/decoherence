@@ -257,10 +257,10 @@ procedure InitMusicManager;
 procedure FreeMusicManager;
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-uses SysUtils, CastleLog, castleFilesUtils,
+uses SysUtils, castleFilesUtils,
   CastleVectors,
   DecoInputOutput, //used for safe threaded loading of sound buffer
-  DecoGlobal, DecoTime;      //used for random
+  DecoGlobal, DecoTime, DecoLog;      //used for random
 
 {========================== TMusicLoadThread ===============================}
 
@@ -295,7 +295,7 @@ end;
 procedure DSoundFile.Load;
 begin
   if fURL='' then begin
-    WriteLnLog('DSoundFile.Load','ERROR: No valid URL provided. Exiting...');
+    dLog(LogSoundError,Self,'DSoundFile.Load','ERROR: No valid URL provided. Exiting...');
     Exit;
   end;
   if not ThreadLocked then begin
@@ -307,7 +307,7 @@ begin
     ThreadWorking := true; }
   end
   else
-     WriteLnLog('DSoundFile.Load','Thread already working...');
+     dLog(LogSoundError,Self,'DSoundFile.Load','Thread already working...');
 end;
 procedure DSoundFile.LoadFinished;
 begin
@@ -327,11 +327,11 @@ end;
 procedure DMusicTrack.Start;
 begin
   if not isLoaded then begin
-    WriteLnLog('DMusicTrack.Start','ERROR: Music is not loaded!');
+    dLog(LogSoundError,Self,'DMusicTrack.Start','ERROR: Music is not loaded!');
     Exit;
   end;
   fCurrent := SoundEngine.PlaySound(self.buffer, false, fLoop, 10, fgain, 0, 1, TVector3.Zero);
-  if fCurrent = nil then WriteLnLog('DMusicTrack.Start','ERROR: Unable to allocate music!');
+  if fCurrent = nil then dLog(LogSoundError,Self,'DMusicTrack.Start','ERROR: Unable to allocate music!');
   fisPlaying := true;
 end;
 
@@ -384,7 +384,7 @@ begin
     fCurrent.Gain := Value
   else begin
     //fGain := value;
-    WriteLnLog('DMusicTrack.setGain','Warning: Setting gain of a non-playing music track...');
+    dLog(LogSoundError,Self,'DMusicTrack.setGain','Warning: Setting gain of a non-playing music track...');
   end;
 end;
 
@@ -536,7 +536,7 @@ end;
 
 procedure InitMusicManager;
 begin
-  WriteLnLog('DecoSount.InitMusicManager','Creating music manager...');
+  dLog(LogInitSound,nil,'DecoSount.InitMusicManager','Creating music manager...');
   Music := DMusicManager.Create;
 end;
 
@@ -544,7 +544,7 @@ end;
 
 procedure FreeMusicManager;
 begin
-  WriteLnLog('DecoSount.FreeMusicManager','Freeing music manager...');
+  dLog(LogInitSound,nil,'DecoSount.FreeMusicManager','Freeing music manager...');
   FreeAndNil(Music);
 end;
 

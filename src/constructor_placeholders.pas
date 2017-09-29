@@ -16,7 +16,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 {---------------------------------------------------------------------------}
 
 { Editor for placeholders and placeholders atlas }   
-unit constructor_placeholders;
+unit Constructor_PlaceHolders;
 
 {$INCLUDE compilerconfig.inc}
 

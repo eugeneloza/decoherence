@@ -367,15 +367,16 @@ function ZeroIntegerMap(sx,sy,sz: integer): TIntMapArray;
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
-uses SysUtils, CastleLog, CastleFilesUtils, CastleImages, CastleVectors,
-  DOM, CastleXMLUtils, DecoInputOutput, DecoTime;
+uses SysUtils, CastleFilesUtils, CastleImages, CastleVectors,
+  DOM, CastleXMLUtils,
+  DecoInputOutput, DecoTime, DecoLog;
 
 {========================= GENERATION ALGORITHM ==============================}
 
 procedure DDungeonGenerator.ForceReady;
 begin
   Parameters.isReady := true;
-  WriteLnLog('DDungeonGenerator.ForceReady','Warning: Be careful, parameters might not be initialized correctly.');
+  dLog(LogWorldInitSoftError,Self,'DDungeonGenerator.ForceReady','Warning: Be careful, parameters might not be initialized correctly.');
 end;
 
 {----------------------------------------------------------------------------}
@@ -541,12 +542,12 @@ begin
     end;
     {finally, if we can't even block the face out... it's horrible :(
      The only alternative to just hanging forever up is...}
-    WriteLnLog(IntToStr(BlockerTiles.Count));
-    WriteLnLog('x='+IntToStr(Map.Dock[d].x));
-    WriteLnLog('y='+IntToStr(Map.Dock[d].y));
-    WriteLnLog('z='+IntToStr(Map.Dock[d].z));
-    WriteLnLog('face='+IntToStr(Map.Dock[d].FaceType));
-    WriteLnLog('at '+AngleToStr(Map.Dock[d].Face));
+    dLog(LogError,Self,'BlockerTiles.Count',IntToStr(BlockerTiles.Count));
+    dLog(LogError,Self,'x=',IntToStr(Map.Dock[d].x));
+    dLog(LogError,Self,'y=',IntToStr(Map.Dock[d].y));
+    dLog(LogError,Self,'z=',IntToStr(Map.Dock[d].z));
+    dLog(LogError,Self,'face=',IntToStr(Map.Dock[d].FaceType));
+    dLog(LogError,Self,'at ',AngleToStr(Map.Dock[d].Face));
     raise Exception.Create('DDungeonGenerator.AddRandomTile: FATAL! Unable to block the map element.')
   end;
 end;
@@ -564,11 +565,11 @@ begin
   if not Parameters.isReady then
     raise Exception.Create('DDungeonGenerator.Generate FATAL - parameters are not loaded!');
   if not isInitialized then begin
-    WriteLnLog('DDungeonGenerator.Generate','Warning: parameters were automatically initialized! It''s best to initialize parameters manually outside the thread.');
+    dLog(LogWorldInitSoftError,Self,'DDungeonGenerator.Generate','Warning: parameters were automatically initialized! It''s best to initialize parameters manually outside the thread.');
     InitParameters;
   end;
   if isWorking then begin
-    WriteLnLog('DDungeonGenerator.Generate','WARNING: Generation thread is buisy! Aborting...');
+    dLog(LogWorldError,Self,'DDungeonGenerator.Generate','WARNING: Generation thread is buisy! Aborting...');
     Exit;
   end;
   fisWorking := true;
@@ -580,11 +581,11 @@ begin
     //add prgenerated or undo tiles
     CurrentStep := RNDM.random(CurrentStep);
     if CurrentStep < MinSteps-1 then CurrentStep := MinSteps-1;
-    WriteLnLog('DDungeonGenerator.Generate','Starting from '+inttostr(CurrentStep));
+    dLog(LogGenerateWorld,Self,'DDungeonGenerator.Generate','Starting from '+inttostr(CurrentStep));
     for i := 0 to CurrentStep do AddTileUnsafe(Gen[i]);
 
     while Map.CalculateFaces<>0 do begin
-      {writeLnLog(inttostr(Map.dock.count));}
+      {dLog(inttostr(Map.dock.count));}
       //add a tile
       AddRandomTile;
       UpdateProgress('Generating',Minimum(Map.Volume/Parameters.Volume,0.90));
@@ -609,9 +610,9 @@ begin
 
       end;
     end;  }
-    WriteLnLog('DDungeonGenerator.Generate','Done in = '+IntToStr(Round((GetNow-t2)*1000))+'ms');
-    WriteLnLog('DDungeonGenerator.Generate','Map volume = '+IntToStr(Map.Volume) +'/'+IntToStr(Parameters.Volume));
-    WriteLnLog('DDungeonGenerator.Generate','Max depth = '+IntToStr(Map.MaxDepth+1)+'/'+IntToStr(Parameters.MinZ));
+    dLog(LogGenerateWorld,Self,'DDungeonGenerator.Generate','Done in = '+IntToStr(Round((GetNow-t2)*1000))+'ms');
+    dLog(LogGenerateWorld,Self,'DDungeonGenerator.Generate','Map volume = '+IntToStr(Map.Volume) +'/'+IntToStr(Parameters.Volume));
+    dLog(LogGenerateWorld,Self,'DDungeonGenerator.Generate','Max depth = '+IntToStr(Map.MaxDepth+1)+'/'+IntToStr(Parameters.MinZ));
   until (Map.Volume>=Parameters.Volume) and (Map.MaxDepth+1>=Parameters.MinZ); {until map meets the paramters}
   {$WARNING may hang up forever here, if paremeters cannot be satisfied}
 
@@ -619,7 +620,7 @@ begin
   //finally resize the dynamic array
   MaxSteps := CurrentStep+1;
   SetLength(Gen,MaxSteps);
-  WriteLnLog('DDungeonGenerator.Generate','Job finished in = '+IntToStr(Round((GetNow-t1)*1000))+'ms');
+  dLog(LogGenerateWorld,Self,'DDungeonGenerator.Generate','Job finished in = '+IntToStr(Round((GetNow-t1)*1000))+'ms');
 
   // finalize
   FreeLists; //we no longer need them
@@ -794,7 +795,7 @@ begin
              (Map.SizeY-(Gen[i].y+Tiles[Gen[i].Tile].b_y)-Tiles[Gen[i].Tile].SizeY)*16, dmBlendSmart);
       end;
     end;
-  WriteLnLog('DDungeonGenerator.MakeMinimap',IntToStr(Length(Map.Img)));
+  dLog(LogGenerateWorld,Self,'DDungeonGenerator.MakeMinimap',IntToStr(Length(Map.Img)));
 end;
 
 {-------------------------------------------------------------------------}
@@ -836,7 +837,7 @@ begin
         tmpNav.Blocked := false;
         NavMap[ix,iy,iz] := NavList.Add(tmpNav);
       end;
-  WriteLnLog('DDungeonGenerator.BuildNav','Navigation Graph created, nodes: '+IntToStr(NavList.Count));
+  dLog(LogGenerateWorld,Self,'DDungeonGenerator.BuildNav','Navigation Graph created, nodes: '+IntToStr(NavList.Count));
   {build links between the nav points}
   for iz := 0 to Map.SizeZ-1 do
     for ix := 0 to Map.SizeX-1 do
@@ -1012,7 +1013,7 @@ var
     procedure SetCandidate(x,y,z: TIntCoordinate); {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
     var NewCandidate: Txyz;
     begin
-      //writeLnLog(inttostr(HelperMap[x,y,z]));
+      //dLog(inttostr(HelperMap[x,y,z]));
       {looks redundant as "open face" can't go into void
        but let it be here for now}
       if {(x>=0) and (y>=0) and (z>=0) and
@@ -1088,7 +1089,7 @@ begin
       else
         HelperMap[RayCastList[j].x,RayCastList[j].y,RayCastList[j].z] := FailedIndex;
 
-      //if RayTrue>0 then writeLnLog(inttostr(mx)+','+inttostr(my)+','+inttostr(mz)+' - '+inttostr(round(100*RayTrue/RayCount)));
+      //if RayTrue>0 then dLog(inttostr(mx)+','+inttostr(my)+','+inttostr(mz)+' - '+inttostr(round(100*RayTrue/RayCount)));
     end;
   until RaycastList.Count=0;
   FreeAndNil(OldList);
@@ -1116,9 +1117,9 @@ begin
           end;
       end;
 
-  //WriteLnLog(inttostr(mx)+inttostr(my)+inttostr(mz),inttostr(tmpNeighboursMap[mx,my,mz].count));
+  //dLog(inttostr(mx)+inttostr(my)+inttostr(mz),inttostr(tmpNeighboursMap[mx,my,mz].count));
   RemoveDuplicatesNeighbours(tmpNeighboursMap[mx,my,mz]);
-  //WriteLnLog(inttostr(mx)+inttostr(my)+inttostr(mz),inttostr(tmpNeighboursMap[mx,my,mz].count));
+  //dLog(inttostr(mx)+inttostr(my)+inttostr(mz),inttostr(tmpNeighboursMap[mx,my,mz].count));
 
   inc(RaycastCount);
   UpdateProgress('Raycasting',1+(RaycastCount/Map.Volume)*0.8);
@@ -1165,11 +1166,11 @@ var i: integer;
 begin
   NeighboursMap := NilIndexMap;
 
-  WriteLnLog('D3DDungeonGenerator.Neighbours_of_neighbours','Merging neighbours of neighbours...');
+  dLog(LogGenerateWorld,Self,'D3DDungeonGenerator.Neighbours_of_neighbours','Merging neighbours of neighbours...');
   for ix := 0 to Map.SizeX-1 do
     for iy := 0 to Map.SizeY-1 do
       for iz := 0 to Map.SizeZ-1 do if tmpNeighboursMap[ix,iy,iz]<>nil then begin
-        //writeLnLog('neighbours',inttostr(tmpNeighboursMap[ix,iy,iz].count));
+        //dLog('neighbours',inttostr(tmpNeighboursMap[ix,iy,iz].count));
         //process neighbours
  {       for dx := 0 to tiles[tmpNeighboursMap[ix,iy,iz].tile].sizex do
           for dy := 0 to tiles[tmpNeighboursMap[ix,iy,iz].tile].sizex do
@@ -1248,7 +1249,7 @@ begin
   for ix := 0 to Map.SizeX-1 do
     for iy := 0 to Map.SizeY-1 do
       for iz := 0 to Map.SizeZ-1 do if NeighboursMap[ix,iy,iz]<>nil then {begin}
-        //writeLnLog(inttostr(ix)+inttostr(iy)+inttostr(iz),inttostr(NeighboursMap[ix,iy,iz].count));
+        //dLog(inttostr(ix)+inttostr(iy)+inttostr(iz),inttostr(NeighboursMap[ix,iy,iz].count));
         for j := 0 to NeighboursMap[ix,iy,iz].Count-1 do
           inc(HitCount.L[NeighboursMap[ix,iy,iz].L[j].Tile].Hits);
       {end;}
@@ -1298,8 +1299,8 @@ begin
 
   until i >= High(Gen);
 
-  WriteLnLog('D3DDungeonGenerator.Chunk_N_Slice','N groups = '+inttostr(length(groups)));
-  for i := 0 to High(Groups) do WriteLnLog('group '+IntToStr(i),IntToStr(Groups[i].Count));
+  dLog(LogGenerateWorld,Self,'D3DDungeonGenerator.Chunk_N_Slice','N groups = '+inttostr(length(groups)));
+  for i := 0 to High(Groups) do dLog(LogGenerateWorld,Self,'group '+IntToStr(i),IntToStr(Groups[i].Count));
 
   FreeAndNil(HitCount);
 end;
@@ -1319,7 +1320,7 @@ begin
   UpdateProgress('Raycasting',1);
 
   //raycast
-  WriteLnLog('D3DDungeonGenerator.Generate','Raycasting started...');
+  dLog(LogGenerateWorld,Self,'D3DDungeonGenerator.Generate','Raycasting started...');
   t := GetNow;
 
   MakeTileIndexMap;
@@ -1330,13 +1331,13 @@ begin
 
   UpdateProgress('Chunking',0.95);
 
-  WriteLnLog('D3DDungeonGenerator.Generate','Raycasting finished in '+IntToStr(Round((GetNow-t)*1000))+'ms.');
+  dLog(LogGenerateWorld,Self,'D3DDungeonGenerator.Generate','Raycasting finished in '+IntToStr(Round((GetNow-t)*1000))+'ms.');
   Chunk_N_Slice;
 
   fisWorking := false;
   fisFinished := true;
 
-  writeLnLog('D3DDungeonGenerator.Generate','Finished. Everything done in '+IntToStr(Round((GetNow-t0)*1000))+'ms.');
+  dLog(LogGenerateWorld,Self,'D3DDungeonGenerator.Generate','Finished. Everything done in '+IntToStr(Round((GetNow-t0)*1000))+'ms.');
   UpdateProgress('Done',2);
 end;
 
@@ -1404,7 +1405,7 @@ var XMLdoc: TXMLDocument;
     Iterator: TXMLElementIterator;
     FS: DFirstStep;
 begin
-  WriteLnLog('DGeneratorParameters.Load',URL);
+  dLog(LogGenerateWorld,Self,'DGeneratorParameters.Load',URL);
 
   if Self=nil then raise Exception.Create('DGeneratorParameters is nil!'); // HELLO, my best bug thing :)
 
@@ -1460,7 +1461,7 @@ begin
     end;
 
   except
-    WriteLnLog('DGeneratorParameters.Load','ERROR: Exception in GeneratorParameters load');
+    dLog(LogWorldError,Self,'DGeneratorParameters.Load','ERROR: Exception in GeneratorParameters load');
   end;
   FreeAndNil(XMLdoc);
 

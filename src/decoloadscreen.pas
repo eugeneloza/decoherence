@@ -1,4 +1,4 @@
-{Copyright (C) 2012-2017 Yevhen Loza
+﻿{Copyright (C) 2012-2017 Yevhen Loza
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -26,22 +26,22 @@ uses fgl,
 
 type
   {link to image file}
-  DLoadImage = class
+  DLoadImage = class(TObject)
     {file name without path}
-    value: string;
-end;
+    Value: string;
+  end;
 
-{actually this one looks like a TStringList for now, but may be extended in future}
+{ Actually this one looks like a TStringList for now, but may be extended in future }
 TLoadImageList = specialize TFPGObjectList<DLoadImage>;
 
 type
-  {a fact with control of displayed frequency and a list of compatible images}
+  { A fact with control of displayed frequency and a list of compatible images }
   DFact = class
-    {fact text}
-    value: string;
+    { Fact text }
+    Value: string;
     {how many times the fact has been displayed}
     {$HINT TODO: not saved/read ATM (should overridden by a savegame?)}
-    frequency: integer;
+    Frequency: integer;
     {list of compatible loadscreen images. It's inefficient to store them
      "many copies" here... but that's for some optimization I might do later}
     Compatibility: TLoadImageList;
@@ -74,23 +74,23 @@ function LoadScreenMainText: string;
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
-uses SysUtils, CastleLog, CastleFilesUtils,
+uses SysUtils, CastleFilesUtils,
   DOM, CastleXMLUtils,
   DecoFont,
-  DecoGlobal, DecoInputOutput;
+  DecoGlobal, DecoInputOutput, DecoLog;
 
 var LastFact: integer = -1;
     CurrentFact: DFact = nil;      //looks ugly! Maybe I should remake it?
 function GetRandomFact: string;
-var newFact: integer;
+var NewFact: integer;
 begin
   repeat
-    NewFact := drnd.random(Facts.Count);
-  until (NewFact <> LastFact) and (drnd.random < 1/facts[newFact].frequency);
-  inc(facts[newFact].frequency,7);      //todo balance facts frequency, now chance is 1,1/8,1/15,1/22...
-  result := facts[newFact].value;
-  CurrentFact := Facts[newFact];
-  LastFact := newFact;
+    NewFact := DRND.Random(Facts.Count);
+  until (NewFact <> LastFact) and (DRND.Random < 1/Facts[NewFact].Frequency);
+  inc(Facts[NewFact].Frequency,7);      //todo balance facts frequency, now chance is 1,1/8,1/15,1/22...
+  Result := Facts[NewFact].Value;
+  CurrentFact := Facts[NewFact];
+  LastFact := NewFact;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -99,17 +99,17 @@ var LoadImageOld: string = '';
 function GetRandomFactImage: string;
 var LoadImageNew: string;
 begin
-  if currentFact = nil then
-    raise Exception.create('GetRandomFactImage ERROR: Get Fact before getting the image!');
-  if currentFact.compatibility.Count>0 then
+  if CurrentFact = nil then
+    raise Exception.Create('GetRandomFactImage ERROR: Get Fact before getting the image!');
+  if CurrentFact.Compatibility.Count>0 then
     repeat
       //as ugly as it might ever be...
-      LoadImageNew := currentFact.compatibility[drnd.random(currentFact.compatibility.Count)].value;
-    until (LoadImageOld <> LoadImageNew) or (currentFact.compatibility.Count=1)
+      LoadImageNew := CurrentFact.Compatibility[DRND.Random(CurrentFact.Compatibility.Count)].Value;
+    until (LoadImageOld <> LoadImageNew) or (CurrentFact.Compatibility.Count=1)
   else
-    raise Exception.create('GetRandomFactImage ERROR: No images to load!');
+    raise Exception.Create('GetRandomFactImage ERROR: No images to load!');
   LoadImageOld := LoadImageNew;
-  result := LoadImageNew;
+  Result := LoadImageNew;
   CurrentFact := nil;
 end;
 
@@ -123,13 +123,13 @@ var FactsDoc: TXMLDocument;
     F: DFact;
     LI: DLoadImage;
 begin
-  if facts<>nil then begin
-    freeandnil(Facts);
-    WriteLnLog('LoadFacts','Facts is not nil. Freeing...');
+  if Facts <> nil then begin
+    dLog(LogInitError,Facts,'LoadFacts','Facts is not nil. Freeing...');
+    FreeAndNil(Facts);
   end;
-  Facts := TFactList.create(true);
+  Facts := TFactList.Create(true);
 
-  WriteLnLog('LoadFacts','Reading file '+FileName);
+  dLog(LogInitInterface,Facts,'LoadFacts','Reading file '+FileName);
 
   FactsDoc := URLReadXMLSafe(FileName);
   BaseElement := FactsDoc.DocumentElement;
@@ -137,30 +137,30 @@ begin
   try
     while Iterator.GetNext do
     begin
-      F := DFact.create;
-      F.frequency := 1;
-      F.compatibility := TLoadImageList.create(true);
+      F := DFact.Create;
+      F.Frequency := 1;
+      F.Compatibility := TLoadImageList.Create(true);
       ValueNode := Iterator.current.ChildElement('Value', true);  //todo: required=false and catch nil value
-      F.value := {$IFDEF UTF8Encode}UTF8encode{$ENDIF}(ValueNode.TextData);
+      F.Value := {$IFDEF UTF8Encode}UTF8encode{$ENDIF}(ValueNode.TextData);
       try
-        Iterator2 := Iterator.current.ChildElement('ImageList', true).ChildrenIterator;
+        Iterator2 := Iterator.Current.ChildElement('ImageList', true).ChildrenIterator;
         while Iterator2.GetNext do
         begin
-          LI := DLoadImage.create;
-          LI.value := {$IFDEF UTF8Encode}UTF8encode{$ENDIF}(Iterator2.current.TextData);
-          F.compatibility.Add(LI);
+          LI := DLoadImage.Create;
+          LI.Value := {$IFDEF UTF8Encode}UTF8encode{$ENDIF}(Iterator2.Current.TextData);
+          F.Compatibility.Add(LI);
         end;
       finally
-        freeAndNil(Iterator2);
+        FreeAndNil(Iterator2);
       end;
 
-      Facts.add(F);
+      Facts.Add(F);
     end;
   finally
     FreeAndNil(Iterator);
   end;
-  freeandnil(FactsDoc);
-  WriteLnLog('LoadFacts','Reading file finished.');
+  FreeAndNil(FactsDoc);
+  dLog(LogInitInterface,Facts,'LoadFacts','Reading file finished.');
 end;
 
 {---------------------------------------------------------------------------}

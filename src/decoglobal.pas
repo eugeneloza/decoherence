@@ -66,9 +66,9 @@ const InterfaceFolder    = 'interface/';
 
 const GZ_ext = {$IFDEF gzipdata}'.gz'{$ELSE}''{$ENDIF};
 
-const anisotropic_smoothing = 4;
-      Shadow_maps_enabled = false;
-      Shadow_volumes_enabled = false;
+const AnisotropicSmoothing = 4;
+      ShadowMapsEnabled = false;
+      ShadowVolumesEnabled = false;
 
 var {global window of the game}
     Window : TCastleWindowTouch;

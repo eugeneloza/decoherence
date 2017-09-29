@@ -21,13 +21,10 @@ unit Decoherence;
 
 interface
 
-const Version = {$INCLUDE version.inc};
-
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
 uses Classes, SysUtils,
-     CastleLog, CastleTimeUtils,
      CastleWindow, CastleWindowTouch, CastleKeysMouse,
 
      CastleScene,
@@ -40,7 +37,8 @@ uses Classes, SysUtils,
      DecoLoadScreen, DecoPerks, DecoActorBody,
      DecoInterfaceLoader,
      DecoPlayerCharacter, DecoLoad3d,
-     DecoNavigation, DecoGlobal, DecoTranslation, DecoGamemode, DecoTime;
+     DecoNavigation,
+     DecoGlobal, DecoTranslation, DecoGamemode, DecoTime, DecoLog;
 
 
 {==========================================================================}
@@ -58,18 +56,6 @@ begin
 end;
 {$POP}
 {$ENDIF}
-
-function NiceDate: string;
-var s: string;
-    i: integer;
-begin
-  s := DateTimeToAtStr(Now); //only place where I'm using SysUtils.Now
-  Result := '';
-  for i := 1 to Length(s) do
-    if Copy(s,i,1) = ' ' then Result += '_' else
-    if Copy(s,i,1) = ':' then Result += '-' else
-    Result += Copy(s,i,1);
-end;
 
 {-------------------------------------------------------------------------}
 
@@ -179,7 +165,7 @@ begin
   if not Dragging then begin
     tmpLink := GUI.IfMouseOver(Round(Event.Position[0]),Round(Event.Position[1]),true,true);
     if tmpLink <> nil then
-      WriteLnLog('doMotion','Motion caught '+tmpLink.ClassName);
+      dLog(logVerbose,nil,'doMotion','Motion caught '+tmpLink.ClassName);
   end;
 
 end;
@@ -194,7 +180,7 @@ begin
 
   InitPerks;
 
-  Load_test_level; //remake it
+  LoadTestLevel; //remake it
 
   //Assign window events
   Window.OnBeforeRender := @WindowManage;
@@ -220,26 +206,13 @@ end;
 
 procedure ApplicationInitialize;
 begin
-  //initialize the log
-  {$IFDEF Android}
-  InitializeLog;
-  {$ELSE}
-    {$IFDEF WriteLog}
-      LogStream := TFileStream.Create('log_'+NiceDate+'.txt',fmCreate);
-      InitializeLog(Version,LogStream,ltTime);
-    {$ELSE}
-      InitializeLog(Version,nil,ltTime);
-    {$ENDIF}
-  {$ENDIF}
-  WritelnLog('(i)','Compillation Date: ' + {$I %DATE%} + ' Time: ' + {$I %TIME%});
-  WritelnLog('FullScreen mode',{$IFDEF Fullscreen}'ON'{$ELSE}'OFF'{$ENDIF});
-  WritelnLog('Allow rescale',{$IFDEF AllowRescale}'ON'{$ELSE}'OFF'{$ENDIF});
-  WritelnLog('ApplicationInitialize','Init');
+  InitLog;
+  dLog(LogInit,nil,'ApplicationInitialize','Init');
 
   //Application.LimitFPS := 60;
 
   //create GUI
-  WritelnLog('ApplicationInitialize','Create interface');
+  dLog(LogInit,nil,'ApplicationInitialize','Create interface');
   InitInterface;
   InitLoadScreen;
   GUI := DInterfaceContainer.Create;
@@ -247,13 +220,13 @@ begin
 
   GUI.LoadScreen;
 
-  WritelnLog('ApplicationInitialize','Initialize interface');
+  dLog(LogInit,nil,'ApplicationInitialize','Initialize interface');
 
   //finally we're ready to show game loading screen
   {$IFDEF AllowRescale}Window.OnResize := @WindowResize;{$ENDIF}
   Window.OnRender := @WindowRender;
 
-  WriteLnLog('ApplicationInitialize','Init finished');
+  dLog(LogInit,nil,'ApplicationInitialize','Init finished');
 
   LoadThread := DLoadGameThread.Create(true);
   {$WARNING BUUUUUUUUUUUUUUUUUG!!!!!}
@@ -301,6 +274,7 @@ Initialization
   Application.OnInitialize  :=  @ApplicationInitialize;
 
 Finalization
+  dLog(LogInit,nil,'Finalization','Started...');
   { free all assigned memory }
   FreeAndNil(GUI);
 
@@ -313,6 +287,6 @@ Finalization
   FreeCreatures;
   FreeInterface;
   //FreeTextureProperties;
-  WriteLnLog('Finalization','Bye...');
+  dLog(Log0,nil,'Finalization','Bye...');
 end.
 

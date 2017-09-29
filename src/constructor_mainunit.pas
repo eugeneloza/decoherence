@@ -23,7 +23,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
   while trying to keep everything simple, is a very complex thing to do
   - it's not for "all and everybody" to use. It requires knowledge of English anyway.
   If you want it - this is a FOSS project - do it yourself. But it won't be easy.}
-unit constructor_mainunit;
+unit Constructor_MainUnit;
 
 {$INCLUDE compilerconfig.inc}
 interface
@@ -31,9 +31,8 @@ interface
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
   fgl,
-  castleLog,
-  decotranslation,
-  constructor_global;
+  DecoTranslation,
+  Constructor_Global;
 
 type TFormList = specialize TFPGObjectList<TWriterForm>;
 
@@ -74,7 +73,8 @@ implementation
 {$R *.lfm}
 
 uses
-  constructor_facts, constructor_tiles, constructor_map, constructor_placeholders;
+  Constructor_Facts, Constructor_Tiles, Constructor_Map, Constructor_Placeholders,
+  DecoLog;
 
 {-----------------------------------------------------------------------------}
 
@@ -116,7 +116,7 @@ end;
 procedure TMainForm.WriteMe(ToGameFolder: boolean);
 var WF: TWriterForm;
 begin
-  WriteLnLog('TMainForm.WriteMe','Started.');
+  dLog(LogConstructorInfo,Self,'TMainForm.WriteMe','Started.');
   if AllForms = nil then MakeFormsList; //not optimal...
 
   for WF in AllForms do
@@ -130,7 +130,7 @@ begin
       if not WF.isLoaded then WF.LoadMe;
       WF.WriteMe(ToGameFolder);
     end;
-  WriteLnLog('TMainForm.WriteMe','Finished.');
+  dLog(LogConstructorInfo,Self,'TMainForm.WriteMe','Finished.');
 end;
 
 {-----------------------------------------------------------------------------}
@@ -212,7 +212,7 @@ end;
 
 Initialization
 
-InitializeLog;
+InitLog;
 
 
 end.

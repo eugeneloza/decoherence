@@ -26,6 +26,7 @@
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir);src"/>
+            <OtherUnitFiles Value="src"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
           <Parsing>
@@ -65,6 +66,7 @@
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir);src"/>
+            <OtherUnitFiles Value="src"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
           <CodeGeneration>
@@ -113,6 +115,7 @@
       <Unit0>
         <Filename Value="constructor_tool.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="Constructor_Tool"/>
       </Unit0>
       <Unit1>
         <Filename Value="src/constructor_mainunit.pas"/>
@@ -120,6 +123,7 @@
         <ComponentName Value="MainForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <UnitName Value="Constructor_MainUnit"/>
       </Unit1>
       <Unit2>
         <Filename Value="src/constructor_facts.pas"/>
@@ -131,6 +135,7 @@
       <Unit3>
         <Filename Value="src/constructor_global.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="Constructor_Global"/>
       </Unit3>
       <Unit4>
         <Filename Value="src/constructor_tiles.pas"/>
@@ -138,6 +143,7 @@
         <ComponentName Value="DungeonTilesEditor"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <UnitName Value="Constructor_Tiles"/>
       </Unit4>
       <Unit5>
         <Filename Value="src/blendercleaner.pas"/>
@@ -150,6 +156,7 @@
         <ComponentName Value="MapEditor"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <UnitName Value="Constructor_Map"/>
       </Unit6>
       <Unit7>
         <Filename Value="src/constructor_tiles_png_map.inc"/>
@@ -161,6 +168,7 @@
         <ComponentName Value="PlaceholdersEditor"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <UnitName Value="Constructor_PlaceHolders"/>
       </Unit8>
       <Unit9>
         <Filename Value="src/decoabstractgenerator.pas"/>
@@ -223,7 +231,7 @@
     </Linking>
   </CompilerOptions>
   <Debugging>
-    <Exceptions Count="5">
+    <Exceptions Count="6">
       <Item1>
         <Name Value="EAbort"/>
       </Item1>
@@ -239,6 +247,9 @@
       <Item5>
         <Name Value="Exception"/>
       </Item5>
+      <Item6>
+        <Name Value="Unknown"/>
+      </Item6>
     </Exceptions>
   </Debugging>
 </CONFIG>

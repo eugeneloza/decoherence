@@ -27,8 +27,8 @@ uses CastleRandom, CastleVectors,
   DecoGlobal;
 
 Type
-  {The most abstract world implementation.
-   Used as external interface for the world}
+  {The most abstract World implementation.
+   Used as external interface for the World}
   DAbstractWorld = class
   private
     { Average and Min distance between nav points
@@ -56,36 +56,36 @@ Type
       Pay attention, nothing special happens (yet) if it is zero
       in m/s^2 }
     property GravityAcceleration: float read fGravityAcceleration;
-    { Seed used to "build" the world if it requires random}
+    { Seed used to "build" the World if it requires random}
     property Seed: LongWord read fSeed write fSeed;
     { World management routine. Called every frame;
       Most important thing it does is managing LODs of tiles/landscape
-      And hiding/LODding world chunks
-      x,y,z are current world coordinates of render camera }
+      And hiding/LODding World chunks
+      x,y,z are current World coordinates of render camera }
     Procedure Manage(position: TVector3); virtual; abstract;
-    {Builds a PathTree for the world}
+    {Builds a PathTree for the World}
     //Function pathfind: DPathTree;
     { Load the World from a file}
     procedure Load(URL: string); virtual;
     { Load the World from a running Generator }
     procedure Load(Generator: DAbstractGenerator); virtual;
-    { Builds a world from the obtained data }
+    { Builds a World from the obtained data }
     procedure Build; virtual;
-    { activates the current world.
+    { activates the current World.
       Caution, it might and will modify Window.SceneManager! }
     procedure Activate; virtual;
     { Splits the World into chunks }
     //Procedure chunk_n_slice; virtual; abstract;
 
-    { Returns Gravity Up for the given location in the world
-      Maybe, move this one to AbstractWorld3D, as it's not needed in non-3D world
+    { Returns Gravity Up for the given location in the World
+      Maybe, move this one to AbstractWorld3D, as it's not needed in non-3D World
       it's bad, that there is no way to make this procedure inline,
       because it might be important to keep it efficiently
       However, for now it's used only for spawning process, so don't bother yet}
     function GetGravity(aPosition: TVector3): TVector3; virtual; abstract;
     function GetGravity(aNav: TNavID): TVector3; virtual; abstract;
 
-    { A dummy procedure to be overriden in rendered world types
+    { A dummy procedure to be overriden in rendered World types
      (such as text or 2D)}
     procedure Render; virtual;
 
@@ -117,12 +117,13 @@ procedure FreeWorld;
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
-uses SysUtils, Classes, CastleLog;
+uses SysUtils, Classes,
+  DecoLog;
 
 constructor DAbstractWorld.Create;
 begin
   inherited Create;
-  WriteLnLog('DAbstractWorld.create','Creating the World');
+  dLog(LogWorldInit,Self,'DAbstractWorld.Create','Creating the World');
   {we create an non-initialized random (i.e. initialized by a stupid constant integer)
   Just to make sure we don't waste any time (<1ms) on initialization now}
   RNDM := TCastleRandom.Create(1);
@@ -134,7 +135,7 @@ end;
 
 destructor DAbstractWorld.Destroy;
 begin
-  WriteLnLog('DAbstractWorld.destroy','Freeing the World');
+  dLog(LogWorldInit,Self,'DAbstractWorld.Destroy','Freeing the World');
   FreeAndNil(RNDM);
   FreeAndNil(Nav);
   FreeAndNil(Weenies);
@@ -153,7 +154,7 @@ end;
 
 Procedure DAbstractWorld.Activate;
 begin
-  WriteLnLog('DAbstractWorld.Activate','Activating the world.');
+  dLog(LogWorldInit,Self,'DAbstractWorld.Activate','Activating the World.');
   if (CurrentWorld<>nil) and (CurrentWorld<>Self) then
     raise Exception.Create('ERROR: Free and nil the previous World before activating this one!');
   LastRender := -1;
@@ -166,7 +167,7 @@ Procedure DAbstractWorld.Render;
 begin
   {this is an abstract routine,
   it must be overridden by DRenderedWorld}
-  WriteLnLog('DAbstractWorld.render','Warning: This shouldn''t happen in normal situation, it''s abstract');
+  dLog(LogWorldError,Self,'DAbstractWorld.render','Warning: This shouldn''t happen in normal situation, it''s abstract');
 end;
 
 {------------------------------------------------------------------------------}
@@ -249,7 +250,7 @@ procedure DAbstractWorld.Load(Generator: DAbstractGenerator);
 begin
   fSeed := drnd.Random32bit; //maybe other algorithm?
   if Nav<>nil then begin
-    WriteLnLog('DAbstractWorld.Load','WARNING: Nav is not nil! Freeing...');
+    dLog(LogWorldInitSoftError,Self,'DAbstractWorld.Load','WARNING: Nav is not nil! Freeing...');
     FreeAndNil(Nav);
   end;
   Nav := Generator.ExportNav;
@@ -269,7 +270,7 @@ end;
 
 procedure FreeWorld;
 begin
-  if CurrentWorld<>nil then WriteLnLog('decoabstractworld.FreeWorld','World is not nil, freeing');
+  if CurrentWorld<>nil then dLog(LogWorldInit,nil,'DecoAbstractWorld.FreeWorld','World is not nil, freeing');
   FreeAndNil(CurrentWorld);
 end;
 

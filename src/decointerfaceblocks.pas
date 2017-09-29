@@ -78,9 +78,9 @@ type
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-uses CastleLog, CastleFilesUtils, DecoFont,
+uses CastleFilesUtils, DecoFont,
   DecoLoadScreen,
-  DecoInputOutput;
+  DecoInputOutput, DecoLog;
 
 procedure DLoadScreen.SpawnChildren;
 begin
@@ -269,7 +269,7 @@ end;}
 begin
   if slided then begin
     if not IsMouseOverTree then doSlideOut;
-    writelnlog('timer out');
+    dLog('timer out');
   end;
 end;}
 

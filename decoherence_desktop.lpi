@@ -13,6 +13,10 @@
       <Title Value="decoherence_desktop"/>
       <UseAppBundle Value="False"/>
       <ResourceType Value="res"/>
+      <UseXPManifest Value="True"/>
+      <XPManifest>
+        <DpiAware Value="True"/>
+      </XPManifest>
     </General>
     <i18n>
       <EnableI18N LFM="False"/>
@@ -107,7 +111,7 @@
         <PackageName Value="castle_base"/>
       </Item2>
     </RequiredPackages>
-    <Units Count="44">
+    <Units Count="45">
       <Unit0>
         <Filename Value="decoherence_desktop.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -253,6 +257,7 @@
       <Unit29>
         <Filename Value="src/deconodeparser.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoNodeParser"/>
       </Unit29>
       <Unit30>
         <Filename Value="src/decoinputoutput.pas"/>
@@ -319,6 +324,11 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="DecoBurner"/>
       </Unit43>
+      <Unit44>
+        <Filename Value="src/decolog.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoLog"/>
+      </Unit44>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

@@ -1,4 +1,4 @@
-{Copyright (C) 2012-2017 Yevhen Loza
+﻿{Copyright (C) 2012-2017 Yevhen Loza
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
   TODO: At this moment language-relative tiles/textures
   (e.g. inscriptions in current game language) are not allowed.
   Use some abstract alien fonts :) }
-unit constructor_tiles;
+unit Constructor_Tiles;
 
 {$INCLUDE compilerconfig.inc}
 interface
@@ -27,9 +27,9 @@ interface
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
   ExtCtrls,
-  constructor_global,
+  Constructor_Global,
   CastleControl, CastleScene, CastleImages, X3DNodes,
-  decodungeontiles;
+  DecoDungeonTiles;
 
 {graphical preferences}
 const delta = 0.2; //this is 'wall thickness' at wall editor
@@ -168,11 +168,11 @@ var
 implementation
 {$R *.lfm}
 
-uses CastleVectors, CastleCameras, castleLog,
+uses CastleVectors, CastleCameras,
      DOM, CastleXMLUtils,
      decoLoad3d, x3dLoad, CastleURIUtils, BlenderCleaner,
-     castleFilesUtils,
-     decoglobal;
+     CastleFilesUtils,
+     DecoGlobal, DecoLog;
 
 procedure TDungeonTilesEditor.FreeMe;
 begin
@@ -200,7 +200,7 @@ procedure TDungeonTilesEditor.ReadTilesList;
 begin
   FreeAndNil(TilesList);
   TilesList := GetFilesList(TilesFolder,'x3d');
-  WriteLnLog('TDungeonTilesEditor.ReadTilesList','Tiles found = '+inttostr(TilesList.count));
+  dLog(LogConstructorInfo,Self,'TDungeonTilesEditor.ReadTilesList','Tiles found = '+IntToStr(TilesList.Count));
 end;
 
 {--------------------------------------------------------------------------}
@@ -249,11 +249,11 @@ end;
 
 procedure TDungeonTilesEditor.WriteMe(ToGameFolder: boolean);
 begin
-  //writeLnLog('TDungeonTilesEditor.WriteMe','Working directly on game data, nothing to save.');
+  //dLog('TDungeonTilesEditor.WriteMe','Working directly on game data, nothing to save.');
   if not ToGameFolder then begin
     if isTileLoaded then begin
       SaveTileMap(TileName,false);
-    end else writelnlog('TDungeonTilesEditor.WriteMe','No tile loaded to save...');
+    end else dLog(LogConstructorError,Self,'TDungeonTilesEditor.WriteMe','No tile loaded to save...');
   end else
     SaveAllTiles;
   inherited WriteMe(ToGameFolder);
@@ -281,11 +281,11 @@ begin
         TileDisplay.scenemanager.camera.input:=TCamera.DefaultInput;
         TileDisplay.update;
       end else
-        WriteLnLog('TDungeonTilesEditor.ResetCamera','ERROR: TileScene is nil! Can''t reset camera');
+        dLog(LogConstructorError,Self,'TDungeonTilesEditor.ResetCamera','ERROR: TileScene is nil! Can''t reset camera');
     end else
-      WriteLnLog('TDungeonTilesEditor.ResetCamera','No Tile Loaded.');
+      dLog(LogConstructorError,Self,'TDungeonTilesEditor.ResetCamera','No Tile Loaded.');
   end else
-    WriteLnLog('TDungeonTilesEditor.ResetCamera','No Camera To Reset.');
+    dLog(LogConstructorError,Self,'TDungeonTilesEditor.ResetCamera','No Camera To Reset.');
 end;
 
 {---------------------------------------------------------------------------}
@@ -368,7 +368,7 @@ procedure FixTextures(root: TX3DRootNode);
           tex.FdUrl.Items.Add(s);
           //check URIFileExists
         except
-          writeLnLog('FixTextures.ScanNodesRecoursive','try..except fired (texture node not found)');
+          dLog(LogConstructorInfo,nil,'FixTextures.ScanNodesRecoursive','try..except fired (texture node not found)');
         end;
   end;
 begin
@@ -383,7 +383,7 @@ var TmpRoot: TX3DRootNode;
     f: string;
     iz: integer;
 begin
-  writeLnLog('TDungeonTilesEditor.CompileTile','Compile: '+FileName);
+  dLog(LogConstructorInfo,Self,'TDungeonTilesEditor.CompileTile','Compile: '+FileName);
 
   //load tile from Architect folder
   TmpRoot := CleanUp( Load3D(ConstructorData(TilesFolder+Filename+'.x3d',false)) ,true,true);
@@ -402,11 +402,11 @@ begin
     for iz := 0 to tmpMap.sizez-1 do begin
       f := TilesFolder+FileName+'_'+inttostr(iz)+'.png';
       if URIFileExists(ConstructorData(f,false)) then begin
-        if not copyFile(FakeConstructorData(f,false), FakeConstructorData(f,true),[cffOverwriteFile],false) then
-          writeLnLog('TDungeonTilesEditor.CompileTile','ERROR: failed to copy map image: '+f);
+        if not CopyFile(FakeConstructorData(f,false), FakeConstructorData(f,true),[cffOverwriteFile],false) then
+          dLog(LogConstructorError,Self,'TDungeonTilesEditor.CompileTile','ERROR: failed to copy map image: '+f);
 
       end else
-        writeLnLog('TDungeonTilesEditor.CompileTile','ERROR: Map image not found: '+f);
+        dLog(LogConstructorError,Self,'TDungeonTilesEditor.CompileTile','ERROR: Map image not found: '+f);
     end;
 
   end;
@@ -421,7 +421,7 @@ begin
   if (TilesBox.ItemIndex>=0) and (TilesBox.Items[TilesBox.ItemIndex]<>'') then
     LoadTile( TilesBox.Items[TilesBox.ItemIndex] )
   else
-    WriteLnLog('TDungeonTilesEditor.LoadButtonClick','ERROR: Tile List is empty');
+    dLog(LogConstructorError,Self,'TDungeonTilesEditor.LoadButtonClick','ERROR: Tile List is empty');
 end;
 
 {============================================================================}
@@ -501,7 +501,7 @@ begin
     exit;
   end;
   Result := tfNone;
-  writelnLog('TDungeonTilesEditor.FaceByIndex','ERROR: Face not found! For index '+ inttostr(index));
+  dLog(LogConstructorError,Self,'TDungeonTilesEditor.FaceByIndex','ERROR: Face not found! For index '+ inttostr(index));
 end;
 
 {-------------------------------------------------------------------------}
@@ -509,12 +509,12 @@ end;
 function TDungeonTilesEditor.BaseByIndex(index: integer): TTileKind;
 var tk: TTileKind;
 begin
-  for tk in TTileKind do if BaseAtlasBox.Items[index]=BaseAtlas[tk].friendlyName then begin
+  for tk in TTileKind do if BaseAtlasBox.Items[index]=BaseAtlas[tk].FriendlyName then begin
     Result := tk;
-    exit;
+    Exit;
   end;
   Result := tkNone;
-  writelnLog('TDungeonTilesEditor.BaseByIndex','ERROR: Base not found! For index '+ inttostr(index));
+  dLog(LogConstructorError,Self,'TDungeonTilesEditor.BaseByIndex','ERROR: Base not found! For index '+ inttostr(index));
 end;
 
 {-------------------------------------------------------------------------}
@@ -609,7 +609,7 @@ begin
     end;
 
 
-  end else writeLnLog('TDungeonTilesEditor.DrawTileMap','TileMap is not ready to draw');
+  end else dLog(LogConstructorError,Self,'TDungeonTilesEditor.DrawTileMap','TileMap is not ready to draw');
 end;
 
 {-------------------------------------------------------------------------}
@@ -668,7 +668,7 @@ begin
       DrawTileMap;
       isChanged := false;
     end;
-  end else WriteLnLog('TDungeonTilesEditor.EmptyMapButtonClick','Tile is not ready!');
+  end else dLog(LogConstructorError,Self,'TDungeonTilesEditor.EmptyMapButtonClick','Tile is not ready!');
 end;
 
 {--------------------------------------------------------------------------}
@@ -869,7 +869,7 @@ end;
 
 procedure DTileMapHelper.GuessSize(Tile3D: TCastleScene);
 begin
-  writeLnLog('DTileMapHelper.GuessSize','Guessing tile size: '+floattostr(Tile3D.BoundingBox.sizex)+'x'+floattostr(Tile3D.BoundingBox.sizey)+'x'+floattostr(Tile3D.BoundingBox.sizez));
+  dLog(LogConstructorError,Self,'DTileMapHelper.GuessSize','Guessing tile size: '+floattostr(Tile3D.BoundingBox.sizex)+'x'+floattostr(Tile3D.BoundingBox.sizey)+'x'+floattostr(Tile3D.BoundingBox.sizez));
   {$Warning this solution is not optimal and might fail for complex tiles}
   Sizex := round((Tile3D.BoundingBox.sizex+0.1)/TileScale);
   Sizey := round((Tile3D.BoundingBox.sizey+0.1)/TileScale{*(1+0.5)}); //whhyyyyyyyy it falied at 1 of ~150 tiles ?????
@@ -887,7 +887,7 @@ begin
   try
     Load(URL,false);
   except
-    WriteLnLog('DTileMapHelper.LoadForConstructor','Exception caught. Usually it''s ok.');
+    dLog(LogConstructorInfo,Self,'DTileMapHelper.LoadForConstructor','Exception caught. Usually it''s ok.');
   end;
 end;
 
@@ -936,7 +936,7 @@ begin
   else
     URLWriteXML(TileDOC, ConstructorData(TilesFolder+TName+'.map',ToGameFolder));
 
-  WriteLnLog(ConstructorData(TilesFolder+TName+'.map',ToGameFolder));
+  dLog(LogConstructorInfo,Self,'DTileMapHelper.Save',ConstructorData(TilesFolder+TName+'.map',ToGameFolder));
 
   FreeAndNil(TileDOC);
 end;

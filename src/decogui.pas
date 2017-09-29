@@ -49,11 +49,11 @@ var GUI: DInterfaceContainer;
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
-uses SysUtils, CastleLog,
+uses SysUtils,
   CastleGLUtils, CastleColors,
   DecoInterfaceComposite, DecoInterfaceBlocks,
   DecoInterfaceLoader,
-  DecoGameMode, DecoTime;
+  DecoGameMode, DecoTime, DecoLog;
 
 {=============================================================================}
 {========================== interface container ==============================}
@@ -61,7 +61,7 @@ uses SysUtils, CastleLog,
 
 constructor DInterfaceContainer.Create;
 begin
-  WriteLnLog('DInterfaceContainer.create','Creating interface.');
+  dLog(LogInitInterface,Self,'DInterfaceContainer.Create','Creating interface.');
   inherited Create;
 
   Base.AnchorToWindow := true;
@@ -73,7 +73,7 @@ end;
 
 destructor DInterfaceContainer.Destroy;
 begin
-  WriteLnLog('DInterfaceContainer.destroy','Game over...');
+  dLog(LogInitInterface,Self,'DInterfaceContainer.Destroy','Game over...');
   { Free special elements that are not freed automatically (are not Children) }
   FreeAndNil(FPSLabel);
   inherited Destroy;
@@ -83,15 +83,15 @@ end;
 
 procedure DInterfaceContainer.Rescale;
 begin
-  WriteLnLog('DInterfaceContainer.rescale', IntToStr(Window.Width) + 'x' +
-                                            IntToStr(Window.Height));
+  dLog(LogInterfaceInfo,Self,'DInterfaceContainer.Rescale',
+    IntToStr(Window.Width) + 'x' + IntToStr(Window.Height));
   inherited Rescale;
 
   { THIS ROUTINE IS NOT YET IMPLEMENTED IN CASTLE GAME ENGINE
     see https://github.com/castle-engine/castle-engine/issues/36 }
   //prevent Window from scaling too small and/or into portrait orientation
   {if window.width < window.height then begin
-    writeLnLog('DInterfaceContainer.rescale','ERROR: Only landscape orientation supported!');
+    dLog('DInterfaceContainer.rescale','ERROR: Only landscape orientation supported!');
     window.width := window.height+10;
   end;}
 

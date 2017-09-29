@@ -54,8 +54,8 @@ function LoadBlenderX3D(URL: string): TX3DRootNode;
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
-uses SysUtils, {StrUtils,}
-  castleLog, castlevectors, decoinputoutput;
+uses SysUtils, {StrUtils,} CastleVectors,
+  DecoInputOutput, DecoLog;
 
 var TextureProperties: TTexturePropertiesNode;
 
@@ -63,9 +63,9 @@ procedure MakeDefaultTextureProperties;
 begin
   {$PUSH}{$WARN 6018 OFF} //hide "unreachable code" warning, it's ok here
   {freeandnil?}
-  if anisotropic_smoothing > 0 then begin
-    textureProperties := TTexturePropertiesNode.Create;
-    TextureProperties.AnisotropicDegree := anisotropic_smoothing;
+  if AnisotropicSmoothing > 0 then begin
+    TextureProperties := TTexturePropertiesNode.Create;
+    TextureProperties.AnisotropicDegree := AnisotropicSmoothing;
     TextureProperties.FdMagnificationFilter.Value := 'DEFAULT';
     TextureProperties.FdMinificationFilter.Value := 'DEFAULT';
 
@@ -81,28 +81,28 @@ end;
  attaches texture properties (anisotropic smoothing) to the texture of the object.
  TODO: Normal map still doesn't work. I should fix it one day...}
 procedure AddMaterial(Root: TX3DRootNode);
-  procedure ScanNodesRecoursive(source: TAbstractX3DGroupingNode);
+  procedure ScanNodesRecoursive(Source: TAbstractX3DGroupingNode);
   var i: integer;
-      material: TMaterialNode;
+      Material: TMaterialNode;
   begin
     for i := 0 to source.FdChildren.Count-1 do
-    if source.FdChildren[i] is TAbstractX3DGroupingNode then
-      ScanNodesRecoursive(TAbstractX3DGroupingNode(source.FdChildren[i]))
+    if Source.FdChildren[i] is TAbstractX3DGroupingNode then
+      ScanNodesRecoursive(TAbstractX3DGroupingNode(Source.FdChildren[i]))
     else
       {NOT FOUND exception is a normal error here, it's processed internally,
        set it to "always ignore this type of exceptions"}
-      if (source.FdChildren[i] is TShapeNode) then
+      if (Source.FdChildren[i] is TShapeNode) then
         try
           // assign TextureProperties (anisotropic smoothing) for the imagetexture
           //{$Warning WHY THE TextureProperties keeps automatically released????}
           (TShapeNode(source.FdChildren[i]).fdAppearance.Value.FindNode(TImageTextureNode,false) as TImageTextureNode).{Fd}TextureProperties{.Value} := TextureProperties{.DeepCopy};
           {create a link to each and every material loaded}
-          Material := (TShapeNode(source.FdChildren[i]).FdAppearance.Value.FindNode(TMaterialNode,false) as TMaterialNode);
+          Material := (TShapeNode(Source.FdChildren[i]).FdAppearance.Value.FindNode(TMaterialNode,false) as TMaterialNode);
           // set material ambient intensity to zero for complete darkness :)
           Material.AmbientIntensity := 0;
           AmbientIntensity.value.add(Material);
         except
-          writeLnLog('AddMaterial.ScanNodesRecoursive','try..except fired');
+          dLog(Log3DLoadSoftError,Source,'AddMaterial.ScanNodesRecoursive','try..except fired');
         end;
   end;
 begin
@@ -113,7 +113,7 @@ end;
 
 function LoadBlenderX3D(URL: string): TX3DRootNode;
 begin
-  WriteLnLog('LoadBlenderX3D','Reading file '+URL);
+  dLog(LogInitData,nil,'LoadBlenderX3D','Reading file '+URL);
   if TextureProperties = nil then MakeDefaultTextureProperties;
   Result := load3DSafe(URL);
   AddMaterial(result);

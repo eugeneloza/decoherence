@@ -16,7 +16,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 {---------------------------------------------------------------------------}
 
 { Global variables and definitions for Constructor }
-unit constructor_global;
+unit Constructor_Global;
 
 {$INCLUDE compilerconfig.inc}
 interface
@@ -25,7 +25,7 @@ uses
   Classes, Forms, SysUtils,
   //Controls,
   StdCtrls,
-  decotranslation;
+  DecoTranslation;
 
 const
   {all data that will remain in Architect folder and used only in Constructor}
@@ -95,7 +95,8 @@ function GetFilesList(path,ext: string): TStringList;
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
-uses CastleFilesUtils, StrUtils, CastleLog;
+uses CastleFilesUtils, StrUtils,
+  DecoLog;
 
 {case-sensitive replace the last occurence of searchstring to replacestring}
 procedure ReplaceStringReverse(var s: string; const searchstring,replacestring: string);
@@ -140,7 +141,7 @@ var s: string;
 begin
   Result := false;
   if SL=nil then begin
-    WriteLnLog('StringListContains','ERROR: String List is nil!');
+    dLog(LogConstructorError,nil,'StringListContains','ERROR: String List is nil!');
     exit;
   end;
   for s in SL do if s=search then begin
@@ -194,7 +195,7 @@ begin
       LanguageSwitch.Items.add(SayLanguage(L));
     LanguageSwitch.ItemIndex := 0;
     LanguageSwitch.OnChange := @LanguageSelectChange;
-  end else WriteLnLog('TLanguageForm.MakeLanguageSwitch','ERROR: LanguageSelect already exists.');
+  end else dLog(LogConstructorError,Self,'TLanguageForm.MakeLanguageSwitch','ERROR: LanguageSelect already exists.');
   ResetLanguageSwitch;
 end;
 

@@ -95,7 +95,7 @@ function LoadBufferSafe(const URL: string; out Duration: TFloatTime): TSoundBuff
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 uses SyncObjs, SysUtils, x3dload,
-  CastleLog;
+  DecoLog;
 
 {$IFDEF ThreadLoad}
 procedure DLoadThread.Execute;
@@ -110,7 +110,7 @@ procedure LoadThread(const Source: ILoadObject; const URL: string);
 var LoadThread: DLoadThread;
 begin
   if Source.ThreadLocked then begin
-    WriteLnLog('DecoInputOutput>LoadThread','Thread is already running, abort');
+    dLog(LogThreadError,nil,'DecoInputOutput>LoadThread','Error: Thread is already running, abort');
     Exit;
   end;
   Source.LockThread;

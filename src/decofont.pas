@@ -1,4 +1,4 @@
-{Copyright (C) 2012-2017 Yevhen Loza
+﻿{Copyright (C) 2012-2017 Yevhen Loza
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ uses
   {$ENDIF}
   CastleFonts, CastleUnicode, CastleStringUtils,
   CastleImages, {CastleTextureFontData,} CastleVectors, CastleColors,
-  CastleLog, CastleFilesUtils,
+  CastleFilesUtils,
   DecoGlobal;
 
 {$IFNDEF Android}
@@ -71,6 +71,7 @@ procedure InitializeFonts;
 procedure DestroyFonts;
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
+uses DecoLog;
 
 var {$IFNDEF Android}MyCharSet: TUnicodeCharList;{$ENDIF}
     RegularFont12,RegularFont16,RegularFont100: DFont;
@@ -92,7 +93,7 @@ end;
 
 procedure InitializeFonts;
 begin
-  WritelnLog('DecoFont : InitializeFonts','Init started');
+  dLog(LogInitInterface,nil,'DecoFont : InitializeFonts','Init started');
    {$IFDEF Android}
    RegularFont16 := DFont.Create(TextureFont_LinBiolinumRG_16);
    RegularFont12 := RegularFont16; {!!!! TODO}
@@ -108,7 +109,7 @@ begin
    RegularFont16 := DFont.Create(ApplicationData(FontFolder+NormalFontFile),16,true,MyCharSet);
    RegularFont100 := DFont.Create(ApplicationData(FontFolder+NormalFontFile),100,true,MyCharSet);
    {$ENDIF}
-   WriteLnLog('DecoFont : InitializeFonts','Fonts loaded successfully.');
+   dLog(LogInitInterface,nil,'DecoFont : InitializeFonts','Fonts loaded successfully.');
 
    SetFonts;
 end;
@@ -164,7 +165,7 @@ begin
     if MaxHb < s[i].Height-s[i].HeightBase then MaxHb := s[i].Height-s[i].HeightBase;
     if MaxW < s[i].Width then MaxW := s[i].Width;
   end;
-//  writelnLog('DFont.broken_string_to_image','max height base  =  ', inttostr(maxhb));
+//  dLog('DFont.broken_string_to_image','max height base  =  ', inttostr(maxhb));
   Result := TGRayScaleAlphaImage.Create;
   Result.SetSize(MaxW,MaxH*(s.Count));
   Result.Clear(Vector2Byte(0,0));

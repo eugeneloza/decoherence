@@ -22,16 +22,14 @@ unit DecoLevel;
 
 interface
 
-uses
-  CastleLog,
-  CastleWindow, CastleWindowTouch, CastleScene, X3DNodes,
+uses CastleWindow, CastleWindowTouch, CastleScene, X3DNodes,
   DecoLoad3d,
   SysUtils,
 
   DecoAbstractWorld, decodungeonworld, DecoDungeonGenerator,
   DecoNavigation, decoglobal;
 
-procedure load_test_level;
+procedure LoadTestLevel;
 procedure InitTestLevel;
 
 var LoadCompleted: boolean = false;
@@ -41,7 +39,7 @@ implementation
 uses CastleFilesUtils,
   DecoPlayerCharacter,
   DecoActorBody,
-  DecoGameMode;
+  DecoGameMode, DecoLog;
 
 procedure Generate3DWorld;
 var GENERATOR: D3dDungeonGenerator;
@@ -58,29 +56,33 @@ begin
   tmpLoadKnightCreature;
 end;
 
+{---------------------------------------------------------------------------}
+
 var LoadedLevel: boolean = false;
-procedure load_test_level;
+procedure LoadTestLevel;
 begin
   Generate3DWorld;
 
-  WritelnLog('load_test_level','Scene');
+  dLog(LogInitData,nil,'DecoLevel>LoadTestLevel','Scene');
 
-  Window.ShadowVolumes := Shadow_volumes_enabled;
-  Window.ShadowVolumesRender := Shadow_volumes_enabled;
+  Window.ShadowVolumes := ShadowVolumesEnabled;
+  Window.ShadowVolumesRender := ShadowVolumesEnabled;
   Window.AntiAliasing := aa8SamplesNicer;
 
   //make a temporary party {wrong place}
   InitPlayer;
   InitNavigation;
 
-  WritelnLog('load_test_level','Finished');
+  dLog(LogInitData,nil,'DecoLevel>LoadTestLevel','Finished');
 end;
+
+{---------------------------------------------------------------------------}
 
 procedure InitTestLevel;
 begin
   if not LoadCompleted then Exit;
   if not LoadedLevel then begin
-     WritelnLog('InitTestLevel','Init');
+     dLog(LogInitData,nil,'InitTestLevel','Init');
      LoadedLevel := true;
      CurrentWorld.Activate;
      Window.TouchInterface := {$IFDEF Android}tiCtlWalkDragRotate{$ELSE}tiNone{$ENDIF};

@@ -165,10 +165,10 @@ procedure InitPlayer;
 procedure FreePlayer;
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-uses SysUtils, Math, CastleLog,
+uses SysUtils, Math,
   DecoNavigation, DecoAbstractWorld, DecoAbstractWorld3d,
   DecoMouse,
-  DecoGameMode, DecoTime;
+  DecoGameMode, DecoTime, DecoLog;
 
 constructor DParty.Create;
 begin
@@ -191,7 +191,7 @@ begin
     NewMember.DrainMPH(DRND.Random(80),1);
     NewMember.DrainSTA(DRND.Random(80),1);
 
-    if (Perks = nil) or (Perks.Count = 0) then WriteLnLog('CreateTestParty','FATAL ERROR: Perks is empty!');
+    if (Perks = nil) or (Perks.Count = 0) then dLog(logInit,Self,'CreateTestParty','FATAL ERROR: Perks is empty!');
     NewMember.Actions.Add(Perks[0]);
 
     Character.Add(NewMember);
@@ -223,7 +223,7 @@ begin
   doMove1; doMove2;
   if Camera = nil then begin
     Exit;// InitNavigation;
-    WriteLnLog('DParty.UpdateCamera','Camera is Nil!');
+    dLog(LogNavigationError,Self,'DParty.UpdateCamera','Camera is Nil!');
   end;
 
   Camera.Position := CameraMan.Position;
@@ -368,7 +368,7 @@ end;
 
 Procedure DPlayerCharacter.Die;
 begin
-  WriteLnLog('DPlayerCharacter.die','Character has entered clinical death state');
+  dLog(LogTemp,Self,'DPlayerCharacter.Die','Character has entered clinical death state');
 end;
 
 {----------------------------------------------------------------------------}
