@@ -94,6 +94,8 @@ function GetScenarioFolder: string;
 
 {inlined equivalent of FloatEquals / Math.equals}
 function dEqual(const a,b: float): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+{ check if URL is valid }
+function URLValid(aURL: string): boolean;
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 uses SysUtils;
@@ -155,6 +157,14 @@ begin
     Result:=((A-B)<=Epsilon)
   else
     Result:=((B-A)<=Epsilon);
+end;
+
+{----------------------------------------------------------------------------}
+
+function URLValid(aURL: string): boolean;
+begin
+  //todo
+  if aURL<>'' then Result := true else Result := false;
 end;
 
 initialization

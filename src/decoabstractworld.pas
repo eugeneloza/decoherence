@@ -248,6 +248,7 @@ end;
 
 procedure DAbstractWorld.Load(Generator: DAbstractGenerator);
 begin
+  if Generator = nil then raise Exception.Create('DAbstractWorld.Load','Generator is nil!');
   fSeed := drnd.Random32bit; //maybe other algorithm?
   if Nav<>nil then begin
     dLog(LogWorldInitSoftError,Self,'DAbstractWorld.Load','WARNING: Nav is not nil! Freeing...');
@@ -262,6 +263,7 @@ end;
 
 procedure DAbstractWorld.Load(URL: string);
 begin
+  if not URLValid(URL) then dLog(LogWorldInit,nil,'DecoAbstractWorld.FreeWorld','World is not nil, freeing');
   {$hint dummy}
   //load seed and Nav
 end;

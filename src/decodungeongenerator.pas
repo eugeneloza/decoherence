@@ -570,7 +570,7 @@ begin
   end;
   if isWorking then begin
     dLog(LogWorldError,Self,'DDungeonGenerator.Generate','WARNING: Generation thread is buisy! Aborting...');
-    Exit;
+    Exit; {$WARNING Won't break the Generate sequence in CHILDREN!!!}
   end;
   fisWorking := true;
 
