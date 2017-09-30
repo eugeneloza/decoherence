@@ -266,7 +266,7 @@ begin
     GLImage.Color := InterfaceColor;
     GLImage.Color[3] := Current.CurrentOpacity;
   end else
-    dLog(LogInterfaceGLError,Self,'DAbstractImage.Update','GL image is nil in "update"');
+    dLog(LogInterfaceGLError,Self,'DAbstractImage.Update','ERROR: GL image is nil in "update"');
 end;
 
 {----------------------------------------------------------------------------}
@@ -280,10 +280,12 @@ end;
 
 procedure DAbstractImage.Draw;
 begin
+  //inherited Draw; //<------------ here we rewrite the draw sequence completely
   if not ImageReady then InitGL;
   if ImageReady then begin
     if not isVisible then Exit;
-    Update; //calls update and checks if the image is visible
+    Update; //Caution, Floater image might de-initialize the image in Update>CyclePhase
+    {if ImageReady then // checking that in doDraw of Floater Image}
     doDraw;
   end;
 end;
@@ -556,6 +558,7 @@ end;
 procedure DWindImage.doDraw;
 var PhaseScaled:integer;
 begin
+  //inherited <---------- this render is different
   GLImage.Color[3] := Current.CurrentOpacity + Current.CurrentOpacity/4 * Sin(2*Pi*OpacityPhase);
 
   PhaseScaled := Round((1-Phase)*Window.Width);
@@ -601,6 +604,7 @@ end;
 procedure DFloatImage.doDraw;
 var x: integer;
 begin
+  //inherited <---------- this render is different
   if not ImageReady then Exit; //image has been reloaded! //BUG
 
   GLImage.Color[3] := Current.CurrentOpacity*Sin(Pi*Phase);
@@ -615,6 +619,7 @@ end;
 procedure DBarImage.doDraw;
 var x: integer;
 begin
+  //inherited <---------- this render is different
   if Max = Min then begin
     dLog(LogInterfaceError,Self,'DBarImage.doDraw','ERROR: Division by zero!');
     Exit;

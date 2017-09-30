@@ -39,10 +39,11 @@ type
     Floater: DFloatImage;
     FloaterLabel: DPhasedLabel;
     MainLabel: DLabel;
-  public
-    procedure ReloadFact;
+  strict protected
     procedure SpawnChildren; override;
     procedure ArrangeChildren; override;
+  public
+    procedure ReloadFact;
   end;
 
 type
