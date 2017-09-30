@@ -31,7 +31,7 @@ uses Classes, SysUtils,
 
      DecoThread, DecoThrash,
 
-     DecoGui, DecoInterface, DecoInput,
+     DecoGui, {DecoInterface,} DecoInput,
      DecoLevel, DecoAbstractWorld,
      DecoSound,
      DecoLoadScreen, DecoPerks, DecoActorBody,
@@ -90,7 +90,9 @@ begin
   // todo Joystick
   if Event.EventType = itMouseButton then
     doMousePress(Event)
-  else if Event.EventType = itKey then begin
+  else
+  if Event.EventType = itKey then begin
+    {some generic buttons here}
     case Event.key of
        K_P,K_PrintScreen:                //k_printscreen doesn't work in x-window system if assigned to some external program like scrot
                          Window.SaveScreen('deco_'+NiceDate+'.jpg');
@@ -105,14 +107,8 @@ begin
 
     end;
 
-    if (CurrentGameMode=gmTravel) and (Player<>nil) then begin
-     case Event.key of
-        k_W: Player.InputMove(mdForward);
-        k_S: Player.InputMove(mdBack);
-        k_A: Player.InputMove(mdLeft);
-        k_D: Player.InputMove(mdRight);
-     end;
-    end;
+    if (CurrentGameMode=gmTravel) and (Player<>nil) then
+      doKeyboardPress(Event.Key);
   end;
 //  SetGameMode(gmCharacterGeneration);
   InitTestLevel;                         //ugly! I'll fix this soon.
@@ -124,17 +120,11 @@ end;
 {$PUSH}{$WARN 5024 off : Parameter "$1" not used}
 procedure doRelease(Container: TUIContainer; const Event: TInputPressRelease);
 begin
-  if Event.EventType = itMouseButton then begin
-    doMouseRelease(Event);
-  end else
-  if Event.EventType = itKey then begin
-    case Event.key of
-      k_W: Player.InputRelease(mdForward);
-      k_S: Player.InputRelease(mdBack);
-      k_A: Player.InputRelease(mdLeft);
-      k_D: Player.InputRelease(mdRight);
-    end;
-  end;
+  if Event.EventType = itMouseButton then
+    doMouseRelease(Event)
+  else
+  if Event.EventType = itKey then
+    doKeyboardRelease(Event.Key);
 end;
 {$POP}
 

@@ -43,6 +43,8 @@ var TouchArray: DTouchList;
 {------------------------------- procs --------------------------------------}
 
 procedure doMouseMotion(const Event: TInputMotion);
+procedure doKeyboardPress(aKey: TKey);
+procedure doKeyboardRelease(aKey: TKey);
 
 procedure doMousePress(const Event: TInputPressRelease);
 procedure doMouseRelease(const Event: TInputPressRelease);
@@ -54,6 +56,29 @@ implementation
 uses CastleVectors,
   DecoNavigation, DecoPlayerCharacter,
   DecoGameMode, DecoGlobal, DecoLog;
+
+
+procedure doKeyboardRelease(aKey: TKey);
+begin
+  case aKey of
+    k_W: Player.InputRelease(mdForward);
+    k_S: Player.InputRelease(mdBack);
+    k_A: Player.InputRelease(mdLeft);
+    k_D: Player.InputRelease(mdRight);
+  end;
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure doKeyboardPress(aKey: TKey);
+begin
+  case aKey of
+     k_W: Player.InputMove(mdForward);
+     k_S: Player.InputMove(mdBack);
+     k_A: Player.InputMove(mdLeft);
+     k_D: Player.InputMove(mdRight);
+  end;
+end;
 
 {-----------------------------------------------------------------------------}
 
