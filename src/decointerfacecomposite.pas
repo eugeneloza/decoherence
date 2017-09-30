@@ -47,13 +47,15 @@ type
 type
   { Element with "ArrangeChildren" and "SpawnChildren" methods }
   DCompositeElement = class(DInterfaceElement)
-  strict protected
+  strict private
     isSpawned: boolean;
-  public
+  strict protected
     { Arranges children elements within this container }
     procedure ArrangeChildren; virtual; abstract;
     { Creates (spawns) elements in this container }
     procedure SpawnChildren; virtual; abstract;
+  public
+    procedure RearrangeChildren;
     constructor Create; override;
   end;
 
@@ -66,21 +68,23 @@ type
     { Frame image }
     fFrame: DFrameImage;
     procedure SetFrame(const Value: DFrameImage);
+  strict protected
+    procedure ArrangeChildren; override;
+    procedure SpawnChildren; override;
   public
     { Frame image around the element }
     property Frame: DFrameImage read fFrame write SetFrame;
-    procedure ArrangeChildren; override;
-    procedure SpawnChildren; override;
   end;
 
 type
   { Image within a frame }
   DFramedImage = class(DFramedElement)
+  strict protected
+    procedure ArrangeChildren; override;
+    procedure SpawnChildren; override;
   public
     { The image interface element }
     Image: DStaticImage;
-    procedure ArrangeChildren; override;
-    procedure SpawnChildren; override;
   end;
 
 type
@@ -97,11 +101,12 @@ type
     { mouse over and mouse out events }
     procedure MouseOver(const Sender: DAbstractElement; const x,y: integer);
     procedure MouseLeave(const Sender: DAbstractElement; const x,y: integer);
+  strict protected
+    procedure ArrangeChildren; override;
+    procedure SpawnChildren; override;
   public
     { button image }
     property Image: TCastleImage write SetImage;
-    procedure ArrangeChildren; override;
-    procedure SpawnChildren; override;
   end;
 
 type
@@ -111,13 +116,14 @@ type
     { target Actor }
     fTarget: DBasicActor; //we don't need anything "higher" than this
     procedure SetTarget(const Value: DBasicActor);
+  strict protected
+    procedure ArrangeChildren; override;
+    procedure SpawnChildren; override;
   public
     { Label that would display the health number }
     Lab: DFloatLabel;
     { the character being monitored }
     property Target: DBasicActor read fTarget write SetTarget;
-    procedure ArrangeChildren; override;
-    procedure SpawnChildren; override;
   end;
 
 type
@@ -127,13 +133,14 @@ type
     { target Actor }
     fTarget: DBasicActor; //we don't need anything "higher" than this
     procedure SetTarget(const Value: DBasicActor);
+  strict protected
+    procedure ArrangeChildren; override;
+    procedure SpawnChildren; override;
   public
     { Label that displays character's nickname }
     Lab: DStringLabel;
     { the character being monitored }
     property Target: DBasicActor read fTarget write SetTarget;
-    procedure ArrangeChildren; override;
-    procedure SpawnChildren; override;
   end;
 
 type
@@ -142,13 +149,14 @@ type
   private
     fTarget: PStatValue;
     procedure SetTarget(const Value: PStatValue);
+  strict protected
+    procedure ArrangeChildren; override;
+    procedure SpawnChildren; override;
   public
     { Displayed statbar image }
     Bar: DStatBarImage;
     { Character's stat to be monitored }
     property Target: PStatValue read fTarget write SetTarget;
-    procedure ArrangeChildren; override;
-    procedure SpawnChildren; override;
   end;
 
 type
@@ -160,9 +168,10 @@ type
     {target character}
     fTarget: DBasicActor; //we don't need anything "higher" than this
     procedure SetTarget(const Value: DBasicActor);
-  public
-    procedure SpawnChildren; override;
+  strict protected
     procedure ArrangeChildren; override;
+    procedure SpawnChildren; override;
+  public
     {the character being monitored}
     property Target: DBasicActor read fTarget write SetTarget;
 end;
@@ -178,11 +187,12 @@ type
     {target character}
     fTarget: DBasicActor;
     procedure SetTarget(const Value: DBasicActor);
+  strict protected
+    procedure ArrangeChildren; override;
+    procedure SpawnChildren; override;
   public
     {the character being monitored}
     property Target: DBasicActor read fTarget write SetTarget;
-    procedure SpawnChildren; override;
-    procedure ArrangeChildren; override;
   end;
 
 {type
@@ -194,9 +204,9 @@ type
     Frame2Left,Frame2Right,
     Frame2BottomLeft,Frame2BottomRight,
     Frame3Bottom : DFrameImage;
-  public
-    procedure SpawnChildren; override;
+  strict protected
     procedure ArrangeChildren; override;
+    procedure SpawnChildren; override;
   end;}
 
 type
@@ -214,13 +224,14 @@ type
     { Player character }
     fTarget: DPlayerCharacter;
     procedure SetTarget(const Value: DPlayerCharacter);
+  strict protected
+    procedure ArrangeChildren; override;
+    procedure SpawnChildren; override;
   public
     { Player character which portrait is displayed }
     property Target: DPlayerCharacter read fTarget write SetTarget;
     { Call-back for character being hit }
     procedure doHit(const Dam: float; const DamType: TDamageType);
-    procedure SpawnChildren; override;
-    procedure ArrangeChildren; override;
   end;
 
 {
@@ -255,6 +266,9 @@ type
     //fCharacter: DPlayerCharacter;
     procedure settarget(value: DPerk);
     //procedure setcharacter(value: DPlayerCharacter);
+  strict protected
+    procedure ArrangeChildren; override;
+    procedure SpawnChildren; override;
   public
     property Target: DPerk read ftarget write settarget;
     //property Character: DPlayerCharacter read fCharacter write setcharacter;
@@ -268,7 +282,9 @@ type
   {
    public
      lines{,rows}: integer;
-     procedure ArrangeChildren(animate: TAnimationStyle); override;
+   strict protected
+     procedure ArrangeChildren; override;
+     procedure SpawnChildren; override;
      }
    end;
 
@@ -279,6 +295,9 @@ type DPerksContainer = class(DAbstractSorter)
   private
    { fTarget: DPlayerCharacter;
     procedure settarget(value: DPlayerCharacter);
+  strict protected
+    procedure ArrangeChildren; override;
+    procedure SpawnChildren; override;
   public
     //ContainerStyle: TPerkContainerStyle;
     property Target: DPlayerCharacter read ftarget write settarget;
@@ -332,6 +351,13 @@ begin
   ArrangeChildren;
 end;
 
+{-----------------------------------------------------------------------------}
+
+procedure DCompositeElement.RearrangeChildren;
+begin
+  if isSpawned then ArrangeChildren;
+end;
+
 {===========================================================================}
 {========================== Framed Element =================================}
 {===========================================================================}
@@ -340,7 +366,7 @@ procedure DFramedElement.SetFrame(const Value: DFrameImage);
 begin
   if fFrame<>Value then begin
     fFrame := Value;
-    ArrangeChildren;
+    RearrangeChildren;
   end
 end;
 
@@ -356,7 +382,6 @@ end;
 
 procedure DFramedElement.ArrangeChildren;
 begin
-  if not isSpawned then Exit;
   //inherited ArrangeChildren;
   Frame.Base.AnchorTo(Self.Current);
   Frame.SetBaseSize(0,0,1,1);
@@ -377,7 +402,6 @@ end;
 
 procedure DFramedImage.ArrangeChildren;
 begin
-  if not isSpawned then Exit;
   inherited ArrangeChildren;
   Image.Base.AnchorToFrame(Frame);
   Image.SetBaseSize(0,0,1,1);
@@ -425,7 +449,6 @@ end;
 
 procedure DButton.ArrangeChildren;
 begin
-  if not isSpawned then Exit;
   inherited ArrangeChildren;
   Image_out.Base.AnchorToFrame(Frame);
   Image_out.SetBaseSize(0,0,1,1);
@@ -452,7 +475,6 @@ end;
 
 procedure DHealthLabel.ArrangeChildren;
 begin
-  if not isSpawned then Exit;
   inherited ArrangeChildren;
   Lab.Base.AnchorToFrame(Frame);
   Lab.SetBaseSize(0,0,1,1);
@@ -486,7 +508,6 @@ end;
 
 procedure DNameLabel.ArrangeChildren;
 begin
-  if not isSpawned then Exit;
   inherited ArrangeChildren;
   Lab.Base.AnchorToFrame(Frame);
   Lab.SetBaseSize(0,0,1,1);
@@ -528,7 +549,6 @@ end;
 
 procedure DFramedBar.ArrangeChildren;
 begin
-  if not isSpawned then Exit;
   inherited ArrangeChildren;
   Bar.Base.AnchorToFrame(Frame);
   Bar.SetBaseSize(0,0,1,1);
@@ -569,7 +589,6 @@ end;
 procedure DStatBars.ArrangeChildren;
 var ScaleX: float;
 begin
-  if not isSpawned then Exit;
   inherited ArrangeChildren;
 
   HP_bar. Base.AnchorToFrame(Frame);
@@ -601,7 +620,7 @@ begin
     STA_bar.Target := fTarget.STARef;
     CNC_bar.Target := fTarget.CNCRef;
     MPH_bar.Target := fTarget.MPHRef;
-    ArrangeChildren; //in case fTarget has different set of stats
+    RearrangeChildren; //in case fTarget has different set of stats
   end;
 end;
 
@@ -638,7 +657,6 @@ end;
 
 procedure DPlayerBarsFull.ArrangeChildren;
 begin
-  if not isSpawned then Exit;
   //inherited ArrangeChildren;
 
   NickName.Base.AnchorTo(Self.Base); //AnchorToFrame(Frame);
@@ -732,7 +750,7 @@ begin
     dLog(LogInitInterface,Self,'DPortrait.SetTarget','Load from portrait');
     //DStaticImage(content).Load(Portrait_img[drnd.Random(Length(Portrait_img))]);  //todo
     fTarget.onHit := @Self.doHit;
-    ArrangeChildren;
+    RearrangeChildren;
   end;
 end;
 
@@ -753,7 +771,6 @@ end;
 
 procedure DPortrait.ArrangeChildren;
 begin
-  if not isSpawned then Exit;
   inherited ArrangeChildren;
   //todo
 end;
