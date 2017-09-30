@@ -157,7 +157,7 @@ Type
     { changes the scale of the element relative to current window size }
     procedure Rescale; virtual;
     { draw the element / as abstract as it might be :) }
-    procedure Draw; virtual;
+    procedure Draw; virtual; abstract;
   strict private
     { Last and Next animation states. }
     Last, Next: DAbstractContainer;
@@ -804,14 +804,6 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DAbstractElement.Draw;
-begin
-  if not isVisible then Exit;
-  Update;
-end;
-
-{----------------------------------------------------------------------------}
-
 constructor DAbstractElement.Create;
 begin
   inherited Create;
@@ -997,8 +989,11 @@ end;
 procedure DInterfaceElement.Draw;
 var i: integer;
 begin
-  inherited Draw;
-  for i := 0 to Children.Count-1 do Children[i].Draw;
+  //inherited Draw; <---------- parent is abstract
+  if isVisible then begin
+    Update;
+    for i := 0 to Children.Count-1 do Children[i].Draw;
+  end;
 end;
 
 {----------------------------------------------------------------------------}

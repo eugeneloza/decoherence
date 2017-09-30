@@ -124,7 +124,7 @@ type
     procedure CyclePhase; //virtual;
   public
     procedure Update; override;
-    procedure Draw; override;
+    procedure doDraw; override;
     procedure ResetPhase;
     constructor Create; override;
   public
@@ -205,8 +205,8 @@ end;
 
 procedure DLabel.RescaleImage;
 begin
-  {$IFNDEF AllowRescale}If SourceImage = nil then Exit;{$ENDIF}
-  If Base.ScaleItem then
+  {$IFNDEF AllowRescale}if SourceImage = nil then Exit;{$ENDIF}
+  if Base.ScaleItem then
     inherited RescaleImage //rescale this label as a simple image to fit "base size"
   else begin
     //don't rescale this label to provide sharp font
@@ -220,8 +220,8 @@ begin
           {$ENDIF}
           InitGLPending := true;
         end
-       else
-         dLog(LogLabelError,Self,'DLabel.RescaleImage/no scale label','ERROR: Base.Initialized = false');
+        else
+          dLog(LogLabelError,Self,'DLabel.RescaleImage/no scale label','ERROR: Base.Initialized = false');
   end;
 end;
 
@@ -350,21 +350,13 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DPhasedLabel.Draw;
+procedure DPhasedLabel.doDraw;
 var y: integer;
 begin
-  //inherited Draw; <-------- this render is different
-  if not ImageReady then InitGL;
+  GLImage.Color[3] := Current.CurrentOpacity*Sin(Pi*Phase);
 
-  if ImageReady then begin
-    if not isVisible then Exit;
-    Update;
-
-    GLImage.Color[3] := Current.CurrentOpacity*Sin(Pi*Phase);
-
-    y := round((1 + 5*Phase)*Window.height/17);
-    GLImage.Draw(2*Window.Width div 3, y);
-  end;
+  y := round((1 + 5*Phase)*Window.height/17);
+  GLImage.Draw(2*Window.Width div 3, y);
 end;
 
 end.

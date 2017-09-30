@@ -58,6 +58,7 @@ type
     { very simple draw procedure,
           checks if GL is initialized and initializes it if necessary }
     procedure Draw; override;
+    procedure doDraw; virtual;
     procedure Update; override;
 
     constructor Create; override;
@@ -144,7 +145,7 @@ type
     procedure CyclePhase; override;
   public
     { completely overrides the default drawing procedure }
-    procedure Draw; override;
+    procedure doDraw; override;
     constructor Create; Override;
   end;
 
@@ -158,7 +159,7 @@ type
   public
     { Call back after one cycle is finished, usually it should call re-loading of the image }
     onCycleFinish: TImageProcedure;
-    procedure Draw; override;
+    procedure doDraw; override;
     constructor Create; Override;
   end;
 
@@ -173,7 +174,7 @@ type
     Min, Max, CurrentMax, Position: float;
     { vertical or horizontal style of the bar }
     Kind: TBarStyle;
-    procedure Draw; override;
+    procedure doDraw; override;
     constructor Create; override;
   end;
 
@@ -267,13 +268,20 @@ end;
 
 {----------------------------------------------------------------------------}
 
+procedure DAbstractImage.doDraw;
+begin
+  GLIMage.Draw(Current.x1,Current.y1,Current.w,Current.h);
+end;
+
+{----------------------------------------------------------------------------}
+
 procedure DAbstractImage.Draw;
 begin
   if not ImageReady then InitGL;
   if ImageReady then begin
     if not isVisible then Exit;
     Update; //calls update and checks if the image is visible
-    GLIMage.Draw(Current.x1,Current.y1,Current.w,Current.h); //todo
+    doDraw;
   end;
 end;
 
@@ -542,30 +550,23 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DWindImage.Draw;
+procedure DWindImage.doDraw;
 var PhaseScaled:integer;
 begin
-  //inherited Draw; <-------- this render is different
-  if not ImageReady then InitGL;
-  if ImageReady then begin
-    if not isVisible then Exit;
-    Update;
+  GLImage.Color[3] := Current.CurrentOpacity + Current.CurrentOpacity/4 * Sin(2*Pi*OpacityPhase);
 
-    GLImage.Color[3] := Current.CurrentOpacity + Current.CurrentOpacity/4 * Sin(2*Pi*OpacityPhase);
+  PhaseScaled := Round((1-Phase)*Window.Width);
 
-    PhaseScaled := Round((1-Phase)*Window.Width);
-
-    //draw first part of the image
-    GLImage.Draw(PhaseScaled,0,
-                 Window.Width-PhaseScaled,Window.Height,
-                 0,0,
-                 Window.Width-PhaseScaled,Window.Height);
-    //draw second part of the image
-    GLImage.Draw(0,0,
-                 PhaseScaled,Window.Height,
-                 Window.Width-PhaseScaled,0,
-                 PhaseScaled,Window.Height);
-  end;
+  //draw first part of the image
+  GLImage.Draw(PhaseScaled,0,
+               Window.Width-PhaseScaled,Window.Height,
+               0,0,
+               Window.Width-PhaseScaled,Window.Height);
+  //draw second part of the image
+  GLImage.Draw(0,0,
+               PhaseScaled,Window.Height,
+               Window.Width-PhaseScaled,0,
+               PhaseScaled,Window.Height);
 end;
 
 {=============================================================================}
@@ -594,51 +595,33 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DFloatImage.Draw;
+procedure DFloatImage.doDraw;
 var x: integer;
 begin
-  //inherited Draw; <-------- this render is different
-  if not ImageReady then InitGL;
+  if not ImageReady then Exit; //image has been reloaded! //BUG
 
-  if ImageReady then begin
-    if not isVisible then Exit;
-    Update;
-
-    if not ImageReady then Exit; //image has been reloaded! //BUG
-
-    GLImage.Color[3] := Current.CurrentOpacity*Sin(Pi*Phase);
-
-    x := Round((Window.Width-Base.w)*Phase);
-    GLImage.Draw(x,0);
-  end;
+  GLImage.Color[3] := Current.CurrentOpacity*Sin(Pi*Phase);
+  x := Round((Window.Width-Base.w)*Phase);
+  GLImage.Draw(x,0);
 end;
 
 {=============================================================================}
 {=========================== bar image =======================================}
 {=============================================================================}
 
-procedure DBarImage.Draw;
+procedure DBarImage.doDraw;
 var x: integer;
 begin
-  //inherited Draw; <-------- this render is different
-
-  if not ImageReady then InitGL;
-
-  if ImageReady then begin
-    if not isVisible then Exit;
-    Update; //calls update and checks if the image is visible
-
-    if Max = Min then begin
-      dLog(LogInterfaceError,Self,'DBarImage.draw','ERROR: Division by zero!');
-      Exit;
-    end;
-    if Kind = bsVertical then begin
-      x := Round(Base.h * Position/(Max-Min));
-      GLImage.Draw(Base.x1,Base.y1,Base.w,x);
-    end else begin
-      x := Round(Base.w * Position/(Max-Min));
-      GLImage.Draw(Base.x1,Base.y1,x,Base.h);
-    end;
+  if Max = Min then begin
+    dLog(LogInterfaceError,Self,'DBarImage.doDraw','ERROR: Division by zero!');
+    Exit;
+  end;
+  if Kind = bsVertical then begin
+    x := Round(Base.h * Position/(Max-Min));
+    GLImage.Draw(Base.x1,Base.y1,Base.w,x);
+  end else begin
+    x := Round(Base.w * Position/(Max-Min));
+    GLImage.Draw(Base.x1,Base.y1,x,Base.h);
   end;
 end;
 
