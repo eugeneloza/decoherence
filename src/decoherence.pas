@@ -40,8 +40,6 @@ uses Classes, SysUtils,
      DecoNavigation,
      DecoGlobal, DecoTranslation, DecoGamemode, DecoTime, DecoLog;
 
-
-{==========================================================================}
 {==========================================================================}
 
 { this is a management procedure that takes place before
@@ -60,10 +58,29 @@ begin
 end;
 {$POP}
 
+{==========================================================================}
+
+{$IFDEF AllowRescale}
+{ this procedure is mostly needed for Desktops in windowed mode
+  and in normal situations should be called only once }
+{$PUSH}{$WARN 5024 off : Parameter "$1" not used}
+procedure GuiResize(Container: TUIContainer);
+begin
+  GUI.Rescale;
+end;
+{$POP}
+{$ENDIF}
 
 {-------------------------------------------------------------------------}
 
-
+{ generic rendering procedure. 3D world is rendered automatically
+  on each Window.Render, so we just need to add a GUI render here }
+{$PUSH}{$WARN 5024 off : Parameter "$1" not used}
+procedure GuiRender(Container: TUIContainer);
+begin
+  GUI.Draw;
+end;
+{$POP}
 
 {======================== Mouse & keyboard =================================}
 
@@ -71,13 +88,9 @@ end;
 procedure doPress(Container: TUIContainer; const Event: TInputPressRelease);
 begin
   // todo Joystick
-  if Event.EventType = itMouseButton then begin
-    doMousePress(Event);
-    {todo: if interface didn't catch the click then}
-    if CurrentGameMode = gmTravel then
-      if mbRight = Event.MouseButton then Camera.MouseLook := not Camera.MouseLook;
-
-  end else if Event.EventType = itKey then begin
+  if Event.EventType = itMouseButton then
+    doMousePress(Event)
+  else if Event.EventType = itKey then begin
     case Event.key of
        K_P,K_PrintScreen:                //k_printscreen doesn't work in x-window system if assigned to some external program like scrot
                          Window.SaveScreen('deco_'+NiceDate+'.jpg');
@@ -129,23 +142,8 @@ end;
 
 {$PUSH}{$WARN 5024 off : Parameter "$1" not used}
 procedure doMotion(Container: TUIContainer; const Event: TInputMotion);
-var
-    tmpLink: DAbstractElement;
-    Dragging: boolean;
 begin
-  if doMouseLook(Event) then Exit;
-
-  Dragging := doMouseDrag(Event);
-
-  {mouse over / if no drag-n-drop}
-  //this is not needed at the moment, we'll turn here a bit later when implementing drag-n-drop
-  //no mouseover is detected if no ifmouseover is run, so should still be here
-  if not Dragging then begin
-    tmpLink := GUI.IfMouseOver(Round(Event.Position[0]),Round(Event.Position[1]),true,true);
-    if tmpLink <> nil then
-      dLog(logVerbose,nil,'doMotion','Motion caught '+tmpLink.ClassName);
-  end;
-
+  doMouseMotion(Event)
 end;
 {$POP}
 

@@ -26,7 +26,7 @@ uses Classes, fgl, SysUtils,
   CastleFilesUtils, CastleKeysMouse,
   DecoInterface, DecoGui;
 
-type DTouch = class (TObject)
+type DTouch = class(TObject)
   FingerIndex: cardinal;
   x0,y0: integer;     //to handle sweeps, drags and cancels
   ClickElement: DSingleInterfaceElement;
@@ -42,6 +42,8 @@ var TouchArray: DTouchList;
 
 {------------------------------- procs --------------------------------------}
 
+procedure doMouseMotion(const Event: TInputMotion);
+
 procedure doMousePress(const Event: TInputPressRelease);
 procedure doMouseRelease(const Event: TInputPressRelease);
 function doMouseLook(const Event: TInputMotion): boolean;
@@ -51,7 +53,29 @@ procedure CenterMouseCursor;
 implementation
 uses CastleVectors,
   DecoNavigation, DecoPlayerCharacter,
-  DecoGlobal, DecoLog;
+  DecoGameMode, DecoGlobal, DecoLog;
+
+{-----------------------------------------------------------------------------}
+
+procedure doMouseMotion(const Event: TInputMotion);
+var tmpLink: DAbstractElement;
+    Dragging: boolean;
+begin
+  if doMouseLook(Event) then Exit;
+
+  Dragging := doMouseDrag(Event);
+
+  {mouse over / if no drag-n-drop}
+  //this is not needed at the moment, we'll turn here a bit later when implementing drag-n-drop
+  //no mouseover is detected if no ifmouseover is run, so should still be here
+  if not Dragging then begin
+    tmpLink := GUI.IfMouseOver(Round(Event.Position[0]),Round(Event.Position[1]),true,true);
+    if tmpLink <> nil then
+      dLog(logVerbose,nil,'doMotion','Motion caught '+tmpLink.ClassName);
+  end;
+end;
+
+{================================= TOUCH ====================================}
 
 constructor DTouch.Create(const xx,yy: single; const Finger: integer);
 begin
@@ -59,6 +83,8 @@ begin
   y0 := Round(yy);
   FingerIndex := Finger;
 end;
+
+{-----------------------------------------------------------------------------}
 
 procedure DTouch.Update(const Event: TInputMotion);
 begin
@@ -78,6 +104,8 @@ begin
     Result := 200
   else raise Exception.Create('Unknown event.MouseButton in decomouse.GetFingerIndex!');
 end;
+
+{-----------------------------------------------------------------------------}
 
 procedure doMouseRelease(const Event: TInputPressRelease);
 var i,FingerIndex: integer;
@@ -127,11 +155,13 @@ begin
 
   TouchArray.Add(NewEventTouch);
   dLog(LogMouseInfo,nil,'doMousePress','Caught mouse press finger='+IntToStr(FingerIndex));
+
+  {todo: if interface didn't catch the click then}
+  if CurrentGameMode = gmTravel then
+    if mbRight = Event.MouseButton then Camera.MouseLook := not Camera.MouseLook;
 end;
 
 {----------------------------------------------------------------------------}
-
-var WindowCenter: TVector2;   {pull it in GUI at rescale}
 
 var CameraWarning: boolean = true;
 function doMouseLook(const Event: TInputMotion): boolean;
@@ -147,19 +177,19 @@ begin
     Exit;
   end;
   Camera.Cursor := mcForceNone; {do it only once}
-  WindowCenter := Vector2(Window.Width div 2, Window.Height div 2);
-  if not TVector2.PerfectlyEquals(Event.Position,WindowCenter) then begin
-    Player.InputMouse(Event.Position - WindowCenter);
+  if not TVector2.PerfectlyEquals(Event.Position,GUI.Center) then begin
+    Player.InputMouse(Event.Position - GUI.Center);
     doMouseLook := false;
-    Window.MousePosition := WindowCenter;
+    Window.MousePosition := GUI.Center; //=CenterMouseCursor inlined
   end else
     doMouseLook := true; {prevent onMotion call-back}
 end;
 
+{----------------------------------------------------------------------------}
+
 procedure CenterMouseCursor;
 begin
-  WindowCenter := Vector2(Window.Width div 2, Window.Height div 2);
-  Window.MousePosition := WindowCenter;
+  Window.MousePosition := GUI.Center;
 end;
 
 {----------------------------------------------------------------------------}

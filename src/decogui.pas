@@ -22,7 +22,7 @@ unit DecoGui;
 
 interface
 
-uses Classes, CastleWindow,
+uses Classes, CastleVectors,
   DecoInterface, DecoLabels, DecoPlayerCharacter,
   DecoGlobal;
 
@@ -39,6 +39,7 @@ Type
     destructor Destroy; override;
   public
     Width,Height: integer;
+    Center: TVector2;
     {}
     procedure LoadScreen;
     {}
@@ -47,10 +48,6 @@ end;
 
 var GUI: DInterfaceContainer;
 
-procedure GuiRender(Container: TUIContainer);
-{$IFDEF AllowRescale}
-procedure GuiResize(Container: TUIContainer);
-{$ENDIF}
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
@@ -85,27 +82,20 @@ begin
 end;
 
 {-----------------------------------------------------------------------------}
-{$IFDEF AllowRescale}
-{ this procedure is mostly needed for Desktops in windowed mode
-  and in normal situations should be called only once }
-{$PUSH}{$WARN 5024 off : Parameter "$1" not used}
-procedure GuiResize(Container: TUIContainer);
-begin
-  if (Window.Width<>GUI.Width) or (Window.Height<>GUI.Height) then begin
-    GUI.Rescale;
-  end;
-end;
-{$POP}
-{$ENDIF}
-{-----------------------------------------------------------------------------}
 
 procedure DInterfaceContainer.Rescale;
 begin
+  if (Window.Width = Width) and (Window.Height = Height) then begin
+    dLog(LogInterfaceInfo,Self,'DInterfaceContainer.Rescale','No need in rescale, abort.');
+    Exit;
+  end;
+
   dLog(LogInterfaceInfo,Self,'DInterfaceContainer.Rescale',
     IntToStr(Window.Width) + 'x' + IntToStr(Window.Height));
   inherited Rescale;
   Width := Window.Width;
   Height := Window.Height;
+  Center := Vector2(Width div 2, Height div 2);
 
   { THIS ROUTINE IS NOT YET IMPLEMENTED IN CASTLE GAME ENGINE
     see https://github.com/castle-engine/castle-engine/issues/36 }
@@ -118,17 +108,6 @@ begin
   { rescale special elements }
   FPSLabel.Rescale;
 end;
-
-{-----------------------------------------------------------------------------}
-
-{ generic rendering procedure. 3D world is rendered automatically
-  on each Window.Render, so we just need to add a GUI render here }
-{$PUSH}{$WARN 5024 off : Parameter "$1" not used}
-procedure GuiRender(Container: TUIContainer);
-begin
-  GUI.Draw;
-end;
-{$POP}
 
 {-----------------------------------------------------------------------------}
 
