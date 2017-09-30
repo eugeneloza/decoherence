@@ -22,7 +22,7 @@ unit DecoGui;
 
 interface
 
-uses Classes,
+uses Classes,{$IFDEF AllowRescale}CastleWindow,{$ENDIF}
   DecoInterface, DecoLabels, DecoPlayerCharacter,
   DecoGlobal;
 
@@ -38,6 +38,7 @@ Type
     constructor Create; override;
     destructor Destroy; override;
   public
+    Width,Height: integer;
     {}
     procedure LoadScreen;
     {}
@@ -46,6 +47,9 @@ end;
 
 var GUI: DInterfaceContainer;
 
+{$IFDEF AllowRescale}
+Procedure WindowResize(Container: TUIContainer);
+{$ENDIF}
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
@@ -80,12 +84,27 @@ begin
 end;
 
 {-----------------------------------------------------------------------------}
+{$IFDEF AllowRescale}
+{ this procedure is mostly needed for Desktops in windowed mode
+  and in normal situations should be called only once }
+{$PUSH}{$WARN 5024 off : Parameter "$1" not used}
+Procedure WindowResize(Container: TUIContainer);
+begin
+  if (Window.Width<>GUI.Width) or (Window.Height<>GUI.Height) then begin
+    GUI.Rescale;
+  end;
+end;
+{$POP}
+{$ENDIF}
+{-----------------------------------------------------------------------------}
 
 procedure DInterfaceContainer.Rescale;
 begin
   dLog(LogInterfaceInfo,Self,'DInterfaceContainer.Rescale',
     IntToStr(Window.Width) + 'x' + IntToStr(Window.Height));
   inherited Rescale;
+  Width := Window.Width;
+  Height := Window.Height;
 
   { THIS ROUTINE IS NOT YET IMPLEMENTED IN CASTLE GAME ENGINE
     see https://github.com/castle-engine/castle-engine/issues/36 }

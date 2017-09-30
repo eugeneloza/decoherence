@@ -44,21 +44,6 @@ uses Classes, SysUtils,
 {==========================================================================}
 {==========================================================================}
 
-{$IFDEF AllowRescale}
-{ this procedure is mostly needed for Desktops in windowed mode
-  and in normal situations should be called only once }
-{$PUSH}{$WARN 5024 off : Parameter "$1" not used}
-Procedure WindowResize(Container: TUIContainer);
-begin
-  if (window.width<>GUI.width) or (window.height<>GUI.height) then begin
-    GUI.rescale;
-  end;
-end;
-{$POP}
-{$ENDIF}
-
-{-------------------------------------------------------------------------}
-
 { this is a management procedure that takes place before
   WindowRender }
 {$PUSH}{$WARN 5024 off : Parameter "$1" not used}
