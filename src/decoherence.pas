@@ -63,14 +63,7 @@ end;
 
 {-------------------------------------------------------------------------}
 
-{ generic rendering procedure. 3D world is rendered automatically
-  on each Window.Render, so we just need to add a GUI render here }
-{$PUSH}{$WARN 5024 off : Parameter "$1" not used}
-Procedure WindowRender(Container: TUIContainer);
-begin
-  GUI.Draw;
-end;
-{$POP}
+
 
 {======================== Mouse & keyboard =================================}
 
@@ -208,8 +201,8 @@ begin
   dLog(LogInit,nil,'ApplicationInitialize','Initialize interface');
 
   //finally we're ready to show game loading screen
-  {$IFDEF AllowRescale}Window.OnResize := @WindowResize;{$ENDIF}
-  Window.OnRender := @WindowRender;
+  {$IFDEF AllowRescale}Window.onResize := @GuiResize;{$ENDIF}
+  Window.onRender := @GuiRender;
 
   dLog(LogInit,nil,'ApplicationInitialize','Init finished');
 

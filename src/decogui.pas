@@ -22,7 +22,7 @@ unit DecoGui;
 
 interface
 
-uses Classes,{$IFDEF AllowRescale}CastleWindow,{$ENDIF}
+uses Classes, CastleWindow,
   DecoInterface, DecoLabels, DecoPlayerCharacter,
   DecoGlobal;
 
@@ -47,8 +47,9 @@ end;
 
 var GUI: DInterfaceContainer;
 
+procedure GuiRender(Container: TUIContainer);
 {$IFDEF AllowRescale}
-Procedure WindowResize(Container: TUIContainer);
+procedure GuiResize(Container: TUIContainer);
 {$ENDIF}
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
@@ -88,7 +89,7 @@ end;
 { this procedure is mostly needed for Desktops in windowed mode
   and in normal situations should be called only once }
 {$PUSH}{$WARN 5024 off : Parameter "$1" not used}
-Procedure WindowResize(Container: TUIContainer);
+procedure GuiResize(Container: TUIContainer);
 begin
   if (Window.Width<>GUI.Width) or (Window.Height<>GUI.Height) then begin
     GUI.Rescale;
@@ -117,6 +118,17 @@ begin
   { rescale special elements }
   FPSLabel.Rescale;
 end;
+
+{-----------------------------------------------------------------------------}
+
+{ generic rendering procedure. 3D world is rendered automatically
+  on each Window.Render, so we just need to add a GUI render here }
+{$PUSH}{$WARN 5024 off : Parameter "$1" not used}
+procedure GuiRender(Container: TUIContainer);
+begin
+  GUI.Draw;
+end;
+{$POP}
 
 {-----------------------------------------------------------------------------}
 
