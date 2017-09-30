@@ -22,7 +22,7 @@ unit DecoLevel;
 
 interface
 
-uses CastleWindow, CastleWindowTouch, CastleScene, X3DNodes,
+uses CastleWindow, {CastleWindowTouch,} CastleScene, X3DNodes,
   DecoLoad3d,
   SysUtils,
 
@@ -85,7 +85,7 @@ begin
      dLog(LogInitData,nil,'InitTestLevel','Init');
      LoadedLevel := true;
      CurrentWorld.Activate;
-     Window.TouchInterface := {$IFDEF Android}tiCtlWalkDragRotate{$ELSE}tiNone{$ENDIF};
+     //Window.TouchInterface := {$IFDEF Android}tiCtlWalkDragRotate{$ELSE}tiNone{$ENDIF};
      SetGameMode(gmTravel);
   end;
 end;

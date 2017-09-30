@@ -25,7 +25,7 @@ interface
 implementation
 
 uses Classes, SysUtils,
-     CastleWindow, CastleWindowTouch, CastleKeysMouse,
+     CastleWindow, {CastleWindowTouch,} CastleKeysMouse,
 
      CastleScene,
 
@@ -234,7 +234,7 @@ Initialization
 
   SetLoadingImage;
 
-  Window := TCastleWindowTouch.Create(Application);
+  Window := TCastleWindow.Create(Application);
 
   Window.DoubleBuffer := true;//true;             //what's the difference? speed? memory?
 

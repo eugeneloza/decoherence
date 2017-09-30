@@ -25,7 +25,7 @@ unit DecoGlobal;
 interface
 
 uses {todo: temporary}//SysUtils,
-  Classes, CastleWindowTouch,
+  Classes, CastleWindow,
   CastleRandom;
 
 const NEnemies = 0.05; {must be <1 / temporary quantity of enemies in % of NavPoints}
@@ -71,9 +71,9 @@ const AnisotropicSmoothing = 4;
       ShadowVolumesEnabled = false;
 
 var {global window of the game}
-    Window : TCastleWindowTouch;
+    Window : TCastleWindow;
     {todo: current scenario}
-    CurrentScenarioFolder: string='test/';
+    CurrentScenarioFolder: string = 'test/';
     { random generator used for all interface random events }
     drnd: TCastleRandom;
 
@@ -109,10 +109,10 @@ begin
    it's 1000 times slower than CastleRandom,
    but provides a perfect seed initialization. }
   AssignFile(dev_rnd, '/dev/urandom');
-  reset(dev_rnd);
+  Reset(dev_rnd);
   repeat
-    read(dev_rnd,result);
-  until result <> 0; // xorshift can't accept 0 as a random seed so we just read /dev/urandom until its not zero
+    Read(dev_rnd,Result);
+  until Result <> 0; // xorshift can't accept 0 as a random seed so we just read /dev/urandom until its not zero
   CloseFile(dev_rnd);
 end;
 {$ELSE}
@@ -133,14 +133,14 @@ end;
 
 procedure DestroyGlobal;
 begin
-  freeandnil(drnd);
+  FreeAndNil(drnd);
 end;
 
 {----------------------------------------------------------------------------}
 
 function GetScenarioFolder: string;
 begin
-  result := ScenarioBaseFolder + CurrentScenarioFolder;
+  Result := ScenarioBaseFolder + CurrentScenarioFolder;
 end;
 
 {----------------------------------------------------------------------------}
