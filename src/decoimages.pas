@@ -262,8 +262,11 @@ end;
 procedure DAbstractImage.Update;
 begin
   inherited Update;
-  GLImage.Color := InterfaceColor;
-  GLImage.Color[3] := Current.CurrentOpacity;
+  if GLImage <> nil then begin
+    GLImage.Color := InterfaceColor;
+    GLImage.Color[3] := Current.CurrentOpacity;
+  end else
+    dLog(LogInterfaceGLError,Self,'DAbstractImage.Update','GL image is nil in "update"');
 end;
 
 {----------------------------------------------------------------------------}
