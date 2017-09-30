@@ -57,6 +57,63 @@ uses CastleVectors,
   DecoNavigation, DecoPlayerCharacter,
   DecoGameMode, DecoGlobal, DecoLog;
 
+var RecordKeys: boolean = false;
+    RecordedKeys: string;
+procedure KeyRecorder(aKey: TKey);
+const test1 = 'DIIQI';
+const test2 = 'DIKFA';
+  function AddKey: boolean;
+  begin
+    Result := true;
+    case aKey of
+      k_A: RecordedKeys += 'A';
+      k_F: RecordedKeys += 'F';
+      k_K: RecordedKeys += 'K';
+      k_Q: RecordedKeys += 'Q';
+      {messing with letter a bit :)}
+      k_D: RecordedKeys += 'I';
+      k_I: RecordedKeys += 'D';
+      else Result := false;
+    end;
+    //dLog(LogVerbose,nil,'',RecordedKeys);
+  end;
+  function TestRecord: boolean;
+    function ifCorresponds(a: string): boolean;
+    begin
+      Result := ( RecordedKeys = copy(a,1,length(RecordedKeys)) ) and
+                ( Length(RecordedKeys) <= Length(a) );
+    end;
+  begin
+    if ifCorresponds(test1) or ifCorresponds(test2)
+    then
+      Result := true
+    else
+      Result := false;
+  end;
+begin
+  if CurrentGameMode = gmTravel then begin
+    if RecordKeys then begin
+      if AddKey then begin
+        if TestRecord then begin
+          if (RecordedKeys = test1) or (RecordedKeys = test2) then begin
+            dLog(LogVerbose,nil,'No','This is a different game!');
+            RecordKeys := false;
+          end
+        end else
+          RecordKeys := false;
+      end else
+        RecordKeys := false;
+    end else
+      if (aKey = k_I) then begin
+        RecordedKeys := '';
+        RecordKeys := true;
+        AddKey;
+      end;
+
+  end;
+end;
+
+{-----------------------------------------------------------------------------}
 
 procedure doKeyboardRelease(aKey: TKey);
 begin
@@ -78,6 +135,7 @@ begin
      k_A: Player.InputMove(mdLeft);
      k_D: Player.InputMove(mdRight);
   end;
+  KeyRecorder(aKey);
 end;
 
 {-----------------------------------------------------------------------------}
