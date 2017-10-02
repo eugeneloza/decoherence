@@ -73,7 +73,10 @@ procedure DestroyFonts;
 implementation
 uses DecoLog;
 
-var {$IFNDEF Android}MyCharSet: TUnicodeCharList;{$ENDIF}
+var {$IFNDEF Android}
+    FullCharSet: TUnicodeCharList;
+    NumCharSet: TUnicodeCharList;
+    {$ENDIF}
     RegularFont12,RegularFont16,RegularFont100: DFont;
 
 {------------------------------------------------------------------------------}
@@ -99,15 +102,19 @@ begin
    RegularFont12 := RegularFont16; {!!!! TODO}
    RegularFont100 := RegularFont16;
    {$ELSE}
-   if MyCharSet = nil then begin
-      MyCharSet := TUnicodeCharList.Create;
+   if FullCharSet = nil then begin
+      FullCharSet := TUnicodeCharList.Create;
       //MyCharSet := AllChars;
-      MyCharSet.Add(SimpleAsciiCharacters);
-      MyCharSet.Add('ЁЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮёйцукенгшщзхъфывапролджэячсмитьбюІЇЄіїє');
+      FullCharSet.Add(SimpleAsciiCharacters);
+      FullCharSet.Add('ЁЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮёйцукенгшщзхъфывапролджэячсмитьбюІЇЄіїє');
    end;
-   RegularFont12 := DFont.Create(ApplicationData(FontFolder+NormalFontFile),12,true,MyCharSet);
-   RegularFont16 := DFont.Create(ApplicationData(FontFolder+NormalFontFile),16,true,MyCharSet);
-   RegularFont100 := DFont.Create(ApplicationData(FontFolder+NormalFontFile),100,true,MyCharSet);
+  if NumCharSet = nil then begin
+     NumCharSet := TUnicodeCharList.Create;
+     NumCharSet.Add('1234567890');
+  end;
+   RegularFont12 := DFont.Create(ApplicationData(FontFolder+NormalFontFile),12,true,FullCharSet);
+   RegularFont16 := DFont.Create(ApplicationData(FontFolder+NormalFontFile),16,true,FullCharSet);
+   RegularFont100 := DFont.Create(ApplicationData(FontFolder+NormalFontFile),100,true,NumCharSet);
    {$ENDIF}
    dLog(LogInitInterface,nil,'DecoFont : InitializeFonts','Fonts loaded successfully.');
 
@@ -121,7 +128,8 @@ begin
   FreeAndNil(RegularFont12);
   FreeAndNil(RegularFont16);
   FreeAndNil(RegularFont100);
-  FreeAndNil(MyCharSet);
+  FreeAndNil(FullCharSet);
+  FreeAndNil(NumCharSet);
 end;
 
 {-----------------------------------------------------------------------------}
