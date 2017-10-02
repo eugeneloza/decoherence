@@ -136,13 +136,19 @@ end;
 {-----------------------------------------------------------------------------}
 
 procedure DInterfaceContainer.PartyInterface;
-var tmp: DPlayerBarsFull;
+var tmp: DInterfaceElement;
 begin
   Self.Clear; //make it more optimal?
   tmp := DPlayerBarsFull.Create;
   tmp.Base.AnchorToWindow := true;
-  tmp.SetBaseSize(0,0,0.1,0.1);
-  tmp.Target := Player.CurrentParty.Character[0];
+  tmp.SetBaseSize(0.1,0.1,0.1,0.1);
+  (tmp as DPlayerBarsFull).Target := Player.CurrentParty.Character[0];
+  Grab(tmp);
+
+  tmp := DFramedImage.Create;
+  (tmp as DFramedImage).Frame := BlackFrame;
+  (tmp as DFramedImage).Image.Load(Portrait_Img[0]);
+  tmp.SetBaseSize(0.2,0.1,0.1,0.1);
   Grab(tmp);
 end;
 

@@ -45,7 +45,9 @@ type
   end;
 
 type
-  { Element with "ArrangeChildren" and "SpawnChildren" methods }
+  { Element with "ArrangeChildren" and "SpawnChildren" methods
+    Usually it is just a container for bottom-level elements
+    and doesn't draw anything by itself}
   DCompositeElement = class(DInterfaceElement)
   strict private
     isSpawned: boolean;
@@ -67,13 +69,13 @@ type
   private
     { Frame image }
     fFrame: DFrameImage;
-    procedure SetFrame(const Value: DFrameImage);
+    procedure SetFrame(const Value: DRectagonalFrame);
   strict protected
     procedure ArrangeChildren; override;
     procedure SpawnChildren; override;
   public
     { Frame image around the element }
-    property Frame: DFrameImage read fFrame write SetFrame;
+    property Frame: DRectagonalFrame read fFrame.Frame write SetFrame;
   end;
 
 type
@@ -362,10 +364,10 @@ end;
 {========================== Framed Element =================================}
 {===========================================================================}
 
-procedure DFramedElement.SetFrame(const Value: DFrameImage);
+procedure DFramedElement.SetFrame(const Value: DRectagonalFrame);
 begin
-  if fFrame<>Value then begin
-    fFrame := Value;
+  if fFrame.Frame<>Value then begin
+    fFrame.Frame := Value;
     RearrangeChildren;
   end
 end;
@@ -374,8 +376,8 @@ end;
 
 procedure DFramedElement.SpawnChildren;
 begin
-  Frame := DFrameImage.Create;
-  Grab(Frame);
+  fFrame := DFrameImage.Create;
+  Grab(fFrame);
 end;
 
 {-----------------------------------------------------------------------------}
@@ -383,8 +385,8 @@ end;
 procedure DFramedElement.ArrangeChildren;
 begin
   //inherited ArrangeChildren;
-  Frame.Base.AnchorTo(Self.Current);
-  Frame.SetBaseSize(0,0,1,1);
+  fFrame.Base.AnchorTo(Self.Current);
+  fFrame.SetBaseSize(0,0,1,1);
 end;
 
 {===========================================================================}
@@ -403,7 +405,7 @@ end;
 procedure DFramedImage.ArrangeChildren;
 begin
   inherited ArrangeChildren;
-  Image.Base.AnchorToFrame(Frame);
+  Image.Base.AnchorToFrame(fFrame);
   Image.SetBaseSize(0,0,1,1);
 end;
 
@@ -450,9 +452,9 @@ end;
 procedure DButton.ArrangeChildren;
 begin
   inherited ArrangeChildren;
-  Image_out.Base.AnchorToFrame(Frame);
+  Image_out.Base.AnchorToFrame(fFrame);
   Image_out.SetBaseSize(0,0,1,1);
-  Image_over.Base.AnchorToFrame(Frame);
+  Image_over.Base.AnchorToFrame(fFrame);
   Image_over.SetBaseSize(0,0,1,1);
 end;
 
@@ -468,7 +470,7 @@ begin
   Lab.Digits := 0;
   Lab.Font := PlayerHealthFont;
   Grab(Lab);
-  Frame.Frame := Characterbar_Bottom;
+  Frame := Characterbar_Bottom;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -476,7 +478,7 @@ end;
 procedure DHealthLabel.ArrangeChildren;
 begin
   inherited ArrangeChildren;
-  Lab.Base.AnchorToFrame(Frame);
+  Lab.Base.AnchorToFrame(fFrame);
   Lab.SetBaseSize(0,0,1,1);
 end;
 
@@ -501,7 +503,7 @@ begin
   Lab := DStringLabel.Create;  //scale=false
   Lab.Font := PlayerNameFont;
   Grab(Lab);
-  Frame.Frame := Characterbar_Top;
+  Frame := Characterbar_Top;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -509,7 +511,7 @@ end;
 procedure DNameLabel.ArrangeChildren;
 begin
   inherited ArrangeChildren;
-  Lab.Base.AnchorToFrame(Frame);
+  Lab.Base.AnchorToFrame(fFrame);
   Lab.SetBaseSize(0,0,1,1);
 end;
 
@@ -540,7 +542,7 @@ end;
 procedure DFramedBar.SpawnChildren;
 begin
   inherited SpawnChildren;
-  Frame.Frame := StatBarsFrame;
+  Frame := StatBarsFrame;
   Bar := DStatBarImage.Create;
   Grab(Bar);
 end;
@@ -550,7 +552,7 @@ end;
 procedure DFramedBar.ArrangeChildren;
 begin
   inherited ArrangeChildren;
-  Bar.Base.AnchorToFrame(Frame);
+  Bar.Base.AnchorToFrame(fFrame);
   Bar.SetBaseSize(0,0,1,1);
 end;
 
@@ -561,7 +563,7 @@ end;
 procedure DStatBars.SpawnChildren;
 begin
   inherited SpawnChildren;
-  Frame.Frame := Characterbar_mid;
+  Frame := Characterbar_mid;
 
   HP_bar := DFramedBar.Create;
   HP_bar.Bar.Load(HpBarImage);
@@ -591,10 +593,10 @@ var ScaleX: float;
 begin
   inherited ArrangeChildren;
 
-  HP_bar. Base.AnchorToFrame(Frame);
-  STA_bar.Base.AnchorToFrame(Frame);
-  CNC_bar.Base.AnchorToFrame(Frame);
-  MPH_bar.Base.AnchorToFrame(Frame);
+  HP_bar. Base.AnchorToFrame(fFrame);
+  STA_bar.Base.AnchorToFrame(fFrame);
+  CNC_bar.Base.AnchorToFrame(fFrame);
+  MPH_bar.Base.AnchorToFrame(fFrame);
 
   if (fTarget <> nil) and (fTarget.MaxMaxMPH > 0) then begin
     ScaleX := 1/4;
@@ -659,7 +661,7 @@ procedure DPlayerBarsFull.ArrangeChildren;
 begin
   //inherited ArrangeChildren;
 
-  NickName.Base.AnchorTo(Self.Base); //AnchorToFrame(Frame);
+  NickName.Base.AnchorTo(Self.Base); //AnchorToFrame(fFrame);
   NickName.Base.Anchor[asBottom].AlignTo := noAlign;
   Health.Base.AnchorTo(Self.Base);
   Health.Base.Anchor[asTop].AlignTo := noAlign;

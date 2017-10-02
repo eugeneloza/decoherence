@@ -95,6 +95,7 @@ type
   public
     { Anchor this element to a DFrameImage and set all Gaps correctly }
     procedure AnchorToFrame(const aFrame: DFrameImage);
+    //procedure AnchorToFrame(const aFrame: DRectagonalFrame);
   end;
 
 type
@@ -415,10 +416,18 @@ begin
     Exit;
   end;
   AnchorTo(aFrame.Current);
-  Anchor[asLeft].Gap := aFrame.Frame.CornerLeft;
-  Anchor[asRight].Gap := aFrame.Frame.CornerRight;
-  Anchor[asTop].Gap := aFrame.Frame.CornerTop;
-  Anchor[asBottom].Gap := aFrame.Frame.CornerBottom;
+  if aFrame.Frame <> nil then begin
+    Anchor[asLeft].Gap := aFrame.Frame.CornerLeft;
+    Anchor[asRight].Gap := aFrame.Frame.CornerRight;
+    Anchor[asTop].Gap := aFrame.Frame.CornerTop;
+    Anchor[asBottom].Gap := aFrame.Frame.CornerBottom;
+  end else begin
+    dLog(LogInterfaceError,Self,'DFrameAnchorHelper.AnchorToFrame','ERROR: Frame image is nil! Assuming zero gaps');
+    Anchor[asLeft].Gap := 0;
+    Anchor[asRight].Gap := 0;
+    Anchor[asTop].Gap := 0;
+    Anchor[asBottom].Gap := 0;
+   end;
 end;
 
 {=============================================================================}
