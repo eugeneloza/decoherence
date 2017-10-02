@@ -73,11 +73,9 @@ procedure DestroyFonts;
 implementation
 uses DecoLog;
 
-var {$IFNDEF Android}
-    FullCharSet: TUnicodeCharList;
-    NumCharSet: TUnicodeCharList;
-    {$ENDIF}
-    RegularFont12,RegularFont16,RegularFont100: DFont;
+{these are internal variables which are managed,
+ "external" fonts variables are assigned to these}
+var RegularFont12,RegularFont16,RegularFont100: DFont;
 
 {------------------------------------------------------------------------------}
 
@@ -95,6 +93,10 @@ begin
 end;
 
 procedure InitializeFonts;
+{$IFNDEF Android}
+var FullCharSet: TUnicodeCharList;
+    NumCharSet: TUnicodeCharList;
+{$ENDIF}
 begin
   dLog(LogInitInterface,nil,'DecoFont : InitializeFonts','Init started');
    {$IFDEF Android}
@@ -102,19 +104,22 @@ begin
    RegularFont12 := RegularFont16; {!!!! TODO}
    RegularFont100 := RegularFont16;
    {$ELSE}
-   if FullCharSet = nil then begin
-      FullCharSet := TUnicodeCharList.Create;
-      //MyCharSet := AllChars;
-      FullCharSet.Add(SimpleAsciiCharacters);
-      FullCharSet.Add('ЁЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮёйцукенгшщзхъфывапролджэячсмитьбюІЇЄіїє');
-   end;
-  if NumCharSet = nil then begin
-     NumCharSet := TUnicodeCharList.Create;
-     NumCharSet.Add('1234567890');
-  end;
+   //assign char sets
+   FullCharSet := TUnicodeCharList.Create;
+   //MyCharSet := AllChars;
+   FullCharSet.Add(SimpleAsciiCharacters);
+   FullCharSet.Add('ЁЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮёйцукенгшщзхъфывапролджэячсмитьбюІЇЄіїє');
+   NumCharSet := TUnicodeCharList.Create;
+   NumCharSet.Add('1234567890');
+
+   //load the font files
    RegularFont12 := DFont.Create(ApplicationData(FontFolder+NormalFontFile),12,true,FullCharSet);
    RegularFont16 := DFont.Create(ApplicationData(FontFolder+NormalFontFile),16,true,FullCharSet);
    RegularFont100 := DFont.Create(ApplicationData(FontFolder+NormalFontFile),100,true,NumCharSet);
+
+   //release char sets
+   FreeAndNil(FullCharSet);
+   FreeAndNil(NumCharSet);
    {$ENDIF}
    dLog(LogInitInterface,nil,'DecoFont : InitializeFonts','Fonts loaded successfully.');
 
@@ -128,8 +133,6 @@ begin
   FreeAndNil(RegularFont12);
   FreeAndNil(RegularFont16);
   FreeAndNil(RegularFont100);
-  FreeAndNil(FullCharSet);
-  FreeAndNil(NumCharSet);
 end;
 
 {-----------------------------------------------------------------------------}
