@@ -57,7 +57,7 @@ var { analogue to Now function, but a fast-access variable, representing
 function NiceDate: string;
 { Advance time for the frame }
 procedure doTime;
-{}
+{Requests a soft-pause (animations run, but actors do not preform actions)}
 procedure RequestSoftPauseByAction(PauseSeconds: DTime);
 { Gets CastleTimeUtils.Timer value from some "starting point" in a thread-safe way }
 function GetNow: DTime; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}

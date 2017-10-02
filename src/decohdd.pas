@@ -51,7 +51,7 @@ type
 
 {$IFDEF ThreadLoad}
 type
-  {}
+  { a thread that loads a TThreadedObject through ILoadObject interface }
   DLoadThread = class(TThread)
   public
     Source: ILoadObject;
@@ -78,7 +78,8 @@ type
     procedure PrepareSafe;
   end;
 
-{}
+{ Loads a TThreadedObject through ILoadObject interface by executing
+  Load(URL) in a Thread (if threading enabled - otherwise does it "online") }
 procedure LoadThread(const Source: ILoadObject; const URL: string);
 
 {safe wrapper for CastleImages.LoadImage, overloaded}

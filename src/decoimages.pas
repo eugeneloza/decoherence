@@ -83,7 +83,7 @@ type
     Careful, it doesn't use SourceImage }
   DFrameImage = class(DAbstractImage)
   public
-    {}
+    {Reference to Frame basic image (rectagonal frame with corresponding gaps)}
     Frame: DRectagonalFrame;
     procedure RescaleImage; override;
     { todo: maybe not scale the image, but draw3x3 by OpenGl features? 

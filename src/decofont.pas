@@ -152,12 +152,12 @@ begin
 
   //reset alpha for correct next drawing
   //todo :  RGB alpha image
-  P  := Result.GrayscaleAlphaPixels;
+  P  := Result.Pixels;
   for i  :=  1 to Result.Width * Result.Height * Result.Depth do
   begin
     p^[1] := p^[0];
     p^[0] := 255;
-    Inc(P);
+    inc(P);
   end;
 end;
 

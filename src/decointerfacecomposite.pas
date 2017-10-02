@@ -368,6 +368,7 @@ procedure DFramedElement.SetFrame(const Value: DRectagonalFrame);
 begin
   if fFrame.Frame<>Value then begin
     fFrame.Frame := Value;
+    //fFrame.Rescale;
     RearrangeChildren;
   end
 end;

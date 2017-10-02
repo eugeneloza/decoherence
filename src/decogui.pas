@@ -40,9 +40,9 @@ Type
   public
     Width,Height: integer;
     Center: TVector2;
-    {}
+    {Initialize and show animated loadscreen}
     procedure LoadScreen;
-    {}
+    {Initialize and show Party interface}
     procedure PartyInterface;
 end;
 
@@ -148,6 +148,7 @@ begin
   tmp := DFramedImage.Create;
   (tmp as DFramedImage).Frame := BlackFrame;
   (tmp as DFramedImage).Image.Load(Portrait_Img[0]);
+  tmp.Base.AnchorToWindow := true;
   tmp.SetBaseSize(0.2,0.1,0.1,0.1);
   Grab(tmp);
 end;
