@@ -1,5 +1,6 @@
 purge.bat
 rmdir /q /s Release
+del /q pasdoc\html\*
 del /q *.apk
 del /q decoherence_desktop
 del /q decoherence_desktop.exe

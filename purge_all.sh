@@ -1,4 +1,5 @@
 bash purge.sh
+rm pasdoc/html/*
 rm -r Release
 rm *.apk
 rm decoherence_desktop
