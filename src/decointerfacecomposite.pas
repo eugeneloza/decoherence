@@ -113,9 +113,25 @@ type
   end;
 
 type
+  { A button with some text over it
+    As a child of DButton it can also contain a bg image }
+  DTextButton = class(DButton)
+  private
+    fLabel: DLabel;
+  strict protected
+    procedure SpawnChildren; override;
+    procedure ArrangeChildren; override;
+  public
+    { Displayed caption at the Button }
+    //property Caption: string read fLabel.Text write fLabel.Text;
+  end;
+
+type
   { A text label in a frame, displaying player's health }
   DHealthLabel = class(DFramedElement)
   private
+    { Label that would display the health number }
+    fLabel: DFloatLabel;
     { target Actor }
     fTarget: DBasicActor; //we don't need anything "higher" than this
     procedure SetTarget(const Value: DBasicActor);
@@ -123,8 +139,6 @@ type
     procedure ArrangeChildren; override;
     procedure SpawnChildren; override;
   public
-    { Label that would display the health number }
-    Lab: DFloatLabel;
     { the character being monitored }
     property Target: DBasicActor read fTarget write SetTarget;
   end;
@@ -133,6 +147,8 @@ type
   { Label, containing character's nickname, framed }
   DNameLabel = class(DFramedElement)
   private
+    { Label that displays character's nickname }
+    fLabel: DStringLabel;
     { target Actor }
     fTarget: DBasicActor; //we don't need anything "higher" than this
     procedure SetTarget(const Value: DBasicActor);
@@ -140,8 +156,6 @@ type
     procedure ArrangeChildren; override;
     procedure SpawnChildren; override;
   public
-    { Label that displays character's nickname }
-    Lab: DStringLabel;
     { the character being monitored }
     property Target: DBasicActor read fTarget write SetTarget;
   end;
@@ -150,14 +164,15 @@ type
   { A statbar within a frame }
   DFramedBar = class(DFramedElement)
   private
+    { Displayed statbar image }
+    fBar: DStatBarImage;
+    { target Actor }
     fTarget: PStatValue;
     procedure SetTarget(const Value: PStatValue);
   strict protected
     procedure ArrangeChildren; override;
     procedure SpawnChildren; override;
   public
-    { Displayed statbar image }
-    Bar: DStatBarImage;
     { Character's stat to be monitored }
     property Target: PStatValue read fTarget write SetTarget;
   end;
@@ -466,6 +481,25 @@ begin
 end;
 
 {===========================================================================}
+
+procedure DTextButton.SpawnChildren;
+begin
+  inherited SpawnChildren;
+  fLabel := DLabel.Create;
+  Grab(fLabel);
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DTextButton.ArrangeChildren;
+begin
+  inherited ArrangeChildren;
+  fLabel.Base.AnchorToFrame(fFrame);
+  fLabel.SetBaseSize(0,0,1,1);
+  //fLabel.Base.Anchor[...] := acCenter;
+end;
+
+{===========================================================================}
 {=========================== Health Label ==================================}
 {===========================================================================}
 
@@ -473,10 +507,10 @@ end;
 procedure DHealthLabel.SpawnChildren;
 begin
   inherited SpawnChildren;
-  Lab := DFloatLabel.Create; //scale=false
-  Lab.Digits := 0;
-  Lab.Font := PlayerHealthFont;
-  Grab(Lab);
+  fLabel := DFloatLabel.Create; //scale=false
+  fLabel.Digits := 0;
+  fLabel.Font := PlayerHealthFont;
+  Grab(fLabel);
   Frame := Characterbar_Bottom;
 end;
 
@@ -485,8 +519,8 @@ end;
 procedure DHealthLabel.ArrangeChildren;
 begin
   inherited ArrangeChildren;
-  Lab.Base.AnchorToFrame(fFrame);
-  Lab.SetBaseSize(0,0,1,1);
+  fLabel.Base.AnchorToFrame(fFrame);
+  fLabel.SetBaseSize(0,0,1,1);
 end;
 
 {-----------------------------------------------------------------------------}
@@ -495,7 +529,7 @@ procedure DHealthLabel.SetTarget(const Value: DBasicActor);
 begin
   if fTarget <> Value then begin
     fTarget := Value;
-    Lab.Target := @Value.HP;
+    fLabel.Target := @Value.HP;
   end;
 end;
 
@@ -507,9 +541,9 @@ end;
 procedure DNameLabel.SpawnChildren;
 begin
   inherited SpawnChildren;
-  Lab := DStringLabel.Create;  //scale=false
-  Lab.Font := PlayerNameFont;
-  Grab(Lab);
+  fLabel := DStringLabel.Create;  //scale=false
+  fLabel.Font := PlayerNameFont;
+  Grab(fLabel);
   Frame := Characterbar_Top;
 end;
 
@@ -518,8 +552,8 @@ end;
 procedure DNameLabel.ArrangeChildren;
 begin
   inherited ArrangeChildren;
-  Lab.Base.AnchorToFrame(fFrame);
-  Lab.SetBaseSize(0,0,1,1);
+  fLabel.Base.AnchorToFrame(fFrame);
+  fLabel.SetBaseSize(0,0,1,1);
 end;
 
 {-----------------------------------------------------------------------------}
@@ -528,7 +562,7 @@ procedure DNameLabel.SetTarget(const Value: DBasicActor);
 begin
   if fTarget <> Value then begin
     fTarget := Value;
-    Lab.Target := @Value.Nickname;
+    fLabel.Target := @Value.Nickname;
   end;
 end;
 
@@ -540,7 +574,7 @@ procedure DFramedBar.SetTarget(const Value: PStatValue);
 begin
   if fTarget <> Value then begin
     fTarget := Value;
-    Bar.Target := Value;
+    fBar.Target := Value;
   end;
 end;
 
@@ -550,8 +584,8 @@ procedure DFramedBar.SpawnChildren;
 begin
   inherited SpawnChildren;
   Frame := StatBarsFrame;
-  Bar := DStatBarImage.Create;
-  Grab(Bar);
+  fBar := DStatBarImage.Create;
+  Grab(fBar);
 end;
 
 {-----------------------------------------------------------------------------}
@@ -559,8 +593,8 @@ end;
 procedure DFramedBar.ArrangeChildren;
 begin
   inherited ArrangeChildren;
-  Bar.Base.AnchorToFrame(fFrame);
-  Bar.SetBaseSize(0,0,1,1);
+  fBar.Base.AnchorToFrame(fFrame);
+  fBar.SetBaseSize(0,0,1,1);
 end;
 
 {===========================================================================}
@@ -572,24 +606,25 @@ begin
   inherited SpawnChildren;
   Frame := Characterbar_mid;
 
+  {$Warning accessing private fields: redo it!}
   HP_bar := DFramedBar.Create;
-  HP_bar.Bar.Load(HpBarImage);
-  HP_bar.Bar.Kind := bsVertical;
+  HP_bar.fBar.Load(HpBarImage);
+  HP_bar.fBar.Kind := bsVertical;
   Grab(HP_bar);
 
   STA_bar := DFramedBar.Create;
-  STA_bar.Bar.Load(StaBarImage);
-  STA_bar.Bar.Kind := bsVertical;
+  STA_bar.fBar.Load(StaBarImage);
+  STA_bar.fBar.Kind := bsVertical;
   Grab(STA_bar);
 
   CNC_bar := DFramedBar.Create;
-  CNC_bar.Bar.Load(CncBarImage);
-  CNC_bar.Bar.Kind := bsVertical;
+  CNC_bar.fBar.Load(CncBarImage);
+  CNC_bar.fBar.Kind := bsVertical;
   Grab(CNC_bar);
 
   MPH_bar := DFramedBar.Create;
-  MPH_bar.Bar.Load(MphBarImage);
-  MPH_bar.Bar.Kind := bsVertical;
+  MPH_bar.fBar.Load(MphBarImage);
+  MPH_bar.fBar.Kind := bsVertical;
   Grab(MPH_bar);
 end;
 
