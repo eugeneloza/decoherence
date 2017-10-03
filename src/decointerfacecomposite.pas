@@ -323,6 +323,20 @@ type DPerksContainer = class(DAbstractSorter)
     //procedure UpdatePerksList;  }
   end;
 
+type
+  { Abstract dialogue element containing "content" and "buttons" }
+  DAbstractDialogue = class(DFramedElement)
+  private
+    Content, fHeader: DFramedElement; {DFramedLabel}
+    //ButtonSpace: DCompositeElement; {or button sorter!}
+  strict protected
+    //procedure SpawnChildren; override;
+    //procedure ArrangeChildren; override;
+  public
+    { Displayed caption at the Button }
+    //property Caption read fLabel.Text write fLabel.Text;
+  end;
+
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 
 implementation
