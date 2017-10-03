@@ -91,7 +91,8 @@ type
 
 type
   { A clickable button with automatic highlighting by mouseover
-       Click should be managed in children elements }
+    Click should be managed in children elements
+    Should receive a link to a loaded image, not load it from HDD. }
   DButton = class abstract(DFramedElement)
   private
     { Link to the button image
@@ -416,8 +417,12 @@ end;
 
 procedure DButton.SetImage(Value: TCastleImage);
 begin
-  Image_out.Load(Value);
-  Image_over.Load(Brighter(Value,1.2));
+  if OldImage<>Value then
+  begin
+    OldImage := Value;
+    Image_out.Load(Value);
+    Image_over.Load(Brighter(Value,1.2));
+  end;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -425,6 +430,7 @@ end;
 procedure DButton.SpawnChildren;
 begin
   inherited SpawnChildren;
+  OldImage := nil;
   Image_out := DStaticImage.Create;
   Image_over := DStaticImage.Create;
   Grab(Image_out);
@@ -662,13 +668,15 @@ procedure DPlayerBarsFull.ArrangeChildren;
 begin
   //inherited ArrangeChildren;
 
-  NickName.Base.AnchorTo(Self.Base); //AnchorToFrame(fFrame);
+  NickName.Base.AnchorTo(Self.Current); //AnchorToFrame(fFrame);
   NickName.Base.Anchor[asBottom].AlignTo := noAlign;
-  Health.Base.AnchorTo(Self.Base);
+  Health.Base.AnchorTo(Self.Current);
   Health.Base.Anchor[asTop].AlignTo := noAlign;
-  PlayerBars.Base.AnchorTo(Self.Base);
-  PlayerBars.Base.Anchor[asTop].Anchor := NickName.Base;
-  PlayerBars.Base.Anchor[asBottom].Anchor := Health.Base;
+  PlayerBars.Base.AnchorTo(Self.Current);
+  PlayerBars.Base.Anchor[asTop].Anchor := NickName.Current;
+  PlayerBars.Base.Anchor[asBottom].Anchor := Health.Current;
+
+  //rescale;
 
   {********** INTERFACE DESIGN BY Saito00 ******************}
 
