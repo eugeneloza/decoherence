@@ -388,13 +388,17 @@ begin
   SpawnChildren;
   isSpawned := true;
   ArrangeChildren;
+  //Rescale;
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure DCompositeElement.RearrangeChildren;
 begin
-  if isSpawned then ArrangeChildren;
+  if isSpawned then begin
+    ArrangeChildren;
+    //Rescale;
+  end;
 end;
 
 {===========================================================================}

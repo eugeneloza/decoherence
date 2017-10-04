@@ -340,6 +340,11 @@ var ScaledImageParts: array [0..2,0..2] of TCastleImage;
     SourceXs, SourceYs, DestXs, DestYs: TVector4Integer;
 begin
   //inherited; <------ this procedure works completely different
+  if Frame = nil then begin
+    dLog(LogInterfaceError,Self,'DFrameImage.RescaleImage','Error: Frame is nil!');
+    Exit;
+  end;
+
   ImageReady := false;
   FreeAndNil(GLImage);
   FreeAndNil(ScaledImage); //redundant, but let it be here
@@ -354,12 +359,12 @@ begin
   {check if minimal frame size is larger than the requested frame size}
   {$warning disabled}
   if Frame.CornerLeft+Frame.CornerRight+1 > Base.w then begin
-    dLog(LogInterfaceScaleHint,Self,'DAbstractInterfaceElement.FrameResize3x3','Reset backwards base.w = '+IntToStr(Base.w)+' / cornerLeft+cornerRight = '+IntToStr(Frame.CornerLeft+Frame.CornerRight));
+    dLog(LogInterfaceScaleHint,Self,'DFrameImage.RescaleImage','Reset backwards base.w = '+IntToStr(Base.w)+' / cornerLeft+cornerRight = '+IntToStr(Frame.CornerLeft+Frame.CornerRight));
     Base.w := Frame.CornerLeft+Frame.CornerRight+1;
     //Base.BackwardSetSize(Base.w,-1);
   end;
   if Frame.CornerTop+Frame.CornerBottom+1 > Base.h then begin
-    dLog(LogInterfaceScaleHint,Self,'DAbstractInterfaceElement.FrameResize3x3','Reset backwards base.h = '+IntToStr(Base.h)+' / cornerTop+cornerBottom = '+inttostr(Frame.CornerTop+Frame.CornerBottom));
+    dLog(LogInterfaceScaleHint,Self,'DFrameImage.RescaleImage','Reset backwards base.h = '+IntToStr(Base.h)+' / cornerTop+cornerBottom = '+inttostr(Frame.CornerTop+Frame.CornerBottom));
     Base.h := Frame.CornerTop+Frame.CornerBottom+1;
     //Base.BackwardSetSize(-1,Base.h);
   end;

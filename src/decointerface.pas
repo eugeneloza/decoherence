@@ -748,6 +748,7 @@ procedure DAbstractElement.SetBaseSize(const NewX,NewY,NewW,NewH: float;NewO: fl
 begin
   Base.SetFloatSizeFull(NewX,NewY,NewW,NewH,NewO);
   AnimateTo(Animate);
+  Rescale;
 end;
 
 {----------------------------------------------------------------------------}
