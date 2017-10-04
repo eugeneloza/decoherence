@@ -69,7 +69,8 @@ begin
     gmTravel: GUI.MakeCharacterGenerationInterface;
   end;}
 
-  if GM = gmTravel then GUI.PartyInterface;
+  if GM = gmTravel then
+  GUI.PartyInterface;
 
   LastGameMode := CurrentGameMode;
   CurrentGameMode := GM;

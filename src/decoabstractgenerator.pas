@@ -72,7 +72,7 @@ type
     { xorshift random generator, fast and thread-safe }
     RNDM: TCastleRandom;
     {Specific SEED of the random number for this algorithm }
-    procedure InitSeed(newseed: longword = 0);
+    procedure InitSeed(NewSeed: longword = 0);
   public
     {are the parameters initialized? If no, they'll be init
      automatically, but its best to do it manually outside the thread

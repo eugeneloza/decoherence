@@ -12,18 +12,18 @@ begin
   for ix := 0 to sizex-1 do
     for iy := 0 to sizey-1 do
       for iz := 0 to sizez-1 do begin
-        if isPassable(Map[ix,iy,iz].base) then begin
+        if isPassable(Map[ix,iy,iz].Base) then begin
           inc(fVolume);
           {$IFNDEF CompleteGen}if fMaxDepth<iz then fMaxDepth := iz;{$ENDIF}
         end;
-        {$IFDEF CompleteGen}if Map[ix,iy,iz].base = tkDown then fHasStairsDown := true;{$ENDIF}
+        {$IFDEF CompleteGen}if Map[ix,iy,iz].Base = tkDown then fHasStairsDown := true;{$ENDIF}
         {$Warning floor/ceiling not working!}
         for a in THorizontalAngle do
-          if isPassable(Map[ix,iy,iz].faces[a]) then begin
-            f := MapSafeFace(ix+a_dx(a),iy+a_dy(a),iz+a_dz(a),invertAngle(a));
+          if isPassable(Map[ix,iy,iz].Faces[a]) then begin
+            f := MapSafeFace(ix+a_dx(a),iy+a_dy(a),iz+a_dz(a),InvertAngle(a));
             if (f = tfNone) or (f = tfInacceptible) then begin
               tmpDock.face := a;
-              tmpDock.facetype := Map[ix,iy,iz].faces[a];
+              tmpDock.facetype := Map[ix,iy,iz].Faces[a];
               tmpDock.x := ix;
               tmpDock.y := iy;
               tmpDock.z := iz;
@@ -37,10 +37,10 @@ begin
       end;
   {$IFDEF CompleteGen}
   //check if it's a blocker tile
-  if (FreeFaces = 1) and (sizex+sizey+sizez = 3) and (Map[0,0,0].base = tkNone) then
-    blocker := true
+  if (FreeFaces = 1) and (SizeX+SizeY+SizeZ = 3) and (Map[0,0,0].Base = tkNone) then
+    Blocker := true
   else
-    blocker := false;
+    Blocker := false;
   {$ENDIF}
   Result := FreeFaces;
 end;

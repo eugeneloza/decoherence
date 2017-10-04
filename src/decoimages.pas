@@ -436,7 +436,12 @@ end;
 
 procedure DSimpleImage.RescaleImage;
 begin
- {$IFNDEF AllowRescale}If SourceImage = nil then Exit;{$ENDIF}
+ {$IFNDEF AllowRescale}
+ If SourceImage = nil then begin
+   dLog(LogInterfaceSceleError,Self,'DSimpleImage.RescaleImage','Source Image is nil!');
+   Exit;
+ end;
+ {$ENDIF}
  if ImageLoaded then begin
    if Base.isInitialized then begin
      ImageReady := false;

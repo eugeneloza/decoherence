@@ -143,13 +143,16 @@ begin
   tmp.Base.AnchorToWindow := true;
   tmp.SetBaseSize(0.1,0.1,0.1,0.1);
   (tmp as DPlayerBarsFull).Target := Player.CurrentParty.Character[0];
+  (tmp as DPlayerBarsFull).RearrangeChildren;
   Grab(tmp);
 
   tmp := DFramedImage.Create;
+  tmp.Base.AnchorToWindow := true;
+  //(tmp as DFramedImage).Frame := BlackFrame; //<-------- here it doesn't work
+  tmp.SetBaseSize(0.2,0.1,0.1,0.1);
   (tmp as DFramedImage).Frame := BlackFrame;
   (tmp as DFramedImage).Image.Load(Portrait_Img[0]);
-  tmp.Base.AnchorToWindow := true;
-  tmp.SetBaseSize(0.2,0.1,0.1,0.1);
+  //(tmp as DFramedImage).RearrangeChildren; //<------- doesn't matter
   Grab(tmp);
 end;
 

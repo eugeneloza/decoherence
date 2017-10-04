@@ -74,8 +74,8 @@ const
 type
   { 1x1x1 tile with some base and free/blocked faces }
   BasicTile = {packed} record
-    base: TTileKind;
-    faces: array [TAngle] of TTileFace; //this is 2x redundant!
+    Base: TTileKind;
+    Faces: array [TAngle] of TTileFace; //this is 2x redundant!
   end;
 
 //inacceptible tile, used as "return"
@@ -101,7 +101,7 @@ type
       {distribute memory according to tilesizex,tilesizey,tilesizez}
       procedure GetMapMemory;
       {empties the map with walls at borders}
-      procedure EmptyMap(initToFree: boolean);
+      procedure EmptyMap(InitToFree: boolean);
       {checks if tx,ty,tz are correct for this tile}
       function IsSafe(tx,ty,tz: integer): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
       function IsSafe(tx,ty: integer): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
@@ -113,7 +113,7 @@ type
       function MapSafeBase(tx,ty,tz: integer): TTileKind; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
       { safe way to get Tile Face
         (checks if tx,ty,tz are within the Tile size and returns tfInacceptible otherwise) }
-      function MapSafeFace(tx,ty,tz: integer; face: TAngle): TTileFace; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+      function MapSafeFace(tx,ty,tz: integer; Face: TAngle): TTileFace; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 
       destructor Destroy; override;
       {frees the minimap memory (careful)}
@@ -350,7 +350,7 @@ begin
         jy := ValueNode.AttributeInteger('y');
         jz := ValueNode.AttributeInteger('z');
         WorkNode := ValueNode.ChildElement('base', true);
-        Map[jx,jy,jz].base := StrToTileKind(WorkNode.AttributeString('tile_kind'));
+        Map[jx,jy,jz].Base := StrToTileKind(WorkNode.AttributeString('tile_kind'));
         WorkNode := ValueNode.ChildElement('faces', true);
         for j in TAngle do
            Map[jx,jy,jz].faces[j] := StrToTileFace(WorkNode.AttributeString(AngleToStr(j)));
@@ -365,7 +365,7 @@ begin
   FreeAndNil(TileDOC);
 
   if not Ready then
-    raise Exception.create('Fatal Error in DTileMap.Load! Unable to open file '+TileName);
+    raise Exception.Create('Fatal Error in DTileMap.Load! Unable to open file '+TileName);
 
   SetLength(Img,sizez);
   for jz := 0 to sizez-1 do
@@ -377,9 +377,9 @@ end;
 procedure DMap.FreeMinimap;
 var jz: integer;
 begin
-  if Length(img)>0 then
-  for jz := 0 to Length(img)-1 do
-    FreeAndNil(img[jz]);
+  if Length(Img)>0 then
+  for jz := 0 to Length(Img)-1 do
+    FreeAndNil(Img[jz]);
 end;
 
 destructor DMap.Destroy;
@@ -481,7 +481,7 @@ begin
   else
     Result := tkInacceptible;
 end;
-Function DMap.MapSafeFace(tx,ty,tz: integer; face: TAngle): TTileFace; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+Function DMap.MapSafeFace(tx,ty,tz: integer; Face: TAngle): TTileFace; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
   if IsSafe(tx,ty,tz) then
     Result := Map[tx,ty,tz].Faces[face]

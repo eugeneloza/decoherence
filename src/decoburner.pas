@@ -23,6 +23,8 @@ unit DecoBurner;
 {$INCLUDE compilerconfig.inc}
 
 interface
+uses CastleImages,
+  DecoInterface;
 
 {$IFDEF BurnerImage}
 { Load Burner image and scale it }
@@ -33,20 +35,21 @@ procedure Burn(const aImage: TCastleImage; const Container: DAbstractContainer);
 {$ENDIF}
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-uses DecoLog;
+uses SysUtils,
+  DecoLog;
 
 {$IFDEF BurnerImage}
-var BurnerImageUnscaled,BurnerImage:TCastleImage;  //todo: not freed automatically!!!!
+var BurnerImageUnscaled, BurnerImage: TCastleImage;  //todo: not freed automatically!!!!
 procedure InitBurnerImage;
 begin
-  {$IFNDEF AllowRescale}if BurnerImage<>nil then exit;{$ENDIF}
+  {$IFNDEF AllowRescale}if BurnerImage<>nil then Exit;{$ENDIF}
   dLog(LogInitInterface,nil,'InitBurnerImage','Started');
   if BurnerImageUnscaled = nil then
     BurnerImageUnscaled := LoadImage(ApplicationData(InterfaceFolder+'burner/burner_Pattern_203_CC0_by_Nobiax_diffuse.png'), [TRGBImage]) as TRGBImage;
-  if (BurnerImage=nil) or (BurnerImage.height <> window.height) or (BurnerImage.width <> window.width) then begin
+  if (BurnerImage=nil) or (BurnerImage.Height <> Window.Height) or (BurnerImage.Width <> Window.Width) then begin
     FreeAndNil(BurnerImage);
     BurnerImage := BurnerImageUnscaled.MakeCopy;
-    BurnerImage.Resize(window.width, window.height, riBilinear);
+    BurnerImage.Resize(Window.Width, Window.Height, riBilinear);
   end;
   {$IFNDEF AllowRescale}FreeAndNil(BurnerImageUnscaled);{$ENDIF}
 
@@ -63,6 +66,10 @@ begin
   aImage.DrawFrom(BurnerImage,0,0,Container.x1,Container.y1,Container.w,Container.h,dmMultiply);
 end;
 {$ENDIF}
+
+finalization
+  FreeAndNil(BurnerImageUnscaled);
+  FreeAndNil(BurnerImage);
 
 end.
 

@@ -85,12 +85,12 @@ function FakeConstructorData(URL: string; ToGameFolder:boolean): string;
 {searches a StringList for the specific element
  This is an inoptimal algorithm
  and MAYBE there is already a ready algorithm in strutils! I didn't look too well}
-function StringListContains(SL: TStringList; search: string): boolean;
+function StringListContains(SL: TStringList; Search: string): boolean;
 
 {reads a specific file extensions from a specific path
  Creates a TStringList, don't forget to free manually
  !Android incompatible}
-function GetFilesList(path,ext: string): TStringList;
+function GetFilesList(Path,Ext: string): TStringList;
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
@@ -99,13 +99,13 @@ uses CastleFilesUtils, StrUtils,
   DecoLog;
 
 {case-sensitive replace the last occurence of searchstring to replacestring}
-procedure ReplaceStringReverse(var s: string; const searchstring,replacestring: string);
+procedure ReplaceStringReverse(var s: string; const SearchString,ReplaceString: string);
 var i: integer;
 begin
-  for i := length(s)-length(searchstring) downto 0 do
-    if copy(s,i,length(searchstring)) = searchstring then begin
-      s := copy(s,0,i-1) + replacestring + copy(s,i+length(searchstring),length(s));
-      break;
+  for i := Length(s)-Length(SearchString) downto 0 do
+    if Copy(s,i,Length(SearchString)) = SearchString then begin
+      s := Copy(s,0,i-1) + ReplaceString + copy(s,i+Length(SearchString),Length(s));
+      Break;
     end;
 end;
 
@@ -131,36 +131,36 @@ begin
     Result := 'data/'+URL
   else
     Result := 'architect/'+URL;
-  Result := AnsiReplaceText(Result,'/',pathdelim); //we're using native OS file access
+  Result := AnsiReplaceText(Result,'/',PathDelim); //we're using native OS file access
 end;
 
 {-----------------------------------------------------------------------------}
 
-function StringListContains(SL: TStringList; search: string): boolean;
+function StringListContains(SL: TStringList; Search: string): boolean;
 var s: string;
 begin
   Result := false;
-  if SL=nil then begin
+  if SL = nil then begin
     dLog(LogConstructorError,nil,'StringListContains','ERROR: String List is nil!');
-    exit;
+    Exit;
   end;
-  for s in SL do if s=search then begin
+  for s in SL do if s = Search then begin
     Result := true;
-    break;
+    Break;
   end;
 end;
 
 {-----------------------------------------------------------------------------}
 
-function GetFilesList(path,ext: string): TStringList;
+function GetFilesList(Path,Ext: string): TStringList;
 var Rec: TSearchRec;
 begin
-  Result := TStringList.create;
+  Result := TStringList.Create;
   // Android incompatible
-  if FindFirst (FakeConstructorData(path + '*.'+ext,false), faAnyFile - faDirectory, Rec) = 0 then
+  if FindFirst (FakeConstructorData(Path + '*.'+Ext,false), faAnyFile - faDirectory, Rec) = 0 then
    try
      repeat
-       Result.Add(AnsiReplaceText(Rec.Name,'.'+ext,''));
+       Result.Add(AnsiReplaceText(Rec.Name,'.'+Ext,''));
      until FindNext(Rec) <> 0;
    finally
      FindClose(Rec);
@@ -180,8 +180,8 @@ Procedure TLanguageForm.MakeLanguageSwitch;
 var L: TLanguage;
 begin
   if LanguageSwitch = nil then begin
-    LanguageSwitch := TComboBox.Create(self);
-    LanguageSwitch.parent := self;  //required to be displayed on the form
+    LanguageSwitch := TComboBox.Create(Self);
+    LanguageSwitch.Parent := Self;  //required to be displayed on the form
     LanguageSwitch.Style := csDropDownList;
     LanguageSwitch.Hint := 'Select current displayed language.';
     LanguageSwitch.ShowHint := true;
@@ -227,7 +227,7 @@ begin
     NL := L;
   if NL <> MyLanguage then begin
     MyLanguage := NL;
-    if assigned(self.OnLanguageChange) then self.OnLanguageChange;
+    if assigned(Self.OnLanguageChange) then Self.OnLanguageChange;
   end;
   //what should happen in case of no language found?
 end;

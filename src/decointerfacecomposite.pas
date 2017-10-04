@@ -117,13 +117,16 @@ type
     As a child of DButton it can also contain a bg image }
   DTextButton = class(DButton)
   private
+    {Label displaying caption of the button}
     fLabel: DLabel;
+    procedure SetText(Value: string);
+    function GetText: string;
   strict protected
     procedure SpawnChildren; override;
     procedure ArrangeChildren; override;
   public
     { Displayed caption at the Button }
-    //property Caption: string read fLabel.Text write fLabel.Text;
+    property Caption: string read GetText write SetText;
   end;
 
 type
@@ -256,15 +259,17 @@ type
 //todo: float label is identical except pointeger -> pfloat
 type
   { a simple editor for an integer variable featuring plus and minus
-    buttons }
-  DIntegerEdit = class(DAbstractCompositeInterfaceElement)
+    buttons
+    How to set max/min? Maybe, this element is not needed, but specific
+    elements should be used for every integer-edit case, like stat edit }
+  DIntegerEdit = class(DFramedElement)
   private
     {sub-elements nicknames for easy access}
-    iLabel: DSingleInterfaceElement;
-    PlusButton, MinusButton: DSingleInterfaceElement;
+    iLabel: DIntegerLabel;
+    PlusButton, MinusButton: DButton;
     { target value }
     fTarget: PInteger;
-    procedure settarget(value: PInteger);
+    procedure SetTarget(value: PInteger);
   public
     {integer to change}
     property Target: Pinteger read ftarget write settarget;
@@ -329,12 +334,14 @@ type
   private
     Content, fHeader: DFramedElement; {DFramedLabel}
     //ButtonSpace: DCompositeElement; {or button sorter!}
+    //procedure SetText(Value: string);
+    //function GetText: string;
   strict protected
     //procedure SpawnChildren; override;
     //procedure ArrangeChildren; override;
   public
-    { Displayed caption at the Button }
-    //property Caption read fLabel.Text write fLabel.Text;
+    { Caption of the Dialogue window }
+    //property Caption read GetText write SetText;
   end;
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
@@ -396,7 +403,7 @@ end;
 
 procedure DFramedElement.SetFrame(const Value: DRectagonalFrame);
 begin
-  if fFrame.Frame<>Value then begin
+  if fFrame.Frame <> Value then begin
     fFrame.Frame := Value;
     //fFrame.Rescale;
     RearrangeChildren;
@@ -511,6 +518,20 @@ begin
   fLabel.Base.AnchorToFrame(fFrame);
   fLabel.SetBaseSize(0,0,1,1);
   //fLabel.Base.Anchor[...] := acCenter;
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DTextButton.SetText(Value: string);
+begin
+  fLabel.Text := Value;
+end;
+
+{-----------------------------------------------------------------------------}
+
+function DTextButton.GetText: string;
+begin
+  Result := fLabel.Text;
 end;
 
 {===========================================================================}
