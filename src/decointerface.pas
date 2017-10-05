@@ -131,6 +131,12 @@ type
     procedure AnchorTo(const aParent: DAbstractContainer; const Gap: integer = 0);
     { Anchors aChild to this Container  }
     procedure AnchorChild(const aChild: DAbstractContainer; const Gap: integer = 0);
+    {}
+    procedure AnchorSide(const aSide: TAnchorSide; const aParent: DAbstractContainer; const aAlign: TAnchorAlign; const Gap: integer = 0);
+    procedure AnchorTop(const aParent: DAbstractContainer; const aAlign: TAnchorAlign; const Gap: integer = 0);
+    procedure AnchorBottom(const aParent: DAbstractContainer; const aAlign: TAnchorAlign; const Gap: integer = 0);
+    procedure AnchorLeft(const aParent: DAbstractContainer; const aAlign: TAnchorAlign; const Gap: integer = 0);
+    procedure AnchorRight(const aParent: DAbstractContainer; const aAlign: TAnchorAlign; const Gap: integer = 0);
     { do these two Containers have equal anchors? }
     function AnchorsEqual(const aCompare: DAbstractContainer): boolean;
   end;
@@ -558,6 +564,32 @@ begin
   aChild.Anchor[asBottom].Gap := Gap;
   aChild.Anchor[asBottom].AlignTo := vaBottom;
   aChild.OpacityAnchor := Self;
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DAbstractContainer.AnchorSide(const aSide: TAnchorSide; const aParent: DAbstractContainer; const aAlign: TAnchorAlign; const Gap: integer = 0);
+begin
+  Anchor[aSide].Anchor := aParent;
+  Anchor[aSide].AlignTo := aAlign;
+  Anchor[aSide].Gap := Gap;
+end;
+
+procedure DAbstractContainer.AnchorTop(const aParent: DAbstractContainer; const aAlign: TAnchorAlign; const Gap: integer = 0);
+begin
+  AnchorSide(asTop,aParent,aAlign,Gap);
+end;
+procedure DAbstractContainer.AnchorBottom(const aParent: DAbstractContainer; const aAlign: TAnchorAlign; const Gap: integer = 0);
+begin
+  AnchorSide(asBottom,aParent,aAlign,Gap);
+end;
+procedure DAbstractContainer.AnchorLeft(const aParent: DAbstractContainer; const aAlign: TAnchorAlign; const Gap: integer = 0);
+begin
+  AnchorSide(asLeft,aParent,aAlign,Gap);
+end;
+procedure DAbstractContainer.AnchorRight(const aParent: DAbstractContainer; const aAlign: TAnchorAlign; const Gap: integer = 0);
+begin
+  AnchorSide(asRight,aParent,aAlign,Gap);
 end;
 
 {----------------------------------------------------------------------------}
