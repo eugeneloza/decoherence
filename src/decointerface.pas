@@ -817,7 +817,8 @@ begin
                             Base.fy2,
                             Base.BaseOpacity);
     end;
- end;
+ end else
+   Current.Assign(Base); {just fall back to an uninitialized copy}
 end;
 
 {----------------------------------------------------------------------------}

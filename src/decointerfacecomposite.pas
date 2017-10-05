@@ -57,8 +57,11 @@ type
     { Creates (spawns) elements in this container }
     procedure SpawnChildren; virtual; abstract;
   public
+    {}
     procedure RearrangeChildren;
     constructor Create; override;
+
+    //procedure Rescale; override;
   end;
 
 type
@@ -400,6 +403,15 @@ begin
     //Rescale;
   end;
 end;
+
+{-----------------------------------------------------------------------------}
+
+{procedure DCompositeElement.Rescale;
+begin
+  //inherited Rescale;
+  RearrangeChildren;
+  inherited Rescale;
+end;}
 
 {===========================================================================}
 {========================== Framed Element =================================}
