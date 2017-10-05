@@ -755,10 +755,13 @@ begin
   //inherited ArrangeChildren;
 
   NickName.Base.AnchorTo(Self.Current); //AnchorToFrame(fFrame);
+  NickName.SetBaseSize(0,0,1,1);
   //NickName.Base.Anchor[asBottom].AlignTo := noAlign;
   Health.Base.AnchorTo(Self.Current);
+  Health.SetBaseSize(0,0,1,1);
   //Health.Base.Anchor[asTop].AlignTo := noAlign;
   PlayerBars.Base.AnchorTo(Self.Current);
+  PlayerBars.SetBaseSize(0,0,1,1);
   //PlayerBars.Base.AnchorTop(NickName.Current,vaBottom);
   PlayerBars.Base.Anchor[asTop].Anchor := NickName.Current;
   PlayerBars.Base.Anchor[asTop].AlignTo := vaBottom;

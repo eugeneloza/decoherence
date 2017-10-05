@@ -675,6 +675,9 @@ begin
   {set animation states to changed container size}
   Base.FloatToInteger;
 
+  if not Base.isInitialized then
+    dLog(LogInterfaceInfo,Self,'DAbstractElement.Rescale','Base is uninitialized in Rescale');
+
   {Rescale Last and Next if they're initialized or just copy Base to avoid bugs}
   if Last.isInitialized then
     Last.FloatToInteger
@@ -817,8 +820,10 @@ begin
                             Base.fy2,
                             Base.BaseOpacity);
     end;
- end else
+ end else begin
    Current.Assign(Base); {just fall back to an uninitialized copy}
+   dLog(LogInterfaceInfo,Self,'DAbstractElement.GetAnimationState','Base is uninitialized, falling back to Current=Base');
+ end;
 end;
 
 {----------------------------------------------------------------------------}
@@ -856,7 +861,7 @@ begin
   FreeAndNil(Base);
   FreeAndNil(Last);
   FreeAndNil(Next);
-  FreeAndNIl(Current);
+  FreeAndNil(Current);
   inherited Destroy;
 end;
 
