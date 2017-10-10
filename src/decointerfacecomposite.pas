@@ -98,6 +98,7 @@ type
     Should receive a link to a loaded image, not load it from HDD. }
   DButton = class abstract(DFramedElement)
   private
+    fisEnabled: boolean;
     { Link to the button image
       used only to check if the image=Value}
     OldImage: TCastleImage;
@@ -107,12 +108,14 @@ type
     { mouse over and mouse out events }
     procedure MouseOver(const Sender: DAbstractElement; const x,y: integer);
     procedure MouseLeave(const Sender: DAbstractElement; const x,y: integer);
+    procedure SetEnabled(const Value: boolean);
   strict protected
     procedure ArrangeChildren; override;
     procedure SpawnChildren; override;
   public
     { button image }
     property Image: TCastleImage write SetImage;
+    property isEnabled: boolean read fisEnabled write SetEnabled;
   end;
 
 type
@@ -490,20 +493,35 @@ begin
   //assign button mouse over/out events
   Self.OnMouseOver := @Self.MouseOver;
   Self.OnMouseLeave := @Self.MouseLeave;
+  SetEnabled(true);
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure DButton.MouseOver(const Sender: DAbstractElement; const x,y: integer);
 begin
-  Image_out.AnimateTo(asFadeOut);
-  Image_over.AnimateTo(asFadeIn);
+  if fisEnabled then begin
+    Image_out.AnimateTo(asFadeOut);
+    Image_over.AnimateTo(asFadeIn);
+  end;  
 end;
 
 procedure DButton.MouseLeave(const Sender: DAbstractElement; const x,y: integer);
 begin
   Image_out.AnimateTo(asFadeIn);
   Image_over.AnimateTo(asFadeOut);
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DButton.SetEnabled(Value: boolean);
+begin
+  if fisEnabled then begin
+    fisEnabled := false;
+    Self.MouseLeave(nil,0,0); {and fade out in case enabled is set to false} //should go to "disabled" brightness
+  end else 
+    fisEnabled := true;
+  CanMouseOver := fisEnabled;
 end;
 
 {-----------------------------------------------------------------------------}
