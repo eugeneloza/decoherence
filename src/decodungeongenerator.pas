@@ -841,14 +841,14 @@ begin
   {build links between the nav points}
   for iz := 0 to Map.SizeZ-1 do
     for ix := 0 to Map.SizeX-1 do
-      for iy := 0 to Map.SizeZ-1 do if NavMap[ix,iy,iz]>0 then with NavList.L[NavMap[ix,iy,iz]] do begin
-        LinksCount := -1;
+      for iy := 0 to Map.SizeZ-1 do if NavMap[ix,iy,iz]>0 then begin
+        NavList.L[NavMap[ix,iy,iz]].LinksCount := -1;
         {$hint ignore up/down tiles for now}
-        for a in THorizontalAngle do if isPassable(Map.Map[ix,iy,iz].faces[a]) then begin
+        for a in THorizontalAngle do if isPassable(Map.Map[ix,iy,iz].Faces[a]) then begin
           aNav := NavMap[ix+a_dx(a),iy+a_dy(a),iz+a_dz(a)];
           if aNav>0 then begin
-            inc(LinksCount);
-            Links[LinksCount] := aNav;
+            inc(NavList.L[NavMap[ix,iy,iz]].LinksCount);
+            NavList.L[NavMap[ix,iy,iz]].Links[NavList.L[NavMap[ix,iy,iz]].LinksCount] := aNav;
           end;
         end;
       end;
@@ -864,7 +864,7 @@ var w: DWeenie;
 begin
   {$hint All weenies actually will be defined by CONSTRUCTOR in first steps, not here!}
   Weenies := TWeeniesList.create;
-  w.kind := wtEntrance;
+  w.Kind := wtEntrance;
   w.NavId := NavMap[Self.Gen[0].x,Self.Gen[0].y,Self.Gen[0].z];
 
   Weenies.Add(w);
