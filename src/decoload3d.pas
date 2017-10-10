@@ -100,7 +100,7 @@ procedure AddMaterial(Root: TX3DRootNode);
           Material := (TShapeNode(Source.FdChildren[i]).FdAppearance.Value.FindNode(TMaterialNode,false) as TMaterialNode);
           // set material ambient intensity to zero for complete darkness :)
           Material.AmbientIntensity := 0;
-          AmbientIntensity.value.add(Material);
+          AmbientIntensity.Value.Add(Material);
         except
           dLog(Log3DLoadSoftError,Source,'AddMaterial.ScanNodesRecoursive','try..except fired');
         end;
@@ -115,15 +115,15 @@ function LoadBlenderX3D(URL: string): TX3DRootNode;
 begin
   dLog(LogInitData,nil,'LoadBlenderX3D','Reading file '+URL);
   if TextureProperties = nil then MakeDefaultTextureProperties;
-  Result := load3DSafe(URL);
-  AddMaterial(result);
+  Result := Load3DSafe(URL);
+  AddMaterial(Result);
 end;
 
 {=================== Ambient Intensity List ==========================}
 
 constructor DMaterialContainer.Create;
 begin
-  Value := TMaterialList.create(false);
+  Value := TMaterialList.Create(false);
   fAmbient := 0;
 end;
 destructor DMaterialContainer.Destroy;

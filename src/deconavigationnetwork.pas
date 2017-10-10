@@ -53,7 +53,7 @@ type
     etc,etc,etc.
     I'm not sure yet how to organize them flexible and easily. }
   DWeenie = record
-    kind: TWeenieType;
+    Kind: TWeenieType;
     NavId: TNavID;
 end;
 
