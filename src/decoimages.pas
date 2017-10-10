@@ -636,7 +636,7 @@ end;
 {=============================================================================}
 
 procedure DBarImage.doDraw;
-var x: integer;
+var xx: integer;
 begin
   //inherited <---------- this render is different
   if Max = Min then begin
@@ -644,11 +644,11 @@ begin
     Exit;
   end;
   if Kind = bsVertical then begin
-    x := Round(Base.h * Position/(Max-Min));
-    GLImage.Draw(Base.x1,Base.y1,Base.w,x);
+    xx := Round(Base.h * Position/(Max-Min));
+    GLImage.Draw(Base.x1,Base.y1,Base.w,xx);
   end else begin
-    x := Round(Base.w * Position/(Max-Min));
-    GLImage.Draw(Base.x1,Base.y1,x,Base.h);
+    xx := Round(Base.w * Position/(Max-Min));
+    GLImage.Draw(Base.x1,Base.y1,xx,Base.h);
   end;
 end;
 

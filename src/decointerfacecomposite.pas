@@ -514,7 +514,7 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-procedure DButton.SetEnabled(Value: boolean);
+procedure DButton.SetEnabled(const Value: boolean);
 begin
   if fisEnabled then begin
     fisEnabled := false;
