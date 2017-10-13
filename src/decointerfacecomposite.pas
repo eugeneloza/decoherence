@@ -576,11 +576,11 @@ end;
 procedure DHealthLabel.SpawnChildren;
 begin
   inherited SpawnChildren;
+  Frame := Characterbar_Bottom;
   fLabel := DFloatLabel.Create; //scale=false
   fLabel.Digits := 0;
   fLabel.Font := PlayerHealthFont;
   Grab(fLabel);
-  Frame := Characterbar_Bottom;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -610,10 +610,10 @@ end;
 procedure DNameLabel.SpawnChildren;
 begin
   inherited SpawnChildren;
+  Frame := Characterbar_Top;
   fLabel := DStringLabel.Create;  //scale=false
   fLabel.Font := PlayerNameFont;
   Grab(fLabel);
-  Frame := Characterbar_Top;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -761,9 +761,9 @@ begin
   Health := DHealthLabel.Create;
   NickName  := DNameLabel.Create;
 
-  Grab(PlayerBars);
   Grab(Health);
   Grab(NickName);
+  Grab(PlayerBars);
 end;
 
 {---------------------------------------------------------------------------}
@@ -773,18 +773,18 @@ begin
   //inherited ArrangeChildren;
 
   NickName.Base.AnchorTo(Self.Current); //AnchorToFrame(fFrame);
-  NickName.SetBaseSize(0,0,1,1);
+  NickName.SetBaseSize(0,0.9,1,0.1);
   //NickName.Base.Anchor[asBottom].AlignTo := noAlign;
   Health.Base.AnchorTo(Self.Current);
-  Health.SetBaseSize(0,0,1,1);
+  Health.SetBaseSize(0,0,1,0.1);
   //Health.Base.Anchor[asTop].AlignTo := noAlign;
   PlayerBars.Base.AnchorTo(Self.Current);
-  PlayerBars.SetBaseSize(0,0,1,1);
+  PlayerBars.SetBaseSize(0,0.1,1,0.8);
   //PlayerBars.Base.AnchorTop(NickName.Current,vaBottom);
-  PlayerBars.Base.Anchor[asTop].Anchor := NickName.Current;
+  PlayerBars.Base.Anchor[asTop].Anchor := Health.Current;
   PlayerBars.Base.Anchor[asTop].AlignTo := vaBottom;
   //PlayerBars.Base.AnchorBottom(Health.Current,vaTop);
-  PlayerBars.Base.Anchor[asBottom].Anchor := Health.Current;
+  PlayerBars.Base.Anchor[asBottom].Anchor := NickName.Current;
   PlayerBars.Base.Anchor[asBottom].AlignTo := vaTop;
 
   //rescale;

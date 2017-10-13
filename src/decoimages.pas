@@ -288,7 +288,8 @@ begin
     Update; //Caution, Floater image might de-initialize the image in Update>CyclePhase
     {if ImageReady then // checking that in doDraw of Floater Image}
     doDraw;
-  end;
+  end else
+    dLog(LogInterfaceScaleHint,Self,'DAbstractImage.Draw','Gl image wasn''t initialized properly');
 end;
 
 {=============================================================================}

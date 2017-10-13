@@ -70,7 +70,7 @@ type
   public
     { pointer to the value it monitors }
     Target: Pstring;
-    procedure Update; override;
+    procedure Draw; override;
   end;
 
 type
@@ -85,7 +85,7 @@ type
       2 - two digits like 1.03
       no more needed at the moment }
     Digits: integer;
-    procedure Update; override;
+    procedure Draw; override;
     constructor Create; override;
   end;
 
@@ -240,10 +240,10 @@ end;
 {========================== String label =====================================}
 {=============================================================================}
 
-procedure DStringLabel.Update;
+procedure DStringLabel.Draw;
 begin
-  inherited Update;
   Text := Target^;
+  inherited Draw;
 end;
 
 {=============================================================================}
@@ -258,14 +258,14 @@ end;
 
 {---------------------------------------------------------------------------}
 
-procedure DFloatLabel.Update;
+procedure DFloatLabel.Draw;
 begin
-  inherited Update;
   case Digits of
     1: Text := IntToStr(Trunc(Target^))+'.'+IntToStr(Round(Frac(Target^)*10));
     2: Text := IntToStr(Trunc(Target^))+'.'+IntToStr(Round(Frac(Target^)*100));
     else Text := IntToStr(Round(Target^));
   end;
+  inherited Draw;
 end;
 
 {=============================================================================}
