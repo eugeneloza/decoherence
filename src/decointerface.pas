@@ -286,6 +286,11 @@ Type
     Children: DInterfaceElementsList;
     procedure Draw; override;
     procedure Rescale; override;
+    { Rescales this Interface element to fit children sizes
+      (should be used only in case children may have fixed sizes (like text labels)
+       or force-change their size, e.g. if they don't allow size smaller
+       than frame gaps)}
+    procedure RescaleToChildren;
   public
     {assign given element as a child and sets its parent to self}
     procedure Grab(const Child: DSingleInterfaceElement);
@@ -401,15 +406,16 @@ procedure DAbstractContainer.IntegerToFloat;
 begin
   GetAnchors;
 
-  CurrentOpacity := BaseOpacity * co;
+  if cValid then begin
+    CurrentOpacity := BaseOpacity * co;
 
-  fx1 := (x1 - cx1 - Anchor[asLeft  ].Gap)/cw;
-  fx2 := (x2 - cx2 + Anchor[asRight ].Gap)/cw;
-  fy1 := (y1 - cy1 - Anchor[asTop   ].Gap)/ch;
-  fy2 := (y2 - cy2 + Anchor[asBottom].Gap)/ch;
+    fx1 := (x1 - cx1 - Anchor[asLeft  ].Gap)/cw;
+    fx2 := (x2 - cx2 + Anchor[asRight ].Gap)/cw;
+    fy1 := (y1 - cy1 - Anchor[asTop   ].Gap)/ch;
+    fy2 := (y2 - cy2 + Anchor[asBottom].Gap)/ch;
 
-  if cValid then
     fInitialized := true
+  end
   else
     fInitialized := false
 end;
@@ -431,35 +437,35 @@ var Ratio: float;
 begin
   GetAnchors;
 
-  CurrentOpacity := BaseOpacity * co;
+  if cValid then begin
+    CurrentOpacity := BaseOpacity * co;
 
-  x1 := cx1 + Round(cw * fx1) + Anchor[asLeft].Gap;
-  y1 := cy1 + Round(ch * fy1) + Anchor[asTop].Gap;
-  if ScaleItem then begin
-    {$HINT this may leave x2,y2,w,h uninitialized}
-    x2 := cx1 + Round(cw * fx2) - Anchor[asRight].Gap;
-    y2 := cy1 + Round(ch * fy2) - Anchor[asBottom].Gap;
-    w := x2 - x1;
-    h := y2 - y1;
-    {inefficient}
-    case ProportionalScale of
-      psWidth:  begin
-                  if RealHeight = 0 then Exit;
-                  Ratio := RealWidth/RealHeight;
-                  w := Round(h*Ratio);
-                  x2 := x1 + w;
-                end;
-      psHeight: begin
-                  if RealWidth = 0 then Exit;
-                  Ratio := RealHeight/RealWidth;
-                  h := Round(w*Ratio);
-                  y2 := y1 + h;
-                end;
-    end;
-  end else AdjustToRealSize;
-
-  if cValid then
+    x1 := cx1 + Round(cw * fx1) + Anchor[asLeft].Gap;
+    y1 := cy1 + Round(ch * fy1) + Anchor[asTop].Gap;
+    if ScaleItem then begin
+      {$HINT this may leave x2,y2,w,h uninitialized}
+      x2 := cx1 + Round(cw * fx2) - Anchor[asRight].Gap;
+      y2 := cy1 + Round(ch * fy2) - Anchor[asBottom].Gap;
+      w := x2 - x1;
+      h := y2 - y1;
+      {inefficient}
+      case ProportionalScale of
+        psWidth:  begin
+                    if RealHeight = 0 then Exit;
+                    Ratio := RealWidth/RealHeight;
+                    w := Round(h*Ratio);
+                    x2 := x1 + w;
+                  end;
+        psHeight: begin
+                    if RealWidth = 0 then Exit;
+                    Ratio := RealHeight/RealWidth;
+                    h := Round(w*Ratio);
+                    y2 := y1 + h;
+                  end;
+      end;
+    end else AdjustToRealSize;
     fInitialized := true
+  end
   else
     fInitialized := false
 end;
@@ -1040,6 +1046,7 @@ var i: integer;
 begin
   inherited Rescale;
   for i := 0 to Children.Count-1 do Children[i].Rescale;
+  RescaleToChildren;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -1049,6 +1056,7 @@ var tx1,tx2,ty1,ty2: integer;
     tmp: Txy;
     c: DAbstractElement;
 begin
+  //inherited <------- no inheritance, this procedure works a bit differently
   tx1 := Base.x1;
   tx2 := Base.x2;
   ty1 := Base.y1;
@@ -1067,6 +1075,26 @@ begin
   Result.x2 := tx2;
   Result.y1 := ty1;
   Result.y2 := ty2;
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DInterfaceElement.RescaleToChildren;
+var TrueSize: Txy;
+begin
+  {This procedure is basic, however, there's no need to move it "up" by inheritance level
+   as it's called only for elements containing children}
+  TrueSize := Self.GetSize;
+
+  //call rescale only in case something has changed and if container size is "valid" (non-zero)
+  if  (TrueSize.x2 <> TrueSize.x1) and (TrueSize.y2 <> TrueSize.y1) and
+     ((TrueSize.x1 <> Self.Base.x1) or (TrueSize.x2 <> Self.Base.x2) or
+      (TrueSize.y1 <> Self.Base.y1) or (TrueSize.y2 <> Self.Base.y2)) then
+  begin
+    Base.SetIntCoord(TrueSize.x1,TrueSize.x2,TrueSize.y1,TrueSize.y2);
+    dLog(LogInterfaceScaleHint,Self,'DInterfaceElement.RescaleToChildren','Backward-rescaling to Children.');
+    //if Base.isInitialized then Rescale;
+  end;
 end;
 
 {-----------------------------------------------------------------------------}
