@@ -179,6 +179,7 @@ begin
 
   //create GUI
   dLog(LogInit,nil,'ApplicationInitialize','Create interface');
+  //dLog(true,nil,BackTraceStrFunc(Get_Frame),'');
   InitInterface;
   InitLoadScreen;
   GUI := DInterfaceContainer.Create;

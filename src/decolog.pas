@@ -115,6 +115,7 @@ begin
       InitializeLog(Version,nil,ltTime);
     {$ENDIF}
   {$ENDIF}
+  //BacktraceOnLog := true;
   {this is basic information, so just output directly}
   WritelnLog('(i)','Compillation Date: ' + {$I %DATE%} + ' Time: ' + {$I %TIME%});
   WritelnLog('(i) FullScreen mode',{$IFDEF Fullscreen}'ON'{$ELSE}'OFF'{$ENDIF});

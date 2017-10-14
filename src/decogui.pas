@@ -136,7 +136,7 @@ end;
 {-----------------------------------------------------------------------------}
 
 procedure DInterfaceContainer.PartyInterface;
-var tmp: DInterfaceElement;
+var tmp: DSingleInterfaceElement;
 begin
   Self.Clear; //make it more optimal?
   tmp := DPlayerBarsFull.Create;
@@ -145,15 +145,20 @@ begin
   (tmp as DPlayerBarsFull).Target := Player.CurrentParty.Character[0];
   (tmp as DPlayerBarsFull).RearrangeChildren;
   Grab(tmp);
+  tmp.Rescale;
 
-  tmp := DFramedImage.Create;
+ { tmp := DFloatLabel.Create;
+  (tmp as DFloatLabel).Target := @base.fx1;
+  grab(tmp); }
+
+ { tmp := DFramedImage.Create;
   tmp.Base.AnchorToWindow := true;
   //(tmp as DFramedImage).Frame := BlackFrame; //<-------- here it doesn't work
   tmp.SetBaseSize(0.2,0.1,0.1,0.1);
-  (tmp as DFramedImage).Frame := BlackFrame;
+  (tmp as DFramedImage).Frame := DecorationFrame2_Left;
   (tmp as DFramedImage).Image.Load(Portrait_Img[0]);
   //(tmp as DFramedImage).RearrangeChildren; //<------- doesn't matter
-  Grab(tmp);
+  Grab(tmp);                   }
 end;
 
 end.
