@@ -45,6 +45,10 @@ type TAnchorAlign = (noAlign, haLeft, haRight, haCenter, vaTop, vaBottom, vaMidd
 { Which part of the image is fitted to maintain proportions }
 type TProportionalScale = (psNone, psWidth, psHeight);
 
+type Txy = record
+  x1,y1,x2,y2: integer;
+end;
+
 type
   { This is an container with coordinates and size
     Capable of rescaling / copying itself
@@ -159,6 +163,8 @@ Type
     procedure Update; virtual;
     { Sets this interface element size to full screen and aligns it to Window }
     procedure SetFullScreen;
+    { Returns true size of this interface element }
+    function GetSize: Txy; virtual;
   public
     { changes the scale of the element relative to current window size }
     procedure Rescale; virtual;
@@ -272,6 +278,9 @@ type DInterfaceElementsList = specialize TFPGObjectList<DSingleInterfaceElement>
 Type
   { An interface element, that can contain "Children" }
   DInterfaceElement = class(DSingleInterfaceElement)
+  strict protected
+    { Returns true size of this interface element and all of its children }
+    function GetSize: Txy; override;
   public
     {list of the children of this interface element}
     Children: DInterfaceElementsList;
@@ -843,6 +852,16 @@ end;
 
 {----------------------------------------------------------------------------}
 
+function DAbstractElement.GetSize: Txy;
+begin
+  Result.x1 := Base.x1;
+  Result.x2 := Base.x2;
+  Result.y1 := Base.y1;
+  Result.y2 := Base.y2;
+end;
+
+{----------------------------------------------------------------------------}
+
 constructor DAbstractElement.Create;
 begin
   inherited Create;
@@ -1021,6 +1040,33 @@ var i: integer;
 begin
   inherited Rescale;
   for i := 0 to Children.Count-1 do Children[i].Rescale;
+end;
+
+{-----------------------------------------------------------------------------}
+
+function DInterfaceElement.GetSize: Txy;
+var tx1,tx2,ty1,ty2: integer;
+    tmp: Txy;
+    c: DAbstractElement;
+begin
+  tx1 := Base.x1;
+  tx2 := Base.x2;
+  ty1 := Base.y1;
+  ty2 := Base.y2;
+
+  //scan children
+  for c in Self.Children do begin
+    tmp := c.GetSize;
+    if tx1 < tmp.x1 then tx1 := tmp.x1;
+    if tx2 > tmp.x2 then tx2 := tmp.x2;
+    if ty1 < tmp.y1 then ty1 := tmp.y1;
+    if ty2 > tmp.y2 then ty2 := tmp.y2;
+  end;
+
+  Result.x1 := tx1;
+  Result.x2 := tx2;
+  Result.y1 := ty1;
+  Result.y2 := ty2;
 end;
 
 {-----------------------------------------------------------------------------}
