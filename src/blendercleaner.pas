@@ -48,7 +48,7 @@ uses CastleVectors, StrUtils;
 
 function CleanUp(Root: TX3DRootNode; CleanWorld: boolean = false; CleanUnitTransform: boolean = false): TX3DRootNode;
   //recoursively clean the given node
-  function CleanRecoursive(parent: TAbstractX3DGroupingNode; child: TX3DNode): boolean;
+  function CleanRecoursive(Parent: TAbstractX3DGroupingNode; Child: TX3DNode): boolean;
   var i: integer;
       RemoveNodeOnly, RemoveAll: boolean;
 
@@ -73,53 +73,53 @@ function CleanUp(Root: TX3DRootNode; CleanWorld: boolean = false; CleanUnitTrans
 
     //clean Background, Navigation and Camera if needed.
     if CleanWorld then
-      if (child is TBackgroundNode) or
-         (child is TNavigationInfoNode) or
-         ((child is TTransformNode) and (AnsiContainsText(child.x3dName,'Camera_'))) then RemoveAll := true;
+      if (Child is TBackgroundNode) or
+         (Child is TNavigationInfoNode) or
+         ((Child is TTransformNode) and (AnsiContainsText(Child.x3dName,'Camera_'))) then RemoveAll := true;
 
     if RemoveAll then begin
       //remove the node completely
-      if parent<>nil then begin
-        parent.FdChildren.remove(child);
-        result := true; //changed the fdChildren.count of parent
-        //freeandnil(child); //????
+      if Parent<>nil then begin
+        Parent.FdChildren.Remove(Child);
+        Result := true; //changed the fdChildren.count of Parent
+        //FreeAndNil(Child); //????
       end;
     end
     else
-      if child is TAbstractX3DGroupingNode then begin
+      if Child is TAbstractX3DGroupingNode then begin
 
         {blender exporter garbage these two nodes are absolutely useless}
-        if AnsiContainsText(child.x3dName,'group_ME_') or
-           AnsiContainsText(child.x3dName,'_ifs_TRANSFORM') then
+        if AnsiContainsText(Child.x3dName,'group_ME_') or
+           AnsiContainsText(Child.x3dName,'_ifs_TRANSFORM') then
              RemoveNodeOnly := true else RemoveNodeOnly := false;
 
         { There is a problem when removing unit TransformNode.
           The node itself might be a placeholder and not its transform
           but its name carries information. However, we can't
           automatically tell that. So this is a "risky" option. }
-        if (CleanUnitTransform) and (child is TTransformNode) then
-          if TTransformNode(child).Translation.IsZero and
-             UnitVector(TTransformNode(child).Scale) and
-             NoRotation(TTransformNode(child).rotation) then RemoveNodeOnly := true;
+        if (CleanUnitTransform) and (Child is TTransformNode) then
+          if TTransformNode(Child).Translation.IsZero and
+             UnitVector(TTransformNode(Child).Scale) and
+             NoRotation(TTransformNode(Child).Rotation) then RemoveNodeOnly := true;
 
         //repeat...until because fdChildren.count can change during the runtime!
         i := 0;
-        if TAbstractX3DGroupingNode(child).FdChildren.count>0 then
+        if TAbstractX3DGroupingNode(Child).FdChildren.Count > 0 then
         repeat
-          if not CleanRecoursive(TAbstractX3DGroupingNode(child),TAbstractX3DGroupingNode(child).FdChildren[i])
+          if not CleanRecoursive(TAbstractX3DGroupingNode(Child),TAbstractX3DGroupingNode(Child).FdChildren[i])
            then inc(i);
-          //if result was true then TAbstractX3DGroupingNode(child).FdChildren[i] has just been removed
-        until i >= TAbstractX3DGroupingNode(child).FdChildren.count;
+          //if result was true then TAbstractX3DGroupingNode(Child).FdChildren[i] has just been removed
+        until i >= TAbstractX3DGroupingNode(Child).FdChildren.Count;
 
-        if parent<> nil then
+        if Parent<> nil then
           if RemoveNodeOnly then begin
-            //move this node's children up one level
-            for i := 0 to TAbstractX3DGroupingNode(child).FdChildren.count-1 do
-              parent.FdChildren.add(TAbstractX3DGroupingNode(child).FdChildren[i]);
+            //move this node's Children up one level
+            for i := 0 to TAbstractX3DGroupingNode(Child).FdChildren.Count-1 do
+              Parent.FdChildren.Add(TAbstractX3DGroupingNode(Child).FdChildren[i]);
             //and delete the node;
-            parent.FdChildren.Remove(child);
-            result := true; //changed the fdChildren.count of parent
-            //freeandnil(child); //????
+            Parent.FdChildren.Remove(Child);
+            Result := true; //changed the fdChildren.Count of Parent
+            //FreeAndNil(Child); //????
           end
 
       end;
@@ -127,7 +127,7 @@ function CleanUp(Root: TX3DRootNode; CleanWorld: boolean = false; CleanUnitTrans
   end;
 begin
   // recoursively scan the node and remove garbage
-  CleanRecoursive(nil,root);
+  CleanRecoursive(nil,Root);
   Result := root;
 end;
 

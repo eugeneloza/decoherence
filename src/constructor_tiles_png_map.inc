@@ -33,7 +33,7 @@ var PNG_Tileset, PNG_Up, PNG_Down, PNG_UpDown, PNG_Map: TRGBAlphaImage;
 begin
  if (not isTileLoaded) or (TileM = nil) then begin
    dLog(LogConstructorError,Self,'TDungeonTilesEditor.MakePNGMap','No tile loaded. Aborting');
-   exit;
+   Exit;
  end;
 
  if not TileM.Blocker then with TileM do begin
@@ -82,7 +82,7 @@ begin
          //I calculate all Corners just for 'less code' reason
          Corner_TL := CheckCorner(ix,iy,iz,aTop,aLeft);
          Corner_TR := CheckCorner(ix,iy,iz,aTop,aRight);
-         Corner_BL := checkCorner(ix,iy,iz,aBottom,aLeft);
+         Corner_BL := CheckCorner(ix,iy,iz,aBottom,aLeft);
          Corner_BR := CheckCorner(ix,iy,iz,aBottom,aRight);
 
          if Faces[aLeft] = tfWall then begin
