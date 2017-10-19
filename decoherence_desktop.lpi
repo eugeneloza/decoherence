@@ -107,7 +107,7 @@
         <PackageName Value="castle_base"/>
       </Item2>
     </RequiredPackages>
-    <Units Count="45">
+    <Units Count="46">
       <Unit0>
         <Filename Value="decoherence_desktop.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -326,6 +326,11 @@
         <Filename Value="src/generated/castletexturefont_linbiolinumrg_16.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit44>
+      <Unit45>
+        <Filename Value="src/decofile.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoFile"/>
+      </Unit45>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
