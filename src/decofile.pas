@@ -25,45 +25,53 @@ interface
 
 //uses  ;
 
+type TSimpleMethod = procedure of object;
+
 type
-  {}
+  { General routines shared by writer and reader }
   DAbstractFile = class abstract(TObject)
   strict protected
-    {}
+    { Full URL to the file, being processed }
     URL: string;
-    {}
+    { XML document reference / automanaged }
     XMLdoc: TXMLDocument;
-    {}
+    { Root node of the document }
+    RootNode: TDOMElement;
+    { Formats the file URL }
     procedure AssignFileName(FileName: string; ToGameFolder: boolean);
   end;
 
 type
-  {}
+  { Relatively abstract file reader.
+    Should be inherited in children with specific content reading procedures }
   DFileReader = class(DAbstractFile)
   strict private
-    {}
+    { Opens the file for reading }
     procedure OpenFile;
-    {}
+    { Closes the file and frees internal stuff }
     procedure CloseFile;
+  
+    procedure ReadBlock(aParent: TDOMElement; ReadContent: TSimpleMethod);
   public
-    {}
+    { Reads header from the file. Must be overriden in children. }
     procedure ReadHeader; virtual;
-    {}
+    { Reads the whole file}
     procedure ReadFile;
   end;
 
 type
-  {}
+  { Relatively abstract file writer.
+    Should be inherited in children with specific content writing procedures }
   DFileWriter = class(DAbstractFile)
   strict private
-    {}
+    { Opens the file for reading }
     procedure OpenFile;
-    {}
+    { Closes the file and frees internal stuff }
     procedure CloseFile;
   public
-    {}
+    { Writes the header of the file. Must be overriden in children. }
     procedure WriteHeader; virtual;
-    {}
+    { Writes the whole file }
     procedure WriteFile;
   end;
 
@@ -73,6 +81,8 @@ uses DecoLog;
 
 procedure DAbstractFile.AssignFileName(FileName: string; ToGameFolder: boolean);
 begin
+  {$WARNING this is wrong! As reader/writer will be used in game also}
+  {make a @procedure for formatting URLs properly dependless of constructor/game}
   if ToGameFolder then
     URL := ConstructorData(FileName+gz_ext,ToGameFolder)
   else
@@ -91,8 +101,8 @@ end;
 procedure DFileWriter.OpenFile;
 begin
   XMLdoc := TXMLDocument.Create;
-  RootNode := XMLdoc.CreateElement('Root');
-  XMLdoc.Appendchild(RootNode);
+  RootNode := XMLdoc.CreateElement('Root'); // create Root
+  XMLdoc.Appendchild(RootNode); // and add Root node to the document
 end;
 
 {------------------------------------------------------------------------------}
@@ -116,33 +126,25 @@ end;
 
 {==============================================================================}
 
-procedure DFileWriter.WriteHeader;
+procedure DFileReader.ReadHeader;
 begin
   //to be overriden in children
 end;
 
 {------------------------------------------------------------------------------}
 
-procedure DFileWriter.OpenFile;
+procedure DFileReader.OpenFile;
 begin
-  {XMLdoc := TXMLDocument.Create;
-  RootNode := XMLdoc.CreateElement('Root');
-  XMLdoc.Appendchild(RootNode);}
+  XMLdoc := URLReadXMLSafe(URL);
+  RootNode := XMLdoc.DocumentElement;
 end;
 
 {------------------------------------------------------------------------------}
 
-procedure DFileWriter.CloseFile;
+procedure DFileReader.CloseFile;
 begin
-  {if ToGameFolder then
-    f := ConstructorData(GetScenarioFolder+MapsFolder+filename+'.xml'+gz_ext,ToGameFolder)
-  else
-    f := ConstructorData(GetScenarioFolder+MapsFolder+filename+'.xml',ToGameFolder);
-  URLWriteXML(XMLdoc, f);
-
-  dLog(LogConstructorInfo,Self,'TMapEditor.SaveMap','File Written: '+f);
-
-  FreeAndNil(XMLdoc);}
+  FreeAndNil(XMLdoc);
+  dLog(LogInitInterface,Self,'DFileReader.CloseFile','File read:'+URL);
 end;
 
 {------------------------------------------------------------------------------}
@@ -156,6 +158,17 @@ begin
 end;
 
 {------------------------------------------------------------------------------}
+
+procedure DFileReader.ReadBlock(aParent: TDOMElement; ReadContent: TSimpleMethod);
+begin
+  Iterator := BaseElement.ChildrenIterator;
+  try
+    while Iterator.GetNext do
+      ReadContent;
+  finally
+    FreeAndNil(Iterator);
+  end;
+end;
 
 end.
 
