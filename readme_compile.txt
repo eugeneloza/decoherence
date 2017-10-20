@@ -1,11 +1,12 @@
 ﻿#General
 
-You can compile the source simply by opening *.lpi in Lazarus IDE (version 1.6.0 and above) and pushing F9 to compile&run.
+You can compile the source simply by opening *.lpi in Lazarus IDE (version 1.9 and above) and pushing F9 to compile&run.
 
 #Requirements
 
-This version requires at least 6.1 Castle Game Engine version to compile (no earlier than GIT 19.03.2017). You can download it here https://github.com/castle-engine/castle-engine and follow installation instructions here http://castle-engine.sourceforge.net/tutorial_install.php
-FreePascal compiler at least version 3.0.0 is required (3.0.2 and older highly recommended).
+This version requires at least 6.3 Castle Game Engine version to compile (no earlier than GIT 20.10.2017). You can download it here https://github.com/castle-engine/castle-engine and follow installation instructions here http://castle-engine.sourceforge.net/tutorial_install.php
+FreePascal compiler at least version 3.1.1 is required.
+You can install latest Lazarus+FPC+cross-compilation tools with fpcupdeluxe. See https://github.com/castle-engine/castle-engine/wiki/fpcupdeluxe for more info.
 
 ##Linux
 
@@ -32,7 +33,7 @@ The DLLs must be placed in the exe folder.
 
 #Command-line compilation
 
-If you prefer command-line compilation, you may try lazbuild. See instructions at http://wiki.lazarus.freepascal.org/lazbuild (Thanks to Akien for the information).
+You can compile the game without Lazarus IDE using Castle Game Engine build-tool https://github.com/castle-engine/castle-engine/wiki/Build-Tool.
 
 #Notes
 
