@@ -869,7 +869,7 @@ begin
   if fTarget <> Value then begin
     fTarget := value;
     //DStaticImage(content).FreeImage;
-    dLog(LogInitInterface,Self,'DPortrait.SetTarget','Load from portrait');
+    dLog(LogInitInterface,Self,{$I %CURRENTROUTINE%},'Load from portrait');
     //DStaticImage(content).Load(Portrait_img[drnd.Random(Length(Portrait_img))]);  //todo
     fTarget.onHit := @Self.doHit;
     RearrangeChildren;
@@ -1081,9 +1081,9 @@ begin
       end;
       ArrangeChildren(animate);
     end else
-      dLog(LogInterfaceError,Self,'DPerksContainer.MakePerksList','ERROR: Target.Actions is empty!');
+      dLog(LogInterfaceError,Self,{$I %CURRENTROUTINE%},'ERROR: Target.Actions is empty!');
   end else
-    dLog(LogInterfaceError,Self,'DPerksContainer.MakePerksList','ERROR: Target is nil!');
+    dLog(LogInterfaceError,Self,{$I %CURRENTROUTINE%},'ERROR: Target is nil!');
 end;}
 
 {---------------------------------------------------------------------}

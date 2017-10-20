@@ -43,7 +43,7 @@ var BurnerImageUnscaled, BurnerImage: TCastleImage;  //todo: not freed automatic
 procedure InitBurnerImage;
 begin
   {$IFNDEF AllowRescale}if BurnerImage<>nil then Exit;{$ENDIF}
-  dLog(LogInitInterface,nil,'InitBurnerImage','Started');
+  dLog(LogInitInterface,nil,{$I %CURRENTROUTINE%},'Started');
   if BurnerImageUnscaled = nil then
     BurnerImageUnscaled := LoadImage(ApplicationData(InterfaceFolder+'burner/burner_Pattern_203_CC0_by_Nobiax_diffuse.png'), [TRGBImage]) as TRGBImage;
   if (BurnerImage=nil) or (BurnerImage.Height <> Window.Height) or (BurnerImage.Width <> Window.Width) then begin
@@ -53,7 +53,7 @@ begin
   end;
   {$IFNDEF AllowRescale}FreeAndNil(BurnerImageUnscaled);{$ENDIF}
 
-  dLog(LogInitInterface,nil,'InitBurnerImage','Finished');
+  dLog(LogInitInterface,nil,{$I %CURRENTROUTINE%},'Finished');
 end;
 
 {working directly on image!}

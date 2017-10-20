@@ -37,12 +37,12 @@ begin
   Result := true;
   if (aImage=nil) or (aImage.isEmpty) then begin
     Result := false;
-    dLog(LogInterfaceError,aImage,'DecoImageProcess>CheckImageValid','FATAL: Image is nil');
+    dLog(LogInterfaceError,aImage,{$I %CURRENTROUTINE%},'FATAL: Image is nil');
     Exit;
   end;
   if not (aImage is TRGBAlphaImage) then begin
     Result := false;
-    dLog(LogInterfaceError,nil,'DecoImageProcess>CheckImageValid','FATAL: Image type '+aImage.ClassName+' is not supported for operation.');
+    dLog(LogInterfaceError,nil,{$I %CURRENTROUTINE%},'FATAL: Image type '+aImage.ClassName+' is not supported for operation.');
     Exit;
   end;
 end;

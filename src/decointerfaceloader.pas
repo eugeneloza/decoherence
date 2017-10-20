@@ -68,7 +68,7 @@ begin
   InitBurnerImage;
   {$ENDIF}
 
-  dLog(LogInit,nil,'InitInterface','Started');
+  dLog(LogInit,nil,{$I %CURRENTROUTINE%},'Started');
 
   WindImage1 := LoadImageSafe(ApplicationData(WindFolder+'WindClouds1_GIMP.jpg'));
   WindImage2 := LoadImageSafe(ApplicationData(WindFolder+'WindClouds2_GIMP.jpg'));
@@ -98,11 +98,11 @@ begin
         it as some EImageLoadError descendant. }
       on EFOpenError do begin
         Portrait_Img[i] := LoadImageSafe(ApplicationData(PortraitFolder+'placeholder.png'));
-        dLog(LogInitError,nil,'DecoInterfaceLoader>InitCompositeInterface','ERROR loading portrait '+fName);
+        dLog(LogInitError,nil,{$I %CURRENTROUTINE%},'ERROR loading portrait '+fName);
       end;
       on EImageLoadError do begin
         Portrait_Img[i] := LoadImageSafe(ApplicationData(PortraitFolder+'placeholder.png'));
-        dLog(LogInitError,nil,'DecoInterfaceLoader>InitCompositeInterface','ERROR loading portrait '+fName);
+        dLog(LogInitError,nil,{$I %CURRENTROUTINE%},'ERROR loading portrait '+fName);
       end;
     end;
   end;
@@ -123,7 +123,7 @@ begin
   Characterbar_Mid := DRectagonalFrame.Create('character_bar_mid_CC-BY-SA_by_Saito00.png',0,0,4,4);
   Characterbar_Bottom := DRectagonalFrame.Create('character_bar_bottom_CC-BY-SA_by_Saito00.png',5,5,4,4);
 
-  dLog(LogInitInterface,nil,'DecoInterfaceLoader>InitInterface','finished');
+  dLog(LogInitInterface,nil,{$I %CURRENTROUTINE%},'finished');
 end;
 
 {----------------------------------------------------------------------------}
@@ -131,7 +131,7 @@ end;
 procedure FreeInterface;
 var i: integer;
 begin
-  dLog(LogInitInterface,nil,'DecoInterfaceLoader>FreeInterface','Freeing...');
+  dLog(LogInitInterface,nil,{$I %CURRENTROUTINE%},'Freeing...');
   FreeAndNil(WindImage1);
   FreeAndNil(WindImage2);
 

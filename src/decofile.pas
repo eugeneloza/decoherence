@@ -111,7 +111,7 @@ procedure DFileWriter.CloseFile;
 begin
   URLWriteXML(XMLdoc, URL);
   FreeAndNil(XMLdoc);
-  dLog(LogConstructorInfo,Self,'DFileWriter.CloseFile','File Written: '+URL);
+  dLog(LogConstructorInfo,Self,{$I %CURRENTROUTINE%},'File Written: '+URL);
 end;
 
 {------------------------------------------------------------------------------}
@@ -144,7 +144,7 @@ end;
 procedure DFileReader.CloseFile;
 begin
   FreeAndNil(XMLdoc);
-  dLog(LogInitInterface,Self,'DFileReader.CloseFile','File read:'+URL);
+  dLog(LogInitInterface,Self,{$I %CURRENTROUTINE%},'File read:'+URL);
 end;
 
 {------------------------------------------------------------------------------}

@@ -63,7 +63,7 @@ uses SysUtils,
 
 constructor DInterfaceContainer.Create;
 begin
-  dLog(LogInitInterface,Self,'DInterfaceContainer.Create','Creating interface.');
+  dLog(LogInitInterface,Self,{$I %CURRENTROUTINE%},'Creating interface.');
   inherited Create;
 
   Base.AnchorToWindow := true;
@@ -75,7 +75,7 @@ end;
 
 destructor DInterfaceContainer.Destroy;
 begin
-  dLog(LogInitInterface,Self,'DInterfaceContainer.Destroy','Game over...');
+  dLog(LogInitInterface,Self,{$I %CURRENTROUTINE%},'Game over...');
   { Free special elements that are not freed automatically (are not Children) }
   FreeAndNil(FPSLabel);
   inherited Destroy;
@@ -86,11 +86,11 @@ end;
 procedure DInterfaceContainer.Rescale;
 begin
   if (Window.Width = Width) and (Window.Height = Height) then begin
-    dLog(LogInterfaceInfo,Self,'DInterfaceContainer.Rescale','No need in rescale, abort.');
+    dLog(LogInterfaceInfo,Self,{$I %CURRENTROUTINE%},'No need in rescale, abort.');
     Exit;
   end;
 
-  dLog(LogInterfaceInfo,Self,'DInterfaceContainer.Rescale',
+  dLog(LogInterfaceInfo,Self,{$I %CURRENTROUTINE%},
     IntToStr(Window.Width) + 'x' + IntToStr(Window.Height));
   inherited Rescale;
   Width := Window.Width;

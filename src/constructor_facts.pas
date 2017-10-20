@@ -99,7 +99,7 @@ begin
       decoloadscreen.Facts := nil;
     except
       freeandnil(decoloadscreen.Facts);
-      dLog(LogConstructorError,Self,'TFactsEditor.LoadMe','Exception reading '+CurrentFile);
+      dLog(LogConstructorError,Self,{$I %CURRENTROUTINE%},'Exception reading '+CurrentFile);
     end;
   end;
 
@@ -117,10 +117,10 @@ begin
     finally
       FindClose(Rec);
     end;
-    dLog(LogConstructorInfo,Self,'TFactsEditor.LoadMe','Images loaded = '+inttostr(LoadImages.count));
+    dLog(LogConstructorInfo,Self,{$I %CURRENTROUTINE%},'Images loaded = '+inttostr(LoadImages.count));
   end
   else
-    dLog(LogConstructorError,Self,'TFactsEditor.LoadMe','ERROR: Unable to load LoadScreen images');
+    dLog(LogConstructorError,Self,{$I %CURRENTROUTINE%},'ERROR: Unable to load LoadScreen images');
 
 
   {for L in TLanguage do if Facts[L]<>nil then
@@ -173,7 +173,7 @@ var XMLdoc: TXMLDocument;
 begin
   for L in TLanguage do
     if Facts[L] = nil then
-      dLog(LogConstructorError,Self,'TFactsEditor.WriteMe','LANGUAGE IS NIL!')
+      dLog(LogConstructorError,Self,{$I %CURRENTROUTINE%},'LANGUAGE IS NIL!')
     else begin
       XMLdoc := TXMLDocument.Create;
       RootNode := XMLdoc.CreateElement('FactsList');
@@ -201,7 +201,7 @@ begin
       else
         f := ConstructorData(LanguageDir(L)+'facts.xml',ToGameFolder);
       URLWriteXML(XMLdoc, f);
-      dLog(LogConstructorInfo,Self,'TFactsEditor.WriteMe','File Written: '+f);
+      dLog(LogConstructorInfo,Self,{$I %CURRENTROUTINE%},'File Written: '+f);
 
       FreeAndNil(XMLdoc);
     end;
@@ -253,7 +253,7 @@ procedure TFactsEditor.AddFactButtonClick(Sender: TObject);
 var NewFact: DFact;
     L: TLanguage;
 begin
-  dLog(LogConstructorInfo,Self,'TFactsEditor.AddFactButtonClick','Creating a new empty fact');
+  dLog(LogConstructorInfo,Self,{$I %CURRENTROUTINE%},'Creating a new empty fact');
   for L in TLanguage do begin
     NewFact := DFact.create;
     NewFact.compatibility := TLoadImageList.create(true);

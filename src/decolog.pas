@@ -81,7 +81,7 @@ var doLog: boolean = true;
 { Initializes Castle Log and display basic info }
 procedure InitLog;
 { Writes a log string
-  should be used like dLog(1, Self,prefix,message)
+  should be used like dLog(1, Self,{$I %CURRENTROUTINE%},message)
   Self = nil inside a procedure }
 procedure dLog(const LogLevel: boolean; const aObj: TObject; const aPrefix, aMessage: string);
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
@@ -94,8 +94,8 @@ var objName: string;
 begin
   if not doLog then Exit;
   if LogLevel then begin
-    if aObj<>nil then objName := ' in '+aObj.ClassName else objName := '';
-    WriteLnLog(aPrefix+objName,aMessage)
+    if aObj<>nil then objName := aObj.ClassName+'.' else objName := '';
+    WriteLnLog(objName+aPrefix,aMessage)
   end;  
 end;
 

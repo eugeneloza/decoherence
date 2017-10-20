@@ -214,6 +214,7 @@
       <Unit19>
         <Filename Value="src/decolog.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoLog"/>
       </Unit19>
       <Unit20>
         <Filename Value="src/decofile.pas"/>

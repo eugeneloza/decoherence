@@ -173,12 +173,12 @@ end;
 procedure ApplicationInitialize;
 begin
   InitLog;
-  dLog(LogInit,nil,'ApplicationInitialize','Init');
+  dLog(LogInit,nil,{$I %CURRENTROUTINE%},'Init');
 
   //Application.LimitFPS := 60;
 
   //create GUI
-  dLog(LogInit,nil,'ApplicationInitialize','Create interface');
+  dLog(LogInit,nil,{$I %CURRENTROUTINE%},'Create interface');
   //dLog(true,nil,BackTraceStrFunc(Get_Frame),'');
   InitInterface;
   InitLoadScreen;
@@ -187,13 +187,13 @@ begin
 
   GUI.LoadScreen;
 
-  dLog(LogInit,nil,'ApplicationInitialize','Initialize interface');
+  dLog(LogInit,nil,{$I %CURRENTROUTINE%},'Initialize interface');
 
   //finally we're ready to show game loading screen
   {$IFDEF AllowRescale}Window.onResize := @GuiResize;{$ENDIF}
   Window.onRender := @GuiRender;
 
-  dLog(LogInit,nil,'ApplicationInitialize','Init finished');
+  dLog(LogInit,nil,{$I %CURRENTROUTINE%},'Init finished');
 
   LoadThread := DLoadGameThread.Create(true);
   {$WARNING BUUUUUUUUUUUUUUUUUG!!!!!}
@@ -227,7 +227,7 @@ Initialization
 
   Window := TCastleWindow.Create(Application);
 
-  Window.DoubleBuffer := true;//true;             //what's the difference? speed? memory?
+  Window.DoubleBuffer := true;
 
   {$IFNDEF AllowRescale}window.ResizeAllowed := raOnlyAtOpen;{$ENDIF}
   {$IFDEF Fullscreen}
@@ -241,7 +241,7 @@ Initialization
   Application.OnInitialize  :=  @ApplicationInitialize;
 
 Finalization
-  dLog(LogInit,nil,'Finalization','Started...');
+  dLog(LogInit,nil,{$I %CURRENTROUTINE%},'Going down...');
   { free all assigned memory }
   FreeAndNil(GUI);
 
@@ -254,6 +254,6 @@ Finalization
   FreeCreatures;
   FreeInterface;
   //FreeTextureProperties;
-  dLog(LogInit,nil,'Finalization','Bye...');
+  dLog(LogInit,nil,{$I %CURRENTROUTINE%},'Bye...');
 end.
 

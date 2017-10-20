@@ -361,32 +361,32 @@ begin
        (Anchor[asTop].Anchor = nil) or
        (Anchor[asRight].Anchor = nil) or
        (Anchor[asBottom].Anchor = nil) then begin
-         dLog(LogInterfaceError,Owner,'DAbstractContainer.GetAnchors','Anchor is Nil!');
+         dLog(LogInterfaceError,Owner,{$I %CURRENTROUTINE%},'Anchor is Nil!');
          GetWindowAnchor;
     end else begin
       case Anchor[asLeft].AlignTo of
         haLeft:   cx1 := Anchor[asLeft].Anchor.x1;
         haRight:  cx1 := Anchor[asLeft].Anchor.x2;
         haCenter: cx1 := (Anchor[asLeft].Anchor.x1 + Anchor[asLeft].Anchor.x2) div 2;
-        else dLog(LogInterfaceError,Owner,'DAbstractContainer.GetAnchors','Invalid Anchor align!')
+        else dLog(LogInterfaceError,Owner,{$I %CURRENTROUTINE%},'Invalid Anchor align!')
       end;
       case Anchor[asRight].AlignTo of
         haLeft:   cx2 := Anchor[asRight].Anchor.x1;
         haRight:  cx2 := Anchor[asRight].Anchor.x2;
         haCenter: cx2 := (Anchor[asRight].Anchor.x1 + Anchor[asRight].Anchor.x2) div 2;
-        else dLog(LogInterfaceError,Owner,'DAbstractContainer.GetAnchors','Invalid Anchor align!')
+        else dLog(LogInterfaceError,Owner,{$I %CURRENTROUTINE%},'Invalid Anchor align!')
       end;
       case Anchor[asTop].AlignTo of
         vaTop:    cy1 := Anchor[asTop].Anchor.y1;
         vaBottom: cy1 := Anchor[asTop].Anchor.y2;
         vaMiddle: cy1 := (Anchor[asTop].Anchor.y1 + Anchor[asTop].Anchor.y2) div 2;
-        else dLog(LogInterfaceError,Owner,'DAbstractContainer.GetAnchors','Invalid Anchor align!')
+        else dLog(LogInterfaceError,Owner,{$I %CURRENTROUTINE%},'Invalid Anchor align!')
       end;
       case Anchor[asBottom].AlignTo of
         vaTop:    cy2 := Anchor[asBottom].Anchor.y1;
         vaBottom: cy2 := Anchor[asBottom].Anchor.y2;
         vaMiddle: cy2 := (Anchor[asBottom].Anchor.y1 + Anchor[asBottom].Anchor.y2) div 2;
-        else dLog(LogInterfaceError,Owner,'DAbstractContainer.GetAnchors','Invalid Anchor align!')
+        else dLog(LogInterfaceError,Owner,{$I %CURRENTROUTINE%},'Invalid Anchor align!')
       end;
     end;  
   end;
@@ -691,7 +691,7 @@ begin
   Base.FloatToInteger;
 
   if not Base.isInitialized then
-    dLog(LogInterfaceInfo,Self,'DAbstractElement.Rescale','Base is uninitialized in Rescale');
+    dLog(LogInterfaceInfo,Self,{$I %CURRENTROUTINE%},'Base is uninitialized in Rescale');
 
   {Rescale Last and Next if they're initialized or just copy Base to avoid bugs}
   if Last.isInitialized then
@@ -837,7 +837,7 @@ begin
     end;
  end else begin
    Current.Assign(Base); {just fall back to an uninitialized copy}
-   dLog(LogInterfaceInfo,Self,'DAbstractElement.GetAnimationState','Base is uninitialized, falling back to Current=Base');
+   dLog(LogInterfaceInfo,Self,{$I %CURRENTROUTINE%},'Base is uninitialized, falling back to Current=Base');
  end;
 end;
 
@@ -1092,11 +1092,11 @@ begin
       (TrueSize.y1 <> Self.Base.y1) or (TrueSize.y2 <> Self.Base.y2)) then
   begin
     Base.SetIntCoord(TrueSize.x1,TrueSize.x2,TrueSize.y1,TrueSize.y2);
-    dLog(LogInterfaceScaleHint,Self,'DInterfaceElement.RescaleToChildren','Backward-rescaling to Children.');
-    dlog(LogInterfaceScaleHint,Self,'x1',IntToStr(TrueSize.x1));
-    dlog(LogInterfaceScaleHint,Self,'x2',IntToStr(TrueSize.x2));
-    dlog(LogInterfaceScaleHint,Self,'y1',IntToStr(TrueSize.y1));
-    dlog(LogInterfaceScaleHint,Self,'y2',IntToStr(TrueSize.y2));
+    dLog(LogInterfaceScaleHint,Self,{$I %CURRENTROUTINE%},'Backward-rescaling to Children.');
+    dlog(LogInterfaceScaleHint,Self,'x1=',IntToStr(TrueSize.x1));
+    dlog(LogInterfaceScaleHint,Self,'x2=',IntToStr(TrueSize.x2));
+    dlog(LogInterfaceScaleHint,Self,'y1=',IntToStr(TrueSize.y1));
+    dlog(LogInterfaceScaleHint,Self,'y2=',IntToStr(TrueSize.y2));
     //if Base.isInitialized then Rescale;
   end;
 end;

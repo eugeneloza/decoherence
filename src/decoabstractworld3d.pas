@@ -425,7 +425,7 @@ var i: integer;
     a: DMonster;
 begin
   if Actors <> nil then begin
-    dLog(LogWorldInitSoftError,Self,'DAbstractWorld3d.SpawnActors','WARNING: Actors is not nil, freeing...');
+    dLog(LogWorldInitSoftError,Self,{$I %CURRENTROUTINE%},'WARNING: Actors is not nil, freeing...');
     FreeAndNil(Actors);
   end;
   Actors := TActorList.Create(true);

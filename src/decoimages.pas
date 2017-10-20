@@ -227,7 +227,7 @@ begin
       GLImage := TGLImage.Create(ScaledImage,true,true);
       ScaledImage := nil;
       ImageReady := true;
-    end else dLog(LogInterfaceGLError,Self,'DAbstractElement.InitGL','ERROR: Scaled Image is nil!');
+    end else dLog(LogInterfaceGLError,Self,{$I %CURRENTROUTINE%},'ERROR: Scaled Image is nil!');
   end;
 end;
 
@@ -267,7 +267,7 @@ begin
     GLImage.Color := InterfaceColor;
     GLImage.Color[3] := Current.CurrentOpacity;
   end else
-    dLog(LogInterfaceGLError,Self,'DAbstractImage.Update','ERROR: GL image is nil in "update"');
+    dLog(LogInterfaceGLError,Self,{$I %CURRENTROUTINE%},'ERROR: GL image is nil in "update"');
 end;
 
 {----------------------------------------------------------------------------}
@@ -289,7 +289,7 @@ begin
     {if ImageReady then // checking that in doDraw of Floater Image}
     doDraw;
   end else
-    dLog(LogInterfaceScaleHint,Self,'DAbstractImage.Draw','Gl image wasn''t initialized properly');
+    dLog(LogInterfaceScaleHint,Self,{$I %CURRENTROUTINE%},'Gl image wasn''t initialized properly');
 end;
 
 {=============================================================================}
@@ -342,7 +342,7 @@ var ScaledImageParts: array [0..2,0..2] of TCastleImage;
 begin
   //inherited; <------ this procedure works completely different
   if Frame = nil then begin
-    dLog(LogInterfaceError,Self,'DFrameImage.RescaleImage','Error: Frame is nil!');
+    dLog(LogInterfaceError,Self,{$I %CURRENTROUTINE%},'Error: Frame is nil!');
     Exit;
   end;
 
@@ -360,12 +360,12 @@ begin
   {check if minimal frame size is larger than the requested frame size}
   {$warning disabled}
   if Frame.CornerLeft+Frame.CornerRight+1 > Base.w then begin
-    dLog(LogInterfaceScaleHint,Self,'DFrameImage.RescaleImage','Reset backwards base.w = '+IntToStr(Base.w)+' / cornerLeft+cornerRight = '+IntToStr(Frame.CornerLeft+Frame.CornerRight));
+    dLog(LogInterfaceScaleHint,Self,{$I %CURRENTROUTINE%},'Reset backwards base.w = '+IntToStr(Base.w)+' / cornerLeft+cornerRight = '+IntToStr(Frame.CornerLeft+Frame.CornerRight));
     Base.w := Frame.CornerLeft+Frame.CornerRight+1;
     //Base.BackwardSetSize(Base.w,-1);
   end;
   if Frame.CornerTop+Frame.CornerBottom+1 > Base.h then begin
-    dLog(LogInterfaceScaleHint,Self,'DFrameImage.RescaleImage','Reset backwards base.h = '+IntToStr(Base.h)+' / cornerTop+cornerBottom = '+inttostr(Frame.CornerTop+Frame.CornerBottom));
+    dLog(LogInterfaceScaleHint,Self,{$I %CURRENTROUTINE%},'Reset backwards base.h = '+IntToStr(Base.h)+' / cornerTop+cornerBottom = '+inttostr(Frame.CornerTop+Frame.CornerBottom));
     Base.h := Frame.CornerTop+Frame.CornerBottom+1;
     //Base.BackwardSetSize(-1,Base.h);
   end;
@@ -418,7 +418,7 @@ end;
 procedure DFrameAnchorHelper.AnchorToFrame(const aFrame: DFrameImage);
 begin
   if aFrame = nil then begin
-    dLog(LogInterfaceError,Self,'DFrameAnchorHelper.AnchorToFrame','ERROR: Frame is nil!');
+    dLog(LogInterfaceError,Self,{$I %CURRENTROUTINE%},'ERROR: Frame is nil!');
     Exit;
   end;
   AnchorTo(aFrame.Current);
@@ -428,7 +428,7 @@ begin
     Anchor[asTop].Gap := aFrame.Frame.CornerTop;
     Anchor[asBottom].Gap := aFrame.Frame.CornerBottom;
   end else begin
-    dLog(LogInterfaceError,Self,'DFrameAnchorHelper.AnchorToFrame','ERROR: Frame image is nil! Assuming zero gaps');
+    dLog(LogInterfaceError,Self,{$I %CURRENTROUTINE%},'ERROR: Frame image is nil! Assuming zero gaps');
     Anchor[asLeft].Gap := 0;
     Anchor[asRight].Gap := 0;
     Anchor[asTop].Gap := 0;
@@ -444,7 +444,7 @@ procedure DSimpleImage.RescaleImage;
 begin
  {$IFNDEF AllowRescale}
  If SourceImage = nil then begin
-   dLog(LogInterfaceSceleError,Self,'DSimpleImage.RescaleImage','Source Image is nil!');
+   dLog(LogInterfaceSceleError,Self,{$I %CURRENTROUTINE%},'Source Image is nil!');
    Exit;
  end;
  {$ENDIF}
@@ -459,7 +459,7 @@ begin
      InitGLPending := true;
    end
    else
-     dLog(LogInterfaceSceleError,Self,'DSimpleImage.RescaleImage','ERROR: Base.Initialized = false');
+     dLog(LogInterfaceSceleError,Self,{$I %CURRENTROUTINE%},'ERROR: Base.Initialized = false');
  end;
 end;
 
@@ -471,7 +471,7 @@ end;
 procedure DStaticImage.Load(const URL: string);
 begin
   FreeImage;
-  dLog(LogInitInterface,Self,'DStaticImage.LoadImage',URL);
+  dLog(LogInitInterface,Self,{$I %CURRENTROUTINE%},URL);
   SourceImage := LoadImageSafe(URL);
   AfterLoad;
   Rescale;
@@ -479,7 +479,7 @@ end;
 procedure DStaticImage.Load(const CopyImage: TCastleImage);
 begin
   FreeImage;
-  dLog(LogInitInterface,Self,'DStaticImage.LoadImage','Copying image from '+CopyImage.ClassName);
+  dLog(LogInitInterface,Self,{$I %CURRENTROUTINE%},'Copying image from '+CopyImage.ClassName);
   SourceImage := CopyImage.MakeCopy;
   AfterLoad;
   Rescale;
@@ -493,7 +493,7 @@ begin
   except
     on E: Exception do
     begin
-      dLog(LogInitError,Self,'DStaticImage.AfterLoad','FATAL: Image has been freed before load completed. ABORT. '{+E.Message});
+      dLog(LogInitError,Self,{$I %CURRENTROUTINE%},'FATAL: Image has been freed before load completed. ABORT. '{+E.Message});
       FreeImage;
       Exit;
     end;
@@ -641,7 +641,7 @@ var xx: integer;
 begin
   //inherited <---------- this render is different
   if Max = Min then begin
-    dLog(LogInterfaceError,Self,'DBarImage.doDraw','ERROR: Division by zero!');
+    dLog(LogInterfaceError,Self,{$I %CURRENTROUTINE%},'ERROR: Division by zero!');
     Exit;
   end;
   if Kind = bsVertical then begin

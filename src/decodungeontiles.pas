@@ -322,7 +322,7 @@ var TileDOC: TXMLDocument;
 begin
   //inherited;
   TileName := DeleteURIExt(ExtractURIName(URL));
-  dLog(LogInitData,Self,'DTileMap.Load',URL);
+  dLog(LogInitData,Self,{$I %CURRENTROUTINE%},URL);
 
   {todo: clear the tile with base = tkInacceptible
    and check that all tile elements are loaded and give an error otherwise

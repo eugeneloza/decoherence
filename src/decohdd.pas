@@ -111,7 +111,7 @@ procedure LoadThread(const Source: ILoadObject; const URL: string);
 var LoadThread: DLoadThread;
 begin
   if Source.ThreadLocked then begin
-    dLog(LogThreadError,nil,'DecoHDD>LoadThread','Error: Thread is already running, abort');
+    dLog(LogThreadError,nil,{$I %CURRENTROUTINE%},'Error: Thread is already running, abort');
     Exit;
   end;
   Source.LockThread;

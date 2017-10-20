@@ -141,7 +141,7 @@ var s: string;
 begin
   Result := false;
   if SL = nil then begin
-    dLog(LogConstructorError,nil,'StringListContains','ERROR: String List is nil!');
+    dLog(LogConstructorError,nil,{$I %CURRENTROUTINE%},'ERROR: String List is nil!');
     Exit;
   end;
   for s in SL do if s = Search then begin
@@ -195,7 +195,7 @@ begin
       LanguageSwitch.Items.add(SayLanguage(L));
     LanguageSwitch.ItemIndex := 0;
     LanguageSwitch.OnChange := @LanguageSelectChange;
-  end else dLog(LogConstructorError,Self,'TLanguageForm.MakeLanguageSwitch','ERROR: LanguageSelect already exists.');
+  end else dLog(LogConstructorError,Self,{$I %CURRENTROUTINE%},'ERROR: LanguageSelect already exists.');
   ResetLanguageSwitch;
 end;
 
