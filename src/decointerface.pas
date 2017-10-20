@@ -1093,6 +1093,10 @@ begin
   begin
     Base.SetIntCoord(TrueSize.x1,TrueSize.x2,TrueSize.y1,TrueSize.y2);
     dLog(LogInterfaceScaleHint,Self,'DInterfaceElement.RescaleToChildren','Backward-rescaling to Children.');
+    dlog(LogInterfaceScaleHint,Self,'x1',IntToStr(TrueSize.x1));
+    dlog(LogInterfaceScaleHint,Self,'x2',IntToStr(TrueSize.x2));
+    dlog(LogInterfaceScaleHint,Self,'y1',IntToStr(TrueSize.y1));
+    dlog(LogInterfaceScaleHint,Self,'y2',IntToStr(TrueSize.y2));
     //if Base.isInitialized then Rescale;
   end;
 end;

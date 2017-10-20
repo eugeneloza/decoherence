@@ -50,7 +50,7 @@ type
     procedure OpenFile;
     { Closes the file and frees internal stuff }
     procedure CloseFile;
-  
+    {}
     procedure ReadBlock(aParent: TDOMElement; ReadContent: TSimpleMethod);
   public
     { Reads header from the file. Must be overriden in children. }
