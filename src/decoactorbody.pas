@@ -33,7 +33,7 @@ type DBodyResource = T3DResource;
 {type
   { this class contains references to animations of DBodyResource,
     maybe it's redundant. }
-  TBodyKind = class (TObject)}
+  TBodyKind = class (DObject)}
 
 {not sure about it, it would cover basic enemies animations, but
  some Actors, player characters and npcs first of all, may use advanced set

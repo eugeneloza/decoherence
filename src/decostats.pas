@@ -22,8 +22,8 @@ unit DecoStats;
 {$INCLUDE compilerconfig.inc}
 
 interface
-{uses
-  decoglobal; }
+uses
+  DecoGlobal;
 
 Const
   {stats for actors}
@@ -43,7 +43,7 @@ Const
 
 Type
   {A record representing the base stats array}
-  DStats = class(TObject)
+  DStats = class(DObject)
   public
     Value: array of integer;
     Count: integer;

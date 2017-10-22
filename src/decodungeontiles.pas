@@ -86,7 +86,7 @@ const
 
 type
   {common routines shared by TileMap and DungeonMap}
-  DMap = class (TObject)
+  DMap = class (DObject)
     public
       {size of this map}
       SizeX,SizeY,SizeZ: byte;

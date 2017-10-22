@@ -38,14 +38,14 @@ unit DecoSound;
 interface
 uses Classes, fgl,
   CastleSoundEngine, CastleTimeUtils,
-  DecoThread;
+  DecoThread, DecoGlobal;
 
 type
   {thread that actually loads the sound file}
   DSoundLoadThread = class(TThread)
   public
     {refrence to DSoundFile / Why can't I make a cyclic refernce?}
-    Parent: TObject; //DSoundFile
+    Parent: DObject; //DSoundFile
   protected
     {loads the file}
     procedure Execute; override;
@@ -133,7 +133,7 @@ type
 
 type
   {the most abstract features of the playlist}
-  DAbstractPlaylist = class(TObject)
+  DAbstractPlaylist = class(DObject)
     public
       {manage the playlist (loading, start, stop, fade)}
       procedure Manage; virtual; abstract;
@@ -230,7 +230,7 @@ type
 type
   {Manages all the playlists, currently played music and ambience
    also tries to merge playlists (not implemented yet)}
-  DMusicManager = class(TObject)
+  DMusicManager = class(DObject)
   private
     {current ambient track, just plays continuously}
     Ambient: DLoopMusicTrack;
@@ -260,7 +260,7 @@ implementation
 uses SysUtils, castleFilesUtils,
   CastleVectors,
   DecoHDD, //used for safe threaded loading of sound buffer
-  DecoGlobal, DecoTime, DecoLog;      //used for random
+  DecoTime, DecoLog;
 
 {========================== TMusicLoadThread ===============================}
 

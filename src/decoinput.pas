@@ -24,9 +24,10 @@ interface
 
 uses Classes, fgl, SysUtils,
   CastleFilesUtils, CastleKeysMouse,
-  DecoInterface, DecoGui;
+  DecoInterface, DecoGui,
+  DecoGlobal;
 
-type DTouch = class(TObject)
+type DTouch = class(DObject)
   FingerIndex: cardinal;
   x0,y0: integer;     //to handle sweeps, drags and cancels
   ClickElement: DSingleInterfaceElement;
@@ -55,7 +56,7 @@ procedure CenterMouseCursor;
 implementation
 uses CastleVectors,
   DecoNavigation, DecoPlayerCharacter,
-  DecoGameMode, DecoGlobal, DecoLog;
+  DecoGameMode, DecoLog;
 
 var RecordKeys: boolean = false;
     RecordedKeys: string;

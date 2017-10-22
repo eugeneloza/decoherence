@@ -36,7 +36,7 @@ type TFaction = (fPlayer, fHostile);
 type
   { This Actor has only the most basic features like his "tile" position
     Will be used in some remote future for Actors behaviour on global map }
-  DSimpleActor = class abstract(TObject)
+  DSimpleActor = class abstract(DObject)
   private
     { Last Nav, where the Actor was standing }
     LastNav: TNavID;
@@ -57,7 +57,7 @@ type TActorList = specialize TFPGObjectList<DSimpleActor>;
 
 type
   {A group of actors, that can manage it's Members}
-  DActorGroup = class(TObject) //maybe class(DSimpleActor);
+  DActorGroup = class(DObject) //maybe class(DSimpleActor);
   public
     {a list of actors in this ActorGroup}
     Members: TActorList;
@@ -979,7 +979,7 @@ end;
 
 constructor DActorGroup.Create;
 begin
-  inherited Create; //<------- actually may be unneeded if parent is TObject
+  inherited Create; //<------- actually may be unneeded if parent is DObject
   Members := TActorList.Create(false);
 end;
 

@@ -128,7 +128,7 @@ type DPartyList = specialize TFPGObjectList<DParty>;
 type
   {Container for all player parties
      together with basic mouse/touch/keyboard input handle}
-  DPlayerControl = class(TObject)
+  DPlayerControl = class(DObject)
   public
     {A list of player's parties (should contain at least 1 record)}
     Parties: DPartyList;

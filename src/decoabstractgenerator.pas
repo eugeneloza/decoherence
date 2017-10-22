@@ -23,7 +23,7 @@ interface
 
 uses Classes, CastleRandom, fgl, CastleGenericLists,
   DecoNavigationNetwork,
-  DecoThread;
+  DecoThread, DecoGlobal;
 
 type
   {maybe I'll change it later}
@@ -47,7 +47,7 @@ type TNeighboursList = specialize TGenericStructList<DNeighbour>;
 type
   { abstract level of Generator Parameters,
     maybe redundant, but maybe it'll turn useful some day }
-  DAbstractGeneratorParameters = class(TObject)
+  DAbstractGeneratorParameters = class(DObject)
   private
     fisReady: boolean;
   public

@@ -34,6 +34,9 @@ const NEnemies = 0.05; {must be <1 / temporary quantity of enemies in % of NavPo
 type Float = single;
      pFloat = ^Float;
 
+type DObject = class(TObject)
+  end;
+
 { folders constants relative to ApplicationData path
   should be "/", not pathdelim, because those are URLs }
 const InterfaceFolder    = 'interface/';

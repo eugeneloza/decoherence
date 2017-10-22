@@ -22,11 +22,12 @@ unit DecoLoadScreen;
 interface
 
 uses fgl,
-  DecoTranslation;
+  DecoTranslation,
+  DecoGlobal;
 
 type
   {link to image file}
-  DLoadImage = class(TObject)
+  DLoadImage = class(DObject)
     {file name without path}
     Value: string;
   end;
@@ -77,7 +78,7 @@ implementation
 uses SysUtils, CastleFilesUtils,
   DOM, CastleXMLUtils,
   DecoFont,
-  DecoGlobal, DecoHDD, DecoLog;
+  DecoHDD, DecoLog;
 
 var LastFact: integer = -1;
     CurrentFact: DFact = nil;      //looks ugly! Maybe I should remake it?

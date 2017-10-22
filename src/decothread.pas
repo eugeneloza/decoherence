@@ -26,7 +26,7 @@ uses Classes,
 
 type
 
-  DThreadedObject = class(TObject)
+  DThreadedObject = class(DObject)
     {$IFDEF ThreadLoad}
   strict private
     fThread: TThread;

@@ -67,7 +67,7 @@ type
 
 type
   { An extension to TCastleImage }
-  DRectagonalFrame = class(TObject)
+  DRectagonalFrame = class(DObject)
   public
     FrameImage: TCastleImage;
     { Frame borders }

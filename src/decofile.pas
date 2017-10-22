@@ -29,7 +29,7 @@ type TSimpleMethod = procedure of object;
 
 type
   { General routines shared by writer and reader }
-  DAbstractFile = class abstract(TObject)
+  DAbstractFile = class abstract(DObject)
   strict protected
     { Full URL to the file, being processed }
     URL: string;

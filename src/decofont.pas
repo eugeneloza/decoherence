@@ -39,7 +39,7 @@ const BoldFontFile = 'Xolonium-Bold.ttf';
 
 const dLineBreak = sLineBreak;
 
-type DString = class(TObject)
+type DString = class(DObject) //maybe make it a record?
   { each line text content }
   Value: String;
   { specific size parameters of this line }

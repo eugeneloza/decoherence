@@ -36,7 +36,7 @@ Type TPerkEffect = (peDamage, peHeal, peStat);   }
 
 type
   {Simplest perk is a passive perk that influences the character in some way}
-  DPerk = class(TObject)
+  DPerk = class(DObject)
   public
     //PerkKind: TPerkKind;
     //PerkType: TPerkType;

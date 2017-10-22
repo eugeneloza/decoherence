@@ -21,7 +21,7 @@ unit DecoLog;
 
 {$INCLUDE compilerconfig.inc}
 interface
-//uses
+//uses nothing
 
 const Version = {$INCLUDE version.inc};
 
@@ -117,9 +117,9 @@ begin
   {$ENDIF}
   //BacktraceOnLog := true;
   {this is basic information, so just output directly}
-  WritelnLog('(i)','Compillation Date: ' + {$I %DATE%} + ' Time: ' + {$I %TIME%});
-  WritelnLog('(i) FullScreen mode',{$IFDEF Fullscreen}'ON'{$ELSE}'OFF'{$ENDIF});
-  WritelnLog('(i) Allow rescale',{$IFDEF AllowRescale}'ON'{$ELSE}'OFF'{$ENDIF});
+  WriteLnLog('(i)','Compillation Date: ' + {$I %DATE%} + ' Time: ' + {$I %TIME%});
+  WriteLnLog('(i) FullScreen mode',{$IFDEF Fullscreen}'ON'{$ELSE}'OFF'{$ENDIF});
+  WriteLnLog('(i) Allow rescale',{$IFDEF AllowRescale}'ON'{$ELSE}'OFF'{$ENDIF});
 end;
 
 end.

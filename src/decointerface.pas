@@ -54,10 +54,10 @@ type
     Capable of rescaling / copying itself
     As abstract as it seems, it's also used as animation state,
     So, constructing it as standalone should be possible }
-  DAbstractContainer = class(TObject)
+  DAbstractContainer = class(DObject)
   strict private
     { Owner of this Container (for displaying debug info) }
-    Owner: TObject;
+    Owner: DObject;
     fInitialized: boolean;
     { Parent container size (cached) }
     cx1,cx2,cy1,cy2,cw,ch: integer;
@@ -113,7 +113,7 @@ type
     ProportionalScale: TProportionalScale;
     { If this Container ready to be used? }
     property isInitialized: boolean read fInitialized;
-    constructor Create(aOwner: TObject); //virtual;
+    constructor Create(aOwner: DObject); //virtual;
     //destructor Destroy; override;
     { Copy parameters from the Source }
     procedure Assign(const Source: DAbstractContainer);
@@ -210,7 +210,7 @@ type TXYProcedure = procedure(const Sender: DAbstractElement; const x,y: integer
 Type
   { A simple time-out mechanisms to preform some timed events on interface
     elements }
-  DTimer = class(TObject)
+  DTimer = class(DObject)
     private
       { Set automatically, date of the timer count start }
       StartTime: DTime;
@@ -322,7 +322,7 @@ uses SysUtils,
 {========================== Abstract Container ===============================}
 {=============================================================================}
 
-constructor DAbstractContainer.Create(aOwner: TObject);
+constructor DAbstractContainer.Create(aOwner: DObject);
 var aa: TAnchorSide;
 begin
   //inherited Create;
