@@ -9,7 +9,7 @@ object MapEditor: TMapEditor
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnShow = FormShow
-  LCLVersion = '1.6.2.0'
+  LCLVersion = '1.9.0.0'
   object MapDisplay: TCastleControl
     Left = 24
     Height = 357

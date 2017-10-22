@@ -26,7 +26,7 @@
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir);src"/>
-            <OtherUnitFiles Value="src"/>
+            <OtherUnitFiles Value="src;src/generated"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
           <Parsing>
@@ -66,7 +66,7 @@
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir);src"/>
-            <OtherUnitFiles Value="src"/>
+            <OtherUnitFiles Value="src;src/generated"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
           <CodeGeneration>
@@ -111,7 +111,7 @@
         <PackageName Value="LCL"/>
       </Item4>
     </RequiredPackages>
-    <Units Count="21">
+    <Units Count="22">
       <Unit0>
         <Filename Value="constructor_tool.pas"/>
         <IsPartOfProject Value="True"/>
@@ -206,6 +206,7 @@
       <Unit17>
         <Filename Value="src/decotranslation.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoTranslation"/>
       </Unit17>
       <Unit18>
         <Filename Value="src/compilerconfig.inc"/>
@@ -220,6 +221,10 @@
         <Filename Value="src/decofile.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit20>
+      <Unit21>
+        <Filename Value="src/generated/decoloadembedded.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit21>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
@@ -229,7 +234,7 @@
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir);src"/>
-      <OtherUnitFiles Value="src"/>
+      <OtherUnitFiles Value="src;src/generated"/>
       <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <Linking>
