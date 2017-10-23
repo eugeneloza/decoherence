@@ -62,7 +62,7 @@ Type
       Most important thing it does is managing LODs of tiles/landscape
       And hiding/LODding World chunks
       x,y,z are current World coordinates of render camera }
-    Procedure Manage(position: TVector3); virtual; abstract;
+    Procedure Manage(Position: TVector3); virtual; abstract;
     {Builds a PathTree for the World}
     //Function pathfind: DPathTree;
     { Load the World from a file}
@@ -181,21 +181,21 @@ end;
 
 procedure DAbstractWorld.CacheNavDistance;
 var i,j: TNavID;
-    count: integer;
-    d, min,sum: float;
+    Count: integer;
+    d, min, sum: float;
 begin
   //warning, this will significantly changed after "LINKS" between navs will be implemented
   min := (Nav[0].Pos-Nav[1].Pos).Length;
   sum := min;
-  count := 0;
+  Count := 0;
   for i := 0 to Nav.Count-1 do
     for j := 0 to Nav[i].LinksCount do begin
       d := (Nav[i].Pos-Nav[Nav[i].Links[j]].Pos).Length;
       if d < min then min := d;
       sum += d;
-      inc(count);
+      inc(Count);
     end;
-  fNavAvgStep := sum/count;
+  fNavAvgStep := sum/Count;
   fNavMinStep := min;
 end;
 function DAbstractWorld.PositionToNav(aPosition: TVector3): TNavID;
@@ -211,7 +211,7 @@ begin
       d := (aPosition-Nav[i].Pos).Length;
       if d <= fNavMinStep/2 then begin
         m := i;
-        break;
+        Break;
       end else
       if d < min_d then begin
         m := i;

@@ -152,24 +152,24 @@ end;
 
 procedure TMainForm.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 var WF: TWriterForm;
-    Unsaved_data: boolean;
-    Unsaved_string: string;
+    UnsavedData: boolean;
+    UnsavedString: string;
 begin
-  Unsaved_data := false;
-  Unsaved_string := '';
+  UnsavedData := false;
+  UnsavedString := '';
   if AllForms = nil then MakeFormsList;
 
   for WF in AllForms do
     if WF.isChanged then begin
-      Unsaved_data := true;
-      Unsaved_string += WF.Name + ' ';
+      UnsavedData := true;
+      UnsavedString += WF.Name + ' ';
       //break;
     end;
 
-  if unsaved_data then
-    if MessageDlg('There is unsaved data in '+Unsaved_String +'! Really exit?',mtCustom, [mbYes,mbNo], 0)=MrNo then begin
-      CloseAction:=canone;
-      exit;
+  if UnsavedData then
+    if MessageDlg('There is unsaved data in ' + UnsavedString + '! Really exit?', mtCustom, [mbYes,mbNo], 0) = MrNo then begin
+      CloseAction := caNone;
+      Exit;
     end;
 end;
 
@@ -188,7 +188,7 @@ end;
 procedure TMainForm.DungeonTilesEditorButtonClick(Sender: TObject);
 begin
   //Application.CreateForm(TDungeonTilesEditor, DungeonTilesEditor);
-  DungeonTilesEditor.show;
+  DungeonTilesEditor.Show;
 end;
 
 {----------------------------------------------------------------------------}

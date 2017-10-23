@@ -141,9 +141,9 @@ type
     { fills Face and base boxes }
     procedure MakeAtlasBoxes;
     { conversion from combobox index to TTileFace }
-    function FaceByIndex(index: integer): TTileFace;
+    function FaceByIndex(Index: integer): TTileFace;
     { conversion from combobox index to TTileKind }
-    function BaseByIndex(index: integer): TTileKind;
+    function BaseByIndex(Index: integer): TTileKind;
     { draws tile map to MapImage}
     procedure DrawTileMap;
     { prepares controls for MapImage editing (reset sizes, enable/disable etc)}
@@ -170,7 +170,7 @@ implementation
 
 uses CastleVectors, CastleCameras,
      DOM, CastleXMLUtils,
-     decoLoad3d, x3dLoad, CastleURIUtils, BlenderCleaner,
+     DecoLoad3d, x3dLoad, CastleURIUtils, BlenderCleaner,
      CastleFilesUtils,
      DecoGlobal, DecoLog;
 
@@ -272,7 +272,7 @@ end;
 
 procedure TDungeonTilesEditor.ResetCamera;
 begin
-  if (TileDisplay.scenemanager.Camera<>nil) then
+  if (TileDisplay.SceneManager.Camera<>nil) then
   begin
     if isTileLoaded {?} then begin
       //set up the camera
@@ -315,16 +315,16 @@ begin
   isTileLoaded := false;
   if FileName = '' then begin
     ShowMessage('No tiles found!');
-    exit;
+    Exit;
   end;
 
   if TileScene<>nil then
-    TileDisplay.SceneManager.Items.remove(TileScene);
+    TileDisplay.SceneManager.Items.Remove(TileScene);
   //FreeAndNil(TileRoot); //owned by TileScene
   FreeAndNil(TileScene);
 
-  TileRoot := CleanUp( Load3D( ConstructorData(TilesFolder+Filename+'.x3d',false) ) ,true,true);
-  TileScene := TCastleScene.create(TileDisplay);
+  TileRoot := CleanUp( Load3D( ConstructorData(TilesFolder+FileName+'.x3d',false) ) ,true,true);
+  TileScene := TCastleScene.Create(TileDisplay);
   TileScene.Load(TileRoot, true);
   TileDisplay.SceneManager.Items.Add(TileScene);
   TileDisplay.SceneManager.MainScene := TileScene;
@@ -334,7 +334,7 @@ begin
   {load tile map}
 
   FreeAndNil(TileM);
-  TileM := DTileMap.LoadForConstructor( ConstructorData(TilesFolder+Filename,false) );
+  TileM := DTileMap.LoadForConstructor( ConstructorData(TilesFolder+FileName,false) );
   if not TileM.Ready then TileM.GuessSize(TileScene);
 
   ResetCamera;
@@ -344,20 +344,20 @@ end;
 
 {---------------------------------------------------------------------------}
 
-procedure FixTextures(root: TX3DRootNode);
+procedure FixTextures(Root: TX3DRootNode);
 {maybe, a better name would be nice.
  attaches texture properties (anisotropic smoothing) to the texture of the object.
  TODO: Normal map still doesn't work. I should fix it one day...}
-  procedure ScanNodesRecoursive(source: TAbstractX3DGroupingNode);
+  procedure ScanNodesRecoursive(Source: TAbstractX3DGroupingNode);
   var i: integer;
       Tex: TImageTextureNode;
       s: string;
   begin
     for i := 0 to source.FdChildren.Count-1 do
-    if source.FdChildren[i] is TAbstractX3DGroupingNode then
-      ScanNodesRecoursive(TAbstractX3DGroupingNode(source.FdChildren[i]))
+    if Source.FdChildren[i] is TAbstractX3DGroupingNode then
+      ScanNodesRecoursive(TAbstractX3DGroupingNode(Source.FdChildren[i]))
     else
-      if (source.FdChildren[i] is TShapeNode) then
+      if (Source.FdChildren[i] is TShapeNode) then
         try
           Tex := (TShapeNode(source.FdChildren[i]).fdAppearance.Value.FindNode(TImageTextureNode,false) as TImageTextureNode);
           //blender only! Using only the first texture file link
@@ -390,7 +390,7 @@ begin
   FixTextures(TmpRoot);
   //todo: check for used/unused textures and delete/add them
   //save tile to game folder
-  Save3D(TmpRoot, ConstructorData(TilesFolder+Filename+'.x3d'+GZ_ext,true));
+  Save3D(TmpRoot, ConstructorData(TilesFolder+Filename+'.x3d'+gz_ext,true));
   FreeAndNil(TmpRoot);
 
   //compile tile map
@@ -444,7 +444,7 @@ begin
    end;
    for i := tfFree to high(TTileFace) do with FaceAtlas[i] do begin
     FriendlyName := 'free #'+IntToStr(i-1);
-    color := $990000*(High(FaceAtlas)-i) div (High(FaceAtlas))+$000099*i div (High(FaceAtlas))+$009900;
+    Color := $990000*(High(FaceAtlas)-i) div (High(FaceAtlas))+$000099*i div (High(FaceAtlas))+$009900;
    end;
 
    {make base}
@@ -471,7 +471,7 @@ begin
    end;
 
    MakeAtlasBoxes;
-  end;
+end;
 
 {-------------------------------------------------------------------------}
 
@@ -496,25 +496,25 @@ end;
 function TDungeonTilesEditor.FaceByIndex(Index: integer): TTileFace;
 var tf: TTileFace;
 begin
-  for tf in TTileFace do if FaceAtlasBox.Items[index] = FaceAtlas[tf].FriendlyName then begin
+  for tf in TTileFace do if FaceAtlasBox.Items[Index] = FaceAtlas[tf].FriendlyName then begin
     Result := tf;
     Exit;
   end;
   Result := tfNone;
-  dLog(LogConstructorError,Self,{$I %CURRENTROUTINE%},'ERROR: Face not found! For index '+ inttostr(index));
+  dLog(LogConstructorError,Self,{$I %CURRENTROUTINE%},'ERROR: Face not found! For index '+ IntToStr(Index));
 end;
 
 {-------------------------------------------------------------------------}
 
-function TDungeonTilesEditor.BaseByIndex(index: integer): TTileKind;
+function TDungeonTilesEditor.BaseByIndex(Index: integer): TTileKind;
 var tk: TTileKind;
 begin
-  for tk in TTileKind do if BaseAtlasBox.Items[index] = BaseAtlas[tk].FriendlyName then begin
+  for tk in TTileKind do if BaseAtlasBox.Items[Index] = BaseAtlas[tk].FriendlyName then begin
     Result := tk;
     Exit;
   end;
   Result := tkNone;
-  dLog(LogConstructorError,Self,{$I %CURRENTROUTINE%},'ERROR: Base not found! For index '+ inttostr(index));
+  dLog(LogConstructorError,Self,{$I %CURRENTROUTINE%},'ERROR: Base not found! For index '+ IntToStr(Index));
 end;
 
 {-------------------------------------------------------------------------}
@@ -522,7 +522,7 @@ end;
 procedure TDungeonTilesEditor.ZScrollChange(Sender: TObject);
 begin
   if CurrentZ<>ZScroll.Position then begin
-    currentZ := ZScroll.Position;
+    CurrentZ := ZScroll.Position;
     DrawTileMap
   end;
 end;
@@ -582,28 +582,28 @@ begin
          //draw floor/ceiling if selected
          if CeilingRadio.Checked then begin
            Brush.Style := bsCross;
-           Brush.Color := FaceAtlas[faces[aUp]].Color;
+           Brush.Color := FaceAtlas[Faces[aUp]].Color;
            FillRect(x3,y3,x4,y4);
          end else
          if FloorRadio.Checked then begin
            Brush.Style := bsDiagCross;
-           Brush.Color := FaceAtlas[faces[aDown]].Color;
+           Brush.Color := FaceAtlas[Faces[aDown]].Color;
            FillRect(x3,y3,x4,y4);
          end;
 
          //draw tile faces
          Brush.Style := bsSolid;
 
-         Brush.Color := FaceAtlas[faces[aTop]].Color;
+         Brush.Color := FaceAtlas[Faces[aTop]].Color;
          FillRect(x3,y1,x4,y3); //top
 
-         Brush.Color := FaceAtlas[faces[aLeft]].Color;
+         Brush.Color := FaceAtlas[Faces[aLeft]].Color;
          FillRect(x1,y3,x3,y4); //left
 
-         Brush.Color := FaceAtlas[faces[aBottom]].Color;
+         Brush.Color := FaceAtlas[Faces[aBottom]].Color;
          FillRect(x3,y4,x4,y2); //bottom
 
-         Brush.Color := FaceAtlas[faces[aRight]].Color;
+         Brush.Color := FaceAtlas[Faces[aRight]].Color;
          FillRect(x4,y3,x2,y4); //right
        end;
     end;
@@ -696,12 +696,12 @@ var ScaleX,ScaleY: float;
 begin
   //working with rectagonal grid only (for now, maybe forever :))
  if (isTileLoaded) and (TileM <> nil) then begin
-   currentZ := ZScroll.Position;  //fool's check
+   CurrentZ := ZScroll.Position;  //fool's check
 
    ScaleX := MapImage.Width/ TileM.SizeX;
    ScaleY := MapImage.Height/TileM.SizeY;
 
-   z1 := currentZ;
+   z1 := CurrentZ;
    x1 := Trunc(X / ScaleX);
    y1 := Trunc(Y / ScaleY);
 

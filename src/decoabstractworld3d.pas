@@ -199,7 +199,7 @@ end;
 
 {--------------------------------------------------------------------------}
 
-procedure DAppearVanishManagerThread.execute;
+procedure DAppearVanishManagerThread.Execute;
 begin
   ObjectsAppear.Clear;
   ObjectsVanish.Clear;
@@ -219,26 +219,26 @@ begin
 
   {
   repeat
-  {  if old[i].tile = new[i].tile then ;
+  {  if old[i].Tile = New[i].Tile then ;
     else}
-    if old[i].tile > new[j].tile then begin
+    if old[i].Tile > New[j].Tile then begin
       {there's a new tile to turn on}
-      tile[new[j]] := true
+      Tile[New[j]] := true
       inc(j);
     end else
-    if new[i].tile>old[j].tile then begin
+    if New[i].Tile>Old[j].Tile then begin
     {there's an old tile to turn off}
-      tile[old[i].tile] := false;
+      Tile[Old[i].Tile] := false;
       inc(i);
     end else begin
       {the tile exists in both new and old neighbours lists, change nothing and advance to the next tile}
       inc(i);
       inc(j);
     end;
-  until i>= old.count-1 and j>= new.count-1; {$warning check here}
+  until i>= Old.Count-1 and j>= New.Count-1; {$warning check here}
   {now we actually put the calculated arrays into current 3d world}
-  for i := 0 to group.count-1 do group[i] := false;
-  for i := 0 to new.count-1 do group...
+  for i := 0 to Group.Count-1 do Group[i] := false;
+  for i := 0 to New.Count-1 do Group...
   }
 end;
 
@@ -381,7 +381,7 @@ begin
     Switch := TSwitchNode.Create;
     Switch.FdChildren.add(WorldObjects[i]);
     Switch.WhichChoice := 0;
-    WorldSwitches.add(Switch);
+    WorldSwitches.Add(Switch);
   end;
 end;
 {$ENDIF}
@@ -395,7 +395,7 @@ begin
   for i := 0 to Groups.Count-1 do begin
     Root := TX3DRootNode.Create;
     for j := 0 to Groups[i].Count-1 do
-      Root.FdChildren.Add({$IFDEF UseSwitches}WorldSwitches[groups[i].Items[j]]{$ELSE}WorldObjects[groups[i].Items[j]]{$ENDIF});
+      Root.FdChildren.Add({$IFDEF UseSwitches}WorldSwitches[Groups[i].Items[j]]{$ELSE}WorldObjects[Groups[i].Items[j]]{$ENDIF});
     WorldRoots.Add(Root);
   end;
 end;

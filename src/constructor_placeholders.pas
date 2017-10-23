@@ -24,12 +24,10 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs,
-  constructor_global;
+  Constructor_Global;
 
 type
-
-  { TPlaceholdersEditor }
-
+  { Editor for placeholders in tiles/overworld }
   TPlaceholdersEditor = class(TWriterForm)
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -47,12 +45,6 @@ var
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 {$R *.lfm}
-
-{uses CastleVectors, CastleCameras, castleLog,
-     DOM, CastleXMLUtils,
-     decoLoad3d, x3dLoad, CastleURIUtils, blendercleaner,
-     castleFilesUtils,
-     decoglobal;}
 
 procedure TPlaceholdersEditor.LoadMe;
 begin

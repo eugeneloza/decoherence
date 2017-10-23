@@ -284,7 +284,8 @@ begin
   SetBaseSize(0,0,0.05,0.05);
 
   Font := DebugFont;
-  Text := 'X';
+
+  Text := 'X'; //initialize the label, so that it always has an image
 end;
 
 {---------------------------------------------------------------------------}

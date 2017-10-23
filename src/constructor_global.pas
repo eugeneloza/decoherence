@@ -76,21 +76,21 @@ var ConstructorLanguage: TLanguage;
 {analogue to castleFilesUtils.ApplicationData (and made based on it)
  but points to ARCHITECT directory (true) or ApplicationData (false)
  WARNING! This is a buggy procedure. No folder can be named "data" in the game files!!!}
-function ConstructorData(URL: string; ToGameFolder:boolean): string;
+function ConstructorData(const URL: string; const ToGameFolder: boolean): string;
 {Desktop-only ApplicationData analogue. Replacement for ApplicationData for
  native FPC functions that don't work with URLs
  The result is relative to application folder!}
-function FakeConstructorData(URL: string; ToGameFolder:boolean): string;
+function FakeConstructorData(const URL: string; const ToGameFolder: boolean): string;
 
 {searches a StringList for the specific element
  This is an inoptimal algorithm
  and MAYBE there is already a ready algorithm in strutils! I didn't look too well}
-function StringListContains(SL: TStringList; Search: string): boolean;
+function StringListContains(const SL: TStringList; const Search: string): boolean;
 
 {reads a specific file extensions from a specific path
  Creates a TStringList, don't forget to free manually
  !Android incompatible}
-function GetFilesList(Path,Ext: string): TStringList;
+function GetFilesList(const Path, Ext: string): TStringList;
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
@@ -99,19 +99,19 @@ uses CastleFilesUtils, StrUtils,
   DecoLog;
 
 {case-sensitive replace the last occurence of searchstring to replacestring}
-procedure ReplaceStringReverse(var s: string; const SearchString,ReplaceString: string);
+procedure ReplaceStringReverse(var s: string; const SearchString, ReplaceString: string);
 var i: integer;
 begin
   for i := Length(s)-Length(SearchString) downto 0 do
     if Copy(s,i,Length(SearchString)) = SearchString then begin
-      s := Copy(s,0,i-1) + ReplaceString + copy(s,i+Length(SearchString),Length(s));
+      s := Copy(s,0,i-1) + ReplaceString + Copy(s,i+Length(SearchString),Length(s));
       Break;
     end;
 end;
 
 {-----------------------------------------------------------------------------}
 
-function ConstructorData(URL: string; ToGameFolder:boolean): string;
+function ConstructorData(const URL: string; const ToGameFolder: boolean): string;
 begin
   Result := ApplicationData(URL);
   if not ToGameFolder then begin
@@ -125,7 +125,7 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-function FakeConstructorData(URL: string; ToGameFolder:boolean): string;
+function FakeConstructorData(const URL: string; const ToGameFolder: boolean): string;
 begin
   if ToGameFolder then
     Result := 'data/'+URL
@@ -136,7 +136,7 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-function StringListContains(SL: TStringList; Search: string): boolean;
+function StringListContains(const SL: TStringList; const Search: string): boolean;
 var s: string;
 begin
   Result := false;
@@ -152,7 +152,7 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-function GetFilesList(Path,Ext: string): TStringList;
+function GetFilesList(const Path, Ext: string): TStringList;
 var Rec: TSearchRec;
 begin
   Result := TStringList.Create;
@@ -192,7 +192,7 @@ begin
     LanguageSwitch.Visible := true;
     LanguageSwitch.Enabled := true;
     for L in TLanguage do
-      LanguageSwitch.Items.add(SayLanguage(L));
+      LanguageSwitch.Items.Add(SayLanguage(L));
     LanguageSwitch.ItemIndex := 0;
     LanguageSwitch.OnChange := @LanguageSelectChange;
   end else dLog(LogConstructorError,Self,{$I %CURRENTROUTINE%},'ERROR: LanguageSelect already exists.');
@@ -207,9 +207,9 @@ begin
   Result := MyLanguage <> ConstructorLanguage;
   if Result then begin
     MyLanguage := ConstructorLanguage;
-    if assigned(self.OnLanguageChange) then self.OnLanguageChange;
+    if Assigned(Self.OnLanguageChange) then Self.OnLanguageChange;
     For i := 0 to LanguageSwitch.Items.Count-1 do
-      if trim(LanguageSwitch.Items[i]) = SayLanguage(MyLanguage) then
+      if Trim(LanguageSwitch.Items[i]) = SayLanguage(MyLanguage) then
               LanguageSwitch.ItemIndex := i;
   end;
 end;
@@ -223,11 +223,11 @@ begin
   //not optimal
   NL := MyLanguage;
   For L in TLanguage do
-    if trim(LanguageSwitch.Items[LanguageSwitch.ItemIndex]) = SayLanguage(L) then
+    if Trim(LanguageSwitch.Items[LanguageSwitch.ItemIndex]) = SayLanguage(L) then
     NL := L;
   if NL <> MyLanguage then begin
     MyLanguage := NL;
-    if assigned(Self.OnLanguageChange) then Self.OnLanguageChange;
+    if Assigned(Self.OnLanguageChange) then Self.OnLanguageChange;
   end;
   //what should happen in case of no language found?
 end;

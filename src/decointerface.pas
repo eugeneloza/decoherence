@@ -328,6 +328,11 @@ begin
   //inherited Create;
   Owner := aOwner;
 
+  x1 := -1;
+  x2 := -1;
+  y1 := -1;
+  y2 := -1;
+
   AnchorToWindow := false;
   fInitialized := false;
   {this is redundant}
@@ -443,7 +448,6 @@ begin
     x1 := cx1 + Round(cw * fx1) + Anchor[asLeft].Gap;
     y1 := cy1 + Round(ch * fy1) + Anchor[asTop].Gap;
     if ScaleItem then begin
-      {$HINT this may leave x2,y2,w,h uninitialized}
       x2 := cx1 + Round(cw * fx2) - Anchor[asRight].Gap;
       y2 := cy1 + Round(ch * fy2) - Anchor[asBottom].Gap;
       w := x2 - x1;
@@ -463,7 +467,8 @@ begin
                     y2 := y1 + h;
                   end;
       end;
-    end else AdjustToRealSize;
+    end
+    else AdjustToRealSize; {sets x2,y2,w,h}
     fInitialized := true
   end
   else
@@ -1085,6 +1090,10 @@ begin
   {This procedure is basic, however, there's no need to move it "up" by inheritance level
    as it's called only for elements containing children}
   TrueSize := Self.GetSize;
+  dlog(LogInterfaceScaleHint,Self,'x1=',IntToStr(TrueSize.x1)+'/'+IntToStr(Base.x1));
+  dlog(LogInterfaceScaleHint,Self,'x2=',IntToStr(TrueSize.x2)+'/'+IntToStr(Base.x2));
+  dlog(LogInterfaceScaleHint,Self,'y1=',IntToStr(TrueSize.y1)+'/'+IntToStr(Base.y1));
+  dlog(LogInterfaceScaleHint,Self,'y2=',IntToStr(TrueSize.y2)+'/'+IntToStr(Base.y2));
 
   //call rescale only in case something has changed and if container size is "valid" (non-zero)
   if  (TrueSize.x2 <> TrueSize.x1) and (TrueSize.y2 <> TrueSize.y1) and
@@ -1093,10 +1102,6 @@ begin
   begin
     Base.SetIntCoord(TrueSize.x1,TrueSize.x2,TrueSize.y1,TrueSize.y2);
     dLog(LogInterfaceScaleHint,Self,{$I %CURRENTROUTINE%},'Backward-rescaling to Children.');
-    dlog(LogInterfaceScaleHint,Self,'x1=',IntToStr(TrueSize.x1));
-    dlog(LogInterfaceScaleHint,Self,'x2=',IntToStr(TrueSize.x2));
-    dlog(LogInterfaceScaleHint,Self,'y1=',IntToStr(TrueSize.y1));
-    dlog(LogInterfaceScaleHint,Self,'y2=',IntToStr(TrueSize.y2));
     //if Base.isInitialized then Rescale;
   end;
 end;

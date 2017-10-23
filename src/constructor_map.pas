@@ -124,27 +124,27 @@ function TMapEditor.GetMapParameters: DDungeonGeneratorParameters;
 var i: integer;
     fs: DFirstStep;
 begin
-  Result := DDungeonGeneratorParameters.create; //this creates tiles and first steps
+  Result := DDungeonGeneratorParameters.Create; //this creates tiles and first steps
   with Result do begin
-    MaxX := StrToInt(EditSizeX.text);
-    MaxY := StrToInt(EditSizeY.text);
-    MaxZ := StrToInt(EditSizeZ.text);
+    MaxX := StrToInt(EditSizeX.Text);
+    MaxY := StrToInt(EditSizeY.Text);
+    MaxZ := StrToInt(EditSizeZ.Text);
 
     Volume := round(MaxX*MaxY*MaxZ * strToFloat(VolumeEdit.Text)/100);
-    MaxFaces := StrToInt(EditMaxF.text);
-    MinFaces := StrToInt(EditMinF.text);
+    MaxFaces := StrToInt(EditMaxF.Text);
+    MinFaces := StrToInt(EditMinF.Text);
 
-    MinX := StrToInt(EditSizeX1.text);
-    MinY := StrToInt(EditSizeY1.text);
-    MinZ := StrToInt(EditSizeZ1.text);
+    MinX := StrToInt(EditSizeX1.Text);
+    MinY := StrToInt(EditSizeY1.Text);
+    MinZ := StrToInt(EditSizeZ1.Text);
 
     Seed := 0;
 
     AbsoluteURL := true;
     for i := 0 to TilesBox.Items.Count-1 do
-      if TilesBox.Checked[i] then TilesList.Add(ConstructorData(TilesFolder+TilesBox.Items[i],false));
+      if TilesBox.Checked[i] then TilesList.Add(ConstructorData(TilesFolder+TilesBox.Items[i], false));
 
-    fs.tile := 'library1_16_P';
+    fs.Tile := 'library1_16_P';
     fs.x := MaxX div 2;
     fs.y := MaxY div 2;
     fs.z := 0;
@@ -176,7 +176,7 @@ begin
 
   ZScroll.Min := 0;
   ZScroll.Position := 0;
-  ZScroll.Max := DungeonMap.SizeZ-1;
+  ZScroll.Max := DungeonMap.SizeZ - 1;
   DrawMap;
 
   GenerateButton.Enabled := true;
@@ -382,12 +382,12 @@ var GParam: DDungeonGeneratorParameters;
     i: integer;
     //flg: boolean;
 begin
-  if FileName='' then begin
+  if FileName = '' then begin
     FileName := MapSelector.Text;
-    if FileName='' then begin
+    if FileName = '' then begin
       ShowMessage('Please, specify a map name!');
       MapEditor.SetFocusedControl(MapSelector);
-      exit;
+      Exit;
     end;
     {for s in MapSelector.Items do if s=FileName then begin
       if MessageDlg('File exists',FileName+' exists, overwrite',mtConfirmation,[mbYes,mbNo],0) = mrNo then exit;
@@ -397,7 +397,7 @@ begin
     MapSelector.Items.Add(FileName);
     GParam := Self.GetMapParameters;
   end else begin
-    GParam := DDungeonGeneratorParameters.create;
+    GParam := DDungeonGeneratorParameters.Create;
     GParam.Load(ConstructorData(GetScenarioFolder+MapsFolder+FileName+'.xml',false));
   end;
 
@@ -465,7 +465,7 @@ begin
     SmallContainer.AttributeSet('x',GParam.FirstSteps.L[i].x);
     SmallContainer.AttributeSet('y',GParam.FirstSteps.L[i].y);
     SmallContainer.AttributeSet('z',GParam.FirstSteps.L[i].z);
-    TextNode := XMLdoc.CreateTextNode(UTF8decode(GParam.FirstSteps.L[i].tile));
+    TextNode := XMLdoc.CreateTextNode(UTF8decode(GParam.FirstSteps.L[i].Tile));
     SmallContainer.AppendChild(TextNode);
     LargeContainer.AppendChild(SmallContainer);
   end;
@@ -526,7 +526,7 @@ end;
 procedure TMapEditor.FillMapsList;
 var s: string;
 begin
-  MapSelector.clear;
+  MapSelector.Clear;
   for s in MapsList do
     MapSelector.Items.Add(s);
 end;
