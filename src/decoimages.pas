@@ -358,16 +358,13 @@ begin
   UnscaledHeight := ScaledImage.Height;
 
   {check if minimal frame size is larger than the requested frame size}
-  {$warning disabled}
   if Frame.CornerLeft+Frame.CornerRight+1 > Base.w then begin
     dLog(LogInterfaceScaleHint,Self,{$I %CURRENTROUTINE%},'Reset backwards base.w = '+IntToStr(Base.w)+' / cornerLeft+cornerRight = '+IntToStr(Frame.CornerLeft+Frame.CornerRight));
-    Base.w := Frame.CornerLeft+Frame.CornerRight+1;
-    //Base.BackwardSetSize(Base.w,-1);
+    Base.SetWidth(Frame.CornerLeft+Frame.CornerRight+1);
   end;
   if Frame.CornerTop+Frame.CornerBottom+1 > Base.h then begin
     dLog(LogInterfaceScaleHint,Self,{$I %CURRENTROUTINE%},'Reset backwards base.h = '+IntToStr(Base.h)+' / cornerTop+cornerBottom = '+inttostr(Frame.CornerTop+Frame.CornerBottom));
-    Base.h := Frame.CornerTop+Frame.CornerBottom+1;
-    //Base.BackwardSetSize(-1,Base.h);
+    Base.SetHeight(Frame.CornerTop+Frame.CornerBottom+1);
   end;
 
   SourceXs[0] := 0;
