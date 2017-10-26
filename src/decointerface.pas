@@ -126,6 +126,8 @@ type
     procedure SetIntCoord(const ax1,ay1,ax2,ay2: integer);
     procedure SetIntFull(const ax1,ay1,ax2,ay2: integer; const aOpacity: float);
     procedure SetIntSize(const ax1,ay1,aWidth,aHeight: integer);
+    procedure SetWidth(const aWidth: integer);
+    procedure SetHeight(const aHeight: integer);
     { Sets int width/height for scaling animations }
     procedure SetIntWidthHeight(const aWidth,aHeight: integer);
     { Resets width and height to their "real" values, e.g. for elements that are not scaled }
@@ -527,6 +529,18 @@ procedure DAbstractContainer.SetIntSize(const ax1,ay1,aWidth,aHeight: integer);
 begin
   SetIntCoord(ax1,ay1,ax1 + aWidth,ay1 + aHeight);
 end;
+
+procedure DAbstractContainer.SetWidth(const aWidth: integer);
+begin
+  {unoptimal and might be wrong}
+  SetIntSize(x1,y1,aWidth,h);
+end;
+procedure DAbstractContainer.SetHeight(const aHeight: integer);
+begin
+  {unoptimal and might be wrong}
+  SetIntSize(x1,y1,w,aHeight);
+end;
+
 
 {----------------------------------------------------------------------------}
 
