@@ -38,6 +38,23 @@ Type TAnimationStyle = (asNone, asDefault,
                         asFlyInBottom,asFlyOutBottom,
                         asFlyInLeft,asFlyOutLeft,
                         asFlyInRight,asFlyOutRight);
+
+{
+ PAY ATTENTION!
+   x1 = Left
+   x2 = Right
+   y1 = Bottom
+   y2 = Top
+
+   x2>x1 ; Width = x2 - x1;
+   y2>y1 ; Height = y2 - y1;
+
+   Left/right/bottom/top are how they are SEEN AT SCREEN
+   x1/x2/y1/y2 are how they are RENDERED by OPENGL
+
+   Anchor to Bottom means that Element is anchored to Bottom coordinate!
+}
+
 { Type of this Anchor }
 type TAnchorSide = (asLeft,asRight,asTop,asBottom);
 { Which part of Parent does this Anchor align to? }
@@ -383,16 +400,16 @@ begin
         haCenter: cx2 := (Anchor[asRight].Anchor.x1 + Anchor[asRight].Anchor.x2) div 2;
         else dLog(LogInterfaceError,Owner,{$I %CURRENTROUTINE%},'Invalid Anchor align!')
       end;
-      case Anchor[asTop].AlignTo of
-        vaBottom: cy1 := Anchor[asTop].Anchor.y1; {Pay attention, this is INVERT due to OpenGL}
-        vaTop:    cy1 := Anchor[asTop].Anchor.y2;
-        vaMiddle: cy1 := (Anchor[asTop].Anchor.y1 + Anchor[asTop].Anchor.y2) div 2;
+      case Anchor[asBottom].AlignTo of                {Pay attention, this is INVERT due to OpenGL}
+        vaBottom: cy1 := Anchor[asBottom].Anchor.y1;
+        vaTop:    cy1 := Anchor[asBottom].Anchor.y2;
+        vaMiddle: cy1 := (Anchor[asBottom].Anchor.y1 + Anchor[asBottom].Anchor.y2) div 2;
         else dLog(LogInterfaceError,Owner,{$I %CURRENTROUTINE%},'Invalid Anchor align!')
       end;
-      case Anchor[asBottom].AlignTo of
-        vaBottom: cy2 := Anchor[asBottom].Anchor.y1; {Pay attention, this is INVERT due to OpenGL}
-        vaTop:    cy2 := Anchor[asBottom].Anchor.y2;
-        vaMiddle: cy2 := (Anchor[asBottom].Anchor.y1 + Anchor[asBottom].Anchor.y2) div 2;
+      case Anchor[asTop].AlignTo of             {Pay attention, this is INVERT due to OpenGL}
+        vaBottom: cy2 := Anchor[asTop].Anchor.y1;
+        vaTop:    cy2 := Anchor[asTop].Anchor.y2;
+        vaMiddle: cy2 := (Anchor[asTop].Anchor.y1 + Anchor[asTop].Anchor.y2) div 2;
         else dLog(LogInterfaceError,Owner,{$I %CURRENTROUTINE%},'Invalid Anchor align!')
       end;
     end;  
@@ -418,8 +435,8 @@ begin
 
     fx1 := (x1 - cx1 - Anchor[asLeft  ].Gap)/cw;
     fx2 := (x2 - cx2 + Anchor[asRight ].Gap)/cw;
-    fy1 := (y1 - cy1 - Anchor[asTop   ].Gap)/ch;
-    fy2 := (y2 - cy2 + Anchor[asBottom].Gap)/ch;
+    fy1 := (y1 - cy1 - Anchor[asBottom].Gap)/ch;
+    fy2 := (y2 - cy2 + Anchor[asTop   ].Gap)/ch;
 
     fInitialized := true
   end
@@ -448,10 +465,10 @@ begin
     CurrentOpacity := BaseOpacity * co;
 
     x1 := cx1 + Round(cw * fx1) + Anchor[asLeft].Gap;
-    y1 := cy1 + Round(ch * fy1) + Anchor[asTop].Gap;
+    y1 := cy1 + Round(ch * fy1) + Anchor[asBottom].Gap;
     if ScaleItem then begin
       x2 := cx1 + Round(cw * fx2) - Anchor[asRight].Gap;
-      y2 := cy1 + Round(ch * fy2) - Anchor[asBottom].Gap;
+      y2 := cy1 + Round(ch * fy2) - Anchor[asTop].Gap;
       w := x2 - x1;
       h := y2 - y1;
       {inefficient}

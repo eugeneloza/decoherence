@@ -516,6 +516,9 @@ end;
 
 procedure DButton.SetEnabled(const Value: boolean);
 begin
+  {emm... Value isn't used here? Rename method to "toggleEnabled" or use Value?}
+  if Value = fisEnabled then Exit; //let's fix it this way for now.
+
   if fisEnabled then begin
     fisEnabled := false;
     Self.MouseLeave(nil,0,0); {and fade out in case enabled is set to false} //should go to "disabled" brightness
@@ -780,12 +783,12 @@ begin
   //Health.Base.Anchor[asTop].AlignTo := noAlign;
   PlayerBars.Base.AnchorTo(Self.Current);
   PlayerBars.SetBaseSize(0,0.1,1,0.8);
-  //PlayerBars.Base.AnchorTop(NickName.Current,vaBottom);
-  PlayerBars.Base.Anchor[asTop].Anchor := Health.Current;
+  PlayerBars.Base.AnchorTop(NickName.Current,vaBottom);
+  PlayerBars.Base.AnchorBottom(Health.Current,vaTop);
+  {PlayerBars.Base.Anchor[asTop].Anchor := Health.Current;
   PlayerBars.Base.Anchor[asTop].AlignTo := vaBottom;
-  //PlayerBars.Base.AnchorBottom(Health.Current,vaTop);
   PlayerBars.Base.Anchor[asBottom].Anchor := NickName.Current;
-  PlayerBars.Base.Anchor[asBottom].AlignTo := vaTop;
+  PlayerBars.Base.Anchor[asBottom].AlignTo := vaTop;}
 
   //rescale;
 
