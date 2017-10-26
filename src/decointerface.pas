@@ -382,14 +382,14 @@ begin
         else dLog(LogInterfaceError,Owner,{$I %CURRENTROUTINE%},'Invalid Anchor align!')
       end;
       case Anchor[asTop].AlignTo of
-        vaTop:    cy1 := Anchor[asTop].Anchor.y1;
-        vaBottom: cy1 := Anchor[asTop].Anchor.y2;
+        vaBottom: cy1 := Anchor[asTop].Anchor.y1; {Pay attention, this is INVERT due to OpenGL}
+        vaTop:    cy1 := Anchor[asTop].Anchor.y2;
         vaMiddle: cy1 := (Anchor[asTop].Anchor.y1 + Anchor[asTop].Anchor.y2) div 2;
         else dLog(LogInterfaceError,Owner,{$I %CURRENTROUTINE%},'Invalid Anchor align!')
       end;
       case Anchor[asBottom].AlignTo of
-        vaTop:    cy2 := Anchor[asBottom].Anchor.y1;
-        vaBottom: cy2 := Anchor[asBottom].Anchor.y2;
+        vaBottom: cy2 := Anchor[asBottom].Anchor.y1; {Pay attention, this is INVERT due to OpenGL}
+        vaTop:    cy2 := Anchor[asBottom].Anchor.y2;
         vaMiddle: cy2 := (Anchor[asBottom].Anchor.y1 + Anchor[asBottom].Anchor.y2) div 2;
         else dLog(LogInterfaceError,Owner,{$I %CURRENTROUTINE%},'Invalid Anchor align!')
       end;
@@ -402,7 +402,7 @@ begin
 
   cw := cx2-cx1;
   ch := cy2-cy1;
-  if (cw>0) and (ch>0) then cValid := true else cValid := false;
+  if (cw > 0) and (ch > 0) then cValid := true else cValid := false;
 end;
 
 {----------------------------------------------------------------------------}
