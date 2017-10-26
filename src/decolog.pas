@@ -86,7 +86,7 @@ procedure InitLog;
 procedure dLog(const LogLevel: boolean; const aObj: TObject; const aPrefix, aMessage: string);
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-uses CastleLog,
+uses CastleLog, SysUtils,
   DecoTime;
 
 procedure dLog(const LogLevel: boolean; const aObj: TObject; const aPrefix, aMessage: string);
@@ -117,9 +117,10 @@ begin
   {$ENDIF}
   //BacktraceOnLog := true;
   {this is basic information, so just output directly}
-  WriteLnLog('(i)','Compillation Date: ' + {$I %DATE%} + ' Time: ' + {$I %TIME%});
+  WriteLnLog('(i) Compillation Date',{$I %DATE%} + ' Time: ' + {$I %TIME%});
   WriteLnLog('(i) FullScreen mode',{$IFDEF Fullscreen}'ON'{$ELSE}'OFF'{$ENDIF});
   WriteLnLog('(i) Allow rescale',{$IFDEF AllowRescale}'ON'{$ELSE}'OFF'{$ENDIF});
+  WriteLnLog('(i) Pointer is',IntToStr(SizeOf(Pointer)*8)+' bit');
 end;
 
 end.

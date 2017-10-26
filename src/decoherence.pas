@@ -241,7 +241,7 @@ Initialization
   Application.OnInitialize  :=  @ApplicationInitialize;
 
 Finalization
-  dLog(LogInit,nil,{$I %CURRENTROUTINE%},'Going down...');
+  dLog(LogInit,nil,'Finalization','Going down...');
   { free all assigned memory }
   FreeAndNil(GUI);
 
@@ -254,6 +254,6 @@ Finalization
   FreeCreatures;
   FreeInterface;
   //FreeTextureProperties;
-  dLog(LogInit,nil,{$I %CURRENTROUTINE%},'Bye...');
+  dLog(LogInit,nil,'Finalization','Bye...');
 end.
 
