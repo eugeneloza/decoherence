@@ -1070,10 +1070,10 @@ begin
   //scan children
   for c in Self.Children do begin
     tmp := c.GetSize;
-    if tx1 < tmp.x1 then tx1 := tmp.x1;
-    if tx2 > tmp.x2 then tx2 := tmp.x2;
-    if ty1 < tmp.y1 then ty1 := tmp.y1;
-    if ty2 > tmp.y2 then ty2 := tmp.y2;
+    if tx1 > tmp.x1 then tx1 := tmp.x1;
+    if tx2 < tmp.x2 then tx2 := tmp.x2;
+    if ty1 > tmp.y1 then ty1 := tmp.y1;
+    if ty2 < tmp.y2 then ty2 := tmp.y2;
   end;
 
   Result.x1 := tx1;
