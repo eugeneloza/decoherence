@@ -66,7 +66,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 {$IFNDEF Android}{$IFNDEF Fullscreen}{$DEFINE AllowRescale}{$ENDIF}{$ENDIF}
 
 { Undefine rescale to save memory. Temporary. }
-{$UNDEF AllowRescale}
+//{$UNDEF AllowRescale}
 
 {======================= EXPERIMENTAL ======================================}
 

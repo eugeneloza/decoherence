@@ -117,7 +117,7 @@ type
     { Float size of the Container }
     fx1,fy1,fx2,fy2{,fw,fh}: float;
     { Real size of the Container }
-    x1,y1,x2,y2,w,h: integer;
+    x1,y1,x2,y2: integer;
     { Base value of the opacity of the container }
     BaseOpacity: float;
     { Opacity of the container multiplied by Anchor's opacity }
@@ -128,6 +128,13 @@ type
     ScaleItem: boolean;
     { Should this Container scale proportionaly? }
     ProportionalScale: TProportionalScale;
+
+    procedure SetWidth(const aWidth: integer);
+    procedure SetHeight(const aHeight: integer);
+    function GetWidth: integer;
+    function GetHeight: integer;
+    property w: integer read GetWidth write SetWidth;
+    property h: integer read GetHeight write SetHeight;
     { If this Container ready to be used? }
     property isInitialized: boolean read fInitialized;
     constructor Create(aOwner: DObject); //virtual;
@@ -143,8 +150,7 @@ type
     procedure SetIntCoord(const ax1,ay1,ax2,ay2: integer);
     procedure SetIntFull(const ax1,ay1,ax2,ay2: integer; const aOpacity: float);
     procedure SetIntSize(const ax1,ay1,aWidth,aHeight: integer);
-    procedure SetWidth(const aWidth: integer);
-    procedure SetHeight(const aHeight: integer);
+
     { Sets int width/height for scaling animations }
     procedure SetIntWidthHeight(const aWidth,aHeight: integer);
     { Resets width and height to their "real" values, e.g. for elements that are not scaled }
@@ -450,8 +456,6 @@ procedure DAbstractContainer.AdjustToRealSize;{$IFDEF SUPPORTS_INLINE}inline;{$E
 begin
   x2 := x1 + RealWidth;
   y2 := y1 + RealHeight;
-  w := RealWidth;
-  h := RealHeight;
 end;
 
 {----------------------------------------------------------------------------}
@@ -469,21 +473,17 @@ begin
     if ScaleItem then begin
       x2 := cx1 + Round(cw * fx2) - Anchor[asRight].Gap;
       y2 := cy1 + Round(ch * fy2) - Anchor[asTop].Gap;
-      w := x2 - x1;
-      h := y2 - y1;
       {inefficient}
       case ProportionalScale of
         psWidth:  begin
                     if RealHeight = 0 then Exit;
                     Ratio := RealWidth/RealHeight;
-                    w := Round(h*Ratio);
-                    x2 := x1 + w;
+                    x2 := x1 + Round(h*Ratio);
                   end;
         psHeight: begin
                     if RealWidth = 0 then Exit;
                     Ratio := RealHeight/RealWidth;
-                    h := Round(w*Ratio);
-                    y2 := y1 + h;
+                    y2 := y1 + Round(w*Ratio);
                   end;
       end;
     end
@@ -531,8 +531,6 @@ begin
   if ScaleItem then begin
     x2 := ax2;
     y2 := ay2;
-    w := x2 - x1;
-    h := y2 - y1;
   end else AdjustToRealSize;
 
   IntegerToFloat;
@@ -550,14 +548,24 @@ end;
 procedure DAbstractContainer.SetWidth(const aWidth: integer);
 begin
   {unoptimal and might be wrong}
-  SetIntSize(x1,y1,aWidth,h);
+  SetIntCoord(x1,y1,x1+aWidth,y2);
 end;
 procedure DAbstractContainer.SetHeight(const aHeight: integer);
 begin
   {unoptimal and might be wrong}
-  SetIntSize(x1,y1,w,aHeight);
+  SetIntCoord(x1,y1,x2,y1+aHeight);
 end;
 
+{----------------------------------------------------------------------------}
+
+function DAbstractContainer.GetWidth: integer;
+begin
+  Result := x2-x1;
+end;
+function DAbstractContainer.GetHeight: integer;
+begin
+  Result := y2-y1;
+end;
 
 {----------------------------------------------------------------------------}
 
@@ -652,14 +660,10 @@ begin
   Self.fy1 := Source.fy1;
   Self.fx2 := Source.fx2;
   Self.fy2 := Source.fy2;
-  {Self.fw := Source.fw;
-  Self.fh := Source.fh;}
   Self.x1 := Source.x1;
   Self.y1 := Source.y1;
   Self.x2 := Source.x2;
   Self.y2 := Source.y2;
-  Self.w := Source.w;
-  Self.h := Source.h;
   Self.ScaleItem := Source.ScaleItem;
   Self.RealWidth := Source.RealWidth;
   Self.RealHeight := Source.RealHeight;
@@ -679,14 +683,10 @@ begin
   Dest.fy1 := Self.fy1;
   Dest.fx2 := Self.fx2;
   Dest.fy2 := Self.fy2;
-  {Dest.fw := Self.fw;
-  Dest.fh := Self.fh;}
   Dest.x1 := Self.x1;
   Dest.y1 := Self.y1;
   Dest.x2 := Self.x2;
   Dest.y2 := Self.y2;
-  Dest.w := Self.w;
-  Dest.h := Self.h;
   Dest.ScaleItem := Self.ScaleItem;
   Dest.RealWidth := Self.RealWidth;
   Dest.RealHeight := Self.RealHeight;
@@ -1164,28 +1164,6 @@ procedure DInterfaceElement.Clear;
 begin
   Children.Clear;
 end;
-
-{----------------------------------------------------------------------------}
-
-{procedure DInterfaceElement.RescaleToChildren(const Animate: TAnimationStyle);
-var i: integer;
-    x1,y1,x2,y2: integer;
-begin
-  if Children.Count>0 then begin
-    x1 := Window.Width;
-    y1 := Window.Height;
-    x2 := 0;
-    y2 := 0;
-    for i := 1 to Children.Count-1 do begin
-      if x1>Children[i].Base.x1 then x1 := Children[i].Base.x1;
-      if y1>Children[i].Base.y1 then y1 := Children[i].Base.y1;
-      if x2>Children[i].Base.x2 then x2 := Children[i].Base.x2;
-      if y2>Children[i].Base.y2 then y2 := Children[i].Base.y2;
-    end;
-    Self.SetIntSize(x1,y1,x2,y2,Animate);
-  end
-  else dLog('DInterfaceElement.RescaleToChildren','No children for resale to');
-end;}
 
 {-----------------------------------------------------------------------}
 

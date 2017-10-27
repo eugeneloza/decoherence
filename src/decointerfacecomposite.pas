@@ -785,21 +785,10 @@ begin
   PlayerBars.SetBaseSize(0,0.1,1,0.8);
   PlayerBars.Base.AnchorTop(NickName.Current,vaBottom);
   PlayerBars.Base.AnchorBottom(Health.Current,vaTop);
-  {PlayerBars.Base.Anchor[asTop].Anchor := Health.Current;
-  PlayerBars.Base.Anchor[asTop].AlignTo := vaBottom;
-  PlayerBars.Base.Anchor[asBottom].Anchor := NickName.Current;
-  PlayerBars.Base.Anchor[asBottom].AlignTo := vaTop;}
-
-  //rescale;
 
   {********** INTERFACE DESIGN BY Saito00 ******************}
 
-  {const LabelSpace = 23/800;
-
-  NickName.  setbasesize(0, cnt_y+cnt_h-labelspace , 1, labelspace);
-  PlayerBars.setbasesize(0, cnt_y+labelspace       , 1, cnt_h-2*labelspace);
-  NumHealth. setbasesize(0, cnt_y                  , 1, labelspace);
-  }
+  {const LabelSpace = 23/800;}
 end;
 
 {=============================================================================}
