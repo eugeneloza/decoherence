@@ -27,6 +27,7 @@ uses
   DecoGlobal, DecoTime, DecoThread;
 
 const DefaultAnimationDuration = 0.3; {in seconds}
+const UninitializedIntCoord = -999;
 
 { Animation style of the object. asDefault means "animate from previous state",
   presuming that there was some "previous state"}
@@ -89,6 +90,8 @@ type
     procedure IntegerToFloat;
     { Resets x2,y2,w,h to fit RealWidth,RealHeight This suggest use of only Left anchor! }
     procedure AdjustToRealSize;{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+
+    function GetInitialized: boolean;
   public
     { Converts float size to integer.
       should be public only for animation states. }
@@ -136,7 +139,7 @@ type
     property w: integer read GetWidth write SetWidth;
     property h: integer read GetHeight write SetHeight;
     { If this Container ready to be used? }
-    property isInitialized: boolean read fInitialized;
+    property isInitialized: boolean read GetInitialized;
     constructor Create(aOwner: DObject); //virtual;
     //destructor Destroy; override;
     { Copy parameters from the Source }
@@ -321,8 +324,6 @@ Type
     procedure Grab(const Child: DSingleInterfaceElement);
     { removes and frees all children }
     procedure Clear;
-    {}
-    {procedure RescaleToChildren(animate: TAnimationStyle);  }
   public
     {returns last (cached) call to MouseOverTree result, may be invalid!}
     isMouseOverTree: boolean;
@@ -353,10 +354,10 @@ begin
   //inherited Create;
   Owner := aOwner;
 
-  x1 := -1;
-  x2 := -1;
-  y1 := -1;
-  y2 := -1;
+  x1 := UninitializedIntCoord;
+  x2 := UninitializedIntCoord;
+  y1 := UninitializedIntCoord;
+  y2 := UninitializedIntCoord;
 
   AnchorToWindow := false;
   fInitialized := false;
@@ -456,6 +457,7 @@ procedure DAbstractContainer.AdjustToRealSize;{$IFDEF SUPPORTS_INLINE}inline;{$E
 begin
   x2 := x1 + RealWidth;
   y2 := y1 + RealHeight;
+  fInitialized := true;
 end;
 
 {----------------------------------------------------------------------------}
@@ -715,6 +717,20 @@ begin
     Result := true
   else
     Result := false;
+end;
+
+{----------------------------------------------------------------------------}
+
+function DAbstractContainer.GetInitialized: boolean;
+begin
+  if fInitialized then begin
+    {check if the x1,x2,y1,y2 are initialized / the wrong place to }
+    if (x1 = UninitializedIntCoord) or
+       (y1 = UninitializedIntCoord) or
+       (x2 = UninitializedIntCoord) or
+       (y2 = UninitializedIntCoord) then fInitialized := false;
+  end;
+  Result := fInitialized;
 end;
 
 {============================================================================}
@@ -1082,7 +1098,8 @@ var i: integer;
 begin
   inherited Rescale;
   for i := 0 to Children.Count-1 do Children[i].Rescale;
-  RescaleToChildren;
+  //if this container is "fine" then get children's content and try to rescale
+  if Base.isInitialized then RescaleToChildren;
 end;
 
 {-----------------------------------------------------------------------------}
