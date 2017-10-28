@@ -91,7 +91,7 @@ type
   end;
 
 type
-  DFrameAnchorHelper = class helper for DAbstractContainer
+  DFrameAnchorHelper = class helper for DAbstractElement
   public
     { Anchor this element to a DFrameImage and set all Gaps correctly }
     procedure AnchorToFrame(const aFrame: DFrameImage);
@@ -418,18 +418,18 @@ begin
     Log(LogInterfaceError,{$I %CURRENTROUTINE%},'ERROR: Frame is nil!');
     Exit;
   end;
-  AnchorTo(aFrame.Current);
+  Base.AnchorTo(aFrame.Current);
   if aFrame.Frame <> nil then begin
-    Anchor[asLeft].Gap := aFrame.Frame.CornerLeft;
-    Anchor[asRight].Gap := aFrame.Frame.CornerRight;
-    Anchor[asTop].Gap := aFrame.Frame.CornerTop;
-    Anchor[asBottom].Gap := aFrame.Frame.CornerBottom;
+    Base.Anchor[asLeft].Gap := aFrame.Frame.CornerLeft;
+    Base.Anchor[asRight].Gap := aFrame.Frame.CornerRight;
+    Base.Anchor[asTop].Gap := aFrame.Frame.CornerTop;
+    Base.Anchor[asBottom].Gap := aFrame.Frame.CornerBottom;
   end else begin
     Log(LogInterfaceError,{$I %CURRENTROUTINE%},'ERROR: Frame image is nil! Assuming zero gaps');
-    Anchor[asLeft].Gap := 0;
-    Anchor[asRight].Gap := 0;
-    Anchor[asTop].Gap := 0;
-    Anchor[asBottom].Gap := 0;
+    Base.Anchor[asLeft].Gap := 0;
+    Base.Anchor[asRight].Gap := 0;
+    Base.Anchor[asTop].Gap := 0;
+    Base.Anchor[asBottom].Gap := 0;
    end;
 end;
 

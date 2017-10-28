@@ -88,6 +88,7 @@ begin
   if fProgress>1 then fProgress := 1;
 end;
 
+{------------------------------------------------------------------------------}
 
 procedure DThread.Log(const LogLevel: boolean; const aProcedure, aMessage: string);
 begin

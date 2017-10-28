@@ -442,7 +442,7 @@ end;
 procedure DFramedElement.ArrangeChildren;
 begin
   //inherited ArrangeChildren;
-  fFrame.Base.AnchorTo(Self.Current);
+  fFrame.AnchorTo(Self);
   fFrame.SetBaseSize(0,0,1,1);
 end;
 
@@ -462,7 +462,7 @@ end;
 procedure DFramedImage.ArrangeChildren;
 begin
   inherited ArrangeChildren;
-  Image.Base.AnchorToFrame(fFrame);
+  Image.AnchorToFrame(fFrame);
   Image.SetBaseSize(0,0,1,1);
 end;
 
@@ -532,9 +532,9 @@ end;
 procedure DButton.ArrangeChildren;
 begin
   inherited ArrangeChildren;
-  Image_out.Base.AnchorToFrame(fFrame);
+  Image_out.AnchorToFrame(fFrame);
   Image_out.SetBaseSize(0,0,1,1);
-  Image_over.Base.AnchorToFrame(fFrame);
+  Image_over.AnchorToFrame(fFrame);
   Image_over.SetBaseSize(0,0,1,1);
 end;
 
@@ -552,7 +552,7 @@ end;
 procedure DTextButton.ArrangeChildren;
 begin
   inherited ArrangeChildren;
-  fLabel.Base.AnchorToFrame(fFrame);
+  fLabel.AnchorToFrame(fFrame);
   fLabel.SetBaseSize(0,0,1,1);
   //fLabel.Base.Anchor[...] := acCenter;
 end;
@@ -591,7 +591,7 @@ end;
 procedure DHealthLabel.ArrangeChildren;
 begin
   inherited ArrangeChildren;
-  fLabel.Base.AnchorToFrame(fFrame);
+  fLabel.AnchorToFrame(fFrame);
   fLabel.SetBaseSize(0,0,1,1);
 end;
 
@@ -624,7 +624,7 @@ end;
 procedure DNameLabel.ArrangeChildren;
 begin
   inherited ArrangeChildren;
-  fLabel.Base.AnchorToFrame(fFrame);
+  fLabel.AnchorToFrame(fFrame);
   fLabel.SetBaseSize(0,0,1,1);
 end;
 
@@ -665,7 +665,7 @@ end;
 procedure DFramedBar.ArrangeChildren;
 begin
   inherited ArrangeChildren;
-  fBar.Base.AnchorToFrame(fFrame);
+  fBar.AnchorToFrame(fFrame);
   fBar.SetBaseSize(0,0,1,1);
 end;
 
@@ -707,10 +707,10 @@ var ScaleX: float;
 begin
   inherited ArrangeChildren;
 
-  HP_bar. Base.AnchorToFrame(fFrame);
-  STA_bar.Base.AnchorToFrame(fFrame);
-  CNC_bar.Base.AnchorToFrame(fFrame);
-  MPH_bar.Base.AnchorToFrame(fFrame);
+  HP_bar. AnchorToFrame(fFrame);
+  STA_bar.AnchorToFrame(fFrame);
+  CNC_bar.AnchorToFrame(fFrame);
+  MPH_bar.AnchorToFrame(fFrame);
 
   if (fTarget <> nil) and (fTarget.MaxMaxMPH > 0) then begin
     ScaleX := 1/4;
@@ -775,10 +775,10 @@ procedure DPlayerBarsFull.ArrangeChildren;
 begin
   //inherited ArrangeChildren;
 
-  NickName.Base.AnchorTo(Self.Current); //AnchorToFrame(fFrame);
+  NickName.AnchorTo(Self); //AnchorToFrame(fFrame);
   NickName.SetBaseSize(0,0.9,1,0.1);
   //NickName.Base.Anchor[asBottom].AlignTo := noAlign;
-  Health.Base.AnchorTo(Self.Current);
+  Health.AnchorTo(Self);
   Health.SetBaseSize(0,0,1,0.1);
   //Health.Base.Anchor[asTop].AlignTo := noAlign;
   PlayerBars.Base.AnchorTo(Self.Current);

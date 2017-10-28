@@ -226,6 +226,8 @@ Type
       Important: GetAnimationState must be called before setting basesize
       of the element as AnimateTo uses currentAnimationState}
     procedure AnimateTo(const Animate: TAnimationStyle; const Duration: float = DefaultAnimationDuration);
+    procedure AnchorTo(const aElement: DAbstractElement);
+  public
     constructor Create; override;
     destructor Destroy; override;
   end;
@@ -851,6 +853,13 @@ begin
   Base.SetFloatSizeFull(NewX,NewY,NewW,NewH,NewO);
   AnimateTo(Animate);
   Rescale;
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DAbstractElement.AnchorTo(const aElement: DAbstractElement);
+begin
+  Base.AnchorTo(aElement.Current);
 end;
 
 {----------------------------------------------------------------------------}
