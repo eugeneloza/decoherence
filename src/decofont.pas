@@ -98,7 +98,7 @@ var FullCharSet: TUnicodeCharList;
     NumCharSet: TUnicodeCharList;
 {$ENDIF}
 begin
-  dLog(LogInitInterface,nil,{$I %CURRENTROUTINE%},'Init started');
+  fLog(LogInitInterface,{$I %CURRENTROUTINE%},'Init started');
    {$IFDEF Android}
    RegularFont16 := DFont.Create(TextureFont_LinBiolinumRG_16);
    RegularFont12 := RegularFont16; {!!!! TODO}
@@ -121,7 +121,7 @@ begin
    FreeAndNil(FullCharSet);
    FreeAndNil(NumCharSet);
    {$ENDIF}
-   dLog(LogInitInterface,nil,{$I %CURRENTROUTINE%},'Fonts loaded successfully.');
+   fLog(LogInitInterface,{$I %CURRENTROUTINE%},'Fonts loaded successfully.');
 
    SetFonts;
 end;

@@ -395,7 +395,7 @@ begin
       toDir := Direction
     else
       toDir := Vector3(0,1,0);
-    dLog(LogActorError,Self,{$I %CURRENTROUTINE%},'ERROR: Direction is zero!');
+    Log(LogActorError,{$I %CURRENTROUTINE%},'ERROR: Direction is zero!');
   end;
 end;
 
@@ -865,7 +865,7 @@ end;
 procedure DActor.PerformAction(const doAction: DMultiPerk);
 begin
   if fTarget = nil then begin
-    dLog(LogActorError,Self,{$I %CURRENTROUTINE%},'ERROR: Action was requested but no target specified...');
+    Log(LogActorError,{$I %CURRENTROUTINE%},'ERROR: Action was requested but no target specified...');
     Exit;
   end;
 
@@ -873,7 +873,7 @@ begin
     Self.Animation(atAttack);
     Self.RequestSoftPause;
     DBasicActor(fTarget).Hit(10,1);
-  end else dLog(LogActorError,Self,{$I %CURRENTROUTINE%},'ERROR: Trying to preform action on invalid actor...');
+  end else Log(LogActorError,{$I %CURRENTROUTINE%},'ERROR: Trying to preform action on invalid actor...');
 end;
 
 {-----------------------------------------------------------------------------}
@@ -883,7 +883,7 @@ begin
   if fTarget<>nil then
     LookAt(Target.Position)
   else
-    dLog(LogActorError,Self,{$I %CURRENTROUTINE%},'Warning: trying to look at a nil target...');
+    Log(LogActorError,{$I %CURRENTROUTINE%},'Warning: trying to look at a nil target...');
 end;
 procedure DActor.LookAt(const aPosition: TVector3);
 begin

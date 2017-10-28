@@ -45,7 +45,7 @@ var Nav: TKambiNavigationInfoNode;
 
 procedure InitNavigation;
 begin
-  dLog(LogInitPlayer,nil,{$I %CURRENTROUTINE%},'Initialize navigation');
+  fLog(LogInitPlayer,{$I %CURRENTROUTINE%},'Initialize navigation');
   Camera := TWalkCamera.Create(Window);
   {z-up orientation}
   Camera.Gravity := false;

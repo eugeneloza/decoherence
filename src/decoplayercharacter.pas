@@ -191,7 +191,7 @@ begin
     NewMember.DrainMPH(DRND.Random(80),1);
     NewMember.DrainSTA(DRND.Random(80),1);
 
-    if (Perks = nil) or (Perks.Count = 0) then dLog(logInit,Self,{$I %CURRENTROUTINE%},'FATAL ERROR: Perks is empty!');
+    if (Perks = nil) or (Perks.Count = 0) then Log(logInit,{$I %CURRENTROUTINE%},'FATAL ERROR: Perks is empty!');
     NewMember.Actions.Add(Perks[0]);
 
     Character.Add(NewMember);
@@ -223,7 +223,7 @@ begin
   doMove1; doMove2;
   if Camera = nil then begin
     Exit;// InitNavigation;
-    dLog(LogNavigationError,Self,{$I %CURRENTROUTINE%},'Camera is Nil!');
+    Log(LogNavigationError,{$I %CURRENTROUTINE%},'Camera is Nil!');
   end;
 
   Camera.Position := CameraMan.Position;
@@ -368,7 +368,7 @@ end;
 
 Procedure DPlayerCharacter.Die;
 begin
-  dLog(LogTemp,Self,{$I %CURRENTROUTINE%},'Character has entered clinical death state');
+  Log(LogTemp,{$I %CURRENTROUTINE%},'Character has entered clinical death state');
 end;
 
 {----------------------------------------------------------------------------}

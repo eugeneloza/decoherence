@@ -97,7 +97,7 @@ begin
       if AddKey then begin
         if TestRecord then begin
           if (RecordedKeys = test1) or (RecordedKeys = test2) then begin
-            dLog(LogVerbose,nil,{$I %CURRENTROUTINE%},'No! This is a different game!');
+            fLog(LogVerbose,{$I %CURRENTROUTINE%},'No! This is a different game!');
             RecordKeys := false;
           end
         end else
@@ -155,7 +155,7 @@ begin
   if not Dragging then begin
     tmpLink := GUI.IfMouseOver(Round(Event.Position[0]),Round(Event.Position[1]),true,true);
     if tmpLink <> nil then
-      dLog(logVerbose,nil,{$I %CURRENTROUTINE%},'Motion caught '+tmpLink.ClassName);
+      fLog(logVerbose,{$I %CURRENTROUTINE%},'Motion caught '+tmpLink.ClassName);
   end;
 end;
 
@@ -202,7 +202,7 @@ begin
     Repeat
       if TouchArray[i].FingerIndex = FingerIndex then Found := true else inc(i);
     until (i>TouchArray.Count-1) or Found;
-    dLog(LogMouseInfo,nil,{$I %CURRENTROUTINE%},'Caught mouse release finger='+IntToStr(FingerIndex)+' n='+IntToStr(i));
+    fLog(LogMouseInfo,{$I %CURRENTROUTINE%},'Caught mouse release finger='+IntToStr(FingerIndex)+' n='+IntToStr(i));
     if Found then begin
       if (TouchArray[i].ClickElement <> nil) then begin
         if Assigned(touchArray[i].ClickElement.OnMouseRelease) then
@@ -212,9 +212,9 @@ begin
       end;
       TouchArray.Remove(TouchArray[i]);
     end else
-      dLog(LogMouseError,nil,{$I %CURRENTROUTINE%},'ERROR: Touch event not found!');
+      fLog(LogMouseError,{$I %CURRENTROUTINE%},'ERROR: Touch event not found!');
  end else
-   dLog(LogMouseError,nil,{$I %CURRENTROUTINE%},'ERROR: Touch event list is empty!');
+   fLog(LogMouseError,{$I %CURRENTROUTINE%},'ERROR: Touch event list is empty!');
 
 end;
 
@@ -238,7 +238,7 @@ begin
   end;
 
   TouchArray.Add(NewEventTouch);
-  dLog(LogMouseInfo,nil,{$I %CURRENTROUTINE%},'Caught mouse press finger='+IntToStr(FingerIndex));
+  fLog(LogMouseInfo,{$I %CURRENTROUTINE%},'Caught mouse press finger='+IntToStr(FingerIndex));
 
   {todo: if interface didn't catch the click then}
   if CurrentGameMode = gmTravel then
@@ -255,7 +255,7 @@ begin
     Cursor := mcDefault;}
   if Camera = nil then begin
     if CameraWarning then begin
-      dLog(LogMouseSoftError,nil,{$I %CURRENTROUTINE%},'Warning: Camera is not initialized for MouseLook');
+      fLog(LogMouseSoftError,{$I %CURRENTROUTINE%},'Warning: Camera is not initialized for MouseLook');
       CameraWarning := false;
     end;
     Exit;

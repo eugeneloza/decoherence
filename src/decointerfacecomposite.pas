@@ -861,7 +861,7 @@ begin
   if fTarget <> Value then begin
     fTarget := value;
     //DStaticImage(content).FreeImage;
-    dLog(LogInitInterface,Self,{$I %CURRENTROUTINE%},'Load from portrait');
+    Log(LogInitInterface,{$I %CURRENTROUTINE%},'Load from portrait');
     //DStaticImage(content).Load(Portrait_img[drnd.Random(Length(Portrait_img))]);  //todo
     fTarget.onHit := @Self.doHit;
     RearrangeChildren;

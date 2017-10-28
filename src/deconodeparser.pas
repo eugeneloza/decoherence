@@ -62,7 +62,7 @@ begin
     Result :=0
   else begin
     Val(v, Result, e);
-    if e<>0 then dLog(LogParserError,nil,{$I %CURRENTROUTINE%},'Invalid integer: '+v);
+    if e<>0 then fLog(LogParserError,{$I %CURRENTROUTINE%},'Invalid integer: '+v);
   end;
 end;
 
@@ -145,7 +145,7 @@ var NameLength: integer; //for optimization
           Result := Result + s;
       until Finish or (j >= NameLength);
       if s <> PlaceHolderEndMarker then begin
-        dLog(LogParserError,Node,{$I %CURRENTROUTINE%},'ERROR: Could not find end of the placeholder: '+Node.X3DName);
+        fLog(LogParserError,Node.ClassName+'>'+{$I %CURRENTROUTINE%},'ERROR: Could not find end of the placeholder: '+Node.X3DName);
         //result := '';
       end;
     end;

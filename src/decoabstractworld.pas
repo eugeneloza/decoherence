@@ -29,7 +29,7 @@ uses CastleRandom, CastleVectors,
 Type
   {The most abstract World implementation.
    Used as external interface for the World}
-  DAbstractWorld = class
+  DAbstractWorld = class(DObject)
   private
     { Average and Min distance between nav points
       Warning, this might go very,very wrong if 2 nav poinst are too close }
@@ -123,7 +123,7 @@ uses SysUtils, Classes,
 constructor DAbstractWorld.Create;
 begin
   inherited Create;
-  dLog(LogWorldInit,Self,{$I %CURRENTROUTINE%},'Creating the World');
+  Log(LogWorldInit,{$I %CURRENTROUTINE%},'Creating the World');
   {we create an non-initialized random (i.e. initialized by a stupid constant integer)
   Just to make sure we don't waste any time (<1ms) on initialization now}
   RNDM := TCastleRandom.Create(1);
@@ -135,7 +135,7 @@ end;
 
 destructor DAbstractWorld.Destroy;
 begin
-  dLog(LogWorldInit,Self,{$I %CURRENTROUTINE%},'Freeing the World');
+  Log(LogWorldInit,{$I %CURRENTROUTINE%},'Freeing the World');
   FreeAndNil(RNDM);
   FreeAndNil(Nav);
   FreeAndNil(Weenies);
@@ -154,7 +154,7 @@ end;
 
 Procedure DAbstractWorld.Activate;
 begin
-  dLog(LogWorldInit,Self,{$I %CURRENTROUTINE%},'Activating the World.');
+  Log(LogWorldInit,{$I %CURRENTROUTINE%},'Activating the World.');
   if (CurrentWorld<>nil) and (CurrentWorld<>Self) then
     raise Exception.Create('ERROR: Free and nil the previous World before activating this one!');
   LastRender := -1;
@@ -167,7 +167,7 @@ Procedure DAbstractWorld.Render;
 begin
   {this is an abstract routine,
   it must be overridden by DRenderedWorld}
-  dLog(LogWorldError,Self,{$I %CURRENTROUTINE%},'Warning: This shouldn''t happen in normal situation, it''s abstract');
+  Log(LogWorldError,{$I %CURRENTROUTINE%},'Warning: This shouldn''t happen in normal situation, it''s abstract');
 end;
 
 {------------------------------------------------------------------------------}
@@ -251,7 +251,7 @@ begin
   if Generator = nil then raise Exception.Create('DAbstractWorld.Load: Generator is nil!');
   fSeed := drnd.Random32bit; //maybe other algorithm?
   if Nav<>nil then begin
-    dLog(LogWorldInitSoftError,Self,{$I %CURRENTROUTINE%},'WARNING: Nav is not nil! Freeing...');
+    Log(LogWorldInitSoftError,{$I %CURRENTROUTINE%},'WARNING: Nav is not nil! Freeing...');
     FreeAndNil(Nav);
   end;
   Nav := Generator.ExportNav;
@@ -263,7 +263,7 @@ end;
 
 procedure DAbstractWorld.Load(URL: string);
 begin
-  if not URLValid(URL) then dLog(LogWorldInit,nil,{$I %CURRENTROUTINE%},'World is not nil, freeing');
+  if not URLValid(URL) then fLog(LogWorldInit,{$I %CURRENTROUTINE%},'World is not nil, freeing');
   {$hint dummy}
   //load seed and Nav
 end;
@@ -272,7 +272,7 @@ end;
 
 procedure FreeWorld;
 begin
-  if CurrentWorld<>nil then dLog(LogWorldInit,nil,{$I %CURRENTROUTINE%},'World is not nil, freeing');
+  if CurrentWorld<>nil then fLog(LogWorldInit,{$I %CURRENTROUTINE%},'World is not nil, freeing');
   FreeAndNil(CurrentWorld);
 end;
 

@@ -116,7 +116,7 @@ end;
 procedure TMainForm.WriteMe(ToGameFolder: boolean);
 var WF: TWriterForm;
 begin
-  dLog(LogConstructorInfo,Self,{$I %CURRENTROUTINE%},'Started.');
+  Log(LogConstructorInfo,{$I %CURRENTROUTINE%},'Started.');
   if AllForms = nil then MakeFormsList; //not optimal...
 
   for WF in AllForms do
@@ -130,7 +130,7 @@ begin
       if not WF.isLoaded then WF.LoadMe;
       WF.WriteMe(ToGameFolder);
     end;
-  dLog(LogConstructorInfo,Self,{$I %CURRENTROUTINE%},'Finished.');
+  Log(LogConstructorInfo,{$I %CURRENTROUTINE%},'Finished.');
 end;
 
 {-----------------------------------------------------------------------------}

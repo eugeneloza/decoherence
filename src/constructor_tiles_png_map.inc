@@ -32,7 +32,7 @@ var PNG_Tileset, PNG_Up, PNG_Down, PNG_UpDown, PNG_Map: TRGBAlphaImage;
 
 begin
  if (not isTileLoaded) or (TileM = nil) then begin
-   dLog(LogConstructorError,Self,'TDungeonTilesEditor.MakePNGMap','No tile loaded. Aborting');
+   Log(LogConstructorError,'TDungeonTilesEditor.MakePNGMap','No tile loaded. Aborting');
    Exit;
  end;
 

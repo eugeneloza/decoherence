@@ -34,7 +34,12 @@ const NEnemies = 0.05; {must be <1 / temporary quantity of enemies in % of NavPo
 type Float = single;
      pFloat = ^Float;
 
-type DObject = class(TObject)
+type
+  {}
+  DObject = class(TObject)
+    {
+      we aren't using DecoLog directly, but relying on it to initialize the log }
+    procedure Log(const LogLevel: boolean; const aProcedure, aMessage: string);
   end;
 
 { folders constants relative to ApplicationData path
@@ -101,8 +106,13 @@ function dEqual(const a,b: float): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$END
 function URLValid(aURL: string): boolean;
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-uses SysUtils;
+uses SysUtils, DecoLog, CastleLog;
 
+procedure DObject.Log(const LogLevel: boolean; const aProcedure, aMessage: string);
+begin
+  if not doLog then Exit;
+  if LogLevel then WriteLnLog(Self.ClassName+'.'+aProcedure,aMessage)
+end;
 {---------------------------------------------------------------------------}
 
 function GetRandomSeed: LongWord;

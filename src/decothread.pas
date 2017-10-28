@@ -48,7 +48,7 @@ type
 type
   {a thread which reports its current state and progress
    should be hold in actual state by calling UpdateProgress from the Execute}
-  TAbstractThread = class(TThread)
+  DThread = class(TThread)
   protected
     {current progress in 0..1}
     fProgress: float;
@@ -63,6 +63,8 @@ type
      this is caused by progress most often used in procedures, making several tries to solve the taks
      to reset progress, use fprogress}
     procedure UpdateProgress(const currentJobValue: string; const ProgressValue: float);
+    { an exact copy of DObject.Log }
+    procedure Log(const LogLevel: boolean; const aProcedure, aMessage: string);
   public
     {current progress of the thread}
     property Progress: float read fProgress;
@@ -76,14 +78,21 @@ type
 function Minimum(v1,v2: float): float; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-uses SysUtils;
+uses SysUtils, DecoLog, CastleLog;
 
-procedure TAbstractThread.UpdateProgress(const CurrentJobValue: string; const ProgressValue: float);
+procedure DThread.UpdateProgress(const CurrentJobValue: string; const ProgressValue: float);
 begin
   fCurrentJob := CurrentJobValue;
   if fProgress < ProgressValue/fMult then
     fProgress := ProgressValue/fMult;
   if fProgress>1 then fProgress := 1;
+end;
+
+
+procedure DThread.Log(const LogLevel: boolean; const aProcedure, aMessage: string);
+begin
+  if not doLog then Exit;
+  if LogLevel then WriteLnLog(Self.ClassName+'.'+aProcedure,aMessage)
 end;
 
 {------------------------------------------------------------------------------}

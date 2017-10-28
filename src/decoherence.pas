@@ -158,7 +158,7 @@ begin
 end;
 
 type
-  DLoadGameThread = class(TAbstractThread)
+  DLoadGameThread = class(DThread)
   protected
     procedure Execute; override;
   end;
@@ -173,13 +173,13 @@ end;
 procedure ApplicationInitialize;
 begin
   InitLog;
-  dLog(LogInit,nil,{$I %CURRENTROUTINE%},'Init');
+  fLog(LogInit,{$I %CURRENTROUTINE%},'Init');
 
   //Application.LimitFPS := 60;
 
   //create GUI
-  dLog(LogInit,nil,{$I %CURRENTROUTINE%},'Create interface');
-  //dLog(true,nil,BackTraceStrFunc(Get_Frame),'');
+  fLog(LogInit,{$I %CURRENTROUTINE%},'Create interface');
+  //fLog(true,BackTraceStrFunc(Get_Frame),'');
   InitInterface;
   InitLoadScreen;
   GUI := DInterfaceContainer.Create;
@@ -187,13 +187,13 @@ begin
 
   GUI.LoadScreen;
 
-  dLog(LogInit,nil,{$I %CURRENTROUTINE%},'Initialize interface');
+  fLog(LogInit,{$I %CURRENTROUTINE%},'Initialize interface');
 
   //finally we're ready to show game loading screen
   {$IFDEF AllowRescale}Window.onResize := @GuiResize;{$ENDIF}
   Window.onRender := @GuiRender;
 
-  dLog(LogInit,nil,{$I %CURRENTROUTINE%},'Init finished');
+  fLog(LogInit,{$I %CURRENTROUTINE%},'Init finished');
 
   LoadThread := DLoadGameThread.Create(true);
   {$WARNING BUUUUUUUUUUUUUUUUUG!!!!!}
@@ -241,7 +241,7 @@ Initialization
   Application.OnInitialize  :=  @ApplicationInitialize;
 
 Finalization
-  dLog(LogInit,nil,'Finalization','Going down...');
+  fLog(LogInit,'Finalization','Going down...');
   { free all assigned memory }
   FreeAndNil(GUI);
 
@@ -254,6 +254,6 @@ Finalization
   FreeCreatures;
   FreeInterface;
   //FreeTextureProperties;
-  dLog(LogInit,nil,'Finalization','Bye...');
+  fLog(LogInit,'Finalization','Bye...');
 end.
 

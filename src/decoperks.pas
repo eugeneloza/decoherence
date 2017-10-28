@@ -130,7 +130,7 @@ end;
 procedure InitPerks;
 var TmpPerk: DPerk;
 begin
-  dLog(LogInitCharacters,nil,{$I %CURRENTROUTINE%},'Loading perks...');
+  fLog(LogInitCharacters,{$I %CURRENTROUTINE%},'Loading perks...');
   Perks := DPerksList.create(true);
   TmpPerk := DPerk.create;
   //TmpPerk.image.LoadThread(PerksFolder+'crossed-swords.png');
@@ -141,7 +141,7 @@ end;
 
 procedure FreePerks;
 begin
-  dLog(LogInitCharacters,nil,{$I %CURRENTROUTINE%},'Freeing perks...');
+  fLog(LogInitCharacters,{$I %CURRENTROUTINE%},'Freeing perks...');
   FreeAndNil(Perks);
 end;
 

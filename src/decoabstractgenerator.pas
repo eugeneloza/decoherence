@@ -63,7 +63,7 @@ type
 type
   {Most abstract generation routine to parent all the generation algorithms
    Required for abstract calls to different implementation of generators}
-  DAbstractGenerator = class(TAbstractThread)
+  DAbstractGenerator = class(DThread)
   protected
     fisWorking: boolean;
     fisInitialized: boolean;

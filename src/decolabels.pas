@@ -182,7 +182,7 @@ begin
     Base.ScaleItem := true;
     Base.FloatToInteger;
     Base.ScaleItem := tmpflg;
-    dLog(LogLabelError,Self,{$I %CURRENTROUTINE%},'Warning! Label width is not initialized! Trying to w='+IntToStr(Base.w));
+    Log(LogLabelError,{$I %CURRENTROUTINE%},'Warning! Label width is not initialized! Trying to w='+IntToStr(Base.w));
   end;
 
   FreeAndNil(BrokenString);
@@ -221,7 +221,7 @@ begin
           InitGLPending := true;
         end
         else
-          dLog(LogLabelError,Self,{$I %CURRENTROUTINE%},'ERROR: Base.Initialized = false');
+          Log(LogLabelError,{$I %CURRENTROUTINE%},'ERROR: Base.Initialized = false');
   end;
 end;
 

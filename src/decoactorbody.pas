@@ -130,7 +130,7 @@ begin
     atAttack: Result := aeIdle;
     atHurt:   Result := aeIdle;
     atDie:    Result := aeStop;
-    else dLog(LogAnimationError,nil,{$I %CURRENTROUTINE%},'ERROR: Unknown animation '+AnimationToString(at));
+    else fLog(LogAnimationError,{$I %CURRENTROUTINE%},'ERROR: Unknown animation '+AnimationToString(at));
   end;
 end;
 function AnimationEnd(at: string): TAnimationEnd;
@@ -152,7 +152,7 @@ begin
     atAttack: Result := 'attack';
     atHurt:   Result := 'hurt';
     atDie:    Result := 'die';
-    else dLog(LogAnimationError,nil,{$I %CURRENTROUTINE%},'ERROR: Unknown animation '+AnimationToString(at));
+    else fLog(LogAnimationError,{$I %CURRENTROUTINE%},'ERROR: Unknown animation '+AnimationToString(at));
   end;
 end;
 
@@ -274,7 +274,7 @@ end;
 procedure FreeCreatures;
 begin
   //tmpKnightCreature.Animations.clear;
-  dLog(LogInitData,nil,{$I %CURRENTROUTINE%},'Freeing creature resources...');
+  fLog(LogInitData,{$I %CURRENTROUTINE%},'Freeing creature resources...');
   //FreeAndNil(tmpKnightCreature);
 end;
 

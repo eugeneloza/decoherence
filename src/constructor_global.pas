@@ -38,6 +38,9 @@ type
   private
     fisLoaded: boolean;
     fisChanged: boolean;
+  strict protected
+    { an exact copy of DObject.Log }
+    procedure Log(const LogLevel: boolean; const aProcedure, aMessage: string);
   public
     {if the TWriterForm instance is loaded from the Architect?}
     property isLoaded: boolean read fisLoaded write fisLoaded default false;
@@ -96,7 +99,7 @@ function GetFilesList(const Path, Ext: string): TStringList;
 implementation
 
 uses CastleFilesUtils, StrUtils,
-  DecoLog;
+  DecoLog, CastleLog;
 
 {case-sensitive replace the last occurence of searchstring to replacestring}
 procedure ReplaceStringReverse(var s: string; const SearchString, ReplaceString: string);
@@ -141,7 +144,7 @@ var s: string;
 begin
   Result := false;
   if SL = nil then begin
-    dLog(LogConstructorError,nil,{$I %CURRENTROUTINE%},'ERROR: String List is nil!');
+    fLog(LogConstructorError,{$I %CURRENTROUTINE%},'ERROR: String List is nil!');
     Exit;
   end;
   for s in SL do if s = Search then begin
@@ -174,6 +177,14 @@ begin
   if not ToGameFolder then isChanged := false;
 end;
 
+{---------------------------------------------------------------------------}
+
+procedure TWriterForm.Log(const LogLevel: boolean; const aProcedure, aMessage: string);
+begin
+  if not doLog then Exit;
+  if LogLevel then WriteLnLog(Self.ClassName+'.'+aProcedure,aMessage)
+end;
+
 {============================================================================}
 
 Procedure TLanguageForm.MakeLanguageSwitch;
@@ -195,7 +206,7 @@ begin
       LanguageSwitch.Items.Add(SayLanguage(L));
     LanguageSwitch.ItemIndex := 0;
     LanguageSwitch.OnChange := @LanguageSelectChange;
-  end else dLog(LogConstructorError,Self,{$I %CURRENTROUTINE%},'ERROR: LanguageSelect already exists.');
+  end else Log(LogConstructorError,{$I %CURRENTROUTINE%},'ERROR: LanguageSelect already exists.');
   ResetLanguageSwitch;
 end;
 

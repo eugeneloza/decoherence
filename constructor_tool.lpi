@@ -194,6 +194,7 @@
       <Unit14>
         <Filename Value="src/decoglobal.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoGlobal"/>
       </Unit14>
       <Unit15>
         <Filename Value="src/decoload3d.pas"/>

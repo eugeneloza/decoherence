@@ -83,21 +83,28 @@ procedure InitLog;
 { Writes a log string
   should be used like dLog(1, Self,{$I %CURRENTROUTINE%},message)
   Self = nil inside a procedure }
-procedure dLog(const LogLevel: boolean; const aObj: TObject; const aPrefix, aMessage: string);
+procedure fLog(const LogLevel: boolean; const aPrefix, aMessage: string);
+//procedure fLog(const LogLevel: boolean; const aObj: TObject; const aPrefix, aMessage: string);
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 uses CastleLog, SysUtils,
   DecoTime;
 
-procedure dLog(const LogLevel: boolean; const aObj: TObject; const aPrefix, aMessage: string);
+procedure fLog(const LogLevel: boolean; const aPrefix, aMessage: string);
+begin
+  if not doLog then Exit;
+  if LogLevel then WriteLnLog(aPrefix,aMessage);
+end;
+
+{procedure fLog(const LogLevel: boolean; const aObj: TObject; const aPrefix, aMessage: string);
 var objName: string;
 begin
   if not doLog then Exit;
   if LogLevel then begin
-    if aObj<>nil then objName := aObj.ClassName+'.' else objName := '';
+    if aObj<>nil then objName := aObj.ClassName+'.' else objName := 'nil.';
     WriteLnLog(objName+aPrefix,aMessage)
-  end;  
-end;
+  end;
+end;}
 
 {---------------------------------------------------------------------------}
 

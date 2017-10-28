@@ -478,7 +478,7 @@ begin
     f := ConstructorData(GetScenarioFolder+MapsFolder+FileName+'.xml',ToGameFolder);
   URLWriteXML(XMLdoc, f);
 
-  dLog(LogConstructorInfo,Self,{$I %CURRENTROUTINE%},'File Written: '+f);
+  Log(LogConstructorInfo,{$I %CURRENTROUTINE%},'File Written: '+f);
 
   FreeAndNil(XMLdoc);
   FreeAndNil(GParam);
@@ -498,7 +498,7 @@ procedure TMapEditor.ReadMapsList;
 begin
   FreeAndNil(MapsList);
   MapsList := GetFilesList(GetScenarioFolder+MapsFolder,'xml');
-  dLog(LogConstructorInfo,Self,{$I %CURRENTROUTINE%},'Maps found = '+IntToStr(MapsList.Count));
+  Log(LogConstructorInfo,{$I %CURRENTROUTINE%},'Maps found = '+IntToStr(MapsList.Count));
 end;
 
 {------------------------------------------------------------------------------}
@@ -507,7 +507,7 @@ procedure TMapEditor.ReadTilesList;
 begin
   FreeAndNil(TilesList);
   TilesList := GetFilesList(TilesFolder,'map');
-  dLog(LogConstructorInfo,Self,{$I %CURRENTROUTINE%},'Tiles found = '+IntToStr(TilesList.Count));
+  Log(LogConstructorInfo,{$I %CURRENTROUTINE%},'Tiles found = '+IntToStr(TilesList.Count));
 end;
 
 {------------------------------------------------------------------------}

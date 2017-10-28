@@ -392,32 +392,32 @@ begin
        (Anchor[asTop].Anchor = nil) or
        (Anchor[asRight].Anchor = nil) or
        (Anchor[asBottom].Anchor = nil) then begin
-         dLog(LogInterfaceError,Owner,{$I %CURRENTROUTINE%},'Anchor is Nil!');
+         fLog(LogInterfaceError,Owner.ClassName+'>'+{$I %CURRENTROUTINE%},'Anchor is Nil!');
          GetWindowAnchor;
     end else begin
       case Anchor[asLeft].AlignTo of
         haLeft:   cx1 := Anchor[asLeft].Anchor.x1;
         haRight:  cx1 := Anchor[asLeft].Anchor.x2;
         haCenter: cx1 := (Anchor[asLeft].Anchor.x1 + Anchor[asLeft].Anchor.x2) div 2;
-        else dLog(LogInterfaceError,Owner,{$I %CURRENTROUTINE%},'Invalid Anchor align!')
+        else fLog(LogInterfaceError,Owner.ClassName+'>'+{$I %CURRENTROUTINE%},'Invalid Anchor align!')
       end;
       case Anchor[asRight].AlignTo of
         haLeft:   cx2 := Anchor[asRight].Anchor.x1;
         haRight:  cx2 := Anchor[asRight].Anchor.x2;
         haCenter: cx2 := (Anchor[asRight].Anchor.x1 + Anchor[asRight].Anchor.x2) div 2;
-        else dLog(LogInterfaceError,Owner,{$I %CURRENTROUTINE%},'Invalid Anchor align!')
+        else fLog(LogInterfaceError,Owner.ClassName+'>'+{$I %CURRENTROUTINE%},'Invalid Anchor align!')
       end;
       case Anchor[asBottom].AlignTo of                {Pay attention, this is INVERT due to OpenGL}
         vaBottom: cy1 := Anchor[asBottom].Anchor.y1;
         vaTop:    cy1 := Anchor[asBottom].Anchor.y2;
         vaMiddle: cy1 := (Anchor[asBottom].Anchor.y1 + Anchor[asBottom].Anchor.y2) div 2;
-        else dLog(LogInterfaceError,Owner,{$I %CURRENTROUTINE%},'Invalid Anchor align!')
+        else fLog(LogInterfaceError,Owner.ClassName+'>'+{$I %CURRENTROUTINE%},'Invalid Anchor align!')
       end;
       case Anchor[asTop].AlignTo of             {Pay attention, this is INVERT due to OpenGL}
         vaBottom: cy2 := Anchor[asTop].Anchor.y1;
         vaTop:    cy2 := Anchor[asTop].Anchor.y2;
         vaMiddle: cy2 := (Anchor[asTop].Anchor.y1 + Anchor[asTop].Anchor.y2) div 2;
-        else dLog(LogInterfaceError,Owner,{$I %CURRENTROUTINE%},'Invalid Anchor align!')
+        else fLog(LogInterfaceError,Owner.ClassName+'>'+{$I %CURRENTROUTINE%},'Invalid Anchor align!')
       end;
     end;  
   end;
@@ -743,7 +743,7 @@ begin
   Base.FloatToInteger;
 
   if not Base.isInitialized then
-    dLog(LogInterfaceInfo,Self,{$I %CURRENTROUTINE%},'Base is uninitialized in Rescale');
+    Log(LogInterfaceInfo,{$I %CURRENTROUTINE%},'Base is uninitialized in Rescale');
 
   {Rescale Last and Next if they're initialized or just copy Base to avoid bugs}
   if Last.isInitialized then
@@ -889,7 +889,7 @@ begin
     end;
  end else begin
    Current.Assign(Base); {just fall back to an uninitialized copy}
-   dLog(LogInterfaceInfo,Self,{$I %CURRENTROUTINE%},'Base is uninitialized, falling back to Current=Base');
+   Log(LogInterfaceInfo,{$I %CURRENTROUTINE%},'Base is uninitialized, falling back to Current=Base');
  end;
 end;
 
@@ -1138,10 +1138,10 @@ begin
   {This procedure is basic, however, there's no need to move it "up" by inheritance level
    as it's called only for elements containing children}
   TrueSize := Self.GetSize;
-  dlog(LogInterfaceScaleHint,Self,'x1=',IntToStr(TrueSize.x1)+'/'+IntToStr(Base.x1));
-  dlog(LogInterfaceScaleHint,Self,'x2=',IntToStr(TrueSize.x2)+'/'+IntToStr(Base.x2));
-  dlog(LogInterfaceScaleHint,Self,'y1=',IntToStr(TrueSize.y1)+'/'+IntToStr(Base.y1));
-  dlog(LogInterfaceScaleHint,Self,'y2=',IntToStr(TrueSize.y2)+'/'+IntToStr(Base.y2));
+  log(LogInterfaceScaleHint,'x1=',IntToStr(TrueSize.x1)+'/'+IntToStr(Base.x1));
+  log(LogInterfaceScaleHint,'x2=',IntToStr(TrueSize.x2)+'/'+IntToStr(Base.x2));
+  log(LogInterfaceScaleHint,'y1=',IntToStr(TrueSize.y1)+'/'+IntToStr(Base.y1));
+  log(LogInterfaceScaleHint,'y2=',IntToStr(TrueSize.y2)+'/'+IntToStr(Base.y2));
 
   //call rescale only in case something has changed and if container size is "valid" (non-zero)
   if  (TrueSize.x2 <> TrueSize.x1) and (TrueSize.y2 <> TrueSize.y1) and
@@ -1149,7 +1149,7 @@ begin
       (TrueSize.y1 <> Self.Base.y1) or (TrueSize.y2 <> Self.Base.y2)) then
   begin
     Base.SetIntCoord(TrueSize.x1,TrueSize.x2,TrueSize.y1,TrueSize.y2);
-    dLog(LogInterfaceScaleHint,Self,{$I %CURRENTROUTINE%},'Backward-rescaling to Children.');
+    Log(LogInterfaceScaleHint,{$I %CURRENTROUTINE%},'Backward-rescaling to Children.');
     //if Base.isInitialized then Rescale;
   end;
 end;

@@ -8,7 +8,7 @@ object DungeonTilesEditor: TDungeonTilesEditor
   ClientWidth = 737
   OnDestroy = FormDestroy
   OnShow = FormShow
-  LCLVersion = '1.8.0.3'
+  LCLVersion = '1.9.0.0'
   object TileDisplay: TCastleControl
     Left = 6
     Height = 476

@@ -9,7 +9,7 @@ object MainForm: TMainForm
   OnClose = FormClose
   OnCreate = FormCreate
   OnDestroy = FormDestroy
-  LCLVersion = '1.8.0.3'
+  LCLVersion = '1.9.0.0'
   object FactsEditorButton: TButton
     Left = 208
     Height = 25
