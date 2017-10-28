@@ -426,21 +426,21 @@ var jx,jy,jz: integer;
 begin
   for jx := 0 to SizeX-1 do
     for jy := 0 to SizeY-1 do
-      for jz := 0 to SizeZ-1 do with Map[jx,jy,jz] do begin
+      for jz := 0 to SizeZ-1 do begin
         if InitToFree then begin
-          Base := tkFree;
-          for a in TAngle do Faces[a] := tfFree;
+          Map[jx,jy,jz].Base := tkFree;
+          for a in TAngle do Map[jx,jy,jz].Faces[a] := tfFree;
         end else begin
-          Base := tkNone;
-          for a in TAngle do Faces[a] := tfNone;
+          Map[jx,jy,jz].Base := tkNone;
+          for a in TAngle do Map[jx,jy,jz].Faces[a] := tfNone;
         end;
         {if this tile is at border then make corresponding walls around it}
-        if jx = 0       then Faces[aLeft]   := tfWall;
-        if jy = 0       then Faces[aTop]    := tfWall;
-        if jx = SizeX-1 then Faces[aRight]  := tfWall;
-        if jy = SizeY-1 then Faces[aBottom] := tfWall;
-        if jz = 0       then Faces[aUp]     := tfWall;
-        if jz = SizeZ-1 then Faces[aDown]   := tfWall;
+        if jx = 0       then Map[jx,jy,jz].Faces[aLeft]   := tfWall;
+        if jy = 0       then Map[jx,jy,jz].Faces[aTop]    := tfWall;
+        if jx = SizeX-1 then Map[jx,jy,jz].Faces[aRight]  := tfWall;
+        if jy = SizeY-1 then Map[jx,jy,jz].Faces[aBottom] := tfWall;
+        if jz = 0       then Map[jx,jy,jz].Faces[aUp]     := tfWall;
+        if jz = SizeZ-1 then Map[jx,jy,jz].Faces[aDown]   := tfWall;
       end
 end;
 

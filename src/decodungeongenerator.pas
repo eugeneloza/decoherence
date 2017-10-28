@@ -919,12 +919,12 @@ var i: integer;
     ix,iy,iz: TIntCoordinate;
 begin
   TileIndexMap := ZeroIntegerMap(Map.SizeX,Map.SizeY,Map.SizeZ);
-  for i := 0 to MaxSteps-1 do with Tiles[Gen[i].Tile] do
-    if not Blocker then // we don't count blockers here, they are not normal tiles :) We'll have to add them later
-    for ix := 0 to SizeX-1 do
-      for iy := 0 to SizeY-1 do
-        for iz := 0 to SizeZ-1 do
-          if Map[ix,iy,iz].Base <> tkNone then
+  for i := 0 to MaxSteps-1 do
+    if not Tiles[Gen[i].Tile].Blocker then // we don't count blockers here, they are not normal tiles :) We'll have to add them later
+    for ix := 0 to Tiles[Gen[i].Tile].SizeX-1 do
+      for iy := 0 to Tiles[Gen[i].Tile].SizeY-1 do
+        for iz := 0 to Tiles[Gen[i].Tile].SizeZ-1 do
+          if Tiles[Gen[i].Tile].Map[ix,iy,iz].Base <> tkNone then
             TileIndexMap[ix+Gen[i].x,iy+Gen[i].y,iz+Gen[i].z] := i;
 end;
 

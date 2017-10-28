@@ -842,12 +842,11 @@ begin
   if not Blocker then
     {this is a normal tile}
     EmptyMap(true)
-  else
+  else begin
     {this is a blocker tile}
-    with Map[0,0,0] do begin
-      Base := tkNone;
-      for a in TAngle do Faces[a] := tfNone;
-    end;
+    Map[0,0,0].Base := tkNone;
+    for a in TAngle do Map[0,0,0].Faces[a] := tfNone;
+  end;
 end;
 
 {-----------------------------------------------------------------------}

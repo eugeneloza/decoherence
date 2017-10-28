@@ -86,8 +86,6 @@ type
     const Friction = 40;
     { Rotation fade ratio. ~radians per second, rather hard to explain :) adds some inertion to camera, the higher this value the faster is rotation}
     const AngularFriction = 40;
-    { Mouse sensivity }
-    const MouseSensivity = 1/1800;
   private
     { Updates game camera with CameraMan coordinates }
     procedure UpdateCamera;
@@ -129,6 +127,9 @@ type
   {Container for all player parties
      together with basic mouse/touch/keyboard input handle}
   DPlayerControl = class(DObject)
+  public
+    { Mouse sensivity }
+    const MouseSensivity = 1/1800;
   public
     {A list of player's parties (should contain at least 1 record)}
     Parties: DPartyList;
@@ -439,23 +440,23 @@ procedure DPlayerControl.InputMouse(Delta: TVector2);
 var TraverseAxis: TVector3;
     UpVector,ForwardVector: TVector3;
 begin
-  with CurrentParty do begin
+  begin
     {based on CastleCameras implementation}
     UpVector := Vector3(0,0,1);
     ForwardVector := Vector3(1,0,0);
     {rotate horizontal}
-    CameraMan.Phi += -Delta[0]*MouseSensivity;
-    if CameraMan.Phi> Pi then CameraMan.Phi -= 2*Pi else
-    if CameraMan.Phi<-Pi then CameraMan.Phi += 2*Pi;
-    CameraMan.Theta += Delta[1]*MouseSensivity;
-    if CameraMan.Theta> Pi/3 then CameraMan.Theta :=  Pi/3 else
-    if CameraMan.Theta<-Pi/3 then CameraMan.Theta := -Pi/3;
+    CurrentParty.CameraMan.Phi += -Delta[0]*MouseSensivity;
+    if CurrentParty.CameraMan.Phi> Pi then CurrentParty.CameraMan.Phi -= 2*Pi else
+    if CurrentParty.CameraMan.Phi<-Pi then CurrentParty.CameraMan.Phi += 2*Pi;
+    CurrentParty.CameraMan.Theta += Delta[1]*MouseSensivity;
+    if CurrentParty.CameraMan.Theta> Pi/3 then CurrentParty.CameraMan.Theta :=  Pi/3 else
+    if CurrentParty.CameraMan.Theta<-Pi/3 then CurrentParty.CameraMan.Theta := -Pi/3;
 
-    CameraMan.Up := UpVector;
-    CameraMan.Direction := RotatePointAroundAxisRad(CameraMan.Phi, ForwardVector, UpVector);
-    TraverseAxis := TVector3.CrossProduct(CameraMan.Direction, UpVector);
-    CameraMan.Direction := RotatePointAroundAxisRad(CameraMan.Theta, CameraMan.Direction, TraverseAxis);
-    CameraMan.Up := RotatePointAroundAxisRad(CameraMan.Theta, CameraMan.Up, TraverseAxis);
+    CurrentParty.CameraMan.Up := UpVector;
+    CurrentParty.CameraMan.Direction := RotatePointAroundAxisRad(CurrentParty.CameraMan.Phi, ForwardVector, UpVector);
+    TraverseAxis := TVector3.CrossProduct(CurrentParty.CameraMan.Direction, UpVector);
+    CurrentParty.CameraMan.Direction := RotatePointAroundAxisRad(CurrentParty.CameraMan.Theta, CurrentParty.CameraMan.Direction, TraverseAxis);
+    CurrentParty.CameraMan.Up := RotatePointAroundAxisRad(CurrentParty.CameraMan.Theta, CurrentParty.CameraMan.Up, TraverseAxis);
   end;
 end;
 
