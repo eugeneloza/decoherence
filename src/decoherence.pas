@@ -31,13 +31,23 @@ uses Classes, SysUtils,
 
      DecoThread, DecoThrash,
 
-     DecoGui, {DecoInterface,} DecoInput,
-     DecoLevel, DecoAbstractWorld,
+     {---- temporary units (for testing) -----}
      DecoSound,
-     DecoLoadScreen, DecoPerks, DecoActorBody,
+     DecoContext,
+     DecoFile,
+     DecoPerks,
+     DecoActorBody,
+     DecoLoad3d,
+     DecoNavigation, {should be in DecoPlayerCharacter}
+     DecoLoadScreen, {should be in DecoInterfaceLoader}
+     {---- end temporary units here ----------}
+
+     DecoGui,
+     DecoLevel, DecoAbstractWorld,
+
      DecoInterfaceLoader,
-     DecoPlayerCharacter, DecoLoad3d,
-     DecoNavigation,
+     DecoPlayerCharacter, DecoInput,
+
      DecoGlobal, DecoTranslation, DecoGamemode, DecoTime, DecoLog;
 
 {==========================================================================}
