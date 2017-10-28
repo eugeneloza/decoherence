@@ -4,7 +4,7 @@ unit DecoContext;
 
 interface
 
-uses fgl;
+uses fgl, DecoGlobal;
 
 type TContextRecord = string;   //todo: integer; read from xml list of possible context elements
 
@@ -12,7 +12,7 @@ type TContextTarget = (ctSpeaker, ctListener, ctAbout);
 
 type
   {a single record that represents a single context element}
-  OContextElement = class(TObject)
+  DContextElement = class(DObject)
   public
     name: TContextRecord;
     target: TContextTarget;
@@ -22,12 +22,12 @@ type
     //function compare;
   end;
 
-type TContextList = specialize TFPGObjectList<OContextElement>;
+type TContextList = specialize TFPGObjectList<DContextElement>;
 
 //todo: some context elements may and should be dynamically generated only when requested!!!!!!!!
 type
   {a containter for context}
-  OContext = class(TObject)
+  DContext = class(DObject)
   public
     {if one of these fails, the whole context fails}
     demand: TContextList;
@@ -37,39 +37,39 @@ type
 
     constructor Create;
     destructor Destroy; override;
-    function FindByName(find_target: TContextTarget; find_record: TContextRecord): OContextElement;
+    function FindByName(find_target: TContextTarget; find_record: TContextRecord): DContextElement;
 end;
 
 type
 
-  ODialogueContext = class(TObject)
+  DDialogueContext = class(DObject)
   public
-    context: OContext;
+    context: DContext;
 
     //speaker, listener, about
 
     {copies all context records of the input}
-    procedure copycontext(const newcontext: OContext);
+    procedure copycontext(const newcontext: DContext);
     {the same as a copy, but freeandnils the source afterwards
      just to grab and free the function result}
-    procedure extract(const newcontext: OContext);
-    function Compare(CheckContext: OContext): float;
+    procedure extract(const newcontext: DContext);
+    function Compare(CheckContext: DContext): float;
 
     constructor Create;
     destructor Destroy; override;
   end;
 
 {make context element}
-function MCE(NewTarget: TContextTarget; NewContextElement: TContextRecord; newimportance: float = 1; newmin: float = 0; newmax: float = 1): OContextElement;
+function MCE(NewTarget: TContextTarget; NewContextElement: TContextRecord; newimportance: float = 1; newmin: float = 0; newmax: float = 1): DContextElement;
 
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
 uses sysUtils, castleLog, castlevectors;
 
-function MCE(NewTarget: TContextTarget; NewContextElement: TContextRecord; newimportance: float = 1; newmin: float = 0; newmax: float = 1): OContextElement;
+function MCE(NewTarget: TContextTarget; NewContextElement: TContextRecord; newimportance: float = 1; newmin: float = 0; newmax: float = 1): DContextElement;
 begin
-  result := OContextElement.create;
+  result := DContextElement.create;
   result.target := newTarget;
   result.name := NewContextElement;
   result.importance := newimportance;
@@ -84,7 +84,7 @@ begin
   if a>b then result := a else result := b;
 end;
 
-function CompareElements(e1,e2: OContextElement): float; {boolean}
+function CompareElements(e1,e2: DContextElement): float; {boolean}
 var dist: float;
 begin
   //fatal: comparing incompatible elements
@@ -98,7 +98,7 @@ begin
   if e1.min > e2.max then dist := e1.min-e2.max else
   if e1.max < e2.min then dist := e2.min-e1.max;
 
-  if zero(dist) then
+  if Zero(dist) then
     result := 1
   else
     result := 1-max(e1.importance,e2.importance); //minimum(1-self.importance,1-cmp.importance); // include dist here?
@@ -106,7 +106,7 @@ end;
 
 {==========================  CONTEXT  ===============================}
 
-constructor OContext.create;
+constructor DContext.create;
 begin
   inherited;
   demand := TContextList.create(true);
@@ -115,7 +115,7 @@ end;
 
 {--------------------------------------------------------------------------}
 
-destructor OContext.destroy;
+destructor DContext.destroy;
 begin
   freeandnil(demand);
   freeandnil(allow);
@@ -124,7 +124,7 @@ end;
 
 {--------------------------------------------------------------------------}
 
-function OContext.FindByName(find_target: TContextTarget; find_record: TContextRecord): OContextElement;
+function DContext.FindByName(find_target: TContextTarget; find_record: TContextRecord): DContextElement;
 var i: integer;
 begin
   result := nil;
@@ -143,15 +143,15 @@ end;
 
 {============================ DIALOGUE CONTEXT ===============================}
 
-constructor ODialogueContext.create;
+constructor DDialogueContext.create;
 begin
   inherited;
-  context := OContext.create;
+  context := DContext.create;
 end;
 
 {--------------------------------------------------------------------------}
 
-destructor ODialogueContext.destroy;
+destructor DDialogueContext.destroy;
 begin
   freeandnil(context);
   inherited;
@@ -159,7 +159,7 @@ end;
 
 {--------------------------------------------------------------------------}
 
-procedure ODialogueContext.copycontext(const newcontext: OContext);
+procedure DDialogueContext.copycontext(const newcontext: DContext);
 var i: integer;
 begin
   for i := 0 to newcontext.demand.Count-1 do
@@ -170,8 +170,8 @@ end;
 
 {--------------------------------------------------------------------------}
 
-procedure ODialogueContext.extract(const newcontext: OContext);
-var temp: OContext;
+procedure DDialogueContext.extract(const newcontext: DContext);
+var temp: DContext;
 begin
   temp := newcontext;
   self.copycontext(temp);
@@ -180,9 +180,9 @@ end;
 
 {--------------------------------------------------------------------------}
 
-function ODialogueContext.Compare(CheckContext: OContext): float;
+function DDialogueContext.Compare(CheckContext: DContext): float;
 var i: integer;
-    tmp: OContextElement;
+    tmp: DContextElement;
 begin
   result := 1;
   for i := 0 to context.demand.count-1 do begin
