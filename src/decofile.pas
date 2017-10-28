@@ -23,7 +23,8 @@ unit DecoFile;
 
 interface
 
-//uses  ;
+uses DecoGlobal, CastleFilesUtils,
+  DOM, CastleXMLUtils;
 
 type TSimpleMethod = procedure of object;
 
@@ -77,16 +78,17 @@ type
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-uses DecoLog;
+uses SysUtils, DecoHDD,
+  DecoLog;
 
 procedure DAbstractFile.AssignFileName(FileName: string; ToGameFolder: boolean);
 begin
   {$WARNING this is wrong! As reader/writer will be used in game also}
   {make a @procedure for formatting URLs properly dependless of constructor/game}
-  if ToGameFolder then
+  {if ToGameFolder then
     URL := ConstructorData(FileName+gz_ext,ToGameFolder)
   else
-    URL := ConstructorData(FileName,ToGameFolder);
+    URL := ConstructorData(FileName,ToGameFolder); }
 end;
 
 {==============================================================================}
@@ -111,7 +113,7 @@ procedure DFileWriter.CloseFile;
 begin
   URLWriteXML(XMLdoc, URL);
   FreeAndNil(XMLdoc);
-  dLog(LogConstructorInfo,Self,{$I %CURRENTROUTINE%},'File Written: '+URL);
+  Log(LogConstructorInfo,{$I %CURRENTROUTINE%},'File Written: '+URL);
 end;
 
 {------------------------------------------------------------------------------}
@@ -119,7 +121,7 @@ end;
 procedure DFileWriter.WriteFile;
 begin
   OpenFile;
-  WriteHeader
+  WriteHeader;
   //Write content
   CloseFile;
 end;
@@ -144,7 +146,7 @@ end;
 procedure DFileReader.CloseFile;
 begin
   FreeAndNil(XMLdoc);
-  dLog(LogInitInterface,Self,{$I %CURRENTROUTINE%},'File read:'+URL);
+  Log(LogInitInterface,{$I %CURRENTROUTINE%},'File read:'+URL);
 end;
 
 {------------------------------------------------------------------------------}
@@ -160,8 +162,9 @@ end;
 {------------------------------------------------------------------------------}
 
 procedure DFileReader.ReadBlock(aParent: TDOMElement; ReadContent: TSimpleMethod);
+var Iterator: TXMLElementIterator;
 begin
-  Iterator := BaseElement.ChildrenIterator;
+  Iterator := aParent.ChildrenIterator;
   try
     while Iterator.GetNext do
       ReadContent;
