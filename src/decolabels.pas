@@ -116,16 +116,13 @@ type
     Used for LoadScreen,
     Actually it's a copy of DecoImages>DPhasedImage very similar to DWindImage }
   DPhasedLabel = class(DLabel)
-  private
-    LastTime: DTime;
   strict protected
-    {current phases of the Label}
-    Phase, OpacityPhase: float; //we need to store PhaseShift for override CyclePhase procedure
     procedure CyclePhase; //virtual;
   public
+    {current phases of the Label}
+    Phase, OpacityPhase: float; //we need to store PhaseShift for override CyclePhase procedure
     procedure Update; override;
     procedure doDraw; override;
-    procedure ResetPhase;
     constructor Create; override;
   public
     { 1/seconds to scroll the full screen }
@@ -310,16 +307,9 @@ constructor DPhasedLabel.Create;
 begin
   inherited Create;
   Base.AnchorToWindow := true;
-  ResetPhase;
+  Phase := 0;
   PhaseSpeed := 0.1;
   Self.ShadowIntensity := 1.0;
-end;
-
-{----------------------------------------------------------------------------}
-
-procedure DPhasedLabel.ResetPhase;
-begin
-  LastTime := -1;
 end;
 
 {----------------------------------------------------------------------------}
@@ -327,12 +317,7 @@ end;
 procedure DPhasedLabel.CyclePhase;
 var PhaseShift: float;
 begin
-  if LastTime < 0 then begin
-    LastTime := DecoNow;
-    Phase := 0;
-  end;
-  PhaseShift := (DecoNow-LastTime)*PhaseSpeed;
-  LastTime := DecoNow;
+  PhaseShift := DeltaT*PhaseSpeed;
   Phase += PhaseShift*(1+0.1*drnd.Random);
   if Phase > 1 then Phase := 1;
 

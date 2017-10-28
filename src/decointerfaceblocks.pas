@@ -127,8 +127,9 @@ begin
 
   FloaterLabel.SetBaseSize(0,2/3,0.3,0.1); //need to reset it each time
   FloaterLabel.Text := GetRandomFact;
-  FloaterLabel.ResetPhase;
+  FloaterLabel.Phase := 0;
 
+  {$WARNING MemoryLeak here}
   LoadThread(Floater,ApplicationData(LoadScreenFolder+GetRandomFactImage));
 end;
 

@@ -44,7 +44,7 @@ const LogInterfaceError   = LogError;
 const LogInterfaceGLError = LogError;
 
 const LogLabelError          = LogInterfaceError;
-const LogInterfaceSceleError = LogInterfaceError;
+const LogInterfaceScaleError = LogInterfaceError;
 
 const LogTemp = true;
 

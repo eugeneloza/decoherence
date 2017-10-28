@@ -121,15 +121,12 @@ type
 type
   { abstract "phased image" that moves and morphs with "phase" }
   DPhasedImage = class abstract(DStaticImage)
-  private
-    LastTime: DTime;
   strict protected
     {current phases of the image}
     Phase, PhaseShift: float; //we need to store PhaseShift for override CyclePhase procedure
     procedure CyclePhase; virtual;
   public
     procedure Update; override;
-    procedure ResetPhase;
   public
     { 1/seconds to scroll the full screen }
     PhaseSpeed: float;   
@@ -441,7 +438,7 @@ procedure DSimpleImage.RescaleImage;
 begin
  {$IFNDEF AllowRescale}
  If SourceImage = nil then begin
-   dLog(LogInterfaceSceleError,Self,{$I %CURRENTROUTINE%},'Source Image is nil!');
+   Log(LogInterfaceSceleError,{$I %CURRENTROUTINE%},'Source Image is nil!');
    Exit;
  end;
  {$ENDIF}
@@ -456,7 +453,7 @@ begin
      InitGLPending := true;
    end
    else
-     Log(LogInterfaceSceleError,{$I %CURRENTROUTINE%},'ERROR: Base.Initialized = false');
+     Log(LogInterfaceScaleError,{$I %CURRENTROUTINE%},'ERROR: Base.Initialized = false');
  end;
 end;
 
@@ -504,34 +501,22 @@ end;
 {======================== phased image =======================================}
 {=============================================================================}
 
-procedure DPhasedImage.ResetPhase;
-begin
-  LastTime := -1;
-end;
-
-{----------------------------------------------------------------------------}
-
 procedure DPhasedImage.Load(const URL:string);
 begin
   inherited Load(URL);
-  ResetPhase;
+  Phase := 0;
 end;
 procedure DPhasedImage.Load(const CopyImage: TCastleImage);
 begin
   inherited Load(CopyImage);
-  ResetPhase;
+  Phase := 0;
 end;
 
 {----------------------------------------------------------------------------}
 
 procedure DPhasedImage.CyclePhase;
 begin
-  if LastTime < 0 then begin
-    LastTime := DecoNow;
-    Phase := 0;
-  end;
-  PhaseShift := (DecoNow-LastTime)*PhaseSpeed;
-  LastTime := DecoNow;
+  PhaseShift := DeltaT*PhaseSpeed;
   Phase += PhaseShift*(1+0.1*drnd.Random);
 end;
 
