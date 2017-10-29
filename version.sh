@@ -1,0 +1,1 @@
+echo \'${PWD##*/}\' > src/version.inc
