@@ -191,11 +191,16 @@ end;
 
 function LoadScreenMainText: string;
 begin
-  Result := 'Добро пожаловать в Decoherence :)'+dlinebreak+
-            'Идёт загрузка, подождите...'+dlinebreak+
-            'Индикатора прогресса ещё нет,'+dlinebreak+
-            'Просто нажмите любую клавишу через 1-2 секунды...';
-
+  {remake it some day into something useful}
+  case CurrentLanguage of
+    Language_English: Result := 'Welcome to Decoherence :)'+dlinebreak+
+                                'Loading completed,'+dlinebreak+
+                                'just press any key...';
+    Language_Russian: Result := 'Добро пожаловать в Decoherence :)'+dlinebreak+
+                                'Загрузка завершена,'+dlinebreak+
+                                'просто нажмите любую клавишу...';
+    else Result := 'Language unavailable'
+  end;
 end;
 
 end.
