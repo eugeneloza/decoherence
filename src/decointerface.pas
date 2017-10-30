@@ -1169,8 +1169,8 @@ begin
 
   //call rescale only in case something has changed and if container size is "valid" (non-zero)
   if  (TrueSize.x2 <> TrueSize.x1) and (TrueSize.y2 <> TrueSize.y1) and
-     ((TrueSize.x1 <> Self.Base.x1) or (TrueSize.x2 <> Self.Base.x2) or
-      (TrueSize.y1 <> Self.Base.y1) or (TrueSize.y2 <> Self.Base.y2)) then
+     ((TrueSize.x1 < Self.Base.x1) or (TrueSize.x2 > Self.Base.x2) or
+      (TrueSize.y1 < Self.Base.y1) or (TrueSize.y2 > Self.Base.y2)) then
   begin
     Base.SetIntCoord(TrueSize.x1,TrueSize.x2,TrueSize.y1,TrueSize.y2);
     Log(LogInterfaceScaleHint,{$I %CURRENTROUTINE%},'Backward-rescaling to Children.');
