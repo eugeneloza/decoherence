@@ -22,13 +22,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
   The Result is determined as "convolution" of 2 DContext instances
   
   Amont the tasks there are: selecting a phrase variant based on character's
-  parameters, such as gender, character, mood, health, availability of voice acting etc.
+  parameters, such as gender, character, mood, health, availability of voice acting etc.,
+  time of the day, location, etc.
   
   At this point the unit is temporary, because it will be required by
   scenario processor later in the game development }
 unit DecoContext;
 
-{$mode objfpc}{$H+}
+{$INCLUDE compilerconfig.inc}
 
 interface
 
@@ -47,7 +48,7 @@ type
     Max, Min: float;
     Importance: float;
     //constructor Create;
-    //function compare;
+    //function Compare;
   end;
 
 type TContextList = specialize TFPGObjectList<DContextElement>;
@@ -88,6 +89,7 @@ type
     and based on Result it will be "available" or "unavailable" }
   DDialogueContext = class(DObject)
   public
+    {}
     Context: DContext;
 
     //speaker, listener, about
@@ -115,9 +117,9 @@ uses SysUtils, DecoLog, CastleVectors;
 function MCE(NewTarget: TContextTarget; NewContextElement: TContextRecord; NewImportance: float = 1; NewMin: float = 0; NewMax: float = 1): DContextElement;
 begin
   Result := DContextElement.Create;
-  Result.Target := newTarget;
+  Result.Target := NewTarget;
   Result.Name := NewContextElement;
-  Result.Importance := newImportance;
+  Result.Importance := NewImportance;
   Result.Min := NewMin;
   Result.Max := NewMax;
 end;
@@ -134,6 +136,7 @@ var Dist: float;
 begin
   //fatal: comparing incompatible elements
   if e1.Name <> e2.Name then begin
+    { actually such stuff should never happen }
     Result := 0;
     fLog(LogContextError,{$I %CURRENTROUTINE%},'Error: comparing incompatible elements '+e1.Name+' vs '+e2.Name);
     Exit;
@@ -153,7 +156,7 @@ end;
 
 constructor DContext.Create;
 begin
-  inherited;
+  //inherited Create; <------- nothing to inherit
   Demand := TContextList.Create(true);
   Allow := TContextList.Create(true);
   Deny := TContextList.Create(true);
@@ -166,7 +169,7 @@ begin
   FreeAndNil(Demand);
   FreeAndNil(Allow);
   FreeAndNil(Deny);
-  inherited;
+  inherited Destroy;
 end;
 
 {--------------------------------------------------------------------------}
@@ -192,7 +195,7 @@ end;
 
 constructor DDialogueContext.Create;
 begin
-  inherited;
+  //inherited Create; <------- nothing to inherit
   Context := DContext.Create;
 end;
 
@@ -201,18 +204,18 @@ end;
 destructor DDialogueContext.Destroy;
 begin
   FreeAndNil(Context);
-  inherited;
+  inherited Destroy;
 end;
 
 {--------------------------------------------------------------------------}
 
-procedure DDialogueContext.CopyContext(const newContext: DContext);
+procedure DDialogueContext.CopyContext(const NewContext: DContext);
 var i: integer;
 begin
-  for i := 0 to newContext.Demand.Count-1 do
-    Context.Demand.Add(newContext.Demand[i]);
-  for i := 0 to newContext.Allow.Count-1 do
-    Context.Allow.Add(newContext.Allow[i]);
+  for i := 0 to NewContext.Demand.Count-1 do
+    Context.Demand.Add(NewContext.Demand[i]);
+  for i := 0 to NewContext.Allow.Count-1 do
+    Context.Allow.Add(NewContext.Allow[i]);
 end;
 
 {--------------------------------------------------------------------------}
@@ -221,7 +224,7 @@ procedure DDialogueContext.Extract(const NewContext: DContext);
 var temp: DContext;
 begin
   temp := NewContext;
-  self.CopyContext(temp);
+  Self.CopyContext(temp);
   FreeAndNil(temp);
 end;
 
@@ -245,6 +248,7 @@ begin
                       Result *= CompareElements(tmp, CheckContext.Demand[i]);
     if Zero(Result) then Exit;
   end;
+  {search across demand/allow not made?}
 end;
 
 {--------------------------------------------------------------------------}
