@@ -124,7 +124,7 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-function Max(a, b: float): float; {$WARNING name conflicts with DContextElement.Max}
+function Maximum(a, b: float): float;
 begin
   if a > b then Result := a else Result := b;
 end;
@@ -146,7 +146,7 @@ begin
   if Zero(Dist) then
     Result := 1
   else
-    Result := 1 - Max(e1.Importance, e2.Importance); //minimum(1-self.Importance,1-cmp.Importance); // include dist here?
+    Result := 1 - Maximum(e1.Importance, e2.Importance); //minimum(1-self.Importance,1-cmp.Importance); // include dist here?
 end;
 
 {==========================  Context  ===============================}
