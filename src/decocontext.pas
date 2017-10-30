@@ -47,7 +47,7 @@ type
     Name: TContextRecord;
     { "target" is oazis-specific
       (and, maybe, wrong - should be included in name(identifier), e.g. "speaker-male") }
-    //Target: TContextTarget;
+    Target: TContextTarget;
     { max and min values of the context element, e.g. that might go for
       disposition between 0.3 and 0.6 or for time between 3pm and 6pm }
     Max, Min: float;

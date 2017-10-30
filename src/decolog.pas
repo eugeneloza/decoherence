@@ -43,6 +43,8 @@ const LogActorError       = LogError;
 const LogInterfaceError   = LogError;
 const LogInterfaceGLError = LogError;
 
+const LogContextError     = LogError;
+
 const LogLabelError          = LogInterfaceError;
 const LogInterfaceScaleError = LogInterfaceError;
 
