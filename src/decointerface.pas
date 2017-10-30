@@ -179,6 +179,10 @@ type
     asSquare is slower in the beginning and end, and faster in the middle}
   TAnimationCurve = (acsLinear, acSquare);
 
+type
+  {}
+  TRescaleResult = (rrOk, rrDirty, rrInvalid);
+
 Type
   { most abstract container for interface elements
     Defines size, scaling and animation state }
@@ -194,6 +198,8 @@ Type
     { Returns true size of this interface element }
     function GetSize: Txy; virtual;
   public
+    {}
+    function ProcessRescaleResult(var r1: TRescaleResult; const r2: TRescaleResult): TRescaleResult;
     { changes the scale of the element relative to current window size }
     procedure Rescale; virtual;
     { draw the element / as abstract as it might be :) }
@@ -312,7 +318,7 @@ Type
     { Returns true size of this interface element and all of its children }
     function GetSize: Txy; override;
   public
-    {list of the children of this interface element}
+    { List of the children of this interface element }
     Children: DInterfaceElementsList;
     procedure Draw; override;
     procedure Rescale; override;
@@ -322,16 +328,16 @@ Type
        than frame gaps)}
     procedure RescaleToChildren;
   public
-    {assign given element as a child and sets its parent to self}
+    { Assign given element as a child and sets its parent to Self }
     procedure Grab(const Child: DSingleInterfaceElement);
-    { removes and frees all children }
+    { Removes and frees all children }
     procedure Clear;
   public
-    {returns last (cached) call to MouseOverTree result, may be invalid!}
+    { Returns last (cached) call to MouseOverTree result, may be invalid! }
     isMouseOverTree: boolean;
-    {returns Self if IAmHere and runs all possible events + scans all children}
+    { Returns Self if IAmHere and runs all possible events + scans all children }
     function ifMouseOver(const xx,yy: integer; const RaiseEvents: boolean; const AllTree: boolean): DAbstractElement; override;
-    {returns true if mouse is over any "canmouseover" child of this element}
+    { Returns true if mouse is over any "canmouseover" child of this element }
     function MouseOverTree(const xx,yy: integer): boolean;
   public
     constructor Create; override;
@@ -738,6 +744,15 @@ end;
 {============================================================================}
 {======================== ABSTRACT ELEMENT ==================================}
 {============================================================================}
+
+function DAbstractElement.ProcessRescaleResult(var r1: TRescaleResult; const r2: TRescaleResult): TRescaleResult;
+begin
+  if (r1 = rrInvalid) or (r2 = rrInvalid) then Result := rrInvalid else
+  if (r1 = rrDirty  ) or (r2 = rrDirty  ) then Result := rrDirty   else
+                                               Result := rrOk;
+end;
+
+{----------------------------------------------------------------------------}
 
 procedure DAbstractElement.Rescale;
 begin
