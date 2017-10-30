@@ -10,7 +10,7 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
+You should have received a Copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.}
 
 {---------------------------------------------------------------------------}
@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
   from a list based on a set of conditions
   Each condition is a DContextElement
   The set of conditions is DContext
-  The result is determined as "convolution" of 2 DContext instances
+  The Result is determined as "convolution" of 2 DContext instances
   
   Amont the tasks there are: selecting a phrase variant based on character's
   parameters, such as gender, character, mood, health, availability of voice acting etc.
@@ -34,176 +34,195 @@ interface
 
 uses fgl, DecoGlobal;
 
-type TContextRecord = string;   //todo: integer; read from xml list of possible context elements
+type TContextRecord = string;   //todo: integer; read from xml list of possible Context elements
 
 type TContextTarget = (ctSpeaker, ctListener, ctAbout);
 
 type
-  {a single record that represents a single context element}
+  { A single record that represents a single Context element }
   DContextElement = class(DObject)
   public
-    name: TContextRecord;
-    target: TContextTarget;
-    max,min: float;
-    importance: float;
-    //constructor create;
+    Name: TContextRecord;
+    Target: TContextTarget;
+    Max, Min: float;
+    Importance: float;
+    //constructor Create;
     //function compare;
   end;
 
 type TContextList = specialize TFPGObjectList<DContextElement>;
 
-//todo: some context elements may and should be dynamically generated only when requested!!!!!!!!
+//todo: some Context elements may and should be dynamically generated only when requested!!!!!!!!
 type
-  {a containter for context}
+  { A basic containter for Context
+
+    Example: "Good morning!"
+      Demand = 'MORNING', 'GREETING'
+      Allow = 'MALE','FEMALE'
+      DENY = 'HOSTILE'
+    means that "Good morning!" would be spoken as a *greeting* and only in the *morning*
+    the character may be either male or female
+    and this phrase may not be spoken by a hostile character }
   DContext = class(DObject)
   public
-    {if one of these fails, the whole context fails}
-    demand: TContextList;
-    {What context is possible(allowed) in this context
-     demand searches for pairs in "demand" and "allow" lists}
-    allow: TContextList;
+    { if one of these fails, the whole Context fails }
+    Demand: TContextList;
+    { What Context is possible(Allowed) in this Context
+      Demand searches for pairs in "Demand" and "Allow" lists }
+    Allow: TContextList;
+    { Which Context is disAllowed in this Context
+      if one of this is true, the whole Context fails }
+    Deny: TContextList;
 
-    constructor Create;
+    constructor Create; //override;
     destructor Destroy; override;
-    function FindByName(find_target: TContextTarget; find_record: TContextRecord): DContextElement;
+  
+    { find a Context element by Name }
+    function FindByName(FindTarget: TContextTarget; FindRecord: TContextRecord): DContextElement;
 end;
 
 type
-
+  { Not sure if this one is needed at this point, as this class is Oazis-specific
+    This represents the "global" Context of the dialogue,
+    i.e. each phrase would be compared to this Context
+    and based on Result it will be "available" or "unavailable" }
   DDialogueContext = class(DObject)
   public
-    context: DContext;
+    Context: DContext;
 
     //speaker, listener, about
 
-    {copies all context records of the input}
-    procedure copycontext(const newcontext: DContext);
-    {the same as a copy, but freeandnils the source afterwards
-     just to grab and free the function result}
-    procedure extract(const newcontext: DContext);
+    { copies all Context records of the input }
+    procedure CopyContext(const NewContext: DContext);
+    { the same as a Copy, but FreeAndNils the source afterwards
+      just to grab and free the function Result }
+    procedure Extract(const NewContext: DContext);
+    {}
     function Compare(CheckContext: DContext): float;
 
-    constructor Create;
+    constructor Create; //override;
     destructor Destroy; override;
   end;
 
-{make context element}
-function MCE(NewTarget: TContextTarget; NewContextElement: TContextRecord; newimportance: float = 1; newmin: float = 0; newmax: float = 1): DContextElement;
+{ make Context element }
+function MCE(NewTarget: TContextTarget; NewContextElement: TContextRecord; NewImportance: float = 1; NewMin: float = 0; NewMax: float = 1): DContextElement;
 
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
-uses sysUtils, castleLog, castlevectors;
+uses SysUtils, DecoLog, CastleVectors;
 
-function MCE(NewTarget: TContextTarget; NewContextElement: TContextRecord; newimportance: float = 1; newmin: float = 0; newmax: float = 1): DContextElement;
+function MCE(NewTarget: TContextTarget; NewContextElement: TContextRecord; NewImportance: float = 1; NewMin: float = 0; NewMax: float = 1): DContextElement;
 begin
-  result := DContextElement.create;
-  result.target := newTarget;
-  result.name := NewContextElement;
-  result.importance := newimportance;
-  result.min := newmin;
-  result.max := newmax;
+  Result := DContextElement.Create;
+  Result.Target := newTarget;
+  Result.Name := NewContextElement;
+  Result.Importance := newImportance;
+  Result.Min := NewMin;
+  Result.Max := NewMax;
 end;
 
 {-----------------------------------------------------------------------------}
 
-function max(a,b: float): float;
+function Max(a, b: float): float; {$WARNING name conflicts with DContextElement.Max}
 begin
-  if a>b then result := a else result := b;
+  if a > b then Result := a else Result := b;
 end;
 
-function CompareElements(e1,e2: DContextElement): float; {boolean}
-var dist: float;
+function CompareElements(e1, e2: DContextElement): float; {boolean}
+var Dist: float;
 begin
   //fatal: comparing incompatible elements
-  if e1.name<>e2.name then begin
-    result := 0;
-    WriteLnLog('CompareElements','Error: comparing incompatible elements '+e1.name+' vs '+e2.name);
-    exit;
+  if e1.Name <> e2.Name then begin
+    Result := 0;
+    fLog(LogContextError,{$I %CURRENTROUTINE%},'Error: comparing incompatible elements '+e1.Name+' vs '+e2.Name);
+    Exit;
   end;
 
-  dist := 0;
-  if e1.min > e2.max then dist := e1.min-e2.max else
-  if e1.max < e2.min then dist := e2.min-e1.max;
+  Dist := 0;
+  if e1.Min > e2.Max then Dist := e1.Min - e2.Max else
+  if e1.Max < e2.Min then Dist := e2.Min - e1.Max;
 
-  if Zero(dist) then
-    result := 1
+  if Zero(Dist) then
+    Result := 1
   else
-    result := 1-max(e1.importance,e2.importance); //minimum(1-self.importance,1-cmp.importance); // include dist here?
+    Result := 1 - Max(e1.Importance, e2.Importance); //minimum(1-self.Importance,1-cmp.Importance); // include dist here?
 end;
 
-{==========================  CONTEXT  ===============================}
+{==========================  Context  ===============================}
 
-constructor DContext.create;
+constructor DContext.Create;
 begin
   inherited;
-  demand := TContextList.create(true);
-  allow := TContextList.create(true);
+  Demand := TContextList.Create(true);
+  Allow := TContextList.Create(true);
+  Deny := TContextList.Create(true);
 end;
 
 {--------------------------------------------------------------------------}
 
-destructor DContext.destroy;
+destructor DContext.Destroy;
 begin
-  freeandnil(demand);
-  freeandnil(allow);
+  FreeAndNil(Demand);
+  FreeAndNil(Allow);
+  FreeAndNil(Deny);
   inherited;
 end;
 
 {--------------------------------------------------------------------------}
 
-function DContext.FindByName(find_target: TContextTarget; find_record: TContextRecord): DContextElement;
+function DContext.FindByName(FindTarget: TContextTarget; FindRecord: TContextRecord): DContextElement;
 var i: integer;
 begin
-  result := nil;
+  Result := nil;
   //find only the first matching element
-  for i := 0 to demand.count-1 do
-    if (demand[i].target = find_target) and (demand[i].name = find_record) then begin
-      result := demand[i];
-      exit;
+  for i := 0 to Demand.Count-1 do
+    if (Demand[i].Target = FindTarget) and (Demand[i].Name = FindRecord) then begin
+      Result := Demand[i];
+      Exit;
     end;
-  for i := 0 to allow.count-1 do
-    if (allow[i].target = find_target) and (allow[i].name = find_record) then begin
-      result := allow[i];
-      exit;
+  for i := 0 to Allow.Count-1 do
+    if (Allow[i].Target = FindTarget) and (Allow[i].Name = FindRecord) then begin
+      Result := Allow[i];
+      Exit;
     end;
 end;
 
-{============================ DIALOGUE CONTEXT ===============================}
+{============================ DIALOGUE Context ===============================}
 
-constructor DDialogueContext.create;
+constructor DDialogueContext.Create;
 begin
   inherited;
-  context := DContext.create;
+  Context := DContext.Create;
 end;
 
 {--------------------------------------------------------------------------}
 
-destructor DDialogueContext.destroy;
+destructor DDialogueContext.Destroy;
 begin
-  freeandnil(context);
+  FreeAndNil(Context);
   inherited;
 end;
 
 {--------------------------------------------------------------------------}
 
-procedure DDialogueContext.copycontext(const newcontext: DContext);
+procedure DDialogueContext.CopyContext(const newContext: DContext);
 var i: integer;
 begin
-  for i := 0 to newcontext.demand.Count-1 do
-    context.demand.Add(newcontext.demand[i]);
-  for i := 0 to newcontext.allow.Count-1 do
-    context.allow.Add(newcontext.allow[i]);
+  for i := 0 to newContext.Demand.Count-1 do
+    Context.Demand.Add(newContext.Demand[i]);
+  for i := 0 to newContext.Allow.Count-1 do
+    Context.Allow.Add(newContext.Allow[i]);
 end;
 
 {--------------------------------------------------------------------------}
 
-procedure DDialogueContext.extract(const newcontext: DContext);
+procedure DDialogueContext.Extract(const NewContext: DContext);
 var temp: DContext;
 begin
-  temp := newcontext;
-  self.copycontext(temp);
-  freeandnil(temp);
+  temp := NewContext;
+  self.CopyContext(temp);
+  FreeAndNil(temp);
 end;
 
 {--------------------------------------------------------------------------}
@@ -212,20 +231,20 @@ function DDialogueContext.Compare(CheckContext: DContext): float;
 var i: integer;
     tmp: DContextElement;
 begin
-  result := 1;
-  for i := 0 to context.demand.count-1 do begin
-    tmp := CheckContext.FindByName(context.demand[i].target,context.demand[i].name);
-    if tmp = nil then result := 0 else
-                      result *= CompareElements(tmp,context.demand[i]);
-    if Zero(result) then exit;
+  Result := 1;
+  {$HINT process deny first, as it's most "severe"}
+  for i := 0 to Context.Demand.Count-1 do begin
+    tmp := CheckContext.FindByName(Context.Demand[i].Target,Context.Demand[i].Name);
+    if tmp = nil then Result := 0 else
+                      Result *= CompareElements(tmp, Context.Demand[i]);
+    if Zero(Result) then Exit;
   end;
-  for i := 0 to CheckContext.demand.count-1 do begin
-    tmp := context.FindByName(CheckContext.demand[i].target,CheckContext.demand[i].name);
-    if tmp = nil then result := 0 else
-                      result *= CompareElements(tmp,CheckContext.demand[i]);
-    if Zero(result) then exit;
+  for i := 0 to CheckContext.Demand.Count-1 do begin
+    tmp := Context.FindByName(CheckContext.Demand[i].Target, CheckContext.Demand[i].Name);
+    if tmp = nil then Result := 0 else
+                      Result *= CompareElements(tmp, CheckContext.Demand[i]);
+    if Zero(Result) then Exit;
   end;
-
 end;
 
 {--------------------------------------------------------------------------}
