@@ -37,15 +37,23 @@ uses fgl, DecoGlobal;
 
 type TContextRecord = string;   //todo: integer; read from xml list of possible Context elements
 
-type TContextTarget = (ctSpeaker, ctListener, ctAbout);
+type TContextTarget = (ctSpeaker, ctListener, ctTopic);
 
 type
   { A single record that represents a single Context element }
   DContextElement = class(DObject)
   public
+    { Name (identifier) of this context element }
     Name: TContextRecord;
-    Target: TContextTarget;
+    { "target" is oazis-specific
+      (and, maybe, wrong - should be included in name(identifier), e.g. "speaker-male") }
+    //Target: TContextTarget;
+    { max and min values of the context element, e.g. that might go for
+      disposition between 0.3 and 0.6 or for time between 3pm and 6pm }
     Max, Min: float;
+    { importance of this context element
+      1 is critically important (default)
+      0 is not important at all }
     Importance: float;
     //constructor Create;
     //function Compare;
@@ -78,7 +86,8 @@ type
     constructor Create; //override;
     destructor Destroy; override;
   
-    { find a Context element by Name }
+    { find a Context element by Name (identifier)
+      * Maybe, should be split into FindAllowDemand and FindDeny as they're very different in nature }
     function FindByName(FindTarget: TContextTarget; FindRecord: TContextRecord): DContextElement;
 end;
 
@@ -99,7 +108,7 @@ type
     { the same as a Copy, but FreeAndNils the source afterwards
       just to grab and free the function Result }
     procedure Extract(const NewContext: DContext);
-    {}
+    { if the given context is compatible with this dialogue? }
     function Compare(CheckContext: DContext): float;
 
     constructor Create; //override;
@@ -225,7 +234,7 @@ var temp: DContext;
 begin
   temp := NewContext;
   Self.CopyContext(temp);
-  FreeAndNil(temp);
+  FreeAndNil(temp); //mmm? What did I mean by this?
 end;
 
 {--------------------------------------------------------------------------}
@@ -248,7 +257,7 @@ begin
                       Result *= CompareElements(tmp, CheckContext.Demand[i]);
     if Zero(Result) then Exit;
   end;
-  {search across demand/allow not made?}
+  {search across demand/allow not made? Fix it relevant to the logic.}
 end;
 
 {--------------------------------------------------------------------------}
