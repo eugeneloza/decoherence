@@ -63,7 +63,7 @@ type
 type
   {Most abstract generation routine to parent all the generation algorithms
    Required for abstract calls to different implementation of generators}
-  DAbstractGenerator = class(DThread)
+  DAbstractGenerator = class(DObject)
   protected
     fisWorking: boolean;
     fisInitialized: boolean;
@@ -109,10 +109,7 @@ type
 
     constructor Create; virtual;//override;
     destructor Destroy; override;
-  protected
-    { here we simply launch "Generate" in a Thread }
-    procedure Execute; override;
-  End;
+  end;
 
 
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
@@ -143,13 +140,6 @@ end;
 procedure DAbstractGenerator.InitSeed(NewSeed: longword = 0);
 begin
   RNDM.Initialize(NewSeed);
-end;
-
-{-----------------------------------------------------------------------------}
-
-procedure DAbstractGenerator.Execute;
-begin
-  Generate;
 end;
 
 {-----------------------------------------------------------------------------}

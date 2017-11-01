@@ -390,7 +390,7 @@ begin
   {load tiles}
   Tiles.Clear;
 
-  UpdateProgress('Loading tiles',0);
+  //UpdateProgress('Loading tiles',0);
 
   For i := 0 to Parameters.TilesList.Count-1 do begin
     if Parameters.AbsoluteURL then
@@ -400,10 +400,10 @@ begin
     tmp.CalculateFaces;
     tmp.ProcessBlockers;
     Tiles.Add(tmp);
-    UpdateProgress('Loading tiles',0.3*i/(Parameters.TilesList.Count-1));
+    //UpdateProgress('Loading tiles',0.3*i/(Parameters.TilesList.Count-1));
   end;
 
-  UpdateProgress('Processing tiles',0.3);
+  //UpdateProgress('Processing tiles',0.3);
 
   {prepare different optimized lists}
   for i := 0 to Tiles.Count-1 do begin
@@ -558,9 +558,9 @@ procedure DDungeonGenerator.Generate;
 var i: integer;
     t1,t2: DTime;
 begin
-  if Self is DDungeonGenerator then fMult := 1 else fMult := 2;
-  fProgress := 0;
-  UpdateProgress('Initialize',0);
+  //if Self is DDungeonGenerator then fMult := 1 else fMult := 2;
+  //fProgress := 0;
+  //UpdateProgress('Initialize',0);
 
   if not Parameters.isReady then
     raise Exception.Create('DDungeonGenerator.Generate FATAL - parameters are not loaded!');
@@ -588,7 +588,7 @@ begin
       {dLog(inttostr(Map.dock.count));}
       //add a tile
       AddRandomTile;
-      UpdateProgress('Generating',Minimum(Map.Volume/Parameters.Volume,0.90));
+      //UpdateProgress('Generating',Minimum(Map.Volume/Parameters.Volume,0.90));
     end;
     {if map doesn't meet the paramters then undo}
 
@@ -616,7 +616,7 @@ begin
   until (Map.Volume>=Parameters.Volume) and (Map.MaxDepth+1>=Parameters.MinZ); {until map meets the paramters}
   {$WARNING may hang up forever here, if paremeters cannot be satisfied}
 
-  UpdateProgress('Finalizing',0.95);
+  //UpdateProgress('Finalizing',0.95);
   //finally resize the dynamic array
   MaxSteps := CurrentStep+1;
   SetLength(Gen,MaxSteps);
@@ -634,7 +634,7 @@ begin
 
   fisWorking := false;
   fisFinished := true;
-  if Self is DDungeonGenerator then UpdateProgress('Done',1);
+  //if Self is DDungeonGenerator then UpdateProgress('Done',1);
 end;
 
 {-----------------------------------------------------------------------------}
@@ -1122,7 +1122,7 @@ begin
   //dLog(inttostr(mx)+inttostr(my)+inttostr(mz),inttostr(tmpNeighboursMap[mx,my,mz].count));
 
   inc(RaycastCount);
-  UpdateProgress('Raycasting',1+(RaycastCount/Map.Volume)*0.8);
+  //UpdateProgress('Raycasting',1+(RaycastCount/Map.Volume)*0.8);
 end;
 
 {----------------------------------------------------------------------------}
@@ -1199,14 +1199,14 @@ begin
      for iz := 0 to Map.SizeZ-1 do if TileIndexMap[ix,iy,iz]>=0 {and is accessible} then
        RaycastTile(ix,iy,iz);
 
- UpdateProgress('Processing',0.8);
+ //UpdateProgress('Processing',0.8);
 
  Neighbours_of_neighbours;
 
  //and free temporary map
  FreeNeighboursMap(tmpNeighboursMap);
 
- UpdateProgress('Finishing',0.9);
+ //UpdateProgress('Finishing',0.9);
 end;
 
 {------------------------------------------------------------------------}
@@ -1317,7 +1317,7 @@ begin
   fisFinished := false;
   fisWorking := true;
 
-  UpdateProgress('Raycasting',1);
+  //UpdateProgress('Raycasting',1);
 
   //raycast
   Log(LogGenerateWorld,{$I %CURRENTROUTINE%},'Raycasting started...');
@@ -1329,7 +1329,7 @@ begin
 
   //TileIndexMap := nil;  //this will free the array -- I'll need it later for debugging?!
 
-  UpdateProgress('Chunking',0.95);
+  //UpdateProgress('Chunking',0.95);
 
   Log(LogGenerateWorld,{$I %CURRENTROUTINE%},'Raycasting finished in '+IntToStr(Round((GetNow-t)*1000))+'ms.');
   Chunk_N_Slice;
@@ -1338,7 +1338,7 @@ begin
   fisFinished := true;
 
   Log(LogGenerateWorld,{$I %CURRENTROUTINE%},'Finished. Everything done in '+IntToStr(Round((GetNow-t0)*1000))+'ms.');
-  UpdateProgress('Done',2);
+  //UpdateProgress('Done',2);
 end;
 
 {------------------------------------------------------------------------}
