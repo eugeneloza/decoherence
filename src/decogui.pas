@@ -23,7 +23,7 @@ unit DecoGui;
 interface
 
 uses Classes, CastleVectors,
-  DecoInterface, DecoLabels, DecoPlayerCharacter,
+  DecoInterfaceCore, DecoLabels, DecoPlayerCharacter,
   DecoGlobal;
 
 Type

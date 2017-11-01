@@ -28,7 +28,7 @@ interface
 
 uses
   CastleImages,
-  DecoInterface, DecoImages, DecoLabels,
+  DecoInterfaceCore, DecoImages, DecoLabels,
   DecoActor, DecoPlayerCharacter, DecoPerks,
   DecoGlobal;
 

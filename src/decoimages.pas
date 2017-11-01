@@ -23,7 +23,7 @@ interface
 
 uses Classes,
   CastleVectors, CastleGLImages, CastleImages,
-  DecoInterface, DecoActor,
+  DecoInterfaceCore, DecoActor,
   DecoHDD, DecoGlobal, DecoTime;
 
 const InterfaceScalingMethod: TResizeInterpolation = riBilinear;  //to quickly change it. Maybe will be a variable some day to support older PCs.

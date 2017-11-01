@@ -123,9 +123,9 @@
         <UnitName Value="Decoherence"/>
       </Unit2>
       <Unit3>
-        <Filename Value="src/decointerface.pas"/>
+        <Filename Value="src/decointerfacecore.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="DecoInterface"/>
+        <UnitName Value="DecoInterfaceCore"/>
       </Unit3>
       <Unit4>
         <Filename Value="src/decoimages.pas"/>

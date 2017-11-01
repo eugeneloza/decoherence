@@ -24,7 +24,7 @@ interface
 
 uses Classes, fgl, SysUtils,
   CastleFilesUtils, CastleKeysMouse,
-  DecoInterface, DecoGui,
+  DecoInterfaceCore, DecoGui,
   DecoGlobal;
 
 type DTouch = class(DObject)

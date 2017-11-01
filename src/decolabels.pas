@@ -132,7 +132,7 @@ type
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 uses SysUtils, CastleImages,
-  DecoInterface, DecoLog;
+  DecoInterfaceCore, DecoLog;
 
 {----------------------------------------------------------------------------}
 

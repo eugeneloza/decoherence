@@ -25,7 +25,7 @@ interface
 
 uses Classes,
   CastleControls,
-  DecoInterface, DecoInterfaCecomposite,
+  DecoInterfaceCore, DecoInterfaCecomposite,
   DecoImages, DecoLabels,
   DecoPlayerCharacter,
   DecoGlobal;
