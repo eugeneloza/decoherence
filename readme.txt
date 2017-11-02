@@ -1,6 +1,6 @@
 ﻿Decoherence is a free and open-source phase-based RPG in the mood of Wizardry 8 in hard sci-fi setting written in Lazarus/FreePascal and Castle Game Engine.
 
-Compiles to: Windows, Linux, Android
+Compiles to: Windows, Linux (Android support is suspended)
 
 # Multilingual
 

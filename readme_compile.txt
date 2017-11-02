@@ -31,6 +31,13 @@ Linux version of the Constructor tool requires GTK+2 (Thanks Akien for the infor
 Specific dll libraries (32 bit / 64 bit) are required in case of Windows. These may be downloaded here: http://castle-engine.sourceforge.net/engine.php. 32 bit versions of all the required libraries can also be found at this project GIT repository.
 The DLLs must be placed in the exe folder.
 
+#Android
+
+(Warning, Android support is suspended)
+For set-up instructions for Android cross-compilation, please, see: https://github.com/castle-engine/castle-engine/wiki/Android
+NOTE: I haven't tested Android cross-compilation for a very long time, it's not guaranteed to work at the moment.
+NOTE: The game should also compile for MacOS, but I have no way to test it. Contribution is welcome :)
+
 #Command-line compilation
 
 You can compile the game without Lazarus IDE using Castle Game Engine build-tool https://github.com/castle-engine/castle-engine/wiki/Build-Tool.
@@ -38,8 +45,3 @@ You can compile the game without Lazarus IDE using Castle Game Engine build-tool
 #Notes
 
 Once you have Castle Game Engine and all the libraries/dll correctly installed you should have no problems compiling for Desktop (Linux/Windows 32/64 bit).
-
-For set-up instructions for Android cross-compilation, please, see: https://github.com/castle-engine/castle-engine/wiki/Android
-NOTE: I haven't tested Android cross-compilation for a very long time, it's not guaranteed to work at the moment.
-NOTE: The game should also compile for MacOS, but I have no way to test it. Contribution is welcome :)
-
