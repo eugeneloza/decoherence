@@ -178,10 +178,6 @@ type
     asSquare is slower in the beginning and end, and faster in the middle}
   TAnimationCurve = (acsLinear, acSquare);
 
-type
-  {}
-  TRescaleResult = (rrOk, rrDirty, rrInvalid);
-
 Type
   { most abstract container for interface elements
     Defines size, scaling and animation state }

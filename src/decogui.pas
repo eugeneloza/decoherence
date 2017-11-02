@@ -139,13 +139,13 @@ procedure DInterfaceContainer.PartyInterface;
 var tmp: DSingleInterfaceElement;
 begin
   Self.Clear; //make it more optimal?
-  tmp := DPlayerBarsFull.Create;
+  {tmp := DPlayerBarsFull.Create;
   tmp.Base.AnchorToWindow := true;
   tmp.SetBaseSize(0.1,0.1,0.1,0.1);
   (tmp as DPlayerBarsFull).Target := Player.CurrentParty.Character[0];
   (tmp as DPlayerBarsFull).RearrangeChildren;
   Grab(tmp);
-  tmp.Rescale;
+  tmp.Rescale;}
 
  { tmp := DFloatLabel.Create;
   (tmp as DFloatLabel).Target := @base.fx1;
