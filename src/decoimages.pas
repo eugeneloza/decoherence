@@ -24,7 +24,7 @@ interface
 uses Classes,
   CastleVectors, CastleGLImages, CastleImages,
   DecoInterfaceCore, DecoActor,
-  DecoHDD, DecoGlobal, DecoTime;
+  DecoGlobal, DecoTime;
 
 const InterfaceScalingMethod: TResizeInterpolation = riBilinear;  //to quickly change it. Maybe will be a variable some day to support older PCs.
 
@@ -322,7 +322,7 @@ end;
 
 procedure DRectagonalFrame.Load(const FileName: string; const cTop,cBottom,cLeft,CRight: integer);
 begin
-  FrameImage := LoadImageSafe(ApplicationData(FramesFolder+FileName),[TRGBAlphaImage]) as TRGBAlphaImage;
+  FrameImage := LoadImage(ApplicationData(FramesFolder+FileName),[TRGBAlphaImage]) as TRGBAlphaImage;
   CornerTop := cTop;
   CornerBottom := cBottom;
   CornerLeft := cLeft;
@@ -466,7 +466,7 @@ procedure DStaticImage.Load(const URL: string);
 begin
   FreeImage;
   Log(LogInitInterface,{$I %CURRENTROUTINE%},URL);
-  SourceImage := LoadImageSafe(URL);
+  SourceImage := LoadImage(URL);
   AfterLoad;
   Rescale;
 end;

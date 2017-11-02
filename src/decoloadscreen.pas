@@ -78,7 +78,7 @@ implementation
 uses SysUtils, CastleFilesUtils,
   DOM, CastleXMLUtils,
   DecoFont,
-  DecoHDD, DecoLog;
+  DecoLog;
 
 var LastFact: integer = -1;
     CurrentFact: DFact = nil;      //looks ugly! Maybe I should remake it?
@@ -132,7 +132,7 @@ begin
 
   fLog(LogInitInterface,Facts.ClassName+'>'+{$I %CURRENTROUTINE%},'Reading file '+FileName);
 
-  FactsDoc := URLReadXMLSafe(FileName);
+  FactsDoc := URLReadXML(FileName);
   BaseElement := FactsDoc.DocumentElement;
   Iterator := BaseElement.ChildrenIterator;
   try

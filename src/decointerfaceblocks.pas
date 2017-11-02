@@ -81,7 +81,7 @@ type
 implementation
 uses CastleFilesUtils, DecoFont,
   DecoLoadScreen,
-  DecoHDD, DecoLog;
+  DecoLog;
 
 procedure DLoadScreen.SpawnChildren;
 begin

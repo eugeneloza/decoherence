@@ -104,7 +104,7 @@ procedure FreeCreatures;
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 uses SysUtils, CastleFilesUtils,
-  DecoHDD, DecoLog;
+  {DecoHDD,} DecoLog;
 
 function AnimationEnd(at: TAnimationType): TAnimationEnd;
 begin
@@ -214,7 +214,7 @@ var CreatureName: string;
 begin
   CreatureName := 'knight';
 
-  Resources.LoadSafe(ApplicationData(CreaturesFolder+CreatureName));
+  Resources.LoadFromFiles(ApplicationData(CreaturesFolder+CreatureName));
   tmpKnightCreature := Resources.FindName('Knight') as DBodyResource;
   tmpKnightCreature.Prepare(nil);
 end;

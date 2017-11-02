@@ -259,14 +259,15 @@ procedure FreeMusicManager;
 implementation
 uses SysUtils, castleFilesUtils,
   CastleVectors,
-  DecoHDD, //used for safe threaded loading of sound buffer
+  //DecoHDD, //used for safe threaded loading of sound buffer
   DecoTime, DecoLog;
 
 {========================== TMusicLoadThread ===============================}
 
 procedure DSoundLoadThread.Execute;
 begin
- (Parent as DSoundFile).Buffer := LoadBufferSafe((parent as DSoundFile).fURL,(parent as DSoundFile).duration);
+  //issue HDD lock
+ (Parent as DSoundFile).Buffer := SoundEngine.LoadBuffer((parent as DSoundFile).fURL,(parent as DSoundFile).duration);
  (Parent as DSoundFile).LoadFinished;
 end;
 

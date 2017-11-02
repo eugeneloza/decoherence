@@ -54,7 +54,7 @@ procedure FreeInterface;
 implementation
 uses Classes, SysUtils, CastleFilesUtils,
   DecoFont, {$IFDEF BurnerImage}DecoBurner,{$ENDIF}
-  DecoHDD, DecoGlobal, DecoLog;
+  DecoGlobal, DecoLog;
 
 {-------------------- INIT INTERFACE ------------------------------------------}
 
@@ -70,20 +70,20 @@ begin
 
   fLog(LogInit,{$I %CURRENTROUTINE%},'Started');
 
-  WindImage1 := LoadImageSafe(ApplicationData(WindFolder+'WindClouds1_GIMP.jpg'));
-  WindImage2 := LoadImageSafe(ApplicationData(WindFolder+'WindClouds2_GIMP.jpg'));
+  WindImage1 := LoadImage(ApplicationData(WindFolder+'WindClouds1_GIMP.jpg'));
+  WindImage2 := LoadImage(ApplicationData(WindFolder+'WindClouds2_GIMP.jpg'));
 
   InterfaceColor := Vector4(1,1,1,1);
 
   BlackFrame := DRectagonalFrame.Create('blackframe.png',0,0,0,1);
 
-  HpBarImage := LoadImageSafe(ApplicationData(ProgressBarFolder+'hp_bar_CC-BY-SA_by_Saito00.png'));
-  StaBarImage := LoadImageSafe(ApplicationData(ProgressBarFolder+'en_bar_CC-BY-SA_by_Saito00.png'));
-  CncBarImage := LoadImageSafe(ApplicationData(ProgressBarFolder+'m_bar_CC-BY-SA_by_Saito00.png'));
-  MphBarImage := LoadImageSafe(ApplicationData(ProgressBarFolder+'mph_bar_CC-BY-SA_by_Saito00.png'));
+  HpBarImage := LoadImage(ApplicationData(ProgressBarFolder+'hp_bar_CC-BY-SA_by_Saito00.png'));
+  StaBarImage := LoadImage(ApplicationData(ProgressBarFolder+'en_bar_CC-BY-SA_by_Saito00.png'));
+  CncBarImage := LoadImage(ApplicationData(ProgressBarFolder+'m_bar_CC-BY-SA_by_Saito00.png'));
+  MphBarImage := LoadImage(ApplicationData(ProgressBarFolder+'mph_bar_CC-BY-SA_by_Saito00.png'));
   StatBarsFrame := DRectagonalFrame.Create('blackframe.png',0,0,0,1);
 
-  DamageOverlay_Img := LoadImageSafe(ApplicationData(DamageFolder+'damageOverlay_CC0_by_EugeneLoza[GIMP].png'));
+  DamageOverlay_Img := LoadImage(ApplicationData(DamageFolder+'damageOverlay_CC0_by_EugeneLoza[GIMP].png'));
 
   Setlength(Portrait_Img,20);
   for i := 0 to Length(Portrait_Img)-1 do begin
@@ -91,17 +91,17 @@ begin
     if i+1<10 then s := '0'+s;
     fName := PortraitFolder+'UNKNOWN_p'+s+'.jpg';
     try
-      Portrait_Img[i] := LoadImageSafe(ApplicationData(fName));
+      Portrait_Img[i] := LoadImage(ApplicationData(fName));
     except
       { If the file does not exist, load the placeholder portrait.
         This is signalled by EFOpenError now, although in the future LoadImage may re-raise
         it as some EImageLoadError descendant. }
       on EFOpenError do begin
-        Portrait_Img[i] := LoadImageSafe(ApplicationData(PortraitFolder+'placeholder.png'));
+        Portrait_Img[i] := LoadImage(ApplicationData(PortraitFolder+'placeholder.png'));
         fLog(LogInitError,{$I %CURRENTROUTINE%},'ERROR loading portrait '+fName);
       end;
       on EImageLoadError do begin
-        Portrait_Img[i] := LoadImageSafe(ApplicationData(PortraitFolder+'placeholder.png'));
+        Portrait_Img[i] := LoadImage(ApplicationData(PortraitFolder+'placeholder.png'));
         fLog(LogInitError,{$I %CURRENTROUTINE%},'ERROR loading portrait '+fName);
       end;
     end;

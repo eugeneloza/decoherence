@@ -168,7 +168,7 @@ function InvertAngle(Angle: TAngle): TAngle; {$IFDEF SUPPORTS_INLINE}inline;{$EN
 implementation
 uses SysUtils, CastleURIUtils,
   DOM, CastleXMLUtils,
-  DecoHDD, DecoLog;
+  DecoLog;
 
 function TileKindToStr(Value: TTileKind): string;
 begin
@@ -332,7 +332,7 @@ begin
   try
     FullURL := URL+'.map';
     if gzipped then FullURL += GZ_ext;
-    TileDOC := URLReadXMLSafe(FullURL);
+    TileDOC := URLReadXML(FullURL);
     RootNode := TileDOC.DocumentElement;
     WorkNode := RootNode.ChildElement('Size');
     SizeX := WorkNode.AttributeInteger('size_x');
@@ -369,7 +369,7 @@ begin
 
   SetLength(Img,sizez);
   for jz := 0 to sizez-1 do
-    Img[jz] := LoadImageSafe(ChangeURIExt(URL,'_'+IntToStr(jz)+'.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
+    Img[jz] := LoadImage(ChangeURIExt(URL,'_'+IntToStr(jz)+'.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
 end;
 
 {----------------------------------------------------------------------------}

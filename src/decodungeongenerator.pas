@@ -367,7 +367,7 @@ implementation
 
 uses SysUtils, CastleFilesUtils, CastleImages, CastleVectors,
   DOM, CastleXMLUtils,
-  DecoHDD, DecoTime, DecoLog;
+  DecoTime, DecoLog;
 
 {========================= GENERATION ALGORITHM ==============================}
 
@@ -1400,7 +1400,7 @@ begin
   if Self=nil then raise Exception.Create('DGeneratorParameters is nil!'); // HELLO, my best bug thing :)
 
   try
-    XMLdoc := URLReadXMLSafe(URL);
+    XMLdoc := URLReadXML(URL);
     RootNode := XMLdoc.DocumentElement;
     LargeContainer := RootNode.ChildElement('Parameters');
     SmallContainer := LargeContainer.ChildElement('Size');

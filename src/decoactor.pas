@@ -297,7 +297,7 @@ type
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 uses SysUtils,
-  CastleFilesUtils, DecoHDD,
+  CastleFilesUtils,
 
   DecoAbstractWorld, DecoAbstractWorld3D,
   CastleScene,

@@ -78,7 +78,7 @@ type
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-uses SysUtils, DecoHDD,
+uses SysUtils,
   DecoLog;
 
 procedure DAbstractFile.AssignFileName(FileName: string; ToGameFolder: boolean);
@@ -137,7 +137,7 @@ end;
 
 procedure DFileReader.OpenFile;
 begin
-  XMLdoc := URLReadXMLSafe(URL);
+  XMLdoc := URLReadXML(URL);
   RootNode := XMLdoc.DocumentElement;
 end;
 

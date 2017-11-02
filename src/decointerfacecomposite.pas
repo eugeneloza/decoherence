@@ -356,7 +356,7 @@ implementation
 uses SysUtils,
    DecoFont, DecoImageProcess,
    //DecoInterfaceBlocks,
-   DecoHDD, DecoInterfaceLoader, DecoLog;
+   DecoInterfaceLoader, DecoLog;
 
 {===========================================================================}
 {====================== D Wind Element =====================================}
