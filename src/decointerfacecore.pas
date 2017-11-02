@@ -195,7 +195,7 @@ Type
     { Sets this interface element size to full screen and aligns it to Window }
     procedure SetFullScreen;
     { Returns true size of this interface element }
-    function GetSize: Txy; virtual;
+    function GetSize: Txy; virtual; deprecated;
   public
     {}
     function ProcessRescaleResult(var r1: TRescaleResult; const r2: TRescaleResult): TRescaleResult;
@@ -315,7 +315,7 @@ Type
   DInterfaceElement = class(DSingleInterfaceElement)
   strict protected
     { Returns true size of this interface element and all of its children }
-    function GetSize: Txy; override;
+    function GetSize: Txy; override; deprecated;
   public
     { List of the children of this interface element }
     Children: DInterfaceElementsList;
@@ -325,7 +325,7 @@ Type
       (should be used only in case children may have fixed sizes (like text labels)
        or force-change their size, e.g. if they don't allow size smaller
        than frame gaps)}
-    procedure RescaleToChildren;
+    procedure RescaleToChildren; deprecated;
   public
     { Assign given element as a child and sets its parent to Self }
     procedure Grab(const Child: DSingleInterfaceElement);
