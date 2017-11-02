@@ -51,7 +51,7 @@ type
     { frees an image without freeing the whole instance }
     procedure FreeImage;
   public
-    { Thread-safe part of rescaling the image }
+    { non-GL part of rescaling the image }
     procedure Rescale; override;
     { Scales the image to Base.size }
     procedure RescaleImage; virtual; abstract;

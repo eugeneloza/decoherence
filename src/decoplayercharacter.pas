@@ -30,15 +30,6 @@ uses Classes, fgl, CastleVectors,
 
 const MaxParty = 6; {0..6 = 7 characters}
 
-
-  {Stores the perk's image. Generally we don't use perks directly as static images,
-   but static images provide a convenient routine to load the image in a thread
-   so let it be this way for now. Theoretically, it's better to make a separate
-   object that handles perks and items images and allows just rescaling them
-   correctly - to save memory. But it is not the issue for now.}
-  //Image: DStaticImage;
-
-
 type
   { Extension of DCoordActor with Up vector required for Camera to work properly }
   DCameraMan = class(DActorPhysics)

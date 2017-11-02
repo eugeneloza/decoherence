@@ -255,8 +255,6 @@ type
     {initializes generation parameters and loads everything}
     procedure InitParameters; override;
     { the main procedure to generate a dungeon,
-      may be directly launched in main thread (for testing or other purposes),
-      automaticlaly called on thread.execute
       WARNING: if map parameters are not valid the Generate procedure
       might and *will* hang forever.
       We need to do something about this,
@@ -565,14 +563,9 @@ begin
   if not Parameters.isReady then
     raise Exception.Create('DDungeonGenerator.Generate FATAL - parameters are not loaded!');
   if not isInitialized then begin
-    Log(LogWorldInitSoftError,{$I %CURRENTROUTINE%},'Warning: parameters were automatically initialized! It''s best to initialize parameters manually outside the thread.');
+    Log(LogWorldInitSoftError,{$I %CURRENTROUTINE%},'Warning: parameters were automatically initialized!');
     InitParameters;
   end;
-  if isWorking then begin
-    Log(LogWorldError,{$I %CURRENTROUTINE%},'WARNING: Generation thread is buisy! Aborting...');
-    Exit; {$WARNING Won't break the Generate sequence in CHILDREN!!!}
-  end;
-  fisWorking := true;
 
   t1 := GetNow;
   repeat
@@ -632,7 +625,6 @@ begin
 
   MakeMinimap;
 
-  fisWorking := false;
   fisFinished := true;
   //if Self is DDungeonGenerator then UpdateProgress('Done',1);
 end;
@@ -1315,7 +1307,6 @@ begin
   //make the logic map
   inherited Generate;
   fisFinished := false;
-  fisWorking := true;
 
   //UpdateProgress('Raycasting',1);
 
@@ -1334,7 +1325,6 @@ begin
   Log(LogGenerateWorld,{$I %CURRENTROUTINE%},'Raycasting finished in '+IntToStr(Round((GetNow-t)*1000))+'ms.');
   Chunk_N_Slice;
 
-  fisWorking := false;
   fisFinished := true;
 
   Log(LogGenerateWorld,{$I %CURRENTROUTINE%},'Finished. Everything done in '+IntToStr(Round((GetNow-t0)*1000))+'ms.');

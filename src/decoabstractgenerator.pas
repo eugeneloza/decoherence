@@ -65,25 +65,20 @@ type
    Required for abstract calls to different implementation of generators}
   DAbstractGenerator = class(DObject)
   protected
-    fisWorking: boolean;
     fisInitialized: boolean;
     fisFinished: boolean;
   protected
-    { xorshift random generator, fast and thread-safe }
+    { xorshift random generator }
     RNDM: TCastleRandom;
     {Specific SEED of the random number for this algorithm }
     procedure InitSeed(NewSeed: longword = 0);
   public
-    {are the parameters initialized? If no, they'll be init
-     automatically, but its best to do it manually outside the thread
-     due to possible HDD reading issues}
+    {are the parameters initialized?}
     property isInitialized: boolean read fisInitialized default false;
-    {is the generator currently working?}
-    property isWorking: boolean read fisWorking default false;
     {if the generation finished successfully?}
     property isFinished: boolean read fisFinished default false;
 
-    {MUST BE MANUALLY RUN BEFORE GENERATION (best if outside the thread)
+    {MUST BE MANUALLY RUN BEFORE GENERATION
      initialize parameters and load pre-generated tiles
      Will attempt automatic initialization if possible
      Use ForceReady to define parameters manually}

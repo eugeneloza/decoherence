@@ -37,7 +37,7 @@ Type
     procedure CacheNavDistance;
   protected
     fSeed: LongWord;
-    { xorshift random generator, fast and thread-safe
+    { xorshift random generator,
       used by BUILD (maybe freed afterwards?) }
     RNDM: TCastleRandom;
     {time of last render. Used for FPS management}

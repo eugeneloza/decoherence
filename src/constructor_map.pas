@@ -160,14 +160,12 @@ begin
   GenerateButton.Enabled := false;
   FreeAndNil(DungeonMap);
   GENERATOR := D3dDungeonGenerator.Create;
-  GENERATOR.FreeOnTerminate := false; //important on Windows
   //GENERATOR.load('');
   FreeAndNil(Generator.Parameters); //purge autocreated parameters
   GENERATOR.Parameters := GetMapParameters;  //will be autofreed by GENERATOR destructor
 
   GENERATOR.ForceReady;
   GENERATOR.InitParameters;
-  //todo: in a thread + stop
   GENERATOR.Generate;
 
   DungeonMap := GENERATOR.ExportMap;

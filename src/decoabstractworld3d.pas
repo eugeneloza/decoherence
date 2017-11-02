@@ -127,7 +127,7 @@ type
   {manages appear and vanish lists
   by comparing previous and new neighbours lists
   will have access to protected fields as it is in the same unit}
-  DAppearVanishManagerThread = class(TThread) // no need to report progress, so most generic TThread is used as ancestor
+  DAppearVanishManagerThread = class(TThread)
   public
     {link to the world that requested management}
     //parent: DAbstractWorldManaged;

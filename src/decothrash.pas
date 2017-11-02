@@ -15,8 +15,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 
 {---------------------------------------------------------------------------}
 
-{ this is an experimental "thrash" unit replacing the "suicide" of some
-  objects + tries to make the process thread-safer.
+{ this is an experimental "thrash" unit replacing the "suicide" of some objects
   usage: thrash.add(some_object); to schedule it's safe freeing
   and use thrash.clear each time you need to clear it.}
 unit decothrash;

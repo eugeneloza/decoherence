@@ -31,7 +31,6 @@ const LogError = true;
 
 const LogInitError        = LogError;
 const LogConstructorError = LogError;
-const LogThreadError      = LogError;
 const LogAnimationError   = LogError;
 const LogNavigationError  = LogError;
 const LogSoundError       = LogError;

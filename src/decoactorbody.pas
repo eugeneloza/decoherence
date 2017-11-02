@@ -30,11 +30,6 @@ uses Classes,
 { at this moment it works fine. So no need to "upgrade" it }
 type DBodyResource = T3DResource;
 
-{type
-  { this class contains references to animations of DBodyResource,
-    maybe it's redundant. }
-  TBodyKind = class (DObject)}
-
 {not sure about it, it would cover basic enemies animations, but
  some Actors, player characters and npcs first of all, may use advanced set
  of animations, therefore just calling the animation by name might be better
@@ -48,17 +43,6 @@ const atIdle = 'idle';
       atDie = 'die';}
 
 const AnimationExtension = '.castle-anim-frames';
-
-type
-  { Not working yet... }
-  DAnimation = class(T3DResourceAnimation)
-  public
-    {loads animation from HDD
-     Relatively thread-safe (well, no :))}
-    procedure Load;
-    procedure Load(Creature,FileName: string);
-  end;
-
 
 type
   { Body is a 3D manifestation of an Actor in the 3D world.
@@ -223,46 +207,12 @@ end;
 
 {============================================================================}
 
-procedure DAnimation.Load;
-begin
-{  FSceneForAnimation := TCastleScene.Create(nil);
-  FSceneForAnimation.Load(URL);}
-end;
-procedure DAnimation.Load(Creature,FileName: string);
-begin
-  Self.URL := ApplicationData(CreaturesFolder+Creature+'/'+FileName+AnimationExtension);
-  Load;
-end;
-
 {****************************************************************************}
 
 procedure tmpLoadKnightCreature;
-var Animation: DAnimation;
-    CreatureName: string;
+var CreatureName: string;
 begin
   CreatureName := 'knight';
-
-  {MEMORY LEAKS + SIGSEGVS, I'm doing something badly wrong}
-
-  {tmpKnightCreature := DBodyResource.Create(CreatureName);
-  Animation := DAnimation.Create(tmpKnightCreature,'idle');
-  Animation.Load(CreatureName,'idle');
-  tmpKnightCreature.Animations.Add(Animation);
-  Animation := DAnimation.Create(tmpKnightCreature,'hurt');
-  Animation.Load(CreatureName,'hurt');
-  tmpKnightCreature.Animations.Add(Animation);
-  Animation := DAnimation.Create(tmpKnightCreature,'attack');
-  Animation.Load(CreatureName,'attack');
-  tmpKnightCreature.Animations.Add(Animation);
-  Animation := DAnimation.Create(tmpKnightCreature,'walk');
-  Animation.Load(CreatureName,'walk');
-  tmpKnightCreature.Animations.Add(Animation);
-  Animation := DAnimation.Create(tmpKnightCreature,'die');
-  Animation.Load(CreatureName,'die');
-  tmpKnightCreature.Animations.Add(Animation);
-  tmpKnightCreature.Prepare(nil); }
-  //Resources.Add(tmpKnightCreature);
-
 
   Resources.LoadSafe(ApplicationData(CreaturesFolder+CreatureName));
   tmpKnightCreature := Resources.FindName('Knight') as DBodyResource;
@@ -273,9 +223,7 @@ end;
 
 procedure FreeCreatures;
 begin
-  //tmpKnightCreature.Animations.clear;
   fLog(LogInitData,{$I %CURRENTROUTINE%},'Freeing creature resources...');
-  //FreeAndNil(tmpKnightCreature);
 end;
 
 
