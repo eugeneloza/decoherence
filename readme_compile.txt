@@ -10,7 +10,7 @@ You can install latest Lazarus+FPC+cross-compilation tools with fpcupdeluxe. See
 
 ##Linux
 
-You need both normal and development verions of the libraries required for Castle Game Engine to run properly. These are: (Debian/Ubuntu package reference):
+You need both normal and development versions of the libraries required for Castle Game Engine to run properly. These are: (Debian/Ubuntu package reference):
 libopenal1
 libopenal-dev
 libpng
@@ -28,7 +28,7 @@ Linux version of the Constructor tool requires GTK+2 (Thanks Akien for the infor
 
 ##Windows
 
-Specific dll libraries (32 bit / 64 bit) are required in case of Windows. These may be downloaded here: http://castle-engine.sourceforge.net/engine.php. 32 bit versions of all the required libraries can also be found at this project GIT repository.
+Specific DLL libraries (32 bit / 64 bit) are required in case of Windows. These may be downloaded here: http://castle-engine.sourceforge.net/engine.php. 32 bit versions of all the required libraries can also be found at this project GIT repository.
 The DLLs must be placed in the exe folder.
 
 #Android

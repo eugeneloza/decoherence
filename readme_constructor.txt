@@ -23,4 +23,4 @@ Constructor is a Desktop-only tool, it is not compatible with Android. Other sys
 
 # Expected release date
 
-Hardly sooner than game betta release.
+Hardly sooner than game beta release.

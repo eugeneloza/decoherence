@@ -4,11 +4,11 @@ Compiles to: Windows, Linux (Android support is suspended)
 
 # Multilingual
 
-At this moment most of the game content is available only in Russian, but I will eventually translate everything into English too... At this moment English is included as a priority task (thanks to everybody for your interest!), so, hopefully, we'll have English version nearly up-to-date with Russian variant.
+Most of the game content is available only in Russian, but I will eventually translate everything into English too... At this moment English is included as a priority task (thanks to everybody for your interest!), so, hopefully, we'll have English version nearly up-to-date with Russian variant.
 
 # Short introduction
 
-The catastrophic war is over. The surviving civilizations of the Diadem Galaxy formed a Galactic Commonwealth of Bass (leaders), Asek (scientists) and Kerf (engineers). Other civilizations are Vegetos (chemists), Velox (fighters) and 'almost-self-destructed' Thess (biologs). Anticipation of 'Galaxy Golden Age' is soon shadowed by discovery of a strange phenomenon in a nearby galaxy. An unexplained spherical anomaly appears and engulfs most of the stars. There is a narrow 'cone-like' exception with vertex at a star named Victoria which obviously "stopped" the collapse. Despite the anomaly being very far away and even at present faster-than-light speed it would reach the Galaxy only in 1500 years, several precautions and scientific projects have been started by the Commonwealth in case the collapse reaches the Galaxy or anything similar appears in the proximity. One of the most 'intriguing' project was the first exogalactic expedition - because there is strong belief that the collapse was stopped by intelligent life. The expedition arrives to Victoria in about 700 years when the galaxy is completely diminished excluding several hundreds stars in 'the cone'. The flight was surprisingly successful but upon entering the star system the starship is unexpectedly caught into a non-gravitational field and is dragged to the nearby gas giant. The crew ejects via landing module which crash-lands at one of the moons. Only up to 6 of 21 crew members survive.
+The catastrophic war is over. The surviving civilizations of the Diadem Galaxy formed a Galactic Commonwealth of Bass (leaders), Asek (scientists) and Kerf (engineers). Other civilizations are Vegetos (chemists), Velox (pilots) and 'almost-self-destructed' Thess (biologists). Anticipation of 'Galaxy Golden Age' is soon shadowed by discovery of a strange phenomenon in a nearby galaxy. An unexplained spherical anomaly appears and engulfs most of the stars. There is a narrow 'cone-like' exception with vertex at a star named Victoria which obviously "stopped" the collapse. Despite the anomaly being very far away and even at present faster-than-light speed it would reach the Galaxy only in 1500 years, several precautions and scientific projects have been started by the Commonwealth in case the collapse reaches the Galaxy or anything similar appears in the proximity. One of the most 'intriguing' project was the first exogalactic expedition - because there is strong belief that the collapse was stopped by intelligent life. The expedition arrives to Victoria in about 700 years when the galaxy is completely diminished excluding several hundreds stars in 'the cone'. The flight was surprisingly successful but upon entering the star system the starship is unexpectedly caught into a non-gravitational field and is dragged to the nearby gas giant. The crew ejects via landing module which crash-lands at one of the moons. Only up to 6 of 21 crew members survive.
 And the adventure begins :) Failure is not an option.
 
 # Features
@@ -43,6 +43,7 @@ zlib1g
 libvorbis
 libfreetype6
 libgtkglext1
+You'll also need OpenGL drivers for your videocard. Usually it is libgl1-mesa-dev.
 
 # Links
 
