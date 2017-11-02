@@ -22,8 +22,7 @@ unit DecoPerks;
 
 interface
 
-uses Classes, fgl,
-  //decoimages,
+uses Classes, Generics.Collections,
   DecoStats,
   DecoGlobal;
 
@@ -77,7 +76,7 @@ Type
 
 
 {list of perks}
-type DPerksList = specialize TFPGObjectList<DPerk>;
+type DPerksList = specialize TObjectList<DPerk>;
 
 type DMultiPerk = class(DPerk)
   Children: DPerksList;

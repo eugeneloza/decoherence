@@ -21,7 +21,7 @@ unit DecoAbstractGenerator;
 {$INCLUDE compilerconfig.inc}
 interface
 
-uses Classes, CastleRandom, fgl, CastleGenericLists,
+uses Classes, CastleRandom, Generics.Collections,
   DecoNavigationNetwork,
   DecoGlobal;
 
@@ -30,8 +30,8 @@ type
   TTileType = word;
   TIntCoordinate = integer;
 
-type TIndexList = specialize TFPGList<TTileType>;
-type TIndexGroups = specialize TFPGObjectList<TIndexList>;
+type TIndexList = specialize TList<TTileType>;
+type TIndexGroups = specialize TObjectList<TIndexList>;
 
 type
   {a two-value description of a "neighbour" tile}
@@ -42,7 +42,7 @@ type
     Visible: integer;
   end;
 
-type TNeighboursList = specialize TGenericStructList<DNeighbour>;
+type TNeighboursList = specialize TList<DNeighbour>;
 
 type
   { abstract level of Generator Parameters,

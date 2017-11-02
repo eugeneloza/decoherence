@@ -36,7 +36,7 @@ unit DecoSound;
 
 {$INCLUDE compilerconfig.inc}
 interface
-uses Classes, fgl,
+uses Classes, Generics.Collections,
   CastleSoundEngine, CastleTimeUtils,
   DecoGlobal;
 
@@ -128,8 +128,8 @@ type
 
 type
   {a list of music tracks}
-  TTrackList = specialize TFPGObjectList<DMusicTrack>;
-  TLoopTrackList = specialize TFPGObjectList<DLoopMusicTrack>;
+  TTrackList = specialize TObjectList<DMusicTrack>;
+  TLoopTrackList = specialize TObjectList<DLoopMusicTrack>;
 
 type
   {the most abstract features of the playlist}

@@ -22,10 +22,10 @@ unit DecoActor;
 
 interface
 
-uses Classes, CastleRandom, fgl, CastleVectors, CastleCameras,
+uses Classes, CastleRandom, Generics.Collections, CastleVectors, CastleCameras,
   CastleResources, CastleCreatures,
   DecoNavigationNetwork,
-  DecoStats, DecoPerks, decoactorbody,
+  DecoStats, DecoPerks, DecoActorBody,
   DecoGlobal, DecoTime;
 
 type TDamageType = (dtHealth);
@@ -53,7 +53,7 @@ type
   end;
 
 { List of DSimpleActors }
-type TActorList = specialize TFPGObjectList<DSimpleActor>;
+type TActorList = specialize TObjectList<DSimpleActor>;
 
 type
   {A group of actors, that can manage it's Members}

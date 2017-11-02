@@ -22,7 +22,7 @@ unit DecoPlayerCharacter;
 
 interface
 
-uses Classes, fgl, CastleVectors,
+uses Classes, Generics.Collections, CastleVectors,
   DecoActor, DecoRaceProfession, DecoPerks,
   DecoNavigationNetwork,
   DecoImages,
@@ -60,7 +60,7 @@ type
 end;
 
 { List of the party characters, a bit better than DActorList }
-type DCharList = specialize TFPGObjectList<DPlayerCharacter>;
+type DCharList = specialize TObjectList<DPlayerCharacter>;
 
 { todo: remake it }
 type TMoveDirection = (mdForward,mdBack,mdLeft,mdRight);
@@ -111,7 +111,7 @@ type
   end;
 
 { A list of player's parties }
-type DPartyList = specialize TFPGObjectList<DParty>;
+type DPartyList = specialize TObjectList<DParty>;
 
 
 type

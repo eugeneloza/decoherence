@@ -30,11 +30,11 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  fgl,
+  Generics.Collections,
   DecoTranslation,
   Constructor_Global;
 
-type TFormList = specialize TFPGObjectList<TWriterForm>;
+type TFormList = specialize TObjectList<TWriterForm>;
 
 type
   { main form for launching other editors }

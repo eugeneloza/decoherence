@@ -21,7 +21,7 @@
       <UseVersionInfo Value="True"/>
       <AutoIncrementBuild Value="True"/>
       <MinorVersionNr Value="1"/>
-      <BuildNr Value="27"/>
+      <BuildNr Value="28"/>
       <StringTable ProductVersion="0.0.0.0"/>
     </VersionInfo>
     <BuildModes Count="3">
@@ -259,6 +259,7 @@
       <Unit30>
         <Filename Value="src/decothrash.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoThrash"/>
       </Unit30>
       <Unit31>
         <Filename Value="src/deconavigationnetwork.pas"/>

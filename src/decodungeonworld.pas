@@ -22,7 +22,7 @@ unit DecoDungeonWorld;
 {$INCLUDE compilerconfig.inc}
 interface
 
-uses Classes, fgl, CastleVectors,
+uses Classes, Generics.Collections, CastleVectors,
   X3DNodes, CastleScene,
   DecoDungeonGenerator, DecoAbstractGenerator, DecoAbstractWorld3d,
   DecoDungeonTiles,
@@ -31,7 +31,7 @@ uses Classes, fgl, CastleVectors,
 
 
 {list of "normal" tiles}
-type TTilesList = specialize TFPGObjectList<DTileMap>;
+type TTilesList = specialize TObjectList<DTileMap>;
 
 //type TContainer = TTransformNode;//{$IFDEF UseSwitches}TSwitchNode{$ELSE}TTransformNode{$ENDIF}
 

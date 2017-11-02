@@ -190,7 +190,7 @@ type
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-uses SysUtils, fgl, CastleFilesUtils,
+uses SysUtils, Generics.Collections, CastleFilesUtils,
   {$IFDEF BurnerImage}DecoBurner,{$ENDIF} DecoInterfaceLoader, DecoLog;
 
 {=============================================================================}
@@ -301,7 +301,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-type TFrameThrash = specialize TFPGObjectList<DRectagonalFrame>;
+type TFrameThrash = specialize TObjectList<DRectagonalFrame>;
 var FrameThrash: TFrameThrash;
 
 constructor DRectagonalFrame.Create;

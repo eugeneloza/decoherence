@@ -22,20 +22,20 @@ unit DecoAbstractWorld3d;
 
 {$INCLUDE compilerconfig.inc}
 interface
-uses Classes, fgl, CastleVectors, X3DNodes, CastleScene,
+uses Classes, Generics.Collections, CastleVectors, X3DNodes, CastleScene,
   DecoAbstractWorld, DecoAbstractGenerator, DecoNodeParser,
   DecoActor,
   DecoNavigation, DecoGlobal;
 
 {generic list of TX3DRootNodes, representing render groups}
-type TRootList = specialize TFPGObjectList<TX3DRootNode>;
+type TRootList = specialize TObjectList<TX3DRootNode>;
 {generic list of TCastleScene, sync with TRootList}
-type TSceneList = specialize TFPGObjectList<TCastleScene>;
+type TSceneList = specialize TObjectList<TCastleScene>;
 {list of ttransform nodes, reperesenting each basic object in the world}
-type TTransformList = specialize TFPGObjectList<TTransformNode>;
+type TTransformList = specialize TObjectList<TTransformNode>;
 {$IFDEF UseSwitches}
 {list of switch nodes wrapping each element of TTransformList}
-type TSwitchList = specialize TFPGObjectList<TSwitchNode>;
+type TSwitchList = specialize TObjectList<TSwitchNode>;
 {$ENDIF}
 
 

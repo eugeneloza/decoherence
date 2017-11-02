@@ -23,7 +23,7 @@ unit DecoFont;
 interface
 
 uses
-  SysUtils, fgl,
+  SysUtils, Generics.Collections,
   {$IFDEF Android}
   CastleTextureFont_LinBiolinumRG_16,
   {$ENDIF}
@@ -45,7 +45,7 @@ type DString = class(DObject) //maybe make it a record?
   { specific size parameters of this line }
   Width, Height, HeightBase: integer;
 end;
-type DStringList  =  specialize TFPGObjectList<DString>;
+type DStringList  =  specialize TObjectList<DString>;
 
 Type DFont = class(TTextureFont)
   { Converts a broken string into a single image }

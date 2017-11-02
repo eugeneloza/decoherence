@@ -22,8 +22,7 @@ unit DecoInterfaceCore;
 
 interface
 
-uses
-  fgl,
+uses Generics.Collections,
   DecoGlobal, DecoTime;
 
 const DefaultAnimationDuration = 0.3; {in seconds}
@@ -309,7 +308,7 @@ Type
     destructor Destroy; override;
   end;
 
-type DInterfaceElementsList = specialize TFPGObjectList<DSingleInterfaceElement>;
+type DInterfaceElementsList = specialize TObjectList<DSingleInterfaceElement>;
 
 Type
   { An interface element, that can contain "Children" }

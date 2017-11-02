@@ -21,7 +21,7 @@ unit DecoDungeonGenerator;
 {$INCLUDE compilerconfig.inc}
 interface
 
-uses Classes, CastleRandom, fgl, CastleGenericLists,
+uses Classes, CastleRandom, Generics.Defaults, Generics.Collections,
   DecoAbstractGenerator, DecoDungeonTiles,
   DecoNavigationNetwork,
   DecoGlobal;
@@ -41,7 +41,7 @@ type
     {the face type of the dock point. For faster checking}
     FaceType: TTileFace;
   end;
-type TDockPointList = specialize TGenericStructList<DDockPoint>;
+type TDockPointList = specialize TList<DDockPoint>;
 
 type
   {extended functionality for DTileMap;
@@ -90,7 +90,7 @@ type
      full version}
     function CalculateFaces: integer; reintroduce; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 end;
-type TGeneratorTileList = specialize TFPGObjectList<DGeneratorTile>;
+type TGeneratorTileList = specialize TObjectList<DGeneratorTile>;
 
 type
   {this is a basic "add a tile" generator step. We can build a map by followig these
@@ -120,7 +120,7 @@ type
     {coordinates to place the tile}
     x,y,z: TIntCoordinate;
   end;
-  TFirstStepsArray = specialize TGenericStructList<DFirstStep>;
+  TFirstStepsArray = specialize TList<DFirstStep>;
 
 type
   {a set of map generation parameters}
@@ -288,7 +288,7 @@ type
   Txyz = record
     x,y,z: TIntCoordinate;
   end;
-type TRaycastList = specialize TGenericStructList<Txyz>;
+type TRaycastList = specialize TList<Txyz>;
 
 type TNeighboursMapArray = array of array of array of TNeighboursList;
 
@@ -827,6 +827,7 @@ begin
         tmpNav.Pos[1] := iy;
         tmpNav.Pos[2] := iz;
         tmpNav.Blocked := false;
+        tmpNav.isSafe := false;
         NavMap[ix,iy,iz] := NavList.Add(tmpNav);
       end;
   Log(LogGenerateWorld,{$I %CURRENTROUTINE%},'Navigation Graph created, nodes: '+IntToStr(NavList.Count));
@@ -1119,18 +1120,20 @@ end;
 
 {----------------------------------------------------------------------------}
 
-function CompareNeighbours(const i1,i2: DNeighbour): integer;
+function CompareNeighbours(constref i1,i2: DNeighbour): integer;
 begin
   Result := i1.tile - i2.tile;
 end;
+type TNeighboursComparer = specialize TComparer<DNeighbour>;
 
 {----------------------------------------------------------------------------}
 
 procedure D3DDungeonGenerator.RemoveDuplicatesNeighbours(var List: TNeighboursList);
 var i: integer;
 begin
-  if list.count <= 1 then Exit;
-  List.Sort(@CompareNeighbours);
+  if List.Count <= 1 then Exit;
+
+  List.Sort(TNeighboursComparer.Construct(@CompareNeighbours));
   i := 0;
   repeat
     if List[i].Tile = List[i+1].Tile then begin
@@ -1171,7 +1174,7 @@ begin
         {$warning not working yet}
         NeighboursMap[ix,iy,iz] := TNeighboursList.Create;
         for i := 0 to tmpNeighboursMap[ix,iy,iz].Count-1 do
-          NeighboursMap[ix,iy,iz].Add(tmpNeighboursMap[ix,iy,iz].L[i]);
+          NeighboursMap[ix,iy,iz].Add(tmpNeighboursMap[ix,iy,iz].Items[i]);
         RemoveDuplicatesNeighbours(NeighboursMap[ix,iy,iz]);
       end;
 end;
@@ -1208,16 +1211,18 @@ type DIndexRec = record
   Index: integer;
   Hits: integer;
 end;
-type HitList = specialize TGenericStructList<DIndexRec>;
+type HitList = specialize TList<DIndexRec>;
 //{$DEFINE InverseSort}
-function CompareHits(const i1,i2: DIndexRec): integer;
+function CompareHits(constref i1,i2: DIndexRec): integer;
 begin
   {$IFNDEF InverseSort}
-  result := i1.hits - i2.hits;
+  Result := i1.Hits - i2.Hits;
   {$ELSE}
-  result := i2.hits - i1.hits;
+  Result := i2.Hits - i1.Hits;
   {$ENDIF}
 end;
+type THitsComparer = specialize TComparer<DIndexRec>;
+
 procedure D3DDungeonGenerator.Chunk_N_Slice;
 var i,j,g: integer;
     ix,iy,iz: integer;
@@ -1243,9 +1248,9 @@ begin
       for iz := 0 to Map.SizeZ-1 do if NeighboursMap[ix,iy,iz]<>nil then {begin}
         //dLog(inttostr(ix)+inttostr(iy)+inttostr(iz),inttostr(NeighboursMap[ix,iy,iz].count));
         for j := 0 to NeighboursMap[ix,iy,iz].Count-1 do
-          inc(HitCount.L[NeighboursMap[ix,iy,iz].L[j].Tile].Hits);
+          HitCount.Items[NeighboursMap[ix,iy,iz].Items[j].Tile].Hits += 1;
       {end;}
-  HitCount.Sort(@CompareHits);
+  HitCount.Sort(THitsComparer.Construct(@CompareHits));
 
   {now let's start the main algorithm}
   g := 0;
@@ -1279,9 +1284,9 @@ begin
       {we're sure neighbours list is not nil!}
       if NeighboursMap[ix,iy,iz]=nil then raise Exception.Create('NeighboursMap is nil!');
       for j := 0 to NeighboursMap[ix,iy,iz].Count-1 do
-        if not TilesUsed[NeighboursMap[ix,iy,iz].L[j].Tile] then begin
-          TilesUsed[NeighboursMap[ix,iy,iz].L[j].Tile] := true;
-          Groups[g].Add(NeighboursMap[ix,iy,iz].L[j].Tile);
+        if not TilesUsed[NeighboursMap[ix,iy,iz].Items[j].Tile] then begin
+          TilesUsed[NeighboursMap[ix,iy,iz].Items[j].Tile] := true;
+          Groups[g].Add(NeighboursMap[ix,iy,iz].Items[j].Tile);
         end;
 
     end;

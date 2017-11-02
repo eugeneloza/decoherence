@@ -23,7 +23,7 @@ unit DecoNavigationNetwork;
 {$INCLUDE compilerconfig.inc}
 interface
 
-uses CastleGenericLists, CastleVectors,
+uses Generics.Collections, CastleGenericLists, CastleVectors,
   DecoGlobal;
 
 type TNavID = integer;
@@ -58,7 +58,7 @@ type
 end;
 
 type TNavList = specialize TGenericStructList<DNavPt>;
-type TWeeniesList = specialize TGenericStructList<DWeenie>;
+type TWeeniesList = specialize TList<DWeenie>;
 
 implementation
 

@@ -22,7 +22,7 @@ unit DecoInput;
 
 interface
 
-uses Classes, fgl, SysUtils,
+uses Classes, Generics.Collections, SysUtils,
   CastleFilesUtils, CastleKeysMouse,
   DecoInterfaceCore, DecoGui,
   DecoGlobal;
@@ -35,7 +35,7 @@ type DTouch = class(DObject)
   procedure Update(const Event: TInputMotion);
 end;
 
-type DTouchList = specialize TFPGObjectList<DTouch>;
+type DTouchList = specialize TObjectList<DTouch>;
 
 {-------------------------------- vars --------------------------------------}
 

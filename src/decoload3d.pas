@@ -23,11 +23,11 @@ unit DecoLoad3d;
 
 interface
 
-uses X3DNodes, fgl,
+uses X3DNodes, Generics.Collections,
   DecoGlobal;
 
 Type
-  TMaterialList = specialize TFPGObjectList<TMaterialNode>;
+  TMaterialList = specialize TObjectList<TMaterialNode>;
 
 Type
   { a link for easy acessing the material of EACH model loaded

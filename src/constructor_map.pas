@@ -460,10 +460,10 @@ begin
   LargeContainer := XMLdoc.CreateElement('FirstSteps');
   for i := 0 to GParam.FirstSteps.Count-1{j in GParam.FirstSteps} do begin
     SmallContainer := XMLdoc.CreateElement('Tile');
-    SmallContainer.AttributeSet('x',GParam.FirstSteps.L[i].x);
-    SmallContainer.AttributeSet('y',GParam.FirstSteps.L[i].y);
-    SmallContainer.AttributeSet('z',GParam.FirstSteps.L[i].z);
-    TextNode := XMLdoc.CreateTextNode(UTF8decode(GParam.FirstSteps.L[i].Tile));
+    SmallContainer.AttributeSet('x',GParam.FirstSteps.Items[i].x);
+    SmallContainer.AttributeSet('y',GParam.FirstSteps.Items[i].y);
+    SmallContainer.AttributeSet('z',GParam.FirstSteps.Items[i].z);
+    TextNode := XMLdoc.CreateTextNode(UTF8decode(GParam.FirstSteps.Items[i].Tile));
     SmallContainer.AppendChild(TextNode);
     LargeContainer.AppendChild(SmallContainer);
   end;

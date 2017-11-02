@@ -21,7 +21,7 @@ unit DecoLoadScreen;
 {$INCLUDE compilerconfig.inc}
 interface
 
-uses fgl,
+uses Generics.Collections,
   DecoTranslation,
   DecoGlobal;
 
@@ -33,7 +33,7 @@ type
   end;
 
 { Actually this one looks like a TStringList for now, but may be extended in future }
-TLoadImageList = specialize TFPGObjectList<DLoadImage>;
+TLoadImageList = specialize TObjectList<DLoadImage>;
 
 type
   { A fact with control of displayed frequency and a list of compatible images }
@@ -51,7 +51,7 @@ type
     destructor Destroy; override;
 end;
 
-Type TFactList = specialize TFPGObjectList<DFact>;
+Type TFactList = specialize TObjectList<DFact>;
 
 var
     {a list of all loaded facts and links to compatible loadscreen images}

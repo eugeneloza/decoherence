@@ -33,7 +33,7 @@ unit DecoContext;
 
 interface
 
-uses fgl, DecoGlobal;
+uses Generics.Collections, DecoGlobal;
 
 type TContextRecord = string;   //todo: integer; read from xml list of possible Context elements
 
@@ -59,7 +59,7 @@ type
     //function Compare;
   end;
 
-type TContextList = specialize TFPGObjectList<DContextElement>;
+type TContextList = specialize TObjectList<DContextElement>;
 
 //todo: some Context elements may and should be dynamically generated only when requested!!!!!!!!
 type

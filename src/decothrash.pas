@@ -18,20 +18,20 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 { this is an experimental "thrash" unit replacing the "suicide" of some objects
   usage: thrash.add(some_object); to schedule it's safe freeing
   and use thrash.clear each time you need to clear it.}
-unit decothrash;
+unit DecoThrash;
 
 {$INCLUDE compilerconfig.inc}
 interface
-uses SysUtils, fgl;
+uses SysUtils, Generics.Collections;
 
-type TThrash = specialize TFPGObjectList<TObject>;
+type TThrash = specialize TObjectList<TObject>;
 
 var Thrash: TThrash;
 
 implementation
 
 initialization
-Thrash := TThrash.create(true);
+Thrash := TThrash.Create(true);
 
 finalization
 FreeAndNil(Thrash);
