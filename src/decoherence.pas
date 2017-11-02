@@ -29,7 +29,7 @@ uses Classes, SysUtils,
 
      CastleScene,
 
-     DecoThread, DecoThrash,
+     DecoThrash,
 
      {---- temporary units (for testing) -----}
      DecoSound,
@@ -167,19 +167,6 @@ begin
   LoadCompleted := true;
 end;
 
-type
-  DLoadGameThread = class(DThread)
-  protected
-    procedure Execute; override;
-  end;
-
-var LoadThread: DLoadGameThread;
-
-procedure DLoadGameThread.execute;
-begin
-  LoadAndInitData;
-end;
-
 procedure ApplicationInitialize;
 begin
   InitLog;
@@ -205,21 +192,7 @@ begin
 
   fLog(LogInit,{$I %CURRENTROUTINE%},'Init finished');
 
-  LoadThread := DLoadGameThread.Create(true);
-  {$WARNING BUUUUUUUUUUUUUUUUUG!!!!!}
-
-  {$DEFINE NoThreads}
-  {$IFDEF Linux}{$IFNDEF RELEASE}{$DEFINE NoThreads}{$ENDIF}{$ENDIF}
-
-  {$IFNDEF NoThreads}
-  LoadThread.Priority := tpNormal;
-  LoadThread.FreeOnTerminate := true;
-  LoadThread.Start;
-  {$ELSE}
-  LoadThread.FreeOnTerminate := false;
-  LoadThread.Execute;
-  FreeAndNil(LoadThread);
-  {$ENDIF}
+  LoadAndInitData;
 end;
 
 {==========================================================================}

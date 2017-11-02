@@ -24,7 +24,7 @@ interface
 uses Classes, CastleRandom, fgl, CastleGenericLists,
   DecoAbstractGenerator, DecoDungeonTiles,
   DecoNavigationNetwork,
-  DecoThread, DecoGlobal;
+  DecoGlobal;
 
 type TIntMapArray = array of array of array of integer;
 

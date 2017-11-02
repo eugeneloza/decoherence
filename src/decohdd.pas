@@ -29,39 +29,6 @@ uses Classes,
   CastleResources, CastleCreatures;
 
 type
-  { I don't like this implementation. Most of the routines will be absolutely
-    identical for all the classes... very redundant.}
-  ILoadObject = interface
-  ['{E1F8DD90-7A47-43DC-902D-4125D5DE67D1}']
-    { procedure describing what to be run }
-    procedure Load(const URL: string);
-
-    {$IFDEF ThreadLoad}
-    { is Thread running? }
-    function ThreadLocked: boolean;
-    { report that thread has started }
-    procedure LockThread;
-    { report that thread has stopped }
-    procedure UnlockThread;
-    { source object grabs a thread to terminate it in destructor }
-    procedure GrabThread(aThread: TThread);
-    {$ENDIF}
-  end;
-
-
-{$IFDEF ThreadLoad}
-type
-  { a thread that loads a TThreadedObject through ILoadObject interface }
-  DLoadThread = class(TThread)
-  public
-    Source: ILoadObject;
-    URL: string;
-  protected
-    procedure Execute; override;
-  end;
-{$ENDIF}
-
-type
   {enable thread-safe loading of resources}
   T3DResourceListHelper = class helper for T3DResourceList
   public
@@ -78,10 +45,6 @@ type
     procedure PrepareSafe;
   end;
 
-{ Loads a TThreadedObject through ILoadObject interface by executing
-  Load(URL) in a Thread (if threading enabled - otherwise does it "online") }
-procedure LoadThread(const Source: ILoadObject; const URL: string);
-
 {safe wrapper for CastleImages.LoadImage, overloaded}
 function LoadImageSafe(const URL: String): TCastleImage;
 function LoadImageSafe(const URL: string;
@@ -97,40 +60,6 @@ function LoadBufferSafe(const URL: string; out Duration: TFloatTime): TSoundBuff
 implementation
 uses SyncObjs, SysUtils, x3dload,
   DecoLog;
-
-{$IFDEF ThreadLoad}
-procedure DLoadThread.Execute;
-begin
-  Source.Load(URL);
-  Source.UnlockThread;
-end;
-
-{----------------------------------------------------------------------------}
-
-procedure LoadThread(const Source: ILoadObject; const URL: string);
-var LoadThread: DLoadThread;
-begin
-  if Source.ThreadLocked then begin
-    fLog(LogThreadError,{$I %CURRENTROUTINE%},'Error: Thread is already running, abort');
-    Exit;
-  end;
-  Source.LockThread;
-  LoadThread := DLoadThread.Create(true);
-  Source.GrabThread(LoadThread);
-  LoadThread.Source := Source;
-  LoadThread.URL := URL;
-  LoadThread.FreeOnTerminate := true;
-  LoadThread.Priority := tpLower;
-  LoadThread.Start;
-end;
-{$ELSE}
-procedure LoadThread(Source: ILoadObject; URL: string);
-begin
-  Source.Load(URL);
-end;
-{$ENDIF}
-
-
 
 {============================================================================}
 {====================== SAFE LOADING (WITH LOCKS) ==========================}

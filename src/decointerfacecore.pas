@@ -24,7 +24,7 @@ interface
 
 uses
   fgl,
-  DecoGlobal, DecoTime, DecoThread;
+  DecoGlobal, DecoTime;
 
 const DefaultAnimationDuration = 0.3; {in seconds}
 const UninitializedIntCoord = -999;
@@ -186,7 +186,7 @@ type
 Type
   { most abstract container for interface elements
     Defines size, scaling and animation state }
-  DAbstractElement = class abstract(DThreadedObject)
+  DAbstractElement = class abstract(DObject)
   strict protected
     { Caches current animation state, recalculated by GetAnimationState at every render}
     procedure GetAnimationState;
@@ -234,7 +234,7 @@ Type
     procedure AnimateTo(const Animate: TAnimationStyle; const Duration: float = DefaultAnimationDuration);
     procedure AnchorTo(const aElement: DAbstractElement);
   public
-    constructor Create; override;
+    constructor Create; virtual;//override;
     destructor Destroy; override;
   end;
 

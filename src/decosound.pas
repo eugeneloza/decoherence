@@ -38,7 +38,7 @@ unit DecoSound;
 interface
 uses Classes, fgl,
   CastleSoundEngine, CastleTimeUtils,
-  DecoThread, DecoGlobal;
+  DecoGlobal;
 
 type
   {thread that actually loads the sound file}
@@ -53,7 +53,7 @@ type
 
 type
   {store and manage music track}
-  DSoundFile = class (DThreadedObject)
+  DSoundFile = class (DObject)
   private
     {thread to load the sound file. Auto freed on terminate. Sets isLoaded flag}
     //LoadThread: DSoundLoadThread;
@@ -74,7 +74,7 @@ type
     procedure Load(URL: string);
     procedure LoadFinished;
 
-    constructor Create; override;
+    constructor Create; virtual;//override;
     constructor Create(URL: string); virtual;
     destructor Destroy; override;
   end;
@@ -298,7 +298,7 @@ begin
     Log(LogSoundError,{$I %CURRENTROUTINE%},'ERROR: No valid URL provided. Exiting...');
     Exit;
   end;
-  if not ThreadLocked then begin
+  {if not ThreadLocked then begin
     {LoadThread := DSoundLoadThread.Create(true);
     LoadThread.Priority := tpLower;
     LoadThread.parent := self;
@@ -307,7 +307,7 @@ begin
     ThreadWorking := true; }
   end
   else
-     Log(LogSoundError,{$I %CURRENTROUTINE%},'Thread already working...');
+     Log(LogSoundError,{$I %CURRENTROUTINE%},'Thread already working...');}
 end;
 procedure DSoundFile.LoadFinished;
 begin

@@ -23,7 +23,7 @@ interface
 
 uses Classes, CastleRandom, fgl, CastleGenericLists,
   DecoNavigationNetwork,
-  DecoThread, DecoGlobal;
+  DecoGlobal;
 
 type
   {maybe I'll change it later}
