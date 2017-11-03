@@ -88,7 +88,7 @@ type
      Result must be assigned to the generator (or freed)}
     function GetMapParameters: DDungeonGeneratorParameters;
     {saves current map parameters to a file}
-    procedure SaveMap(FileName: string; togamefolder: boolean);
+    procedure SaveMap(FileName: string; const ToGameFolder: boolean);
     {compile all the maps to game folder}
     procedure SaveAll;
 
@@ -103,7 +103,7 @@ type
   public
     procedure LoadMe; override;
     procedure FreeMe; override;
-    procedure WriteMe(ToGameFolder: boolean); override;
+    procedure WriteMe(const ToGameFolder: boolean); override;
   end;
 
 var
@@ -358,7 +358,7 @@ end;
 
 {-------------------------------------------------------------------------}
 
-procedure TMapEditor.WriteMe(ToGameFolder: boolean);
+procedure TMapEditor.WriteMe(const ToGameFolder: boolean);
 begin
   if ToGameFolder then
     SaveAll
@@ -369,7 +369,7 @@ end;
 
 {------------------------------------------------------------------------------}
 
-procedure TMapEditor.SaveMap(FileName: string; togamefolder: boolean);
+procedure TMapEditor.SaveMap(FileName: string; const ToGameFolder: boolean);
 var GParam: DDungeonGeneratorParameters;
     XMLdoc: TXMLDocument;
     RootNode: TDOMNode;

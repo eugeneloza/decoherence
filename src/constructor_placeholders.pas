@@ -36,7 +36,7 @@ type
   public
     procedure LoadMe; override;
     procedure FreeMe; override;
-    procedure WriteMe(ToGameFolder: boolean); override;
+    procedure WriteMe(const ToGameFolder: boolean); override;
   end;
 
 var
@@ -66,7 +66,7 @@ end;
 
 {------------------------------------------------------------------------------}
 
-procedure TPlaceholdersEditor.WriteMe(ToGameFolder: boolean);
+procedure TPlaceholdersEditor.WriteMe(const ToGameFolder: boolean);
 begin
   {$Warning dummy}
   inherited WriteMe(ToGameFolder);

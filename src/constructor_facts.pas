@@ -61,11 +61,11 @@ type
     LoadImages: TLoadImageList;
     {re-fills listboxes}
     procedure ReloadContent;
-    procedure SaveFacts(ToGameFolder: boolean);
+    procedure SaveFacts(const ToGameFolder: boolean);
   public
     procedure LoadMe; override;
     procedure FreeMe; override;
-    procedure WriteMe(ToGameFolder: boolean); override;
+    procedure WriteMe(const ToGameFolder: boolean); override;
   end;
 
 var
@@ -155,7 +155,7 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-procedure TFactsEditor.WriteMe(ToGameFolder: boolean);
+procedure TFactsEditor.WriteMe(const ToGameFolder: boolean);
 begin
   SaveFacts(ToGameFolder);
   inherited WriteMe(ToGameFolder);
@@ -163,7 +163,7 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-procedure TFactsEditor.SaveFacts(ToGameFolder: boolean);
+procedure TFactsEditor.SaveFacts(const ToGameFolder: boolean);
 var XMLdoc: TXMLDocument;
     RootNode, ContainerNode, ValueNode, Value2node, TextNode: TDOMNode;
     i: DFact;

@@ -129,21 +129,21 @@ type
       It's really important to make the tile map correctly }
     procedure ResetCamera;
     { Loads the selected tile }
-    procedure LoadTile(FileName: string);
+    procedure LoadTile(const FileName: string);
     { Save/compile all the tiles }
     procedure SaveAllTiles;
     { Save Tile map }
-    procedure SaveTileMap(FileName: string; toGameFolder: boolean);
+    procedure SaveTileMap(const FileName: string; const toGameFolder: boolean);
     { compile the tile to game folder }
-    procedure CompileTile(FileName: string);
+    procedure CompileTile(const FileName: string);
     { Fills the Face and Base atlas; todo: load/save ini }
     procedure FillAtlas;
     { fills Face and base boxes }
     procedure MakeAtlasBoxes;
     { conversion from combobox index to TTileFace }
-    function FaceByIndex(Index: integer): TTileFace;
+    function FaceByIndex(const Index: integer): TTileFace;
     { conversion from combobox index to TTileKind }
-    function BaseByIndex(Index: integer): TTileKind;
+    function BaseByIndex(const Index: integer): TTileKind;
     { draws tile map to MapImage}
     procedure DrawTileMap;
     { prepares controls for MapImage editing (reset sizes, enable/disable etc)}
@@ -154,11 +154,11 @@ type
       based on caeles CC0 template from OpenGameArt }
     procedure MakePNGMap;
     { the actual editor of the tile map, responds to mouse x,y click }
-    procedure EditTileMap(x,y: integer);
+    procedure EditTileMap(const x,y: integer);
   public
     procedure LoadMe; override;
     procedure FreeMe; override;
-    procedure WriteMe(ToGameFolder: boolean); override;
+    procedure WriteMe(const ToGameFolder: boolean); override;
   end;
 
 var
@@ -228,7 +228,7 @@ end;
 
 {--------------------------------------------------------------------------}
 
-procedure TDungeonTilesEditor.SaveTileMap(FileName: string; toGameFolder: boolean);
+procedure TDungeonTilesEditor.SaveTileMap(const FileName: string; const toGameFolder: boolean);
 begin
   TileM.Save(FileName,ToGameFolder);
 end;
@@ -247,7 +247,7 @@ end;
 
 {--------------------------------------------------------------------------}
 
-procedure TDungeonTilesEditor.WriteMe(ToGameFolder: boolean);
+procedure TDungeonTilesEditor.WriteMe(const ToGameFolder: boolean);
 begin
   //dLog({$I %CURRENTROUTINE%},'Working directly on game data, nothing to save.');
   if not ToGameFolder then begin
@@ -305,7 +305,7 @@ end;
 
 {---------------------------------------------------------------------------}
 
-procedure TDungeonTilesEditor.LoadTile(FileName: string);
+procedure TDungeonTilesEditor.LoadTile(const FileName: string);
 begin
   if isChanged then begin
     if MessageDlg('Unsaved changes?', 'Your changes are unsaved! Really load a new tile?', mtConfirmation, [mbYes, mbNo],0) = mrNo then exit;
@@ -377,7 +377,7 @@ end;
 
 {--------------------------------------------------------------------------}
 
-procedure TDungeonTilesEditor.CompileTile(FileName: string);
+procedure TDungeonTilesEditor.CompileTile(const FileName: string);
 var TmpRoot: TX3DRootNode;
     tmpMap: DTileMap;
     f: string;
@@ -493,7 +493,7 @@ end;
 
 {-------------------------------------------------------------------------}
 
-function TDungeonTilesEditor.FaceByIndex(Index: integer): TTileFace;
+function TDungeonTilesEditor.FaceByIndex(const Index: integer): TTileFace;
 var tf: TTileFace;
 begin
   for tf in TTileFace do if FaceAtlasBox.Items[Index] = FaceAtlas[tf].FriendlyName then begin
@@ -506,7 +506,7 @@ end;
 
 {-------------------------------------------------------------------------}
 
-function TDungeonTilesEditor.BaseByIndex(Index: integer): TTileKind;
+function TDungeonTilesEditor.BaseByIndex(const Index: integer): TTileKind;
 var tk: TTileKind;
 begin
   for tk in TTileKind do if BaseAtlasBox.Items[Index] = BaseAtlas[tk].FriendlyName then begin
@@ -686,7 +686,7 @@ begin
   EditTileMap(x,y);
 end;
 
-procedure TDungeonTilesEditor.EditTileMap(x,y: integer);
+procedure TDungeonTilesEditor.EditTileMap(const x,y: integer);
 var ScaleX,ScaleY: float;
     dx,dy: float;
     x1,y1,z1,ax,ay: integer;

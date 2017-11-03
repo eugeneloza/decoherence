@@ -60,7 +60,7 @@ type
     { enumerates all the editor forms, fills AllForms }
     procedure MakeFormsList;
     { write the data to Architect or Game folder }
-    procedure WriteMe(ToGameFolder: boolean); override;
+    procedure WriteMe(const ToGameFolder: boolean); override;
 
     procedure DetectLanguageSelect; override;
   end;
@@ -103,7 +103,7 @@ end;
 
 procedure TMainForm.MakeFormsList;
 begin
-  AllForms := TFormList.create(false);
+  AllForms := TFormList.Create(false);
   //add all future forms here
   AllForms.Add(FactsEditor);
   AllForms.Add(DungeonTilesEditor);
@@ -113,7 +113,7 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-procedure TMainForm.WriteMe(ToGameFolder: boolean);
+procedure TMainForm.WriteMe(const ToGameFolder: boolean);
 var WF: TWriterForm;
 begin
   Log(LogConstructorInfo,{$I %CURRENTROUTINE%},'Started.');

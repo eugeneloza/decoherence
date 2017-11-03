@@ -71,7 +71,7 @@ type
     {TWriterForm abstract load procedure}
     procedure LoadMe; virtual; abstract;
     {TWriterForm abstract save procedure}
-    procedure WriteMe(ToGameFolder: boolean); virtual;
+    procedure WriteMe(const ToGameFolder: boolean); virtual;
     {TWriterForm abstract destructor}
     procedure FreeMe; virtual; abstract;
   end;
@@ -194,7 +194,7 @@ end;
 
 {============================================================================}
 
-procedure TWriterForm.WriteMe(ToGameFolder: boolean);
+procedure TWriterForm.WriteMe(const ToGameFolder: boolean);
 begin
   if not ToGameFolder then isChanged := false;
 end;

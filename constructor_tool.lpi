@@ -198,6 +198,7 @@
       <Unit12>
         <Filename Value="src/decodungeontiles.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoDungeonTiles"/>
       </Unit12>
       <Unit13>
         <Filename Value="src/decodungeonworld.pas"/>
@@ -215,6 +216,7 @@
       <Unit16>
         <Filename Value="src/decoloadscreen.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoLoadScreen"/>
       </Unit16>
       <Unit17>
         <Filename Value="src/decotranslation.pas"/>
