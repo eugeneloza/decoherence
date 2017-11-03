@@ -56,6 +56,12 @@
               </Win32>
             </Options>
           </Linking>
+          <Other>
+            <CustomOptions Value="-dConstructor"/>
+            <OtherDefines Count="1">
+              <Define0 Value="Constructor"/>
+            </OtherDefines>
+          </Other>
         </CompilerOptions>
       </Item2>
       <Item3 Name="Release">
@@ -86,6 +92,12 @@
               </Win32>
             </Options>
           </Linking>
+          <Other>
+            <CustomOptions Value="-dConstructor"/>
+            <OtherDefines Count="1">
+              <Define0 Value="Constructor"/>
+            </OtherDefines>
+          </Other>
         </CompilerOptions>
       </Item3>
     </BuildModes>
@@ -221,6 +233,7 @@
       <Unit20>
         <Filename Value="src/decofile.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoFile"/>
       </Unit20>
       <Unit21>
         <Filename Value="src/generated/decoloadembedded.pas"/>
@@ -245,6 +258,12 @@
         </Win32>
       </Options>
     </Linking>
+    <Other>
+      <CustomOptions Value="-dConstructor"/>
+      <OtherDefines Count="1">
+        <Define0 Value="Constructor"/>
+      </OtherDefines>
+    </Other>
   </CompilerOptions>
   <Debugging>
     <Exceptions Count="6">
