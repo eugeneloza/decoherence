@@ -25,11 +25,33 @@ uses
   Classes, Forms, SysUtils,
   //Controls,
   StdCtrls,
-  DecoTranslation;
+  DecoFile,
+  DecoTranslation,
+
+  DOM, CastleXMLUtils;
 
 const
   {all data that will remain in Architect folder and used only in Constructor}
   LocalFolder = 'local/';
+
+type
+  {}
+  DHeaderModule = class(DDataModule)
+  strict private const
+    s_Module = 'Header';
+    s_FriendlyName = 'FriendlyName';
+    s_Comment = 'Comment';
+  public
+    FriendlyName: string;
+    Comment: string;
+    function WriteModule: TDOMNode; override;
+    procedure ReadModule(const aParent: TDOMElement); override;
+  {$IFDEF Constructor}
+  public
+    procedure ConstructInterface; override;
+    procedure ReadInterface; override;
+  {$ENDIF}
+  end;
 
 type
   {a generic Form with abstract write/load and several other abstract
@@ -247,7 +269,55 @@ begin
   DetectLanguageSelect;
 end;
 
+{============================================================================}
+
+function DHeaderModule.WriteModule: TDOMNode;
+var ValueNode, TextNode: TDOMNode;
+begin
+  inherited WriteModule;
+  Result := Parent.CreateElement(s_Module);
+
+  ValueNode := Parent.CreateElement(s_FriendlyName);
+  TextNode := Parent.CreateTextNode(UTF8decode(FriendlyName));
+  ValueNode.AppendChild(TextNode);
+  Result.AppendChild(ValueNode);
+
+  ValueNode := Parent.CreateElement(s_Comment);
+  TextNode := Parent.CreateTextNode(UTF8decode(Comment));
+  ValueNode.AppendChild(TextNode);
+  Result.AppendChild(ValueNode);
+end;
+
 {---------------------------------------------------------------------------}
+
+procedure DHeaderModule.ReadModule(const aParent: TDOMElement);
+var ContainerNode, ValueNode: TDOMElement;
+begin
+  inherited ReadModule(aParent);
+  ContainerNode := aParent.ChildElement(s_Module);
+  ValueNode := ContainerNode.ChildElement(s_FriendlyName);
+  FriendlyName := ValueNode.TextData;
+  ValueNode := ContainerNode.ChildElement(s_Comment);
+  Comment := ValueNode.TextData;
+end;
+
+{---------------------------------------------------------------------------}
+
+{$IFDEF Constructor}
+
+procedure DHeaderModule.ConstructInterface;
+begin
+
+end;
+
+{---------------------------------------------------------------------------}
+
+procedure DHeaderModule.ReadInterface;
+begin
+
+end;
+
+{$ENDIF}
 
 end.
 

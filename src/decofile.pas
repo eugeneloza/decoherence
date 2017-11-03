@@ -20,7 +20,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 unit DecoFile;
 
 {$INCLUDE compilerconfig.inc}
-{$DEFINE Constructor}
 
 interface
 
@@ -31,21 +30,25 @@ type TSimpleMethod = procedure of object;
 
 type
   { the most generic data module }
-  DDataModule = class(DObject)
-  strict protected
+  DDataModule = class abstract(DObject)
+  public
+    Parent: TXMLDocument;
+    {}
+    {$IFDEF Constructor}ToGameFolder: boolean;{$ELSE}const ToGameFolder = true;{$ENDIF}
   public
     {}
     isChanged: boolean;
     {}
-    procedure WriteModule; virtual;
+    function WriteModule: TDOMNode; virtual;
     {}
-    procedure ReadModule; virtual;
-    {$IFDEF Constructor}
+    procedure ReadModule(const aParent: TDOMElement); virtual;
+  {$IFDEF Constructor}
+  public
     {}
     procedure ConstructInterface; virtual; abstract;
     {}
     procedure ReadInterface; virtual; abstract;
-    {$ENDIF}
+  {$ENDIF}
   end;
 
 type
@@ -101,11 +104,12 @@ implementation
 uses SysUtils,
   DecoLog;
 
-procedure DDataModule.WriteModule;
+function DDataModule.WriteModule: TDOMNode;
 begin
+  Result := nil;  //to avoid Result not set warning
   isChanged := false;
 end;
-procedure DDataModule.ReadModule;
+procedure DDataModule.ReadModule(const aParent: TDOMElement);
 begin
   isChanged := false;
 end;
