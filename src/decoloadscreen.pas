@@ -141,7 +141,7 @@ begin
       F := DFact.Create;
       F.Frequency := 1;
       F.Compatibility := TLoadImageList.Create(true);
-      ValueNode := Iterator.current.ChildElement('Value', true);  //todo: required=false and catch nil value
+      ValueNode := Iterator.Current.ChildElement('Value', true);  //todo: required=false and catch nil value
       F.Value := {$IFDEF UTF8Encode}UTF8encode{$ENDIF}(ValueNode.TextData);
       try
         Iterator2 := Iterator.Current.ChildElement('ImageList', true).ChildrenIterator;

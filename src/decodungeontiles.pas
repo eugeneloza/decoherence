@@ -81,8 +81,9 @@ type
 //inacceptible tile, used as "return"
 const
   InacceptibleTile: BasicTile =
-    (base: tkInacceptible;
-     faces: (tfInacceptible,tfInacceptible,tfInacceptible,tfInacceptible,tfInacceptible,tfInacceptible));
+    (Base:   tkInacceptible;
+     Faces: (tfInacceptible, tfInacceptible, tfInacceptible,
+             tfInacceptible, tfInacceptible, tfInacceptible));
 
 type
   {common routines shared by TileMap and DungeonMap}
@@ -343,9 +344,9 @@ begin
 
     Iterator := RootNode.ChildrenIterator;
     try
-      while Iterator.GetNext do if Iterator.current.NodeName = UTF8decode('Tile') then
+      while Iterator.GetNext do if Iterator.Current.NodeName = UTF8decode('Tile') then
       begin
-        ValueNode := Iterator.current;
+        ValueNode := Iterator.Current;
         jx := ValueNode.AttributeInteger('x');
         jy := ValueNode.AttributeInteger('y');
         jz := ValueNode.AttributeInteger('z');
@@ -353,7 +354,7 @@ begin
         Map[jx,jy,jz].Base := StrToTileKind(WorkNode.AttributeString('tile_kind'));
         WorkNode := ValueNode.ChildElement('faces', true);
         for j in TAngle do
-           Map[jx,jy,jz].faces[j] := StrToTileFace(WorkNode.AttributeString(AngleToStr(j)));
+           Map[jx,jy,jz].Faces[j] := StrToTileFace(WorkNode.AttributeString(AngleToStr(j)));
       end;
     finally
       FreeAndNil(Iterator);
@@ -367,8 +368,8 @@ begin
   if not Ready then
     raise Exception.Create('Fatal Error in DTileMap.Load! Unable to open file '+TileName);
 
-  SetLength(Img,sizez);
-  for jz := 0 to sizez-1 do
+  SetLength(Img,SizeZ);
+  for jz := 0 to SizeZ-1 do
     Img[jz] := LoadImage(ChangeURIExt(URL,'_'+IntToStr(jz)+'.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
 end;
 
