@@ -20,6 +20,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 unit DecoFile;
 
 {$INCLUDE compilerconfig.inc}
+{$DEFINE Constructor}
 
 interface
 
@@ -27,6 +28,25 @@ uses DecoGlobal, CastleFilesUtils,
   DOM, CastleXMLUtils;
 
 type TSimpleMethod = procedure of object;
+
+type
+  { the most generic data module }
+  DDataModule = class(DObject)
+  strict protected
+  public
+    {}
+    isChanged: boolean;
+    {}
+    procedure WriteModule; virtual;
+    {}
+    procedure ReadModule; virtual;
+    {$IFDEF Constructor}
+    {}
+    procedure ConstructInterface; virtual; abstract;
+    {}
+    procedure ReadInterface; virtual; abstract;
+    {$ENDIF}
+  end;
 
 type
   { General routines shared by writer and reader }
@@ -80,6 +100,18 @@ type
 implementation
 uses SysUtils,
   DecoLog;
+
+procedure DDataModule.WriteModule;
+begin
+  isChanged := false;
+end;
+procedure DDataModule.ReadModule;
+begin
+  isChanged := false;
+end;
+
+
+{==============================================================================}
 
 procedure DAbstractFile.AssignFileName(FileName: string; ToGameFolder: boolean);
 begin
