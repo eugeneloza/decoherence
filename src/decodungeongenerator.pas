@@ -1409,22 +1409,22 @@ begin
     RootNode := XMLdoc.DocumentElement;
     LargeContainer := RootNode.ChildElement('Parameters');
     SmallContainer := LargeContainer.ChildElement('Size');
-    MaxX := SmallContainer.AttributeInteger('maxx');
-    MaxY := SmallContainer.AttributeInteger('maxy');
-    MaxZ := SmallContainer.AttributeInteger('maxz');
-    MinX := SmallContainer.AttributeInteger('minx');
-    MinY := SmallContainer.AttributeInteger('miny');
-    MinZ := SmallContainer.AttributeInteger('minz');
+    MaxX := SmallContainer.AttributeInteger('MaxX');
+    MaxY := SmallContainer.AttributeInteger('MaxY');
+    MaxZ := SmallContainer.AttributeInteger('MaxZ');
+    MinX := SmallContainer.AttributeInteger('MinX');
+    MinY := SmallContainer.AttributeInteger('MinY');
+    MinZ := SmallContainer.AttributeInteger('MinZ');
 
     SmallContainer := LargeContainer.ChildElement('Volume');
-    Volume := SmallContainer.AttributeInteger('value');
+    Volume := SmallContainer.AttributeInteger('Value');
 
     SmallContainer := LargeContainer.ChildElement('Faces');
-    MaxFaces := SmallContainer.AttributeInteger('max');
-    MinFaces := SmallContainer.AttributeInteger('min');
+    MaxFaces := SmallContainer.AttributeInteger('Max');
+    MinFaces := SmallContainer.AttributeInteger('Min');
 
     SmallContainer := LargeContainer.ChildElement('Seed');
-    Seed := SmallContainer.AttributeInteger('value');
+    Seed := SmallContainer.AttributeInteger('Value');
 
     AbsoluteURL := false;
     LargeContainer := RootNode.ChildElement('TilesList');

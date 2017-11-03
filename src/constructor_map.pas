@@ -415,18 +415,18 @@ begin
   LargeContainer.AppendChild(SmallContainer);
 
   SmallContainer := XMLdoc.CreateElement('Volume');
-  SmallContainer.AttributeSet('value',GParam.Volume);
+  SmallContainer.AttributeSet('Value',GParam.Volume);
   LargeContainer.AppendChild(SmallContainer);
 
   LargeContainer.AppendChild(SmallContainer);
   SmallContainer := XMLdoc.CreateElement('Faces');
-  SmallContainer.AttributeSet('max',GParam.MaxFaces);
-  SmallContainer.AttributeSet('min',GParam.MinFaces);
+  SmallContainer.AttributeSet('Max',GParam.MaxFaces);
+  SmallContainer.AttributeSet('Min',GParam.MinFaces);
   LargeContainer.AppendChild(SmallContainer);
 
   LargeContainer.AppendChild(SmallContainer);
   SmallContainer := XMLdoc.CreateElement('Seed');
-  SmallContainer.AttributeSet('value',GParam.Seed);
+  SmallContainer.AttributeSet('Value',GParam.Seed);
   LargeContainer.AppendChild(SmallContainer);
 
   RootNode.AppendChild(LargeContainer);

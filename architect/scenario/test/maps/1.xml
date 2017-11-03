@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <InteriorMap>
   <Parameters>
-    <Size maxx="9" maxy="9" maxz="9" minx="9" miny="9" minz="9"/>
-    <Volume value="219"/>
-    <Faces max="9" min="4"/>
-    <Seed value="0"/>
+    <Size MaxX="9" MaxY="9" MaxZ="9" MinX="9" MinY="9" MinZ="9"/>
+    <Volume Value="219"/>
+    <Faces Max="9" Min="4"/>
+    <Seed Value="0"/>
   </Parameters>
   <TilesList>
     <Tile>library10</Tile>
@@ -12,38 +12,6 @@
     <Tile>library1_02_I</Tile>
     <Tile>library1_03_I</Tile>
     <Tile>library1_04_T</Tile>
-    <Tile>library_BrickPass_17_B</Tile>
-    <Tile>library_BrickPass_18_B</Tile>
-    <Tile>library_BrickPass_19_B</Tile>
-    <Tile>library_BrickStairs_01_I</Tile>
-    <Tile>library1_16_P</Tile>
-    <Tile>library1_17_R</Tile>
-    <Tile>library2_01_I</Tile>
-    <Tile>library2_02_I</Tile>
-    <Tile>library2_03_I</Tile>
-    <Tile>library2_18_L</Tile>
-    <Tile>library2_19_L</Tile>
-    <Tile>library3_16_S</Tile>
-    <Tile>library3_17_S</Tile>
-    <Tile>library3_18_S</Tile>
-    <Tile>library3_19_S</Tile>
-    <Tile>library4_01_D</Tile>
-    <Tile>library2_04_I</Tile>
-    <Tile>library4_19_R</Tile>
-    <Tile>library_BrickPass_01_L</Tile>
-    <Tile>library_BrickPass_06_O</Tile>
-    <Tile>library_BrickStairs_02_I</Tile>
-    <Tile>library_NarrowPass_01_I</Tile>
-    <Tile>library_NarrowPass_14_D</Tile>
-    <Tile>library4_13_K</Tile>
-    <Tile>library4_14_K</Tile>
-    <Tile>library4_16_R</Tile>
-    <Tile>library4_17_R</Tile>
-    <Tile>library4_18_R</Tile>
-    <Tile>library7_18_R</Tile>
-    <Tile>library7_19_R</Tile>
-    <Tile>library8</Tile>
-    <Tile>library9</Tile>
     <Tile>library1_05_T</Tile>
     <Tile>library1_06_T</Tile>
     <Tile>library1_07_T</Tile>
@@ -55,6 +23,16 @@
     <Tile>library1_13_I</Tile>
     <Tile>library1_14_I</Tile>
     <Tile>library1_15_I</Tile>
+    <Tile>library1_17_R</Tile>
+    <Tile>library2_01_I</Tile>
+    <Tile>library2_02_I</Tile>
+    <Tile>library2_03_I</Tile>
+    <Tile>library2_04_I</Tile>
+    <Tile>library1_16_P</Tile>
+    <Tile>library2_19_L</Tile>
+    <Tile>library4_07_B</Tile>
+    <Tile>library6_18_R</Tile>
+    <Tile>library_BrickStairs_04_I</Tile>
     <Tile>library2_06_T</Tile>
     <Tile>library2_07_T</Tile>
     <Tile>library2_08_T</Tile>
@@ -65,29 +43,45 @@
     <Tile>library2_14_L</Tile>
     <Tile>library2_16_L</Tile>
     <Tile>library2_17_L</Tile>
+    <Tile>library2_18_L</Tile>
+    <Tile>library3_16_S</Tile>
+    <Tile>library3_17_S</Tile>
+    <Tile>library3_18_S</Tile>
+    <Tile>library3_19_S</Tile>
+    <Tile>library4_01_D</Tile>
     <Tile>library4_02_D</Tile>
     <Tile>library4_03_D</Tile>
     <Tile>library4_04_D</Tile>
     <Tile>library4_06_B</Tile>
-    <Tile>library4_07_B</Tile>
     <Tile>library4_08_B</Tile>
     <Tile>library4_09_B</Tile>
     <Tile>library4_11_K</Tile>
     <Tile>library4_12_K</Tile>
+    <Tile>library4_13_K</Tile>
+    <Tile>library4_14_K</Tile>
+    <Tile>library4_16_R</Tile>
+    <Tile>library4_17_R</Tile>
+    <Tile>library4_18_R</Tile>
+    <Tile>library4_19_R</Tile>
     <Tile>library5_16_R</Tile>
     <Tile>library5_17_R</Tile>
     <Tile>library5_18_R</Tile>
     <Tile>library5_19_R</Tile>
     <Tile>library6_16_R</Tile>
     <Tile>library6_17_R</Tile>
-    <Tile>library6_18_R</Tile>
     <Tile>library6_19_R</Tile>
     <Tile>library7_16_R</Tile>
     <Tile>library7_17_R</Tile>
+    <Tile>library7_18_R</Tile>
+    <Tile>library7_19_R</Tile>
+    <Tile>library8</Tile>
+    <Tile>library9</Tile>
+    <Tile>library_BrickPass_01_L</Tile>
     <Tile>library_BrickPass_02_L</Tile>
     <Tile>library_BrickPass_03_L</Tile>
     <Tile>library_BrickPass_04_L</Tile>
     <Tile>library_BrickPass_05_I</Tile>
+    <Tile>library_BrickPass_06_O</Tile>
     <Tile>library_BrickPass_07_O</Tile>
     <Tile>library_BrickPass_08_O</Tile>
     <Tile>library_BrickPass_09_O</Tile>
@@ -97,20 +91,26 @@
     <Tile>library_BrickPass_14_U</Tile>
     <Tile>library_BrickPass_15_I</Tile>
     <Tile>library_BrickPass_16_B</Tile>
-    <Tile>library_BrickStairs_17_O</Tile>
-    <Tile>library_BrickStairs_18_O</Tile>
-    <Tile>library_BrickStairs_19_O</Tile>
+    <Tile>library_BrickPass_17_B</Tile>
+    <Tile>library_BrickPass_18_B</Tile>
+    <Tile>library_BrickPass_19_B</Tile>
+    <Tile>library_BrickStairs_01_I</Tile>
+    <Tile>library_BrickStairs_02_I</Tile>
     <Tile>library_BrickStairs_03_I</Tile>
-    <Tile>library_BrickStairs_04_I</Tile>
     <Tile>library_BrickStairs_11_O</Tile>
     <Tile>library_BrickStairs_12_O</Tile>
     <Tile>library_BrickStairs_13_O</Tile>
     <Tile>library_BrickStairs_14_O</Tile>
     <Tile>library_BrickStairs_16_O</Tile>
+    <Tile>library_BrickStairs_17_O</Tile>
+    <Tile>library_BrickStairs_18_O</Tile>
+    <Tile>library_BrickStairs_19_O</Tile>
+    <Tile>library_NarrowPass_01_I</Tile>
     <Tile>library_NarrowPass_02_I</Tile>
     <Tile>library_NarrowPass_11_D</Tile>
     <Tile>library_NarrowPass_12_D</Tile>
     <Tile>library_NarrowPass_13_D</Tile>
+    <Tile>library_NarrowPass_14_D</Tile>
     <Tile>library_NarrowPass_16_B</Tile>
     <Tile>library_NarrowPass_17_B</Tile>
     <Tile>library_NarrowPass_18_B</Tile>
