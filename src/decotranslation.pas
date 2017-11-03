@@ -34,9 +34,9 @@ var
   CurrentLanguage: TLanguage = Language_English;
 
 { Provides a name for the current language directory without backslashes }
-function LanguageDir(Lang: TLanguage): string;
+function LanguageDir(const Lang: TLanguage): string;
 { Says the language name in English }
-function SayLanguage(Lang: TLanguage): string;
+function SayLanguage(const Lang: TLanguage): string;
 { Displays a "Loading..." image for the language }
 procedure SetLoadingImage;
 
@@ -47,7 +47,7 @@ uses SysUtils,
   CastleControls, DecoLoadEmbedded, {needed to use load image}
   DecoGlobal;
 
-function LanguageDir(Lang: TLanguage): string;
+function LanguageDir(const Lang: TLanguage): string;
 begin
   case Lang of
     Language_English: Result := 'ENG/';
@@ -59,7 +59,7 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-function SayLanguage(Lang: TLanguage): string;
+function SayLanguage(const Lang: TLanguage): string;
 begin
   case Lang of
     Language_English: Result := 'English';

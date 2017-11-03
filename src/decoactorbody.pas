@@ -61,7 +61,7 @@ type
       At the moment it is absolutely identical to our implementation of time }
     Time: Single;
     { Move Actor's time forward }
-    procedure AdvanceTime(SecondsPassed: single);{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+    procedure AdvanceTime(const SecondsPassed: single);{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
   public
     { Name of current and next animation }
     CurrentAnimationName, NextAnimationName: string;
@@ -95,9 +95,9 @@ var tmpKnightCreature: DBodyResource;
  mind that this determines automatic management of animations,
  "Walk" animation loops forever and is managed by Actor AI}
 type TAnimationEnd = (aeLoop, aeStop, aeIdle);
-function AnimationEnd(at: TAnimationType): TAnimationEnd;
-function AnimationEnd(at: string): TAnimationEnd;
-function AnimationToString(at: TAnimationType): string;
+function AnimationEnd(const at: TAnimationType): TAnimationEnd;
+function AnimationEnd(const at: string): TAnimationEnd;
+function AnimationToString(const at: TAnimationType): string;
 
 procedure tmpLoadKnightCreature;
 procedure FreeCreatures;
@@ -106,7 +106,7 @@ implementation
 uses SysUtils, CastleFilesUtils,
   {DecoHDD,} DecoLog;
 
-function AnimationEnd(at: TAnimationType): TAnimationEnd;
+function AnimationEnd(const at: TAnimationType): TAnimationEnd;
 begin
   case at of
     atIdle:   Result := aeLoop;
@@ -117,7 +117,7 @@ begin
     else fLog(LogAnimationError,{$I %CURRENTROUTINE%},'ERROR: Unknown animation '+AnimationToString(at));
   end;
 end;
-function AnimationEnd(at: string): TAnimationEnd;
+function AnimationEnd(const at: string): TAnimationEnd;
 begin
   case at of
     'idle','walk': Result := aeLoop;
@@ -128,7 +128,7 @@ end;
 
 {---------------------------------------------------------------------------}
 
-function AnimationToString(at: TAnimationType): string;
+function AnimationToString(const at: TAnimationType): string;
 begin
   case at of
     atIdle:   Result := 'idle';
@@ -161,7 +161,7 @@ end;
 
 {---------------------------------------------------------------------------}
 
-procedure DBody.AdvanceTime(SecondsPassed: single);{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+procedure DBody.AdvanceTime(const SecondsPassed: single);{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
   Time += SecondsPassed * SlowTimeRate;
 

@@ -58,7 +58,7 @@ function NiceDate: string;
 { Advance time for the frame }
 procedure doTime;
 {Requests a soft-pause (animations run, but actors do not preform actions)}
-procedure RequestSoftPauseByAction(PauseSeconds: DTime);
+procedure RequestSoftPauseByAction(const PauseSeconds: DTime);
 { Gets CastleTimeUtils.Timer value from some "starting point" in a thread-safe way }
 function GetNow: DTime; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 {$HINT maybe use raw integer for these values? That'll give approx +0.5% speed, but will require converting FPS_goal to integer}
@@ -113,7 +113,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure RequestSoftPauseByAction(PauseSeconds: DTime);
+procedure RequestSoftPauseByAction(const PauseSeconds: DTime);
 begin
   SoftPause := PauseSeconds*SoftPauseCoefficient; {request PauseSeconds seconds of pause for some animations}
   LocalTimeFlowSpeed := 0; {and slow down local time for next ~2 seconds}

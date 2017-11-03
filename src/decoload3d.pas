@@ -41,7 +41,7 @@ Type
       { used only to "Get" value}
       property Ambient: float read fAmbient;
       { set Ambient Intensity for all models }
-      procedure SetAmbientIntensity(v: float);
+      procedure SetAmbientIntensity(const v: float);
       constructor Create;
       destructor Destroy; override;
   end;
@@ -49,7 +49,7 @@ Type
 var AmbientIntensity: DMaterialContainer;
 
 { adds requested TTexturePropertiesNode and creates corresponding lists}
-function LoadBlenderX3D(URL: string): TX3DRootNode;
+function LoadBlenderX3D(const URL: string): TX3DRootNode;
 //procedure FreeTextureProperties;
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
@@ -80,8 +80,8 @@ end;
 {maybe, a better name would be nice.
  attaches texture properties (anisotropic smoothing) to the texture of the object.
  TODO: Normal map still doesn't work. I should fix it one day...}
-procedure AddMaterial(Root: TX3DRootNode);
-  procedure ScanNodesRecoursive(Source: TAbstractX3DGroupingNode);
+procedure AddMaterial(const Root: TX3DRootNode);
+  procedure ScanNodesRecoursive(const Source: TAbstractX3DGroupingNode);
   var i: integer;
       Material: TMaterialNode;
   begin
@@ -111,7 +111,7 @@ end;
 
 {---------------------------------------------------------------------------}
 
-function LoadBlenderX3D(URL: string): TX3DRootNode;
+function LoadBlenderX3D(const URL: string): TX3DRootNode;
 begin
   fLog(LogInitData,{$I %CURRENTROUTINE%},'Reading file '+URL);
   if TextureProperties = nil then MakeDefaultTextureProperties;
@@ -131,7 +131,7 @@ begin
   FreeAndNil(Value);
   inherited Destroy;
 end;
-procedure DMaterialContainer.SetAmbientIntensity(v: float);
+procedure DMaterialContainer.SetAmbientIntensity(const v: float);
 var i: TMaterialNode;
 begin
   fAmbient := v;

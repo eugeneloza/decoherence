@@ -60,7 +60,7 @@ var
 {initialize LoadScreens}
 procedure InitLoadScreen;
 {load facts from a filename. Used both by game and constructor.}
-procedure LoadFacts(FileName: string);
+procedure LoadFacts(const FileName: string);
 
 {free fact list memory}
 procedure FreeLoadScreen;
@@ -116,7 +116,7 @@ end;
 
 {---------------------------------------------------------------------------------}
 
-procedure LoadFacts(FileName: string);
+procedure LoadFacts(const FileName: string);
 var FactsDoc: TXMLDocument;
     BaseElement: TDOMElement;
     ValueNode: TDOMElement;

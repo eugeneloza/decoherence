@@ -28,7 +28,7 @@ uses Classes, DecoPerks, DecoStats,
 
 type
   {At this moment there is no Difference between race and Profession in data they store, only processing is Different}
-  DRaceProfession = class(TComponent)
+  DRaceProfession = class(TComponent) //DObject;
   public
     {Stats and bonuses}
     Stats, Bonus: DStats;

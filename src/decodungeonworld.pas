@@ -45,7 +45,7 @@ type
     px,py,pz,px0,py0,pz0: TIntCoordinate;
     {converts x,y,z to px,py,pz and returns true if changed
      *time-critical procedure}
-    function UpdatePlayerCoordinates(x,y,z: float): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+    function UpdatePlayerCoordinates(const x,y,z: float): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
     {Manages tiles (show/hide/trigger events) *time-critical procedure}
     Procedure ManageTiles; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
   protected
@@ -61,21 +61,21 @@ type
 
     {Detects if the current tile has been changed and launches manage_tiles
      position is CAMERA.position}
-    Procedure Manage(position: TVector3); override;
+    Procedure Manage(const Position: TVector3); override;
     {Sorts tiles into chunks}
     //Procedure chunk_n_slice; override;
     {loads the world from a running generator}
-    procedure Load(Generator: DAbstractGenerator); override;
+    procedure Load(const Generator: DAbstractGenerator); override;
     {loads the world from a saved file}
-    procedure Load(URL: string); override;
+    procedure Load(const URL: string); override;
 
     {loads word scenes into scene manager}
     Procedure Activate; override;
 
     { Dungeong world is flat, so it always returns (0,0,1)
       See also https://github.com/eugeneloza/decoherence/issues/76#issuecomment-321906640 }
-    function GetGravity(aPosition: TVector3): TVector3; override;
-    function GetGravity(aNav: TNavID): TVector3; override;
+    function GetGravity(const aPosition: TVector3): TVector3; override;
+    function GetGravity(const aNav: TNavID): TVector3; override;
 
     constructor Create; override;
     destructor Destroy; override;
@@ -94,7 +94,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-function DDungeonWorld.UpdatePlayerCoordinates(x,y,z: float): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+function DDungeonWorld.UpdatePlayerCoordinates(const x,y,z: float): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 //var nx,ny,nz: TIntCoordinate;
 begin
   {todo: may be optimized, at the moment we have here: 6 assignments,
@@ -120,7 +120,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DDungeonWorld.Manage(Position: TVector3);
+procedure DDungeonWorld.Manage(const Position: TVector3);
 begin
   inherited Manage(Position);
   if FirstRender then begin
@@ -135,18 +135,18 @@ end;
 
 {----------------------------------------------------------------------------}
 
-function DDungeonWorld.GetGravity(aPosition: TVector3): TVector3;
+function DDungeonWorld.GetGravity(const aPosition: TVector3): TVector3;
 begin
   Result := Vector3(0,0,1);
 end;
-function DDungeonWorld.GetGravity(aNav: TNavID): TVector3;
+function DDungeonWorld.GetGravity(const aNav: TNavID): TVector3;
 begin
   Result := Vector3(0,0,1);
 end;
 
 {----------------------------------------------------------------------------}
 
-procedure DDungeonWorld.Load(Generator: DAbstractGenerator);
+procedure DDungeonWorld.Load(const Generator: DAbstractGenerator);
 var DG: D3dDungeonGenerator;
 begin
   inherited Load(Generator);
@@ -167,7 +167,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DDungeonWorld.Load(URL: string);
+procedure DDungeonWorld.Load(const URL: string);
 begin
   {$Warning dummy}
 end;

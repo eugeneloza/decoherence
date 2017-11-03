@@ -109,7 +109,7 @@ type
       just to grab and free the function Result }
     procedure Extract(const NewContext: DContext);
     { if the given context is compatible with this dialogue? }
-    function Compare(CheckContext: DContext): float;
+    function Compare(const CheckContext: DContext): float;
 
     constructor Create; //override;
     destructor Destroy; override;
@@ -239,7 +239,7 @@ end;
 
 {--------------------------------------------------------------------------}
 
-function DDialogueContext.Compare(CheckContext: DContext): float;
+function DDialogueContext.Compare(const CheckContext: DContext): float;
 var i: integer;
     tmp: DContextElement;
 begin

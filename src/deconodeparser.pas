@@ -47,15 +47,15 @@ type
 
 {temporary?
  if this node is a placeholder}
-function IsPlaceholder(node: TX3DNode): boolean;
+function IsPlaceholder(const Node: TX3DNode): boolean;
 
-function ParseNode(node: TX3DNode): DNodeInfo;
+function ParseNode(const Node: TX3DNode): DNodeInfo;
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 uses StrUtils, DecoLog;
 
 {eeeem? there should have been this procedure in System unit?}
-function StrToInt(v: string): integer;
+function StrToInt(const v: string): integer;
 var e: integer;
 begin
   if v='' then
@@ -107,9 +107,9 @@ const CollisionSymbol = '*';  //visible=true, collision=true (default is visible
   TriggerMarker = '/trigger=';  //attaches a trigger to the node
   SeparatorMarker = ';'; //marks the end of a trigger/name string value
 
-function ParseNode(Node: TX3DNode): DNodeInfo;
+function ParseNode(const Node: TX3DNode): DNodeInfo;
 var NameLength: integer; //for optimization
-  function GetMarker(Marker: string): string;
+  function GetMarker(const Marker: string): string;
   var i: integer;
       s: string;
       Finish: boolean;
@@ -178,7 +178,7 @@ end;
 
 {------------------------------------------------------------------------------}
 
-function IsPlaceholder(Node: TX3DNode): boolean;
+function IsPlaceholder(const Node: TX3DNode): boolean;
 begin
   Result := false;
   //at this moment only TransformNodes can be placeholders!

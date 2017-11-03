@@ -32,7 +32,7 @@ implementation
 uses CastleVectors,
   DecoLog;
 
-function CheckImageValid(aImage: TCastleImage): boolean;
+function CheckImageValid(const aImage: TCastleImage): boolean;
 begin
   Result := true;
   if (aImage=nil) or (aImage.isEmpty) then begin
@@ -49,7 +49,7 @@ end;
 
 {------------------------------------------------------------------------}
 
-function Clamp255(a: integer): byte;
+function Clamp255(const a: integer): byte;
 begin
   { maybe, make it "softer"? It'll require knowing "max" (which is actually mult*255 = 255+20% default)}
   if a<255 then Result := a else Result := 255;

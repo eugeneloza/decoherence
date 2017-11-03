@@ -103,7 +103,7 @@ function GetScenarioFolder: string;
 {inlined equivalent of FloatEquals / Math.equals}
 function dEqual(const a,b: float): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 { check if URL is valid }
-function URLValid(aURL: string): boolean;
+function URLValid(const aURL: string): boolean;
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 uses SysUtils, DecoLog, CastleLog;
@@ -174,7 +174,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-function URLValid(aURL: string): boolean;
+function URLValid(const aURL: string): boolean;
 begin
   //todo
   if aURL<>'' then Result := true else Result := false;

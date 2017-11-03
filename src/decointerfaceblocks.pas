@@ -58,11 +58,11 @@ type
     StatBars: DPlayerBarsFull;
     Portrait: DPortrait;
     property Target: DPlayerCharacter read fTarget write settarget;
-    procedure ArrangeChildren(animate: TAnimationStyle); override;
+    procedure ArrangeChildren(const animate: TAnimationStyle); override;
     constructor Create(AOwner: TComponent); override;
   public
-    procedure SlideIn(Sender: DAbstractElement; x,y: integer);
-    procedure SlideOut(Sender: DAbstractElement; x,y: integer);
+    procedure SlideIn(const Sender: DAbstractElement; const x,y: integer);
+    procedure SlideOut(const Sender: DAbstractElement; const x,y: integer);
     procedure doSlideIn;
     procedure doSlideOut;
     procedure doTimeout; }
@@ -73,7 +73,7 @@ type
   DPartyView = class (DInterfaceElement)
   public
     {CharacterSpace: array [0..maxparty] of DCharacterSpace;
-    procedure ArrangeChildren(animate: TAnimationStyle); override;
+    procedure ArrangeChildren(const animate: TAnimationStyle); override;
     constructor Create(AOwner: TComponent); override; }
   end;
 

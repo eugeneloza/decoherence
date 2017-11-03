@@ -104,7 +104,7 @@ type
     OldImage: TCastleImage;
     { Two images for "mouse out" and "mouse over" states }
     Image_out,Image_over: DStaticImage;
-    procedure SetImage(Value: TCastleImage);
+    procedure SetImage(const Value: TCastleImage);
     { mouse over and mouse out events }
     procedure MouseOver(const Sender: DAbstractElement; const x,y: integer);
     procedure MouseLeave(const Sender: DAbstractElement; const x,y: integer);
@@ -275,13 +275,13 @@ type
     PlusButton, MinusButton: DButton;
     { target value }
     fTarget: PInteger;
-    procedure SetTarget(value: PInteger);
+    procedure SetTarget(const value: PInteger);
   public
     {integer to change}
     property Target: Pinteger read ftarget write settarget;
     procedure ArrangeChildren(animate: TAnimationStyle); override;
-    procedure incTarget(Sender: DAbstractElement; x,y: integer);
-    procedure decTarget(Sender: DAbstractElement; x,y: integer);
+    procedure incTarget(const Sender: DAbstractElement; const x,y: integer);
+    procedure decTarget(const Sender: DAbstractElement; const x,y: integer);
   end;
 }
 //  {integer with "bonus" edit}
@@ -293,8 +293,8 @@ type
  {   PerkImage: DSingleInterfaceElement; {animated image}
     fTarget: DPerk;
     //fCharacter: DPlayerCharacter;
-    procedure settarget(value: DPerk);
-    //procedure setcharacter(value: DPlayerCharacter);
+    procedure settarget(const value: DPerk);
+    //procedure setcharacter(const value: DPlayerCharacter);
   strict protected
     procedure ArrangeChildren; override;
     procedure SpawnChildren; override;
@@ -323,14 +323,14 @@ type DPerksContainer = class(DAbstractSorter)
   {container for buffs-debuffs, perks and actions}
   private
    { fTarget: DPlayerCharacter;
-    procedure settarget(value: DPlayerCharacter);
+    procedure settarget(const value: DPlayerCharacter);
   strict protected
     procedure ArrangeChildren; override;
     procedure SpawnChildren; override;
   public
     //ContainerStyle: TPerkContainerStyle;
     property Target: DPlayerCharacter read ftarget write settarget;
-    procedure MakePerksList(animate: TAnimationStyle);
+    procedure MakePerksList(const animate: TAnimationStyle);
     //procedure UpdatePerksList;  }
   end;
 
@@ -340,7 +340,7 @@ type
   private
     Content, fHeader: DFramedElement; {DFramedLabel}
     //ButtonSpace: DCompositeElement; {or button sorter!}
-    //procedure SetText(Value: string);
+    //procedure SetText(const Value: string);
     //function GetText: string;
   strict protected
     //procedure SpawnChildren; override;
@@ -470,7 +470,7 @@ end;
 {=========================== Framed Button =================================}
 {===========================================================================}
 
-procedure DButton.SetImage(Value: TCastleImage);
+procedure DButton.SetImage(const Value: TCastleImage);
 begin
   if OldImage<>Value then
   begin

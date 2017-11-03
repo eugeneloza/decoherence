@@ -38,7 +38,7 @@ var CurrentGameMode: TGameMode = gmNone;
 
 { Correctly sets the current game mode and initializes all the corresponding
   routines }
-procedure SetGameMode(GM: TGameMode);
+procedure SetGameMode(const GM: TGameMode);
 { Does this game mode require a 3D world render }
 function is3DGameMode: boolean;
 function GameModeNeedsClearingScreen: boolean;
@@ -48,7 +48,7 @@ implementation
 uses DecoGui, DecoAbstractWorld, DecoAbstractWorld3d,
   DecoGlobal;
 
-procedure SetGameMode(GM: TGameMode);
+procedure SetGameMode(const GM: TGameMode);
 begin
   if GM = LastGameMode then Exit;
 

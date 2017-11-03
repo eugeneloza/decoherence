@@ -44,8 +44,8 @@ var TouchArray: DTouchList;
 {------------------------------- procs --------------------------------------}
 
 procedure doMouseMotion(const Event: TInputMotion);
-procedure doKeyboardPress(aKey: TKey);
-procedure doKeyboardRelease(aKey: TKey);
+procedure doKeyboardPress(const aKey: TKey);
+procedure doKeyboardRelease(const aKey: TKey);
 
 procedure doMousePress(const Event: TInputPressRelease);
 procedure doMouseRelease(const Event: TInputPressRelease);
@@ -60,7 +60,7 @@ uses CastleVectors,
 
 var RecordKeys: boolean = false;
     RecordedKeys: string;
-procedure KeyRecorder(aKey: TKey);
+procedure KeyRecorder(const aKey: TKey);
 const test1 = 'DIIQI';
 const test2 = 'DIKFA';
   function AddKey: boolean;
@@ -116,7 +116,7 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-procedure doKeyboardRelease(aKey: TKey);
+procedure doKeyboardRelease(const aKey: TKey);
 begin
   case aKey of
     k_W: Player.InputRelease(mdForward);
@@ -128,7 +128,7 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-procedure doKeyboardPress(aKey: TKey);
+procedure doKeyboardPress(const aKey: TKey);
 begin
   case aKey of
      k_W: Player.InputMove(mdForward);

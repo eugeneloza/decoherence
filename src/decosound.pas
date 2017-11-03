@@ -71,11 +71,11 @@ type
     property isLoaded: boolean read fisLoaded default false;
     {creates and starts LoadThread. When finished runs LoadFinished}
     procedure Load;
-    procedure Load(URL: string);
+    procedure Load(const URL: string);
     procedure LoadFinished;
 
     constructor Create; virtual;//override;
-    constructor Create(URL: string); virtual;
+    constructor Create(const URL: string); virtual;
     destructor Destroy; override;
   end;
 
@@ -108,9 +108,9 @@ type
     {manage the music / should be called each frame}
     procedure Manage;
     {sets current music "gain", move to private?}
-    procedure SetGain(value: single);
+    procedure SetGain(const Value: single);
     constructor Create; override;
-    constructor Create(URL: string); override;
+    constructor Create(const URL: string); override;
   end;
 
 {situation differentiator. Best if assigned to const mysituation = 0.
@@ -180,8 +180,8 @@ type
     private
       TensionChanged: boolean;
       fTension: TTension;
-      procedure SetTension(value: TTension);
-      function GetTrack(newtension: TTension): integer;
+      procedure SetTension(const Value: TTension);
+      function GetTrack(const NewTension: TTension): integer;
     protected
       {list of tracks in the playlist. All the tracks are horizontally synchronized
        and MUST have the same rhythm,
@@ -214,7 +214,7 @@ type
     private
       fSituation: TSituation;
       SituationChanged: boolean;
-      procedure SetSituation(value: TSituation);
+      procedure SetSituation(const Value: TSituation);
     public
       {vertically synchronized synchronized playlists :)
        You have to manage their blendability based on possible situation change,
@@ -279,7 +279,7 @@ begin
   buffer := 0;
   duration := -1;
 end;
-constructor DSoundFile.Create(URL: string);
+constructor DSoundFile.Create(const URL: string);
 begin
   Self.Create;
   fURL := URL;
@@ -288,7 +288,7 @@ end;
 
 {---------------------------------------------------------------------------}
 
-procedure DSoundFile.Load(URL :string);
+procedure DSoundFile.Load(const URL :string);
 begin
   fURL := URL;
   Self.Load;
@@ -340,7 +340,7 @@ end;
 
 procedure DMusicTrack.FadeOut;
 begin
-  FadeStart := decoNow;
+  FadeStart := DecoNow;
 end;
 
 {---------------------------------------------------------------------------}
@@ -358,7 +358,7 @@ begin
   inherited Create;
   FadeStart := -1;
 end;
-constructor DMusicTrack.create(URL: string);
+constructor DMusicTrack.create(const URL: string);
 begin
   inherited Create(URL);
   FadeStart := -1;
@@ -379,7 +379,7 @@ end;
 
 {---------------------------------------------------------------------------}
 
-procedure DMusicTrack.setGain(Value: single);
+procedure DMusicTrack.setGain(const Value: single);
 begin
   if Assigned(fCurrent) and fCurrent.PlayingOrPaused then
     fCurrent.Gain := Value
@@ -449,7 +449,7 @@ end;
 
 {---------------------------------------------------------------------------}
 
-procedure DSyncPlaylist.settension(value: TTension);
+procedure DSyncPlaylist.settension(const Value: TTension);
 begin
   if gettrack(ftension){current track playing}<>gettrack(value) then tensionchanged := true;
   ftension := value;
@@ -457,7 +457,7 @@ end;
 
 {---------------------------------------------------------------------------}
 
-function DSyncPlaylist.gettrack(newtension: TTension): integer;
+function DSyncPlaylist.gettrack(const NewTension: TTension): integer;
 var i: integer;
     tension_dist: single;
 begin
@@ -466,8 +466,8 @@ begin
   {$warning the track may be not loaded yet!}
   //select a track that fits the new tension best //todo: optmize?
   for i := 0 to Tracks.count do
-    if abs(tracks[i].Tension - newtension)<tension_dist then begin
-      tension_dist := abs(tracks[i].Tension - newtension);
+    if abs(tracks[i].Tension - NewTension)<Tension_Dist then begin
+      tension_dist := abs(Tracks[i].Tension - newtension);
       Result := i;
     end;
 end;
@@ -497,7 +497,7 @@ end;
 
 {---------------------------------------------------------------------------}
 
-procedure DMultiSyncPlaylist.SetSituation(value: TSituation);
+procedure DMultiSyncPlaylist.SetSituation(const Value: TSituation);
 begin
   if fsituation<>value then begin
     situationChanged := true;

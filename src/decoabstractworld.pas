@@ -62,13 +62,13 @@ Type
       Most important thing it does is managing LODs of tiles/landscape
       And hiding/LODding World chunks
       x,y,z are current World coordinates of render camera }
-    Procedure Manage(Position: TVector3); virtual; abstract;
+    Procedure Manage(const Position: TVector3); virtual; abstract;
     {Builds a PathTree for the World}
     //Function pathfind: DPathTree;
     { Load the World from a file}
-    procedure Load(URL: string); virtual;
+    procedure Load(const URL: string); virtual;
     { Load the World from a running Generator }
-    procedure Load(Generator: DAbstractGenerator); virtual;
+    procedure Load(const Generator: DAbstractGenerator); virtual;
     { Builds a World from the obtained data }
     procedure Build; virtual;
     { activates the current World.
@@ -82,8 +82,8 @@ Type
       it's bad, that there is no way to make this procedure inline,
       because it might be important to keep it efficiently
       However, for now it's used only for spawning process, so don't bother yet}
-    function GetGravity(aPosition: TVector3): TVector3; virtual; abstract;
-    function GetGravity(aNav: TNavID): TVector3; virtual; abstract;
+    function GetGravity(const aPosition: TVector3): TVector3; virtual; abstract;
+    function GetGravity(const aNav: TNavID): TVector3; virtual; abstract;
 
     { A dummy procedure to be overriden in rendered World types
      (such as text or 2D)}
@@ -101,10 +101,10 @@ Type
   public
     Nav: TNavList;
     Weenies: TWeeniesList;
-    function NavToVector3(aNav: TNavID): TVector3;
-    function PositionToNav(aPosition: TVector3): TNavID;
-    procedure BlockNav(aNav: TNavID);
-    procedure ReleaseNav(aNav: TNavID);
+    function NavToVector3(const aNav: TNavID): TVector3;
+    function PositionToNav(const aPosition: TVector3): TNavID;
+    procedure BlockNav(const aNav: TNavID);
+    procedure ReleaseNav(const aNav: TNavID);
     procedure ClearNavBlocks;
   end;
 
@@ -172,7 +172,7 @@ end;
 
 {------------------------------------------------------------------------------}
 
-function DAbstractWorld.NavToVector3(aNav: TNavID): TVector3;
+function DAbstractWorld.NavToVector3(const aNav: TNavID): TVector3;
 begin
   Result := Nav[aNav].Pos;
 end;
@@ -198,7 +198,7 @@ begin
   fNavAvgStep := sum/Count;
   fNavMinStep := min;
 end;
-function DAbstractWorld.PositionToNav(aPosition: TVector3): TNavID;
+function DAbstractWorld.PositionToNav(const aPosition: TVector3): TNavID;
 var i, m: TNavID;
     d, min_d: float;
 begin
@@ -223,14 +223,14 @@ end;
 
 {------------------------------------------------------------------------------}
 
-procedure DAbstractWorld.BlockNav(aNav: TNavId);
+procedure DAbstractWorld.BlockNav(const aNav: TNavId);
 begin
   Nav.L[aNav].Blocked := true;
 end;
 
 {------------------------------------------------------------------------------}
 
-procedure DAbstractWorld.ReleaseNav(aNav: TNavId);
+procedure DAbstractWorld.ReleaseNav(const aNav: TNavId);
 begin
   Nav.L[aNav].Blocked := false;
 end;
@@ -246,7 +246,7 @@ end;
 
 {------------------------------------------------------------------------------}
 
-procedure DAbstractWorld.Load(Generator: DAbstractGenerator);
+procedure DAbstractWorld.Load(const Generator: DAbstractGenerator);
 begin
   if Generator = nil then raise Exception.Create('DAbstractWorld.Load: Generator is nil!');
   fSeed := drnd.Random32bit; //maybe other algorithm?
@@ -261,7 +261,7 @@ end;
 
 {------------------------------------------------------------------------------}
 
-procedure DAbstractWorld.Load(URL: string);
+procedure DAbstractWorld.Load(const URL: string);
 begin
   if not URLValid(URL) then fLog(LogWorldInit,{$I %CURRENTROUTINE%},'World is not nil, freeing');
   {$hint dummy}

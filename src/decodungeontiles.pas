@@ -90,7 +90,7 @@ type
   DMap = class (DObject)
     public
       {size of this map}
-      SizeX,SizeY,SizeZ: byte;
+      SizeX, SizeY, SizeZ: byte;
       {internal map of this tile}
       Map: array of array of array of BasicTile;
 
@@ -98,23 +98,23 @@ type
       Img: array of TRGBAlphaImage;
 
       {sets the size of the tile and adjusts memory}
-      procedure SetSize(tx: integer = 1; ty: integer = 1; tz: integer = 1);
+      procedure SetSize(const tx: integer = 1; const ty: integer = 1; const tz: integer = 1);
       {distribute memory according to tilesizex,tilesizey,tilesizez}
       procedure GetMapMemory;
       {empties the map with walls at borders}
-      procedure EmptyMap(InitToFree: boolean);
+      procedure EmptyMap(const InitToFree: boolean);
       {checks if tx,ty,tz are correct for this tile}
-      function IsSafe(tx,ty,tz: integer): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
-      function IsSafe(tx,ty: integer): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+      function IsSafe(const tx,ty,tz: integer): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+      function IsSafe(const tx,ty: integer): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
       {safe way to get BasicTile
        (checks if tx,ty,tz are within the Tile size and returns tkInacceptible otherwise) }
-      function MapSafe(tx,ty,tz: integer): BasicTile; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+      function MapSafe(const tx,ty,tz: integer): BasicTile; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
       { safe way to get Tile base
        (checks if tx,ty,tz are within the Tile size and returns tkInacceptible otherwise) }
-      function MapSafeBase(tx,ty,tz: integer): TTileKind; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+      function MapSafeBase(const tx,ty,tz: integer): TTileKind; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
       { safe way to get Tile Face
         (checks if tx,ty,tz are within the Tile size and returns tfInacceptible otherwise) }
-      function MapSafeFace(tx,ty,tz: integer; Face: TAngle): TTileFace; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+      function MapSafeFace(const tx,ty,tz: integer; const Face: TAngle): TTileFace; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 
       destructor Destroy; override;
       {frees the minimap memory (careful)}
@@ -136,34 +136,34 @@ type
 
       {is the tile ready to work (loaded and parsed correctly)?}
       property Ready: boolean read fReady write fReady;
-      constructor Load(URL: string; gzipped: boolean);// override;
+      constructor Load(const URL: string; const GZipped: boolean);// override;
 end;
 
 //var MaxTileTypes: integer;
     //TilesList: TStringList;
 
 { convert TTileKind to a string for saving }
-function TileKindToStr(Value: TTileKind): string;
+function TileKindToStr(const Value: TTileKind): string;
 { convert a string to TTileKind for loading }
-function StrToTileKind(Value: string): TTileKind;
+function StrToTileKind(const Value: string): TTileKind;
 
-function TileFaceToStr(Value: TTileFace): string;
-function StrToTileFace(Value: string): TTileFace;
-function AngleToStr(Value: TAngle): string;
-function StrToAngle(Value: string): TAngle;
+function TileFaceToStr(const Value: TTileFace): string;
+function StrToTileFace(const Value: string): TTileFace;
+function AngleToStr(const Value: TAngle): string;
+function StrToAngle(const Value: string): TAngle;
 
 {check if this tile is Passable - in a safe way}
-function isPassable(Value: TTileFace): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
-function isLookable(Value: TTileFace): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
-function isPassable(Value: TTileKind): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+function isPassable(const Value: TTileFace): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+function isLookable(const Value: TTileFace): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+function isPassable(const Value: TTileKind): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 {determine x/y shifts introduced by current Angle}
-function a_dx(Angle: TAngle): integer; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
-function a_dy(Angle: Tangle): integer; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
-function a_dz(Angle: Tangle): integer; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+function a_dx(const Angle: TAngle): integer; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+function a_dy(const Angle: Tangle): integer; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+function a_dz(const Angle: Tangle): integer; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 {inverse function - calculate angle based on dx,dy}
-function GetAngle(ddx,ddy: integer): TAngle; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+function GetAngle(const ddx, ddy: integer): TAngle; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 {inverts Angle to the opposite of the pair}
-function InvertAngle(Angle: TAngle): TAngle; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+function InvertAngle(const Angle: TAngle): TAngle; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
@@ -171,7 +171,7 @@ uses SysUtils, CastleURIUtils,
   DOM, CastleXMLUtils,
   DecoLog;
 
-function TileKindToStr(Value: TTileKind): string;
+function TileKindToStr(const Value: TTileKind): string;
 begin
   case Value of
     tkNone: Result := 'NA';
@@ -183,7 +183,7 @@ begin
     else raise Exception.Create('Unknown TileKind in TileKindToStr');
   end;
 end;
-function StrToTileKind(Value: string): TTileKind;
+function StrToTileKind(const Value: string): TTileKind;
 begin
   case Value of
     'NA':   Result := tkNone;
@@ -198,7 +198,7 @@ end;
 
 {---------------------------------------------------------------------------}
 
-function TileFaceToStr(Value: TTileFace): string;
+function TileFaceToStr(const Value: TTileFace): string;
 begin
   case Value of
     tfNone: Result := 'none';
@@ -207,7 +207,7 @@ begin
     else raise Exception.Create('Unknown TTileFace Value in TileFaceToStr');
   end;
 end;
-function StrToTileFace(Value: string): TTileFace;
+function StrToTileFace(const Value: string): TTileFace;
 begin
   case Value of
     'none': Result := tfNone;
@@ -218,7 +218,7 @@ end;
 
 {---------------------------------------------------------------------------}
 
-function AngleToStr(Value: TAngle): string;
+function AngleToStr(const Value: TAngle): string;
 begin
   case Value of
     aTop:    Result := 'top';
@@ -229,7 +229,7 @@ begin
     aDown:   Result := 'down';
   end;
 end;
-function StrToAngle(Value: string): TAngle;
+function StrToAngle(const Value: string): TAngle;
 begin
   case Value of
     'top':    Result := aTop;
@@ -243,15 +243,15 @@ end;
 
 {---------------------------------------------------------------------------}
 
-function isPassable(Value: TTileFace): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+function isPassable(const Value: TTileFace): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
   if Value >= tfFree then Result := true else Result := false;
 end;
-function isLookable(Value: TTileFace): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+function isLookable(const Value: TTileFace): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
   if Value >= tfFree then Result := true else Result := false;
 end;
-function isPassable(Value: TTileKind): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+function isPassable(const Value: TTileKind): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
   if (Value = tkFree) or (Value = tkUp) or (Value = tkDown) then
     Result := true
@@ -261,7 +261,7 @@ end;
 
 {----------------------------------------------------------------------}
 
-function a_dx(Angle: TAngle): integer; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+function a_dx(const Angle: TAngle): integer; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
   case Angle of
     aLeft:  Result := -1;
@@ -269,7 +269,7 @@ begin
     else    Result := 0;
   end;
 end;
-function a_dy(Angle: Tangle): integer; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+function a_dy(const Angle: Tangle): integer; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
   case Angle of
     aTop:    Result := -1;
@@ -277,7 +277,7 @@ begin
     else     Result := 0;
   end;
 end;
-function a_dz(Angle: Tangle): integer; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+function a_dz(const Angle: Tangle): integer; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
   case Angle of
     aUp:   Result := -1;
@@ -288,7 +288,7 @@ end;
 
 {----------------------------------------------------------------------}
 
-function GetAngle(ddx,ddy: integer): TAngle; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+function GetAngle(const ddx, ddy: integer): TAngle; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
   if ddy<0 then Result := aTop else
   if ddy>0 then Result := aBottom else
@@ -298,7 +298,7 @@ end;
 
 {----------------------------------------------------------------------}
 
-function InvertAngle(Angle: TAngle): TAngle; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+function InvertAngle(const Angle: TAngle): TAngle; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
   case Angle of
     aTop:    Result := aBottom;
@@ -313,7 +313,7 @@ end;
 
 {======================== DTILE TYPE ==========================================}
 
-constructor DTileMap.Load(URL: string; gzipped: boolean);
+constructor DTileMap.Load(const URL: string; const GZipped: boolean);
 var TileDOC: TXMLDocument;
     RootNode,WorkNode,ValueNode: TDOMElement;
     Iterator: TXMLElementIterator;
@@ -391,7 +391,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DMap.setsize(tx: integer = 1; ty: integer = 1; tz: integer = 1);
+procedure DMap.SetSize(const tx: integer = 1; const ty: integer = 1; const tz: integer = 1);
 begin
   SizeX := tx;
   SizeY := ty;
@@ -421,7 +421,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DMap.EmptyMap(InitToFree: boolean);
+procedure DMap.EmptyMap(const InitToFree: boolean);
 var jx,jy,jz: integer;
     a: TAngle;
 begin
@@ -447,7 +447,7 @@ end;
 
 {-------------------------------------------------------------------------}
 
-function DMap.IsSafe(tx,ty,tz: integer): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+function DMap.IsSafe(const tx,ty,tz: integer): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
   if (tx >= 0)    and (ty >= 0)    and (tz >= 0)        and
      (tx < Sizex) and (ty < SizeY) and (tz < SizeZ)
@@ -456,7 +456,7 @@ begin
   else
     Result := false;
 end;
-function DMap.IsSafe(tx,ty: integer): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+function DMap.IsSafe(const tx,ty: integer): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
   if (tx >= 0)    and (ty >= 0)        and
      (tx < SizeX) and (ty < SizeY)
@@ -468,21 +468,21 @@ end;
 
 {--------------------------------------------------------------------}
 
-Function DMap.MapSafe(tx,ty,tz: integer): BasicTile; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+Function DMap.MapSafe(const tx,ty,tz: integer): BasicTile; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
   if IsSafe(tx,ty,tz) then
     Result := Map[tx,ty,tz]
   else
     Result := InacceptibleTile; //this is a bit slower, but more bug-proof
 end;
-Function DMap.MapSafeBase(tx,ty,tz: integer): TTileKind; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+Function DMap.MapSafeBase(const tx,ty,tz: integer): TTileKind; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
   if IsSafe(tx,ty,tz) then
     Result := Map[tx,ty,tz].Base
   else
     Result := tkInacceptible;
 end;
-Function DMap.MapSafeFace(tx,ty,tz: integer; Face: TAngle): TTileFace; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+Function DMap.MapSafeFace(const tx,ty,tz: integer; const Face: TAngle): TTileFace; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
   if IsSafe(tx,ty,tz) then
     Result := Map[tx,ty,tz].Faces[face]

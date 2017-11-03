@@ -92,9 +92,9 @@ type
     { Should be called each frame to process Camera stuff }
     procedure Manage;
     { Teleports party to some Position or Nav }
-    procedure TeleportTo(aPosition, aDirection: TVector3);
-    procedure TeleportTo(aNav: TNavId; aDirection: TVector3);
-    procedure TeleportTo(aNav: TNavId);
+    procedure TeleportTo(const aPosition, aDirection: TVector3);
+    procedure TeleportTo(const aNav: TNavId; const aDirection: TVector3);
+    procedure TeleportTo(const aNav: TNavId);
     { Puts the party to sleep // all the parties available? }
     procedure Rest;
 
@@ -136,11 +136,11 @@ type
     { is MouseLook active (Desktop only) or DragLook is used }
     MouseLook: boolean;
     { Move in Direction pressed }
-    procedure InputMove(MoveDir: TMoveDirection);
+    procedure InputMove(const MoveDir: TMoveDirection);
     { Move in Direction released }
-    procedure InputRelease(MoveDir: TMoveDirection);
+    procedure InputRelease(const MoveDir: TMoveDirection);
     { Mouse moved }
-    procedure InputMouse(Delta: TVector2);
+    procedure InputMouse(const Delta: TVector2);
     { Stop all movement }
     procedure Stop;
   public
@@ -258,7 +258,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DParty.TeleportTo(aPosition, aDirection: TVector3);
+procedure DParty.TeleportTo(const aPosition, aDirection: TVector3);
 begin
   CameraMan.TeleportTo(aPosition, aDirection);
   CameraMan.ResetUp;
@@ -271,12 +271,12 @@ begin
 
   UpdateCamera;
 end;
-procedure DParty.TeleportTo(aNav: TNavId);
+procedure DParty.TeleportTo(const aNav: TNavId);
 begin
   CameraMan.TeleportTo(aNav); //this is redundant, but blocking navNet would be more stable
   TeleportTo(CurrentWorld.NavToVector3(aNav),Vector3(0,1,0));
 end;
-procedure DParty.TeleportTo(aNav: TNavId; aDirection: TVector3);
+procedure DParty.TeleportTo(const aNav: TNavId; const aDirection: TVector3);
 begin
   CameraMan.TeleportTo(aNav);
   TeleportTo(CurrentWorld.NavToVector3(aNav),aDirection);
@@ -427,7 +427,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DPlayerControl.InputMouse(Delta: TVector2);
+procedure DPlayerControl.InputMouse(const Delta: TVector2);
 var TraverseAxis: TVector3;
     UpVector,ForwardVector: TVector3;
 begin
@@ -462,7 +462,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DPlayerControl.InputMove(MoveDir: TMoveDirection);
+procedure DPlayerControl.InputMove(const MoveDir: TMoveDirection);
 begin
   MovePress[MoveDir] := true;
   isAccelerating := MovePress[mdForward] or
@@ -471,7 +471,7 @@ begin
                     MovePress[mdRight];
 end;
 
-procedure DPlayerControl.InputRelease(MoveDir: TMoveDirection);
+procedure DPlayerControl.InputRelease(const MoveDir: TMoveDirection);
 begin
   MovePress[MoveDir] := false;
   isAccelerating := MovePress[mdForward] or

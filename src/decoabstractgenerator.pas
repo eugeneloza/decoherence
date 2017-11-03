@@ -71,7 +71,7 @@ type
     { xorshift random generator }
     RNDM: TCastleRandom;
     {Specific SEED of the random number for this algorithm }
-    procedure InitSeed(NewSeed: longword = 0);
+    procedure InitSeed(const NewSeed: longword = 0);
   public
     {are the parameters initialized?}
     property isInitialized: boolean read fisInitialized default false;
@@ -132,7 +132,7 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-procedure DAbstractGenerator.InitSeed(NewSeed: longword = 0);
+procedure DAbstractGenerator.InitSeed(const NewSeed: longword = 0);
 begin
   RNDM.Initialize(NewSeed);
 end;

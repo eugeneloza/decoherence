@@ -87,7 +87,7 @@ type
              The root (container) node is not added
      WARNING placeholders cannot be children of children!
              Otherwise we'll have to recreate the whole nodes tree}
-    procedure AddRecoursive(Dest,Source: TAbstractX3DGroupingNode);
+    procedure AddRecoursive(const Dest,Source: TAbstractX3DGroupingNode);
   public
     {list of actors in the world}
     Actors: TActorList;
@@ -99,15 +99,15 @@ type
     {builds current 3d world}
     procedure Build; override;
     { Load the World from a running Generator }
-    procedure Load(Generator: DAbstractGenerator); override;
-    procedure Load(URL: string); override;
+    procedure Load(const Generator: DAbstractGenerator); override;
+    procedure Load(const URL: string); override;
     procedure RescaleNavigationNetwork;
 
-    procedure Manage(Position: TVector3); override;
+    procedure Manage(const Position: TVector3); override;
 
     { turns on or off SceneManager.Exists
       This should not be called in Rendered World types }
-    procedure ToggleSceneManager(Value: boolean);
+    procedure ToggleSceneManager(const Value: boolean);
 
     destructor Destroy; override;
   end;
@@ -280,7 +280,7 @@ end;
 
 {---------------------------------------------------------------------------}
 
-procedure DAbstractWorld3d.Load(Generator: DAbstractGenerator);
+procedure DAbstractWorld3d.Load(const Generator: DAbstractGenerator);
 begin
   inherited Load(Generator);
   Groups := Generator.ExportGroups;
@@ -307,7 +307,7 @@ end;
 
 {---------------------------------------------------------------------------}
 
-procedure DAbstractWorld3d.Load(URL: string);
+procedure DAbstractWorld3d.Load(const URL: string);
 begin
   inherited Load(URL);
   //load groups and WorldElementsList
@@ -331,7 +331,7 @@ end;
 
 {------------------------------------------------------------------------------}
 
-procedure DAbstractWorld3d.AddRecoursive(Dest, Source: TAbstractX3DGroupingNode);
+procedure DAbstractWorld3d.AddRecoursive(const Dest, Source: TAbstractX3DGroupingNode);
 var i: integer;
     Slot,Replacement: TTransformNode;
     Parsed: DNodeInfo;
@@ -458,7 +458,7 @@ end;
 
 {------------------------------------------------------------------------------}
 
-Procedure DAbstractWorld3d.Manage(Position: TVector3);
+Procedure DAbstractWorld3d.Manage(const Position: TVector3);
 var a: DSimpleActor;
 begin
   //inherited; --- nothing to inherit yet
@@ -471,7 +471,7 @@ end;
 {------------------------------------------------------------------------------}
 
 
-Procedure DAbstractWorld3d.ToggleSceneManager(Value: boolean);
+Procedure DAbstractWorld3d.ToggleSceneManager(const Value: boolean);
 begin
   Window.SceneManager.Exists := Value;
 end;

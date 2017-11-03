@@ -145,7 +145,7 @@ type
       FirstSteps: TFirstStepsArray;
 
       {loads and applies the map parameters}
-      procedure Load(URL: string);
+      procedure Load(const URL: string);
 
       constructor Create;
       destructor Destroy; override;
@@ -188,7 +188,7 @@ type
      used to make first steps of the generation as they are bound to
      a specific tile name, not to a tile ID which can change}
     //function GetTileByName(TileName: string): DGeneratorMap;
-    function GetTileByName(TileName: string): TTileType;
+    function GetTileByName(const TileName: string): TTileType;
 
     {gets a "normal" tile, not a blocker}
     function GetNormalTile: TTileType; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
@@ -225,7 +225,7 @@ type
      usually should not be added manually, but is used inline in "AddTile"
      Returns false if tile mismatches Map
      Returns True if tile matches Map and can be placed }
-    function CheckCompatibility(Tile: BasicTile; x,y,z: TIntCoordinate): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+    function CheckCompatibility(const Tile: BasicTile; const x,y,z: TIntCoordinate): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
     {Core of the algorithm : Tries to add a random tile to the map}
     procedure AddRandomTile; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
     {checks tile compatibility to the map and adds it if its possible
@@ -233,9 +233,9 @@ type
      and false if the tile cannot be placed at these coordinates  }
     function AddTile(Tile: TTileType; x,y,z: TIntCoordinate): boolean;
     {When we're sure what we are doing, we're not making any checks, just add the tile as fast as it is possible}
-    procedure AddTileUnsafe(Tile: DGeneratorTile; x,y,z: TIntCoordinate); {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+    procedure AddTileUnsafe(const Tile: DGeneratorTile; const x,y,z: TIntCoordinate); {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
     {overloaded version that accepts a DGeneratorStep;}
-    procedure AddTileUnsafe(Step: DGeneratorStep);
+    procedure AddTileUnsafe(const Step: DGeneratorStep);
     {creates a minimap as Map.img}
     procedure MakeMinimap;
     {resizes the generated map for its real size}
@@ -335,10 +335,10 @@ type
      and returns Neighbours array}
     procedure Raycast;
     {preforms all possible raycasting from a given tile}
-    procedure RaycastTile(mx,my,mz: TIntCoordinate); {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+    procedure RaycastTile(const mx,my,mz: TIntCoordinate); {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
     {raycasts a single ray from x1y1z1 to x2y2z2
      returns true if ray can pass, false otherwise}
-    function Ray(x1,y1,z1,x2,y2,z2: float): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+    function Ray(const x1,y1,z1,x2,y2,z2: float): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
     {chunks the map according to the visibility of the tiles}
     procedure Chunk_N_Slice;
   public
@@ -359,9 +359,9 @@ type
 {free every element of a Neigobours map}
 procedure FreeNeighboursMap(var nmap: TNeighboursMapArray);
 {free every element of a groups array}
-procedure FreeGroups(ngroups: TGroupsArray);
+procedure FreeGroups(const ngroups: TGroupsArray);
 {returns an integer array of (map.sizex,map.sizey,map.sizez) size}
-function ZeroIntegerMap(sx,sy,sz: integer): TIntMapArray;
+function ZeroIntegerMap(const sx,sy,sz: integer): TIntMapArray;
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
@@ -707,7 +707,7 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-procedure DDungeonGenerator.AddTileUnsafe(Tile: DGeneratorTile; x,y,z: TIntCoordinate); {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+procedure DDungeonGenerator.AddTileUnsafe(const Tile: DGeneratorTile; const x,y,z: TIntCoordinate); {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 var jx,jy,jz: TIntCoordinate;
     a: TAngle;
 begin
@@ -725,14 +725,14 @@ begin
           Map.Map[x+jx,y+jy,z+jz].Faces[a] := Tile.Map[jx,jy,jz].Faces[a];
     end;
 end;
-procedure DDungeonGenerator.AddTileUnsafe(Step: DGeneratorStep);
+procedure DDungeonGenerator.AddTileUnsafe(const Step: DGeneratorStep);
 begin
   AddTileUnsafe(Tiles[Step.Tile],Step.x,Step.y,Step.z);
 end;
 
 {-----------------------------------------------------------------------------}
 
-function DDungeonGenerator.CheckCompatibility(Tile: BasicTile; x,y,z: TIntCoordinate): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+function DDungeonGenerator.CheckCompatibility(const Tile: BasicTile; const x,y,z: TIntCoordinate): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 var TmpTile: BasicTile;
     a: TAngle;
 begin
@@ -877,7 +877,7 @@ end;
 
 {================== 3D DUNGEON GENERATOR ROUTINES ===========================}
 
-function ZeroIntegerMap(sx,sy,sz: integer): TIntMapArray;
+function ZeroIntegerMap(const sx,sy,sz: integer): TIntMapArray;
 var ix,iy,iz: TIntCoordinate;
 begin
   SetLength(Result,sx);
@@ -923,7 +923,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-function D3DDungeonGenerator.Ray(x1,y1,z1,x2,y2,z2: float): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+function D3DDungeonGenerator.Ray(const x1,y1,z1,x2,y2,z2: float): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 var //anglex,angley,anglez: TAngle;
     vx,vy,vz,a: float;
     ix,iy,iz: integer;
@@ -993,7 +993,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure D3DDungeonGenerator.RaycastTile(mx,my,mz: TIntCoordinate); {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+procedure D3DDungeonGenerator.RaycastTile(const mx,my,mz: TIntCoordinate); {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 var
     HelperMap: TIntMapArray;
     RaycastList,OldList: TRaycastList;
@@ -1396,7 +1396,7 @@ end;
 
 {========================= OTHER ROUTINES ===================================}
 
-procedure DDungeonGeneratorParameters.Load(URL: string);
+procedure DDungeonGeneratorParameters.Load(const URL: string);
 var XMLdoc: TXMLDocument;
     RootNode, LargeContainer,SmallContainer: TDOMElement;
     Iterator: TXMLElementIterator;
@@ -1478,7 +1478,7 @@ begin
   end;
   raise Exception.create('DDungeonGenerator.GetTileByName: FATAL! Tile cannot be found!');
 end;}
-Function DDungeonGenerator.GetTileByName(TileName: string): TTileType;
+Function DDungeonGenerator.GetTileByName(const TileName: string): TTileType;
 var i: integer;
 begin
   for i := 0 to Tiles.Count do if tiles[i].TileName = TileName then begin
@@ -1557,7 +1557,7 @@ end;
 
 {============================ FREEING ROUTINES ==============================}
 
-procedure FreeGroups(nGroups: TGroupsArray);
+procedure FreeGroups(const nGroups: TGroupsArray);
 var i: integer;
 begin
   if nGroups<>nil then
