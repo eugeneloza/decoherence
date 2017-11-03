@@ -194,7 +194,7 @@ Type
     function GetSize: Txy; virtual; deprecated;
   public
     {}
-    function ProcessRescaleResult(var r1: TRescaleResult; const r2: TRescaleResult): TRescaleResult;
+    //function ProcessRescaleResult(var r1: TRescaleResult; const r2: TRescaleResult): TRescaleResult;
     { changes the scale of the element relative to current window size }
     procedure Rescale; virtual;
     { draw the element / as abstract as it might be :) }
@@ -740,12 +740,12 @@ end;
 {======================== ABSTRACT ELEMENT ==================================}
 {============================================================================}
 
-function DAbstractElement.ProcessRescaleResult(var r1: TRescaleResult; const r2: TRescaleResult): TRescaleResult;
+{function DAbstractElement.ProcessRescaleResult(var r1: TRescaleResult; const r2: TRescaleResult): TRescaleResult;
 begin
   if (r1 = rrInvalid) or (r2 = rrInvalid) then Result := rrInvalid else
   if (r1 = rrDirty  ) or (r2 = rrDirty  ) then Result := rrDirty   else
                                                Result := rrOk;
-end;
+end;}
 
 {----------------------------------------------------------------------------}
 
