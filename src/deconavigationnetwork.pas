@@ -23,7 +23,11 @@ unit DecoNavigationNetwork;
 {$INCLUDE compilerconfig.inc}
 interface
 
-uses Generics.Collections, CastleGenericLists, CastleVectors,
+uses Generics.Collections,
+  //
+  CastleGenericLists,  //temorary, as it is deprecated
+  //
+  CastleVectors,
   DecoGlobal;
 
 type TNavID = integer;

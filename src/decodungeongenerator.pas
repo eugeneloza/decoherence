@@ -22,6 +22,9 @@ unit DecoDungeonGenerator;
 interface
 
 uses Classes, CastleRandom, Generics.Defaults, Generics.Collections,
+  //
+  CastleGenericLists,   //temporary as it is deprecated
+  //
   DecoAbstractGenerator, DecoDungeonTiles,
   DecoNavigationNetwork,
   DecoGlobal;
@@ -1211,9 +1214,11 @@ type DIndexRec = record
   Index: integer;
   Hits: integer;
 end;
-type HitList = specialize TList<DIndexRec>;
+//type HitList = specialize TList<DIndexRec>;
+type HitList = specialize TGenericStructList<DIndexRec>;
 //{$DEFINE InverseSort}
-function CompareHits(constref i1,i2: DIndexRec): integer;
+//function CompareHits(constref i1, i2: DIndexRec): integer;
+function CompareHits(const i1, i2: DIndexRec): integer;
 begin
   {$IFNDEF InverseSort}
   Result := i1.Hits - i2.Hits;
@@ -1221,7 +1226,7 @@ begin
   Result := i2.Hits - i1.Hits;
   {$ENDIF}
 end;
-type THitsComparer = specialize TComparer<DIndexRec>;
+//type THitsComparer = specialize TComparer<DIndexRec>;
 
 procedure D3DDungeonGenerator.Chunk_N_Slice;
 var i,j,g: integer;
@@ -1248,9 +1253,10 @@ begin
       for iz := 0 to Map.SizeZ-1 do if NeighboursMap[ix,iy,iz]<>nil then {begin}
         //dLog(inttostr(ix)+inttostr(iy)+inttostr(iz),inttostr(NeighboursMap[ix,iy,iz].count));
         for j := 0 to NeighboursMap[ix,iy,iz].Count-1 do
-          HitCount.Items[NeighboursMap[ix,iy,iz].Items[j].Tile].Hits += 1;
+          inc(HitCount.{Items}L[NeighboursMap[ix,iy,iz].Items[j].Tile].Hits);
       {end;}
-  HitCount.Sort(THitsComparer.Construct(@CompareHits));
+  HitCount.Sort(@CompareHits);
+  //HitCount.Sort(THitsComparer.Construct(@CompareHits));
 
   {now let's start the main algorithm}
   g := 0;
