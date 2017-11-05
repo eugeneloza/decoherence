@@ -490,6 +490,5 @@ begin
     Result := tfInacceptible;
 end;
 
-
 end.
 

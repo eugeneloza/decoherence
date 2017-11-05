@@ -31,7 +31,7 @@ Const
   St_dx = 1;
   St_ag = 2;
   St_acc = 3;
-  Maxbasestats = 3; {+1}
+  MaxBaseStats = 3; {+1}
   {stats for player characters}
   St_end = 1;
   St_spd = 5;
@@ -39,7 +39,7 @@ Const
   St_phys = 7;
   St_bio = 8;
   St_mph = 9;
-  Maxstats = 9; {+1}
+  MaxStats = 9; {+1}
 
 Type
   {A record representing the base stats array}

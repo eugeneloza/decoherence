@@ -44,27 +44,27 @@ type
 
 { folders constants relative to ApplicationData path
   should be "/", not pathdelim, because those are URLs }
-const InterfaceFolder    = 'interface/';
-      FramesFolder       = InterfaceFolder+'frames/';
-      LoadScreenFolder   = InterfaceFolder+'loadscreen/';
-      ProgressBarFolder  = InterfaceFolder+'progressbar/';
-      BackgroundsFolder  = InterfaceFolder+'background/';
-      WindFolder         = InterfaceFolder+'wind/';
-      DecorationsFolder  = InterfaceFolder+'decorations/';
-      PortraitFolder     = InterfaceFolder+'portrait/';
-      PerksFolder        = InterfaceFolder+'perks/';
-      DamageFolder       = InterfaceFolder+'damage/';
-      FontFolder         = InterfaceFolder+'fonts/';
+const InterfaceFolder     = 'interface/';
+      FramesFolder        = InterfaceFolder+'frames/';
+      LoadScreenFolder    = InterfaceFolder+'loadscreen/';
+      ProgressBarFolder   = InterfaceFolder+'progressbar/';
+      BackgroundsFolder   = InterfaceFolder+'background/';
+      WindFolder          = InterfaceFolder+'wind/';
+      DecorationsFolder   = InterfaceFolder+'decorations/';
+      PortraitFolder      = InterfaceFolder+'portrait/';
+      PerksFolder         = InterfaceFolder+'perks/';
+      DamageFolder        = InterfaceFolder+'damage/';
+      FontFolder          = InterfaceFolder+'fonts/';
 
-      ScenarioBaseFolder = 'scenario/';
+      ScenarioBaseFolder  = 'scenario/';
       {because there can be several scenario subfolders, these are only for "addition"}
-      TextFolder         = 'text/';
-      MapsFolder         = 'maps/';
+      TextFolder          = 'text/';
+      MapsFolder          = 'maps/';
 
-      ModelsFolder      = 'models/';
-      TilesFolder       = ModelsFolder+'tiles/';
-      PlaceholdersFoldr = ModelsFolder+'placeholders/';
-      CreaturesFolder   = ModelsFolder+'creatures/';
+      ModelsFolder        = 'models/';
+      TilesFolder         = ModelsFolder+'tiles/';
+      PlaceholdersFolder  = ModelsFolder+'placeholders/';
+      CreaturesFolder     = ModelsFolder+'creatures/';
 
       //TODO: Android incompatible!!!
       //Models_folder       = +'models'+pathdelim;
