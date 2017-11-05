@@ -214,8 +214,9 @@ var aFriction: float;
 begin
   doMove1; doMove2;
   if Camera = nil then begin
-    Exit;// InitNavigation;
+    // InitNavigation;
     Log(LogNavigationError,{$I %CURRENTROUTINE%},'Camera is Nil!');
+    Exit;
   end;
 
   Camera.Position := CameraMan.Position;
@@ -384,7 +385,7 @@ constructor DCameraMan.Create;
 begin
   inherited Create;
   ResetUp;
-  theta := 0;
+  Theta := 0;
   phi := 0;
 end;
 
@@ -481,11 +482,11 @@ begin
 end;
 
 procedure DPlayerControl.ResetMoveInput;
+var
+  I: TMoveDirection;
 begin
-  MovePress[mdForward] := false;
-  MovePress[mdBack] := false;
-  MovePress[mdLeft] := false;
-  MovePress[mdRight] := false;
+  for I := Low(TMoveDirection) to High(TMoveDirection) do
+    MovePress[I] := false;
 end;
 
 {----------------------------------------------------------------------------}
