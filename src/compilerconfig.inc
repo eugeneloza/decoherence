@@ -45,13 +45,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
   e.g. freepascal debugger doesn't show line numbers in inlined code }
 {$DEFINE SUPPORTS_INLINE}
 
-{ Use thread for loading stuff in DecoHDD? }
-{$DEFINE ThreadLoad}
-
 { Gzip or not gzip, that is the answer. }
 {$DEFINE gzipdata}
 
-{ If we attach additional Switch Nodes to 3d world management }
+{ If we attach additional Switch Nodes to 3d world management
+  (intermediate optimization) }
 {$DEFINE UseSwitches}
 
 { Fix a windows encoding bug }
