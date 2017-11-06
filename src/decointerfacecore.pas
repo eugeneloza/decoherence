@@ -178,10 +178,19 @@ type
     asSquare is slower in the beginning and end, and faster in the middle}
   TAnimationCurve = (acsLinear, acSquare);
 
-Type
+type
+  {}
+  DAnchoredObject = class abstract (DObject)
+  public
+
+  end;
+
+type TAnchorList = specialize TObjectList<DAnchoredObject>;
+
+type
   { most abstract container for interface elements
     Defines size, scaling and animation state }
-  DAbstractElement = class abstract(DObject)
+  DAbstractElement = class abstract(DAnchoredObject)
   strict protected
     { Caches current animation state, recalculated by GetAnimationState at every render}
     procedure GetAnimationState;
@@ -192,6 +201,11 @@ Type
     procedure SetFullScreen;
     { Returns true size of this interface element }
     function GetSize: Txy; virtual; deprecated;
+  strict protected
+    {}
+    NotifyAnchors: TAnchorList;
+    {}
+    procedure AddAnchor(aAnchor: DAnchoredObject);
   public
     {}
     //function ProcessRescaleResult(var r1: TRescaleResult; const r2: TRescaleResult): TRescaleResult;
@@ -939,6 +953,16 @@ end;
 
 {----------------------------------------------------------------------------}
 
+procedure DAbstractElement.AddAnchor(aAnchor: DAnchoredObject);
+var a: DAnchoredObject;
+begin
+  //check if the Anchor isn't already available in NotifyAnchors
+  for a in NotifyAnchors do if a = aAnchor then Exit;
+  NotifyAnchors.Add(aAnchor);
+end;
+
+{----------------------------------------------------------------------------}
+
 constructor DAbstractElement.Create;
 begin
   inherited Create;
@@ -948,6 +972,8 @@ begin
   Last := DAbstractContainer.Create(Self);
   Next := DAbstractContainer.Create(Self);
   Current := DAbstractContainer.Create(Self);
+
+  NotifyAnchors := TAnchorList.Create(false);
 end;
 
 {----------------------------------------------------------------------------}
@@ -958,6 +984,8 @@ begin
   FreeAndNil(Last);
   FreeAndNil(Next);
   FreeAndNil(Current);
+
+  FreeAndNil(NotifyAnchors);
   inherited Destroy;
 end;
 
