@@ -782,9 +782,28 @@ end;}
 {----------------------------------------------------------------------------}
 
 procedure DAbstractElement.Rescale;
+var TmpSize: Txy;
+    ContainerSizeChanged: boolean;
 begin
+  {ugly fix to check if container size has changed}
+  TmpSize.x1 := Base.x1;
+  TmpSize.x2 := Base.x2;
+  TmpSize.y1 := Base.y1;
+  TmpSize.y2 := Base.y2;
+
   {set animation states to changed container size}
   Base.FloatToInteger;
+
+  {check if container size has been actually changed}
+  if (Base.isInitialized) then
+    ContainerSizeChanged := (TmpSize.x1 <> Base.x1) or (TmpSize.x2 <> Base.x2) or
+                            (TmpSize.y1 <> Base.y1) or (TmpSize.y2 <> Base.y2)
+  else
+    ContainerSizeChanged := false;
+  {don't run anything related to container size changed, even if it did change
+   Beware of bugs here! As the container size might remain the same, just
+   Base became initialized.
+   Actually this can't happen in a normal situation. But did anything ever went as planned?}
 
   if not Base.isInitialized then
     Log(LogInterfaceInfo,{$I %CURRENTROUTINE%},'Base is uninitialized in Rescale');
@@ -804,7 +823,8 @@ begin
 
   //notify anchored elements to this one, that this one has rescaled
   //if something has changed to avoid cyclic
-  NotifyRescale;
+  if (ContainerSizeChanged) then
+    NotifyRescale;
 end;
 
 {----------------------------------------------------------------------------}
@@ -1174,7 +1194,9 @@ procedure DInterfaceElement.Rescale;
 var i: integer;
 begin
   inherited Rescale;
-  for i := 0 to Children.Count-1 do Children[i].Rescale;
+  {$WARNING this whole procedure must be removed but keep an eye on it until everything is workin fine}
+  //for i := 0 to Children.Count-1 do Children[i].Rescale;
+
   //if this container is "fine" then get children's content and try to rescale
   //if Base.isInitialized then RescaleToChildren;
 end;
