@@ -212,14 +212,20 @@ type
     {}
     NotifyAnchors: TAnchorList;
     {}
-    procedure AddAnchor(aAnchor: DAnchoredObject); override;
-    {}
     procedure NotifyRescale;
   public
+    {}
+    procedure AddAnchor(aAnchor: DAnchoredObject); override;
     {}
     //function ProcessRescaleResult(var r1: TRescaleResult; const r2: TRescaleResult): TRescaleResult;
     { changes the scale of the element relative to current window size }
     procedure Rescale; override;
+    {}
+    procedure RescaleRecoursive; virtual;
+    {}
+    function RescaleContainer: boolean;
+    {}
+    function RescaleContent: boolean; virtual;
     { draw the element / as abstract as it might be :) }
     procedure Draw; virtual; abstract;
   strict private
@@ -339,7 +345,8 @@ Type
     { List of the children of this interface element }
     Children: DInterfaceElementsList;
     procedure Draw; override;
-    procedure Rescale; override;
+    {}
+    procedure RescaleRecoursive; override;
     { Rescales this Interface element to fit children sizes
       (should be used only in case children may have fixed sizes (like text labels)
        or force-change their size, e.g. if they don't allow size smaller
@@ -781,11 +788,10 @@ end;}
 
 {----------------------------------------------------------------------------}
 
-procedure DAbstractElement.Rescale;
+function DAbstractElement.RescaleContainer: boolean;
 var TmpSize: Txy;
-    ContainerSizeChanged: boolean;
 begin
-  {ugly fix to check if container size has changed}
+  {ugly/temporary fix to check if container size has changed}
   TmpSize.x1 := Base.x1;
   TmpSize.x2 := Base.x2;
   TmpSize.y1 := Base.y1;
@@ -794,32 +800,56 @@ begin
   {set animation states to changed container size}
   Base.FloatToInteger;
 
+  if not Base.isInitialized then
+    Log(LogInterfaceInfo,{$I %CURRENTROUTINE%},'Base is uninitialized in Rescale');
+
   {check if container size has been actually changed}
   if (Base.isInitialized) then
-    ContainerSizeChanged := (TmpSize.x1 <> Base.x1) or (TmpSize.x2 <> Base.x2) or
-                            (TmpSize.y1 <> Base.y1) or (TmpSize.y2 <> Base.y2)
+    Result := (TmpSize.x1 <> Base.x1) or (TmpSize.x2 <> Base.x2) or
+              (TmpSize.y1 <> Base.y1) or (TmpSize.y2 <> Base.y2)
   else
-    ContainerSizeChanged := false;
+    Result := false;
   {don't run anything related to container size changed, even if it did change
    Beware of bugs here! As the container size might remain the same, just
    Base became initialized.
    Actually this can't happen in a normal situation. But did anything ever went as planned?}
 
-  if not Base.isInitialized then
-    Log(LogInterfaceInfo,{$I %CURRENTROUTINE%},'Base is uninitialized in Rescale');
+   {Rescale Last and Next if they're initialized or just copy Base to avoid bugs}
+   if Last.isInitialized then
+     Last.FloatToInteger
+   else
+     Last.Assign(Base);
 
-  {Rescale Last and Next if they're initialized or just copy Base to avoid bugs}
-  if Last.isInitialized then
-    Last.FloatToInteger
-  else
-    Last.Assign(Base);
+   if Next.isInitialized then
+     Next.FloatToInteger
+   else
+     Next.Assign(Base);
 
-  if Next.isInitialized then
-    Next.FloatToInteger
-  else
-    Next.Assign(Base);
+   {$WARNING All angors are attached to current, not to base!!!! Should notify all chidren of current has changed???}
+   GetAnimationState; //Get Self.Current (required to scale Anchored elements accordingly!)
+end;
 
-  GetAnimationState; //Get Self.Current (required to scale Anchored elements accordingly!)
+{----------------------------------------------------------------------------}
+
+function DAbstractElement.RescaleContent: boolean;
+begin
+  {at this abstract level it does nothing}
+  Result := false;
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DAbstractElement.RescaleRecoursive;
+begin
+  Rescale; //just rescale self and do nothing more
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DAbstractElement.Rescale;
+var ContainerSizeChanged: boolean;
+begin
+  ContainerSizeChanged := RescaleContainer or RescaleContent;
 
   //notify anchored elements to this one, that this one has rescaled
   //if something has changed to avoid cyclic
@@ -1190,15 +1220,11 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DInterfaceElement.Rescale;
+procedure DInterfaceElement.RescaleRecoursive;
 var i: integer;
 begin
-  inherited Rescale;
-  {$WARNING this whole procedure must be removed but keep an eye on it until everything is workin fine}
-  //for i := 0 to Children.Count-1 do Children[i].Rescale;
-
-  //if this container is "fine" then get children's content and try to rescale
-  //if Base.isInitialized then RescaleToChildren;
+  inherited RescaleRecoursive;
+  for i := 0 to Children.Count-1 do Children[i].RescaleRecoursive;
 end;
 
 {-----------------------------------------------------------------------------}

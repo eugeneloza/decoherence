@@ -92,10 +92,15 @@ begin
 
   Log(LogInterfaceInfo,{$I %CURRENTROUTINE%},
     IntToStr(Window.Width) + 'x' + IntToStr(Window.Height));
-  inherited Rescale;
+
   Width := Window.Width;
   Height := Window.Height;
   Center := Vector2(Width div 2, Height div 2);
+
+  {$WARNING no rescaling children. This can go wild!}
+  //inherited Rescale;
+  Self.RescaleRecoursive;
+
 
   { THIS ROUTINE IS NOT YET IMPLEMENTED IN CASTLE GAME ENGINE
     see https://github.com/castle-engine/castle-engine/issues/36 }
@@ -139,13 +144,13 @@ procedure DInterfaceContainer.PartyInterface;
 var tmp: DSingleInterfaceElement;
 begin
   Self.Clear; //make it more optimal?
-  {tmp := DPlayerBarsFull.Create;
+  tmp := DPlayerBarsFull.Create;
   tmp.Base.AnchorToWindow := true;
   tmp.SetBaseSize(0.1,0.1,0.1,0.1);
   (tmp as DPlayerBarsFull).Target := Player.CurrentParty.Character[0];
   (tmp as DPlayerBarsFull).RearrangeChildren;
   Grab(tmp);
-  tmp.Rescale;}
+  tmp.Rescale;
 
  { tmp := DFloatLabel.Create;
   (tmp as DFloatLabel).Target := @base.fx1;
