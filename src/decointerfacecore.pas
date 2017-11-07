@@ -703,7 +703,9 @@ begin
   for aa in TAnchorSide do
     Self.Anchor[aa] := Source.Anchor[aa];
   Self.OpacityAnchor := Source.OpacityAnchor;
-  {$WARNING copy Notify Anchors here?}
+  if Self.Owner <> Source.Owner then begin
+    Self.Log(LogInterfaceScaleError, {$I %CURRENTROUTINE},'WARNING: NotifyAnchor should be copied, do it!');
+  end;
 end;
 procedure DAbstractContainer.AssignTo(const Dest: DAbstractContainer);
 var aa: TAnchorSide;
@@ -727,7 +729,9 @@ begin
   for aa in TAnchorSide do
     Dest.Anchor[aa] := Self.Anchor[aa];
   Dest.OpacityAnchor := Self.OpacityAnchor;
-  {$WARNING copy Notify Anchors here?}
+  if Dest.Owner <> Self.Owner then begin
+    Self.Log(LogInterfaceScaleError, {$I %CURRENTROUTINE},'WARNING: NotifyAnchor should be copied, do it!');
+  end;
 end;
 
 {----------------------------------------------------------------------------}
