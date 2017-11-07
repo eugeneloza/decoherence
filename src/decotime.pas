@@ -24,6 +24,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 unit DecoTime;
 
 {$INCLUDE compilerconfig.inc}
+{$DEFINE UseFloatTimer}
 
 interface
 
@@ -33,9 +34,12 @@ uses
   CastleTimeUtils,
   DecoGlobal;
 
-Type DTime = TFloatTime;
+type DTime = TFloatTime;
      {see note for CastleTimeUtils.TTimerResult}
      DIntTime = int64;
+
+     DThreadedTime = {$IFDEF UseFloatTimer}DTime{$ELSE}DIntTime{$ENDIF};
+
 
 var { analogue to Now function, but a fast-access variable, representing
       current global time (time where animations take place)
@@ -61,13 +65,13 @@ procedure doTime;
 procedure RequestSoftPauseByAction(const PauseSeconds: DTime);
 { Gets CastleTimeUtils.Timer value from some "starting point" in a thread-safe way }
 function GetNow: DTime; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
-{$HINT maybe use raw integer for these values? That'll give approx +0.5% speed, but will require converting FPS_goal to integer}
+function GetNowInt: DIntTime; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 { This is a less accurate but accelerated (~130 times) version
   of the timer by using threads. Should be used after ForceGetNowThread.
   Should be used only in time-critical cases, such as World.Manage }
-function GetNowThread: DTime; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+function GetNowThread: DThreadedTime; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 { Forces initialization of the threaded timer value. }
-function ForceGetNowThread: DTime; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+function ForceGetNowThread: DThreadedTime; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 uses SysUtils, Classes{$IFDEF Windows}, SyncObjs{$ENDIF};
@@ -159,7 +163,7 @@ var
   tv: TTimeval;
 begin
   FpGettimeofday(@tv, nil);
-  Result := Int64(tv.tv_sec) * 1000000 + Int64(tv.tv_usec);
+  Result := int64(tv.tv_sec) * 1000000 + int64(tv.tv_usec);
 end;
 {$ENDIF}
 
@@ -168,6 +172,10 @@ end;
 function GetNow: DTime; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
   Result := Timer / TimerFrequency;
+end;
+function GetNowInt: DIntTime; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+begin
+  Result := Timer;
 end;
 
 {========================== GET TIME IN A THREAD =============================}
@@ -188,15 +196,14 @@ end;
 
 {----------------------------------------------------------------------------}
 
-var LastTime: DTime;
-function GetNowThread: DTime; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+var LastTime: DThreadedTime;
+function GetNowThread: DThreadedTime; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
   if ThreadedTimer.Finished then begin
-    LastTime := ThreadedTimer.time / TimerFrequency;
-    Result := LastTime;
+    LastTime := ThreadedTimer.Time {$IFDEF UseFloatTimer}/ TimerFrequency{$ENDIF};
     ThreadedTimer.Start;
-  end else
-    Result := LastTime;
+  end;
+  Result := LastTime;
 end;
 
 {----------------------------------------------------------------------------}
@@ -205,24 +212,21 @@ end;
   and must always be used once before starting accessing the GetNowThread sequentially
   so that the first value will be correct (otherwise it might be extermely wrong,
   which is bad for World.Manage) }
-function ForceGetNowThread: DTime; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+function ForceGetNowThread: DThreadedTime; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
-  LastTime := GetNow;
-  {//DecoNow; --- actually we should be perfectly fine with this value?
-   It will give "a bit incorrect" (thou it can't go badly wrong) value for first
-   several cycles of World.Manage, but anyway it should preform
-   several additional routines.
-   On the other hand, we access ForceGetNowThread only once per frame,
-   so, maybe, better not to bother}
+  if ThreadedTimer.Finished then begin
+    LastTime := {$IFDEF UseFloatTimer}GetNow{$ELSE}GetNowInt{$ENDIF};
+    ThreadedTimer.Start;
+  end;
   Result := LastTime;
-  if ThreadedTimer.Finished then ThreadedTimer.Start;
 end;
 
 initialization
   //create threaded timer and run it immediately to make sure everything is initialized properly
-  ThreadedTimer := TTimerThread.create(false);
+  ThreadedTimer := TTimerThread.Create(true);
   ThreadedTimer.Priority := tpLower;
   ThreadedTimer.FreeOnTerminate := false;
+  ForceGetNowThread;
 
   {$IFDEF Windows}
   //initialize the timer in Windows and determine TimerFrequency

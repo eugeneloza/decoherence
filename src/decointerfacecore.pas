@@ -62,9 +62,24 @@ type TAnchorAlign = (noAlign, haLeft, haRight, haCenter, vaTop, vaBottom, vaMidd
 { Which part of the image is fitted to maintain proportions }
 type TProportionalScale = (psNone, psWidth, psHeight);
 
-type Txy = record
+type
+  {}
+  Txy = record
   x1,y1,x2,y2: integer;
 end;
+
+
+  type
+    {}
+    DAnchoredObject = class abstract (DObject)
+    public
+      {}
+      procedure AddAnchor(aAnchor: DAnchoredObject); virtual; abstract;
+      {}
+      procedure Rescale; virtual; abstract;
+    end;
+
+  type TAnchorList = specialize TObjectList<DAnchoredObject>;
 
 type
   { This is an container with coordinates and size
@@ -74,7 +89,7 @@ type
   DAbstractContainer = class(DObject)
   strict private
     { Owner of this Container (for displaying debug info) }
-    Owner: DObject;
+    Owner: DAnchoredObject;
     fInitialized: boolean;
     { Parent container size (cached) }
     cx1,cx2,cy1,cy2,cw,ch: integer;
@@ -139,7 +154,7 @@ type
     property h: integer read GetHeight write SetHeight;
     { If this Container ready to be used? }
     property isInitialized: boolean read GetInitialized;
-    constructor Create(aOwner: DObject); //virtual;
+    constructor Create(aOwner: DAnchoredObject); //virtual;
     //destructor Destroy; override;
     { Copy parameters from the Source }
     procedure Assign(const Source: DAbstractContainer);
@@ -178,10 +193,11 @@ type
     asSquare is slower in the beginning and end, and faster in the middle}
   TAnimationCurve = (acsLinear, acSquare);
 
-Type
+
+type
   { most abstract container for interface elements
     Defines size, scaling and animation state }
-  DAbstractElement = class abstract(DObject)
+  DAbstractElement = class abstract(DAnchoredObject)
   strict protected
     { Caches current animation state, recalculated by GetAnimationState at every render}
     procedure GetAnimationState;
@@ -192,11 +208,18 @@ Type
     procedure SetFullScreen;
     { Returns true size of this interface element }
     function GetSize: Txy; virtual; deprecated;
+  strict protected
+    {}
+    NotifyAnchors: TAnchorList;
+    {}
+    procedure AddAnchor(aAnchor: DAnchoredObject); override;
+    {}
+    procedure NotifyRescale;
   public
     {}
     //function ProcessRescaleResult(var r1: TRescaleResult; const r2: TRescaleResult): TRescaleResult;
     { changes the scale of the element relative to current window size }
-    procedure Rescale; virtual;
+    procedure Rescale; override;
     { draw the element / as abstract as it might be :) }
     procedure Draw; virtual; abstract;
   strict private
@@ -351,7 +374,7 @@ uses SysUtils,
 {========================== Abstract Container ===============================}
 {=============================================================================}
 
-constructor DAbstractContainer.Create(aOwner: DObject);
+constructor DAbstractContainer.Create(aOwner: DAnchoredObject);
 var aa: TAnchorSide;
 begin
   //inherited Create;
@@ -612,6 +635,7 @@ begin
   Anchor[asBottom].Gap := Gap;
   Anchor[asBottom].AlignTo := vaBottom;
   OpacityAnchor := aParent;
+  aParent.Owner.AddAnchor(Self.Owner);
 end;
 procedure DAbstractContainer.AnchorChild(const aChild: DAbstractContainer; const Gap: integer = 0);
 begin
@@ -628,6 +652,7 @@ begin
   aChild.Anchor[asBottom].Gap := Gap;
   aChild.Anchor[asBottom].AlignTo := vaBottom;
   aChild.OpacityAnchor := Self;
+  Self.Owner.AddAnchor(aChild.Owner);
 end;
 
 {----------------------------------------------------------------------------}
@@ -637,6 +662,7 @@ begin
   Anchor[aSide].Anchor := aParent;
   Anchor[aSide].AlignTo := aAlign;
   Anchor[aSide].Gap := Gap;
+  aParent.Owner.AddAnchor(Self.Owner);
 end;
 
 procedure DAbstractContainer.AnchorTop(const aParent: DAbstractContainer; const aAlign: TAnchorAlign; const Gap: integer = 0);
@@ -680,6 +706,9 @@ begin
   for aa in TAnchorSide do
     Self.Anchor[aa] := Source.Anchor[aa];
   Self.OpacityAnchor := Source.OpacityAnchor;
+  if Self.Owner <> Source.Owner then begin
+    Self.Log(LogInterfaceScaleError, {$I %CURRENTROUTINE},'WARNING: NotifyAnchor should be copied, do it!');
+  end;
 end;
 procedure DAbstractContainer.AssignTo(const Dest: DAbstractContainer);
 var aa: TAnchorSide;
@@ -703,6 +732,9 @@ begin
   for aa in TAnchorSide do
     Dest.Anchor[aa] := Self.Anchor[aa];
   Dest.OpacityAnchor := Self.OpacityAnchor;
+  if Dest.Owner <> Self.Owner then begin
+    Self.Log(LogInterfaceScaleError, {$I %CURRENTROUTINE},'WARNING: NotifyAnchor should be copied, do it!');
+  end;
 end;
 
 {----------------------------------------------------------------------------}
@@ -769,6 +801,10 @@ begin
     Next.Assign(Base);
 
   GetAnimationState; //Get Self.Current (required to scale Anchored elements accordingly!)
+
+  //notify anchored elements to this one, that this one has rescaled
+  //if something has changed to avoid cyclic
+  NotifyRescale;
 end;
 
 {----------------------------------------------------------------------------}
@@ -939,6 +975,24 @@ end;
 
 {----------------------------------------------------------------------------}
 
+procedure DAbstractElement.AddAnchor(aAnchor: DAnchoredObject);
+var a: DAnchoredObject;
+begin
+  //check if the Anchor isn't already available in NotifyAnchors
+  for a in NotifyAnchors do if a = aAnchor then Exit;
+  NotifyAnchors.Add(aAnchor);
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DAbstractElement.NotifyRescale;
+var a: DAnchoredObject;
+begin
+  for a in NotifyAnchors do a.Rescale;
+end;
+
+{----------------------------------------------------------------------------}
+
 constructor DAbstractElement.Create;
 begin
   inherited Create;
@@ -948,6 +1002,8 @@ begin
   Last := DAbstractContainer.Create(Self);
   Next := DAbstractContainer.Create(Self);
   Current := DAbstractContainer.Create(Self);
+
+  NotifyAnchors := TAnchorList.Create(false);
 end;
 
 {----------------------------------------------------------------------------}
@@ -958,6 +1014,8 @@ begin
   FreeAndNil(Last);
   FreeAndNil(Next);
   FreeAndNil(Current);
+
+  FreeAndNil(NotifyAnchors);
   inherited Destroy;
 end;
 
@@ -1118,7 +1176,7 @@ begin
   inherited Rescale;
   for i := 0 to Children.Count-1 do Children[i].Rescale;
   //if this container is "fine" then get children's content and try to rescale
-  if Base.isInitialized then RescaleToChildren;
+  //if Base.isInitialized then RescaleToChildren;
 end;
 
 {-----------------------------------------------------------------------------}
