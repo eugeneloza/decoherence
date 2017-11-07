@@ -801,6 +801,10 @@ begin
     Next.Assign(Base);
 
   GetAnimationState; //Get Self.Current (required to scale Anchored elements accordingly!)
+
+  //notify anchored elements to this one, that this one has rescaled
+  //if something has changed to avoid cyclic
+  NotifyRescale;
 end;
 
 {----------------------------------------------------------------------------}
@@ -1173,9 +1177,6 @@ begin
   for i := 0 to Children.Count-1 do Children[i].Rescale;
   //if this container is "fine" then get children's content and try to rescale
   //if Base.isInitialized then RescaleToChildren;
-
-  //if something has changed to avoid cyclic
-  NotifyRescale;
 end;
 
 {-----------------------------------------------------------------------------}
