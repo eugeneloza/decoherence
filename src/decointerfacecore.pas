@@ -75,7 +75,8 @@ end;
     public
       {}
       procedure AddAnchor(aAnchor: DAnchoredObject); virtual; abstract;
-
+      {}
+      procedure Rescale; virtual; abstract;
     end;
 
   type TAnchorList = specialize TObjectList<DAnchoredObject>;
@@ -212,11 +213,13 @@ type
     NotifyAnchors: TAnchorList;
     {}
     procedure AddAnchor(aAnchor: DAnchoredObject); override;
+    {}
+    procedure NotifyRescale;
   public
     {}
     //function ProcessRescaleResult(var r1: TRescaleResult; const r2: TRescaleResult): TRescaleResult;
     { changes the scale of the element relative to current window size }
-    procedure Rescale; virtual;
+    procedure Rescale; override;
     { draw the element / as abstract as it might be :) }
     procedure Draw; virtual; abstract;
   strict private
@@ -978,6 +981,14 @@ end;
 
 {----------------------------------------------------------------------------}
 
+procedure DAbstractElement.NotifyRescale;
+var a: DAnchoredObject;
+begin
+  for a in NotifyAnchors do a.Rescale;
+end;
+
+{----------------------------------------------------------------------------}
+
 constructor DAbstractElement.Create;
 begin
   inherited Create;
@@ -1161,7 +1172,10 @@ begin
   inherited Rescale;
   for i := 0 to Children.Count-1 do Children[i].Rescale;
   //if this container is "fine" then get children's content and try to rescale
-  if Base.isInitialized then RescaleToChildren;
+  //if Base.isInitialized then RescaleToChildren;
+
+  //if something has changed to avoid cyclic
+  NotifyRescale;
 end;
 
 {-----------------------------------------------------------------------------}
