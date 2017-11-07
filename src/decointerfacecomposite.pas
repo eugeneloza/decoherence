@@ -379,7 +379,7 @@ begin
   Wind1.PhaseSpeed := 1/(15+drnd.Random);
   Wind2.PhaseSpeed := 1/(10+drnd.Random);
 
-  Rescale;
+  RescaleRecoursive;
 end;
 
 

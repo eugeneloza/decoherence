@@ -849,7 +849,8 @@ end;
 procedure DAbstractElement.Rescale;
 var ContainerSizeChanged: boolean;
 begin
-  ContainerSizeChanged := RescaleContainer or RescaleContent;
+  ContainerSizeChanged := RescaleContainer;
+  ContainerSizeChanged := RescaleContent or ContainerSizeChanged;
 
   //notify anchored elements to this one, that this one has rescaled
   //if something has changed to avoid cyclic

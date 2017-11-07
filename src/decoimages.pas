@@ -52,9 +52,7 @@ type
     procedure FreeImage;
   public
     { non-GL part of rescaling the image }
-    procedure Rescale; override;
-    { Scales the image to Base.size }
-    procedure RescaleImage; virtual; abstract;
+    //function RescaleContent: boolean; override;
     { very simple draw procedure,
           checks if GL is initialized and initializes it if necessary }
     procedure Draw; override;
@@ -85,7 +83,7 @@ type
   public
     {Reference to Frame basic image (rectagonal frame with corresponding gaps)}
     Frame: DRectagonalFrame;
-    procedure RescaleImage; override;
+    function RescaleContent: boolean; override;
     { todo: maybe not scale the image, but draw3x3 by OpenGl features? 
           or return the use of burner (e.g. noise) overlay }
   end;
@@ -103,7 +101,7 @@ type
     Base for images and labels (uses RescaleImage) }
   DSimpleImage = class abstract(DAbstractImage)
   public
-    procedure RescaleImage; override;
+    function RescaleContent: boolean; override;
   end;
 
 type
@@ -248,15 +246,6 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DAbstractImage.Rescale;
-begin
-  inherited Rescale;
-  //Base.FixProportions(RealWidth,Realheight); //should be done by proportional scale?
-  RescaleImage;
-end;
-
-{----------------------------------------------------------------------------}
-
 procedure DAbstractImage.Update;
 begin
   inherited Update;
@@ -331,7 +320,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DFrameImage.RescaleImage;
+function DFrameImage.RescaleContent: boolean;
 var ScaledImageParts: array [0..2,0..2] of TCastleImage;
     ix, iy: integer;
     UnscaledWidth, UnscaledHeight: integer;
@@ -342,6 +331,7 @@ begin
     Log(LogInterfaceError,{$I %CURRENTROUTINE%},'Error: Frame is nil!');
     Exit;
   end;
+  Result := true;
 
   ImageReady := false;
   FreeAndNil(GLImage);
@@ -358,10 +348,12 @@ begin
   if Frame.CornerLeft+Frame.CornerRight+1 > Base.w then begin
     Log(LogInterfaceScaleHint,{$I %CURRENTROUTINE%},'Reset backwards base.w = '+IntToStr(Base.w)+' / cornerLeft+cornerRight = '+IntToStr(Frame.CornerLeft+Frame.CornerRight));
     Base.SetWidth(Frame.CornerLeft+Frame.CornerRight+1);
+    Result := true;
   end;
   if Frame.CornerTop+Frame.CornerBottom+1 > Base.h then begin
     Log(LogInterfaceScaleHint,{$I %CURRENTROUTINE%},'Reset backwards base.h = '+IntToStr(Base.h)+' / cornerTop+cornerBottom = '+inttostr(Frame.CornerTop+Frame.CornerBottom));
     Base.SetHeight(Frame.CornerTop+Frame.CornerBottom+1);
+    Result := true;
   end;
 
   SourceXs[0] := 0;
@@ -434,7 +426,7 @@ end;
 {======================== Simple image =======================================}
 {=============================================================================}
 
-procedure DSimpleImage.RescaleImage;
+function DSimpleImage.RescaleContent: boolean;
 begin
  {$IFNDEF AllowRescale}
  If SourceImage = nil then begin
@@ -455,6 +447,7 @@ begin
    else
      Log(LogInterfaceScaleError,{$I %CURRENTROUTINE%},'ERROR: Base.Initialized = false');
  end;
+ Result := false;
 end;
 
 
