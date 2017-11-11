@@ -69,27 +69,50 @@ type
 end;
 
 
-  type
+type
+  {}
+  DAnchoredObject = class abstract (DObject)
+  public
     {}
-    DAnchoredObject = class abstract (DObject)
-    public
-      {}
-      procedure AddAnchor(aAnchor: DAnchoredObject); virtual; abstract;
-      {}
-      procedure Rescale; virtual; abstract;
-    end;
+    procedure AddAnchor(aAnchor: DAnchoredObject); virtual; abstract;
+    {}
+    procedure Rescale; virtual; abstract;
+  end;
 
-  type TAnchorList = specialize TObjectList<DAnchoredObject>;
+type TAnchorList = specialize TObjectList<DAnchoredObject>;
 
 type
   { This is an container with coordinates and size
     Capable of rescaling / copying itself
     As abstract as it seems, it's also used as animation state,
     So, constructing it as standalone should be possible }
-  DAbstractContainer = class(DObject)
-  strict private
+  DIntegerContainer = class(DObject)
+  strict protected
     { Owner of this Container (for displaying debug info) }
     Owner: DAnchoredObject;
+  public
+    { Real size of the Container }
+    x1,y1,x2,y2: integer;
+
+    //Opacity: float;
+
+
+    procedure SetWidth(const aWidth: integer);
+    procedure SetHeight(const aHeight: integer);
+    function GetWidth: integer;
+    function GetHeight: integer;
+
+    property w: integer read GetWidth write SetWidth;
+    property h: integer read GetHeight write SetHeight;
+
+    constructor Create(aOwner: DAnchoredObject); virtual;
+    //destructor Destroy; override;
+  end;
+
+type
+  {}
+  DFloatContainer = class(DIntegerContainer)
+  strict protected
     fInitialized: boolean;
     { Parent container size (cached) }
     cx1,cx2,cy1,cy2,cw,ch: integer;
@@ -103,7 +126,7 @@ type
     { Converts integer size to float. }
     procedure IntegerToFloat;
     { Resets x2,y2,w,h to fit RealWidth,RealHeight This suggest use of only Left anchor! }
-    procedure AdjustToRealSize;{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+    procedure AdjustToRealSize;{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF} deprecated;
 
     function GetInitialized: boolean;
   public
@@ -115,7 +138,7 @@ type
       { Specifies Anchor object, Anchor type, and additional gap }
       DAnchor = record
         { Anchor to which element }
-        Anchor: DAbstractContainer;
+        Anchor: DFloatContainer;
         { To which side of the Anchor should it align? }
         AlignTo: TAnchorAlign;
         { Additional gap between this element and Anchor in px }
@@ -126,39 +149,28 @@ type
     Anchor: array[TAnchorSide] of DAnchor;
     { Parent's opacity is multiplied by this Container opacity,
       May be nil }
-    OpacityAnchor: DAbstractContainer;
+    OpacityAnchor: DFloatContainer;
     { Is this Container scaled agains Anchors or Window?
       Should be True only at top-level Container (i.e. GUI Container)
       However, maybe, reintroduction or manual scaling would be prefferable? }
     AnchorToWindow: boolean;
     { Float size of the Container }
     fx1,fy1,fx2,fy2{,fw,fh}: float;
-    { Real size of the Container }
-    x1,y1,x2,y2: integer;
     { Base value of the opacity of the container }
-    BaseOpacity: float;
+    BaseOpacity: float; //deprecated;
     { Opacity of the container multiplied by Anchor's opacity }
-    CurrentOpacity: float;
+    CurrentOpacity: float; //deprecated;
     { Keep proportions of the container }
-    RealWidth, RealHeight: integer;
+    RealWidth, RealHeight: integer; //deprecated;
     { Can this item be scaled? Otherwise its w, h is always RealWidth, RealHeight}
-    ScaleItem: boolean;
+    ScaleItem: boolean; //deprecated;
     { Should this Container scale proportionaly? }
-    ProportionalScale: TProportionalScale;
-
-    procedure SetWidth(const aWidth: integer);
-    procedure SetHeight(const aHeight: integer);
-    function GetWidth: integer;
-    function GetHeight: integer;
-    property w: integer read GetWidth write SetWidth;
-    property h: integer read GetHeight write SetHeight;
+    ProportionalScale: TProportionalScale; //deprecated;
     { If this Container ready to be used? }
     property isInitialized: boolean read GetInitialized;
-    constructor Create(aOwner: DAnchoredObject); //virtual;
-    //destructor Destroy; override;
     { Copy parameters from the Source }
-    procedure Assign(const Source: DAbstractContainer);
-    procedure AssignTo(const Dest: DAbstractContainer);
+    procedure Assign(const Source: DFloatContainer);
+    procedure AssignTo(const Dest: DFloatContainer);
     { Set container position and size }
     procedure SetFloatCoord(const afx1,afy1,afx2,afy2: float);
     procedure SetFloatFull(const afx1,afy1,afx2,afy2,aOpacity: float);
@@ -171,20 +183,22 @@ type
     { Sets int width/height for scaling animations }
     procedure SetIntWidthHeight(const aWidth,aHeight: integer);
     { Resets width and height to their "real" values, e.g. for elements that are not scaled }
-    procedure ResetToReal;
-    procedure SetRealSize(const aWidth,aHeight: integer);
+    procedure ResetToReal; deprecated;
+    procedure SetRealSize(const aWidth,aHeight: integer); deprecated;
     { Anchors this Container to aParent }
-    procedure AnchorTo(const aParent: DAbstractContainer; const Gap: integer = 0);
+    procedure AnchorTo(const aParent: DFloatContainer; const Gap: integer = 0);
     { Anchors aChild to this Container  }
-    procedure AnchorChild(const aChild: DAbstractContainer; const Gap: integer = 0);
+    procedure AnchorChild(const aChild: DFloatContainer; const Gap: integer = 0);
     {}
-    procedure AnchorSide(const aSide: TAnchorSide; const aParent: DAbstractContainer; const aAlign: TAnchorAlign; const Gap: integer = 0);
-    procedure AnchorTop(const aParent: DAbstractContainer; const aAlign: TAnchorAlign; const Gap: integer = 0);
-    procedure AnchorBottom(const aParent: DAbstractContainer; const aAlign: TAnchorAlign; const Gap: integer = 0);
-    procedure AnchorLeft(const aParent: DAbstractContainer; const aAlign: TAnchorAlign; const Gap: integer = 0);
-    procedure AnchorRight(const aParent: DAbstractContainer; const aAlign: TAnchorAlign; const Gap: integer = 0);
+    procedure AnchorSide(const aSide: TAnchorSide; const aParent: DFloatContainer; const aAlign: TAnchorAlign; const Gap: integer = 0);
+    procedure AnchorTop(const aParent: DFloatContainer; const aAlign: TAnchorAlign; const Gap: integer = 0);
+    procedure AnchorBottom(const aParent: DFloatContainer; const aAlign: TAnchorAlign; const Gap: integer = 0);
+    procedure AnchorLeft(const aParent: DFloatContainer; const aAlign: TAnchorAlign; const Gap: integer = 0);
+    procedure AnchorRight(const aParent: DFloatContainer; const aAlign: TAnchorAlign; const Gap: integer = 0);
     { do these two Containers have equal anchors? }
-    function AnchorsEqual(const aCompare: DAbstractContainer): boolean;
+    function AnchorsEqual(const aCompare: DFloatContainer): boolean;
+  public
+    constructor Create(aOwner: DAnchoredObject); override;
   end;
 
 type
@@ -230,7 +244,7 @@ type
     procedure Draw; virtual; abstract;
   strict private
     { Last and Next animation states. }
-    Last, Next: DAbstractContainer;
+    Last, Next: DFloatContainer;
     fVisible: boolean;
     {$HINT should it set visible to all children? }
     procedure SetVisible(const Value: boolean);
@@ -241,7 +255,7 @@ type
     AnimationDuration: DTime;
     AnimationCurve: TAnimationCurve;
     {base state of the element. contains its coordinates and width/height}
-    Current, Base: DAbstractContainer;
+    Current, Base: DFloatContainer;
     {source width/height of the element. Used to preserve proportions while scaling}
 
     procedure SetBaseSize(const NewX,NewY,NewW,NewH: float;NewO: float=1; const Animate: TAnimationStyle = asNone); virtual;
@@ -381,8 +395,7 @@ uses SysUtils,
 {========================== Abstract Container ===============================}
 {=============================================================================}
 
-constructor DAbstractContainer.Create(aOwner: DAnchoredObject);
-var aa: TAnchorSide;
+constructor DIntegerContainer.Create(aOwner: DAnchoredObject);
 begin
   //inherited Create;
   Owner := aOwner;
@@ -391,7 +404,15 @@ begin
   x2 := UninitializedIntCoord;
   y1 := UninitializedIntCoord;
   y2 := UninitializedIntCoord;
+  //Opacity := 1;
+end;
 
+{----------------------------------------------------------------------------}
+
+constructor DFloatContainer.Create(aOwner: DAnchoredObject);
+var aa: TAnchorSide;
+begin
+  inherited Create(aOwner);
   AnchorToWindow := false;
   fInitialized := false;
   {this is redundant}
@@ -408,7 +429,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DAbstractContainer.GetWindowAnchor;{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+procedure DFloatContainer.GetWindowAnchor;{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
   cx1 := 0;
   cy1 := 0;
@@ -416,7 +437,7 @@ begin
   cy2 := Window.Height;
 end;
 
-procedure DAbstractContainer.GetAnchors;
+procedure DFloatContainer.GetAnchors;
 begin
   if AnchorToWindow then
     GetWindowAnchor
@@ -466,7 +487,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DAbstractContainer.IntegerToFloat;
+procedure DFloatContainer.IntegerToFloat;
 begin
   GetAnchors;
 
@@ -486,7 +507,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DAbstractContainer.AdjustToRealSize;{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+procedure DFloatContainer.AdjustToRealSize;{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
   x2 := x1 + RealWidth;
   y2 := y1 + RealHeight;
@@ -495,7 +516,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DAbstractContainer.FloatToInteger;
+procedure DFloatContainer.FloatToInteger;
 var Ratio: float;
 begin
   GetAnchors;
@@ -531,7 +552,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DAbstractContainer.SetFloatCoord(const afx1,afy1,afx2,afy2: float);
+procedure DFloatContainer.SetFloatCoord(const afx1,afy1,afx2,afy2: float);
 begin
   fx1 := afx1;
   fy1 := afy1;
@@ -540,12 +561,12 @@ begin
 
   FloatToInteger;
 end;
-procedure DAbstractContainer.SetFloatFull(const  afx1,afy1,afx2,afy2,aOpacity: float);
+procedure DFloatContainer.SetFloatFull(const  afx1,afy1,afx2,afy2,aOpacity: float);
 begin
   BaseOpacity := aOpacity;
   SetFloatCoord(afx1,afy1,afx2,afy2);
 end;
-procedure DAbstractContainer.SetFloatSize(const afx1,afy1,afWidth,afHeight: float);
+procedure DFloatContainer.SetFloatSize(const afx1,afy1,afWidth,afHeight: float);
 begin
   fx1 := afx1;
   fy1 := afy1;
@@ -554,12 +575,12 @@ begin
 
   FloatToInteger;
 end;
-procedure DAbstractContainer.SetFloatSizeFull(const afx1,afy1,afWidth,afHeight,aOpacity: float);
+procedure DFloatContainer.SetFloatSizeFull(const afx1,afy1,afWidth,afHeight,aOpacity: float);
 begin
   BaseOpacity := aOpacity;
   SetFloatSize(afx1,afy1,afWidth,afHeight);
 end;
-procedure DAbstractContainer.SetIntCoord(const ax1,ay1,ax2,ay2: integer);
+procedure DFloatContainer.SetIntCoord(const ax1,ay1,ax2,ay2: integer);
 begin
   x1 := ax1;
   y1 := ay1;
@@ -570,41 +591,41 @@ begin
 
   IntegerToFloat;
 end;
-procedure DAbstractContainer.SetIntFull(const ax1,ay1,ax2,ay2: integer; const aOpacity: float);
+procedure DFloatContainer.SetIntFull(const ax1,ay1,ax2,ay2: integer; const aOpacity: float);
 begin
   BaseOpacity := aOpacity;
   SetIntCoord(ax1,ay1,ax2,ay2);
 end;
-procedure DAbstractContainer.SetIntSize(const ax1,ay1,aWidth,aHeight: integer);
+procedure DFloatContainer.SetIntSize(const ax1,ay1,aWidth,aHeight: integer);
 begin
   SetIntCoord(ax1,ay1,ax1 + aWidth,ay1 + aHeight);
 end;
 
-procedure DAbstractContainer.SetWidth(const aWidth: integer);
+procedure DIntegerContainer.SetWidth(const aWidth: integer);
 begin
   {unoptimal and might be wrong}
-  SetIntCoord(x1,y1,x1+aWidth,y2);
+  //SetIntCoord(x1,y1,x1+aWidth,y2);
 end;
-procedure DAbstractContainer.SetHeight(const aHeight: integer);
+procedure DIntegerContainer.SetHeight(const aHeight: integer);
 begin
   {unoptimal and might be wrong}
-  SetIntCoord(x1,y1,x2,y1+aHeight);
+  //SetIntCoord(x1,y1,x2,y1+aHeight);
 end;
 
 {----------------------------------------------------------------------------}
 
-function DAbstractContainer.GetWidth: integer;
+function DIntegerContainer.GetWidth: integer;
 begin
   Result := x2-x1;
 end;
-function DAbstractContainer.GetHeight: integer;
+function DIntegerContainer.GetHeight: integer;
 begin
   Result := y2-y1;
 end;
 
 {----------------------------------------------------------------------------}
 
-procedure DAbstractContainer.SetIntWidthHeight(const aWidth,aHeight: integer);
+procedure DFloatContainer.SetIntWidthHeight(const aWidth,aHeight: integer);
 begin
   {not sure about this}
   SetIntSize(x1,y1,aWidth,aHeight);
@@ -612,14 +633,14 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DAbstractContainer.ResetToReal;
+procedure DFloatContainer.ResetToReal;
 begin
   SetIntWidthHeight(RealWidth,RealHeight);
 end;
 
 {----------------------------------------------------------------------------}
 
-procedure DAbstractContainer.SetRealSize(const aWidth,aHeight: integer);
+procedure DFloatContainer.SetRealSize(const aWidth,aHeight: integer);
 begin
   RealWidth := aWidth;
   RealHeight := aHeight;
@@ -627,7 +648,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DAbstractContainer.AnchorTo(const aParent: DAbstractContainer; const Gap: integer = 0);
+procedure DFloatContainer.AnchorTo(const aParent: DFloatContainer; const Gap: integer = 0);
 begin
   Anchor[asLeft  ].Anchor := aParent;
   Anchor[asLeft  ].Gap := Gap;
@@ -644,7 +665,7 @@ begin
   OpacityAnchor := aParent;
   aParent.Owner.AddAnchor(Self.Owner);
 end;
-procedure DAbstractContainer.AnchorChild(const aChild: DAbstractContainer; const Gap: integer = 0);
+procedure DFloatContainer.AnchorChild(const aChild: DFloatContainer; const Gap: integer = 0);
 begin
   aChild.Anchor[asLeft  ].Anchor := Self;
   aChild.Anchor[asLeft  ].Gap := Gap;
@@ -664,7 +685,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DAbstractContainer.AnchorSide(const aSide: TAnchorSide; const aParent: DAbstractContainer; const aAlign: TAnchorAlign; const Gap: integer = 0);
+procedure DFloatContainer.AnchorSide(const aSide: TAnchorSide; const aParent: DFloatContainer; const aAlign: TAnchorAlign; const Gap: integer = 0);
 begin
   Anchor[aSide].Anchor := aParent;
   Anchor[aSide].AlignTo := aAlign;
@@ -672,26 +693,26 @@ begin
   aParent.Owner.AddAnchor(Self.Owner);
 end;
 
-procedure DAbstractContainer.AnchorTop(const aParent: DAbstractContainer; const aAlign: TAnchorAlign; const Gap: integer = 0);
+procedure DFloatContainer.AnchorTop(const aParent: DFloatContainer; const aAlign: TAnchorAlign; const Gap: integer = 0);
 begin
   AnchorSide(asTop,aParent,aAlign,Gap);
 end;
-procedure DAbstractContainer.AnchorBottom(const aParent: DAbstractContainer; const aAlign: TAnchorAlign; const Gap: integer = 0);
+procedure DFloatContainer.AnchorBottom(const aParent: DFloatContainer; const aAlign: TAnchorAlign; const Gap: integer = 0);
 begin
   AnchorSide(asBottom,aParent,aAlign,Gap);
 end;
-procedure DAbstractContainer.AnchorLeft(const aParent: DAbstractContainer; const aAlign: TAnchorAlign; const Gap: integer = 0);
+procedure DFloatContainer.AnchorLeft(const aParent: DFloatContainer; const aAlign: TAnchorAlign; const Gap: integer = 0);
 begin
   AnchorSide(asLeft,aParent,aAlign,Gap);
 end;
-procedure DAbstractContainer.AnchorRight(const aParent: DAbstractContainer; const aAlign: TAnchorAlign; const Gap: integer = 0);
+procedure DFloatContainer.AnchorRight(const aParent: DFloatContainer; const aAlign: TAnchorAlign; const Gap: integer = 0);
 begin
   AnchorSide(asRight,aParent,aAlign,Gap);
 end;
 
 {----------------------------------------------------------------------------}
 
-procedure DAbstractContainer.Assign(const Source: DAbstractContainer);
+procedure DFloatContainer.Assign(const Source: DFloatContainer);
 var aa: TAnchorSide;
 begin
   Self.fx1 := Source.fx1;
@@ -717,7 +738,7 @@ begin
     Self.Log(LogInterfaceScaleError, {$I %CURRENTROUTINE},'WARNING: NotifyAnchor should be copied, do it!');
   end;
 end;
-procedure DAbstractContainer.AssignTo(const Dest: DAbstractContainer);
+procedure DFloatContainer.AssignTo(const Dest: DFloatContainer);
 var aa: TAnchorSide;
 begin
   Dest.fx1 := Self.fx1;
@@ -746,7 +767,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-function DAbstractContainer.AnchorsEqual(const aCompare: DAbstractContainer): boolean;
+function DFloatContainer.AnchorsEqual(const aCompare: DFloatContainer): boolean;
 begin
   { we don't care to which part of Parent we Anchor?
     Or should we? }
@@ -763,7 +784,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-function DAbstractContainer.GetInitialized: boolean;
+function DFloatContainer.GetInitialized: boolean;
 begin
   if fInitialized then begin
     {check if the x1,x2,y1,y2 are initialized / the wrong place to }
@@ -1049,10 +1070,10 @@ begin
   inherited Create;
   fVisible := true;
   AnimationCurve := acSquare;
-  Base := DAbstractContainer.Create(Self);
-  Last := DAbstractContainer.Create(Self);
-  Next := DAbstractContainer.Create(Self);
-  Current := DAbstractContainer.Create(Self);
+  Base := DFloatContainer.Create(Self);
+  Last := DFloatContainer.Create(Self);
+  Next := DFloatContainer.Create(Self);
+  Current := DFloatContainer.Create(Self);
 
   NotifyAnchors := TAnchorList.Create(false);
 end;
