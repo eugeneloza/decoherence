@@ -251,7 +251,7 @@ begin
   inherited Update;
   if GLImage <> nil then begin
     GLImage.Color := InterfaceColor;
-    GLImage.Color[3] := Current.CurrentOpacity;
+    GLImage.Color[3] := Current.Opacity;
   end else
     Log(LogInterfaceGLError,{$I %CURRENTROUTINE%},'ERROR: GL image is nil in "update"');
 end;
@@ -346,13 +346,15 @@ begin
 
   {check if minimal frame size is larger than the requested frame size}
   if Frame.CornerLeft+Frame.CornerRight+1 > Base.w then begin
+    {$WARNING not working}
     Log(LogInterfaceScaleHint,{$I %CURRENTROUTINE%},'Reset backwards base.w = '+IntToStr(Base.w)+' / cornerLeft+cornerRight = '+IntToStr(Frame.CornerLeft+Frame.CornerRight));
-    Base.SetWidth(Frame.CornerLeft+Frame.CornerRight+1);
+    //Base.SetWidth(Frame.CornerLeft+Frame.CornerRight+1);
     Result := true;
   end;
   if Frame.CornerTop+Frame.CornerBottom+1 > Base.h then begin
+    {$WARNING not working}
     Log(LogInterfaceScaleHint,{$I %CURRENTROUTINE%},'Reset backwards base.h = '+IntToStr(Base.h)+' / cornerTop+cornerBottom = '+inttostr(Frame.CornerTop+Frame.CornerBottom));
-    Base.SetHeight(Frame.CornerTop+Frame.CornerBottom+1);
+    //Base.SetHeight(Frame.CornerTop+Frame.CornerBottom+1);
     Result := true;
   end;
 
@@ -554,7 +556,7 @@ procedure DWindImage.doDraw;
 var PhaseScaled:integer;
 begin
   //inherited <---------- this render is different
-  GLImage.Color[3] := Current.CurrentOpacity + Current.CurrentOpacity/4 * Sin(2*Pi*OpacityPhase);
+  GLImage.Color[3] := Current.Opacity + Current.Opacity/4 * Sin(2*Pi*OpacityPhase);
 
   PhaseScaled := Round((1-Phase)*Window.Width);
 
@@ -602,7 +604,7 @@ begin
   //inherited <---------- this render is different
   if not ImageReady then Exit; //image has been reloaded! //BUG
 
-  GLImage.Color[3] := Current.CurrentOpacity*Sin(Pi*Phase);
+  GLImage.Color[3] := Current.Opacity*Sin(Pi*Phase);
   x := Round((Window.Width-Base.w)*Phase);
   GLImage.Draw(x,0);
 end;

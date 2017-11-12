@@ -87,23 +87,23 @@ type
     As abstract as it seems, it's also used as animation state,
     So, constructing it as standalone should be possible }
   DIntegerContainer = class(DObject)
+  strict private
+    function GetWidth: integer;
+    function GetHeight: integer;
   strict protected
     { Owner of this Container (for displaying debug info) }
     Owner: DAnchoredObject;
   public
     { Real size of the Container }
     x1,y1,x2,y2: integer;
+    Opacity: float;
 
-    //Opacity: float;
 
+    //procedure SetWidth(const aWidth: integer);
+    //procedure SetHeight(const aHeight: integer);
 
-    procedure SetWidth(const aWidth: integer);
-    procedure SetHeight(const aHeight: integer);
-    function GetWidth: integer;
-    function GetHeight: integer;
-
-    property w: integer read GetWidth write SetWidth;
-    property h: integer read GetHeight write SetHeight;
+    property w: integer read GetWidth {write SetWidth};
+    property h: integer read GetHeight {write SetHeight};
 
     constructor Create(aOwner: DAnchoredObject); virtual;
     //destructor Destroy; override;
@@ -158,8 +158,6 @@ type
     fx1,fy1,fx2,fy2{,fw,fh}: float;
     { Base value of the opacity of the container }
     BaseOpacity: float; //deprecated;
-    { Opacity of the container multiplied by Anchor's opacity }
-    CurrentOpacity: float; //deprecated;
     { Keep proportions of the container }
     RealWidth, RealHeight: integer; //deprecated;
     { Can this item be scaled? Otherwise its w, h is always RealWidth, RealHeight}
@@ -476,7 +474,7 @@ begin
     end;  
   end;
   if (OpacityAnchor <> nil) then
-    co := OpacityAnchor.CurrentOpacity
+    co := OpacityAnchor.Opacity
   else
     co := 1;
 
@@ -492,7 +490,7 @@ begin
   GetAnchors;
 
   if cValid then begin
-    CurrentOpacity := BaseOpacity * co;
+    Opacity := BaseOpacity * co;
 
     fx1 := (x1 - cx1 - Anchor[asLeft  ].Gap)/cw;
     fx2 := (x2 - cx2 + Anchor[asRight ].Gap)/cw;
@@ -522,7 +520,7 @@ begin
   GetAnchors;
 
   if cValid then begin
-    CurrentOpacity := BaseOpacity * co;
+    Opacity := BaseOpacity * co;
 
     x1 := cx1 + Round(cw * fx1) + Anchor[asLeft].Gap;
     y1 := cy1 + Round(ch * fy1) + Anchor[asBottom].Gap;
@@ -601,7 +599,7 @@ begin
   SetIntCoord(ax1,ay1,ax1 + aWidth,ay1 + aHeight);
 end;
 
-procedure DIntegerContainer.SetWidth(const aWidth: integer);
+{procedure DIntegerContainer.SetWidth(const aWidth: integer);
 begin
   {unoptimal and might be wrong}
   //SetIntCoord(x1,y1,x1+aWidth,y2);
@@ -610,7 +608,7 @@ procedure DIntegerContainer.SetHeight(const aHeight: integer);
 begin
   {unoptimal and might be wrong}
   //SetIntCoord(x1,y1,x2,y1+aHeight);
-end;
+end;}
 
 {----------------------------------------------------------------------------}
 
@@ -727,7 +725,7 @@ begin
   Self.RealWidth := Source.RealWidth;
   Self.RealHeight := Source.RealHeight;
   Self.BaseOpacity := Source.BaseOpacity;
-  Self.CurrentOpacity := Source.CurrentOpacity;
+  Self.Opacity := Source.Opacity;
   Self.ProportionalScale := Source.ProportionalScale;
   Self.fInitialized := Source.isInitialized;
   Self.AnchorToWindow := Source.AnchorToWindow;
@@ -753,7 +751,7 @@ begin
   Dest.RealWidth := Self.RealWidth;
   Dest.RealHeight := Self.RealHeight;
   Dest.BaseOpacity := Self.BaseOpacity;
-  Dest.CurrentOpacity := Self.CurrentOpacity;
+  Dest.Opacity := Self.Opacity;
   Dest.ProportionalScale := Self.ProportionalScale;
   Dest.fInitialized := Self.isInitialized;
   Dest.AnchorToWindow := Self.AnchorToWindow;

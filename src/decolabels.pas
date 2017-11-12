@@ -341,7 +341,7 @@ procedure DPhasedLabel.doDraw;
 var y: integer;
 begin
   //inherited <---------- this render is different
-  GLImage.Color[3] := Current.CurrentOpacity*Sin(Pi*Phase);
+  GLImage.Color[3] := Current.Opacity*Sin(Pi*Phase);
 
   y := round((1 + 5*Phase)*Window.height/17);
   GLImage.Draw(2*Window.Width div 3, y);
