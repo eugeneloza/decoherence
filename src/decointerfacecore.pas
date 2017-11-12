@@ -86,7 +86,7 @@ type
     Capable of rescaling / copying itself
     As abstract as it seems, it's also used as animation state,
     So, constructing it as standalone should be possible }
-  DIntegerContainer = class(DObject)
+  DIntContainer = class(DObject)
   strict private
     function GetWidth: integer;
     function GetHeight: integer;
@@ -105,13 +105,21 @@ type
     property w: integer read GetWidth {write SetWidth};
     property h: integer read GetHeight {write SetHeight};
 
+    procedure Assign(const Source: DIntContainer);
+    procedure AssignTo(const Dest: DIntContainer);
+
+    procedure SetIntCoord(const ax1,ay1,ax2,ay2: integer);
+    procedure SetIntFull(const ax1,ay1,ax2,ay2: integer; const aOpacity: float);
+    procedure SetIntFull(const ax1,ay1,ax2,ay2: float; const aOpacity: float);
+    procedure SetIntSize(const ax1,ay1,aWidth,aHeight: integer);
+
     constructor Create(aOwner: DAnchoredObject); virtual;
     //destructor Destroy; override;
   end;
 
 type
   {}
-  DFloatContainer = class(DIntegerContainer)
+  DFloatContainer = class(DIntContainer)
   strict protected
     fInitialized: boolean;
     { Parent container size (cached) }
@@ -174,12 +182,9 @@ type
     procedure SetFloatFull(const afx1,afy1,afx2,afy2,aOpacity: float);
     procedure SetFloatSize(const afx1,afy1,afWidth,afHeight: float);
     procedure SetFloatSizeFull(const afx1,afy1,afWidth,afHeight,aOpacity: float);
-    procedure SetIntCoord(const ax1,ay1,ax2,ay2: integer);
-    procedure SetIntFull(const ax1,ay1,ax2,ay2: integer; const aOpacity: float);
-    procedure SetIntSize(const ax1,ay1,aWidth,aHeight: integer);
 
     { Sets int width/height for scaling animations }
-    procedure SetIntWidthHeight(const aWidth,aHeight: integer);
+    procedure SetIntWidthHeight(const aWidth,aHeight: integer); deprecated;
     { Resets width and height to their "real" values, e.g. for elements that are not scaled }
     procedure ResetToReal; deprecated;
     procedure SetRealSize(const aWidth,aHeight: integer); deprecated;
@@ -242,7 +247,8 @@ type
     procedure Draw; virtual; abstract;
   strict private
     { Last and Next animation states. }
-    Last, Next: DFloatContainer;
+    Last: DIntContainer;
+    Next: DFloatContainer;
     fVisible: boolean;
     {$HINT should it set visible to all children? }
     procedure SetVisible(const Value: boolean);
@@ -253,7 +259,8 @@ type
     AnimationDuration: DTime;
     AnimationCurve: TAnimationCurve;
     {base state of the element. contains its coordinates and width/height}
-    Current, Base: DFloatContainer;
+    Current: DIntContainer;
+    Base: DFloatContainer;
     {source width/height of the element. Used to preserve proportions while scaling}
 
     procedure SetBaseSize(const NewX,NewY,NewW,NewH: float;NewO: float=1; const Animate: TAnimationStyle = asNone); virtual;
@@ -393,7 +400,7 @@ uses SysUtils,
 {========================== Abstract Container ===============================}
 {=============================================================================}
 
-constructor DIntegerContainer.Create(aOwner: DAnchoredObject);
+constructor DIntContainer.Create(aOwner: DAnchoredObject);
 begin
   //inherited Create;
   Owner := aOwner;
@@ -578,23 +585,31 @@ begin
   BaseOpacity := aOpacity;
   SetFloatSize(afx1,afy1,afWidth,afHeight);
 end;
-procedure DFloatContainer.SetIntCoord(const ax1,ay1,ax2,ay2: integer);
+procedure DIntContainer.SetIntCoord(const ax1,ay1,ax2,ay2: integer);
 begin
   x1 := ax1;
   y1 := ay1;
-  if ScaleItem then begin
+  {if ScaleItem then begin
     x2 := ax2;
     y2 := ay2;
   end else AdjustToRealSize;
 
-  IntegerToFloat;
+  IntegerToFloat;}
+  {$WARNING Integers are not converted to float}
 end;
-procedure DFloatContainer.SetIntFull(const ax1,ay1,ax2,ay2: integer; const aOpacity: float);
+procedure DIntContainer.SetIntFull(const ax1,ay1,ax2,ay2: integer; const aOpacity: float);
 begin
-  BaseOpacity := aOpacity;
+  {$WARNING Base opacity is not set!}
+  Opacity := aOpacity;
   SetIntCoord(ax1,ay1,ax2,ay2);
 end;
-procedure DFloatContainer.SetIntSize(const ax1,ay1,aWidth,aHeight: integer);
+procedure DIntContainer.SetIntFull(const ax1,ay1,ax2,ay2: float; const aOpacity: float);
+begin
+  {$WARNING Base opacity is not set!}
+  Opacity := aOpacity;
+  SetIntCoord(Round(ax1),Round(ay1),Round(ax2),Round(ay2));
+end;
+procedure DIntContainer.SetIntSize(const ax1,ay1,aWidth,aHeight: integer);
 begin
   SetIntCoord(ax1,ay1,ax1 + aWidth,ay1 + aHeight);
 end;
@@ -612,11 +627,11 @@ end;}
 
 {----------------------------------------------------------------------------}
 
-function DIntegerContainer.GetWidth: integer;
+function DIntContainer.GetWidth: integer;
 begin
   Result := x2-x1;
 end;
-function DIntegerContainer.GetHeight: integer;
+function DIntContainer.GetHeight: integer;
 begin
   Result := y2-y1;
 end;
@@ -710,22 +725,48 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DFloatContainer.Assign(const Source: DFloatContainer);
+procedure DIntContainer.Assign(const Source: DIntContainer);
 var aa: TAnchorSide;
 begin
-  Self.fx1 := Source.fx1;
-  Self.fy1 := Source.fy1;
-  Self.fx2 := Source.fx2;
-  Self.fy2 := Source.fy2;
   Self.x1 := Source.x1;
   Self.y1 := Source.y1;
   Self.x2 := Source.x2;
   Self.y2 := Source.y2;
+  Self.Opacity := Source.Opacity;
+  if Self.Owner <> Source.Owner then begin
+    Self.Log(LogInterfaceScaleError, {$I %CURRENTROUTINE},'WARNING: NotifyAnchor should be copied, do it!');
+  end;
+end;
+procedure DIntContainer.AssignTo(const Dest: DIntContainer);
+var aa: TAnchorSide;
+begin
+  Dest.x1 := Self.x1;
+  Dest.y1 := Self.y1;
+  Dest.x2 := Self.x2;
+  Dest.y2 := Self.y2;
+  Dest.Opacity := Self.Opacity;
+  if Dest.Owner <> Self.Owner then begin
+    Self.Log(LogInterfaceScaleError, {$I %CURRENTROUTINE},'WARNING: NotifyAnchor should be copied, do it!');
+  end;
+end;
+
+procedure DFloatContainer.Assign(const Source: DFloatContainer);
+var aa: TAnchorSide;
+begin
+  Self.x1 := Source.x1;
+  Self.y1 := Source.y1;
+  Self.x2 := Source.x2;
+  Self.y2 := Source.y2;
+  Self.Opacity := Source.Opacity;
+
+  Self.fx1 := Source.fx1;
+  Self.fy1 := Source.fy1;
+  Self.fx2 := Source.fx2;
+  Self.fy2 := Source.fy2;
   Self.ScaleItem := Source.ScaleItem;
   Self.RealWidth := Source.RealWidth;
   Self.RealHeight := Source.RealHeight;
   Self.BaseOpacity := Source.BaseOpacity;
-  Self.Opacity := Source.Opacity;
   Self.ProportionalScale := Source.ProportionalScale;
   Self.fInitialized := Source.isInitialized;
   Self.AnchorToWindow := Source.AnchorToWindow;
@@ -739,19 +780,20 @@ end;
 procedure DFloatContainer.AssignTo(const Dest: DFloatContainer);
 var aa: TAnchorSide;
 begin
-  Dest.fx1 := Self.fx1;
-  Dest.fy1 := Self.fy1;
-  Dest.fx2 := Self.fx2;
-  Dest.fy2 := Self.fy2;
   Dest.x1 := Self.x1;
   Dest.y1 := Self.y1;
   Dest.x2 := Self.x2;
   Dest.y2 := Self.y2;
+  Dest.Opacity := Self.Opacity;
+
+  Dest.fx1 := Self.fx1;
+  Dest.fy1 := Self.fy1;
+  Dest.fx2 := Self.fx2;
+  Dest.fy2 := Self.fy2;
   Dest.ScaleItem := Self.ScaleItem;
   Dest.RealWidth := Self.RealWidth;
   Dest.RealHeight := Self.RealHeight;
   Dest.BaseOpacity := Self.BaseOpacity;
-  Dest.Opacity := Self.Opacity;
   Dest.ProportionalScale := Self.ProportionalScale;
   Dest.fInitialized := Self.isInitialized;
   Dest.AnchorToWindow := Self.AnchorToWindow;
@@ -834,10 +876,10 @@ begin
    Actually this can't happen in a normal situation. But did anything ever went as planned?}
 
    {Rescale Last and Next if they're initialized or just copy Base to avoid bugs}
-   if Last.isInitialized then
+{   if Last.isInitialized then
      Last.FloatToInteger
    else
-     Last.Assign(Base);
+     Last.Assign(Base);}
 
    if Next.isInitialized then
      Next.FloatToInteger
@@ -905,13 +947,14 @@ begin
        requires that CurrentAnimationState is initialized... TODO}
       //asDefault: Last.Assign(Self);
       {fades in/out element}
-      asFadeIn:  Last.BaseOpacity := 0;
+      asFadeIn:  Last.Opacity := 0;
       asFadeOut: Next.BaseOpacity := 0;
       {asFadeOutSuicide}
       {zooms in/out element}
       asZoomIn:  begin
-                   Last.SetIntWidthHeight(1,1);
-                   Last.BaseOpacity := 0;
+                   {$WARNING not working}
+                   //Last.SetIntWidthHeight(1,1);
+                   Last.Opacity := 0;
                  end;
       asZoomOut: begin
                    Next.SetIntWidthHeight(1,1);
@@ -929,12 +972,13 @@ begin
                          3: my := -0.0001;
                        end;
                        if Animate=asFlyInRandom then begin
-                         Last.fx1 := mx;
-                         Last.fy1 := my;
-                         Last.AnchorToWindow := true;
+                         {$HINT Test needed}
+                         Last.x1 := Round(mx*Window.Width);
+                         Last.y1 := Round(my*Window.Width);
+                         //Last.AnchorToWindow := true;
                        end else begin
-                         Next.fx2 := mx;
-                         Next.fy2 := my;
+                         Next.fx1 := mx;
+                         Next.fy1 := my;
                          Next.AnchorToWindow := true;
                        end;
                      end;
@@ -948,12 +992,13 @@ begin
                          asFlyInTop,asFlyOutTop: my := -0.0001;
                        end;
                        if (Animate=asFlyInLeft) or (Animate=asFlyInRight) or (Animate=asFlyInTop) or (Animate=asFlyInBottom) then begin
-                         Last.fx1 := mx;
-                         Last.fy1 := my;
-                         Last.AnchorToWindow := true;
+                         {$HINT Test needed}
+                         Last.x1 := Round(mx*Window.Width);
+                         Last.y1 := Round(my*Window.Width);
+                         //Last.AnchorToWindow := true;
                        end else begin
-                         Next.fx2 := mx;
-                         Next.fy2 := my;
+                         Next.fx1 := mx;
+                         Next.fy1 := my;
                          Next.AnchorToWindow := true;
                        end;
                      end;
@@ -975,7 +1020,8 @@ end;
 
 procedure DAbstractElement.AnchorTo(const aElement: DAbstractElement);
 begin
-  Base.AnchorTo(aElement.Current);
+  {$WARNING not working}
+  Base.AnchorTo(aElement.Base);
 end;
 
 {----------------------------------------------------------------------------}
@@ -985,7 +1031,7 @@ var Phase: float;
 begin
   if Base.isInitialized then begin
     if AnimationStart<0 then AnimationStart := DecoNow;
-    if (Last.isInitialized) and (Next.isInitialized) and
+    if {(Last.isInitialized) and} (Next.isInitialized) and
       ((DecoNow-AnimationStart < AnimationDuration)) then begin
       //if this is start of the animation - init time
       //determine animation time passed
@@ -995,22 +1041,23 @@ begin
         //acLinear: ; //<- change nothing.
         acSquare: if Phase<0.5 then Phase := Sqr(2*Phase)/2 else Phase := 1 - Sqr(2*(1-Phase))/2;
       end;
+      {$WARNING Not working}
       Current.Assign(Next);
-      Current.SetFloatFull( Last.fx1+(Next.fx1-Last.fx1)*Phase,
-                            Last.fy1+(Next.fy1-Last.fy1)*Phase,
-                            Last.fx2+(Next.fx2-Last.fx2)*Phase,
-                            Last.fy2+(Next.fy2-Last.fy2)*Phase,
-                            Last.BaseOpacity+((Next.BaseOpacity-Last.BaseOpacity)*Phase));
+      Current.SetIntFull(Last.x1+(Next.x1-Last.x1)*Phase,
+                         Last.y1+(Next.y1-Last.y1)*Phase,
+                         Last.x2+(Next.x2-Last.x2)*Phase,
+                         Last.y2+(Next.y2-Last.y2)*Phase,
+                         Last.Opacity+((Next.Opacity-Last.Opacity)*Phase));
       {during the animation, the Element is always scaled}
-      Current.ScaleItem := true;
+      //Current.ScaleItem := true;
       //we don't need scale back to float, as it's not a basic animation state
     end else begin
       Current.Assign(Base);
-      Current.SetFloatFull( Base.fx1,
-                            Base.fy1,
-                            Base.fx2,
-                            Base.fy2,
-                            Base.BaseOpacity);
+      Current.SetIntFull( Base.x1,
+                          Base.y1,
+                          Base.x2,
+                          Base.y2,
+                          Base.BaseOpacity);
     end;
  end else begin
    Current.Assign(Base); {just fall back to an uninitialized copy}

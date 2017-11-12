@@ -781,10 +781,10 @@ begin
   Health.AnchorTo(Self);
   Health.SetBaseSize(0,0,1,0.1);
   //Health.Base.Anchor[asTop].AlignTo := noAlign;
-  PlayerBars.Base.AnchorTo(Self.Current);
+  PlayerBars.Base.AnchorTo(Self.Base);
   PlayerBars.SetBaseSize(0,0.1,1,0.8);
-  PlayerBars.Base.AnchorTop(NickName.Current,vaBottom);
-  PlayerBars.Base.AnchorBottom(Health.Current,vaTop);
+  PlayerBars.Base.AnchorTop(NickName.Base,vaBottom);
+  PlayerBars.Base.AnchorBottom(Health.Base,vaTop);
 
   {********** INTERFACE DESIGN BY Saito00 ******************}
 

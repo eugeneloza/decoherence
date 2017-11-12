@@ -409,7 +409,7 @@ begin
     Log(LogInterfaceError,{$I %CURRENTROUTINE%},'ERROR: Frame is nil!');
     Exit;
   end;
-  Base.AnchorTo(aFrame.Current);
+  Base.AnchorTo(aFrame.Base);
   if aFrame.Frame <> nil then begin
     Base.Anchor[asLeft].Gap := aFrame.Frame.CornerLeft;
     Base.Anchor[asRight].Gap := aFrame.Frame.CornerRight;
