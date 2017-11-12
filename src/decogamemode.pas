@@ -88,10 +88,7 @@ end;
 
 function is3DGameMode: boolean;
 begin
-  if (CurrentGameMode = gmTravel) or (CurrentGameMode = gmBattle) then
-    Result := true
-  else
-    Result := false;
+  Result := (CurrentGameMode = gmTravel) or (CurrentGameMode = gmBattle)
 end;
 
 {------------------------------------------------------------}
@@ -99,10 +96,7 @@ end;
 function GameModeNeedsClearingScreen: boolean;
 begin
   {$HINT something more efficient, or world-attached might be here}
-  if (Window.SceneManager = nil) or (Window.SceneManager.Exists = false) then
-    Result := true
-  else
-    Result := false;
+  Result := (Window.SceneManager = nil) or not Window.SceneManager.Exists;
 end;
 
 
