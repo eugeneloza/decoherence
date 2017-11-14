@@ -52,9 +52,7 @@ type
     procedure FreeImage;
   public
     { non-GL part of rescaling the image }
-    procedure Rescale; override;
-    { Scales the image to Base.size }
-    procedure RescaleImage; virtual; abstract;
+    //function RescaleContent: boolean; override;
     { very simple draw procedure,
           checks if GL is initialized and initializes it if necessary }
     procedure Draw; override;
@@ -85,7 +83,7 @@ type
   public
     {Reference to Frame basic image (rectagonal frame with corresponding gaps)}
     Frame: DRectagonalFrame;
-    procedure RescaleImage; override;
+    function RescaleContent: boolean; override;
     { todo: maybe not scale the image, but draw3x3 by OpenGl features? 
           or return the use of burner (e.g. noise) overlay }
   end;
@@ -103,7 +101,7 @@ type
     Base for images and labels (uses RescaleImage) }
   DSimpleImage = class abstract(DAbstractImage)
   public
-    procedure RescaleImage; override;
+    function RescaleContent: boolean; override;
   end;
 
 type
@@ -248,21 +246,12 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DAbstractImage.Rescale;
-begin
-  inherited Rescale;
-  //Base.FixProportions(RealWidth,Realheight); //should be done by proportional scale?
-  RescaleImage;
-end;
-
-{----------------------------------------------------------------------------}
-
 procedure DAbstractImage.Update;
 begin
   inherited Update;
   if GLImage <> nil then begin
     GLImage.Color := InterfaceColor;
-    GLImage.Color[3] := Current.CurrentOpacity;
+    GLImage.Color[3] := Current.Opacity;
   end else
     Log(LogInterfaceGLError,{$I %CURRENTROUTINE%},'ERROR: GL image is nil in "update"');
 end;
@@ -331,7 +320,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DFrameImage.RescaleImage;
+function DFrameImage.RescaleContent: boolean;
 var ScaledImageParts: array [0..2,0..2] of TCastleImage;
     ix, iy: integer;
     UnscaledWidth, UnscaledHeight: integer;
@@ -342,6 +331,7 @@ begin
     Log(LogInterfaceError,{$I %CURRENTROUTINE%},'Error: Frame is nil!');
     Exit;
   end;
+  Result := true;
 
   ImageReady := false;
   FreeAndNil(GLImage);
@@ -356,12 +346,16 @@ begin
 
   {check if minimal frame size is larger than the requested frame size}
   if Frame.CornerLeft+Frame.CornerRight+1 > Base.w then begin
+    {$WARNING not working}
     Log(LogInterfaceScaleHint,{$I %CURRENTROUTINE%},'Reset backwards base.w = '+IntToStr(Base.w)+' / cornerLeft+cornerRight = '+IntToStr(Frame.CornerLeft+Frame.CornerRight));
-    Base.SetWidth(Frame.CornerLeft+Frame.CornerRight+1);
+    //Base.SetWidth(Frame.CornerLeft+Frame.CornerRight+1);
+    Result := true;
   end;
   if Frame.CornerTop+Frame.CornerBottom+1 > Base.h then begin
+    {$WARNING not working}
     Log(LogInterfaceScaleHint,{$I %CURRENTROUTINE%},'Reset backwards base.h = '+IntToStr(Base.h)+' / cornerTop+cornerBottom = '+inttostr(Frame.CornerTop+Frame.CornerBottom));
-    Base.SetHeight(Frame.CornerTop+Frame.CornerBottom+1);
+    //Base.SetHeight(Frame.CornerTop+Frame.CornerBottom+1);
+    Result := true;
   end;
 
   SourceXs[0] := 0;
@@ -415,7 +409,7 @@ begin
     Log(LogInterfaceError,{$I %CURRENTROUTINE%},'ERROR: Frame is nil!');
     Exit;
   end;
-  Base.AnchorTo(aFrame.Current);
+  Base.AnchorTo(aFrame.Base);
   if aFrame.Frame <> nil then begin
     Base.Anchor[asLeft].Gap := aFrame.Frame.CornerLeft;
     Base.Anchor[asRight].Gap := aFrame.Frame.CornerRight;
@@ -434,7 +428,7 @@ end;
 {======================== Simple image =======================================}
 {=============================================================================}
 
-procedure DSimpleImage.RescaleImage;
+function DSimpleImage.RescaleContent: boolean;
 begin
  {$IFNDEF AllowRescale}
  If SourceImage = nil then begin
@@ -455,6 +449,7 @@ begin
    else
      Log(LogInterfaceScaleError,{$I %CURRENTROUTINE%},'ERROR: Base.Initialized = false');
  end;
+ Result := false;
 end;
 
 
@@ -561,7 +556,7 @@ procedure DWindImage.doDraw;
 var PhaseScaled:integer;
 begin
   //inherited <---------- this render is different
-  GLImage.Color[3] := Current.CurrentOpacity + Current.CurrentOpacity/4 * Sin(2*Pi*OpacityPhase);
+  GLImage.Color[3] := Current.Opacity + Current.Opacity/4 * Sin(2*Pi*OpacityPhase);
 
   PhaseScaled := Round((1-Phase)*Window.Width);
 
@@ -609,7 +604,7 @@ begin
   //inherited <---------- this render is different
   if not ImageReady then Exit; //image has been reloaded! //BUG
 
-  GLImage.Color[3] := Current.CurrentOpacity*Sin(Pi*Phase);
+  GLImage.Color[3] := Current.Opacity*Sin(Pi*Phase);
   x := Round((Window.Width-Base.w)*Phase);
   GLImage.Draw(x,0);
 end;

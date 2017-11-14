@@ -49,7 +49,7 @@ type
     constructor Create; override;
     destructor Destroy; override;
     //procedure Rescale; override;
-    procedure RescaleImage; override;
+    function RescaleContent: boolean; override;
   public
     { text at the label }
     property Text: string read fText write SetText;
@@ -200,12 +200,13 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DLabel.RescaleImage;
+function DLabel.RescaleContent: boolean;
 begin
   {$IFNDEF AllowRescale}if SourceImage = nil then Exit;{$ENDIF}
-  if Base.ScaleItem then
-    inherited RescaleImage //rescale this label as a simple image to fit "base size"
-  else begin
+  if Base.ScaleItem then begin
+     Result := inherited RescaleContent //rescale this label as a simple image to fit "base size"
+  end else begin
+    Result := true;
     //don't rescale this label to provide sharp font
     if ImageLoaded then
        if Base.isInitialized then begin
@@ -340,7 +341,7 @@ procedure DPhasedLabel.doDraw;
 var y: integer;
 begin
   //inherited <---------- this render is different
-  GLImage.Color[3] := Current.CurrentOpacity*Sin(Pi*Phase);
+  GLImage.Color[3] := Current.Opacity*Sin(Pi*Phase);
 
   y := round((1 + 5*Phase)*Window.height/17);
   GLImage.Draw(2*Window.Width div 3, y);

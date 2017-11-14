@@ -69,27 +69,58 @@ type
 end;
 
 
-  type
+type
+  {}
+  DAnchoredObject = class abstract (DObject)
+  public
     {}
-    DAnchoredObject = class abstract (DObject)
-    public
-      {}
-      procedure AddAnchor(aAnchor: DAnchoredObject); virtual; abstract;
-      {}
-      procedure Rescale; virtual; abstract;
-    end;
+    procedure AddAnchor(aAnchor: DAnchoredObject); virtual; abstract;
+    {}
+    procedure Rescale; virtual; abstract;
+  end;
 
-  type TAnchorList = specialize TObjectList<DAnchoredObject>;
+type TAnchorList = specialize TObjectList<DAnchoredObject>;
 
 type
   { This is an container with coordinates and size
     Capable of rescaling / copying itself
     As abstract as it seems, it's also used as animation state,
     So, constructing it as standalone should be possible }
-  DAbstractContainer = class(DObject)
+  DIntContainer = class(DObject)
   strict private
+    function GetWidth: integer;
+    function GetHeight: integer;
+  strict protected
     { Owner of this Container (for displaying debug info) }
     Owner: DAnchoredObject;
+  public
+    { Real size of the Container }
+    x1,y1,x2,y2: integer;
+    Opacity: float;
+
+
+    //procedure SetWidth(const aWidth: integer);
+    //procedure SetHeight(const aHeight: integer);
+
+    property w: integer read GetWidth {write SetWidth};
+    property h: integer read GetHeight {write SetHeight};
+
+    procedure Assign(const Source: DIntContainer);
+    procedure AssignTo(const Dest: DIntContainer);
+
+    procedure SetIntCoord(const ax1,ay1,ax2,ay2: integer);
+    procedure SetIntFull(const ax1,ay1,ax2,ay2: integer; const aOpacity: float);
+    procedure SetIntFull(const ax1,ay1,ax2,ay2: float; const aOpacity: float);
+    procedure SetIntSize(const ax1,ay1,aWidth,aHeight: integer);
+
+    constructor Create(aOwner: DAnchoredObject); virtual;
+    //destructor Destroy; override;
+  end;
+
+type
+  {}
+  DFloatContainer = class(DIntContainer)
+  strict protected
     fInitialized: boolean;
     { Parent container size (cached) }
     cx1,cx2,cy1,cy2,cw,ch: integer;
@@ -103,7 +134,7 @@ type
     { Converts integer size to float. }
     procedure IntegerToFloat;
     { Resets x2,y2,w,h to fit RealWidth,RealHeight This suggest use of only Left anchor! }
-    procedure AdjustToRealSize;{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+    procedure AdjustToRealSize;{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF} deprecated;
 
     function GetInitialized: boolean;
   public
@@ -115,7 +146,7 @@ type
       { Specifies Anchor object, Anchor type, and additional gap }
       DAnchor = record
         { Anchor to which element }
-        Anchor: DAbstractContainer;
+        Anchor: DFloatContainer;
         { To which side of the Anchor should it align? }
         AlignTo: TAnchorAlign;
         { Additional gap between this element and Anchor in px }
@@ -126,65 +157,51 @@ type
     Anchor: array[TAnchorSide] of DAnchor;
     { Parent's opacity is multiplied by this Container opacity,
       May be nil }
-    OpacityAnchor: DAbstractContainer;
+    OpacityAnchor: DFloatContainer;
     { Is this Container scaled agains Anchors or Window?
       Should be True only at top-level Container (i.e. GUI Container)
       However, maybe, reintroduction or manual scaling would be prefferable? }
     AnchorToWindow: boolean;
     { Float size of the Container }
     fx1,fy1,fx2,fy2{,fw,fh}: float;
-    { Real size of the Container }
-    x1,y1,x2,y2: integer;
     { Base value of the opacity of the container }
-    BaseOpacity: float;
-    { Opacity of the container multiplied by Anchor's opacity }
-    CurrentOpacity: float;
+    BaseOpacity: float; //deprecated;
     { Keep proportions of the container }
-    RealWidth, RealHeight: integer;
+    RealWidth, RealHeight: integer; //deprecated;
     { Can this item be scaled? Otherwise its w, h is always RealWidth, RealHeight}
-    ScaleItem: boolean;
+    ScaleItem: boolean; //deprecated;
     { Should this Container scale proportionaly? }
-    ProportionalScale: TProportionalScale;
-
-    procedure SetWidth(const aWidth: integer);
-    procedure SetHeight(const aHeight: integer);
-    function GetWidth: integer;
-    function GetHeight: integer;
-    property w: integer read GetWidth write SetWidth;
-    property h: integer read GetHeight write SetHeight;
+    ProportionalScale: TProportionalScale; //deprecated;
     { If this Container ready to be used? }
     property isInitialized: boolean read GetInitialized;
-    constructor Create(aOwner: DAnchoredObject); //virtual;
-    //destructor Destroy; override;
     { Copy parameters from the Source }
-    procedure Assign(const Source: DAbstractContainer);
-    procedure AssignTo(const Dest: DAbstractContainer);
+    procedure Assign(const Source: DFloatContainer);
+    procedure AssignTo(const Dest: DFloatContainer);
     { Set container position and size }
     procedure SetFloatCoord(const afx1,afy1,afx2,afy2: float);
     procedure SetFloatFull(const afx1,afy1,afx2,afy2,aOpacity: float);
     procedure SetFloatSize(const afx1,afy1,afWidth,afHeight: float);
     procedure SetFloatSizeFull(const afx1,afy1,afWidth,afHeight,aOpacity: float);
-    procedure SetIntCoord(const ax1,ay1,ax2,ay2: integer);
-    procedure SetIntFull(const ax1,ay1,ax2,ay2: integer; const aOpacity: float);
-    procedure SetIntSize(const ax1,ay1,aWidth,aHeight: integer);
 
     { Sets int width/height for scaling animations }
-    procedure SetIntWidthHeight(const aWidth,aHeight: integer);
+    procedure SetIntWidthHeight(const aWidth,aHeight: integer); deprecated;
     { Resets width and height to their "real" values, e.g. for elements that are not scaled }
-    procedure ResetToReal;
-    procedure SetRealSize(const aWidth,aHeight: integer);
+    procedure ResetToReal; deprecated;
+    procedure SetRealSize(const aWidth,aHeight: integer); deprecated;
     { Anchors this Container to aParent }
-    procedure AnchorTo(const aParent: DAbstractContainer; const Gap: integer = 0);
+    procedure AnchorTo(const aParent: DFloatContainer; const Gap: integer = 0);
     { Anchors aChild to this Container  }
-    procedure AnchorChild(const aChild: DAbstractContainer; const Gap: integer = 0);
+    procedure AnchorChild(const aChild: DFloatContainer; const Gap: integer = 0);
     {}
-    procedure AnchorSide(const aSide: TAnchorSide; const aParent: DAbstractContainer; const aAlign: TAnchorAlign; const Gap: integer = 0);
-    procedure AnchorTop(const aParent: DAbstractContainer; const aAlign: TAnchorAlign; const Gap: integer = 0);
-    procedure AnchorBottom(const aParent: DAbstractContainer; const aAlign: TAnchorAlign; const Gap: integer = 0);
-    procedure AnchorLeft(const aParent: DAbstractContainer; const aAlign: TAnchorAlign; const Gap: integer = 0);
-    procedure AnchorRight(const aParent: DAbstractContainer; const aAlign: TAnchorAlign; const Gap: integer = 0);
+    procedure AnchorSide(const aSide: TAnchorSide; const aParent: DFloatContainer; const aAlign: TAnchorAlign; const Gap: integer = 0);
+    procedure AnchorTop(const aParent: DFloatContainer; const aAlign: TAnchorAlign; const Gap: integer = 0);
+    procedure AnchorBottom(const aParent: DFloatContainer; const aAlign: TAnchorAlign; const Gap: integer = 0);
+    procedure AnchorLeft(const aParent: DFloatContainer; const aAlign: TAnchorAlign; const Gap: integer = 0);
+    procedure AnchorRight(const aParent: DFloatContainer; const aAlign: TAnchorAlign; const Gap: integer = 0);
     { do these two Containers have equal anchors? }
-    function AnchorsEqual(const aCompare: DAbstractContainer): boolean;
+    function AnchorsEqual(const aCompare: DFloatContainer): boolean;
+  public
+    constructor Create(aOwner: DAnchoredObject); override;
   end;
 
 type
@@ -212,19 +229,26 @@ type
     {}
     NotifyAnchors: TAnchorList;
     {}
-    procedure AddAnchor(aAnchor: DAnchoredObject); override;
-    {}
     procedure NotifyRescale;
   public
+    {}
+    procedure AddAnchor(aAnchor: DAnchoredObject); override;
     {}
     //function ProcessRescaleResult(var r1: TRescaleResult; const r2: TRescaleResult): TRescaleResult;
     { changes the scale of the element relative to current window size }
     procedure Rescale; override;
+    {}
+    procedure RescaleRecoursive; virtual;
+    {}
+    function RescaleContainer: boolean;
+    {}
+    function RescaleContent: boolean; virtual;
     { draw the element / as abstract as it might be :) }
     procedure Draw; virtual; abstract;
   strict private
     { Last and Next animation states. }
-    Last, Next: DAbstractContainer;
+    Last: DIntContainer;
+    Next: DFloatContainer;
     fVisible: boolean;
     {$HINT should it set visible to all children? }
     procedure SetVisible(const Value: boolean);
@@ -235,7 +259,8 @@ type
     AnimationDuration: DTime;
     AnimationCurve: TAnimationCurve;
     {base state of the element. contains its coordinates and width/height}
-    Current, Base: DAbstractContainer;
+    Current: DIntContainer;
+    Base: DFloatContainer;
     {source width/height of the element. Used to preserve proportions while scaling}
 
     procedure SetBaseSize(const NewX,NewY,NewW,NewH: float;NewO: float=1; const Animate: TAnimationStyle = asNone); virtual;
@@ -339,7 +364,8 @@ Type
     { List of the children of this interface element }
     Children: DInterfaceElementsList;
     procedure Draw; override;
-    procedure Rescale; override;
+    {}
+    procedure RescaleRecoursive; override;
     { Rescales this Interface element to fit children sizes
       (should be used only in case children may have fixed sizes (like text labels)
        or force-change their size, e.g. if they don't allow size smaller
@@ -374,8 +400,7 @@ uses SysUtils,
 {========================== Abstract Container ===============================}
 {=============================================================================}
 
-constructor DAbstractContainer.Create(aOwner: DAnchoredObject);
-var aa: TAnchorSide;
+constructor DIntContainer.Create(aOwner: DAnchoredObject);
 begin
   //inherited Create;
   Owner := aOwner;
@@ -384,7 +409,15 @@ begin
   x2 := UninitializedIntCoord;
   y1 := UninitializedIntCoord;
   y2 := UninitializedIntCoord;
+  //Opacity := 1;
+end;
 
+{----------------------------------------------------------------------------}
+
+constructor DFloatContainer.Create(aOwner: DAnchoredObject);
+var aa: TAnchorSide;
+begin
+  inherited Create(aOwner);
   AnchorToWindow := false;
   fInitialized := false;
   {this is redundant}
@@ -401,7 +434,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DAbstractContainer.GetWindowAnchor;{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+procedure DFloatContainer.GetWindowAnchor;{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
   cx1 := 0;
   cy1 := 0;
@@ -409,7 +442,7 @@ begin
   cy2 := Window.Height;
 end;
 
-procedure DAbstractContainer.GetAnchors;
+procedure DFloatContainer.GetAnchors;
 begin
   if AnchorToWindow then
     GetWindowAnchor
@@ -448,7 +481,7 @@ begin
     end;  
   end;
   if (OpacityAnchor <> nil) then
-    co := OpacityAnchor.CurrentOpacity
+    co := OpacityAnchor.Opacity
   else
     co := 1;
 
@@ -459,12 +492,12 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DAbstractContainer.IntegerToFloat;
+procedure DFloatContainer.IntegerToFloat;
 begin
   GetAnchors;
 
   if cValid then begin
-    CurrentOpacity := BaseOpacity * co;
+    Opacity := BaseOpacity * co;
 
     fx1 := (x1 - cx1 - Anchor[asLeft  ].Gap)/cw;
     fx2 := (x2 - cx2 + Anchor[asRight ].Gap)/cw;
@@ -479,7 +512,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DAbstractContainer.AdjustToRealSize;{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+procedure DFloatContainer.AdjustToRealSize;{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
   x2 := x1 + RealWidth;
   y2 := y1 + RealHeight;
@@ -488,13 +521,13 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DAbstractContainer.FloatToInteger;
+procedure DFloatContainer.FloatToInteger;
 var Ratio: float;
 begin
   GetAnchors;
 
   if cValid then begin
-    CurrentOpacity := BaseOpacity * co;
+    Opacity := BaseOpacity * co;
 
     x1 := cx1 + Round(cw * fx1) + Anchor[asLeft].Gap;
     y1 := cy1 + Round(ch * fy1) + Anchor[asBottom].Gap;
@@ -524,7 +557,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DAbstractContainer.SetFloatCoord(const afx1,afy1,afx2,afy2: float);
+procedure DFloatContainer.SetFloatCoord(const afx1,afy1,afx2,afy2: float);
 begin
   fx1 := afx1;
   fy1 := afy1;
@@ -533,12 +566,12 @@ begin
 
   FloatToInteger;
 end;
-procedure DAbstractContainer.SetFloatFull(const  afx1,afy1,afx2,afy2,aOpacity: float);
+procedure DFloatContainer.SetFloatFull(const  afx1,afy1,afx2,afy2,aOpacity: float);
 begin
   BaseOpacity := aOpacity;
   SetFloatCoord(afx1,afy1,afx2,afy2);
 end;
-procedure DAbstractContainer.SetFloatSize(const afx1,afy1,afWidth,afHeight: float);
+procedure DFloatContainer.SetFloatSize(const afx1,afy1,afWidth,afHeight: float);
 begin
   fx1 := afx1;
   fy1 := afy1;
@@ -547,57 +580,65 @@ begin
 
   FloatToInteger;
 end;
-procedure DAbstractContainer.SetFloatSizeFull(const afx1,afy1,afWidth,afHeight,aOpacity: float);
+procedure DFloatContainer.SetFloatSizeFull(const afx1,afy1,afWidth,afHeight,aOpacity: float);
 begin
   BaseOpacity := aOpacity;
   SetFloatSize(afx1,afy1,afWidth,afHeight);
 end;
-procedure DAbstractContainer.SetIntCoord(const ax1,ay1,ax2,ay2: integer);
+procedure DIntContainer.SetIntCoord(const ax1,ay1,ax2,ay2: integer);
 begin
   x1 := ax1;
   y1 := ay1;
-  if ScaleItem then begin
+  {if ScaleItem then begin
     x2 := ax2;
     y2 := ay2;
   end else AdjustToRealSize;
 
-  IntegerToFloat;
+  IntegerToFloat;}
+  {$WARNING Integers are not converted to float}
 end;
-procedure DAbstractContainer.SetIntFull(const ax1,ay1,ax2,ay2: integer; const aOpacity: float);
+procedure DIntContainer.SetIntFull(const ax1,ay1,ax2,ay2: integer; const aOpacity: float);
 begin
-  BaseOpacity := aOpacity;
+  {$WARNING Base opacity is not set!}
+  Opacity := aOpacity;
   SetIntCoord(ax1,ay1,ax2,ay2);
 end;
-procedure DAbstractContainer.SetIntSize(const ax1,ay1,aWidth,aHeight: integer);
+procedure DIntContainer.SetIntFull(const ax1,ay1,ax2,ay2: float; const aOpacity: float);
+begin
+  {$WARNING Base opacity is not set!}
+  Opacity := aOpacity;
+  SetIntCoord(Round(ax1),Round(ay1),Round(ax2),Round(ay2));
+end;
+procedure DIntContainer.SetIntSize(const ax1,ay1,aWidth,aHeight: integer);
 begin
   SetIntCoord(ax1,ay1,ax1 + aWidth,ay1 + aHeight);
 end;
 
-procedure DAbstractContainer.SetWidth(const aWidth: integer);
+{procedure DIntegerContainer.SetWidth(const aWidth: integer);
 begin
   {unoptimal and might be wrong}
-  SetIntCoord(x1,y1,x1+aWidth,y2);
+  //SetIntCoord(x1,y1,x1+aWidth,y2);
 end;
-procedure DAbstractContainer.SetHeight(const aHeight: integer);
+procedure DIntegerContainer.SetHeight(const aHeight: integer);
 begin
   {unoptimal and might be wrong}
-  SetIntCoord(x1,y1,x2,y1+aHeight);
-end;
+  //SetIntCoord(x1,y1,x2,y1+aHeight);
+end;}
 
 {----------------------------------------------------------------------------}
 
-function DAbstractContainer.GetWidth: integer;
+function DIntContainer.GetWidth: integer;
 begin
   Result := x2-x1;
 end;
-function DAbstractContainer.GetHeight: integer;
+function DIntContainer.GetHeight: integer;
 begin
   Result := y2-y1;
 end;
 
 {----------------------------------------------------------------------------}
 
-procedure DAbstractContainer.SetIntWidthHeight(const aWidth,aHeight: integer);
+procedure DFloatContainer.SetIntWidthHeight(const aWidth,aHeight: integer);
 begin
   {not sure about this}
   SetIntSize(x1,y1,aWidth,aHeight);
@@ -605,14 +646,14 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DAbstractContainer.ResetToReal;
+procedure DFloatContainer.ResetToReal;
 begin
   SetIntWidthHeight(RealWidth,RealHeight);
 end;
 
 {----------------------------------------------------------------------------}
 
-procedure DAbstractContainer.SetRealSize(const aWidth,aHeight: integer);
+procedure DFloatContainer.SetRealSize(const aWidth,aHeight: integer);
 begin
   RealWidth := aWidth;
   RealHeight := aHeight;
@@ -620,7 +661,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DAbstractContainer.AnchorTo(const aParent: DAbstractContainer; const Gap: integer = 0);
+procedure DFloatContainer.AnchorTo(const aParent: DFloatContainer; const Gap: integer = 0);
 begin
   Anchor[asLeft  ].Anchor := aParent;
   Anchor[asLeft  ].Gap := Gap;
@@ -637,7 +678,7 @@ begin
   OpacityAnchor := aParent;
   aParent.Owner.AddAnchor(Self.Owner);
 end;
-procedure DAbstractContainer.AnchorChild(const aChild: DAbstractContainer; const Gap: integer = 0);
+procedure DFloatContainer.AnchorChild(const aChild: DFloatContainer; const Gap: integer = 0);
 begin
   aChild.Anchor[asLeft  ].Anchor := Self;
   aChild.Anchor[asLeft  ].Gap := Gap;
@@ -657,7 +698,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DAbstractContainer.AnchorSide(const aSide: TAnchorSide; const aParent: DAbstractContainer; const aAlign: TAnchorAlign; const Gap: integer = 0);
+procedure DFloatContainer.AnchorSide(const aSide: TAnchorSide; const aParent: DFloatContainer; const aAlign: TAnchorAlign; const Gap: integer = 0);
 begin
   Anchor[aSide].Anchor := aParent;
   Anchor[aSide].AlignTo := aAlign;
@@ -665,41 +706,67 @@ begin
   aParent.Owner.AddAnchor(Self.Owner);
 end;
 
-procedure DAbstractContainer.AnchorTop(const aParent: DAbstractContainer; const aAlign: TAnchorAlign; const Gap: integer = 0);
+procedure DFloatContainer.AnchorTop(const aParent: DFloatContainer; const aAlign: TAnchorAlign; const Gap: integer = 0);
 begin
   AnchorSide(asTop,aParent,aAlign,Gap);
 end;
-procedure DAbstractContainer.AnchorBottom(const aParent: DAbstractContainer; const aAlign: TAnchorAlign; const Gap: integer = 0);
+procedure DFloatContainer.AnchorBottom(const aParent: DFloatContainer; const aAlign: TAnchorAlign; const Gap: integer = 0);
 begin
   AnchorSide(asBottom,aParent,aAlign,Gap);
 end;
-procedure DAbstractContainer.AnchorLeft(const aParent: DAbstractContainer; const aAlign: TAnchorAlign; const Gap: integer = 0);
+procedure DFloatContainer.AnchorLeft(const aParent: DFloatContainer; const aAlign: TAnchorAlign; const Gap: integer = 0);
 begin
   AnchorSide(asLeft,aParent,aAlign,Gap);
 end;
-procedure DAbstractContainer.AnchorRight(const aParent: DAbstractContainer; const aAlign: TAnchorAlign; const Gap: integer = 0);
+procedure DFloatContainer.AnchorRight(const aParent: DFloatContainer; const aAlign: TAnchorAlign; const Gap: integer = 0);
 begin
   AnchorSide(asRight,aParent,aAlign,Gap);
 end;
 
 {----------------------------------------------------------------------------}
 
-procedure DAbstractContainer.Assign(const Source: DAbstractContainer);
+procedure DIntContainer.Assign(const Source: DIntContainer);
 var aa: TAnchorSide;
 begin
-  Self.fx1 := Source.fx1;
-  Self.fy1 := Source.fy1;
-  Self.fx2 := Source.fx2;
-  Self.fy2 := Source.fy2;
   Self.x1 := Source.x1;
   Self.y1 := Source.y1;
   Self.x2 := Source.x2;
   Self.y2 := Source.y2;
+  Self.Opacity := Source.Opacity;
+  if Self.Owner <> Source.Owner then begin
+    Self.Log(LogInterfaceScaleError, {$I %CURRENTROUTINE},'WARNING: NotifyAnchor should be copied, do it!');
+  end;
+end;
+procedure DIntContainer.AssignTo(const Dest: DIntContainer);
+var aa: TAnchorSide;
+begin
+  Dest.x1 := Self.x1;
+  Dest.y1 := Self.y1;
+  Dest.x2 := Self.x2;
+  Dest.y2 := Self.y2;
+  Dest.Opacity := Self.Opacity;
+  if Dest.Owner <> Self.Owner then begin
+    Self.Log(LogInterfaceScaleError, {$I %CURRENTROUTINE},'WARNING: NotifyAnchor should be copied, do it!');
+  end;
+end;
+
+procedure DFloatContainer.Assign(const Source: DFloatContainer);
+var aa: TAnchorSide;
+begin
+  Self.x1 := Source.x1;
+  Self.y1 := Source.y1;
+  Self.x2 := Source.x2;
+  Self.y2 := Source.y2;
+  Self.Opacity := Source.Opacity;
+
+  Self.fx1 := Source.fx1;
+  Self.fy1 := Source.fy1;
+  Self.fx2 := Source.fx2;
+  Self.fy2 := Source.fy2;
   Self.ScaleItem := Source.ScaleItem;
   Self.RealWidth := Source.RealWidth;
   Self.RealHeight := Source.RealHeight;
   Self.BaseOpacity := Source.BaseOpacity;
-  Self.CurrentOpacity := Source.CurrentOpacity;
   Self.ProportionalScale := Source.ProportionalScale;
   Self.fInitialized := Source.isInitialized;
   Self.AnchorToWindow := Source.AnchorToWindow;
@@ -710,22 +777,23 @@ begin
     Self.Log(LogInterfaceScaleError, {$I %CURRENTROUTINE},'WARNING: NotifyAnchor should be copied, do it!');
   end;
 end;
-procedure DAbstractContainer.AssignTo(const Dest: DAbstractContainer);
+procedure DFloatContainer.AssignTo(const Dest: DFloatContainer);
 var aa: TAnchorSide;
 begin
-  Dest.fx1 := Self.fx1;
-  Dest.fy1 := Self.fy1;
-  Dest.fx2 := Self.fx2;
-  Dest.fy2 := Self.fy2;
   Dest.x1 := Self.x1;
   Dest.y1 := Self.y1;
   Dest.x2 := Self.x2;
   Dest.y2 := Self.y2;
+  Dest.Opacity := Self.Opacity;
+
+  Dest.fx1 := Self.fx1;
+  Dest.fy1 := Self.fy1;
+  Dest.fx2 := Self.fx2;
+  Dest.fy2 := Self.fy2;
   Dest.ScaleItem := Self.ScaleItem;
   Dest.RealWidth := Self.RealWidth;
   Dest.RealHeight := Self.RealHeight;
   Dest.BaseOpacity := Self.BaseOpacity;
-  Dest.CurrentOpacity := Self.CurrentOpacity;
   Dest.ProportionalScale := Self.ProportionalScale;
   Dest.fInitialized := Self.isInitialized;
   Dest.AnchorToWindow := Self.AnchorToWindow;
@@ -739,7 +807,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-function DAbstractContainer.AnchorsEqual(const aCompare: DAbstractContainer): boolean;
+function DFloatContainer.AnchorsEqual(const aCompare: DFloatContainer): boolean;
 begin
   { we don't care to which part of Parent we Anchor?
     Or should we? }
@@ -756,7 +824,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-function DAbstractContainer.GetInitialized: boolean;
+function DFloatContainer.GetInitialized: boolean;
 begin
   if fInitialized then begin
     {check if the x1,x2,y1,y2 are initialized / the wrong place to }
@@ -781,30 +849,74 @@ end;}
 
 {----------------------------------------------------------------------------}
 
-procedure DAbstractElement.Rescale;
+function DAbstractElement.RescaleContainer: boolean;
+var TmpSize: Txy;
 begin
+  {ugly/temporary fix to check if container size has changed}
+  TmpSize.x1 := Base.x1;
+  TmpSize.x2 := Base.x2;
+  TmpSize.y1 := Base.y1;
+  TmpSize.y2 := Base.y2;
+
   {set animation states to changed container size}
   Base.FloatToInteger;
 
   if not Base.isInitialized then
     Log(LogInterfaceInfo,{$I %CURRENTROUTINE%},'Base is uninitialized in Rescale');
 
-  {Rescale Last and Next if they're initialized or just copy Base to avoid bugs}
-  if Last.isInitialized then
-    Last.FloatToInteger
+  {check if container size has been actually changed}
+  if (Base.isInitialized) then
+    Result := (TmpSize.x1 <> Base.x1) or (TmpSize.x2 <> Base.x2) or
+              (TmpSize.y1 <> Base.y1) or (TmpSize.y2 <> Base.y2)
   else
-    Last.Assign(Base);
+    Result := false;
+  {don't run anything related to container size changed, even if it did change
+   Beware of bugs here! As the container size might remain the same, just
+   Base became initialized.
+   Actually this can't happen in a normal situation. But did anything ever went as planned?}
 
-  if Next.isInitialized then
-    Next.FloatToInteger
-  else
-    Next.Assign(Base);
+   {Rescale Last and Next if they're initialized or just copy Base to avoid bugs}
+{   if Last.isInitialized then
+     Last.FloatToInteger
+   else
+     Last.Assign(Base);}
 
-  GetAnimationState; //Get Self.Current (required to scale Anchored elements accordingly!)
+   if Next.isInitialized then
+     Next.FloatToInteger
+   else
+     Next.Assign(Base);
+
+   {$WARNING All angors are attached to current, not to base!!!! Should notify all chidren of current has changed???}
+   GetAnimationState; //Get Self.Current (required to scale Anchored elements accordingly!)
+end;
+
+{----------------------------------------------------------------------------}
+
+function DAbstractElement.RescaleContent: boolean;
+begin
+  {at this abstract level it does nothing}
+  Result := false;
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DAbstractElement.RescaleRecoursive;
+begin
+  Rescale; //just rescale self and do nothing more
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DAbstractElement.Rescale;
+var ContainerSizeChanged: boolean;
+begin
+  ContainerSizeChanged := RescaleContainer;
+  ContainerSizeChanged := RescaleContent or ContainerSizeChanged;
 
   //notify anchored elements to this one, that this one has rescaled
   //if something has changed to avoid cyclic
-  NotifyRescale;
+  if (ContainerSizeChanged) then
+    NotifyRescale;
 end;
 
 {----------------------------------------------------------------------------}
@@ -835,13 +947,14 @@ begin
        requires that CurrentAnimationState is initialized... TODO}
       //asDefault: Last.Assign(Self);
       {fades in/out element}
-      asFadeIn:  Last.BaseOpacity := 0;
+      asFadeIn:  Last.Opacity := 0;
       asFadeOut: Next.BaseOpacity := 0;
       {asFadeOutSuicide}
       {zooms in/out element}
       asZoomIn:  begin
-                   Last.SetIntWidthHeight(1,1);
-                   Last.BaseOpacity := 0;
+                   {$WARNING not working}
+                   //Last.SetIntWidthHeight(1,1);
+                   Last.Opacity := 0;
                  end;
       asZoomOut: begin
                    Next.SetIntWidthHeight(1,1);
@@ -859,12 +972,13 @@ begin
                          3: my := -0.0001;
                        end;
                        if Animate=asFlyInRandom then begin
-                         Last.fx1 := mx;
-                         Last.fy1 := my;
-                         Last.AnchorToWindow := true;
+                         {$HINT Test needed}
+                         Last.x1 := Round(mx*Window.Width);
+                         Last.y1 := Round(my*Window.Width);
+                         //Last.AnchorToWindow := true;
                        end else begin
-                         Next.fx2 := mx;
-                         Next.fy2 := my;
+                         Next.fx1 := mx;
+                         Next.fy1 := my;
                          Next.AnchorToWindow := true;
                        end;
                      end;
@@ -878,12 +992,13 @@ begin
                          asFlyInTop,asFlyOutTop: my := -0.0001;
                        end;
                        if (Animate=asFlyInLeft) or (Animate=asFlyInRight) or (Animate=asFlyInTop) or (Animate=asFlyInBottom) then begin
-                         Last.fx1 := mx;
-                         Last.fy1 := my;
-                         Last.AnchorToWindow := true;
+                         {$HINT Test needed}
+                         Last.x1 := Round(mx*Window.Width);
+                         Last.y1 := Round(my*Window.Width);
+                         //Last.AnchorToWindow := true;
                        end else begin
-                         Next.fx2 := mx;
-                         Next.fy2 := my;
+                         Next.fx1 := mx;
+                         Next.fy1 := my;
                          Next.AnchorToWindow := true;
                        end;
                      end;
@@ -905,7 +1020,8 @@ end;
 
 procedure DAbstractElement.AnchorTo(const aElement: DAbstractElement);
 begin
-  Base.AnchorTo(aElement.Current);
+  {$WARNING not working}
+  Base.AnchorTo(aElement.Base);
 end;
 
 {----------------------------------------------------------------------------}
@@ -915,7 +1031,7 @@ var Phase: float;
 begin
   if Base.isInitialized then begin
     if AnimationStart<0 then AnimationStart := DecoNow;
-    if (Last.isInitialized) and (Next.isInitialized) and
+    if {(Last.isInitialized) and} (Next.isInitialized) and
       ((DecoNow-AnimationStart < AnimationDuration)) then begin
       //if this is start of the animation - init time
       //determine animation time passed
@@ -925,22 +1041,23 @@ begin
         //acLinear: ; //<- change nothing.
         acSquare: if Phase<0.5 then Phase := Sqr(2*Phase)/2 else Phase := 1 - Sqr(2*(1-Phase))/2;
       end;
+      {$WARNING Not working}
       Current.Assign(Next);
-      Current.SetFloatFull( Last.fx1+(Next.fx1-Last.fx1)*Phase,
-                            Last.fy1+(Next.fy1-Last.fy1)*Phase,
-                            Last.fx2+(Next.fx2-Last.fx2)*Phase,
-                            Last.fy2+(Next.fy2-Last.fy2)*Phase,
-                            Last.BaseOpacity+((Next.BaseOpacity-Last.BaseOpacity)*Phase));
+      Current.SetIntFull(Last.x1+(Next.x1-Last.x1)*Phase,
+                         Last.y1+(Next.y1-Last.y1)*Phase,
+                         Last.x2+(Next.x2-Last.x2)*Phase,
+                         Last.y2+(Next.y2-Last.y2)*Phase,
+                         Last.Opacity+((Next.Opacity-Last.Opacity)*Phase));
       {during the animation, the Element is always scaled}
-      Current.ScaleItem := true;
+      //Current.ScaleItem := true;
       //we don't need scale back to float, as it's not a basic animation state
     end else begin
       Current.Assign(Base);
-      Current.SetFloatFull( Base.fx1,
-                            Base.fy1,
-                            Base.fx2,
-                            Base.fy2,
-                            Base.BaseOpacity);
+      Current.SetIntFull( Base.x1,
+                          Base.y1,
+                          Base.x2,
+                          Base.y2,
+                          Base.BaseOpacity);
     end;
  end else begin
    Current.Assign(Base); {just fall back to an uninitialized copy}
@@ -998,10 +1115,10 @@ begin
   inherited Create;
   fVisible := true;
   AnimationCurve := acSquare;
-  Base := DAbstractContainer.Create(Self);
-  Last := DAbstractContainer.Create(Self);
-  Next := DAbstractContainer.Create(Self);
-  Current := DAbstractContainer.Create(Self);
+  Base := DFloatContainer.Create(Self);
+  Last := DFloatContainer.Create(Self);
+  Next := DFloatContainer.Create(Self);
+  Current := DFloatContainer.Create(Self);
 
   NotifyAnchors := TAnchorList.Create(false);
 end;
@@ -1170,13 +1287,11 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DInterfaceElement.Rescale;
+procedure DInterfaceElement.RescaleRecoursive;
 var i: integer;
 begin
-  inherited Rescale;
-  for i := 0 to Children.Count-1 do Children[i].Rescale;
-  //if this container is "fine" then get children's content and try to rescale
-  //if Base.isInitialized then RescaleToChildren;
+  inherited RescaleRecoursive;
+  for i := 0 to Children.Count-1 do Children[i].RescaleRecoursive;
 end;
 
 {-----------------------------------------------------------------------------}
