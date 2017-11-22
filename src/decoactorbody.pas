@@ -53,6 +53,7 @@ type
   DBody = class(T3DOrient)
   { animation display routines }
   private
+    CurrentChild: T3D;
 
     CurrentAnimation: T3DResourceAnimation;
     { Current "time" for the scene to determine the animation frame to display.
@@ -75,9 +76,6 @@ type
     procedure ResetAnimation;
 
 
-    { Returns current frame of the animation
-      Engine-specific }
-    function GetChild: T3D; override;
     { Advances time and recalculates the geometry
       Engine-specific }
     procedure Update(const SecondsPassed: Single; var RemoveMe: TRemoveType); override;
@@ -142,13 +140,6 @@ end;
 
 {================================= D BODY =================================}
 
-function DBody.GetChild: T3D;
-begin
-  if not (GetExists and Resource.Prepared) then Exit;
-  if CurrentAnimation = nil then ResetAnimation;
-  Result := CurrentAnimation.Scene(Time, true);
-end;
-
 {---------------------------------------------------------------------------}
 
 procedure DBody.ResetAnimation;
@@ -183,9 +174,35 @@ begin
   end;
 end;
 procedure DBody.Update(const SecondsPassed: Single; var RemoveMe: TRemoveType);
+
+  { Returns current frame of the animation
+    Engine-specific }
+  function GetChild: T3D;
+  begin
+    if not (GetExists and Resource.Prepared) then Exit;
+    if CurrentAnimation = nil then ResetAnimation;
+    Result := CurrentAnimation.Scene(Time, true);
+  end;
+
+  procedure UpdateChild;
+  var
+    NewChild: T3D;
+  begin
+    NewChild := GetChild;
+    if CurrentChild <> NewChild then
+    begin
+      if CurrentChild <> nil then
+        Remove(CurrentChild);
+      CurrentChild := NewChild;
+      if CurrentChild <> nil then
+        Add(CurrentChild);
+    end;
+  end;
+
 begin
   AdvanceTime(SecondsPassed);
   VisibleChangeHere([vcVisibleGeometry]);
+  UpdateChild;
 end;
 
 {---------------------------------------------------------------------------}
