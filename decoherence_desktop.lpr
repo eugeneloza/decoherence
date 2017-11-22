@@ -1,6 +1,6 @@
-program decoherence_desktop;
+program Decoherence_Desktop;
 
-{$INCLUDE compilerconfig.inc}
+{$INCLUDE src/compilerconfig.inc}
 
 {$IFDEF RELEASE}
   {$DEFINE WriteLog}

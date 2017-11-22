@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 program Constructor_Tool;
 
 {$IFDEF Windows}{$APPTYPE Console}{$ENDIF}
-{$INCLUDE compilerconfig.inc}
+{$INCLUDE src/compilerconfig.inc}
 
 uses
   {$IFDEF UNIX}cThreads,{$ENDIF}
