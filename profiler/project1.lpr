@@ -1,8 +1,8 @@
-program project1;
+program Project1;
 
 {$INCLUDE profiler.inc}
 
-uses SysUtils, CastleClassUtils{$IFDEF UseProfiler}, Profiler{$ENDIF};
+uses SysUtils, CastleClassUtils, Profiler;
 
 type
   TProfiledObject = class(TObject)
@@ -20,12 +20,15 @@ pend;
 procedure TProfiledObject.MyProc2;
 var i: integer;
 pbegin
+  MyProc1;
   for i := 0 to maxint div 7 do ;
 pend;
 
 procedure TProfiledObject.MyProc3;
 var i: integer;
 pbegin
+  MyProc2;
+  MyProc1;
   for i := 0 to maxint div 14 do ;
 pend;
 
@@ -38,14 +41,14 @@ fend;
 procedure RawProcedure2;
 var i: integer;
 fbegin
+  RawProcedure1;
   for i := 0 to maxint div 11 do ;
 fend;
 
 var MyObj: TProfiledObject;
 
-begin
-  MyObj := TProfiledObject.Create;
-
+procedure InitTest;
+fbegin
   RawProcedure2;
   MyObj.MyProc3;
   RawProcedure1;
@@ -57,6 +60,13 @@ begin
   RawProcedure1;
   MyObj.MyProc3;
   RawProcedure2;
+fend;
+
+
+begin
+  MyObj := TProfiledObject.Create;
+
+  InitTest;
 
   MyObj.Free;
 end.
