@@ -15,12 +15,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 
 {---------------------------------------------------------------------------}
 
-{$WARN 2005 off : Comment level $1 found}
-{ Simple macro-based profiler unit
+(* Simple macro-based profiler unit
 
   usage:
 
-  {$INCLUDE profiler.inc} in the project and add Profiler unit to "USES" section
+  {$INCLUDE profiler.inc} and add Profiler unit to "USES" section
+  of every unit of the project
 
   You may disable/enable profiler by editing profiler.inc and
   commenting/uncommenting {$DEFINE UseProfiler} line
@@ -29,6 +29,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
   Eventually just replace begin...end; of every routine you want to profile into:
   pbegin...pend; in case of a method (procedure/function of object)
   fbegin...fend; in case of a plain procedure/function;
+
+  Defining SortProfilerResults would sort the routines in decreasing order
+  based on how much total time they consumed (separately at every hierarchy level)
 
   Warning: it's not thread-safe
 
@@ -41,13 +44,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
   Lazarus IDE > Options > Editor > Code Folding
   Lazarus IDE > Options > Completion and Hints > Add Close Statements for Pascal Blocks
   as macros significantly slow down the IDE in this case
-}
-{$WARN 2005 on : Comment level $1 found}
+*)
 
 unit Profiler;
 interface
 
 {$INCLUDE profiler.inc}
+
+//{$DEFINE SortProfilerResults}
 
 {$IFDEF UseProfiler}
 procedure StartProfiler(const aFunction: string); inline;
@@ -140,6 +144,9 @@ procedure DisplayProfilerResult;
   var
     i: integer;
   begin
+    {$IFDEF SortProfilerResults}
+    aProfiler.Children.Sort(TProfilerComparer.Construct(@CompareProfiles));
+    {$ENDIF}
     for i := 0 to aProfiler.Children.Count-1 do begin
       WriteLn(aPrefix + aProfiler.Children[i].EntryName+'(x'+IntToStr(aProfiler.Children[i].EntryHits)+')'+' : '+IntToStr(Round(aProfiler.Children[i].EntryTime*1000))+'ms');
       DisplayRecoursive(aProfiler.Children[i] as TProfiler,aPrefix+'...');
