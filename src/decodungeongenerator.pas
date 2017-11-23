@@ -97,7 +97,7 @@ type
    we can also use preset generatoe steps to make some tiles already available at map}
   DGeneratorStep = record
     {id of the tile}
-    tile: TTileType;
+    Tile: TTileType;
     {coordinates to place the tile}
     x,y,z: TIntCoordinate;
   end;
@@ -127,9 +127,9 @@ type
   DDungeonGeneratorParameters = class(DAbstractGeneratorParameters)
     public
       {the map cannot be larger than these}
-      MaxX,MaxY,MaxZ: TIntCoordinate;
+      MaxX, MaxY, MaxZ: TIntCoordinate;
       {the map cannot be smaller than these}
-      MinX,MinY,MinZ: TIntCoordinate;
+      MinX, MinY, MinZ: TIntCoordinate;
       {target map volume. The map will be regenerated until it's met
        Usually the algorithm can handle up to ~30% packaging of maxx*maxy*maxz}
       Volume: integer;
@@ -213,8 +213,8 @@ type
     {current size of the dynamic array}
     MaxSteps: integer;
     {current (the last used) step of the generator;
-     careful, currentStep starts from -1, while corresponding min/max steps start from 0
-     so conversion is min/maxStep = currentStep+1}
+     careful, CurrentStep starts from -1, while corresponding min/max steps start from 0
+     so conversion is min/maxStep = CurrentStep+1}
     CurrentStep: integer;
     {adds +1 to CurrentStep and resizes the array if necessary}
     procedure IncCurrentStep; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
@@ -233,7 +233,7 @@ type
      and false if the tile cannot be placed at these coordinates  }
     function AddTile(Tile: TTileType; x,y,z: TIntCoordinate): boolean;
     {When we're sure what we are doing, we're not making any checks, just add the tile as fast as it is possible}
-    procedure AddTileUnsafe(const Tile: DGeneratorTile; const x,y,z: TIntCoordinate); {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+    procedure AddTileUnsafe(const Tile: DGeneratorTile; const x, y, z: TIntCoordinate); {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
     {overloaded version that accepts a DGeneratorStep;}
     procedure AddTileUnsafe(const Step: DGeneratorStep);
     {creates a minimap as Map.img}
@@ -286,7 +286,7 @@ end;
 type
   {coordinate of a raycast_to candidate}
   Txyz = record
-    x,y,z: TIntCoordinate;
+    x, y, z: TIntCoordinate;
   end;
 type TRaycastList = specialize TList<Txyz>;
 
@@ -310,7 +310,7 @@ type
     {a map that stores tiles markers for quick access...
      maybe not needed?}
     TileIndexMap: TIntMapArray;
-    {returns an integer array of (map.sizex,map.sizey,map.sizez) size}
+    {returns an integer array of (map.SizeX,map.sizey,map.sizez) size}
     //function ZeroIntegerMap: TIntMapArray;
     {puts tile # markers on a map to detect which tile is here}
     procedure MakeTileIndexMap;
@@ -324,7 +324,7 @@ type
     Groups: TGroupsArray;
     {merge the neighbours of neighbours in order for the light to work smoothly
      todo!!!}
-    procedure Neighbours_of_neighbours;
+    procedure NeighboursOfNeighbours;
     {initializes a neighbours map with nils}
     function NilIndexMap: TNeighboursMapArray;
     {remove duplicates in the sorted tiles list and (!!!) sorts the array
@@ -360,7 +360,7 @@ type
 procedure FreeNeighboursMap(var nmap: TNeighboursMapArray);
 {free every element of a groups array}
 procedure FreeGroups(const ngroups: TGroupsArray);
-{returns an integer array of (map.sizex,map.sizey,map.sizez) size}
+{returns an integer array of (map.SizeX,map.sizey,map.sizez) size}
 function ZeroIntegerMap(const sx,sy,sz: integer): TIntMapArray;
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
@@ -392,9 +392,9 @@ begin
 
   For i := 0 to Parameters.TilesList.Count-1 do begin
     if Parameters.AbsoluteURL then
-      tmp := DGeneratorTile.Load(Parameters.TilesList[i],false)
+      tmp := DGeneratorTile.Load(Parameters.TilesList[i], false)
     else
-      tmp := DGeneratorTile.Load(ApplicationData(TilesFolder+Parameters.TilesList[i]),true);
+      tmp := DGeneratorTile.Load(ApplicationData(TilesFolder+Parameters.TilesList[i]), true);
     tmp.CalculateFaces;
     tmp.ProcessBlockers;
     Tiles.Add(tmp);
@@ -405,17 +405,17 @@ begin
 
   {prepare different optimized lists}
   for i := 0 to Tiles.Count-1 do begin
-    if Tiles[i].blocker then
+    if Tiles[i].Blocker then
       BlockerTiles.Add(i)
     else
     begin
-      NormalTiles.add(i);
+      NormalTiles.Add(i);
       if Tiles[i].HasStairsDown then
-        DownTiles.add(i);
+        DownTiles.Add(i);
       if Tiles[i].FreeFaces>=3 then
-        RichTiles.add(i)
+        RichTiles.Add(i)
       else
-        PoorTiles.add(i);
+        PoorTiles.Add(i);
     end;
   end;
 
@@ -424,19 +424,19 @@ begin
     inc(NormalTilesTotalDocks,Tiles[NormalTiles[i]].FreeFaces);
 
   {initialize random seed}
-  InitSeed(Parameters.seed);
+  InitSeed(Parameters.Seed);
 
   {initialize map size}
-  Map.SetSize(Parameters.MaxX,Parameters.MaxY,Parameters.MaxZ); //we don't care about RAM now, we'll shrink the map later
+  Map.SetSize(Parameters.MaxX, Parameters.MaxY, Parameters.MaxZ); //we don't care about RAM now, we'll shrink the map later
 
   {load pregenerated tiles}
   MaxSteps := 0;
-  SetLength(Gen, maxSteps);
+  SetLength(Gen, MaxSteps);
   CurrentStep := -1;
 
   for i := 0 to Parameters.FirstSteps.Count-1 do begin
     incCurrentStep;
-    Gen[CurrentStep].tile := GetTileByName(Parameters.FirstSteps[i].Tile);
+    Gen[CurrentStep].Tile := GetTileByName(Parameters.FirstSteps[i].Tile);
     Gen[CurrentStep].x := Parameters.FirstSteps[i].x;
     Gen[CurrentStep].y := Parameters.FirstSteps[i].y;
     Gen[CurrentStep].z := Parameters.FirstSteps[i].z;
@@ -503,13 +503,13 @@ begin
     {try add a random normal tile}
     repeat
       if RNDM.Random<0.9 then begin
-        if (Map.FreeFaces > parameters.MaxFaces) or (Map.Volume>Parameters.Volume) then
+        if (Map.FreeFaces > Parameters.MaxFaces) or (Map.Volume>Parameters.Volume) then
           t := GetPoorTile
         else
-        if (Map.FreeFaces < parameters.MinFaces) and (Map.Volume<Parameters.Volume) then
+        if (Map.FreeFaces < Parameters.MinFaces) and (Map.Volume<Parameters.Volume) then
           t := GetRichTile
         else
-        if (Map.MaxDepth < parameters.MinZ*(Map.Volume/Parameters.Volume)) then
+        if (Map.MaxDepth < Parameters.MinZ*(Map.Volume/Parameters.Volume)) then
           t := GetDownTile
         else
           t := GetNormalTile;
@@ -527,14 +527,14 @@ begin
     for tt := 0 to NormalTiles.Count-1 do begin
       t := NormalTiles[tt];
       for td := 0 to Tiles[t].Dock.Count-1 do
-        if canDock then
+        if CanDock then
           if TryAdd then Exit;
     end;
     {if we haven't "exited" yet, then there is no tile that fits this
      map's dock point. We have to block it out}
     for tt := 0 to BlockerTiles.Count-1 do begin
       t := BlockerTiles[tt];
-      for td := 0 to Tiles[t].dock.Count-1 do //actually it should be always just one
+      for td := 0 to Tiles[t].Dock.Count-1 do //actually it should be always just one
         if CanDock then
           if TryAdd then Exit;
     end;
@@ -572,13 +572,13 @@ begin
     t2 := GetNow;
     Map.EmptyMap(false);
     //add prgenerated or undo tiles
-    CurrentStep := RNDM.random(CurrentStep);
+    CurrentStep := RNDM.Random(CurrentStep);
     if CurrentStep < MinSteps-1 then CurrentStep := MinSteps-1;
-    Log(LogGenerateWorld,{$I %CURRENTROUTINE%},'Starting from '+inttostr(CurrentStep));
+    Log(LogGenerateWorld,{$I %CURRENTROUTINE%},'Starting from '+IntToStr(CurrentStep));
     for i := 0 to CurrentStep do AddTileUnsafe(Gen[i]);
 
     while Map.CalculateFaces<>0 do begin
-      {dLog(inttostr(Map.dock.count));}
+      {dLog(IntToStr(Map.Dock.Count));}
       //add a tile
       AddRandomTile;
       //UpdateProgress('Generating',Minimum(Map.Volume/Parameters.Volume,0.90));
@@ -588,17 +588,17 @@ begin
     //if failed then try to undo and regenerate the map again
     {if false then begin
       if CurrentStep > MinSteps then begin
-        CurrentStep := MinSteps + RNDM.random(currentStep-MinSteps);
+        CurrentStep := MinSteps + RNDM.Random(CurrentStep-MinSteps);
         MaxSteps := CurrentStep;
-        setLength(Gen,MaxSteps);
+        SetLength(Gen, MaxSteps);
 
-        LastUndo := min;
+        LastUndo := Min;
         ...
-        if LastMax<current then
-          LastMax := current;
+        if LastMax<Current then
+          LastMax := Current;
           LastUndo := LastMax;
         end;
-        goto 10% behind LastUndo>min;
+        goto 10% behind LastUndo>Min;
         or %random to avoid some no-way-out cases
 
       end;
@@ -696,7 +696,7 @@ begin
 
   AddTileUnsafe(Tiles[Tile],x,y,z);
   {add current step to GEN}
-  incCurrentStep;
+  IncCurrentStep;
   Gen[CurrentStep].Tile := Tile;
   Gen[CurrentStep].x := x;
   Gen[CurrentStep].y := y;
@@ -771,7 +771,7 @@ var i: integer;
     iz: TIntCoordinate;
 begin
   Map.FreeMinimap;
-  setLength(Map.Img,Map.SizeZ);
+  SetLength(Map.Img,Map.SizeZ);
   for i := 0 to Map.SizeZ-1 do begin
     Map.Img[i] := TRGBAlphaImage.Create;
     Map.Img[i].SetSize((Map.SizeX)*16,(Map.SizeY)*16,1);
@@ -1006,11 +1006,11 @@ var
     procedure SetCandidate(x,y,z: TIntCoordinate); {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
     var NewCandidate: Txyz;
     begin
-      //dLog(inttostr(HelperMap[x,y,z]));
+      //dLog(IntToStr(HelperMap[x,y,z]));
       {looks redundant as "open face" can't go into void
        but let it be here for now}
       if {(x>=0) and (y>=0) and (z>=0) and
-         (x<Map.Sizex) and (y<Map.Sizey) and (z<Map.SizeZ) and }
+         (x<Map.SizeX) and (y<Map.SizeY) and (z<Map.SizeZ) and }
          (HelperMap[x,y,z] = -1) then
       begin
         //HelperMap[x,y,z] := CandidateIndex;
@@ -1033,15 +1033,15 @@ var
               SetCandidate(OldList[i].x+a_dx(a),OldList[i].y+a_dy(a),OldList[i].z+a_dz(a));
     end;
     {raycast 8 corners of one tile to another}
-    {procedure RayCastCorners(cand: integer);
+    {procedure RayCastCorners(Cand: integer);
     begin
       //not available yet!
       for dx:=0 to 1 do
        for dy:=0 to 1 do
         for dz:=0 to 1 do begin
-          if dx=0 then x0:=ix+raycast_corner_accuracy*(random+0.1) else x0:=ix+1-raycast_corner_accuracy*(random+0.1);
-          if dy=0 then y0:=iy+raycast_corner_accuracy*(random+0.1) else y0:=iy+1-raycast_corner_accuracy*(random+0.1);
-          if dz=0 then z0:=iz+raycast_corner_accuracy*(random+0.1) else z0:=iz+1-raycast_corner_accuracy*(random+0.1);
+          if dx=0 then x0:=ix+RaycastCornerAccuracy*(DRND.Random+0.1) else x0:=ix+1-RaycastCornerAccuracy*(DRND.Random+0.1);
+          if dy=0 then y0:=iy+RaycastCornerAccuracy*(DRND.Random+0.1) else y0:=iy+1-RaycastCornerAccuracy*(DRND.Random+0.1);
+          if dz=0 then z0:=iz+RaycastCornerAccuracy*(DRND.Random+0.1) else z0:=iz+1-RaycastCornerAccuracy*(DRND.Random+0.1);
         end;
     end;}
 begin
@@ -1082,7 +1082,7 @@ begin
       else
         HelperMap[RayCastList[j].x,RayCastList[j].y,RayCastList[j].z] := FailedIndex;
 
-      //if RayTrue>0 then dLog(inttostr(mx)+','+inttostr(my)+','+inttostr(mz)+' - '+inttostr(round(100*RayTrue/RayCount)));
+      //if RayTrue>0 then dLog(IntToStr(mx)+','+IntToStr(my)+','+IntToStr(mz)+' - '+IntToStr(round(100*RayTrue/RayCount)));
     end;
   until RaycastList.Count=0;
   FreeAndNil(OldList);
@@ -1092,10 +1092,10 @@ begin
 
   tmpNeighboursMap[mx,my,mz] := TNeighboursList.Create;
   //make a list of neighbours
-  for nx := 0 to Map.sizex-1 do
+  for nx := 0 to Map.SizeX-1 do
     for ny := 0 to map.sizey-1 do
       for nz := 0 to map.sizez-1 do if HelperMap[nx,ny,nz]>0 then begin
-        Neighbour.tile := TileIndexMap[nx,ny,nz];
+        Neighbour.Tile := TileIndexMap[nx,ny,nz];
         Neighbour.visible := HelperMap[nx,ny,nz];
         tmpNeighboursMap[mx,my,mz].Add(Neighbour);
 
@@ -1110,9 +1110,9 @@ begin
           end;
       end;
 
-  //dLog(inttostr(mx)+inttostr(my)+inttostr(mz),inttostr(tmpNeighboursMap[mx,my,mz].count));
+  //dLog(IntToStr(mx)+IntToStr(my)+IntToStr(mz),IntToStr(tmpNeighboursMap[mx,my,mz].count));
   RemoveDuplicatesNeighbours(tmpNeighboursMap[mx,my,mz]);
-  //dLog(inttostr(mx)+inttostr(my)+inttostr(mz),inttostr(tmpNeighboursMap[mx,my,mz].count));
+  //dLog(IntToStr(mx)+IntToStr(my)+IntToStr(mz),IntToStr(tmpNeighboursMap[mx,my,mz].count));
 
   inc(RaycastCount);
   //UpdateProgress('Raycasting',1+(RaycastCount/Map.Volume)*0.8);
@@ -1122,7 +1122,7 @@ end;
 
 function CompareNeighbours(constref i1,i2: DNeighbour): integer;
 begin
-  Result := i1.tile - i2.tile;
+  Result := i1.Tile - i2.Tile;
 end;
 type TNeighboursComparer = specialize TComparer<DNeighbour>;
 
@@ -1154,7 +1154,7 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-procedure D3DDungeonGenerator.Neighbours_of_neighbours;
+procedure D3DDungeonGenerator.NeighboursOfNeighbours;
 var i: integer;
     ix,iy,iz: TIntCoordinate;
     dx,dy,dz: TIntCoordinate;
@@ -1165,11 +1165,11 @@ begin
   for ix := 0 to Map.SizeX-1 do
     for iy := 0 to Map.SizeY-1 do
       for iz := 0 to Map.SizeZ-1 do if tmpNeighboursMap[ix,iy,iz]<>nil then begin
-        //dLog('neighbours',inttostr(tmpNeighboursMap[ix,iy,iz].count));
+        //dLog('neighbours',IntToStr(tmpNeighboursMap[ix,iy,iz].Count));
         //process neighbours
- {       for dx := 0 to tiles[tmpNeighboursMap[ix,iy,iz].tile].sizex do
-          for dy := 0 to tiles[tmpNeighboursMap[ix,iy,iz].tile].sizex do
-            for dz := 0 to tiles[tmpNeighboursMap[ix,iy,iz].tile].sizex do {***};
+ {       for dx := 0 to Tiles[tmpNeighboursMap[ix,iy,iz].Tile].SizeX do
+          for dy := 0 to Tiles[tmpNeighboursMap[ix,iy,iz].Tile].SizeX do
+            for dz := 0 to Tiles[tmpNeighboursMap[ix,iy,iz].Tile].SizeX do {***};
  }
         {$warning not working yet}
         NeighboursMap[ix,iy,iz] := TNeighboursList.Create;
@@ -1196,7 +1196,7 @@ begin
 
  //UpdateProgress('Processing',0.8);
 
- Neighbours_of_neighbours;
+ NeighboursOfNeighbours;
 
  //and free temporary map
  FreeNeighboursMap(tmpNeighboursMap);
@@ -1247,7 +1247,7 @@ begin
   for ix := 0 to Map.SizeX-1 do
     for iy := 0 to Map.SizeY-1 do
       for iz := 0 to Map.SizeZ-1 do if NeighboursMap[ix,iy,iz]<>nil then {begin}
-        //dLog(inttostr(ix)+inttostr(iy)+inttostr(iz),inttostr(NeighboursMap[ix,iy,iz].count));
+        //dLog(IntToStr(ix)+IntToStr(iy)+IntToStr(iz),IntToStr(NeighboursMap[ix,iy,iz].Count));
         for j := 0 to NeighboursMap[ix,iy,iz].Count-1 do
           inc(HitCount.L[NeighboursMap[ix,iy,iz].Items[j].Tile].Hits);
       {end;}
@@ -1256,7 +1256,7 @@ begin
 
   {now let's start the main algorithm}
   g := 0;
-  setlength(TilesUsed,Length(Gen));
+  SetLength(TilesUsed,Length(Gen));
   for j := 0 to high(TilesUsed) do TilesUsed[j] := false;
   i := 0;
   repeat
@@ -1269,15 +1269,15 @@ begin
 
     //skip sorted list to first unused tile
 
-    {if (i <= high(tilesUsed)){ and (not tilesUsed[Hit_count[i].index]) } then} begin
+    {if (i <= High(TilesUsed)){ and (not TilesUsed[Hit_count[i].Index]) } then} begin
 
-      {we don't actually need to scan the whole tile(sizex,sizey,sizez), only top-left element,
+      {we don't actually need to scan the whole tile(SizeX,sizey,sizez), only top-left element,
        if we'll miss something, we'll just add missed tiles to *other* groups later}
       ix := Gen[HitCount[i].Index].x;
       iy := Gen[HitCount[i].Index].y;
       iz := Gen[HitCount[i].Index].z;
       //blockers behave a bit differently
-      if Tiles[Gen[HitCount[i].index].Tile].Blocker then begin
+      if Tiles[Gen[HitCount[i].Index].Tile].Blocker then begin
         ix += Tiles[Gen[HitCount[i].Index].Tile].b_x;
         iy += Tiles[Gen[HitCount[i].Index].Tile].b_y;
         iz += Tiles[Gen[HitCount[i].Index].Tile].b_z;
@@ -1298,7 +1298,7 @@ begin
 
   until i >= High(Gen);
 
-  Log(LogGenerateWorld,{$I %CURRENTROUTINE%},'N groups = '+inttostr(length(groups)));
+  Log(LogGenerateWorld,{$I %CURRENTROUTINE%},'N groups = '+IntToStr(Length(Groups)));
   for i := 0 to High(Groups) do Log(LogGenerateWorld,'group '+IntToStr(i),IntToStr(Groups[i].Count));
 
   FreeAndNil(HitCount);
@@ -1447,7 +1447,7 @@ begin
       while Iterator.GetNext do if Iterator.current.NodeName = UTF8decode('Tile') then
       begin
         SmallContainer := Iterator.current;
-        FS.tile := SmallContainer.TextData;
+        FS.Tile := SmallContainer.TextData;
         FS.x := SmallContainer.AttributeInteger('x');
         FS.y := SmallContainer.AttributeInteger('y');
         FS.z := SmallContainer.AttributeInteger('z');
@@ -1469,14 +1469,14 @@ end;
 {-----------------------------------------------------------------------------}
 
 {Function DDungeonGenerator.GetTileByName(TileName: string): DGeneratorMap;
-var I: DGeneratorMap;
+var i: DGeneratorMap;
 begin
   Result := nil;
-  for I in Tiles do if I.TileName = TileName then begin
-    Result := I;
+  for i in Tiles do if i.TileName = TileName then begin
+    Result := i;
     exit;
   end;
-  raise Exception.create('DDungeonGenerator.GetTileByName: FATAL! Tile cannot be found!');
+  raise Exception.Create('DDungeonGenerator.GetTileByName: FATAL! Tile cannot be found!');
 end;}
 Function DDungeonGenerator.GetTileByName(const TileName: string): TTileType;
 var i: integer;
@@ -1560,7 +1560,7 @@ end;
 procedure FreeGroups(const nGroups: TGroupsArray);
 var i: integer;
 begin
-  if nGroups<>nil then
+  if nGroups <> nil then
     for i := 0 to high(nGroups) do
       FreeAndNil(nGroups[i]);
 end;
