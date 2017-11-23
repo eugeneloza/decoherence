@@ -354,7 +354,7 @@ constructor DPlayerCharacter.Create;
 begin
   inherited Create;
   isPlayer := true;
-  Faction := fPlayer;
+  Faction := ffPlayer;
 end;
 
 {----------------------------------------------------------------------------}

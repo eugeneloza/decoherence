@@ -36,7 +36,7 @@ type
     of Object;
 
 type
-  TFaction = (fPlayer, fHostile);
+  TFaction = (ffPlayer, ffHostile);
 
 type
   { This Actor has only the most basic features like his "tile" position
@@ -1094,7 +1094,7 @@ constructor DMonster.Create;
 begin
   inherited Create;
   Self.onHit := @Self.doHit;
-  Faction := fHostile;
+  Faction := ffHostile;
 end;
 
 { ----------------------------------------------------------------------------- }
