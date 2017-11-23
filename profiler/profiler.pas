@@ -31,8 +31,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
   pbegin...pend; in case of a method (procedure/function of object)
   fbegin...fend; in case of a plain procedure/function;
 
+  Warning: it's not thread-safe
+
   Requires FPC 3.1.1 and above
   Requires CastleUtils (Castle Game Engine)
+
+  I highly recommend disabling code folding in
+  Lazarus IDE > Options > Editor > Code Folding
+  Lazarus IDE > Options > Completion and Hints > Add Close Statements for Pascal Blocks
+  as macros significantly slow down the IDE in this case
 }
 {$WARN 2005 on : Comment level $1 found}
 

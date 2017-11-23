@@ -2,8 +2,7 @@ program project1;
 
 {$INCLUDE profiler.inc}
 
-uses SysUtils
-  ProfilerUnit;
+uses SysUtils, CastleClassUtils{$IFDEF UseProfiler}, Profiler{$ENDIF};
 
 type
   TProfiledObject = class(TObject)

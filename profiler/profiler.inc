@@ -15,12 +15,12 @@
 {$DEFINE fend:=
   SendProfilerData({$I %CURRENTROUTINE%},Now-_t);
   end}//no semicolon in the end!
-{$DEFINE ProfilerUnit:=, Profiler} //warning: no comma should be before this macro
+//{$DEFINE ProfilerUnit:=, Profiler} //warning: no comma should be before this macro
 {$WARN 2005 on : Comment level $1 found}
 {$ELSE}
 {$DEFINE pbegin:=begin}
 {$DEFINE fbegin:=begin}
 {$DEFINE pend:=end}//no semicolon in the end!
 {$DEFINE fend:=end}
-{$DEFINE ProfilerUnit:=}
+//{$DEFINE ProfilerUnit:=}
 {$ENDIF}
