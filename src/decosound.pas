@@ -221,7 +221,7 @@ type
        e.g. an incoming nuke might happen only on enemy's turn, there's no need
        to blend it with player's turn.}
       PlayLists: array of DSyncPlaylist;
-      {}
+      { }
       property Situation: TSituation read fsituation write setsituation;
       procedure Manage; override;
     end;

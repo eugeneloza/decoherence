@@ -98,7 +98,7 @@ type
     and based on Result it will be "available" or "unavailable" }
   DDialogueContext = class(DObject)
   public
-    {}
+    { }
     Context: DContext;
 
     //speaker, listener, about

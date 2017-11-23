@@ -35,7 +35,7 @@ const
   LocalFolder = 'local/';
 
 type
-  {}
+  { }
   DHeaderModule = class(DDataModule)
   strict private const
     s_Module = 'Header';

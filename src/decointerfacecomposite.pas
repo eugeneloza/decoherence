@@ -57,7 +57,7 @@ type
     { Creates (spawns) elements in this container }
     procedure SpawnChildren; virtual; abstract;
   public
-    {}
+    { }
     procedure RearrangeChildren;
     constructor Create; override;
 
@@ -241,11 +241,11 @@ type
     the 3d character face :) Only 2D inanimated image for now... }
   DPortrait = class(DFramedElement)
   private
-    {}
+    { }
     Portrait: DPlayerPortrait;
-    {}
+    { }
     DamageOverlay: DStaticImage; //static at this moment
-    {}
+    { }
     DamageLabel: DDamageLabel;
   private
     { Player character }

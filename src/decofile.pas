@@ -33,20 +33,20 @@ type
   DDataModule = class abstract(DObject)
   public
     Parent: TXMLDocument;
-    {}
+    { }
     {$IFDEF Constructor}ToGameFolder: boolean;{$ELSE}const ToGameFolder = true;{$ENDIF}
   public
-    {}
+    { }
     isChanged: boolean;
-    {}
+    { }
     function WriteModule: TDOMNode; virtual;
-    {}
+    { }
     procedure ReadModule(const aParent: TDOMElement); virtual;
   {$IFDEF Constructor}
   public
-    {}
+    { }
     procedure ConstructInterface; virtual; abstract;
-    {}
+    { }
     procedure ReadInterface; virtual; abstract;
   {$ENDIF}
   end;
@@ -74,7 +74,7 @@ type
     procedure OpenFile;
     { Closes the file and frees internal stuff }
     procedure CloseFile;
-    {}
+    { }
     procedure ReadBlock(aParent: TDOMElement; ReadContent: TSimpleMethod);
   public
     { Reads header from the file. Must be overriden in children. }

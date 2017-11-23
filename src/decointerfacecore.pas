@@ -63,19 +63,19 @@ type TAnchorAlign = (noAlign, haLeft, haRight, haCenter, vaTop, vaBottom, vaMidd
 type TProportionalScale = (psNone, psWidth, psHeight);
 
 type
-  {}
+  { }
   Txy = record
   x1,y1,x2,y2: integer;
 end;
 
 
 type
-  {}
+  { }
   DAnchoredObject = class abstract (DObject)
   public
-    {}
+    { }
     procedure AddAnchor(aAnchor: DAnchoredObject); virtual; abstract;
-    {}
+    { }
     procedure Rescale; virtual; abstract;
   end;
 
@@ -118,7 +118,7 @@ type
   end;
 
 type
-  {}
+  { }
   DFloatContainer = class(DIntContainer)
   strict protected
     fInitialized: boolean;
@@ -192,7 +192,7 @@ type
     procedure AnchorTo(const aParent: DFloatContainer; const Gap: integer = 0);
     { Anchors aChild to this Container  }
     procedure AnchorChild(const aChild: DFloatContainer; const Gap: integer = 0);
-    {}
+    { }
     procedure AnchorSide(const aSide: TAnchorSide; const aParent: DFloatContainer; const aAlign: TAnchorAlign; const Gap: integer = 0);
     procedure AnchorTop(const aParent: DFloatContainer; const aAlign: TAnchorAlign; const Gap: integer = 0);
     procedure AnchorBottom(const aParent: DFloatContainer; const aAlign: TAnchorAlign; const Gap: integer = 0);
@@ -226,22 +226,22 @@ type
     { Returns true size of this interface element }
     function GetSize: Txy; virtual; deprecated;
   strict protected
-    {}
+    { }
     NotifyAnchors: TAnchorList;
-    {}
+    { }
     procedure NotifyRescale;
   public
-    {}
+    { }
     procedure AddAnchor(aAnchor: DAnchoredObject); override;
-    {}
+    { }
     //function ProcessRescaleResult(var r1: TRescaleResult; const r2: TRescaleResult): TRescaleResult;
     { changes the scale of the element relative to current window size }
     procedure Rescale; override;
-    {}
+    { }
     procedure RescaleRecoursive; virtual;
-    {}
+    { }
     function RescaleContainer: boolean;
-    {}
+    { }
     function RescaleContent: boolean; virtual;
     { draw the element / as abstract as it might be :) }
     procedure Draw; virtual; abstract;
@@ -364,7 +364,7 @@ Type
     { List of the children of this interface element }
     Children: DInterfaceElementsList;
     procedure Draw; override;
-    {}
+    { }
     procedure RescaleRecoursive; override;
     { Rescales this Interface element to fit children sizes
       (should be used only in case children may have fixed sizes (like text labels)
