@@ -172,13 +172,16 @@ procedure DisplayProfilerResult;
     aProfiler.Children.Sort(TProfilerComparer.Construct(@CompareProfiles));
     {$ENDIF}
     for i := 0 to aProfiler.Children.Count-1 do begin
-      WriteLn(aPrefix + aProfiler.Children[i].EntryName+'(x'+IntToStr(aProfiler.Children[i].EntryHits)+')'+' : '+IntToStr(Round(aProfiler.Children[i].EntryTime*1000))+'ms');
+      WriteLn(aPrefix + aProfiler.Children[i].EntryName +
+        '(x'+IntToStr(aProfiler.Children[i].EntryHits) + ')' + ' : ' +
+        IntToStr(Round(aProfiler.Children[i].EntryTime*1000)) + 'ms');
       DisplayRecoursive(aProfiler.Children[i] as TProfiler,aPrefix+'...');
     end;
   end;
 begin
   WriteLn('--------- Profiler analysis --------');
-  DisplayRecoursive(TopProfiler,'');   //the top element is not displayed, only its children
+  //the top element is not displayed, only its children
+  DisplayRecoursive(TopProfiler,'');
   WriteLn('------------------------------------');
 end;
 
@@ -188,7 +191,7 @@ initialization
 
 finalization
   DisplayProfilerResult;
-  FreeAndNil(TopProfiler);
+  FreeAndNil(TopProfiler); //will recoursively free all its Children
 {$ENDIF}
 end.
 
