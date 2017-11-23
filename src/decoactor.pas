@@ -131,7 +131,7 @@ type
     procedure doAI; virtual; abstract;
   private
     { shows or hides body of this actor }
-    procedure SetVisible(const value: Boolean);
+    procedure SetVisible(const Value: Boolean);
     { reads visibility of this Actor's body }
     function GetVisible: Boolean;
     { creates a body }
@@ -179,18 +179,18 @@ Type
     fSTA: DStatValue;
     fCNC: DStatValue;
     fMPH: DStatValue;
-    procedure SetHP(const value: Float);
-    procedure SetMaxHP(const value: Float);
-    procedure SetMaxMaxHP(const value: Float);
-    procedure SetSTA(const value: Float);
-    procedure SetMaxSTA(const value: Float);
-    procedure SetMaxMaxSTA(const value: Float);
-    procedure SetCNC(const value: Float);
-    procedure SetMaxCNC(const value: Float);
-    procedure SetMaxMaxCNC(const value: Float);
-    procedure SetMPH(const value: Float);
-    procedure SetMaxMPH(const value: Float);
-    procedure SetMaxMaxMPH(const value: Float);
+    procedure SetHP(const Value: Float);
+    procedure SetMaxHP(const Value: Float);
+    procedure SetMaxMaxHP(const Value: Float);
+    procedure SetSTA(const Value: Float);
+    procedure SetMaxSTA(const Value: Float);
+    procedure SetMaxMaxSTA(const Value: Float);
+    procedure SetCNC(const Value: Float);
+    procedure SetMaxCNC(const Value: Float);
+    procedure SetMaxMaxCNC(const Value: Float);
+    procedure SetMPH(const Value: Float);
+    procedure SetMaxMPH(const Value: Float);
+    procedure SetMaxMaxMPH(const Value: Float);
   public
     { getters and setters }
     property HP: Float read fHP.Current write SetHP;
@@ -219,7 +219,7 @@ Type
     { Hit equals to consume+drain }
     procedure Hit(const Damage: Float; const Skill: Float); // =consumeHP
     { Returns true if healed or false if nothing to heal }
-    function Heal(const value: Float; const Skill: Float): Boolean;
+    function Heal(const Value: Float; const Skill: Float): Boolean;
     // =restoreHP
 
     { Abstract action preformed on Actor's death }
@@ -227,7 +227,7 @@ Type
 
     { "consumption" procedures return true if success and false if failed,
       "restoration" procedures return true if something has been restored,
-      "drain" procedures can drain values below zero }
+      "drain" procedures can drain Values below zero }
     function ConsumeSTA(const Consumption: Float; const Skill: Float): Boolean;
     function RestoreSTA(const Restoration: Float; const Skill: Float): Boolean;
     procedure DrainSTA(const Drain: Float; const Skill: Float);
@@ -484,7 +484,7 @@ constructor DBasicActor.Create;
 begin
   inherited Create;
   Nickname := 'abc';
-  // setting some values to avoid uncertainity
+  // setting some Values to avoid uncertainity
   SetMaxMaxHP(100);
   SetMaxMaxSTA(100);
   SetMaxMaxCNC(100);
@@ -505,31 +505,31 @@ end;
 
 { ---------------------------------------------------------------------------- }
 
-Procedure DBasicActor.SetHP(const value: Float);
+Procedure DBasicActor.SetHP(const Value: Float);
 begin
-  If value < fHP.Max then
-    fHP.Current := value
+  If Value < fHP.Max then
+    fHP.Current := Value
   else
     fHP.Current := fHP.Max;
   If fHP.Current < 0 then
     Die;
 end;
 
-Procedure DBasicActor.SetMaxHP(const value: Float);
+Procedure DBasicActor.SetMaxHP(const Value: Float);
 begin
-  If value < fHP.MaxMax then
-    fHP.Max := value
+  If Value < fHP.MaxMax then
+    fHP.Max := Value
   else
     fHP.Max := fHP.MaxMax;
   If fHP.Max < 0 then
     Die;
 end;
 
-Procedure DBasicActor.SetMaxMaxHP(const value: Float);
+Procedure DBasicActor.SetMaxMaxHP(const Value: Float);
 begin
-  if fHP.MaxMax < value then
-    Heal(value - fHP.MaxMax, 1);
-  fHP.MaxMax := value;
+  if fHP.MaxMax < Value then
+    Heal(Value - fHP.MaxMax, 1);
+  fHP.MaxMax := Value;
   If fHP.MaxMax < 0 then
     Die;
 end;
@@ -542,29 +542,29 @@ end;
 
 { --------------------------------------------------------------------------- }
 
-Procedure DBasicActor.SetSTA(const value: Float);
+Procedure DBasicActor.SetSTA(const Value: Float);
 begin
-  If value < fSTA.Max then
-    fSTA.Current := value
+  If Value < fSTA.Max then
+    fSTA.Current := Value
   else
     fSTA.Current := fSTA.Max;
   If fSTA.Current < 0 then { EXAUSTED STATE };
 end;
 
-Procedure DBasicActor.SetMaxSTA(const value: Float);
+Procedure DBasicActor.SetMaxSTA(const Value: Float);
 begin
-  If value < fSTA.MaxMax then
-    fSTA.Max := value
+  If Value < fSTA.MaxMax then
+    fSTA.Max := Value
   else
     fSTA.Max := fSTA.MaxMax;
   If fSTA.Max < 0 then { EXAUSTED STATE };
 end;
 
-Procedure DBasicActor.SetMaxMaxSTA(const value: Float);
+Procedure DBasicActor.SetMaxMaxSTA(const Value: Float);
 begin
-  if fSTA.MaxMax < value then
-    RestoreSTA(value - fSTA.MaxMax, 1);
-  fSTA.MaxMax := value;
+  if fSTA.MaxMax < Value then
+    RestoreSTA(Value - fSTA.MaxMax, 1);
+  fSTA.MaxMax := Value;
   If fSTA.MaxMax < 0 then { EXAUSTED STATE };
 end;
 
@@ -576,29 +576,29 @@ end;
 
 { ----------------------------------------------------------------------------- }
 
-Procedure DBasicActor.SetCNC(const value: Float);
+Procedure DBasicActor.SetCNC(const Value: Float);
 begin
-  If value < fCNC.Max then
-    fCNC.Current := value
+  If Value < fCNC.Max then
+    fCNC.Current := Value
   else
     fCNC.Current := fCNC.Max;
   If fCNC.Current < 0 then { BURN-OUT STATE };
 end;
 
-Procedure DBasicActor.SetMaxCNC(const value: Float);
+Procedure DBasicActor.SetMaxCNC(const Value: Float);
 begin
-  If value < fCNC.MaxMax then
-    fCNC.Max := value
+  If Value < fCNC.MaxMax then
+    fCNC.Max := Value
   else
     fCNC.Max := fCNC.MaxMax;
   If fCNC.Max < 0 then { BURN-OUT STATE };
 end;
 
-Procedure DBasicActor.SetMaxMaxCNC(const value: Float);
+Procedure DBasicActor.SetMaxMaxCNC(const Value: Float);
 begin
-  if fCNC.MaxMax < value then
-    RestoreCNC(value - fCNC.MaxMax, 1);
-  fCNC.MaxMax := value;
+  if fCNC.MaxMax < Value then
+    RestoreCNC(Value - fCNC.MaxMax, 1);
+  fCNC.MaxMax := Value;
   If fCNC.MaxMax < 0 then { BURN-OUT STATE };
 end;
 
@@ -610,29 +610,29 @@ end;
 
 { --------------------------------------------------------------------------- }
 
-Procedure DBasicActor.SetMPH(const value: Float);
+Procedure DBasicActor.SetMPH(const Value: Float);
 begin
-  If value < fMPH.Max then
-    fMPH.Current := value
+  If Value < fMPH.Max then
+    fMPH.Current := Value
   else
     fMPH.Current := fMPH.Max;
   If fMPH.Current < 0 then { * STATE };
 end;
 
-Procedure DBasicActor.SetMaxMPH(const value: Float);
+Procedure DBasicActor.SetMaxMPH(const Value: Float);
 begin
-  If value < fMPH.MaxMax then
-    fMPH.Max := value
+  If Value < fMPH.MaxMax then
+    fMPH.Max := Value
   else
     fMPH.Max := fMPH.MaxMax;
   If fMPH.Max < 0 then { * STATE };
 end;
 
-Procedure DBasicActor.SetMaxMaxMPH(const value: Float);
+Procedure DBasicActor.SetMaxMaxMPH(const Value: Float);
 begin
-  if fMPH.MaxMax < value then
-    RestoreMPH(value - fMPH.MaxMax, 1);
-  fMPH.MaxMax := value;
+  if fMPH.MaxMax < Value then
+    RestoreMPH(Value - fMPH.MaxMax, 1);
+  fMPH.MaxMax := Value;
   If fMPH.MaxMax < 0 then { * STATE };
 end;
 
@@ -684,12 +684,12 @@ begin
     Self.onHit(Damage, dtHealth);
 end;
 
-function DBasicActor.Heal(const value: Float; const Skill: Float): Boolean;
+function DBasicActor.Heal(const Value: Float; const Skill: Float): Boolean;
 begin
   if (HP < MaxHP) or ((MaxHP < MaxMaxHP) and (Skill > 0)) then
   begin
-    SetHP(HP + value);
-    SetMaxHP(MaxHP + value * Skill); // todo
+    SetHP(HP + Value);
+    SetMaxHP(MaxHP + Value * Skill); // todo
     Result := true;
   end
   else
@@ -852,9 +852,9 @@ end;
 
 { ----------------------------------------------------------------------------- }
 
-procedure DActorBody.SetVisible(const value: Boolean);
+procedure DActorBody.SetVisible(const Value: Boolean);
 begin
-  Body.Exists := value;
+  Body.Exists := Value;
 end;
 
 function DActorBody.GetVisible: Boolean;
