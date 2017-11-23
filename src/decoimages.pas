@@ -512,7 +512,7 @@ end;
 procedure DPhasedImage.CyclePhase;
 begin
   PhaseShift := DeltaT*PhaseSpeed;
-  Phase += PhaseShift*(1+0.1*drnd.Random);
+  Phase += PhaseShift*(1+0.1*DRND.Random);
 end;
 
 {----------------------------------------------------------------------------}
@@ -540,13 +540,13 @@ procedure DWindImage.CyclePhase;
 begin
   inherited CyclePhase;
   if Phase > 1 then Phase -= 1;
-  OpacityPhase += PhaseShift/2*(1+0.2*drnd.Random);
+  OpacityPhase += PhaseShift/2*(1+0.2*DRND.Random);
   if OpacityPhase>1 then OpacityPhase -= 1;
 
   if PhaseShift > 0.5 then begin
     //if pause was too long reinitialize with random phases.
-    Phase := drnd.Random;
-    OpacityPhase := drnd.Random;
+    Phase := DRND.Random;
+    OpacityPhase := DRND.Random;
   end;
 end;
 

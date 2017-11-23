@@ -147,7 +147,7 @@ begin
   //if not (GetExists and Resource.Prepared) then Exit;
   if Resource = nil then Exit; //if the actor has no body, just hang up
   CurrentAnimation := (Resource.Animations.FindName(CurrentAnimationName)) as T3DResourceAnimation{DAnimation};
-  time := 0;
+  Time := 0;
 end;
 
 {---------------------------------------------------------------------------}
@@ -157,7 +157,7 @@ begin
   Time += SecondsPassed * SlowTimeRate;
 
   // manage end of the animation
-  if (CurrentAnimation<>nil) and (time>CurrentAnimation.Duration) then begin
+  if (CurrentAnimation<>nil) and (Time>CurrentAnimation.Duration) then begin
     if NextAnimationName<>'' then begin
       CurrentAnimationName := NextAnimationName;
       ResetAnimation;
@@ -210,9 +210,9 @@ end;
 constructor DBody.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  time := 0; //redundant
+  Time := 0; //redundant
   SlowTimeRate := 1.0;
-  case drnd.Random(5) of
+  case DRND.Random(5) of
     0: CurrentAnimationName := 'walk';
     1: CurrentAnimationName := 'hurt';
     2: CurrentAnimationName := 'attack';

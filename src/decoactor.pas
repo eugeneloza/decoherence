@@ -350,7 +350,7 @@ procedure DCoordActor.GetRandomDirection;
 var
   rDir: Float;
 begin
-  rDir := drnd.Random * 2 * Pi;
+  rDir := DRND.Random * 2 * Pi;
   Direction := Vector3(sin(rDir), cos(rDir), 0);
   toDir := Direction;
 end;
@@ -1074,11 +1074,11 @@ begin
 
   if fTarget <> nil then
     // tmp
-    if (drnd.Random < 0.005) and CanSee(fTarget) then
+    if (DRND.Random < 0.005) and CanSee(fTarget) then
       Self.PerformAction(nil);
 
-  // if drnd.Random<0.006 then self.Animation(atAttack);
-  // if drnd.Random<0.002 then self.ForceAnimation(atDie);
+  // if DRND.Random<0.006 then Self.Animation(atAttack);
+  // if DRND.Random<0.002 then Self.ForceAnimation(atDie);
 
   // body.Resource.Animations.FindName('Attack');
   // body.Sound3d();

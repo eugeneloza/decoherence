@@ -426,7 +426,7 @@ begin
   if URLs.Count=1 then PreviousTrack := -1; //if only one track is available, then forget about shuffling
   //shuffle tracks, but don't repeat the previous one
   repeat
-    NewTrack := drnd.Random(URLs.Count);
+    NewTrack := DRND.Random(URLs.Count);
   until NewTrack<>PreviousTrack;
   {$hint process silence here}
   //load here

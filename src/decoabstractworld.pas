@@ -249,7 +249,7 @@ end;
 procedure DAbstractWorld.Load(const Generator: DAbstractGenerator);
 begin
   if Generator = nil then raise Exception.Create('DAbstractWorld.Load: Generator is nil!');
-  fSeed := drnd.Random32bit; //maybe other algorithm?
+  fSeed := DRND.Random32bit; //maybe other algorithm?
   if Nav<>nil then begin
     Log(LogWorldInitSoftError,{$I %CURRENTROUTINE%},'WARNING: Nav is not nil! Freeing...');
     FreeAndNil(Nav);

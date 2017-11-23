@@ -376,8 +376,8 @@ begin
   //load (copy) wind images
   Wind1.Load(WindImage1);
   Wind2.Load(WindImage2);
-  Wind1.PhaseSpeed := 1/(15+drnd.Random);
-  Wind2.PhaseSpeed := 1/(10+drnd.Random);
+  Wind1.PhaseSpeed := 1/(15+DRND.Random);
+  Wind2.PhaseSpeed := 1/(10+DRND.Random);
 
   RescaleRecoursive;
 end;
@@ -862,7 +862,7 @@ begin
     fTarget := value;
     //DStaticImage(content).FreeImage;
     Log(LogInitInterface,{$I %CURRENTROUTINE%},'Load from portrait');
-    //DStaticImage(content).Load(Portrait_img[drnd.Random(Length(Portrait_img))]);  //todo
+    //DStaticImage(content).Load(Portrait_img[DRND.Random(Length(Portrait_img))]);  //todo
     fTarget.onHit := @Self.doHit;
     RearrangeChildren;
   end;

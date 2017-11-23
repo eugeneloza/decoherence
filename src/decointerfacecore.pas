@@ -963,9 +963,9 @@ begin
 
       {asZoomOutSuicide}
       asFlyInRandom,asFlyOutRandom: begin
-                       mx := drnd.Random;
-                       my := drnd.Random;
-                       case drnd.Random(4) of
+                       mx := DRND.Random;
+                       my := DRND.Random;
+                       case DRND.Random(4) of
                          0: mx :=  0.0001;
                          1: mx := -0.0001;
                          2: my :=  0.0001;
@@ -983,8 +983,8 @@ begin
                        end;
                      end;
       asFlyInTop,asFlyOutTop,asFlyInBottom,asFlyOutBottom,asFlyInLeft,asFlyOutLeft,asFlyInRight,asFlyOutRight: begin
-                       mx := drnd.Random*Window.Width/Window.Height;
-                       my := drnd.Random;
+                       mx := DRND.Random*Window.Width/Window.Height;
+                       my := DRND.Random;
                        case animate of
                          asFlyInLeft,asFlyOutLeft: mx :=  0.0001;
                          asFlyInRight,asFlyOutRight: mx := -0.0001;

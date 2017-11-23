@@ -88,7 +88,7 @@ var { global window of the game }
   { todo: current scenario }
   CurrentScenarioFolder: string = 'test/';
   { random generator used for all interface random events }
-  drnd: TCastleRandom;
+  DRND: TCastleRandom;
 
 {$IFNDEF Android}
   LogStream: TFileStream;
@@ -128,19 +128,19 @@ end;
 function GetRandomSeed: LongWord;
 {$IFDEF USE_DEV_URANDOM}
 var
-  dev_rnd: file of integer;
+  DevRnd: file of integer;
 begin
   { algorithm according to http://wiki.freepascal.org/Dev_random
     /dev/urandom is a native *nix very high-quality random number generator.
     it's 1000 times slower than CastleRandom,
     but provides a perfect seed initialization. }
-  AssignFile(dev_rnd, '/dev/urandom');
-  Reset(dev_rnd);
+  AssignFile(DevRnd, '/dev/urandom');
+  Reset(DevRnd);
   repeat
-    Read(dev_rnd, Result);
+    Read(DevRnd, Result);
   until Result <> 0;
   // xorshift can't accept 0 as a random seed so we just read /dev/urandom until its not zero
-  CloseFile(dev_rnd);
+  CloseFile(DevRnd);
 end;
 {$ELSE}
 
@@ -153,14 +153,14 @@ end;
 
 procedure InitGlobal;
 begin
-  drnd := TCastleRandom.Create(GetRandomSeed);
+  DRND := TCastleRandom.Create(GetRandomSeed);
 end;
 
 { ---------------------------------------------------------------------------- }
 
 procedure DestroyGlobal;
 begin
-  FreeAndNil(drnd);
+  FreeAndNil(DRND);
 end;
 
 { ---------------------------------------------------------------------------- }
