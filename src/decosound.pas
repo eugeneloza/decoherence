@@ -95,7 +95,7 @@ type
     procedure doFade;
   private
     {gain volume 0..1}
-    const fgain = 1; {maybe, global music volume?}
+    const fGain = 1; {maybe, global music volume?}
     {fade out time}
     const FadeTime = 3; {in seconds}
   public
@@ -235,7 +235,7 @@ type
     {current ambient track, just plays continuously}
     Ambient: DLoopMusicTrack;
     {current music playlist}
-    Music,OldMusic: DPlaylist; //sequential or synchronized
+    Music, OldMusic: DPlaylist; //sequential or synchronized
   public
     {manage the music, should be called each frame
      or otherwise relatively often
@@ -267,7 +267,7 @@ uses SysUtils, castleFilesUtils,
 procedure DSoundLoadThread.Execute;
 begin
   //issue HDD lock
- (Parent as DSoundFile).Buffer := SoundEngine.LoadBuffer((parent as DSoundFile).fURL,(parent as DSoundFile).duration);
+ (Parent as DSoundFile).Buffer := SoundEngine.LoadBuffer((Parent as DSoundFile).fURL, (Parent as DSoundFile).Duration);
  (Parent as DSoundFile).LoadFinished;
 end;
 
@@ -276,8 +276,8 @@ end;
 constructor DSoundFile.Create;
 begin
   inherited Create;
-  buffer := 0;
-  duration := -1;
+  Buffer := 0;
+  Duration := -1;
 end;
 constructor DSoundFile.Create(const URL: string);
 begin
@@ -302,7 +302,7 @@ begin
   {if not ThreadLocked then begin
     {LoadThread := DSoundLoadThread.Create(true);
     LoadThread.Priority := tpLower;
-    LoadThread.parent := self;
+    LoadThread.Parent := Self;
     LoadThread.FreeOnTerminate := true;
     LoadThread.Start;
     ThreadWorking := true; }
@@ -331,7 +331,7 @@ begin
     Log(LogSoundError,{$I %CURRENTROUTINE%},'ERROR: Music is not loaded!');
     Exit;
   end;
-  fCurrent := SoundEngine.PlaySound(self.buffer, false, fLoop, 10, fgain, 0, 1, TVector3.Zero);
+  fCurrent := SoundEngine.PlaySound(Self.Buffer, false, fLoop, 10, fGain, 0, 1, TVector3.Zero);
   if fCurrent = nil then Log(LogSoundError,{$I %CURRENTROUTINE%},'ERROR: Unable to allocate music!');
   fisPlaying := true;
 end;
@@ -345,7 +345,7 @@ end;
 
 {---------------------------------------------------------------------------}
 
-procedure DMusicTrack.manage;
+procedure DMusicTrack.Manage;
 begin
   if isPlaying then
     if FadeStart>0 then doFade;
@@ -358,7 +358,7 @@ begin
   inherited Create;
   FadeStart := -1;
 end;
-constructor DMusicTrack.create(const URL: string);
+constructor DMusicTrack.Create(const URL: string);
 begin
   inherited Create(URL);
   FadeStart := -1;
@@ -368,7 +368,7 @@ end;
 
 procedure DMusicTrack.doFade;
 begin
-  if decoNow-FadeStart<FadeTime then begin
+  if decoNow-FadeStart < FadeTime then begin
     setGain(1-(decoNow-FadeStart)/FadeTime);
   end else begin
     SetGain(0);       //fade to zero
@@ -409,11 +409,11 @@ end;
 
 {procedure DPlayList.LoadAll;
 var s: string;
-    musicTrack: DMusicTrack;
+    MusicTrack: DMusicTrack;
 begin
   {$warning this is wrong! we need to load only one url at once in sequential playlist!}
   for s in URLs do
-    musicTrack := DMusicTrack.create(s);
+    MusicTrack := DMusicTrack.Create(s);
   {$hint different implementation for loop tracks}
   {$hint delayed load of the music files!}
 end;}
@@ -449,34 +449,34 @@ end;
 
 {---------------------------------------------------------------------------}
 
-procedure DSyncPlaylist.settension(const Value: TTension);
+procedure DSyncPlaylist.SetTension(const Value: TTension);
 begin
-  if gettrack(ftension){current track playing}<>gettrack(value) then tensionchanged := true;
-  ftension := value;
+  if GetTrack(fTension){current track playing}<>GetTrack(Value) then TensionChanged := true;
+  fTension := Value;
 end;
 
 {---------------------------------------------------------------------------}
 
-function DSyncPlaylist.gettrack(const NewTension: TTension): integer;
+function DSyncPlaylist.GetTrack(const NewTension: TTension): integer;
 var i: integer;
-    tension_dist: single;
+    TensionDist: single;
 begin
-  tension_dist := 9999; //some arbitrary large value
+  TensionDist := 9999; //some arbitrary large value
   Result := -1;
-  {$warning the track may be not loaded yet!}
+  {$WARNING the track may be not loaded yet!}
   //select a track that fits the new tension best //todo: optmize?
-  for i := 0 to Tracks.count do
-    if abs(tracks[i].Tension - NewTension)<Tension_Dist then begin
-      tension_dist := abs(Tracks[i].Tension - newtension);
+  for i := 0 to Tracks.Count do
+    if Abs(Tracks[i].Tension - NewTension) < TensionDist then begin
+      TensionDist := Abs(Tracks[i].Tension - NewTension);
       Result := i;
     end;
 end;
 
 {---------------------------------------------------------------------------}
 
-procedure DSyncPlaylist.manage;
+procedure DSyncPlaylist.Manage;
 begin
-  tensionchanged := false;
+  TensionChanged := false;
 end;
 
 {---------------------------------------------------------------------------}
@@ -499,38 +499,40 @@ end;
 
 procedure DMultiSyncPlaylist.SetSituation(const Value: TSituation);
 begin
-  if fsituation<>value then begin
-    situationChanged := true;
-    fsituation := value;
+  if fSituation <> Value then begin
+    SituationChanged := true;
+    fSituation := Value;
   end;
 end;
 
 {---------------------------------------------------------------------------}
 
-procedure DMultiSyncPlaylist.manage;
+procedure DMultiSyncPlaylist.Manage;
 begin
-  situationchanged := false;
+  SituationChanged := false;
 end;
 
 {============================ DMusicManager ================================}
 
-procedure DMusicManager.manage;
+procedure DMusicManager.Manage;
 begin
-
+  //todo
 end;
 
 {---------------------------------------------------------------------------}
 
-constructor DMusicManager.create;
+constructor DMusicManager.Create;
 begin
-
+  //inherited Create;
+  //todo
 end;
 
 {---------------------------------------------------------------------------}
 
-destructor DMusicManager.destroy;
+destructor DMusicManager.Destroy;
 begin
-
+  //todo
+  inherited Destroy;
 end;
 
 {============================ other routines ===============================}
