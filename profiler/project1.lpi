@@ -93,6 +93,7 @@
       <Unit0>
         <Filename Value="project1.lpr"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="Project1"/>
       </Unit0>
       <Unit1>
         <Filename Value="profiler.pas"/>

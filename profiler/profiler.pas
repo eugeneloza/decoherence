@@ -32,8 +32,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 
   Warning: it's not thread-safe
 
+  Warning: it won't work for nested(local) procedures
+
   Requires FPC 3.1.1 and above
-  Requires CastleUtils (Castle Game Engine)
+  Requires Castle Game Engine (Generics.Collections and CastleTimeUtils)
 
   I highly recommend disabling code folding in
   Lazarus IDE > Options > Editor > Code Folding
@@ -61,6 +63,7 @@ type
   TProfilerChild = class(TObject)
     EntryName: string;
     EntryTime: TFloatTime;
+    EntryHits: integer;
   end;
   TProfilerList = specialize TObjectList<TProfilerChild>; //for some stupid reason it won't allow recoursive type definition
   TProfiler = class(TProfilerChild)
@@ -80,6 +83,7 @@ begin
   //inherited Create; <-- nothing to inherit
   Children := TProfilerList.Create(true);
   EntryTime := 0; //redundant
+  EntryHits := 0;
 end;
 
 destructor TProfiler.Destroy;
@@ -117,7 +121,8 @@ end;
 
 procedure StopProfiler; inline;
 begin
-  CurrentLevel.EntryTime := TimerSeconds(Timer, CurrentLevel.TimerStart);
+  CurrentLevel.EntryTime += TimerSeconds(Timer, CurrentLevel.TimerStart);
+  inc(CurrentLevel.EntryHits);
   CurrentLevel := CurrentLevel.Parent;
 end;
 
@@ -136,13 +141,13 @@ procedure DisplayProfilerResult;
     i: integer;
   begin
     for i := 0 to aProfiler.Children.Count-1 do begin
-      WriteLn(aPrefix + aProfiler.Children[i].EntryName+' : '+IntToStr(Round(aProfiler.Children[i].EntryTime*1000))+'ms');
-      DisplayRecoursive(aProfiler.Children[i] as TProfiler,aPrefix+'> ');
+      WriteLn(aPrefix + aProfiler.Children[i].EntryName+'(x'+IntToStr(aProfiler.Children[i].EntryHits)+')'+' : '+IntToStr(Round(aProfiler.Children[i].EntryTime*1000))+'ms');
+      DisplayRecoursive(aProfiler.Children[i] as TProfiler,aPrefix+'...');
     end;
   end;
 begin
   WriteLn('--------- Profiler analysis --------');
-  DisplayRecoursive(TopProfiler,'');
+  DisplayRecoursive(TopProfiler,'');   //the top element is not displayed, only its children
   WriteLn('------------------------------------');
 end;
 

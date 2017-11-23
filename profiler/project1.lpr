@@ -39,6 +39,11 @@ fbegin
 fend;
 
 procedure RawProcedure2;
+  {procedure NestedProcedure;
+  var k: integer;
+  fbegin
+    for k := 0 to maxint div 119 do ;
+  fend; --------- NOT WORKING FOR NESTED}
 var i: integer;
 fbegin
   RawProcedure1;
@@ -47,7 +52,7 @@ fend;
 
 var MyObj: TProfiledObject;
 
-procedure InitTest;
+procedure CoreTest;
 fbegin
   RawProcedure2;
   MyObj.MyProc3;
@@ -62,6 +67,12 @@ fbegin
   RawProcedure2;
 fend;
 
+procedure InitTest;
+fbegin
+  MyObj.MyProc1;
+  CoreTest;
+  RawProcedure1;
+fend;
 
 begin
   MyObj := TProfiledObject.Create;
