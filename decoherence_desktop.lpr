@@ -8,7 +8,7 @@ program Decoherence_Desktop;
 {$ENDIF}
 
 Uses {$IFDEF useCMEM}cmem,{$ENDIF}{$IFDEF UNIX}cthreads,{$ENDIF} SysUtils,
-  decoglobal, Decoherence;
+  DecoGlobal, Decoherence;
 
 {$R *.res}
 
