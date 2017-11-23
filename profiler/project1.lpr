@@ -14,14 +14,14 @@ type
 procedure TProfiledObject.MyProc1;
 var i: integer;
 pbegin
-  for i := 0 to maxint div 10 do ;
+  for i := 0 to MaxInt div 10 do ;
 pend;
 
 procedure TProfiledObject.MyProc2;
 var i: integer;
 pbegin
   MyProc1;
-  for i := 0 to maxint div 7 do ;
+  for i := 0 to MaxInt div 7 do ;
 pend;
 
 procedure TProfiledObject.MyProc3;
@@ -29,25 +29,25 @@ var i: integer;
 pbegin
   MyProc2;
   MyProc1;
-  for i := 0 to maxint div 14 do ;
+  for i := 0 to MaxInt div 14 do ;
 pend;
 
 procedure RawProcedure1;
 var i: integer;
 fbegin
-  for i := 0 to maxint div 8 do ;
+  for i := 0 to MaxInt div 8 do ;
 fend;
 
 procedure RawProcedure2;
   {procedure NestedProcedure;
   var k: integer;
   fbegin
-    for k := 0 to maxint div 119 do ;
+    for k := 0 to MaxInt div 119 do ;
   fend; --------- NOT WORKING FOR NESTED}
 var i: integer;
 fbegin
   RawProcedure1;
-  for i := 0 to maxint div 11 do ;
+  for i := 0 to MaxInt div 11 do ;
 fend;
 
 var MyObj: TProfiledObject;

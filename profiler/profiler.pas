@@ -54,7 +54,12 @@ interface
 //{$DEFINE SortProfilerResults}
 
 {$IFDEF UseProfiler}
+{ Tries to find a profiler entry for aFunction or creates it otherwise
+  assigns CurrentLevel to this function
+  and starts counting time for the current function }
 procedure StartProfiler(const aFunction: string); inline;
+{ Stops counting time for the current function
+  and records results}
 procedure StopProfiler; inline;
 {$ENDIF}
 
@@ -64,22 +69,33 @@ implementation
 uses SysUtils, Generics.Defaults, Generics.Collections, CastleTimeUtils;
 
 type
+  { A profiler record }
   TProfilerChild = class(TObject)
+    { Profiled procedure name }
     EntryName: string;
+    { Total procedure time }
     EntryTime: TFloatTime;
+    { Number of procedure calls }
     EntryHits: integer;
   end;
+  { List of profiler records }
   TProfilerList = specialize TObjectList<TProfilerChild>; //for some stupid reason it won't allow recoursive type definition
+  { A profiler tree }
   TProfiler = class(TProfilerChild)
+    { Higher level element }
     Parent: TProfiler;
+    { Last access time (assigned by StartProfiler)}
     TimerStart: TTimerResult;
+    { Tree of children }
     Children: TProfilerList;
     constructor Create; //override;
     destructor Destroy; override;
   end;
 
 var
+  { Top-level element, hosts all other profiler results as Children }
   TopProfiler: TProfiler;
+  { Current profiler level }
   CurrentLevel: TProfiler;
 
 constructor TProfiler.Create;
@@ -103,12 +119,13 @@ procedure StartProfiler(const aFunction: string); inline;
     NewEntry: TProfiler;
   begin
     Result := nil;
+    //try to find if the requested function is already in the Children
     for i := 0 to CurrentLevel.Children.Count-1 do
       if CurrentLevel.Children[i].EntryName = aFunction then begin
         Result := CurrentLevel.Children[i] as TProfiler;
         Exit;
       end;
-    //else - function name is not found
+    //else - function name is not found, create a new entry for it
     NewEntry := TProfiler.Create;
     NewEntry.EntryName := aFunction;
     NewEntry.Parent := CurrentLevel;
@@ -118,19 +135,26 @@ procedure StartProfiler(const aFunction: string); inline;
 var
   CurrentElement: TProfiler;
 begin
+  //find entry for aFunction
   CurrentElement := FindEntry;
+  //start counting time for it
   CurrentElement.TimerStart := Timer;
+  //and switch down a level
   CurrentLevel := CurrentElement;
 end;
 
 procedure StopProfiler; inline;
 begin
+  //stop counting time and record the result
   CurrentLevel.EntryTime += TimerSeconds(Timer, CurrentLevel.TimerStart);
+  //increase number of accesses to the function
   inc(CurrentLevel.EntryHits);
+  //and return to upper level profiler
   CurrentLevel := CurrentLevel.Parent;
 end;
 
 {$IFDEF SortProfilerResults}
+//used to sort profiler results if requested
 function CompareProfiles(constref p1, p2: TProfilerChild): integer;
 begin
   if p1.EntryTime > p2.EntryTime then Result := -1 else
