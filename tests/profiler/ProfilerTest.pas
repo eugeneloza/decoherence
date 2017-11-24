@@ -1,4 +1,4 @@
-program Project1;
+program ProfilerTest;
 
 {$INCLUDE ../../src/profiler.inc}
 

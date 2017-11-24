@@ -10,7 +10,7 @@
       </Flags>
       <SessionStorage Value="InProjectDir"/>
       <MainUnit Value="0"/>
-      <Title Value="project1"/>
+      <Title Value="ProfilerTest"/>
       <UseAppBundle Value="False"/>
       <ResourceType Value="res"/>
     </General>
@@ -20,7 +20,7 @@
         <CompilerOptions>
           <Version Value="11"/>
           <Target>
-            <Filename Value="project1"/>
+            <Filename Value="ProfilerTest"/>
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir);../../src"/>
@@ -55,7 +55,7 @@
         <CompilerOptions>
           <Version Value="11"/>
           <Target>
-            <Filename Value="project1"/>
+            <Filename Value="ProfilerTest"/>
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir);../../src"/>
@@ -92,9 +92,8 @@
     </RequiredPackages>
     <Units Count="3">
       <Unit0>
-        <Filename Value="project1.lpr"/>
+        <Filename Value="ProfilerTest.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="Project1"/>
       </Unit0>
       <Unit1>
         <Filename Value="../../src/profiler.inc"/>
@@ -109,7 +108,7 @@
   <CompilerOptions>
     <Version Value="11"/>
     <Target>
-      <Filename Value="project1"/>
+      <Filename Value="ProfilerTest"/>
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir);../../src"/>

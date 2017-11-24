@@ -12,5 +12,6 @@ rm -r src/backup
 rm -r src/lib
 rm -r tests/profiler/backup
 rm -r tests/profiler/lib
+rm tests/profiler/ProfilerTest
 rm .fuse_hidden*
 rm heap.trc
