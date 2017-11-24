@@ -397,7 +397,7 @@ uses SysUtils,
   DecoLog;
 
 {=============================================================================}
-{========================== Abstract Container ===============================}
+{=========================== Integer Container ===============================}
 {=============================================================================}
 
 constructor DIntContainer.Create(aOwner: DAnchoredObject);
@@ -405,7 +405,7 @@ begin
   //inherited Create;
   Owner := aOwner;
 
-  x1 := UninitializedIntCoord;
+  x1 := UninitializedIntCoord; //used for debugging
   x2 := UninitializedIntCoord;
   y1 := UninitializedIntCoord;
   y2 := UninitializedIntCoord;
@@ -413,6 +413,88 @@ begin
 end;
 
 {----------------------------------------------------------------------------}
+
+procedure DIntContainer.SetIntCoord(const ax1,ay1,ax2,ay2: integer);
+begin
+  x1 := ax1;
+  y1 := ay1;
+  {if ScaleItem then begin
+    x2 := ax2;
+    y2 := ay2;
+  end else AdjustToRealSize;
+
+  IntegerToFloat;}
+  {$WARNING Integers are not converted to float}
+end;
+procedure DIntContainer.SetIntFull(const ax1,ay1,ax2,ay2: integer; const aOpacity: float);
+begin
+  {$WARNING Base opacity is not set!}
+  Opacity := aOpacity;
+  SetIntCoord(ax1,ay1,ax2,ay2);
+end;
+procedure DIntContainer.SetIntFull(const ax1,ay1,ax2,ay2: float; const aOpacity: float);
+begin
+  {$WARNING Base opacity is not set!}
+  Opacity := aOpacity;
+  SetIntCoord(Round(ax1),Round(ay1),Round(ax2),Round(ay2));
+end;
+procedure DIntContainer.SetIntSize(const ax1,ay1,aWidth,aHeight: integer);
+begin
+  SetIntCoord(ax1,ay1,ax1 + aWidth,ay1 + aHeight);
+end;
+
+{procedure DIntegerContainer.SetWidth(const aWidth: integer);
+begin
+  {unoptimal and might be wrong}
+  //SetIntCoord(x1,y1,x1+aWidth,y2);
+end;
+procedure DIntegerContainer.SetHeight(const aHeight: integer);
+begin
+  {unoptimal and might be wrong}
+  //SetIntCoord(x1,y1,x2,y1+aHeight);
+end;}
+
+{----------------------------------------------------------------------------}
+
+function DIntContainer.GetWidth: integer;
+begin
+  Result := x2-x1;
+end;
+function DIntContainer.GetHeight: integer;
+begin
+  Result := y2-y1;
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DIntContainer.Assign(const Source: DIntContainer);
+var aa: TAnchorSide;
+begin
+  Self.x1 := Source.x1;
+  Self.y1 := Source.y1;
+  Self.x2 := Source.x2;
+  Self.y2 := Source.y2;
+  Self.Opacity := Source.Opacity;
+  if Self.Owner <> Source.Owner then begin
+    Self.Log(LogInterfaceScaleError, {$I %CURRENTROUTINE},'WARNING: NotifyAnchor should be copied, do it!');
+  end;
+end;
+procedure DIntContainer.AssignTo(const Dest: DIntContainer);
+var aa: TAnchorSide;
+begin
+  Dest.x1 := Self.x1;
+  Dest.y1 := Self.y1;
+  Dest.x2 := Self.x2;
+  Dest.y2 := Self.y2;
+  Dest.Opacity := Self.Opacity;
+  if Dest.Owner <> Self.Owner then begin
+    Self.Log(LogInterfaceScaleError, {$I %CURRENTROUTINE},'WARNING: NotifyAnchor should be copied, do it!');
+  end;
+end;
+
+{=============================================================================}
+{============================ Float Container ================================}
+{=============================================================================}
 
 constructor DFloatContainer.Create(aOwner: DAnchoredObject);
 var aa: TAnchorSide;
@@ -585,56 +667,6 @@ begin
   BaseOpacity := aOpacity;
   SetFloatSize(afx1,afy1,afWidth,afHeight);
 end;
-procedure DIntContainer.SetIntCoord(const ax1,ay1,ax2,ay2: integer);
-begin
-  x1 := ax1;
-  y1 := ay1;
-  {if ScaleItem then begin
-    x2 := ax2;
-    y2 := ay2;
-  end else AdjustToRealSize;
-
-  IntegerToFloat;}
-  {$WARNING Integers are not converted to float}
-end;
-procedure DIntContainer.SetIntFull(const ax1,ay1,ax2,ay2: integer; const aOpacity: float);
-begin
-  {$WARNING Base opacity is not set!}
-  Opacity := aOpacity;
-  SetIntCoord(ax1,ay1,ax2,ay2);
-end;
-procedure DIntContainer.SetIntFull(const ax1,ay1,ax2,ay2: float; const aOpacity: float);
-begin
-  {$WARNING Base opacity is not set!}
-  Opacity := aOpacity;
-  SetIntCoord(Round(ax1),Round(ay1),Round(ax2),Round(ay2));
-end;
-procedure DIntContainer.SetIntSize(const ax1,ay1,aWidth,aHeight: integer);
-begin
-  SetIntCoord(ax1,ay1,ax1 + aWidth,ay1 + aHeight);
-end;
-
-{procedure DIntegerContainer.SetWidth(const aWidth: integer);
-begin
-  {unoptimal and might be wrong}
-  //SetIntCoord(x1,y1,x1+aWidth,y2);
-end;
-procedure DIntegerContainer.SetHeight(const aHeight: integer);
-begin
-  {unoptimal and might be wrong}
-  //SetIntCoord(x1,y1,x2,y1+aHeight);
-end;}
-
-{----------------------------------------------------------------------------}
-
-function DIntContainer.GetWidth: integer;
-begin
-  Result := x2-x1;
-end;
-function DIntContainer.GetHeight: integer;
-begin
-  Result := y2-y1;
-end;
 
 {----------------------------------------------------------------------------}
 
@@ -724,31 +756,6 @@ begin
 end;
 
 {----------------------------------------------------------------------------}
-
-procedure DIntContainer.Assign(const Source: DIntContainer);
-var aa: TAnchorSide;
-begin
-  Self.x1 := Source.x1;
-  Self.y1 := Source.y1;
-  Self.x2 := Source.x2;
-  Self.y2 := Source.y2;
-  Self.Opacity := Source.Opacity;
-  if Self.Owner <> Source.Owner then begin
-    Self.Log(LogInterfaceScaleError, {$I %CURRENTROUTINE},'WARNING: NotifyAnchor should be copied, do it!');
-  end;
-end;
-procedure DIntContainer.AssignTo(const Dest: DIntContainer);
-var aa: TAnchorSide;
-begin
-  Dest.x1 := Self.x1;
-  Dest.y1 := Self.y1;
-  Dest.x2 := Self.x2;
-  Dest.y2 := Self.y2;
-  Dest.Opacity := Self.Opacity;
-  if Dest.Owner <> Self.Owner then begin
-    Self.Log(LogInterfaceScaleError, {$I %CURRENTROUTINE},'WARNING: NotifyAnchor should be copied, do it!');
-  end;
-end;
 
 procedure DFloatContainer.Assign(const Source: DFloatContainer);
 var aa: TAnchorSide;
