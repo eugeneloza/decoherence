@@ -8,7 +8,7 @@
       </Flags>
       <SessionStorage Value="InProjectDir"/>
       <MainUnit Value="0"/>
-      <Title Value="constructor_tool"/>
+      <Title Value="Constructor_Tool"/>
       <ResourceType Value="res"/>
       <UseXPManifest Value="True"/>
       <Icon Value="0"/>
@@ -22,7 +22,7 @@
         <CompilerOptions>
           <Version Value="11"/>
           <Target>
-            <Filename Value="constructor_tool"/>
+            <Filename Value="Constructor_Tool"/>
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir);src"/>
@@ -68,7 +68,7 @@
         <CompilerOptions>
           <Version Value="11"/>
           <Target>
-            <Filename Value="constructor_tool"/>
+            <Filename Value="Constructor_Tool"/>
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir);src"/>
@@ -125,9 +125,8 @@
     </RequiredPackages>
     <Units Count="23">
       <Unit0>
-        <Filename Value="constructor_tool.pas"/>
+        <Filename Value="Constructor_Tool.lpr"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="Constructor_Tool"/>
       </Unit0>
       <Unit1>
         <Filename Value="src/constructor_mainunit.pas"/>
@@ -250,7 +249,7 @@
   <CompilerOptions>
     <Version Value="11"/>
     <Target>
-      <Filename Value="constructor_tool"/>
+      <Filename Value="Constructor_Tool"/>
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir);src"/>

@@ -4,8 +4,8 @@
   qualified_name="localhost.debian.eugeneloza.decoherence1"
   author="Yevhen Loza"
 
-  standalone_source="decoherence_desktop.lpr"
-  android_source="decoherence_android.lpr"
+  standalone_source="Decoherence_Desktop.lpr"
+  android_source="Decoherence_Android.lpr"
   android_project="android_application/"
   screen_orientation="landscape">
 

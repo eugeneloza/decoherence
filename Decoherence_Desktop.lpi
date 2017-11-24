@@ -10,7 +10,7 @@
       </Flags>
       <SessionStorage Value="InProjectDir"/>
       <MainUnit Value="0"/>
-      <Title Value="decoherence_desktop"/>
+      <Title Value="Decoherence_Desktop"/>
       <UseAppBundle Value="False"/>
       <ResourceType Value="res"/>
     </General>
@@ -30,7 +30,7 @@
         <CompilerOptions>
           <Version Value="11"/>
           <Target>
-            <Filename Value="decoherence_desktop"/>
+            <Filename Value="Decoherence_Desktop"/>
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir);src"/>
@@ -66,7 +66,7 @@
         <CompilerOptions>
           <Version Value="11"/>
           <Target>
-            <Filename Value="decoherence_desktop"/>
+            <Filename Value="Decoherence_Desktop"/>
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir);src"/>
@@ -109,9 +109,8 @@
     </RequiredPackages>
     <Units Count="46">
       <Unit0>
-        <Filename Value="decoherence_desktop.lpr"/>
+        <Filename Value="Decoherence_Desktop.lpr"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="Decoherence_Desktop"/>
       </Unit0>
       <Unit1>
         <Filename Value="src/decoglobal.pas"/>
@@ -337,7 +336,7 @@
   <CompilerOptions>
     <Version Value="11"/>
     <Target>
-      <Filename Value="decoherence_desktop"/>
+      <Filename Value="Decoherence_Desktop"/>
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir);src"/>
