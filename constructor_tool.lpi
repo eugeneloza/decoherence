@@ -123,7 +123,7 @@
         <PackageName Value="LCL"/>
       </Item4>
     </RequiredPackages>
-    <Units Count="22">
+    <Units Count="23">
       <Unit0>
         <Filename Value="constructor_tool.pas"/>
         <IsPartOfProject Value="True"/>
@@ -241,6 +241,10 @@
         <Filename Value="src/generated/decoloadembedded.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit21>
+      <Unit22>
+        <Filename Value="src/macro.inc"/>
+        <IsPartOfProject Value="True"/>
+      </Unit22>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
