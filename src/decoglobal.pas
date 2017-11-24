@@ -93,6 +93,7 @@ var { global window of the game }
 {$IFNDEF Android}
   LogStream: TFileStream;
 {$ENDIF}
+
 {$IFDEF LINUX}
 {$DEFINE USE_DEV_URANDOM}
 {$ENDIF}
@@ -105,8 +106,7 @@ function GetRandomSeed: LongWord;
 function GetScenarioFolder: string;
 
 { inlined equivalent of FloatEquals / Math.equals }
-function dEqual(const a, b: Float): Boolean; {$IFDEF SUPPORTS_INLINE}inline;
-{$ENDIF}
+function dEqual(const a, b: Float): Boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 { check if URL is valid }
 function URLValid(const aURL: string): Boolean;
 
@@ -172,8 +172,7 @@ end;
 
 { ---------------------------------------------------------------------------- }
 
-function dEqual(const a, b: Float): Boolean; {$IFDEF SUPPORTS_INLINE}inline;
-{$ENDIF}
+function dEqual(const a, b: Float): Boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 Const
   Epsilon = 1E-4;
   { EZeroResolution = 1E-16;
