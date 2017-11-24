@@ -48,6 +48,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 {$R-}{$Q-}
 {$ENDIF}
 
+{$IFDEF RELEASE}
+{$DEFINE WriteLog}
+{$ENDIF}
+
 {======================== ENGINE-SPECIFIC DIRECTIVES =========================}
 
 { Inline code? Just in case of bugs...

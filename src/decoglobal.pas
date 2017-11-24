@@ -90,10 +90,6 @@ var { global window of the game }
   { random generator used for all interface random events }
   DRND: TCastleRandom;
 
-{$IFNDEF Android}
-  LogStream: TFileStream;
-{$ENDIF}
-
 {$IFDEF LINUX}
 {$DEFINE USE_DEV_URANDOM}
 {$ENDIF}

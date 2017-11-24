@@ -77,7 +77,12 @@ const LogMouseInfo          = LogVerbose;
 
 const LogConstructorInfo    = LogVerbose;
 
-var doLog: boolean = true;
+var
+  doLog: boolean = true;
+
+  {$IFDEF WriteLog}
+    LogStream: TFileStream;
+  {$ENDIF}
 
 { Initializes Castle Log and display basic info }
 procedure InitLog;
