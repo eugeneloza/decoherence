@@ -1,10 +1,19 @@
+# Do a basic clean-up
+
 bash purge.sh
+
+# Remove compiled files and screenshots
+
 rm pasdoc/html/*
 rm -r Release
 rm *.apk
-rm decoherence_desktop
-rm decoherence_desktop.exe
 rm *.jpg
 rm *.scr.png
-rm constructor_tool
-rm constructor_tool.exe
+
+# Compiled executables
+
+rm Decoherence_Desktop
+rm Decoherence_Desktop.exe
+rm Constructor_Tool
+rm Constructor_Tool.exe
+rm tests/profiler/ProfilerTest
