@@ -170,12 +170,12 @@ end;
 procedure ApplicationInitialize;
 begin
   InitLog;
-  fLog(LogInit,{$I %CURRENTROUTINE%},'Init');
+  fLog(LogInit,_CurrentRoutine,'Init');
 
   //Application.LimitFPS := 60;
 
   //create GUI
-  fLog(LogInit,{$I %CURRENTROUTINE%},'Create interface');
+  fLog(LogInit,_CurrentRoutine,'Create interface');
   //fLog(true,BackTraceStrFunc(Get_Frame),'');
   InitInterface;
   InitLoadScreen;
@@ -184,13 +184,13 @@ begin
 
   GUI.LoadScreen;
 
-  fLog(LogInit,{$I %CURRENTROUTINE%},'Initialize interface');
+  fLog(LogInit,_CurrentRoutine,'Initialize interface');
 
   //finally we're ready to show game loading screen
   {$IFDEF AllowRescale}Window.onResize := @GuiResize;{$ENDIF}
   Window.onRender := @GuiRender;
 
-  fLog(LogInit,{$I %CURRENTROUTINE%},'Init finished');
+  fLog(LogInit,_CurrentRoutine,'Init finished');
 
   LoadAndInitData;
 end;
@@ -224,7 +224,7 @@ Initialization
   Application.OnInitialize  :=  @ApplicationInitialize;
 
 Finalization
-  fLog(LogInit,'Finalization','Going down...');
+  fLog(LogInit,_CurrentRoutine,'Going down...');
   { free all assigned memory }
   FreeAndNil(GUI);
 
@@ -237,6 +237,6 @@ Finalization
   FreeCreatures;
   FreeInterface;
   //FreeTextureProperties;
-  fLog(LogInit,'Finalization','Bye...');
+  fLog(LogInit,_CurrentRoutine,'Bye...');
 end.
 

@@ -17,6 +17,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 
 { Compiler directives/options to include in every unit }
 
+//yes, I use this horrible stuff
+{$WARN 2005 off : Comment level $1 found}
+
+{============================= MACROS ========================================}
+
+
+//include some useful macros
+{$INCLUDE macro.inc}
+
 {====================== LANGUAGE-SPECIFIC DIRECTIVES =========================}
 
 {$mode objfpc}
@@ -55,7 +64,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 { Fix a windows encoding bug }
 {$IFDEF Windows}{$DEFINE UTF8Encode}{$ENDIF}
 
-{======================== GAME-SPECIFIC DIRECTIVES =========================}
+{========================= GAME-SPECIFIC DIRECTIVES ==========================}
 
 { Defines fullscreen mode }
 //{$DEFINE Fullscreen}
@@ -66,11 +75,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 { Undefine rescale to save memory. Temporary. }
 //{$UNDEF AllowRescale}
 
-{======================= EXPERIMENTAL ======================================}
+{======================== EXPERIMENTAL ======================================}
 
 { A burner image is applied to frames and some other interface elements }
 //{$DEFINE BurnerImage}
-
-{======================= SOME DEBUG STUFF ==================================}
-
-{$WARN 2005 off : Comment level $1 found}
