@@ -156,13 +156,13 @@ begin
 
   InitPerks;
 
-  LoadTestLevel; //remake it
+  //LoadTestLevel; //remake it
 
   //Assign window events
-  Window.OnBeforeRender := @WindowManage;
-  Window.OnPress := @doPress;
+  Window.onBeforeRender := @WindowManage;
+  Window.onPress := @doPress;
   Window.onRelease := @doRelease;
-  Window.OnMotion := @doMotion;
+  Window.onMotion := @doMotion;
 
   LoadCompleted := true;
 end;

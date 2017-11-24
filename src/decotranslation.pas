@@ -31,7 +31,7 @@ type
 
 var
   { Current game language }
-  CurrentLanguage: TLanguage = Language_English;
+  CurrentLanguage: TLanguage = Language_Russian;
 
 { Provides a name for the current language directory without backslashes }
 function LanguageDir(const Lang: TLanguage): string;

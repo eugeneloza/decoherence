@@ -47,17 +47,22 @@ type DString = class(DObject) //maybe make it a record?
 end;
 type DStringList  =  specialize TObjectList<DString>;
 
-Type DFont = class(TTextureFont)
-  { Converts a broken string into a single image }
-  function BrokenStringToImage(const s: DStringList): TGrayscaleAlphaImage;
-  { Converts a broken string into a single image with shadow }
-  function BrokenStringToImageWithShadow(const s: DStringList; ShadowStrength: float; ShadowLength: integer): TGrayscaleAlphaImage;
-  { Breaks a string to a DStringList }
-  function BreakStings(const s : String; const w: integer): DStringList;
+type
+  { }
+  DFont = class(TTextureFont)
  private
-  //todo  : RGB Alpha image;
-  { Converts a single line of text to an image }
-  function StringToImage(const s: string): TGrayscaleAlphaImage;
+   //todo  : RGB Alpha image;
+   { Converts a single line of text to an image }
+   function StringToImage(const s: string): TGrayscaleAlphaImage;
+ public
+   { }
+   Gap: integer;
+   { Converts a broken string into a single image }
+   function BrokenStringToImage(const s: DStringList): TGrayscaleAlphaImage;
+   { Converts a broken string into a single image with shadow }
+   function BrokenStringToImageWithShadow(const s: DStringList; ShadowStrength: float; ShadowLength: integer): TGrayscaleAlphaImage;
+   { Breaks a string to a DStringList }
+   function BreakStings(const s : String; const w: integer): DStringList;
 end;
 
 var DefaultFont: DFont;
@@ -114,8 +119,11 @@ begin
 
    //load the font files
    RegularFont12 := DFont.Create(ApplicationData(FontFolder+NormalFontFile),12,true,FullCharSet);
+   RegularFont12.Gap := 3;
    RegularFont16 := DFont.Create(ApplicationData(FontFolder+NormalFontFile),16,true,FullCharSet);
+   RegularFont16.Gap := 3;
    RegularFont100 := DFont.Create(ApplicationData(FontFolder+NormalFontFile),100,true,NumCharSet);
+   RegularFont100.Gap := 3;
 
    //release char sets
    FreeAndNil(FullCharSet);
@@ -142,7 +150,7 @@ var P : Pvector2byte;
     i : integer;
 begin
   Result := TGrayscaleAlphaImage.Create;
-  Result.SetSize(TextWidth(s),TextHeight(s));  //including baseline
+  Result.SetSize(TextWidth(s),TextHeight(s)+Self.Gap);  //including baseline
   Result.Clear(Vector2Byte(0,255));
 
   PushProperties; // save previous TargetImage value
@@ -176,7 +184,8 @@ begin
     if MaxHb < s[i].Height-s[i].HeightBase then MaxHb := s[i].Height-s[i].HeightBase;
     if MaxW < s[i].Width then MaxW := s[i].Width;
   end;
-//  dLog('DFont.broken_string_to_image','max height base  =  ', inttostr(maxhb));
+  MaxH += Self.Gap;
+//  Log('DFont.broken_string_to_image','max height base  =  ', inttostr(maxhb));
   Result := TGRayScaleAlphaImage.Create;
   Result.SetSize(MaxW,MaxH*(s.Count));
   Result.Clear(Vector2Byte(0,0));

@@ -84,6 +84,7 @@ begin
   if not LoadedLevel then begin
      Log(LogInitData,_CurrentRoutine,'Init');
      LoadedLevel := true;
+     if CurrentWorld = nil then Exit;
      CurrentWorld.Activate;
      //Window.TouchInterface := {$IFDEF Android}tiCtlWalkDragRotate{$ELSE}tiNone{$ENDIF};
      SetGameMode(gmTravel);
