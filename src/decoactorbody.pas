@@ -112,7 +112,7 @@ begin
     atAttack: Result := aeIdle;
     atHurt:   Result := aeIdle;
     atDie:    Result := aeStop;
-    else fLog(LogAnimationError,_CurrentRoutine,'ERROR: Unknown animation '+AnimationToString(at));
+    else Log(LogAnimationError,_CurrentRoutine,'ERROR: Unknown animation '+AnimationToString(at));
   end;
 end;
 function AnimationEnd(const at: string): TAnimationEnd;
@@ -134,7 +134,7 @@ begin
     atAttack: Result := 'attack';
     atHurt:   Result := 'hurt';
     atDie:    Result := 'die';
-    else fLog(LogAnimationError,_CurrentRoutine,'ERROR: Unknown animation '+AnimationToString(at));
+    else Log(LogAnimationError,_CurrentRoutine,'ERROR: Unknown animation '+AnimationToString(at));
   end;
 end;
 
@@ -240,7 +240,7 @@ end;
 
 procedure FreeCreatures;
 begin
-  fLog(LogInitData,_CurrentRoutine,'Freeing creature resources...');
+  Log(LogInitData,_CurrentRoutine,'Freeing creature resources...');
 end;
 
 

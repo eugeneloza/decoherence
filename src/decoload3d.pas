@@ -102,7 +102,7 @@ procedure AddMaterial(const Root: TX3DRootNode);
           Material.AmbientIntensity := 0;
           AmbientIntensity.Value.Add(Material);
         except
-          fLog(Log3DLoadSoftError,Source.NodeName+'('+Source.ClassName+')'+'>'+_CurrentRoutine,'try..except fired');
+          Log(Log3DLoadSoftError,Source.X3DName+'('+Source.ClassName+')'+'>'+_CurrentRoutine,'try..except fired');
         end;
   end;
 begin
@@ -113,7 +113,7 @@ end;
 
 function LoadBlenderX3D(const URL: string): TX3DRootNode;
 begin
-  fLog(LogInitData,_CurrentRoutine,'Reading file '+URL);
+  Log(LogInitData,_CurrentRoutine,'Reading file '+URL);
   if TextureProperties = nil then MakeDefaultTextureProperties;
   Result := Load3D(URL);
   AddMaterial(Result);

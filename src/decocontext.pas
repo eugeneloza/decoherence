@@ -121,7 +121,7 @@ function MCE(NewTarget: TContextTarget; NewContextElement: TContextRecord; NewIm
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
-uses SysUtils, DecoLog, CastleVectors;
+uses SysUtils, DecoLog, CastleVectors{, Math};
 
 function MCE(NewTarget: TContextTarget; NewContextElement: TContextRecord; NewImportance: float = 1; NewMin: float = 0; NewMax: float = 1): DContextElement;
 begin
@@ -147,7 +147,7 @@ begin
   if e1.Name <> e2.Name then begin
     { actually such stuff should never happen }
     Result := 0;
-    fLog(LogContextError,_CurrentRoutine,'Error: comparing incompatible elements '+e1.Name+' vs '+e2.Name);
+    Log(LogContextError,_CurrentRoutine,'Error: comparing incompatible elements '+e1.Name+' vs '+e2.Name);
     Exit;
   end;
 

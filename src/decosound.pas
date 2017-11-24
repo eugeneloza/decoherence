@@ -539,7 +539,7 @@ end;
 
 procedure InitMusicManager;
 begin
-  fLog(LogInitSound,_CurrentRoutine,'Creating music manager...');
+  Log(LogInitSound,_CurrentRoutine,'Creating music manager...');
   Music := DMusicManager.Create;
 end;
 
@@ -547,7 +547,7 @@ end;
 
 procedure FreeMusicManager;
 begin
-  fLog(LogInitSound,_CurrentRoutine,'Freeing music manager...');
+  Log(LogInitSound,_CurrentRoutine,'Freeing music manager...');
   FreeAndNil(Music);
 end;
 

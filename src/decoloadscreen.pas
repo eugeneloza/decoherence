@@ -125,12 +125,12 @@ var FactsDoc: TXMLDocument;
     LI: DLoadImage;
 begin
   if Facts <> nil then begin
-    fLog(LogInitError,Facts.ClassName+'>'+_CurrentRoutine,'Facts is not nil. Freeing...');
+    Log(LogInitError,Facts.ClassName+'>'+_CurrentRoutine,'Facts is not nil. Freeing...');
     FreeAndNil(Facts);
   end;
   Facts := TFactList.Create(true);
 
-  fLog(LogInitInterface,Facts.ClassName+'>'+_CurrentRoutine,'Reading file '+FileName);
+  Log(LogInitInterface,Facts.ClassName+'>'+_CurrentRoutine,'Reading file '+FileName);
 
   FactsDoc := URLReadXML(FileName);
   BaseElement := FactsDoc.DocumentElement;
@@ -161,7 +161,7 @@ begin
     FreeAndNil(Iterator);
   end;
   FreeAndNil(FactsDoc);
-  fLog(LogInitInterface,Facts.ClassName+'>'+_CurrentRoutine,'Reading file finished.');
+  Log(LogInitInterface,Facts.ClassName+'>'+_CurrentRoutine,'Reading file finished.');
 end;
 
 {---------------------------------------------------------------------------}

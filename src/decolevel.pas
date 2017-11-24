@@ -63,7 +63,7 @@ procedure LoadTestLevel;
 begin
   Generate3DWorld;
 
-  fLog(LogInitData,_CurrentRoutine,'Scene');
+  Log(LogInitData,_CurrentRoutine,'Scene');
 
   Window.ShadowVolumes := ShadowVolumesEnabled;
   Window.ShadowVolumesRender := ShadowVolumesEnabled;
@@ -73,7 +73,7 @@ begin
   InitPlayer;
   InitNavigation;
 
-  fLog(LogInitData,_CurrentRoutine,'Finished');
+  Log(LogInitData,_CurrentRoutine,'Finished');
 end;
 
 {---------------------------------------------------------------------------}
@@ -82,7 +82,7 @@ procedure InitTestLevel;
 begin
   if not LoadCompleted then Exit;
   if not LoadedLevel then begin
-     fLog(LogInitData,_CurrentRoutine,'Init');
+     Log(LogInitData,_CurrentRoutine,'Init');
      LoadedLevel := true;
      CurrentWorld.Activate;
      //Window.TouchInterface := {$IFDEF Android}tiCtlWalkDragRotate{$ELSE}tiNone{$ENDIF};

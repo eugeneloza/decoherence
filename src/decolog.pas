@@ -89,14 +89,14 @@ procedure InitLog;
 { Writes a log string
   should be used like dLog(1, Self,_CurrentRoutine,message)
   Self = nil inside a procedure }
-procedure fLog(const LogLevel: boolean; const aPrefix, aMessage: string);
+procedure Log(const LogLevel: boolean; const aPrefix, aMessage: string);
 //procedure fLog(const LogLevel: boolean; const aObj: TObject; const aPrefix, aMessage: string);
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 uses CastleLog, SysUtils,
   DecoTime;
 
-procedure fLog(const LogLevel: boolean; const aPrefix, aMessage: string);
+procedure Log(const LogLevel: boolean; const aPrefix, aMessage: string);
 begin
   if not doLog then Exit;
   if LogLevel then WriteLnLog(aPrefix,aMessage);

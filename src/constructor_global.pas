@@ -62,7 +62,7 @@ type
     fisChanged: boolean;
   strict protected
     { an exact copy of DObject.Log }
-    procedure Log(const LogLevel: boolean; const aProcedure, aMessage: string);
+    //procedure Log(const LogLevel: boolean; const aProcedure, aMessage: string);
   public
     {if the TWriterForm instance is loaded from the Architect?}
     property isLoaded: boolean read fisLoaded write fisLoaded default false;
@@ -121,7 +121,7 @@ function GetFilesList(const Path, Ext: string): TStringList;
 implementation
 
 uses CastleFilesUtils, StrUtils,
-  DecoLog, CastleLog;
+  DecoLog{, CastleLog};
 
 {case-sensitive replace the last occurence of searchstring to replacestring}
 procedure ReplaceStringReverse(var s: string; const SearchString, ReplaceString: string);
@@ -166,7 +166,7 @@ var s: string;
 begin
   Result := false;
   if SL = nil then begin
-    fLog(LogConstructorError,_CurrentRoutine,'ERROR: String List is nil!');
+    Log(LogConstructorError,_CurrentRoutine,'ERROR: String List is nil!');
     Exit;
   end;
   for s in SL do if s = Search then begin
@@ -201,11 +201,11 @@ end;
 
 {---------------------------------------------------------------------------}
 
-procedure TWriterForm.Log(const LogLevel: boolean; const aProcedure, aMessage: string);
+{procedure TWriterForm.Log(const LogLevel: boolean; const aProcedure, aMessage: string);
 begin
   if not doLog then Exit;
   if LogLevel then WriteLnLog(Self.ClassName+'.'+aProcedure,aMessage)
-end;
+end;}
 
 {============================================================================}
 

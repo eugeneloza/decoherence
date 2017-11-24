@@ -476,7 +476,7 @@ begin
   Self.y2 := Source.y2;
   Self.Opacity := Source.Opacity;
   if Self.Owner <> Source.Owner then begin
-    Self.Log(LogInterfaceScaleError, {$I %CURRENTROUTINE},'WARNING: NotifyAnchor should be copied, do it!');
+    Log(LogInterfaceScaleError, _CurrentRoutine, 'WARNING: NotifyAnchor should be copied, do it!');
   end;
 end;
 procedure DIntContainer.AssignTo(const Dest: DIntContainer);
@@ -488,7 +488,7 @@ begin
   Dest.y2 := Self.y2;
   Dest.Opacity := Self.Opacity;
   if Dest.Owner <> Self.Owner then begin
-    Self.Log(LogInterfaceScaleError, {$I %CURRENTROUTINE},'WARNING: NotifyAnchor should be copied, do it!');
+    Log(LogInterfaceScaleError, _CurrentRoutine,'WARNING: NotifyAnchor should be copied, do it!');
   end;
 end;
 
@@ -533,32 +533,32 @@ begin
        (Anchor[asTop].Anchor = nil) or
        (Anchor[asRight].Anchor = nil) or
        (Anchor[asBottom].Anchor = nil) then begin
-         fLog(LogInterfaceError,Owner.ClassName+'>'+_CurrentRoutine,'Anchor is Nil!');
+         Log(LogInterfaceError,Owner.ClassName+'>'+_CurrentRoutine,'Anchor is Nil!');
          GetWindowAnchor;
     end else begin
       case Anchor[asLeft].AlignTo of
         haLeft:   cx1 := Anchor[asLeft].Anchor.x1;
         haRight:  cx1 := Anchor[asLeft].Anchor.x2;
         haCenter: cx1 := (Anchor[asLeft].Anchor.x1 + Anchor[asLeft].Anchor.x2) div 2;
-        else fLog(LogInterfaceError,Owner.ClassName+'>'+_CurrentRoutine,'Invalid Anchor align!')
+        else Log(LogInterfaceError,Owner.ClassName+'>'+_CurrentRoutine,'Invalid Anchor align!')
       end;
       case Anchor[asRight].AlignTo of
         haLeft:   cx2 := Anchor[asRight].Anchor.x1;
         haRight:  cx2 := Anchor[asRight].Anchor.x2;
         haCenter: cx2 := (Anchor[asRight].Anchor.x1 + Anchor[asRight].Anchor.x2) div 2;
-        else fLog(LogInterfaceError,Owner.ClassName+'>'+_CurrentRoutine,'Invalid Anchor align!')
+        else Log(LogInterfaceError,Owner.ClassName+'>'+_CurrentRoutine,'Invalid Anchor align!')
       end;
       case Anchor[asBottom].AlignTo of                {Pay attention, this is INVERT due to OpenGL}
         vaBottom: cy1 := Anchor[asBottom].Anchor.y1;
         vaTop:    cy1 := Anchor[asBottom].Anchor.y2;
         vaMiddle: cy1 := (Anchor[asBottom].Anchor.y1 + Anchor[asBottom].Anchor.y2) div 2;
-        else fLog(LogInterfaceError,Owner.ClassName+'>'+_CurrentRoutine,'Invalid Anchor align!')
+        else Log(LogInterfaceError,Owner.ClassName+'>'+_CurrentRoutine,'Invalid Anchor align!')
       end;
       case Anchor[asTop].AlignTo of             {Pay attention, this is INVERT due to OpenGL}
         vaBottom: cy2 := Anchor[asTop].Anchor.y1;
         vaTop:    cy2 := Anchor[asTop].Anchor.y2;
         vaMiddle: cy2 := (Anchor[asTop].Anchor.y1 + Anchor[asTop].Anchor.y2) div 2;
-        else fLog(LogInterfaceError,Owner.ClassName+'>'+_CurrentRoutine,'Invalid Anchor align!')
+        else Log(LogInterfaceError,Owner.ClassName+'>'+_CurrentRoutine,'Invalid Anchor align!')
       end;
     end;  
   end;
@@ -781,7 +781,7 @@ begin
     Self.Anchor[aa] := Source.Anchor[aa];
   Self.OpacityAnchor := Source.OpacityAnchor;
   if Self.Owner <> Source.Owner then begin
-    Self.Log(LogInterfaceScaleError, {$I %CURRENTROUTINE},'WARNING: NotifyAnchor should be copied, do it!');
+    Log(LogInterfaceScaleError, _CurrentRoutine, 'WARNING: NotifyAnchor should be copied, do it!');
   end;
 end;
 procedure DFloatContainer.AssignTo(const Dest: DFloatContainer);
@@ -808,7 +808,7 @@ begin
     Dest.Anchor[aa] := Self.Anchor[aa];
   Dest.OpacityAnchor := Self.OpacityAnchor;
   if Dest.Owner <> Self.Owner then begin
-    Self.Log(LogInterfaceScaleError, {$I %CURRENTROUTINE},'WARNING: NotifyAnchor should be copied, do it!');
+    Log(LogInterfaceScaleError, _CurrentRoutine,'WARNING: NotifyAnchor should be copied, do it!');
   end;
 end;
 

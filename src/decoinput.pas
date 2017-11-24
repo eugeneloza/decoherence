@@ -97,7 +97,7 @@ begin
       if AddKey then begin
         if TestRecord then begin
           if (RecordedKeys = test1) or (RecordedKeys = test2) then begin
-            fLog(LogVerbose,_CurrentRoutine,'No! This is a different game!');
+            Log(LogVerbose,_CurrentRoutine,'No! This is a different game!');
             RecordKeys := false;
           end
         end else
@@ -155,7 +155,7 @@ begin
   if not Dragging then begin
     tmpLink := GUI.IfMouseOver(Round(Event.Position[0]),Round(Event.Position[1]),true,true);
     if tmpLink <> nil then
-      fLog(logVerbose,_CurrentRoutine,'Motion caught '+tmpLink.ClassName);
+      Log(logVerbose,_CurrentRoutine,'Motion caught '+tmpLink.ClassName);
   end;
 end;
 
@@ -202,7 +202,7 @@ begin
     Repeat
       if TouchArray[i].FingerIndex = FingerIndex then Found := true else inc(i);
     until (i>TouchArray.Count-1) or Found;
-    fLog(LogMouseInfo,_CurrentRoutine,'Caught mouse release finger='+IntToStr(FingerIndex)+' n='+IntToStr(i));
+    Log(LogMouseInfo,_CurrentRoutine,'Caught mouse release finger='+IntToStr(FingerIndex)+' n='+IntToStr(i));
     if Found then begin
       if (TouchArray[i].ClickElement <> nil) then begin
         if Assigned(touchArray[i].ClickElement.OnMouseRelease) then
@@ -212,9 +212,9 @@ begin
       end;
       TouchArray.Remove(TouchArray[i]);
     end else
-      fLog(LogMouseError,_CurrentRoutine,'ERROR: Touch event not found!');
+      Log(LogMouseError,_CurrentRoutine,'ERROR: Touch event not found!');
  end else
-   fLog(LogMouseError,_CurrentRoutine,'ERROR: Touch event list is empty!');
+   Log(LogMouseError,_CurrentRoutine,'ERROR: Touch event list is empty!');
 
 end;
 
@@ -238,7 +238,7 @@ begin
   end;
 
   TouchArray.Add(NewEventTouch);
-  fLog(LogMouseInfo,_CurrentRoutine,'Caught mouse press finger='+IntToStr(FingerIndex));
+  Log(LogMouseInfo,_CurrentRoutine,'Caught mouse press finger='+IntToStr(FingerIndex));
 
   {todo: if interface didn't catch the click then}
   if CurrentGameMode = gmTravel then
@@ -255,7 +255,7 @@ begin
     Cursor := mcDefault;}
   if Camera = nil then begin
     if CameraWarning then begin
-      fLog(LogMouseSoftError,_CurrentRoutine,'Warning: Camera is not initialized for MouseLook');
+      Log(LogMouseSoftError,_CurrentRoutine,'Warning: Camera is not initialized for MouseLook');
       CameraWarning := false;
     end;
     Exit;

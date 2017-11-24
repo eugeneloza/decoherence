@@ -368,7 +368,7 @@ procedure FixTextures(Root: TX3DRootNode);
           Tex.FdUrl.Items.Add(s);
           //check URIFileExists
         except
-          fLog(LogConstructorInfo,Source.FdChildren[i].NodeName+'('+Source.FdChildren[i].ClassName+')'+'>'+_CurrentRoutine,'try..except fired (texture node not found)');
+          Log(LogConstructorInfo,Source.FdChildren[i].X3DName+'('+Source.FdChildren[i].ClassName+')'+'>'+_CurrentRoutine,'try..except fired (texture node not found)');
         end;
   end;
 begin

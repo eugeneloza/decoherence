@@ -37,12 +37,12 @@ begin
   Result := true;
   if (aImage=nil) or (aImage.isEmpty) then begin
     Result := false;
-    fLog(LogInterfaceError,_CurrentRoutine,'FATAL: Image is nil');
+    Log(LogInterfaceError,_CurrentRoutine,'FATAL: Image is nil');
     Exit;
   end;
   if not (aImage is TRGBAlphaImage) then begin
     Result := false;
-    fLog(LogInterfaceError,aImage.className+'>'+_CurrentRoutine,'FATAL: Image type '+aImage.ClassName+' is not supported for operation.');
+    Log(LogInterfaceError,aImage.className+'>'+_CurrentRoutine,'FATAL: Image type '+aImage.ClassName+' is not supported for operation.');
     Exit;
   end;
 end;

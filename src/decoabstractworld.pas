@@ -263,7 +263,7 @@ end;
 
 procedure DAbstractWorld.Load(const URL: string);
 begin
-  if not URLValid(URL) then fLog(LogWorldInit,_CurrentRoutine,'World is not nil, freeing');
+  if not URLValid(URL) then Log(LogWorldInit,_CurrentRoutine,'World is not nil, freeing');
   {$hint dummy}
   //load seed and Nav
 end;
@@ -272,7 +272,7 @@ end;
 
 procedure FreeWorld;
 begin
-  if CurrentWorld<>nil then fLog(LogWorldInit,_CurrentRoutine,'World is not nil, freeing');
+  if CurrentWorld<>nil then Log(LogWorldInit,_CurrentRoutine,'World is not nil, freeing');
   FreeAndNil(CurrentWorld);
 end;
 
