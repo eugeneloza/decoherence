@@ -1,3 +1,5 @@
+# Garbage and temporary files
+
 *.compiled
 *.rsj
 *.rst
@@ -8,29 +10,42 @@
 *.blend1
 *.blend2
 *~
-*.apk
 *.a
-*.log
 *.lps
 *.bak
-*.dbg
-*.exe
 *.fuse_hidden*
-*commit*
-log_*.txt
-deco_20*.jpg
+*.dbg
 android_application
-Release
-decoherence_desktop
-constructor_tool
 backup
 lib
 library
-PROPRIETARY_*
-UNKNOWN_*
-heap.trc
-html
-pasdoc_gui
-todo
 link.res
 castle-engine-output/
+
+# Logs, screenshots and to-do's
+
+*.log
+*commit*
+log_*.txt
+deco_20*.jpg
+heap.trc
+todo
+pasdoc_gui
+
+# Executable and compiled files
+
+*.apk
+*.exe
+html
+Release
+
+# Linux executables
+
+decoherence_desktop
+constructor_tool
+ProfilerTest
+
+# License-unsafe files
+
+PROPRIETARY_*
+UNKNOWN_*
