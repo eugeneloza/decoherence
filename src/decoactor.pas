@@ -412,7 +412,7 @@ begin
       toDir := Direction
     else
       toDir := Vector3(0, 1, 0);
-    Log(LogActorError, {$I %CURRENTROUTINE%}, 'ERROR: Direction is zero!');
+    Log(LogActorError, _CurrentRoutine, 'ERROR: Direction is zero!');
   end;
 end;
 
@@ -916,7 +916,7 @@ function DActor.GetTarget: DCoordActor;
 begin
   if fTarget = nil then
     GetEnemyTarget; // todo
-  // dLog(LogActorError,Self,{$I %CURRENTROUTINE%},'Warning: Autoselecting target not implemented yet...');
+  // dLog(LogActorError,Self,_CurrentRoutine,'Warning: Autoselecting target not implemented yet...');
   Result := fTarget;
 end;
 
@@ -993,8 +993,7 @@ procedure DActor.PerformAction(const doAction: DMultiPerk);
 begin
   if fTarget = nil then
   begin
-    Log(LogActorError,
-{$I %CURRENTROUTINE%},
+    Log(LogActorError, _CurrentRoutine,
       'ERROR: Action was requested but no target specified...');
     Exit;
   end;
@@ -1007,8 +1006,8 @@ begin
     DBasicActor(fTarget).Hit(10, 1);
   end
   else
-    Log(LogActorError,
-{$I %CURRENTROUTINE%}, 'ERROR: Trying to preform action on invalid actor...');
+    Log(LogActorError, _CurrentRoutine,
+      'ERROR: Trying to preform action on invalid actor...');
 end;
 
 { ----------------------------------------------------------------------------- }
@@ -1018,8 +1017,8 @@ begin
   if fTarget <> nil then
     LookAt(Target.Position)
   else
-    Log(LogActorError,
-{$I %CURRENTROUTINE%}, 'Warning: trying to look at a nil target...');
+    Log(LogActorError, _CurrentRoutine,
+      'Warning: trying to look at a nil target...');
 end;
 
 procedure DActor.LookAt(const aPosition: TVector3);

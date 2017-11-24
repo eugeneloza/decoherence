@@ -296,7 +296,7 @@ end;
 procedure DSoundFile.Load;
 begin
   if fURL='' then begin
-    Log(LogSoundError,{$I %CURRENTROUTINE%},'ERROR: No valid URL provided. Exiting...');
+    Log(LogSoundError,_CurrentRoutine,'ERROR: No valid URL provided. Exiting...');
     Exit;
   end;
   {if not ThreadLocked then begin
@@ -308,7 +308,7 @@ begin
     ThreadWorking := true; }
   end
   else
-     Log(LogSoundError,{$I %CURRENTROUTINE%},'Thread already working...');}
+     Log(LogSoundError,_CurrentRoutine,'Thread already working...');}
 end;
 procedure DSoundFile.LoadFinished;
 begin
@@ -328,11 +328,11 @@ end;
 procedure DMusicTrack.Start;
 begin
   if not isLoaded then begin
-    Log(LogSoundError,{$I %CURRENTROUTINE%},'ERROR: Music is not loaded!');
+    Log(LogSoundError,_CurrentRoutine,'ERROR: Music is not loaded!');
     Exit;
   end;
   fCurrent := SoundEngine.PlaySound(Self.Buffer, false, fLoop, 10, fGain, 0, 1, TVector3.Zero);
-  if fCurrent = nil then Log(LogSoundError,{$I %CURRENTROUTINE%},'ERROR: Unable to allocate music!');
+  if fCurrent = nil then Log(LogSoundError,_CurrentRoutine,'ERROR: Unable to allocate music!');
   fisPlaying := true;
 end;
 
@@ -385,7 +385,7 @@ begin
     fCurrent.Gain := Value
   else begin
     //fGain := value;
-    Log(LogSoundError,{$I %CURRENTROUTINE%},'Warning: Setting gain of a non-playing music track...');
+    Log(LogSoundError,_CurrentRoutine,'Warning: Setting gain of a non-playing music track...');
   end;
 end;
 
@@ -539,7 +539,7 @@ end;
 
 procedure InitMusicManager;
 begin
-  fLog(LogInitSound,{$I %CURRENTROUTINE%},'Creating music manager...');
+  fLog(LogInitSound,_CurrentRoutine,'Creating music manager...');
   Music := DMusicManager.Create;
 end;
 
@@ -547,7 +547,7 @@ end;
 
 procedure FreeMusicManager;
 begin
-  fLog(LogInitSound,{$I %CURRENTROUTINE%},'Freeing music manager...');
+  fLog(LogInitSound,_CurrentRoutine,'Freeing music manager...');
   FreeAndNil(Music);
 end;
 

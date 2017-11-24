@@ -82,7 +82,7 @@ var doLog: boolean = true;
 { Initializes Castle Log and display basic info }
 procedure InitLog;
 { Writes a log string
-  should be used like dLog(1, Self,{$I %CURRENTROUTINE%},message)
+  should be used like dLog(1, Self,_CurrentRoutine,message)
   Self = nil inside a procedure }
 procedure fLog(const LogLevel: boolean; const aPrefix, aMessage: string);
 //procedure fLog(const LogLevel: boolean; const aObj: TObject; const aPrefix, aMessage: string);

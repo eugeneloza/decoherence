@@ -68,7 +68,7 @@ begin
   InitBurnerImage;
   {$ENDIF}
 
-  fLog(LogInit,{$I %CURRENTROUTINE%},'Started');
+  fLog(LogInit,_CurrentRoutine,'Started');
 
   WindImage1 := LoadImage(ApplicationData(WindFolder+'WindClouds1_GIMP.jpg'));
   WindImage2 := LoadImage(ApplicationData(WindFolder+'WindClouds2_GIMP.jpg'));
@@ -98,11 +98,11 @@ begin
         it as some EImageLoadError descendant. }
       on EFOpenError do begin
         Portrait_Img[i] := LoadImage(ApplicationData(PortraitFolder+'placeholder.png'));
-        fLog(LogInitError,{$I %CURRENTROUTINE%},'ERROR loading portrait '+fName);
+        fLog(LogInitError,_CurrentRoutine,'ERROR loading portrait '+fName);
       end;
       on EImageLoadError do begin
         Portrait_Img[i] := LoadImage(ApplicationData(PortraitFolder+'placeholder.png'));
-        fLog(LogInitError,{$I %CURRENTROUTINE%},'ERROR loading portrait '+fName);
+        fLog(LogInitError,_CurrentRoutine,'ERROR loading portrait '+fName);
       end;
     end;
   end;
@@ -123,7 +123,7 @@ begin
   Characterbar_Mid := DRectagonalFrame.Create('character_bar_mid_CC-BY-SA_by_Saito00.png',0,0,4,4);
   Characterbar_Bottom := DRectagonalFrame.Create('character_bar_bottom_CC-BY-SA_by_Saito00.png',5,5,4,4);
 
-  fLog(LogInitInterface,{$I %CURRENTROUTINE%},'finished');
+  fLog(LogInitInterface,_CurrentRoutine,'finished');
 end;
 
 {----------------------------------------------------------------------------}
@@ -131,7 +131,7 @@ end;
 procedure FreeInterface;
 var i: integer;
 begin
-  fLog(LogInitInterface,{$I %CURRENTROUTINE%},'Freeing...');
+  fLog(LogInitInterface,_CurrentRoutine,'Freeing...');
   FreeAndNil(WindImage1);
   FreeAndNil(WindImage2);
 

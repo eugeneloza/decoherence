@@ -147,7 +147,7 @@ begin
   if e1.Name <> e2.Name then begin
     { actually such stuff should never happen }
     Result := 0;
-    fLog(LogContextError,{$I %CURRENTROUTINE%},'Error: comparing incompatible elements '+e1.Name+' vs '+e2.Name);
+    fLog(LogContextError,_CurrentRoutine,'Error: comparing incompatible elements '+e1.Name+' vs '+e2.Name);
     Exit;
   end;
 

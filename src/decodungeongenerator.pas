@@ -374,7 +374,7 @@ uses SysUtils, CastleFilesUtils, CastleImages, CastleVectors,
 procedure DDungeonGenerator.ForceReady;
 begin
   Parameters.isReady := true;
-  Log(LogWorldInitSoftError,{$I %CURRENTROUTINE%},'Warning: Be careful, parameters might not be initialized correctly.');
+  Log(LogWorldInitSoftError,_CurrentRoutine,'Warning: Be careful, parameters might not be initialized correctly.');
 end;
 
 {----------------------------------------------------------------------------}
@@ -563,7 +563,7 @@ begin
   if not Parameters.isReady then
     raise Exception.Create('DDungeonGenerator.Generate FATAL - parameters are not loaded!');
   if not isInitialized then begin
-    Log(LogWorldInitSoftError,{$I %CURRENTROUTINE%},'Warning: parameters were automatically initialized!');
+    Log(LogWorldInitSoftError,_CurrentRoutine,'Warning: parameters were automatically initialized!');
     InitParameters;
   end;
 
@@ -574,7 +574,7 @@ begin
     //add prgenerated or undo tiles
     CurrentStep := RNDM.Random(CurrentStep);
     if CurrentStep < MinSteps-1 then CurrentStep := MinSteps-1;
-    Log(LogGenerateWorld,{$I %CURRENTROUTINE%},'Starting from '+IntToStr(CurrentStep));
+    Log(LogGenerateWorld,_CurrentRoutine,'Starting from '+IntToStr(CurrentStep));
     for i := 0 to CurrentStep do AddTileUnsafe(Gen[i]);
 
     while Map.CalculateFaces<>0 do begin
@@ -603,9 +603,9 @@ begin
 
       end;
     end;  }
-    Log(LogGenerateWorld,{$I %CURRENTROUTINE%},'Done in = '+IntToStr(Round((GetNow-t2)*1000))+'ms');
-    Log(LogGenerateWorld,{$I %CURRENTROUTINE%},'Map volume = '+IntToStr(Map.Volume) +'/'+IntToStr(Parameters.Volume));
-    Log(LogGenerateWorld,{$I %CURRENTROUTINE%},'Max depth = '+IntToStr(Map.MaxDepth+1)+'/'+IntToStr(Parameters.MinZ));
+    Log(LogGenerateWorld,_CurrentRoutine,'Done in = '+IntToStr(Round((GetNow-t2)*1000))+'ms');
+    Log(LogGenerateWorld,_CurrentRoutine,'Map volume = '+IntToStr(Map.Volume) +'/'+IntToStr(Parameters.Volume));
+    Log(LogGenerateWorld,_CurrentRoutine,'Max depth = '+IntToStr(Map.MaxDepth+1)+'/'+IntToStr(Parameters.MinZ));
   until (Map.Volume>=Parameters.Volume) and (Map.MaxDepth+1>=Parameters.MinZ); {until map meets the paramters}
   {$WARNING may hang up forever here, if paremeters cannot be satisfied}
 
@@ -613,7 +613,7 @@ begin
   //finally resize the dynamic array
   MaxSteps := CurrentStep+1;
   SetLength(Gen,MaxSteps);
-  Log(LogGenerateWorld,{$I %CURRENTROUTINE%},'Job finished in = '+IntToStr(Round((GetNow-t1)*1000))+'ms');
+  Log(LogGenerateWorld,_CurrentRoutine,'Job finished in = '+IntToStr(Round((GetNow-t1)*1000))+'ms');
 
   // finalize
   FreeLists; //we no longer need them
@@ -787,7 +787,7 @@ begin
              (Map.SizeY-(Gen[i].y+Tiles[Gen[i].Tile].b_y)-Tiles[Gen[i].Tile].SizeY)*16, dmBlendSmart);
       end;
     end;
-  Log(LogGenerateWorld,{$I %CURRENTROUTINE%},IntToStr(Length(Map.Img)));
+  Log(LogGenerateWorld,_CurrentRoutine,IntToStr(Length(Map.Img)));
 end;
 
 {-------------------------------------------------------------------------}
@@ -830,7 +830,7 @@ begin
         tmpNav.isSafe := false;
         NavMap[ix,iy,iz] := NavList.Add(tmpNav);
       end;
-  Log(LogGenerateWorld,{$I %CURRENTROUTINE%},'Navigation Graph created, nodes: '+IntToStr(NavList.Count));
+  Log(LogGenerateWorld,_CurrentRoutine,'Navigation Graph created, nodes: '+IntToStr(NavList.Count));
   {build links between the nav points}
   for iz := 0 to Map.SizeZ-1 do
     for ix := 0 to Map.SizeX-1 do
@@ -1161,7 +1161,7 @@ var i: integer;
 begin
   NeighboursMap := NilIndexMap;
 
-  Log(LogGenerateWorld,{$I %CURRENTROUTINE%},'Merging neighbours of neighbours...');
+  Log(LogGenerateWorld,_CurrentRoutine,'Merging neighbours of neighbours...');
   for ix := 0 to Map.SizeX-1 do
     for iy := 0 to Map.SizeY-1 do
       for iz := 0 to Map.SizeZ-1 do if tmpNeighboursMap[ix,iy,iz]<>nil then begin
@@ -1298,7 +1298,7 @@ begin
 
   until i >= High(Gen);
 
-  Log(LogGenerateWorld,{$I %CURRENTROUTINE%},'N groups = '+IntToStr(Length(Groups)));
+  Log(LogGenerateWorld,_CurrentRoutine,'N groups = '+IntToStr(Length(Groups)));
   for i := 0 to High(Groups) do Log(LogGenerateWorld,'group '+IntToStr(i),IntToStr(Groups[i].Count));
 
   FreeAndNil(HitCount);
@@ -1318,7 +1318,7 @@ begin
   //UpdateProgress('Raycasting',1);
 
   //raycast
-  Log(LogGenerateWorld,{$I %CURRENTROUTINE%},'Raycasting started...');
+  Log(LogGenerateWorld,_CurrentRoutine,'Raycasting started...');
   t := GetNow;
 
   MakeTileIndexMap;
@@ -1329,12 +1329,12 @@ begin
 
   //UpdateProgress('Chunking',0.95);
 
-  Log(LogGenerateWorld,{$I %CURRENTROUTINE%},'Raycasting finished in '+IntToStr(Round((GetNow-t)*1000))+'ms.');
+  Log(LogGenerateWorld,_CurrentRoutine,'Raycasting finished in '+IntToStr(Round((GetNow-t)*1000))+'ms.');
   Chunk_N_Slice;
 
   fisFinished := true;
 
-  Log(LogGenerateWorld,{$I %CURRENTROUTINE%},'Finished. Everything done in '+IntToStr(Round((GetNow-t0)*1000))+'ms.');
+  Log(LogGenerateWorld,_CurrentRoutine,'Finished. Everything done in '+IntToStr(Round((GetNow-t0)*1000))+'ms.');
   //UpdateProgress('Done',2);
 end;
 
@@ -1402,7 +1402,7 @@ var XMLdoc: TXMLDocument;
     Iterator: TXMLElementIterator;
     FS: DFirstStep;
 begin
-  Log(LogGenerateWorld,{$I %CURRENTROUTINE%},URL);
+  Log(LogGenerateWorld,_CurrentRoutine,URL);
 
   if Self=nil then raise Exception.Create('DGeneratorParameters is nil!'); // HELLO, my best bug thing :)
 
@@ -1458,7 +1458,7 @@ begin
     end;
 
   except
-    Log(LogWorldError,{$I %CURRENTROUTINE%},'ERROR: Exception in GeneratorParameters load');
+    Log(LogWorldError,_CurrentRoutine,'ERROR: Exception in GeneratorParameters load');
   end;
   FreeAndNil(XMLdoc);
 
