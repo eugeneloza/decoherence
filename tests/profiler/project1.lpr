@@ -1,6 +1,6 @@
 program Project1;
 
-{$INCLUDE profiler.inc}
+{$INCLUDE ../../src/profiler.inc}
 
 uses SysUtils, CastleClassUtils, CastleLog, Profiler;
 

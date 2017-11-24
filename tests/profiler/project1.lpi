@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
   <ProjectOptions>
-    <Version Value="9"/>
+    <Version Value="10"/>
     <General>
       <Flags>
         <MainUnitHasUsesSectionForAllUnits Value="False"/>
@@ -23,7 +23,8 @@
             <Filename Value="project1"/>
           </Target>
           <SearchPaths>
-            <IncludeFiles Value="$(ProjOutDir)"/>
+            <IncludeFiles Value="$(ProjOutDir);../../src"/>
+            <OtherUnitFiles Value="../../src"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
           <Parsing>
@@ -57,7 +58,8 @@
             <Filename Value="project1"/>
           </Target>
           <SearchPaths>
-            <IncludeFiles Value="$(ProjOutDir)"/>
+            <IncludeFiles Value="$(ProjOutDir);../../src"/>
+            <OtherUnitFiles Value="../../src"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
           <CodeGeneration>
@@ -95,12 +97,11 @@
         <UnitName Value="Project1"/>
       </Unit0>
       <Unit1>
-        <Filename Value="profiler.pas"/>
+        <Filename Value="../../src/profiler.inc"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="Profiler"/>
       </Unit1>
       <Unit2>
-        <Filename Value="profiler.inc"/>
+        <Filename Value="../../src/profiler.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit2>
     </Units>
@@ -111,7 +112,8 @@
       <Filename Value="project1"/>
     </Target>
     <SearchPaths>
-      <IncludeFiles Value="$(ProjOutDir)"/>
+      <IncludeFiles Value="$(ProjOutDir);../../src"/>
+      <OtherUnitFiles Value="../../src"/>
       <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
   </CompilerOptions>
