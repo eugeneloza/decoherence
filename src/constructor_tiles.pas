@@ -200,7 +200,7 @@ procedure TDungeonTilesEditor.ReadTilesList;
 begin
   FreeAndNil(TilesList);
   TilesList := GetFilesList(TilesFolder,'x3d');
-  Log(LogConstructorInfo,{$I %CURRENTROUTINE%},'Tiles found = '+IntToStr(TilesList.Count));
+  Log(LogConstructorInfo,_CurrentRoutine,'Tiles found = '+IntToStr(TilesList.Count));
 end;
 
 {--------------------------------------------------------------------------}
@@ -249,11 +249,11 @@ end;
 
 procedure TDungeonTilesEditor.WriteMe(const ToGameFolder: boolean);
 begin
-  //dLog({$I %CURRENTROUTINE%},'Working directly on game data, nothing to save.');
+  //dLog(_CurrentRoutine,'Working directly on game data, nothing to save.');
   if not ToGameFolder then begin
     if isTileLoaded then begin
       SaveTileMap(TileName,false);
-    end else Log(LogConstructorError,{$I %CURRENTROUTINE%},'No tile loaded to save...');
+    end else Log(LogConstructorError,_CurrentRoutine,'No tile loaded to save...');
   end else
     SaveAllTiles;
   inherited WriteMe(ToGameFolder);
@@ -281,11 +281,11 @@ begin
         TileDisplay.SceneManager.Camera.Input := TCamera.DefaultInput;
         TileDisplay.Update;
       end else
-        Log(LogConstructorError,{$I %CURRENTROUTINE%},'ERROR: TileScene is nil! Can''t reset camera');
+        Log(LogConstructorError,_CurrentRoutine,'ERROR: TileScene is nil! Can''t reset camera');
     end else
-      Log(LogConstructorError,{$I %CURRENTROUTINE%},'No Tile Loaded.');
+      Log(LogConstructorError,_CurrentRoutine,'No Tile Loaded.');
   end else
-    Log(LogConstructorError,{$I %CURRENTROUTINE%},'No Camera To Reset.');
+    Log(LogConstructorError,_CurrentRoutine,'No Camera To Reset.');
 end;
 
 {---------------------------------------------------------------------------}
@@ -368,7 +368,7 @@ procedure FixTextures(Root: TX3DRootNode);
           Tex.FdUrl.Items.Add(s);
           //check URIFileExists
         except
-          fLog(LogConstructorInfo,Source.FdChildren[i].NodeName+'('+Source.FdChildren[i].ClassName+')'+'>'+{$I %CURRENTROUTINE%},'try..except fired (texture node not found)');
+          fLog(LogConstructorInfo,Source.FdChildren[i].NodeName+'('+Source.FdChildren[i].ClassName+')'+'>'+_CurrentRoutine,'try..except fired (texture node not found)');
         end;
   end;
 begin
@@ -383,7 +383,7 @@ var TmpRoot: TX3DRootNode;
     f: string;
     iz: integer;
 begin
-  Log(LogConstructorInfo,{$I %CURRENTROUTINE%},'Compile: '+FileName);
+  Log(LogConstructorInfo,_CurrentRoutine,'Compile: '+FileName);
 
   //load tile from Architect folder
   TmpRoot := CleanUp( Load3D(ConstructorData(TilesFolder+Filename+'.x3d',false)) ,true,true);
@@ -403,10 +403,10 @@ begin
       f := TilesFolder+FileName+'_'+IntToStr(iz)+'.png';
       if URIFileExists(ConstructorData(f,false)) then begin
         if not CopyFile(FakeConstructorData(f,false), FakeConstructorData(f,true),[cffOverwriteFile],false) then
-          Log(LogConstructorError,{$I %CURRENTROUTINE%},'ERROR: failed to copy map image: '+f);
+          Log(LogConstructorError,_CurrentRoutine,'ERROR: failed to copy map image: '+f);
 
       end else
-        Log(LogConstructorError,{$I %CURRENTROUTINE%},'ERROR: Map image not found: '+f);
+        Log(LogConstructorError,_CurrentRoutine,'ERROR: Map image not found: '+f);
     end;
 
   end;
@@ -421,7 +421,7 @@ begin
   if (TilesBox.ItemIndex >= 0) and (TilesBox.Items[TilesBox.ItemIndex] <> '') then
     LoadTile( TilesBox.Items[TilesBox.ItemIndex] )
   else
-    Log(LogConstructorError,{$I %CURRENTROUTINE%},'ERROR: Tile List is empty');
+    Log(LogConstructorError,_CurrentRoutine,'ERROR: Tile List is empty');
 end;
 
 {============================================================================}
@@ -501,7 +501,7 @@ begin
     Exit;
   end;
   Result := tfNone;
-  Log(LogConstructorError,{$I %CURRENTROUTINE%},'ERROR: Face not found! For index '+ IntToStr(Index));
+  Log(LogConstructorError,_CurrentRoutine,'ERROR: Face not found! For index '+ IntToStr(Index));
 end;
 
 {-------------------------------------------------------------------------}
@@ -514,7 +514,7 @@ begin
     Exit;
   end;
   Result := tkNone;
-  Log(LogConstructorError,{$I %CURRENTROUTINE%},'ERROR: Base not found! For index '+ IntToStr(Index));
+  Log(LogConstructorError,_CurrentRoutine,'ERROR: Base not found! For index '+ IntToStr(Index));
 end;
 
 {-------------------------------------------------------------------------}
@@ -609,7 +609,7 @@ begin
     end;
 
 
-  end else Log(LogConstructorError,{$I %CURRENTROUTINE%},'TileMap is not ready to draw');
+  end else Log(LogConstructorError,_CurrentRoutine,'TileMap is not ready to draw');
 end;
 
 {-------------------------------------------------------------------------}
@@ -668,7 +668,7 @@ begin
       DrawTileMap;
       isChanged := false;
     end;
-  end else Log(LogConstructorError,{$I %CURRENTROUTINE%},'Tile is not ready!');
+  end else Log(LogConstructorError,_CurrentRoutine,'Tile is not ready!');
 end;
 
 {--------------------------------------------------------------------------}
@@ -868,7 +868,7 @@ end;
 
 procedure DTileMapHelper.GuessSize(Tile3D: TCastleScene);
 begin
-  Log(LogConstructorError,{$I %CURRENTROUTINE%},'Guessing tile size: '+FloatToStr(Tile3D.BoundingBox.SizeX)+'x'+FloatToStr(Tile3D.BoundingBox.SizeY)+'x'+FloatToStr(Tile3D.BoundingBox.SizeZ));
+  Log(LogConstructorError,_CurrentRoutine,'Guessing tile size: '+FloatToStr(Tile3D.BoundingBox.SizeX)+'x'+FloatToStr(Tile3D.BoundingBox.SizeY)+'x'+FloatToStr(Tile3D.BoundingBox.SizeZ));
   {$Warning this solution is not optimal and might fail for complex tiles}
   SizeX := Round((Tile3D.BoundingBox.SizeX+0.1)/TileScale);
   SizeY := Round((Tile3D.BoundingBox.SizeY+0.1)/TileScale{*(1+0.5)}); //whhyyyyyyyy it falied at 1 of ~150 tiles ?????
@@ -886,7 +886,7 @@ begin
   try
     Load(URL,false);
   except
-    Log(LogConstructorInfo,{$I %CURRENTROUTINE%},'Exception caught. Usually it''s ok.');
+    Log(LogConstructorInfo,_CurrentRoutine,'Exception caught. Usually it''s ok.');
   end;
 end;
 
@@ -935,7 +935,7 @@ begin
   else
     URLWriteXML(TileDOC, ConstructorData(TilesFolder+TName+'.map',ToGameFolder));
 
-  Log(LogConstructorInfo,{$I %CURRENTROUTINE%},ConstructorData(TilesFolder+TName+'.map',ToGameFolder));
+  Log(LogConstructorInfo,_CurrentRoutine,ConstructorData(TilesFolder+TName+'.map',ToGameFolder));
 
   FreeAndNil(TileDOC);
 end;
