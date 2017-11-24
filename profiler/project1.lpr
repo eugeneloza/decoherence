@@ -2,7 +2,7 @@ program Project1;
 
 {$INCLUDE profiler.inc}
 
-uses SysUtils, CastleClassUtils, Profiler;
+uses SysUtils, CastleClassUtils, CastleLog, Profiler;
 
 type
   TProfiledObject = class(TObject)
@@ -109,6 +109,8 @@ StopProfiler;
 end;
 
 begin
+  InitializeLog;
+
   MyObj := TProfiledObject.Create;
 
   InitTest;

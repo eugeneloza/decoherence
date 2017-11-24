@@ -44,7 +44,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
            Maybe, for inline procedures too.
 
   Requires FPC 3.1.1 and above
-  Requires Castle Game Engine (Generics.Collections and CastleTimeUtils)
+  Requires Castle Game Engine (Generics.Collections, CastleLog and CastleTimeUtils)
 
   I highly recommend disabling code folding in
   Lazarus IDE > Options > Editor > Code Folding
@@ -72,7 +72,8 @@ procedure doStopProfiler; inline;
 implementation
 
 {$IFDEF UseProfiler}
-uses SysUtils, Generics.Defaults, Generics.Collections, CastleTimeUtils;
+uses SysUtils, CastleLog,
+  Generics.Defaults, Generics.Collections, CastleTimeUtils;
 
 type
   { A profiler record }
@@ -178,17 +179,17 @@ procedure DisplayProfilerResult;
     aProfiler.Children.Sort(TProfilerComparer.Construct(@CompareProfiles));
     {$ENDIF}
     for i := 0 to aProfiler.Children.Count-1 do begin
-      WriteLn(aPrefix + aProfiler.Children[i].EntryName +
+      WriteLnLog(aPrefix + aProfiler.Children[i].EntryName +
         '(x'+IntToStr(aProfiler.Children[i].EntryHits) + ')' + ' : ' +
         IntToStr(Round(aProfiler.Children[i].EntryTime*1000)) + 'ms');
       DisplayRecoursive(aProfiler.Children[i] as TProfiler,aPrefix+'...');
     end;
   end;
 begin
-  WriteLn('--------- Profiler analysis --------');
+  WriteLnLog('--------- Profiler analysis --------');
   //the top element is not displayed, only its children
   DisplayRecoursive(TopProfiler,'');
-  WriteLn('------------------------------------');
+  WriteLnLog('------------------------------------');
 end;
 
 initialization
