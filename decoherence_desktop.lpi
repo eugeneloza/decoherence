@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
   <ProjectOptions>
-    <Version Value="10"/>
+    <Version Value="9"/>
     <General>
       <Flags>
         <MainUnitHasUsesSectionForAllUnits Value="False"/>
@@ -107,10 +107,11 @@
         <PackageName Value="castle_base"/>
       </Item2>
     </RequiredPackages>
-    <Units Count="45">
+    <Units Count="46">
       <Unit0>
         <Filename Value="decoherence_desktop.lpr"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="Decoherence_Desktop"/>
       </Unit0>
       <Unit1>
         <Filename Value="src/decoglobal.pas"/>
@@ -327,6 +328,10 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="DecoContext"/>
       </Unit44>
+      <Unit45>
+        <Filename Value="src/macro.inc"/>
+        <IsPartOfProject Value="True"/>
+      </Unit45>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
