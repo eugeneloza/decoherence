@@ -2,10 +2,7 @@ program Decoherence_Desktop;
 
 {$INCLUDE src/compilerconfig.inc}
 
-{$IFDEF RELEASE}
-  {$DEFINE WriteLog}
-  {$IFDEF Windows}{$APPTYPE GUI}{$ENDIF}
-{$ENDIF}
+{$IFDEF Windows}{$IFDEF RELEASE}{$APPTYPE GUI}{$ELSE}{$APPTYPE CONSOLE}{$ENDIF}{$ENDIF}
 
 Uses {$IFDEF useCMEM}cmem,{$ENDIF}{$IFDEF UNIX}cthreads,{$ENDIF} SysUtils,
   DecoGlobal, Decoherence;
