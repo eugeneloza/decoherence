@@ -25,17 +25,23 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
   You may disable/enable profiler by editing profiler.inc and
   commenting/uncommenting {$DEFINE UseProfiler} line
   When disabled, the profiler doesn't affect anything at all.
-
-  Eventually just replace begin...end; of every routine you want to profile into:
-  pbegin...pend; in case of a method (procedure/function of object)
-  fbegin...fend; in case of a plain procedure/function;
-
   Defining SortProfilerResults would sort the routines in decreasing order
   based on how much total time they consumed (separately at every hierarchy level)
 
-  Warning: it's not thread-safe
+  Just place StartProfiler just after "begin" of the procedure
+  and StopProfiler just before "end" of the procedure that needs profiling.
+  (see example)
 
-  Warning: it won't work for nested(local) procedures
+  You may also use direct calls to doStartProfiler...doStopProfiler with a
+  custom string given to doStartProfiler to profile different parts of the code.
+
+  Caution: StartProfiler must always have a matching StopProfiler otherwise
+  the profiler may build a wild profiler tree :)
+
+  Warning: it's not thread-safe.
+
+  Warning: it doesn't seem to work for nested(local) procedures.
+           Maybe, for inline procedures too.
 
   Requires FPC 3.1.1 and above
   Requires Castle Game Engine (Generics.Collections and CastleTimeUtils)
