@@ -13,47 +13,75 @@ type
 
 procedure TProfiledObject.MyProc1;
 var i: integer;
-pbegin
+begin
+StartProfiler;
+
   for i := 0 to MaxInt div 10 do ;
-pend;
+
+StopProfiler;
+end;
 
 procedure TProfiledObject.MyProc2;
 var i: integer;
-pbegin
+begin
+StartProfiler;
+
   MyProc1;
   for i := 0 to MaxInt div 7 do ;
-pend;
+
+StopProfiler;
+end;
 
 procedure TProfiledObject.MyProc3;
 var i: integer;
-pbegin
+begin
+StartProfiler;
+
   MyProc2;
   MyProc1;
   for i := 0 to MaxInt div 14 do ;
-pend;
+
+StopProfiler;
+end;
 
 procedure RawProcedure1;
 var i: integer;
-fbegin
+begin
+StartProfiler;
+
   for i := 0 to MaxInt div 8 do ;
-fend;
+
+StopProfiler;
+end;
 
 procedure RawProcedure2;
-  {procedure NestedProcedure;
+{
+  procedure NestedProcedure;
   var k: integer;
-  fbegin
+  begin
+  StartProfiler;
+
     for k := 0 to MaxInt div 119 do ;
-  fend; --------- NOT WORKING FOR NESTED}
+
+  StopProfiler;
+  end; --------- NOT WORKING FOR NESTED
+}
 var i: integer;
-fbegin
+begin
+StartProfiler;
+
   RawProcedure1;
   for i := 0 to MaxInt div 11 do ;
-fend;
+
+StopProfiler;
+end;
 
 var MyObj: TProfiledObject;
 
 procedure CoreTest;
-fbegin
+begin
+StartProfiler;
+
   RawProcedure2;
   MyObj.MyProc3;
   RawProcedure1;
@@ -65,14 +93,20 @@ fbegin
   RawProcedure1;
   MyObj.MyProc3;
   RawProcedure2;
-fend;
+
+StopProfiler;
+end;
 
 procedure InitTest;
-fbegin
+begin
+StartProfiler;
+
   MyObj.MyProc1;
   CoreTest;
   RawProcedure1;
-fend;
+
+StopProfiler;
+end;
 
 begin
   MyObj := TProfiledObject.Create;

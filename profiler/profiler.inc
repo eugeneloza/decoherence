@@ -1,28 +1,22 @@
 {$MACRO ON}
 
+//temporary place it here
+{$DEFINE _CurrentRoutine:={$IF DECLARED(ClassName)}ClassName+'.'+{$ENDIF}{$I %CURRENTROUTINE%}}
+
 {$DEFINE UseProfiler}
+
+//main part
 
 {$IFDEF UseProfiler} //if we use profiler then create macros
 
-{$WARN 2005 off : Comment level $1 found}
-//this will start a method profiler
-{$DEFINE pbegin:=begin
-  StartProfiler(Self.ClassName+'.'+{$I %CURRENTROUTINE%});}
-//this will start a routine profiler
-{$DEFINE fbegin:=begin
-  StartProfiler({$I %CURRENTROUTINE%});}
-//these are actually equal they stop profiler and record the result
-{$DEFINE pend:=StopProfiler;
-  end}//no semicolon in the end!
-{$DEFINE fend:=StopProfiler;
-  end}
-{$WARN 2005 on : Comment level $1 found}
+//this will start profiling the procedure
+{$DEFINE StartProfiler:=doStartProfiler(_CurrentRoutine)}
+//this will stop profiling the procedure
+{$DEFINE StopProfiler:=doStopProfiler}
 
 {$ELSE} //otherwise just replace fbegin/fend with begin/end
 
-{$DEFINE pbegin:=begin}
-{$DEFINE fbegin:=begin}
-{$DEFINE pend:=end}//no semicolon in the end!
-{$DEFINE fend:=end}
+{$DEFINE StartProfiler:=}
+{$DEFINE StopProfiler:=}
 
 {$ENDIF}

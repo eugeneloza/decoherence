@@ -57,10 +57,10 @@ interface
 { Tries to find a profiler entry for aFunction or creates it otherwise
   assigns CurrentLevel to this function
   and starts counting time for the current function }
-procedure StartProfiler(const aFunction: string); inline;
+procedure doStartProfiler(const aFunction: string); inline;
 { Stops counting time for the current function
   and records results}
-procedure StopProfiler; inline;
+procedure doStopProfiler; inline;
 {$ENDIF}
 
 implementation
@@ -112,7 +112,7 @@ begin
   inherited Destroy;
 end;
 
-procedure StartProfiler(const aFunction: string); inline;
+procedure doStartProfiler(const aFunction: string); inline;
   function FindEntry: TProfiler; inline;
   var
     i: integer;
@@ -143,7 +143,7 @@ begin
   CurrentLevel := CurrentElement;
 end;
 
-procedure StopProfiler; inline;
+procedure doStopProfiler; inline;
 begin
   //stop counting time and record the result
   CurrentLevel.EntryTime += TimerSeconds(Timer, CurrentLevel.TimerStart);
