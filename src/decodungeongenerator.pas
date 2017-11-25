@@ -195,7 +195,7 @@ type
     {gets a "normal" tile, not a blocker}
     function GetNormalTile: TTileType; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
     {gets a "blocker", not a normal tile}
-    function GetBlockerTile: TTileType; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+    //function GetBlockerTile: TTileType; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
     {gets a tile with stairs down}
     function GetDownTile: TTileType; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
     {gets a tile with 3 and more free faces
@@ -462,19 +462,16 @@ function DDungeonGenerator.GetNormalTile: TTileType; {$IFDEF SUPPORTS_INLINE}inl
 begin
   Result := NormalTiles[RNDM.Random(NormalTiles.Count)];
 end;
-function DDungeonGenerator.GetBlockerTile: TTileType; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+{function DDungeonGenerator.GetBlockerTile: TTileType; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
-  {$Warning tiles count might be zero!}
   Result := BlockerTiles[RNDM.Random(BlockerTiles.Count)];
-end;
+end;}
 function DDungeonGenerator.GetDownTile: TTileType; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
-  {$Warning tiles count might be zero!}
   Result := DownTiles[RNDM.Random(DownTiles.Count)];
 end;
 function DDungeonGenerator.GetRichTile: TTileType; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
-  {$Warning tiles count might be zero!}
   Result := RichTiles[RNDM.Random(RichTiles.Count)];
 end;
 function DDungeonGenerator.GetPoorTile: TTileType; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
@@ -513,13 +510,13 @@ begin
     {try add a random normal tile}
     repeat
       if RNDM.Random<0.9 then begin
-        if (Map.FreeFaces > Parameters.MaxFaces) or (Map.Volume>Parameters.Volume) then
+        if (PoorTiles.Count>0) and ((Map.FreeFaces > Parameters.MaxFaces) or (Map.Volume>Parameters.Volume)) then
           t := GetPoorTile
         else
-        if (Map.FreeFaces < Parameters.MinFaces) and (Map.Volume<Parameters.Volume) then
+        if (RichTiles.Count>0) and ((Map.FreeFaces < Parameters.MinFaces) and (Map.Volume<Parameters.Volume)) then
           t := GetRichTile
         else
-        if (Map.MaxDepth < Parameters.MinZ*(Map.Volume/Parameters.Volume)) then
+        if (DownTiles.Count>0) and ((Map.MaxDepth < Parameters.MinZ*(Map.Volume/Parameters.Volume))) then
           t := GetDownTile
         else
           t := GetNormalTile;
