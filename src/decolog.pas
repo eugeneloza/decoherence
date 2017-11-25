@@ -21,7 +21,7 @@ unit DecoLog;
 
 {$INCLUDE compilerconfig.inc}
 interface
-//uses nothing
+uses Classes;
 
 const Version = {$INCLUDE version.inc};
 

@@ -58,7 +58,7 @@
             </Debugging>
           </Linking>
           <Other>
-            <CustomOptions Value="-dDEBUG"/>
+            <CustomOptions Value="-dDEBUG -dGAME"/>
           </Other>
         </CompilerOptions>
       </Item2>
@@ -86,7 +86,7 @@
             <LinkSmart Value="True"/>
           </Linking>
           <Other>
-            <CustomOptions Value="-dRELEASE"/>
+            <CustomOptions Value="-dRELEASE  -dGAME"/>
           </Other>
         </CompilerOptions>
       </Item3>
@@ -354,6 +354,7 @@
       <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <Other>
+      <CustomOptions Value="-dGAME"/>
       <OtherDefines Count="1">
         <Define0 Value="Debug"/>
       </OtherDefines>
