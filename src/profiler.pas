@@ -55,7 +55,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 unit Profiler;
 interface
 
-{$INCLUDE profiler.inc}
+{$INCLUDE compilerconfig.inc}
 
 //{$DEFINE SortProfilerResults}
 
@@ -63,10 +63,10 @@ interface
 { Tries to find a profiler entry for aFunction or creates it otherwise
   assigns CurrentLevel to this function
   and starts counting time for the current function }
-procedure doStartProfiler(const aFunction: string); inline;
+procedure doStartProfiler(const aFunction: string); {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 { Stops counting time for the current function
   and records results}
-procedure doStopProfiler; inline;
+procedure doStopProfiler(const aFunction: string); {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 {$ENDIF}
 
 implementation
@@ -119,7 +119,7 @@ begin
   inherited Destroy;
 end;
 
-procedure doStartProfiler(const aFunction: string); inline;
+procedure doStartProfiler(const aFunction: string); {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
   function FindEntry: TProfiler; inline;
   var
     i: integer;
@@ -150,12 +150,16 @@ begin
   CurrentLevel := CurrentElement;
 end;
 
-procedure doStopProfiler; inline;
+procedure doStopProfiler(const aFunction: string); {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
-  //stop counting time and record the result
-  CurrentLevel.EntryTime += TimerSeconds(Timer, CurrentLevel.TimerStart);
-  //increase number of accesses to the function
-  inc(CurrentLevel.EntryHits);
+  repeat
+    //stop counting time and record the result
+    CurrentLevel.EntryTime += TimerSeconds(Timer, CurrentLevel.TimerStart);
+    //increase number of accesses to the function
+    inc(CurrentLevel.EntryHits);
+    //and return to upper level profiler
+    if CurrentLevel.EntryName <> aFunction then CurrentLevel := CurrentLevel.Parent;
+  until CurrentLevel.EntryName = aFunction;
   //and return to upper level profiler
   CurrentLevel := CurrentLevel.Parent;
 end;
