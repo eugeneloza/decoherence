@@ -102,10 +102,12 @@ procedure FreeCreatures;
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 uses SysUtils, CastleFilesUtils,
-  {DecoHDD,} DecoLog;
+  {DecoHDD,} DecoLog, Profiler;
 
 function AnimationEnd(const at: TAnimationType): TAnimationEnd;
 begin
+  StartProfiler;
+
   case at of
     atIdle:   Result := aeLoop;
     atWalk:   Result := aeLoop;
@@ -114,20 +116,28 @@ begin
     atDie:    Result := aeStop;
     else Log(LogAnimationError,_CurrentRoutine,'ERROR: Unknown animation '+AnimationToString(at));
   end;
+
+  StopProfiler;
 end;
 function AnimationEnd(const at: string): TAnimationEnd;
 begin
+  StartProfiler;
+
   case at of
     'idle','walk': Result := aeLoop;
     'die': Result := aeStop;
     else Result := aeIdle;
   end;
+
+  StopProfiler;
 end;
 
 {---------------------------------------------------------------------------}
 
 function AnimationToString(const at: TAnimationType): string;
 begin
+  StartProfiler;
+
   case at of
     atIdle:   Result := 'idle';
     atWalk:   Result := 'walk';
@@ -136,6 +146,8 @@ begin
     atDie:    Result := 'die';
     else Log(LogAnimationError,_CurrentRoutine,'ERROR: Unknown animation '+AnimationToString(at));
   end;
+
+  StopProfiler;
 end;
 
 {================================= D BODY =================================}
@@ -144,16 +156,22 @@ end;
 
 procedure DBody.ResetAnimation;
 begin
+  StartProfiler;
+
   //if not (GetExists and Resource.Prepared) then Exit;
   if Resource = nil then Exit; //if the actor has no body, just hang up
   CurrentAnimation := (Resource.Animations.FindName(CurrentAnimationName)) as T3DResourceAnimation{DAnimation};
   Time := 0;
+
+  StopProfiler;
 end;
 
 {---------------------------------------------------------------------------}
 
 procedure DBody.AdvanceTime(const SecondsPassed: single);{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
+  StartProfiler;
+
   Time += SecondsPassed * SlowTimeRate;
 
   // manage end of the animation
@@ -172,6 +190,8 @@ begin
         aeStop: Time := CurrentAnimation.Duration-0.01; //this is ugly, fix it soon
       end;
   end;
+
+  StopProfiler;
 end;
 procedure DBody.Update(const SecondsPassed: Single; var RemoveMe: TRemoveType);
 
@@ -200,15 +220,21 @@ procedure DBody.Update(const SecondsPassed: Single; var RemoveMe: TRemoveType);
   end;
 
 begin
+  StartProfiler;
+
   AdvanceTime(SecondsPassed);
   VisibleChangeHere([vcVisibleGeometry]);
   UpdateChild;
+
+  StopProfiler;
 end;
 
 {---------------------------------------------------------------------------}
 
 constructor DBody.Create(AOwner: TComponent);
 begin
+  StartProfiler;
+
   inherited Create(AOwner);
   Time := 0; //redundant
   SlowTimeRate := 1.0;
@@ -220,6 +246,7 @@ begin
     else CurrentAnimationName := 'idle';
   end;
   //ResetAnimation;
+  StopProfiler;
 end;
 
 {============================================================================}
@@ -229,18 +256,25 @@ end;
 procedure tmpLoadKnightCreature;
 var CreatureName: string;
 begin
+  StartProfiler;
+
   CreatureName := 'knight';
 
   Resources.LoadFromFiles(ApplicationData(CreaturesFolder+CreatureName));
   tmpKnightCreature := Resources.FindName('Knight') as DBodyResource;
   tmpKnightCreature.Prepare(nil);
+
+  StopProfiler;
 end;
 
 {---------------------------------------------------------------------------}
 
 procedure FreeCreatures;
 begin
+  StartProfiler;
   Log(LogInitData,_CurrentRoutine,'Freeing creature resources...');
+  //nothing here
+  StopProfiler;
 end;
 
 

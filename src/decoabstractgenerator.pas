@@ -110,47 +110,67 @@ type
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
-uses SysUtils, CastleLog;
+uses SysUtils, DecoLog, Profiler;
 
 {-----------------------------------------------------------------------------}
 
 constructor DAbstractGenerator.Create;
 begin
+  StartProfiler;
+
   //inherited Create;
   {we create an non-initialized random (i.e. initialized by a stupid constant integer)
   Just to make sure we don't waste any time (<1ms) on initialization now}
   RNDM := TCastleRandom.Create(1);
+
+  StopProfiler;
 end;
 
 {-----------------------------------------------------------------------------}
 
 destructor DAbstractGenerator.Destroy;
 begin
+  StartProfiler;
+
   FreeAndNil(RNDM);
   inherited Destroy;
+
+  StopProfiler;
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure DAbstractGenerator.InitSeed(const NewSeed: longword = 0);
 begin
+  StartProfiler;
+
   RNDM.Initialize(NewSeed);
+
+  StopProfiler;
 end;
 
 {-----------------------------------------------------------------------------}
 
 function DAbstractGenerator.ExportNav: TNavList;
 begin
+  StartProfiler;
+
   Result := NavList;
   NavList := nil;
+
+  StopProfiler;
 end;
 
 {-----------------------------------------------------------------------------}
 
 function DAbstractGenerator.ExportWeenies: TWeeniesList;
 begin
+  StartProfiler;
+
   Result := Weenies;
   Weenies := nil;
+
+  StopProfiler;
 end;
 
 

@@ -55,12 +55,14 @@ function LoadBlenderX3D(const URL: string): TX3DRootNode;
 implementation
 
 uses SysUtils, {StrUtils,} CastleVectors, X3DLoad,
-  DecoLog;
+  DecoLog, Profiler;
 
 var TextureProperties: TTexturePropertiesNode;
 
 procedure MakeDefaultTextureProperties;
 begin
+  StartProfiler;
+
   {$PUSH}{$WARN 6018 OFF} //hide "unreachable code" warning, it's ok here
   {freeandnil?}
   if AnisotropicSmoothing > 0 then begin
@@ -73,6 +75,8 @@ begin
     TextureProperties.KeepExisting := 1;
   end else TextureProperties := nil;
   {$POP}
+
+  StopProfiler;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -106,36 +110,56 @@ procedure AddMaterial(const Root: TX3DRootNode);
         end;
   end;
 begin
+  StartProfiler;
+
   ScanNodesRecoursive(Root);
+
+  StopProfiler;
 end;
 
 {---------------------------------------------------------------------------}
 
 function LoadBlenderX3D(const URL: string): TX3DRootNode;
 begin
+  StartProfiler;
+
   Log(LogInitData,_CurrentRoutine,'Reading file '+URL);
   if TextureProperties = nil then MakeDefaultTextureProperties;
   Result := Load3D(URL);
   AddMaterial(Result);
+
+  StopProfiler;
 end;
 
 {=================== Ambient Intensity List ==========================}
 
 constructor DMaterialContainer.Create;
 begin
+  StartProfiler;
+
   Value := TMaterialList.Create(false);
   fAmbient := 0;
+
+  StopProfiler;
 end;
 destructor DMaterialContainer.Destroy;
 begin
+  StartProfiler;
+
   FreeAndNil(Value);
   inherited Destroy;
+
+  StopProfiler;
 end;
 procedure DMaterialContainer.SetAmbientIntensity(const v: float);
 var i: TMaterialNode;
 begin
+  StartProfiler;
+
   fAmbient := v;
   for i in Value do i.AmbientIntensity := v;
+
+  StopProfiler;
 end;
 
 initialization

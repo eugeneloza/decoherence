@@ -55,7 +55,7 @@ uses SysUtils,
   CastleGLUtils, CastleColors,
   DecoInterfaceComposite, DecoInterfaceBlocks,
   DecoInterfaceLoader,
-  DecoGameMode, DecoTime, DecoLog;
+  DecoGameMode, DecoTime, DecoLog, Profiler;
 
 {=============================================================================}
 {========================== interface container ==============================}
@@ -63,28 +63,38 @@ uses SysUtils,
 
 constructor DInterfaceContainer.Create;
 begin
+  StartProfiler;
+
   Log(LogInitInterface,_CurrentRoutine,'Creating interface.');
   inherited Create;
 
   Base.AnchorToWindow := true;
 
   FPSLabel := DFPSLAbel.Create;
+
+  StopProfiler;
 end;
 
 {-----------------------------------------------------------------------------}
 
 destructor DInterfaceContainer.Destroy;
 begin
+  StartProfiler;
+
   Log(LogInitInterface,_CurrentRoutine,'Game over...');
   { Free special elements that are not freed automatically (are not Children) }
   FreeAndNil(FPSLabel);
   inherited Destroy;
+
+  StopProfiler;
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure DInterfaceContainer.Rescale;
 begin
+  StartProfiler;
+
   if (Window.Width = Width) and (Window.Height = Height) then begin
     Log(LogInterfaceInfo,_CurrentRoutine,'No need in rescale, abort.');
     Exit;
@@ -112,12 +122,16 @@ begin
 
   { rescale special elements }
   FPSLabel.Rescale;
+
+  StopProfiler;
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure DInterfaceContainer.Draw;
 begin
+  StartProfiler;
+
   { clear the screen depending on the game mode
     in case SceneManager doesn't clear it }
   if GameModeNeedsClearingScreen then RenderContext.Clear([cbColor], Black);
@@ -126,6 +140,8 @@ begin
 
   { draw special elements }
   FPSLabel.CountFPS;
+
+  StopProfiler;
 end;
 
 {===========================================================================}
@@ -134,8 +150,12 @@ end;
 
 procedure DInterfaceContainer.LoadScreen;
 begin
+  StartProfiler;
+
   Self.Clear;
   Grab(DLoadScreen.Create);
+
+  StopProfiler;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -143,6 +163,8 @@ end;
 procedure DInterfaceContainer.PartyInterface;
 var tmp: DSingleInterfaceElement;
 begin
+  StartProfiler;
+
   Self.Clear; //make it more optimal?
   {tmp := DPlayerBarsFull.Create;
   tmp.Base.AnchorToWindow := true;
@@ -164,6 +186,8 @@ begin
   (tmp as DFramedImage).Image.Load(Portrait_Img[0]);
   //(tmp as DFramedImage).RearrangeChildren; //<------- doesn't matter
   Grab(tmp);                   }
+
+  StopProfiler;
 end;
 
 end.

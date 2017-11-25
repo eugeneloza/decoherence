@@ -54,7 +54,7 @@ procedure FreeInterface;
 implementation
 uses Classes, SysUtils, CastleFilesUtils,
   DecoFont, {$IFDEF BurnerImage}DecoBurner,{$ENDIF}
-  DecoGlobal, DecoLog;
+  DecoGlobal, DecoLog, Profiler;
 
 {-------------------- INIT INTERFACE ------------------------------------------}
 
@@ -63,6 +63,8 @@ var i: integer;
     s: string;
     fName: string;
 begin
+  StartProfiler;
+
   InitializeFonts;      //load fonts
   {$IFDEF BurnerImage}
   InitBurnerImage;
@@ -124,6 +126,8 @@ begin
   Characterbar_Bottom := DRectagonalFrame.Create('character_bar_bottom_CC-BY-SA_by_Saito00.png',5,5,4,4);
 
   Log(LogInitInterface,_CurrentRoutine,'finished');
+
+  StopProfiler;
 end;
 
 {----------------------------------------------------------------------------}
@@ -131,6 +135,8 @@ end;
 procedure FreeInterface;
 var i: integer;
 begin
+  StartProfiler;
+
   Log(LogInitInterface,_CurrentRoutine,'Freeing...');
   FreeAndNil(WindImage1);
   FreeAndNil(WindImage2);
@@ -145,6 +151,8 @@ begin
   Portrait_Img := nil;
 
   DestroyFonts;
+
+  StopProfiler;
 end;
 
 

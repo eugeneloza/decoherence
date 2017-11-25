@@ -76,7 +76,7 @@ procedure InitializeFonts;
 procedure DestroyFonts;
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-uses DecoLog;
+uses DecoLog, Profiler;
 
 {these are internal variables which are managed,
  "external" fonts variables are assigned to these}
@@ -86,6 +86,8 @@ var RegularFont12,RegularFont16,RegularFont100: DFont;
 
 procedure SetFonts;
 begin
+  StartProfiler;
+
   DefaultFont := RegularFont16;
   DebugFont := RegularFont12;
 
@@ -95,6 +97,8 @@ begin
   LoadScreenFont := RegularFont16;
 
   PlayerDamageFont := RegularFont100;
+
+  StopProfiler;
 end;
 
 procedure InitializeFonts;
@@ -103,6 +107,8 @@ var FullCharSet: TUnicodeCharList;
     NumCharSet: TUnicodeCharList;
 {$ENDIF}
 begin
+  StartProfiler;
+
   Log(LogInitInterface,_CurrentRoutine,'Init started');
    {$IFDEF Android}
    RegularFont16 := DFont.Create(TextureFont_LinBiolinumRG_16);
@@ -132,15 +138,21 @@ begin
    Log(LogInitInterface,_CurrentRoutine,'Fonts loaded successfully.');
 
    SetFonts;
+
+   StopProfiler;
 end;
 
 {----------------------------------------------------------------------------}
 
 procedure DestroyFonts;
 begin
+  StartProfiler;
+
   FreeAndNil(RegularFont12);
   FreeAndNil(RegularFont16);
   FreeAndNil(RegularFont100);
+
+  StopProfiler;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -149,6 +161,8 @@ function DFont.StringToImage(const s: string): TGrayscaleAlphaImage;
 var P : Pvector2byte;
     i : integer;
 begin
+  StartProfiler;
+
   Result := TGrayscaleAlphaImage.Create;
   Result.SetSize(TextWidth(s),TextHeight(s)+Self.Gap);  //including baseline
   Result.Clear(Vector2Byte(0,255));
@@ -167,6 +181,8 @@ begin
     p^[0] := 255;
     inc(P);
   end;
+
+  StopProfiler;
 end;
 
 {---------------------------------------------------------------------------}
@@ -176,6 +192,8 @@ var DummyImage : TGrayscaleAlphaImage;
     i : integer;
     MaxH,MaxHb,MaxW : integer;
 begin
+  StartProfiler;
+
   MaxH  := 0;
   MaxHb := 0;
   MaxW  := 0;
@@ -194,6 +212,8 @@ begin
     Result.DrawFrom(DummyImage,0,MaxH*(s.Count-1-i)+MaxHb-(s[i].Height-s[i].HeightBase),dmBlendSmart);
     FreeAndNil(DummyImage);
   end;
+
+  StopProfiler;
 end;
 
 {---------------------------------------------------------------------------}
@@ -203,6 +223,8 @@ var DummyImage,ShadowImage : TGrayscaleAlphaImage;
     Iteration,i : integer;
     p : PVector2byte;
 begin
+  StartProfiler;
+
   DummyImage := BrokenStringToImage(s);
   if (ShadowStrength > 0) and (ShadowLength > 0) then begin
     Result := TGrayscaleAlphaImage.Create(DummyImage.Width+ShadowLength,DummyImage.Height+ShadowLength);//dummyImage.MakeCopy as TGrayscaleAlphaImage;
@@ -223,6 +245,8 @@ begin
     FreeAndNil(DummyImage);
   end else
     Result := DummyImage;
+
+  StopProfiler;
 end;
 
 {---------------------------------------------------------------------------}
@@ -231,6 +255,8 @@ function DFont.BreakStings(const s: string; const w: integer): DStringList;
 var i1,i2,i_break : integer;
     NewString : DString;
 begin
+  StartProfiler;
+
   Result := DStringList.Create;
   i1 := 1;
   i2 := 1;
@@ -256,6 +282,8 @@ begin
   NewString.Height := TextHeight(NewString.Value);
   NewString.Width := TextWidth(NewString.Value);
   Result.Add(NewString);
+
+  StopProfiler;
 end;
 
 end.

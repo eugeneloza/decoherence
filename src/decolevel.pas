@@ -39,11 +39,13 @@ implementation
 uses CastleFilesUtils,
   DecoPlayerCharacter,
   DecoActorBody,
-  DecoGameMode, DecoLog;
+  DecoGameMode, DecoLog, Profiler;
 
 procedure Generate3DWorld;
 var GENERATOR: D3dDungeonGenerator;
 begin
+  StartProfiler;
+
   GENERATOR := D3dDungeonGenerator.Create;
   GENERATOR.parameters.load(ApplicationData(GetScenarioFolder+MapsFolder+'1'+'.xml'+GZ_ext));
   GENERATOR.InitParameters;
@@ -54,6 +56,8 @@ begin
   CurrentWorld.Build;
 
   tmpLoadKnightCreature;
+
+  StopProfiler;
 end;
 
 {---------------------------------------------------------------------------}
@@ -61,6 +65,8 @@ end;
 var LoadedLevel: boolean = false;
 procedure LoadTestLevel;
 begin
+  StartProfiler;
+
   Generate3DWorld;
 
   Log(LogInitData,_CurrentRoutine,'Scene');
@@ -74,12 +80,16 @@ begin
   InitNavigation;
 
   Log(LogInitData,_CurrentRoutine,'Finished');
+
+  StopProfiler;
 end;
 
 {---------------------------------------------------------------------------}
 
 procedure InitTestLevel;
 begin
+  StartProfiler;
+
   if not LoadCompleted then Exit;
   if not LoadedLevel then begin
      Log(LogInitData,_CurrentRoutine,'Init');
@@ -89,6 +99,8 @@ begin
      //Window.TouchInterface := {$IFDEF Android}tiCtlWalkDragRotate{$ELSE}tiNone{$ENDIF};
      SetGameMode(gmTravel);
   end;
+
+  StopProfiler;
 end;
 
 

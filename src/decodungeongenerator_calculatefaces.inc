@@ -3,6 +3,8 @@ var ix,iy,iz: integer;
     f: TTileFace;
     tmpDock: DDockPoint;
 begin
+  StartProfiler;
+
   if Dock = nil then Dock := TDockPointList.Create else Dock.Clear;
   fFreeFaces := 0;
   fVolume := 0;
@@ -43,4 +45,6 @@ begin
     Blocker := false;
   {$ENDIF}
   Result := FreeFaces;
+
+  StopProfiler;
 end;

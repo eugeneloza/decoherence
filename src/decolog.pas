@@ -94,28 +94,24 @@ procedure Log(const LogLevel: boolean; const aPrefix, aMessage: string);
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 uses CastleLog, SysUtils,
-  DecoTime;
+  DecoTime, Profiler;
 
 procedure Log(const LogLevel: boolean; const aPrefix, aMessage: string);
 begin
+  StartProfiler;
+
   if not doLog then Exit;
   if LogLevel then WriteLnLog(aPrefix,aMessage);
-end;
 
-{procedure fLog(const LogLevel: boolean; const aObj: TObject; const aPrefix, aMessage: string);
-var objName: string;
-begin
-  if not doLog then Exit;
-  if LogLevel then begin
-    if aObj<>nil then objName := aObj.ClassName+'.' else objName := 'nil.';
-    WriteLnLog(objName+aPrefix,aMessage)
-  end;
-end;}
+  StopProfiler;
+end;
 
 {---------------------------------------------------------------------------}
 
 procedure InitLog;
 begin
+  StartProfiler;
+
   if not doLog then Exit;
   //initialize the log
   {$IFDEF Android}
@@ -134,6 +130,8 @@ begin
   WriteLnLog('(i) FullScreen mode',{$IFDEF Fullscreen}'ON'{$ELSE}'OFF'{$ENDIF});
   WriteLnLog('(i) Allow rescale',{$IFDEF AllowRescale}'ON'{$ELSE}'OFF'{$ENDIF});
   WriteLnLog('(i) Pointer is',IntToStr(SizeOf(Pointer)*8)+' bit');
+
+  StopProfiler;
 end;
 
 end.

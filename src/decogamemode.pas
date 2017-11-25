@@ -46,10 +46,12 @@ function GameModeNeedsClearingScreen: boolean;
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 uses DecoGui, DecoAbstractWorld, DecoAbstractWorld3d,
-  DecoGlobal;
+  DecoGlobal, Profiler;
 
 procedure SetGameMode(const GM: TGameMode);
 begin
+  StartProfiler;
+
   if GM = LastGameMode then Exit;
 
   {release interface elements used by previous game mode}
@@ -82,21 +84,30 @@ begin
     if is3DGameMode then Window.SceneManager.exists := true
                     else Window.SceneManager.exists := false;}
 
+  StopProfiler;
 end;
 
 {------------------------------------------------------------}
 
 function is3DGameMode: boolean;
 begin
-  Result := (CurrentGameMode = gmTravel) or (CurrentGameMode = gmBattle)
+  StartProfiler;
+
+  Result := (CurrentGameMode = gmTravel) or (CurrentGameMode = gmBattle);
+
+  StopProfiler;
 end;
 
 {------------------------------------------------------------}
 
 function GameModeNeedsClearingScreen: boolean;
 begin
+  StartProfiler;
+
   {$HINT something more efficient, or world-attached might be here}
   Result := (Window.SceneManager = nil) or not Window.SceneManager.Exists;
+
+  StopProfiler;
 end;
 
 

@@ -52,11 +52,13 @@ procedure LoadRaceProfessionData;
 function CheckCompatibiliyGeneration(const Race, Profession: DRaceProfession): Float;
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-uses SysUtils;
+uses SysUtils, DecoLog, Profiler;
 
 procedure LoadRaceProfessionData;
 var i: integer;
 begin
+  StartProfiler;
+
   {Todo: load from file}
   SetLength(Races,1);
   Races[0] := DRaceProfession.Create(Window);
@@ -81,26 +83,38 @@ begin
     StatsSum := 0;
     for i := 0 to MaxStats do inc(StatsSum,Stats.Value[i]);
   end;
+
+  StopProfiler;
 end;
 
 constructor DRaceProfession.Create(AOwner: TComponent);
 begin
+  StartProfiler;
+
   inherited Create(AOwner);
   Stats := DStats.Create(true);
   Bonus := DStats.Create(true);
+
+  StopProfiler;
 end;
 
 Destructor DRaceProfession.destroy;
 begin
+  StartProfiler;
+
   FreeAndNil(Stats);
   FreeAndNil(Bonus);
   inherited Destroy;
+
+  StopProfiler;
 end;
 
 function CheckCompatibiliyGeneration(const race, Profession: DRaceProfession): Float;
 var //flg: boolean;
     i, DiffBonus, DiffStats: integer;
 begin
+  StartProfiler;
+
   DiffBonus := 0;
   for i := 0 to MaxStats do if Race.Bonus.Value[i] < Profession.Bonus.Value[i] then inc(DiffBonus);
   if DiffBonus > Profession.BonusSum then Result := -1 else begin
@@ -108,7 +122,7 @@ begin
     for i := 0 to MaxStats do if Race.Stats.Value[i] < Profession.Stats.Value[i] then inc(DiffStats, Profession.Stats.Value[i] - Race.Stats.Value[i]);
     if DiffBonus > 0 then Result := 0.5 else Result := 1;
     Result := Result*(1-DiffStats/Profession.StatsSum);
-  end
+  end;
 {  ....
 
   If Profession.Bonussum = 1 then begin
@@ -135,6 +149,8 @@ begin
       if flg then Result := rcFull else Result := rcLimited;
     end;
   end;}
+
+  StopProfiler;
 end;
 // Float! <0 - impossible 0..1 - compatible
 

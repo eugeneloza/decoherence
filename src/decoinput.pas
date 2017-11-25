@@ -56,7 +56,7 @@ procedure CenterMouseCursor;
 implementation
 uses CastleVectors,
   DecoNavigation, DecoPlayerCharacter,
-  DecoGameMode, DecoLog;
+  DecoGameMode, DecoLog, Profiler;
 
 var RecordKeys: boolean = false;
     RecordedKeys: string;
@@ -118,18 +118,24 @@ end;
 
 procedure doKeyboardRelease(const aKey: TKey);
 begin
+  StartProfiler;
+
   case aKey of
     k_W: Player.InputRelease(mdForward);
     k_S: Player.InputRelease(mdBack);
     k_A: Player.InputRelease(mdLeft);
     k_D: Player.InputRelease(mdRight);
   end;
+
+  StopProfiler;
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure doKeyboardPress(const aKey: TKey);
 begin
+  StartProfiler;
+
   case aKey of
      k_W: Player.InputMove(mdForward);
      k_S: Player.InputMove(mdBack);
@@ -137,6 +143,8 @@ begin
      k_D: Player.InputMove(mdRight);
   end;
   KeyRecorder(aKey);
+
+  StopProfiler;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -145,6 +153,8 @@ procedure doMouseMotion(const Event: TInputMotion);
 var tmpLink: DAbstractElement;
     Dragging: boolean;
 begin
+  StartProfiler;
+
   if doMouseLook(Event) then Exit;
 
   Dragging := doMouseDrag(Event);
@@ -157,29 +167,41 @@ begin
     if tmpLink <> nil then
       Log(logVerbose,_CurrentRoutine,'Motion caught '+tmpLink.ClassName);
   end;
+
+  StopProfiler;
 end;
 
 {================================= TOUCH ====================================}
 
 constructor DTouch.Create(const xx,yy: single; const Finger: integer);
 begin
+  StartProfiler;
+
   x0 := Round(xx);
   y0 := Round(yy);
   FingerIndex := Finger;
+
+  StopProfiler;
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure DTouch.Update(const Event: TInputMotion);
 begin
+  StartProfiler;
+
   x0 := Round(Event.Position[0]);
   y0 := Round(Event.Position[1]);
+
+  StopProfiler;
 end;
 
 {-----------------------------------------------------------------------------}
 
 function GetFingerIndex(const Event: TInputPressRelease): integer;
 begin
+  StartProfiler;
+
   if Event.MouseButton = mbLeft then
     Result := Event.FingerIndex
   else if Event.MouseButton = mbRight then
@@ -187,6 +209,8 @@ begin
   else if Event.MouseButton = mbMiddle then
     Result := 200
   else raise Exception.Create('Unknown event.MouseButton in decomouse.GetFingerIndex!');
+
+  StopProfiler;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -195,7 +219,9 @@ procedure doMouseRelease(const Event: TInputPressRelease);
 var i,FingerIndex: integer;
     Found: boolean;
 begin
- if TouchArray.Count>0 then begin
+  StartProfiler;
+
+  if TouchArray.Count>0 then begin
     fingerindex := GetFingerIndex(Event);
     i := 0;
     Found := false;
@@ -213,9 +239,10 @@ begin
       TouchArray.Remove(TouchArray[i]);
     end else
       Log(LogMouseError,_CurrentRoutine,'ERROR: Touch event not found!');
- end else
+  end else
    Log(LogMouseError,_CurrentRoutine,'ERROR: Touch event list is empty!');
 
+  StopProfiler;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -225,6 +252,8 @@ var NewEventTouch: DTouch;
     FingerIndex: integer;
     tmpLink: DAbstractElement;
 begin
+  StartProfiler;
+
   FingerIndex := GetFingerIndex(Event);
   NewEventTouch := DTouch.Create(Event.Position[0],Event.Position[1],FingerIndex);
 
@@ -243,6 +272,8 @@ begin
   {todo: if interface didn't catch the click then}
   if CurrentGameMode = gmTravel then
     if mbRight = Event.MouseButton then Camera.MouseLook := not Camera.MouseLook;
+
+  StopProfiler;
 end;
 
 {----------------------------------------------------------------------------}
@@ -250,6 +281,8 @@ end;
 var CameraWarning: boolean = true;
 function doMouseLook(const Event: TInputMotion): boolean;
 begin
+  StartProfiler;
+
   {if FMouseLook then
     Cursor := mcForceNone else
     Cursor := mcDefault;}
@@ -267,13 +300,19 @@ begin
     Window.MousePosition := GUI.Center; //=CenterMouseCursor inlined
   end else
     doMouseLook := true; {prevent onMotion call-back}
+
+  StopProfiler;
 end;
 
 {----------------------------------------------------------------------------}
 
 procedure CenterMouseCursor;
 begin
+  StartProfiler;
+
   Window.MousePosition := GUI.Center;
+
+  StopProfiler;
 end;
 
 {----------------------------------------------------------------------------}
@@ -281,6 +320,8 @@ end;
 function doMouseDrag(const Event: TInputMotion): boolean;
 var i: integer;
 begin
+  StartProfiler;
+
   {check for drag-n-drops}
   Result := false;
   {if Event.EventType = itMouseButton then }begin
@@ -300,6 +341,8 @@ begin
     end;
 
   end;
+
+  StopProfiler;
 end;
 
 

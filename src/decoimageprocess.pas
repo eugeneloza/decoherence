@@ -30,10 +30,12 @@ function Brighter(const aImage: TCastleImage; const Mult: float = 1.2): TCastleI
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 uses CastleVectors,
-  DecoLog;
+  DecoLog, Profiler;
 
 function CheckImageValid(const aImage: TCastleImage): boolean;
 begin
+  StartProfiler;
+
   Result := true;
   if (aImage=nil) or (aImage.isEmpty) then begin
     Result := false;
@@ -45,14 +47,20 @@ begin
     Log(LogInterfaceError,aImage.className+'>'+_CurrentRoutine,'FATAL: Image type '+aImage.ClassName+' is not supported for operation.');
     Exit;
   end;
+
+  StopProfiler;
 end;
 
 {------------------------------------------------------------------------}
 
 function Clamp255(const a: integer): byte;
 begin
+  StartProfiler;
+
   { maybe, make it "softer"? It'll require knowing "max" (which is actually mult*255 = 255+20% default)}
   if a<255 then Result := a else Result := 255;
+
+  StopProfiler;
 end;
 
 {------------------------------------------------------------------------}
@@ -62,6 +70,8 @@ var IMG: TRGBAlphaImage;
   p: PVector4byte;
   i: integer;
 begin
+  StartProfiler;
+
   if not CheckImageValid(aImage) then Exit;
   IMG := aImage.MakeCopy as TRGBAlphaImage;
   p := IMG.Pixels;
@@ -74,6 +84,8 @@ begin
     inc(p,IMG.PixelSize);
   end;
   Result := IMG;
+
+  StopProfiler;
 end;
 
 {------------------------------------------------------------------------}

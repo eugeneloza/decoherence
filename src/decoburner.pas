@@ -23,10 +23,10 @@ unit DecoBurner;
 {$INCLUDE compilerconfig.inc}
 
 interface
+{$IFDEF BurnerImage}
 uses CastleImages,
   DecoInterface;
 
-{$IFDEF BurnerImage}
 { Load Burner image and scale it }
 procedure InitBurnerImage;
 { Burn the image (works directly on image, no copy!)}
@@ -35,13 +35,15 @@ procedure Burn(const aImage: TCastleImage; const Container: DAbstractContainer);
 {$ENDIF}
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-uses SysUtils,
-  DecoLog;
-
 {$IFDEF BurnerImage}
+uses SysUtils,
+  DecoLog, Profiler;
+
 var BurnerImageUnscaled, BurnerImage: TCastleImage;  //todo: not freed automatically!!!!
 procedure InitBurnerImage;
 begin
+  StartProfiler;
+
   {$IFNDEF AllowRescale}if BurnerImage<>nil then Exit;{$ENDIF}
   dLog(LogInitInterface,nil,_CurrentRoutine,'Started');
   if BurnerImageUnscaled = nil then
@@ -54,22 +56,32 @@ begin
   {$IFNDEF AllowRescale}FreeAndNil(BurnerImageUnscaled);{$ENDIF}
 
   dLog(LogInitInterface,nil,_CurrentRoutine,'Finished');
+
+  StopProfiler;
 end;
 
 {working directly on image!}
 procedure Burn(const aImage: TCastleImage; const x,y,w,h: integer);
 begin
+  StartProfiler;
+
   aImage.DrawFrom(BurnerImage,0,0,x,y,w,h,dmMultiply);
+
+  StopProfiler;
 end;
 procedure Burn(const aImage: TCastleImage; const Container: DAbstractContainer);
 begin
+  StartProfiler;
+
   aImage.DrawFrom(BurnerImage,0,0,Container.x1,Container.y1,Container.w,Container.h,dmMultiply);
+
+  StopProfiler;
 end;
-{$ENDIF}
 
 finalization
   FreeAndNil(BurnerImageUnscaled);
   FreeAndNil(BurnerImage);
+{$ENDIF}
 
 end.
 

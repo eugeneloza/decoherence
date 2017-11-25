@@ -356,7 +356,7 @@ implementation
 uses SysUtils,
    DecoFont, DecoImageProcess,
    //DecoInterfaceBlocks,
-   DecoInterfaceLoader, DecoLog;
+   DecoInterfaceLoader, DecoLog, Profiler;
 
 {===========================================================================}
 {====================== D Wind Element =====================================}
@@ -364,6 +364,8 @@ uses SysUtils,
 
 constructor DWindElement.Create;
 begin
+  StartProfiler;
+
   inherited Create;
   SetFullScreen;
 
@@ -380,6 +382,8 @@ begin
   Wind2.PhaseSpeed := 1/(10+DRND.Random);
 
   RescaleRecoursive;
+
+  StopProfiler;
 end;
 
 
@@ -389,31 +393,43 @@ end;
 
 constructor DCompositeElement.Create;
 begin
+  StartProfiler;
+
   isSpawned := false;
   inherited Create;
   SpawnChildren;
   isSpawned := true;
   ArrangeChildren;
   //Rescale;
+
+  StopProfiler;
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure DCompositeElement.RearrangeChildren;
 begin
+  StartProfiler;
+
   if isSpawned then begin
     ArrangeChildren;
     //Rescale;
   end;
+
+  StopProfiler;
 end;
 
 {-----------------------------------------------------------------------------}
 
 {procedure DCompositeElement.Rescale;
 begin
+  StartProfiler;
+
   //inherited Rescale;
   RearrangeChildren;
   inherited Rescale;
+
+  StopProfiler;
 end;}
 
 {===========================================================================}
@@ -422,28 +438,40 @@ end;}
 
 procedure DFramedElement.SetFrame(const Value: DRectagonalFrame);
 begin
+  StartProfiler;
+
   if fFrame.Frame <> Value then begin
     fFrame.Frame := Value;
     //fFrame.Rescale;
     RearrangeChildren;
-  end
+  end;
+
+  StopProfiler;
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure DFramedElement.SpawnChildren;
 begin
+  StartProfiler;
+
   fFrame := DFrameImage.Create;
   Grab(fFrame);
+
+  StopProfiler;
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure DFramedElement.ArrangeChildren;
 begin
+  StartProfiler;
+
   //inherited ArrangeChildren;
   fFrame.AnchorTo(Self);
   fFrame.SetBaseSize(0,0,1,1);
+
+  StopProfiler;
 end;
 
 {===========================================================================}
@@ -452,18 +480,26 @@ end;
 
 procedure DFramedImage.SpawnChildren;
 begin
+  StartProfiler;
+
   inherited SpawnChildren;
   Image := DStaticImage.Create;
   Grab(Image);
+
+  StopProfiler;
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure DFramedImage.ArrangeChildren;
 begin
+  StartProfiler;
+
   inherited ArrangeChildren;
   Image.AnchorToFrame(fFrame);
   Image.SetBaseSize(0,0,1,1);
+
+  StopProfiler;
 end;
 
 {===========================================================================}
@@ -472,18 +508,24 @@ end;
 
 procedure DButton.SetImage(const Value: TCastleImage);
 begin
+  StartProfiler;
+
   if OldImage<>Value then
   begin
     OldImage := Value;
     Image_out.Load(Value);
     Image_over.Load(Brighter(Value,1.2));
   end;
+
+  StopProfiler;
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure DButton.SpawnChildren;
 begin
+  StartProfiler;
+
   inherited SpawnChildren;
   OldImage := nil;
   Image_out := DStaticImage.Create;
@@ -494,28 +536,40 @@ begin
   Self.OnMouseOver := @Self.MouseOver;
   Self.OnMouseLeave := @Self.MouseLeave;
   SetEnabled(true);
+
+  StopProfiler;
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure DButton.MouseOver(const Sender: DAbstractElement; const x,y: integer);
 begin
+  StartProfiler;
+
   if fisEnabled then begin
     Image_out.AnimateTo(asFadeOut);
     Image_over.AnimateTo(asFadeIn);
-  end;  
+  end;
+
+  StopProfiler;
 end;
 
 procedure DButton.MouseLeave(const Sender: DAbstractElement; const x,y: integer);
 begin
+  StartProfiler;
+
   Image_out.AnimateTo(asFadeIn);
   Image_over.AnimateTo(asFadeOut);
+
+  StopProfiler;
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure DButton.SetEnabled(const Value: boolean);
 begin
+  StartProfiler;
+
   {emm... Value isn't used here? Rename method to "toggleEnabled" or use Value?}
   if Value = fisEnabled then Exit; //let's fix it this way for now.
 
@@ -525,84 +579,117 @@ begin
   end else 
     fisEnabled := true;
   CanMouseOver := fisEnabled;
+
+  StopProfiler;
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure DButton.ArrangeChildren;
 begin
+  StartProfiler;
+
   inherited ArrangeChildren;
   Image_out.AnchorToFrame(fFrame);
   Image_out.SetBaseSize(0,0,1,1);
   Image_over.AnchorToFrame(fFrame);
   Image_over.SetBaseSize(0,0,1,1);
+
+  StopProfiler;
 end;
 
 {===========================================================================}
 
 procedure DTextButton.SpawnChildren;
 begin
+  StartProfiler;
+
   inherited SpawnChildren;
   fLabel := DLabel.Create;
   Grab(fLabel);
+
+  StopProfiler;
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure DTextButton.ArrangeChildren;
 begin
+  StartProfiler;
+
   inherited ArrangeChildren;
   fLabel.AnchorToFrame(fFrame);
   fLabel.SetBaseSize(0,0,1,1);
   //fLabel.Base.Anchor[...] := acCenter;
+
+  StopProfiler;
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure DTextButton.SetText(Value: string);
 begin
+  StartProfiler;
+
   fLabel.Text := Value;
+
+  StopProfiler;
 end;
 
 {-----------------------------------------------------------------------------}
 
 function DTextButton.GetText: string;
 begin
+  StartProfiler;
+
   Result := fLabel.Text;
+
+  StopProfiler;
 end;
 
 {===========================================================================}
 {=========================== Health Label ==================================}
 {===========================================================================}
 
-
 procedure DHealthLabel.SpawnChildren;
 begin
+  StartProfiler;
+
   inherited SpawnChildren;
   Frame := Characterbar_Bottom;
   fLabel := DFloatLabel.Create; //scale=false
   fLabel.Digits := 0;
   fLabel.Font := PlayerHealthFont;
   Grab(fLabel);
+
+  StopProfiler;
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure DHealthLabel.ArrangeChildren;
 begin
+  StartProfiler;
+
   inherited ArrangeChildren;
   fLabel.AnchorToFrame(fFrame);
   fLabel.SetBaseSize(0,0,1,1);
+
+  StopProfiler;
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure DHealthLabel.SetTarget(const Value: DBasicActor);
 begin
+  StartProfiler;
+
   if fTarget <> Value then begin
     fTarget := Value;
     fLabel.Target := @Value.HP;
   end;
+
+  StopProfiler;
 end;
 
 {===========================================================================}
@@ -612,30 +699,42 @@ end;
 
 procedure DNameLabel.SpawnChildren;
 begin
+  StartProfiler;
+
   inherited SpawnChildren;
   Frame := Characterbar_Top;
   fLabel := DStringLabel.Create;  //scale=false
   fLabel.Font := PlayerNameFont;
   Grab(fLabel);
+
+  StopProfiler;
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure DNameLabel.ArrangeChildren;
 begin
+  StartProfiler;
+
   inherited ArrangeChildren;
   fLabel.AnchorToFrame(fFrame);
   fLabel.SetBaseSize(0,0,1,1);
+
+  StopProfiler;
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure DNameLabel.SetTarget(const Value: DBasicActor);
 begin
+  StartProfiler;
+
   if fTarget <> Value then begin
     fTarget := Value;
     fLabel.Target := @Value.Nickname;
   end;
+
+  StopProfiler;
 end;
 
 {===========================================================================}
@@ -644,29 +743,41 @@ end;
 
 procedure DFramedBar.SetTarget(const Value: PStatValue);
 begin
+  StartProfiler;
+
   if fTarget <> Value then begin
     fTarget := Value;
     fBar.Target := Value;
   end;
+
+  StopProfiler;
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure DFramedBar.SpawnChildren;
 begin
+  StartProfiler;
+
   inherited SpawnChildren;
   Frame := StatBarsFrame;
   fBar := DStatBarImage.Create;
   Grab(fBar);
+
+  StopProfiler;
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure DFramedBar.ArrangeChildren;
 begin
+  StartProfiler;
+
   inherited ArrangeChildren;
   fBar.AnchorToFrame(fFrame);
   fBar.SetBaseSize(0,0,1,1);
+
+  StopProfiler;
 end;
 
 {===========================================================================}
@@ -675,6 +786,8 @@ end;
 
 procedure DStatBars.SpawnChildren;
 begin
+  StartProfiler;
+
   inherited SpawnChildren;
   Frame := Characterbar_mid;
 
@@ -698,6 +811,8 @@ begin
   MPH_bar.fBar.Load(MphBarImage);
   MPH_bar.fBar.Kind := bsVertical;
   Grab(MPH_bar);
+
+  StopProfiler;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -705,6 +820,8 @@ end;
 procedure DStatBars.ArrangeChildren;
 var ScaleX: float;
 begin
+  StartProfiler;
+
   inherited ArrangeChildren;
 
   HP_bar. AnchorToFrame(fFrame);
@@ -723,12 +840,16 @@ begin
   STA_bar.SetBaseSize(  ScaleX,0,ScaleX,1);
   CNC_bar.SetBaseSize(2*ScaleX,0,ScaleX,1);
   MPH_bar.SetBaseSize(3*ScaleX,0,ScaleX,1);
+
+  StopProfiler;
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure DStatBars.SetTarget(const Value: DBasicActor);
 begin
+  StartProfiler;
+
   if fTarget <> Value then begin
     fTarget := Value;
     //and copy the target to all children
@@ -738,6 +859,8 @@ begin
     MPH_bar.Target := fTarget.MPHRef;
     RearrangeChildren; //in case fTarget has different set of stats
   end;
+
+  StopProfiler;
 end;
 
 {=============================================================================}
@@ -746,6 +869,8 @@ end;
 
 procedure DPlayerBarsFull.SetTarget(const Value: DBasicActor);
 begin
+  StartProfiler;
+
   if fTarget <> Value then begin
     fTarget := Value;
     //and copy the target to all children
@@ -753,12 +878,16 @@ begin
     Health.Target  := Value;
     NickName.Target   := Value;
   end;
+
+  StopProfiler;
 end;
 
 {---------------------------------------------------------------------------}
 
 procedure DPlayerBarsFull.SpawnChildren;
 begin
+  StartProfiler;
+
   //inherited SpawnChildren;  <----- nothing to inherit
   PlayerBars := DStatBars.Create;
   Health := DHealthLabel.Create;
@@ -767,12 +896,16 @@ begin
   Grab(Health);
   Grab(NickName);
   Grab(PlayerBars);
+
+  StopProfiler;
 end;
 
 {---------------------------------------------------------------------------}
 
 procedure DPlayerBarsFull.ArrangeChildren;
 begin
+  StartProfiler;
+
   //inherited ArrangeChildren;
 
   NickName.AnchorTo(Self); //AnchorToFrame(fFrame);
@@ -789,6 +922,8 @@ begin
   {********** INTERFACE DESIGN BY Saito00 ******************}
 
   {const LabelSpace = 23/800;}
+
+  StopProfiler;
 end;
 
 {=============================================================================}
@@ -797,6 +932,8 @@ end;
 
 {procedure DPartyDecorations.SpawnChildren;
 begin
+  StartProfiler;
+
   //inherited SpawnChildren; <---- nothing to inherit
   SetFullScreen;
 
@@ -821,6 +958,8 @@ begin
   Frame3Bottom := DFrameImage.Create;
   Frame3Bottom.Frame := DecorationFrame3_Bottom;
   Grab(Frame3Bottom);
+
+  StopProfiler;
 end;                  }
 
 {---------------------------------------------------------------------------}
@@ -830,6 +969,8 @@ const yscale = 1/800;
       xscale = 1/1200;
 var yy1, yy2: float;
 begin
+  StartProfiler;
+
   inherited ArrangeChildren;
 
   {********** INTERFACE DESIGN BY Saito00 ******************}
@@ -850,6 +991,8 @@ begin
   //Frame3Bottom     .base.backwardsetsize(frame2bottomright.base.x1-frame2bottomleft.base.x2+22*2,-1);
   //Frame3Bottom.AnimateTo(appear_animation);
   Rescale; //BUG?
+
+  StopProfiler;
 end;}
 
 {=============================================================================}
@@ -858,6 +1001,8 @@ end;}
 
 procedure DPortrait.SetTarget(const Value: DPlayerCharacter);
 begin
+  StartProfiler;
+
   if fTarget <> Value then begin
     fTarget := value;
     //DStaticImage(content).FreeImage;
@@ -866,12 +1011,16 @@ begin
     fTarget.onHit := @Self.doHit;
     RearrangeChildren;
   end;
+
+  StopProfiler;
 end;
 
 {---------------------------------------------------------------------------}
 
 procedure DPortrait.SpawnChildren;
 begin
+  StartProfiler;
+
   inherited SpawnChildren;
   Portrait:= DPlayerPortrait.Create;
   Grab(Portrait);
@@ -879,20 +1028,28 @@ begin
   Grab(DamageOverlay);
   DamageLabel:= DDamageLabel.Create;
   Grab(DamageLabel);
+
+  StopProfiler;
 end;
 
 {---------------------------------------------------------------------------}
 
 procedure DPortrait.ArrangeChildren;
 begin
+  StartProfiler;
+
   inherited ArrangeChildren;
   //todo
+
+  StopProfiler;
 end;
 
 {---------------------------------------------------------------------------}
 
 procedure DPortrait.doHit(const dam: float; const damtype: TDamageType);
 begin
+  StartProfiler;
+
   {DCharacterSpace(parent).doSlideIn;
   DCharacterSpace(parent).timer.settimeout(PortraitTimeOut);
   (damageOverlay.content as DStaticImage).FreeImage;
@@ -913,6 +1070,8 @@ begin
     DLabel(damageLabel.content).Text := IntToStr(Round(Dam));
     DamageLabel.Rescale;
   end;}
+
+  StopProfiler;
 end;
 
 {=============================================================================}
@@ -923,22 +1082,30 @@ end;
 
 {procedure DIntegerEdit.incTarget(Sender: DAbstractElement; x,y: integer);
 begin
+  StartProfiler;
+
   //remake to self.ftarget! make min/max
   {hmm... looks complex...}
   if Sender is DSingleInterfaceElement then  //fool's check
     if DSingleInterfaceElement(Sender).Parent is DIntegerEdit then    //another fool's check :)
       Inc(DIntegerEdit(DSingleInterfaceElement(Sender).Parent).Target^); //todo!!!!!!!!!
+
+  StopProfiler;
 end;}
 
 {---------------------------------------------------------------------------}
 
 {procedure DIntegerEdit.decTarget(Sender: DAbstractElement; x,y: integer);
 begin
+  StartProfiler;
+
   //remake to self.ftarget! make min/max
   {hmm... looks complex...}
   if Sender is DSingleInterfaceElement then  //fool's check
     if DSingleInterfaceElement(Sender).Parent is DIntegerEdit then    //another fool's check :)
       Dec(DIntegerEdit(DSingleInterfaceElement(Sender).Parent).Target^); //todo!!!!!!!!!
+
+  StopProfiler;
 end;}
 
 {---------------------------------------------------------------------------}
@@ -947,6 +1114,8 @@ end;}
 var tmp: DIntegerLabel;
     tmpImg: DStaticImage;
 begin
+  StartProfiler;
+
   inherited create(AOwner);
   iLabel := DSingleInterfaceElement.create(Self);
   tmp := DIntegerLabel.create(ilabel);
@@ -970,28 +1139,38 @@ begin
   //tmpImg.LoadThread('');
   MinusButton.Content := tmpImg;
   Grab(MinusButton);
+
+  StopProfiler;
 end;}
 
 {---------------------------------------------------------------------------}
 
 {procedure DIntegerEdit.SetTarget(Value: pInteger);
 begin
+  StartProfiler;
+
   if fTarget <> Value then begin
     fTarget := Value;
     DIntegerLabel(iLabel.Content).Value := Value;
     //reset button activity
   end;
+
+  StopProfiler;
 end;}
 
 {---------------------------------------------------------------------------}
 
 {procedure DIntegerEdit.ArrangeChildren(Animate: TAnimationStyle);
 begin
+  StartProfiler;
+
   inherited ArrangeChildren(Animate);
   //todo ***
   PlusButton.SetBaseSize(cnt_x,cnt_y,cnt_h,cnt_h,1,Animate);
   MinusButton.SetBaseSize(cnt_x+cnt_w-cnt_h,cnt_y,cnt_h,cnt_h,1,Animate);
   iLabel.SetBaseSize(cnt_x+cnt_h,cnt_y,cnt_w-2*cnt_h,cnt_h,1,Animate);
+
+  StopProfiler;
 end;}
 
 {=============================================================================}
@@ -1000,6 +1179,8 @@ end;}
 
 {procedure DPerkInterfaceItem.settarget(value: DPerk);
 begin
+  StartProfiler;
+
   if Value <> fTarget then begin
     fTarget := Value;
     (PerkImage.Content as DStaticImage).FreeImage;
@@ -1007,6 +1188,8 @@ begin
     //(PerkImage.content as DStaticImage).load(fTarget.Image.SourceImage);
     //add events?
   end;
+
+  StopProfiler;
 end;}
 
 {---------------------------------------------------------------------------}
@@ -1014,11 +1197,15 @@ end;}
 {constructor DPerkInterfaceItem.create(AOwner: TComponent);
 var tmp: DStaticImage;
 begin
+  StartProfiler;
+
   inherited create(AOwner);
   PerkImage := DSingleInterfaceElement.create(self);
   tmp := DStaticImage.create(self);
   PerkImage.Content := tmp;
   Grab(PerkImage);
+
+  StopProfiler;
 end;}
 
 {=============================================================================}
@@ -1029,18 +1216,26 @@ end;}
 var scale: float;
     i: integer;
 begin
+  StartProfiler;
+
   inherited ArrangeChildren(animate);
   scale := cnt_h/lines;
   for i := 0 to children.Count-1 do children[i].setbasesize(cnt_x+i*scale,cnt_y,scale,scale,1,animate);
   //todo : auto scrollers
+
+  StopProfiler;
 end;}
 
 {---------------------------------------------------------------------}
 
 {constructor DAbstractSorter.create(AOwner: TComponent);
 begin
+  StartProfiler;
+
   inherited create(AOwner);
   Lines := 1;
+
+  StopProfiler;
 end;}
 
 {=============================================================================}
@@ -1049,10 +1244,14 @@ end;}
 
 {procedure DPerksContainer.SetTarget(Value: DPlayerCharacter);
 begin
+  StartProfiler;
+
   if fTarget <> Value then begin
     fTarget := Value;
     MakePerksList(asNone);
   end;
+
+  StopProfiler;
 end;}
 
 {---------------------------------------------------------------------}
@@ -1061,6 +1260,8 @@ end;}
 var tmp: DSingleInterfaceElement;
     i: integer;
 begin
+  StartProfiler;
+
   if fTarget<>nil then begin
     if (fTarget.Actions<>nil) and (fTarget.Actions.count>0) then begin
       children.Clear;
@@ -1076,6 +1277,8 @@ begin
       dLog(LogInterfaceError,Self,_CurrentRoutine,'ERROR: Target.Actions is empty!');
   end else
     dLog(LogInterfaceError,Self,_CurrentRoutine,'ERROR: Target is nil!');
+
+  StopProfiler;
 end;}
 
 {---------------------------------------------------------------------}

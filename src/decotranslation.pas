@@ -45,27 +45,35 @@ implementation
 
 uses SysUtils,
   CastleControls, DecoLoadEmbedded, {needed to use load image}
-  DecoGlobal;
+  DecoGlobal, Profiler;
 
 function LanguageDir(const Lang: TLanguage): string;
 begin
+  StartProfiler;
+
   case Lang of
     Language_English: Result := 'ENG/';
     Language_Russian: Result := 'RUS/';
     else raise Exception.Create('Unknown Language in DecoTranslation.LanguageDir!');
   end;
   Result := GetScenarioFolder + TextFolder + Result;
+
+  StopProfiler;
 end;
 
 {-----------------------------------------------------------------------------}
 
 function SayLanguage(const Lang: TLanguage): string;
 begin
+  StartProfiler;
+
   case Lang of
     Language_English: Result := 'English';
     Language_Russian: Result := 'Russian';
     else              Result := 'Unknown Language';
   end;
+
+  StopProfiler;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -73,6 +81,8 @@ end;
 {thanks to Michalis, it's simple :) see https://github.com/eugeneloza/decoherence/issues/22}
 procedure SetLoadingImage;
 begin
+  StartProfiler;
+
   {no need yet}
   //Theme.LoadingBackgroundColor := Black; // adjust as needed
   //Theme.LoadingTextColor := White; // adjust as needed
@@ -83,6 +93,8 @@ begin
   end;
 
   Theme.OwnsImages[tiLoading] := false;
+
+  StopProfiler;
 end;
 
 end.

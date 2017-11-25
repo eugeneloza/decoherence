@@ -102,7 +102,7 @@ type
       and changes displayed value approx once per second }
   DFPSLabel = class(DLabel)
   strict private
-    FPScount: Integer;
+    FPScount: integer;
     LastRenderTime: DTime;
   public
     { Call this each frame instead of Draw,
@@ -132,36 +132,48 @@ type
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 uses SysUtils, CastleImages,
-  DecoInterfaceCore, DecoLog;
+  DecoInterfaceCore, DecoLog, Profiler;
 
 {----------------------------------------------------------------------------}
 
 constructor DLabel.Create;
 begin
+  StartProfiler;
+
   inherited Create;
   Base.ScaleItem := false;
   ShadowIntensity := 0;
   ShadowLength := 3;
   Font := DefaultFont;
   //fText := ''; //autoinitialized
+
+  StopProfiler;
 end;
 
 {----------------------------------------------------------------------------}
 
 destructor DLabel.Destroy;
 begin
+  StartProfiler;
+
   FreeAndNil(BrokenString);
   inherited Destroy;
+
+  StopProfiler;
 end;
 
 {----------------------------------------------------------------------------}
 
 procedure DLabel.SetText(const Value: string);
 begin
+  StartProfiler;
+
   if fText <> Value then begin
     fText := Value;
     PrepareTextImage;
   end;
+
+  StopProfiler;
 end;
 
 {----------------------------------------------------------------------------}
@@ -169,6 +181,8 @@ end;
 procedure DLabel.PrepareTextImage;
 var tmpflg: boolean;
 begin
+  StartProfiler;
+
   ImageReady := false;
   ImageLoaded := false;
 
@@ -196,12 +210,16 @@ begin
   ImageLoaded := true;
 
   Rescale;
+
+  StopProfiler;
 end;
 
 {----------------------------------------------------------------------------}
 
 function DLabel.RescaleContent: boolean;
 begin
+  StartProfiler;
+
   {$IFNDEF AllowRescale}if SourceImage = nil then Exit;{$ENDIF}
   if Base.ScaleItem then begin
      Result := inherited RescaleContent //rescale this label as a simple image to fit "base size"
@@ -221,6 +239,8 @@ begin
         else
           Log(LogLabelError,_CurrentRoutine,'ERROR: Base.Initialized = false');
   end;
+
+  StopProfiler;
 end;
 
 
@@ -230,8 +250,12 @@ end;
 
 procedure DIntegerLabel.Update;
 begin
+  StartProfiler;
+
   inherited Update;
   Text := IntToStr(Target^);
+
+  StopProfiler;
 end;
 
 {=============================================================================}
@@ -240,8 +264,12 @@ end;
 
 procedure DStringLabel.Draw;
 begin
+  StartProfiler;
+
   Text := Target^;
   inherited Draw;
+
+  StopProfiler;
 end;
 
 {=============================================================================}
@@ -250,20 +278,28 @@ end;
 
 Constructor DFloatLabel.Create;
 begin
+  StartProfiler;
+
   inherited Create;
   Digits := 0;
+
+  StopProfiler;
 end;
 
 {---------------------------------------------------------------------------}
 
 procedure DFloatLabel.Draw;
 begin
+  StartProfiler;
+
   case Digits of
     1: Text := IntToStr(Trunc(Target^))+'.'+IntToStr(Round(Frac(Target^)*10));
     2: Text := IntToStr(Trunc(Target^))+'.'+IntToStr(Round(Frac(Target^)*100));
     else Text := IntToStr(Round(Target^));
   end;
   inherited Draw;
+
+  StopProfiler;
 end;
 
 {=============================================================================}
@@ -272,6 +308,8 @@ end;
 
 constructor DFPSLabel.Create;
 begin
+  StartProfiler;
+
   inherited Create;
   FPSCount := 0;
   LastRenderTime := -1;
@@ -284,12 +322,16 @@ begin
   Font := DebugFont;
 
   Text := 'X'; //initialize the label, so that it always has an image
+
+  StopProfiler;
 end;
 
 {---------------------------------------------------------------------------}
 
 procedure DFPSLabel.CountFPS;
 begin
+  StartProfiler;
+
   if LastRenderTime < 0 then LastRenderTime := DecoNow;
 
   if (DecoNow - LastRenderTime >= 1) then begin
@@ -298,6 +340,8 @@ begin
     LastRenderTime := DecoNow;
   end else inc(FPSCount);
   Draw;
+
+  StopProfiler;
 end;
 
 {=============================================================================}
@@ -306,11 +350,15 @@ end;
 
 constructor DPhasedLabel.Create;
 begin
+  StartProfiler;
+
   inherited Create;
   Base.AnchorToWindow := true;
   Phase := 0;
   PhaseSpeed := 0.1;
   Self.ShadowIntensity := 1.0;
+
+  StopProfiler;
 end;
 
 {----------------------------------------------------------------------------}
@@ -318,6 +366,8 @@ end;
 procedure DPhasedLabel.CyclePhase;
 var PhaseShift: float;
 begin
+  StartProfiler;
+
   PhaseShift := DeltaT*PhaseSpeed;
   Phase += PhaseShift*(1+0.1*DRND.Random);
   if Phase > 1 then Phase := 1;
@@ -325,14 +375,20 @@ begin
   OpacityPhase += PhaseShift/2*(1+0.2*DRND.Random);
   if OpacityPhase>1 then OpacityPhase := 1;
   {not sure about this... but let it be this way for now}
+
+  StopProfiler;
 end;
 
 {----------------------------------------------------------------------------}
 
 procedure DPhasedLabel.Update;
 begin
+  StartProfiler;
+
   inherited Update;
   CyclePhase;
+
+  StopProfiler;
 end;
 
 {----------------------------------------------------------------------------}
@@ -340,11 +396,15 @@ end;
 procedure DPhasedLabel.doDraw;
 var y: integer;
 begin
+  StartProfiler;
+
   //inherited <---------- this render is different
   GLImage.Color[3] := Current.Opacity*Sin(Pi*Phase);
 
   y := round((1 + 5*Phase)*Window.height/17);
   GLImage.Draw(2*Window.Width div 3, y);
+
+  StopProfiler;
 end;
 
 end.

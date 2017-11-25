@@ -109,7 +109,7 @@ function URLValid(const aURL: string): Boolean;
 { +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ }
 implementation
 
-uses SysUtils{, DecoLog, CastleLog};
+uses SysUtils, Profiler;
 
 {procedure DObject.Log(const LogLevel: Boolean;
   const aProcedure, aMessage: string);
@@ -126,6 +126,8 @@ function GetRandomSeed: LongWord;
 var
   DevRnd: file of integer;
 begin
+  StartProfiler;
+
   { algorithm according to http://wiki.freepascal.org/Dev_random
     /dev/urandom is a native *nix very high-quality random number generator.
     it's 1000 times slower than CastleRandom,
@@ -137,6 +139,8 @@ begin
   until Result <> 0;
   // xorshift can't accept 0 as a random seed so we just read /dev/urandom until its not zero
   CloseFile(DevRnd);
+
+  StopProfiler;
 end;
 {$ELSE}
 
@@ -149,21 +153,33 @@ end;
 
 procedure InitGlobal;
 begin
+  StartProfiler;
+
   DRND := TCastleRandom.Create(GetRandomSeed);
+
+  StopProfiler;
 end;
 
 { ---------------------------------------------------------------------------- }
 
 procedure DestroyGlobal;
 begin
+  StartProfiler;
+
   FreeAndNil(DRND);
+
+  StopProfiler;
 end;
 
 { ---------------------------------------------------------------------------- }
 
 function GetScenarioFolder: string;
 begin
+  StartProfiler;
+
   Result := ScenarioBaseFolder + CurrentScenarioFolder;
+
+  StopProfiler;
 end;
 
 { ---------------------------------------------------------------------------- }
@@ -175,17 +191,25 @@ Const
     DZeroResolution = 1E-12;
     SZeroResolution = 1E-4; }
 begin
+  StartProfiler;
+
   if (a > b) then
     Result := ((a - b) <= Epsilon)
   else
     Result := ((b - a) <= Epsilon);
+
+  StopProfiler;
 end;
 
 { ---------------------------------------------------------------------------- }
 
 function URLValid(const aURL: string): Boolean;
 begin
-  Result := aURL <> '' // todo
+  StartProfiler;
+
+  Result := aURL <> ''; // todo
+
+  StopProfiler;
 end;
 
 initialization

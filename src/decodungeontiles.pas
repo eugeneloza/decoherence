@@ -169,10 +169,12 @@ function InvertAngle(const Angle: TAngle): TAngle; {$IFDEF SUPPORTS_INLINE}inlin
 implementation
 uses SysUtils, CastleURIUtils,
   DOM, CastleXMLUtils,
-  DecoLog;
+  DecoLog, Profiler;
 
 function TileKindToStr(const Value: TTileKind): string;
 begin
+  StartProfiler;
+
   case Value of
     tkNone: Result := 'NA';
     tkFree: Result := 'FREE';
@@ -182,9 +184,13 @@ begin
     tkInacceptible: raise Exception.Create('tkInacceptible in TileKindToStr');  //this one shouldn't appear in string
     else raise Exception.Create('Unknown TileKind in TileKindToStr');
   end;
+
+  StopProfiler;
 end;
 function StrToTileKind(const Value: string): TTileKind;
 begin
+  StartProfiler;
+
   case Value of
     'NA':   Result := tkNone;
     'FREE': Result := tkFree;
@@ -194,32 +200,44 @@ begin
     'ERROR':  raise Exception.Create('tkInacceptible in StrToTileKind');  //this one shouldn't appear in string
     else raise Exception.Create('Unknown TileKind in StrToTileKind');
   end;
+
+  StopProfiler;
 end;
 
 {---------------------------------------------------------------------------}
 
 function TileFaceToStr(const Value: TTileFace): string;
 begin
+  StartProfiler;
+
   case Value of
     tfNone: Result := 'none';
     tfWall: Result := 'wall';
     tfFree..high(TTileFace): Result := IntToStr(Value);
     else raise Exception.Create('Unknown TTileFace Value in TileFaceToStr');
   end;
+
+  StopProfiler;
 end;
 function StrToTileFace(const Value: string): TTileFace;
 begin
+  StartProfiler;
+
   case Value of
     'none': Result := tfNone;
     'wall': Result := tfWall;
     else Result := StrToInt(Value);
   end;
+
+  StopProfiler;
 end;
 
 {---------------------------------------------------------------------------}
 
 function AngleToStr(const Value: TAngle): string;
 begin
+  StartProfiler;
+
   case Value of
     aTop:    Result := 'top';
     aBottom: Result := 'bottom';
@@ -228,9 +246,13 @@ begin
     aUp:     Result := 'up';
     aDown:   Result := 'down';
   end;
+
+  StopProfiler;
 end;
 function StrToAngle(const Value: string): TAngle;
 begin
+  StartProfiler;
+
   case Value of
     'top':    Result := aTop;
     'bottom': Result := aBottom;
@@ -239,6 +261,8 @@ begin
     'up':     Result := aUp;
     'down':   Result := aDown;
   end;
+
+  StopProfiler;
 end;
 
 {---------------------------------------------------------------------------}
@@ -321,6 +345,8 @@ var TileDOC: TXMLDocument;
     j: TAngle;
     FullURL: string;
 begin
+  StartProfiler;
+
   //inherited;
   TileName := DeleteURIExt(ExtractURIName(URL));
   Log(LogInitData,_CurrentRoutine,URL);
@@ -371,6 +397,8 @@ begin
   SetLength(Img,SizeZ);
   for jz := 0 to SizeZ-1 do
     Img[jz] := LoadImage(ChangeURIExt(URL,'_'+IntToStr(jz)+'.png'),[TRGBAlphaImage]) as TRGBAlphaImage;
+
+  StopProfiler;
 end;
 
 {----------------------------------------------------------------------------}
@@ -378,21 +406,31 @@ end;
 procedure DMap.FreeMinimap;
 var jz: integer;
 begin
+  StartProfiler;
+
   if Length(Img)>0 then
   for jz := 0 to Length(Img)-1 do
     FreeAndNil(Img[jz]);
+
+  StopProfiler;
 end;
 
 destructor DMap.Destroy;
 begin
+  StartProfiler;
+
   FreeMinimap;
   inherited Destroy;
+
+  StopProfiler;
 end;
 
 {----------------------------------------------------------------------------}
 
 procedure DMap.SetSize(const tx: integer = 1; const ty: integer = 1; const tz: integer = 1);
 begin
+  StartProfiler;
+
   SizeX := tx;
   SizeY := ty;
   SizeZ := tz;
@@ -403,6 +441,8 @@ begin
   else
     //in case this is a "blocker" tile we still need a complete 1x1x1 base
     raise Exception.Create('DMap.setsize: Tilesize is zero!');
+
+  StopProfiler;
 end;
 
 {----------------------------------------------------------------------------}
@@ -410,6 +450,8 @@ end;
 procedure DMap.GetMapMemory;
 var ix,iy: integer;
 begin
+  StartProfiler;
+
   {set length of 3d dynamic array}
   SetLength(Map,SizeX);
   for ix := 0 to SizeX-1 do begin
@@ -417,6 +459,8 @@ begin
     for iy := 0 to SizeY-1 do
       SetLength(Map[ix,iy],SizeZ);
   end;
+
+  StopProfiler;
 end;
 
 {----------------------------------------------------------------------------}
@@ -425,6 +469,8 @@ procedure DMap.EmptyMap(const InitToFree: boolean);
 var jx,jy,jz: integer;
     a: TAngle;
 begin
+  StartProfiler;
+
   for jx := 0 to SizeX-1 do
     for jy := 0 to SizeY-1 do
       for jz := 0 to SizeZ-1 do begin
@@ -442,7 +488,9 @@ begin
         if jy = SizeY-1 then Map[jx,jy,jz].Faces[aBottom] := tfWall;
         if jz = 0       then Map[jx,jy,jz].Faces[aUp]     := tfWall;
         if jz = SizeZ-1 then Map[jx,jy,jz].Faces[aDown]   := tfWall;
-      end
+      end;
+
+  StopProfiler;
 end;
 
 {-------------------------------------------------------------------------}

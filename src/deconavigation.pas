@@ -35,7 +35,7 @@ procedure InitNavigation;
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 uses  CastleFilesUtils, x3dLoad,
-  DecoLog;
+  DecoLog, Profiler;
 
 var Nav: TKambiNavigationInfoNode;
     NavRoot: TX3DRootNode;
@@ -45,6 +45,8 @@ var Nav: TKambiNavigationInfoNode;
 
 procedure InitNavigation;
 begin
+  StartProfiler;
+
   Log(LogInitPlayer,_CurrentRoutine,'Initialize navigation');
   Camera := TWalkCamera.Create(Window);
   {z-up orientation}
@@ -95,6 +97,7 @@ begin
   Navigation.ShadowMaps := ShadowMapsEnabled;
   Navigation.Load(NavRoot,true);
 
+  StopProfiler;
 end;
 
 end.

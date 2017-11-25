@@ -78,13 +78,15 @@ implementation
 uses SysUtils, CastleFilesUtils,
   DOM, CastleXMLUtils,
   DecoFont,
-  DecoLog;
+  DecoLog, Profiler;
 
 var LastFact: integer = -1;
     CurrentFact: DFact = nil;      //looks ugly! Maybe I should remake it?
 function GetRandomFact: string;
 var NewFact: integer;
 begin
+  StartProfiler;
+
   repeat
     NewFact := DRND.Random(Facts.Count);
   until (NewFact <> LastFact) and (DRND.Random < 1/Facts[NewFact].Frequency);
@@ -92,6 +94,8 @@ begin
   Result := Facts[NewFact].Value;
   CurrentFact := Facts[NewFact];
   LastFact := NewFact;
+
+  StopProfiler;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -100,6 +104,8 @@ var LoadImageOld: string = '';
 function GetRandomFactImage: string;
 var LoadImageNew: string;
 begin
+  StartProfiler;
+
   if CurrentFact = nil then
     raise Exception.Create('GetRandomFactImage ERROR: Get Fact before getting the image!');
   if CurrentFact.Compatibility.Count>0 then
@@ -112,6 +118,8 @@ begin
   LoadImageOld := LoadImageNew;
   Result := LoadImageNew;
   CurrentFact := nil;
+
+  StopProfiler;
 end;
 
 {---------------------------------------------------------------------------------}
@@ -124,6 +132,8 @@ var FactsDoc: TXMLDocument;
     F: DFact;
     LI: DLoadImage;
 begin
+  StartProfiler;
+
   if Facts <> nil then begin
     Log(LogInitError,Facts.ClassName+'>'+_CurrentRoutine,'Facts is not nil. Freeing...');
     FreeAndNil(Facts);
@@ -162,35 +172,51 @@ begin
   end;
   FreeAndNil(FactsDoc);
   Log(LogInitInterface,Facts.ClassName+'>'+_CurrentRoutine,'Reading file finished.');
+
+  StopProfiler;
 end;
 
 {---------------------------------------------------------------------------}
 
 destructor DFact.Destroy;
 begin
+  StartProfiler;
+
   FreeAndNil(Compatibility);
   inherited Destroy;
+
+  StopProfiler;
 end;
 
 {---------------------------------------------------------------------------}
 
 procedure InitLoadScreen;
 begin
+  StartProfiler;
+
   //LoadFacts does everything, jsut providing it a correct filename.
   LoadFacts(ApplicationData(LanguageDir(CurrentLanguage)+'facts.xml'+gz_ext));
+
+  StopProfiler;
 end;
 
 {---------------------------------------------------------------------------------}
 
 procedure FreeLoadScreen;
 begin
+  StartProfiler;
+
   FreeAndNil(Facts);
+
+  StopProfiler;
 end;
 
 {--------------------------------------------------------------------------}
 
 function LoadScreenMainText: string;
 begin
+  StartProfiler;
+
   {remake it some day into something useful}
   case CurrentLanguage of
     Language_English: Result := 'Welcome to Decoherence :)'+dlinebreak+
@@ -201,6 +227,8 @@ begin
                                 'просто нажмите любую клавишу...';
     else Result := 'Language unavailable'
   end;
+
+  StopProfiler;
 end;
 
 end.

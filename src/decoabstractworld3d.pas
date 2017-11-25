@@ -172,10 +172,12 @@ uses SysUtils, DecoLoad3d,
   DecoNavigationNetwork, DecoPlayerCharacter,
   DecoActorBody,
   CastleSceneCore,
-  DecoLog;
+  DecoLog, Profiler;
 
 {============================ DAbstractWorld3D =============================}
 {================================ MANAGE ===================================}
+
+{Warning! No profiler for threaded objects}
 
 constructor DAppearVanishManagerThread.Create;
 begin
@@ -246,24 +248,34 @@ end;
 
 procedure DAbstractWorldManaged.StartAppearVanishManagerThread;
 begin
+  StartProfiler;
   {$warning todo}
+  StopProfiler;
 end;
 
 {--------------------------------------------------------------------------}
 
 constructor DAbstractWorldManaged.Create;
 begin
+  StartProfiler;
+
   inherited Create;
   AppearVanishManager := DAppearVanishManagerThread.Create;
   AppearVanishManager.Priority := tpNormal;  {$HINT maybe use tpLower}
+
+  StopProfiler;
 end;
 
 {--------------------------------------------------------------------------}
 
 destructor DAbstractWorldManaged.Destroy;
 begin
+  StartProfiler;
+
   FreeAndNil(AppearVanishManager);
   inherited Destroy;
+
+  StopProfiler;
 end;
 
 
@@ -272,19 +284,27 @@ end;
 
 function CopyTransform(const Source: TTransformNode): TTransformNode;
 begin
+  StartProfiler;
+
   Result := TTransformNode.Create;
   Result.Translation := Source.Translation;
   Result.Scale := Source.Scale;
   Result.Rotation := Source.Rotation;
+
+  StopProfiler;
 end;
 
 {---------------------------------------------------------------------------}
 
 procedure DAbstractWorld3d.Load(const Generator: DAbstractGenerator);
 begin
+  StartProfiler;
+
   inherited Load(Generator);
   Groups := Generator.ExportGroups;
   WorldElementsURL := Generator.ExportTiles;
+
+  StopProfiler;
 end;
 
 {---------------------------------------------------------------------------}
@@ -292,6 +312,8 @@ end;
 procedure DAbstractWorld3d.RescaleNavigationNetwork;
 var i: integer;
 begin
+  StartProfiler;
+
   {$hint I don't like that!}
   for i := 0 to Nav.Count-1 do begin
 {
@@ -303,14 +325,20 @@ begin
     Nav.L[i].Pos[1] := -WorldScale * Nav.L[i].Pos[1];
     Nav.L[i].Pos[2] := -WorldScale * Nav.L[i].Pos[2];
   end;
+
+  StopProfiler;
 end;
 
 {---------------------------------------------------------------------------}
 
 procedure DAbstractWorld3d.Load(const URL: string);
 begin
+  StartProfiler;
+
   inherited Load(URL);
   //load groups and WorldElementsList
+
+  StopProfiler;
 end;
 
 {---------------------------------------------------------------------------}
@@ -318,6 +346,8 @@ end;
 procedure DAbstractWorld3d.Activate;
 var  i: integer;
 begin
+  StartProfiler;
+
   inherited Activate;
   Window.SceneManager.Items.Clear;
   Window.SceneManager.Items.Add(Navigation);
@@ -327,6 +357,8 @@ begin
 
   for i := 0 to WorldScenes.Count-1 do
     Window.SceneManager.Items.Add(WorldScenes[i]);
+
+  StopProfiler;
 end;
 
 {------------------------------------------------------------------------------}
@@ -336,6 +368,8 @@ var i: integer;
     Slot,Replacement: TTransformNode;
     Parsed: DNodeInfo;
 begin
+  StartProfiler;
+
   for i := 0 to Source.FdChildren.Count-1 do
     if not isPlaceholder(Source.FdChildren[i]) then
       //add the node normally
@@ -353,6 +387,8 @@ begin
         Dest.FdChildren.Add(Replacement);
       end;
     end;
+
+  StopProfiler;
 end;
 
 
@@ -362,12 +398,16 @@ procedure DAbstractWorld3d.LoadWorldObjects;
 var s: string;
   tmpRoot: TX3DRootNode;
 begin
+  StartProfiler;
+
   WorldElements3d := TRootList.Create(true);
   For s in WorldElementsURL do begin
     tmpRoot := LoadBlenderX3D(s);
     tmpRoot.KeepExisting := 1;   //List owns the nodes, so don't free them manually/automatically
     WorldElements3d.Add(tmpRoot);
   end;
+
+  StopProfiler;
 end;
 
 {----------------------------------------------------------------------------}
@@ -376,6 +416,8 @@ procedure DAbstractWorld3d.BuildSwitches;
 var i: integer;
   Switch: TSwitchNode;
 begin
+  StartProfiler;
+
   WorldSwitches := TSwitchList.Create(false); //scene will take care of freeing
   for i := 0 to WorldObjects.Count-1 do begin
     Switch := TSwitchNode.Create;
@@ -383,6 +425,8 @@ begin
     Switch.WhichChoice := 0;
     WorldSwitches.Add(Switch);
   end;
+
+  StopProfiler;
 end;
 {$ENDIF}
 {----------------------------------------------------------------------------}
@@ -391,6 +435,8 @@ procedure DAbstractWorld3d.BuildRoots;
 var i,j: integer;
   Root: TX3DRootNode;
 begin
+  StartProfiler;
+
   WorldRoots := TRootList.Create(false); //scene will take care of freeing, owns root
   for i := 0 to Groups.Count-1 do begin
     Root := TX3DRootNode.Create;
@@ -398,6 +444,8 @@ begin
       Root.FdChildren.Add({$IFDEF UseSwitches}WorldSwitches[Groups[i].Items[j]]{$ELSE}WorldObjects[Groups[i].Items[j]]{$ENDIF});
     WorldRoots.Add(Root);
   end;
+
+  StopProfiler;
 end;
 
 {----------------------------------------------------------------------------}
@@ -406,6 +454,8 @@ procedure DAbstractWorld3d.BuildScenes;
 var i: integer;
     Scene: TCastleScene;
 begin
+  StartProfiler;
+
   WorldScenes := TSceneList.Create(true); //list owns the scenes and will free them accordingly
   for i := 0 to WorldRoots.Count-1 do begin
     Scene := TCastleScene.Create(nil); //List will free the scenes, not freeing them automatically
@@ -415,6 +465,8 @@ begin
     Scene.Load(WorldRoots[i],true);
     WorldScenes.Add(Scene);
   end;
+
+  StopProfiler;
 end;
 
 {----------------------------------------------------------------------------}
@@ -424,6 +476,8 @@ var i: integer;
     n: TNavID;
     a: DMonster;
 begin
+  StartProfiler;
+
   if Actors <> nil then begin
     Log(LogWorldInitSoftError,_CurrentRoutine,'WARNING: Actors is not nil, freeing...');
     FreeAndNil(Actors);
@@ -442,18 +496,24 @@ begin
     a.Spawn(n, tmpKnightCreature);
     Actors.Add(a);
   end;
+
+  StopProfiler;
 end;
 
 {----------------------------------------------------------------------------}
 
 procedure DAbstractWorld3d.Build;
 begin
+  StartProfiler;
+
   inherited Build;
   LoadWorldObjects;
   BuildTransforms;
   {$IFDEF UseSwitches}BuildSwitches;{$ENDIF}
   BuildRoots;
   BuildScenes;
+
+  StopProfiler;
 end;
 
 {------------------------------------------------------------------------------}
@@ -461,11 +521,15 @@ end;
 Procedure DAbstractWorld3d.Manage(const Position: TVector3);
 var a: DSimpleActor;
 begin
+  StartProfiler;
+
   //inherited; --- nothing to inherit yet
 
   //manage all actors in the World
   if Actors<>nil then
     for a in Actors do a.Manage;
+
+  StopProfiler;
 end;
 
 {------------------------------------------------------------------------------}
@@ -473,7 +537,9 @@ end;
 
 Procedure DAbstractWorld3d.ToggleSceneManager(const Value: boolean);
 begin
+  StartProfiler;
   Window.SceneManager.Exists := Value;
+  StopProfiler;
 end;
 
 
@@ -481,6 +547,8 @@ end;
 
 destructor DAbstractWorld3d.Destroy;
 begin
+  StartProfiler;
+
   //free 3d-related lists
   FreeAndNil(WorldScenes);
   FreeAndNil(WorldRoots);
@@ -490,6 +558,8 @@ begin
   FreeAndNil(WorldElementsURL);
   FreeAndNil(Actors);           //owns children, so will free them automatically (! might conflict);
   inherited Destroy;
+
+  StopProfiler;
 end;
 
 {=============================== OTHER ROUTINES ===============================}
@@ -500,7 +570,9 @@ end;
 {procedure FreeRootList(List: TRootList);
 var i: integer;
 begin
+  StartProfiler;
   for i := 0 to List.count do FreeAndNil(List[i]);
+  StopProfiler;
 end;}
 
 

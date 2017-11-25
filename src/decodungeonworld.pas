@@ -47,7 +47,7 @@ type
      *time-critical procedure}
     function UpdatePlayerCoordinates(const x,y,z: float): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
     {Manages tiles (show/hide/trigger events) *time-critical procedure}
-    Procedure ManageTiles; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+    procedure ManageTiles; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
   protected
     {neighbours array}
     Neighbours: TNeighboursMapArray;
@@ -70,7 +70,7 @@ type
     procedure Load(const URL: string); override;
 
     {loads word scenes into scene manager}
-    Procedure Activate; override;
+    procedure Activate; override;
 
     { Dungeong world is flat, so it always returns (0,0,1)
       See also https://github.com/eugeneloza/decoherence/issues/76#issuecomment-321906640 }
@@ -85,11 +85,13 @@ type
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 uses SysUtils, CastleFilesUtils, CastleLog,
-  DecoPlayerCharacter, DecoTime;
+  DecoPlayerCharacter, DecoTime, DecoLog, Profiler;
 
 procedure DDungeonWorld.ManageTiles; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
+  StartProfiler;
   {$WARNING dummy}
+  StopProfiler;
 end;
 
 {----------------------------------------------------------------------------}
@@ -97,6 +99,8 @@ end;
 function DDungeonWorld.UpdatePlayerCoordinates(const x,y,z: float): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 //var nx,ny,nz: TIntCoordinate;
 begin
+  StartProfiler;
+
   {todo: may be optimized, at the moment we have here: 6 assignments,
    using nx,ny,nz we will have *MORE* work *IF* the tile has changed,
    but only 3 assignments otherwise}
@@ -116,12 +120,16 @@ begin
   else
     {current tile hasn't changed}
     Result := false;
+
+  StopProfiler;
 end;
 
 {----------------------------------------------------------------------------}
 
 procedure DDungeonWorld.Manage(const Position: TVector3);
 begin
+  StartProfiler;
+
   inherited Manage(Position);
   if FirstRender then begin
     {$warning reset all tiles visibility here}
@@ -131,17 +139,23 @@ begin
 
   if UpdatePlayerCoordinates(Position[0],Position[1],Position[2]) then
     ManageTiles;
+
+  StopProfiler;
 end;
 
 {----------------------------------------------------------------------------}
 
 function DDungeonWorld.GetGravity(const aPosition: TVector3): TVector3;
 begin
+  StartProfiler;
   Result := Vector3(0,0,1);
+  StopProfiler;
 end;
 function DDungeonWorld.GetGravity(const aNav: TNavID): TVector3;
 begin
+  StartProfiler;
   Result := Vector3(0,0,1);
+  StopProfiler;
 end;
 
 {----------------------------------------------------------------------------}
@@ -149,6 +163,8 @@ end;
 procedure DDungeonWorld.Load(const Generator: DAbstractGenerator);
 var DG: D3dDungeonGenerator;
 begin
+  StartProfiler;
+
   inherited Load(Generator);
   fGravityAcceleration := 10;
   DG := Generator as D3dDungeonGenerator;
@@ -163,19 +179,24 @@ begin
    however, loading from generator is *not* a normal case
    (used mostly for testing in pre-alpha), so such redundancy will be ok
    normally World should load from a file and loading tiles will happen only once}
+  StopProfiler;
 end;
 
 {----------------------------------------------------------------------------}
 
 procedure DDungeonWorld.Load(const URL: string);
 begin
+  StartProfiler;
   {$Warning dummy}
+  StopProfiler;
 end;
 
 {----------------------------------------------------------------------------}
 
 procedure DDungeonWorld.Activate;
 begin
+  StartProfiler;
+
   inherited Activate;
   {$WARNING todo}
   Player.CurrentParty.TeleportTo(Weenies[0].NavId);
@@ -183,6 +204,8 @@ begin
   {$WARNING this is wrong}
   {why does it get a wrong GRAVITY_UP if called from Self.Activate?????}
   SpawnActors; //must go after BuildNav;
+
+  StopProfiler;
 end;
 
 {----------------------------------------------------------------------------}
@@ -191,6 +214,8 @@ procedure DDungeonWorld.BuildTransforms;
 var i: integer;
   Transform: TTransformNode;
 begin
+  StartProfiler;
+
   WorldObjects := TTransformList.Create(false); //scene will take care of freeing
   for i := 0 to High(Steps) do begin
     Transform := TTransformNode.Create;
@@ -201,12 +226,16 @@ begin
     AddRecoursive(Transform,WorldElements3d[Steps[i].Tile]);
     WorldObjects.Add(Transform);
   end;
+
+  StopProfiler;
 end;
 
 {----------------------------------------------------------------------------}
 
 constructor DDungeonWorld.Create;
 begin
+  StartProfiler;
+
   inherited Create;
   px  := UninitializedCoordinate;
   py  := UninitializedCoordinate;
@@ -214,12 +243,16 @@ begin
   px0 := UninitializedCoordinate;        //we use px0 := px at the moment, so these are not needed, but it might change in future
   py0 := UninitializedCoordinate;
   pz0 := UninitializedCoordinate;
+
+  StopProfiler;
 end;
 
 {----------------------------------------------------------------------------}
 
 destructor DDungeonWorld.Destroy;
 begin
+  StartProfiler;
+
   {$hint freeandnil(window.scenemanager)?}
   
   //free basic map parameters
@@ -228,6 +261,8 @@ begin
   FreeNeighboursMap(Neighbours);
 
   inherited Destroy;
+
+  StopProfiler;
 end;
 
 end.

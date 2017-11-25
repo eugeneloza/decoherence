@@ -260,41 +260,59 @@ implementation
 uses SysUtils, castleFilesUtils,
   CastleVectors,
   //DecoHDD, //used for safe threaded loading of sound buffer
-  DecoTime, DecoLog;
+  DecoTime, DecoLog, Profiler;
 
 {========================== TMusicLoadThread ===============================}
 
 procedure DSoundLoadThread.Execute;
 begin
-  //issue HDD lock
- (Parent as DSoundFile).Buffer := SoundEngine.LoadBuffer((Parent as DSoundFile).fURL, (Parent as DSoundFile).Duration);
- (Parent as DSoundFile).LoadFinished;
+  StartProfiler;
+
+   //issue HDD lock
+  (Parent as DSoundFile).Buffer := SoundEngine.LoadBuffer((Parent as DSoundFile).fURL, (Parent as DSoundFile).Duration);
+  (Parent as DSoundFile).LoadFinished;
+
+  StopProfiler
 end;
 
 {============================= DSoundFile ==================================}
 
 constructor DSoundFile.Create;
 begin
+  StartProfiler;
+
   inherited Create;
   Buffer := 0;
   Duration := -1;
+
+  StopProfiler;
 end;
 constructor DSoundFile.Create(const URL: string);
 begin
+  StartProfiler;
+
   Self.Create;
   fURL := URL;
   Self.Load;
+
+  StopProfiler;
 end;
 
 {---------------------------------------------------------------------------}
 
 procedure DSoundFile.Load(const URL :string);
 begin
+  StartProfiler;
+
   fURL := URL;
   Self.Load;
+
+  StopProfiler;
 end;
 procedure DSoundFile.Load;
 begin
+  StartProfiler;
+
   if fURL='' then begin
     Log(LogSoundError,_CurrentRoutine,'ERROR: No valid URL provided. Exiting...');
     Exit;
@@ -309,24 +327,31 @@ begin
   end
   else
      Log(LogSoundError,_CurrentRoutine,'Thread already working...');}
+
+  StopProfiler;
 end;
 procedure DSoundFile.LoadFinished;
 begin
+  StartProfiler;
   fisLoaded := true;
+  StopProfiler;
 end;
 
 {---------------------------------------------------------------------------}
 
 destructor DSoundFile.Destroy;
 begin
+  StartProfiler;
   SoundEngine.FreeBuffer(Buffer);
   inherited Destroy;
+  StopProfiler;
 end;
 
 {========================== DMusicTrack ==================================}
 
 procedure DMusicTrack.Start;
 begin
+  StartProfiler;
   if not isLoaded then begin
     Log(LogSoundError,_CurrentRoutine,'ERROR: Music is not loaded!');
     Exit;
@@ -334,75 +359,92 @@ begin
   fCurrent := SoundEngine.PlaySound(Self.Buffer, false, fLoop, 10, fGain, 0, 1, TVector3.Zero);
   if fCurrent = nil then Log(LogSoundError,_CurrentRoutine,'ERROR: Unable to allocate music!');
   fisPlaying := true;
+  StopProfiler;
 end;
 
 {---------------------------------------------------------------------------}
 
 procedure DMusicTrack.FadeOut;
 begin
+  StartProfiler;
   FadeStart := DecoNow;
+  StopProfiler;
 end;
 
 {---------------------------------------------------------------------------}
 
 procedure DMusicTrack.Manage;
 begin
+  StartProfiler;
   if isPlaying then
     if FadeStart>0 then doFade;
+  StopProfiler;
 end;
 
 {---------------------------------------------------------------------------}
 
 constructor DMusicTrack.Create;
 begin
+  StartProfiler;
   inherited Create;
   FadeStart := -1;
+  StopProfiler;
 end;
 constructor DMusicTrack.Create(const URL: string);
 begin
+  StartProfiler;
   inherited Create(URL);
   FadeStart := -1;
+  StopProfiler;
 end;
 
 {---------------------------------------------------------------------------}
 
 procedure DMusicTrack.doFade;
 begin
-  if decoNow-FadeStart < FadeTime then begin
-    setGain(1-(decoNow-FadeStart)/FadeTime);
+  StartProfiler;
+  if DecoNow-FadeStart < FadeTime then begin
+    SetGain(1-(decoNow-FadeStart)/FadeTime);
   end else begin
     SetGain(0);       //fade to zero
     fCurrent.Release; //stop the music
     fisPlaying := false;
   end;
+  StopProfiler;
 end;
 
 {---------------------------------------------------------------------------}
 
 procedure DMusicTrack.setGain(const Value: single);
 begin
+  StartProfiler;
   if Assigned(fCurrent) and fCurrent.PlayingOrPaused then
     fCurrent.Gain := Value
   else begin
     //fGain := value;
     Log(LogSoundError,_CurrentRoutine,'Warning: Setting gain of a non-playing music track...');
   end;
+  StopProfiler;
 end;
 
 {============================ DPlaylist ================================}
 
 constructor DPlaylist.Create;
 begin
+  StartProfiler;
   //inherited Create;
   URLs := TStringList.Create;
+  StopProfiler;
 end;
 
 {---------------------------------------------------------------------------}
 
 destructor DPlayList.Destroy;
 begin
+  StartProfiler;
   FreeAndNil(URLs);
   inherited Destroy;
+  StopProfiler;
 end;
 
 {---------------------------------------------------------------------------}
@@ -411,11 +453,13 @@ end;
 var s: string;
     MusicTrack: DMusicTrack;
 begin
+  StartProfiler;
   {$warning this is wrong! we need to load only one url at once in sequential playlist!}
   for s in URLs do
     MusicTrack := DMusicTrack.Create(s);
   {$hint different implementation for loop tracks}
   {$hint delayed load of the music files!}
+  StopProfiler;
 end;}
 
 {---------------------------------------------------------------------------}
@@ -423,6 +467,7 @@ end;}
 procedure DSequentialPlaylist.LoadNext;
 var NewTrack: integer;
 begin
+  StartProfiler;
   if URLs.Count=1 then PreviousTrack := -1; //if only one track is available, then forget about shuffling
   //shuffle tracks, but don't repeat the previous one
   repeat
@@ -430,29 +475,36 @@ begin
   until NewTrack<>PreviousTrack;
   {$hint process silence here}
   //load here
+  StopProfiler;
 end;
 
 {---------------------------------------------------------------------------}
 
 constructor DSequentialPlaylist.Create;
 begin
+  StartProfiler;
   inherited Create;
   PreviousTrack := -1;
   Tracks := TTrackList.Create;
+  StopProfiler;
 end;
 
 destructor DSequentialPlaylist.Destroy;
 begin
+  StartProfiler;
   FreeAndNil(Tracks);
   inherited Destroy;
+  StopProfiler;
 end;
 
 {---------------------------------------------------------------------------}
 
 procedure DSyncPlaylist.SetTension(const Value: TTension);
 begin
+  StartProfiler;
   if GetTrack(fTension){current track playing}<>GetTrack(Value) then TensionChanged := true;
   fTension := Value;
+  StopProfiler;
 end;
 
 {---------------------------------------------------------------------------}
@@ -461,6 +513,7 @@ function DSyncPlaylist.GetTrack(const NewTension: TTension): integer;
 var i: integer;
     TensionDist: single;
 begin
+  StartProfiler;
   TensionDist := 9999; //some arbitrary large value
   Result := -1;
   {$WARNING the track may be not loaded yet!}
@@ -470,85 +523,106 @@ begin
       TensionDist := Abs(Tracks[i].Tension - NewTension);
       Result := i;
     end;
+  StopProfiler;
 end;
 
 {---------------------------------------------------------------------------}
 
 procedure DSyncPlaylist.Manage;
 begin
+  StartProfiler;
   TensionChanged := false;
+  StopProfiler;
 end;
 
 {---------------------------------------------------------------------------}
 
 constructor DSyncPlaylist.Create;
 begin
+  StartProfiler;
   inherited Create;
   Tracks := TLoopTrackList.Create;
+  StopProfiler;
 end;
 
 {---------------------------------------------------------------------------}
 
 destructor DSyncPlaylist.Destroy;
 begin
+  StartProfiler;
   FreeAndNil(Tracks);
   inherited Destroy;
+  StopProfiler;
 end;
 
 {---------------------------------------------------------------------------}
 
 procedure DMultiSyncPlaylist.SetSituation(const Value: TSituation);
 begin
+  StartProfiler;
   if fSituation <> Value then begin
     SituationChanged := true;
     fSituation := Value;
   end;
+  StopProfiler;
 end;
 
 {---------------------------------------------------------------------------}
 
 procedure DMultiSyncPlaylist.Manage;
 begin
+  StartProfiler;
   SituationChanged := false;
+  StopProfiler;
 end;
 
 {============================ DMusicManager ================================}
 
 procedure DMusicManager.Manage;
 begin
+  StartProfiler;
   //todo
+  StopProfiler;
 end;
 
 {---------------------------------------------------------------------------}
 
 constructor DMusicManager.Create;
 begin
+  StartProfiler;
   //inherited Create;
   //todo
+  StopProfiler;
 end;
 
 {---------------------------------------------------------------------------}
 
 destructor DMusicManager.Destroy;
 begin
+  StartProfiler;
   //todo
   inherited Destroy;
+  StopProfiler;
 end;
 
 {============================ other routines ===============================}
 
 procedure InitMusicManager;
 begin
+  StartProfiler;
   Log(LogInitSound,_CurrentRoutine,'Creating music manager...');
   Music := DMusicManager.Create;
+  StopProfiler;
 end;
 
 {---------------------------------------------------------------------------}
 
 procedure FreeMusicManager;
 begin
+  StartProfiler;
   Log(LogInitSound,_CurrentRoutine,'Freeing music manager...');
   FreeAndNil(Music);
+  StopProfiler;
 end;
 
 {

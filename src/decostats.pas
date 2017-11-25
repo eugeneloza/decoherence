@@ -25,7 +25,7 @@ interface
 uses
   DecoGlobal;
 
-Const
+const
   {stats for actors}
   St_str = 0;
   St_dx = 1;
@@ -41,30 +41,41 @@ Const
   St_mph = 9;
   MaxStats = 9; {+1}
 
-Type
+type
   {A record representing the base stats array}
   DStats = class(DObject)
   public
     Value: array of integer;
     Count: integer;
-    Constructor Create(SetFullStats: boolean);
-    Destructor Destroy; override;
-  End;
+    constructor Create(SetFullStats: boolean);
+    destructor Destroy; override;
+  end;
 
 implementation
+uses DecoLog, Profiler;
 
-Constructor DStats.Create(SetFullStats: boolean);
-Begin
-  If SetFullStats then
+constructor DStats.Create(SetFullStats: boolean);
+begin
+  StartProfiler;
+  //inherited Create;
+
+  if SetFullStats then
     Count := MaxStats+1
-  Else
+  else
     Count := MaxBaseStats+1;
-  SetLength(Value,Count);
+  SetLength(Value, Count);
+
+  StopProfiler;
 End;
 
-Destructor DStats.Destroy;
+destructor DStats.Destroy;
 begin
-  SetLength(Value,0); //redundant
+  StartProfiler;
+
+  SetLength(Value, 0); //redundant
+  inherited Destroy;
+
+  StopProfiler;
 end;
 
 end.

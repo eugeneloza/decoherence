@@ -23,6 +23,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
   only in extremely time-critical routines often calculating time like World.Manage}
 unit DecoTime;
 
+{$HINT Profiler not used here}
+
 {$INCLUDE compilerconfig.inc}
 {$DEFINE UseFloatTimer}
 

@@ -19,6 +19,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 unit DecoNodeParser;
 
 {$INCLUDE compilerconfig.inc}
+{$HINT IsPlaceholder is not profiled}
+
 interface
 
 uses X3DNodes,
@@ -52,18 +54,22 @@ function IsPlaceholder(const Node: TX3DNode): boolean;
 function ParseNode(const Node: TX3DNode): DNodeInfo;
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
-uses StrUtils, DecoLog;
+uses StrUtils, DecoLog, Profiler;
 
 {eeeem? there should have been this procedure in System unit?}
 function StrToInt(const v: string): integer;
 var e: integer;
 begin
+  StartProfiler;
+
   if v='' then
     Result :=0
   else begin
     Val(v, Result, e);
     if e<>0 then Log(LogParserError,_CurrentRoutine,'Invalid integer: '+v);
   end;
+
+  StopProfiler;
 end;
 
 
@@ -152,6 +158,8 @@ var NameLength: integer; //for optimization
   end;
 
 begin
+  StartProfiler;
+
   //parse visible/collision state
   Result.Visible := true;
   Result.Collision := false;
@@ -174,6 +182,8 @@ begin
     Result.Name := GetMarker(NameMarker);
     Result.Trigger := GetMarker(TriggerMarker);
   end;
+
+  StopProfiler;
 end;
 
 {------------------------------------------------------------------------------}

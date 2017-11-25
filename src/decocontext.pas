@@ -121,28 +121,36 @@ function MCE(NewTarget: TContextTarget; NewContextElement: TContextRecord; NewIm
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
-uses SysUtils, DecoLog, CastleVectors{, Math};
+uses SysUtils, CastleVectors,
+  DecoLog, Profiler{, Math};
 
 function MCE(NewTarget: TContextTarget; NewContextElement: TContextRecord; NewImportance: float = 1; NewMin: float = 0; NewMax: float = 1): DContextElement;
 begin
+  StopProfiler;
+
   Result := DContextElement.Create;
   Result.Target := NewTarget;
   Result.Name := NewContextElement;
   Result.Importance := NewImportance;
   Result.Min := NewMin;
   Result.Max := NewMax;
+
+  StopProfiler;
 end;
 
 {-----------------------------------------------------------------------------}
 
 function Maximum(a, b: float): float;
 begin
+  StartProfiler;
   if a > b then Result := a else Result := b;
+  StopProfiler;
 end;
 
 function CompareElements(e1, e2: DContextElement): float; {boolean}
 var Dist: float;
 begin
+  StartProfiler;
   //fatal: comparing incompatible elements
   if e1.Name <> e2.Name then begin
     { actually such stuff should never happen }
@@ -159,26 +167,36 @@ begin
     Result := 1
   else
     Result := 1 - Maximum(e1.Importance, e2.Importance); //minimum(1-self.Importance,1-cmp.Importance); // include dist here?
+
+  StopProfiler;
 end;
 
 {==========================  Context  ===============================}
 
 constructor DContext.Create;
 begin
+  StartProfiler;
+
   //inherited Create; <------- nothing to inherit
   Demand := TContextList.Create(true);
   Allow := TContextList.Create(true);
   Deny := TContextList.Create(true);
+
+  StopProfiler;
 end;
 
 {--------------------------------------------------------------------------}
 
 destructor DContext.Destroy;
 begin
+  StartProfiler;
+
   FreeAndNil(Demand);
   FreeAndNil(Allow);
   FreeAndNil(Deny);
   inherited Destroy;
+
+  StopProfiler;
 end;
 
 {--------------------------------------------------------------------------}
@@ -186,6 +204,8 @@ end;
 function DContext.FindByName(FindTarget: TContextTarget; FindRecord: TContextRecord): DContextElement;
 var i: integer;
 begin
+  StartProfiler;
+
   Result := nil;
   //find only the first matching element
   for i := 0 to Demand.Count-1 do
@@ -198,22 +218,32 @@ begin
       Result := Allow[i];
       Exit;
     end;
+
+  StopProfiler;
 end;
 
 {============================ DIALOGUE Context ===============================}
 
 constructor DDialogueContext.Create;
 begin
+  StartProfiler;
+
   //inherited Create; <------- nothing to inherit
   Context := DContext.Create;
+
+  StopProfiler;
 end;
 
 {--------------------------------------------------------------------------}
 
 destructor DDialogueContext.Destroy;
 begin
+  StartProfiler;
+
   FreeAndNil(Context);
   inherited Destroy;
+
+  StopProfiler;
 end;
 
 {--------------------------------------------------------------------------}
@@ -221,10 +251,14 @@ end;
 procedure DDialogueContext.CopyContext(const NewContext: DContext);
 var i: integer;
 begin
+  StartProfiler;
+
   for i := 0 to NewContext.Demand.Count-1 do
     Context.Demand.Add(NewContext.Demand[i]);
   for i := 0 to NewContext.Allow.Count-1 do
     Context.Allow.Add(NewContext.Allow[i]);
+
+  StopProfiler;
 end;
 
 {--------------------------------------------------------------------------}
@@ -232,9 +266,13 @@ end;
 procedure DDialogueContext.Extract(const NewContext: DContext);
 var temp: DContext;
 begin
+  StartProfiler;
+
   temp := NewContext;
   Self.CopyContext(temp);
   FreeAndNil(temp); //mmm? What did I mean by this?
+
+  StopProfiler;
 end;
 
 {--------------------------------------------------------------------------}
@@ -243,6 +281,8 @@ function DDialogueContext.Compare(const CheckContext: DContext): float;
 var i: integer;
     tmp: DContextElement;
 begin
+  StartProfiler;
+
   Result := 1;
   {$HINT process deny first, as it's most "severe"}
   for i := 0 to Context.Demand.Count-1 do begin
@@ -258,6 +298,8 @@ begin
     if Zero(Result) then Exit;
   end;
   {search across demand/allow not made? Fix it relevant to the logic.}
+
+  StopProfiler;
 end;
 
 {--------------------------------------------------------------------------}
