@@ -106,6 +106,9 @@ var
   CurrentLevel: TProfiler;
   { }
   ProgramStartTime: TTimerResult;
+  { }
+  SelfUsedTime: TFloatTime;
+
 
 constructor TProfiler.Create;
 begin
@@ -143,17 +146,26 @@ procedure doStartProfiler(const aFunction: string); {$IFDEF SUPPORTS_INLINE}inli
   end;
 var
   CurrentElement: TProfiler;
+  CurrentTimer: TTimerResult;
 begin
+  CurrentTimer := Timer;
+
   //find entry for aFunction
   CurrentElement := FindEntry;
   //start counting time for it
   CurrentElement.TimerStart := Timer;
   //and switch down a level
   CurrentLevel := CurrentElement;
+
+  SelfUsedTime += TimerSeconds(Timer,CurrentTimer);
 end;
 
 procedure doStopProfiler(const aFunction: string); {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+var
+  CurrentTimer: TTimerResult;
 begin
+  CurrentTimer := Timer;
+
   repeat
     //stop counting time and record the result
     CurrentLevel.EntryTime += TimerSeconds(Timer, CurrentLevel.TimerStart);
@@ -167,6 +179,8 @@ begin
   until CurrentLevel.EntryName = aFunction;
   //and return to upper level profiler
   CurrentLevel := CurrentLevel.Parent;
+
+  SelfUsedTime += TimerSeconds(Timer,CurrentTimer);
 end;
 
 {$IFDEF SortProfilerResults}
@@ -201,13 +215,15 @@ procedure DisplayProfilerResult;
   end;
 begin
   WriteLnLog('--------- Profiler analysis --------');
+  WriteLnLog('Total Execution Time = '+DisplayTime(TimerSeconds(Timer, ProgramStartTime)));
+  WriteLnLog('Profiler itself consumed '+ DisplayTime(SelfUsedTime));
   //the top element is not displayed, only its children
   DisplayRecoursive(TopProfiler,'');
-  WriteLnLog('Total Execution Time = '+DisplayTime(TimerSeconds(Timer, ProgramStartTime)));
   WriteLnLog('------------------------------------');
 end;
 
 initialization
+  SelfUsedTime := 0;
   ProgramStartTime := Timer;
   TopProfiler := TProfiler.Create;
   CurrentLevel := TopProfiler;
