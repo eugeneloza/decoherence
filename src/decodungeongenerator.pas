@@ -340,7 +340,8 @@ type
     procedure RaycastTile(const mx,my,mz: TIntCoordinate); {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
     {raycasts a single ray from x1y1z1 to x2y2z2
      returns true if ray can pass, false otherwise}
-    function Ray(const x1,y1,z1,x2,y2,z2: float): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+    {$WARNING Ray is temporarily un-inlined}
+    function Ray(const x1,y1,z1,x2,y2,z2: float): boolean; {{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF} }
     {chunks the map according to the visibility of the tiles}
     procedure Chunk_N_Slice;
   public
@@ -972,7 +973,8 @@ end;
 
 {----------------------------------------------------------------------------}
 
-function D3DDungeonGenerator.Ray(const x1,y1,z1,x2,y2,z2: float): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+{$WARNING Ray is temporarily un-inlined}
+function D3DDungeonGenerator.Ray(const x1,y1,z1,x2,y2,z2: float): boolean; {{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}}
 var //anglex,angley,anglez: TAngle;
     vx,vy,vz,a: float;
     ix,iy,iz: integer;
