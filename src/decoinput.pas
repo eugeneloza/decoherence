@@ -215,6 +215,10 @@ end;
 
 {-----------------------------------------------------------------------------}
 
+var
+  { used to detect if mouse is in dragg-look mode }
+  DragMouseLook: boolean = false;
+
 procedure doMouseRelease(const Event: TInputPressRelease);
 var i,FingerIndex: integer;
     Found: boolean;
@@ -228,6 +232,10 @@ begin
     Repeat
       if TouchArray[i].FingerIndex = FingerIndex then Found := true else inc(i);
     until (i>TouchArray.Count-1) or Found;
+
+    //stop dragging
+    if i=0 then DragMouseLook := false;
+
     Log(LogMouseInfo,_CurrentRoutine,'Caught mouse release finger='+IntToStr(FingerIndex)+' n='+IntToStr(i));
     if Found then begin
       if (TouchArray[i].ClickElement <> nil) then begin
@@ -252,6 +260,7 @@ var NewEventTouch: DTouch;
     FingerIndex: integer;
     tmpLink: DAbstractElement;
     InterfaceCaughtEvent: boolean;
+    i: integer;
 begin
   StartProfiler;
 
@@ -271,12 +280,17 @@ begin
     if NewEventTouch.ClickElement.CanDrag then NewEventTouch.ClickElement.StartDrag(Round(Event.Position[0]),Round(Event.Position[1]));
   end;
 
-  TouchArray.Add(NewEventTouch);
-  Log(LogMouseInfo,_CurrentRoutine,'Caught mouse press finger='+IntToStr(FingerIndex));
+  i := TouchArray.Add(NewEventTouch);
 
   {todo: if interface didn't catch the click then}
-  if (CurrentGameMode = gmTravel) and (not InterfaceCaughtEvent) then
-    if mbRight = Event.MouseButton then Camera.MouseLook := not Camera.MouseLook;
+  if (CurrentGameMode = gmTravel) and (not InterfaceCaughtEvent) then begin
+    //switch control mode
+    if Event.MouseButton = mbRight then Camera.MouseLook := not Camera.MouseLook;
+    //start dragging mouse look
+    if i=0 then DragMouseLook := true;
+  end;
+
+  Log(LogMouseInfo,_CurrentRoutine,'Caught mouse press finger='+IntToStr(FingerIndex));
 
   StopProfiler;
 end;
@@ -296,15 +310,26 @@ begin
     Exit;
   end;
 
-  if not Camera.MouseLook then Exit;
+  if Camera.MouseLook then begin
 
-  Camera.Cursor := mcForceNone; {do it only once}
-  if not TVector2.PerfectlyEquals(Event.Position,GUI.Center) then begin
-    Player.InputMouse(Event.Position - GUI.Center);
+    Camera.Cursor := mcForceNone; {do it only once}
+    if not TVector2.PerfectlyEquals(Event.Position,GUI.Center) then begin
+      Player.InputMouse(Event.Position - GUI.Center);
+      doMouseLook := false;
+      Window.MousePosition := GUI.Center; //=CenterMouseCursor inlined
+    end else
+      doMouseLook := true; {prevent onMotion call-back}
+
+  end
+  else
+  if DragMouseLook then begin
+    //DragMouseLook doesn't change cursor.position
+    {however, it's a good idea to catch DragMouseLook not to go outside window
+     - scroll it like Blender does}
+    {$HINT Why Event.OldPosition rotation style is MUCH slower than MouseLook style rotation???}
+    Player.InputMouse(Event.OldPosition - Event.Position);
     doMouseLook := false;
-    Window.MousePosition := GUI.Center; //=CenterMouseCursor inlined
-  end else
-    doMouseLook := true; {prevent onMotion call-back}
+  end;
 
   StopProfiler;
 end;
