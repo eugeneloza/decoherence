@@ -251,8 +251,11 @@ procedure doMousePress(const Event: TInputPressRelease);
 var NewEventTouch: DTouch;
     FingerIndex: integer;
     tmpLink: DAbstractElement;
+    InterfaceCaughtEvent: boolean;
 begin
   StartProfiler;
+
+  InterfaceCaughtEvent := false;
 
   FingerIndex := GetFingerIndex(Event);
   NewEventTouch := DTouch.Create(Event.Position[0],Event.Position[1],FingerIndex);
@@ -261,8 +264,10 @@ begin
   tmpLink := GUI.IfMouseOver(Round(Event.Position[0]),Round(Event.Position[1]),true,true);
   if (tmpLink is DSingleInterfaceElement) then begin
     NewEventTouch.ClickElement := DSingleInterfaceElement(tmpLink);
-    if Assigned(NewEventTouch.ClickElement.OnMousePress) then
+    if Assigned(NewEventTouch.ClickElement.OnMousePress) then begin
       NewEventTouch.ClickElement.OnMousePress(tmpLink,Round(Event.Position[0]),Round(Event.Position[1]));
+      InterfaceCaughtEvent := true;
+    end;
     if NewEventTouch.ClickElement.CanDrag then NewEventTouch.ClickElement.StartDrag(Round(Event.Position[0]),Round(Event.Position[1]));
   end;
 
@@ -270,7 +275,7 @@ begin
   Log(LogMouseInfo,_CurrentRoutine,'Caught mouse press finger='+IntToStr(FingerIndex));
 
   {todo: if interface didn't catch the click then}
-  if CurrentGameMode = gmTravel then
+  if (CurrentGameMode = gmTravel) and (not InterfaceCaughtEvent) then
     if mbRight = Event.MouseButton then Camera.MouseLook := not Camera.MouseLook;
 
   StopProfiler;
@@ -283,9 +288,6 @@ function doMouseLook(const Event: TInputMotion): boolean;
 begin
   StartProfiler;
 
-  {if FMouseLook then
-    Cursor := mcForceNone else
-    Cursor := mcDefault;}
   if Camera = nil then begin
     if CameraWarning then begin
       Log(LogMouseSoftError,_CurrentRoutine,'Warning: Camera is not initialized for MouseLook');
@@ -293,6 +295,9 @@ begin
     end;
     Exit;
   end;
+
+  if not Camera.MouseLook then Exit;
+
   Camera.Cursor := mcForceNone; {do it only once}
   if not TVector2.PerfectlyEquals(Event.Position,GUI.Center) then begin
     Player.InputMouse(Event.Position - GUI.Center);
@@ -308,11 +313,7 @@ end;
 
 procedure CenterMouseCursor;
 begin
-  StartProfiler;
-
   Window.MousePosition := GUI.Center;
-
-  StopProfiler;
 end;
 
 {----------------------------------------------------------------------------}

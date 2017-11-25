@@ -24,7 +24,7 @@ interface
 uses Classes, SysUtils,
   CastleCameras, {castlePlayer,} CastleSceneCore, CastleScene,
   CastleVectors,  X3DNodes,
-  decoglobal;
+  DecoGlobal;
 
 const PlayerHeight = 0.5;
 
