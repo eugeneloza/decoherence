@@ -22,9 +22,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 
 {============================= MACROS ========================================}
 
-
 //include some useful macros
 {$INCLUDE macro.inc}
+
+{============================= profiler ======================================}
+
+{$DEFINE UseProfiler}
+{$INCLUDE profiler.inc}
 
 {====================== LANGUAGE-SPECIFIC DIRECTIVES =========================}
 
