@@ -104,6 +104,8 @@ var
   TopProfiler: TProfiler;
   { Current profiler level }
   CurrentLevel: TProfiler;
+  { }
+  ProgramStartTime: TTimerResult;
 
 constructor TProfiler.Create;
 begin
@@ -175,6 +177,10 @@ type TProfilerComparer = specialize TComparer<TProfilerChild>;
 {$ENDIF}
 
 procedure DisplayProfilerResult;
+  function DisplayTime(t: TFloatTime): string;
+  begin
+    Result := FloatToStr(Round(t*1000)/1000) + 's';
+  end;
   procedure DisplayRecoursive(const aProfiler: TProfiler; const aPrefix: string);
   var
     i: integer;
@@ -185,7 +191,8 @@ procedure DisplayProfilerResult;
     for i := 0 to aProfiler.Children.Count-1 do begin
       WriteLnLog(aPrefix + aProfiler.Children[i].EntryName +
         '(x'+IntToStr(aProfiler.Children[i].EntryHits) + ')' + ' : ' +
-        IntToStr(Round(aProfiler.Children[i].EntryTime*1000)) + 'ms');
+        DisplayTime(aProfiler.Children[i].EntryTime));
+
       DisplayRecoursive(aProfiler.Children[i] as TProfiler,aPrefix+'...');
     end;
   end;
@@ -193,10 +200,12 @@ begin
   WriteLnLog('--------- Profiler analysis --------');
   //the top element is not displayed, only its children
   DisplayRecoursive(TopProfiler,'');
+  WriteLnLog('Total Execution Time = '+DisplayTime(TimerSeconds(Timer, ProgramStartTime)));
   WriteLnLog('------------------------------------');
 end;
 
 initialization
+  ProgramStartTime := Timer;
   TopProfiler := TProfiler.Create;
   CurrentLevel := TopProfiler;
 
