@@ -18,7 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 { Editor for all game data }   
 program Constructor_Tool;
 
-{$IFDEF Windows}{$APPTYPE Console}{$ENDIF}
+{$IFDEF Windows}{$APPTYPE Console}{$ENDIF} //it's always console
 {$INCLUDE src/compilerconfig.inc}
 
 uses

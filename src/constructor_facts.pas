@@ -221,6 +221,8 @@ end;
 procedure TFactsEditor.Memo1Change(Sender: TObject);
 var CurrentFactText: string;
 begin
+  if FactsListBox.ItemIndex<0 then Exit; //fool's check
+
   CurrentFactText := Trim(Memo1.Text);
 
   if Length(CurrentFactText)<=350 then FactLengthLabel.Color := clDefault
