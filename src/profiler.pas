@@ -38,10 +38,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
   Caution: StartProfiler must always have a matching StopProfiler otherwise
   the profiler may build a wild profiler tree :)
 
-  Warning: it's not thread-safe.
+  Works safely for recoursive, inlined, nested(local) and inherited procedures.
+  Can handle unexpected "Exit" from the procedure correctly.
+  Enjoy!
 
-  Warning: it doesn't seem to work for nested(local) procedures.
-           Maybe, for inline procedures too.
+  Warning: it's not thread-safe.
 
   Requires FPC 3.1.1 and above
   Requires Castle Game Engine (Generics.Collections, CastleLog and CastleTimeUtils)

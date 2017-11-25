@@ -1,15 +1,22 @@
 program ProfilerTest;
 
-{$INCLUDE ../../src/profiler.inc}
+{$INCLUDE ../../src/compilerconfig.inc}
 
 uses SysUtils, CastleClassUtils, CastleLog, Profiler;
 
 type
   TProfiledObject = class(TObject)
+  public
     procedure MyProc1;
     procedure MyProc2;
-    procedure MyProc3;
+    procedure MyProc3; virtual;
   end;
+
+type
+  TProfiledObject2 = class(TProfiledObject)
+  public
+    procedure MyProc3; override;
+end;
 
 procedure TProfiledObject.MyProc1;
 var i: integer;
@@ -44,18 +51,35 @@ StartProfiler;
 StopProfiler;
 end;
 
+procedure TProfiledObject2.MyProc3;
+var i: integer;
+begin
+StartProfiler;
+  inherited MyProc3;
+  for i := 0 to MaxInt div 33 do ;
+StopProfiler;
+end;
+
+procedure InlinedProcedure; inline;
+var i: integer;
+begin
+StartProfiler;
+  for i := 0 to MaxInt div 17 do ;
+StopProfiler;
+end;
+
 procedure RawProcedure1;
 var i: integer;
 begin
 StartProfiler;
 
   for i := 0 to MaxInt div 8 do ;
+  InlinedProcedure;
 
 StopProfiler;
 end;
 
 procedure RawProcedure2;
-{
   procedure NestedProcedure;
   var k: integer;
   begin
@@ -64,14 +88,13 @@ procedure RawProcedure2;
     for k := 0 to MaxInt div 119 do ;
 
   StopProfiler;
-  end; --------- NOT WORKING FOR NESTED
-}
+  end;
 var i: integer;
 begin
 StartProfiler;
 
-  RawProcedure1;
   for i := 0 to MaxInt div 11 do ;
+  NestedProcedure;
 
 StopProfiler;
 end;
@@ -111,7 +134,7 @@ end;
 begin
   InitializeLog;
 
-  MyObj := TProfiledObject.Create;
+  MyObj := TProfiledObject2.Create;
 
   InitTest;
 
