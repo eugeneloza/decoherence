@@ -87,9 +87,15 @@ var NewFact: integer;
 begin
   StartProfiler;
 
-  repeat
-    NewFact := DRND.Random(Facts.Count);
-  until (NewFact <> LastFact) and (DRND.Random < 1/Facts[NewFact].Frequency);
+  if Facts.Count = 0 then raise Exception.Create('GetRandomFact ERROR: No facts loaded!');
+
+  if Facts.Count > 1 then
+    repeat
+      NewFact := DRND.Random(Facts.Count);
+    until (NewFact <> LastFact) and (DRND.Random < 1/Facts[NewFact].Frequency)
+  else
+    NewFact := 0;
+
   inc(Facts[NewFact].Frequency,7);      //todo balance facts frequency, now chance is 1,1/8,1/15,1/22...
   Result := Facts[NewFact].Value;
   CurrentFact := Facts[NewFact];
