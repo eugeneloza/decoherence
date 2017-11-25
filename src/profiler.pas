@@ -161,6 +161,9 @@ begin
     inc(CurrentLevel.EntryHits);
     //and return to upper level profiler
     if CurrentLevel.EntryName <> aFunction then CurrentLevel := CurrentLevel.Parent;
+
+    if CurrentLevel = nil then
+      raise Exception.Create('FATAL. No matching StartProfiler...StopProfiler found in '+aFunction);
   until CurrentLevel.EntryName = aFunction;
   //and return to upper level profiler
   CurrentLevel := CurrentLevel.Parent;
