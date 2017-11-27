@@ -49,7 +49,7 @@ var
 
 procedure InitNavigation;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Log(LogInitPlayer, _CurrentRoutine, 'Initialize navigation');
   Camera := TWalkCamera.Create(Window);
@@ -101,7 +101,7 @@ begin
   Navigation.ShadowMaps := ShadowMapsEnabled;
   Navigation.Load(NavRoot, True);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 end.

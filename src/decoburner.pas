@@ -46,7 +46,7 @@ var
 
 procedure InitBurnerImage;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   {$IFNDEF AllowRescale}
   if BurnerImage <> nil then
@@ -70,27 +70,27 @@ begin
 
   dLog(LogInitInterface, nil, _CurrentRoutine, 'Finished');
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {working directly on image!}
 procedure Burn(const aImage: TCastleImage; const x, y, w, h: integer);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   aImage.DrawFrom(BurnerImage, 0, 0, x, y, w, h, dmMultiply);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 procedure Burn(const aImage: TCastleImage; const Container: DAbstractContainer);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   aImage.DrawFrom(BurnerImage, 0, 0, Container.x1, Container.y1, Container.w,
     Container.h, dmMultiply);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 finalization

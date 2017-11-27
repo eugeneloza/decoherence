@@ -126,7 +126,7 @@ function GetRandomSeed: LongWord;
 var
   DevRnd: file of integer;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   { algorithm according to http://wiki.freepascal.org/Dev_random
     /dev/urandom is a native *nix very high-quality random number generator.
@@ -140,7 +140,7 @@ begin
   // xorshift can't accept 0 as a random seed so we just read /dev/urandom until its not zero
   CloseFile(DevRnd);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 {$ELSE}
 
@@ -153,33 +153,33 @@ end;
 
 procedure InitGlobal;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   DRND := TCastleRandom.Create(GetRandomSeed);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 { ---------------------------------------------------------------------------- }
 
 procedure DestroyGlobal;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   FreeAndNil(DRND);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 { ---------------------------------------------------------------------------- }
 
 function GetScenarioFolder: string;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Result := ScenarioBaseFolder + CurrentScenarioFolder;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 { ---------------------------------------------------------------------------- }
@@ -191,25 +191,25 @@ Const
     DZeroResolution = 1E-12;
     SZeroResolution = 1E-4; }
 begin
-  StartProfiler;
+  {StartProfiler}
 
   if (a > b) then
     Result := ((a - b) <= Epsilon)
   else
     Result := ((b - a) <= Epsilon);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 { ---------------------------------------------------------------------------- }
 
 function URLValid(const aURL: string): Boolean;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Result := aURL <> ''; // todo
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 initialization

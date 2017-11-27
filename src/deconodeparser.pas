@@ -62,7 +62,7 @@ function StrToInt(const v: string): integer;
 var
   e: integer;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   if v = '' then
     Result := 0
@@ -73,7 +73,7 @@ begin
       Log(LogParserError, _CurrentRoutine, 'Invalid integer: ' + v);
   end;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 
@@ -175,7 +175,7 @@ var
   end;
 
 begin
-  StartProfiler;
+  {StartProfiler}
 
   //parse visible/collision state
   Result.Visible := True;
@@ -203,7 +203,7 @@ begin
     Result.Trigger := GetMarker(TriggerMarker);
   end;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {------------------------------------------------------------------------------}

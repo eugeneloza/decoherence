@@ -65,7 +65,7 @@ var
   s: string;
   fName: string;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   InitializeFonts;      //load fonts
   {$IFDEF BurnerImage}
@@ -150,7 +150,7 @@ begin
 
   Log(LogInitInterface, _CurrentRoutine, 'finished');
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
@@ -159,7 +159,7 @@ procedure FreeInterface;
 var
   i: integer;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Log(LogInitInterface, _CurrentRoutine, 'Freeing...');
   FreeAndNil(WindImage1);
@@ -176,7 +176,7 @@ begin
 
   DestroyFonts;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 

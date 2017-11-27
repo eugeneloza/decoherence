@@ -101,47 +101,47 @@ uses SysUtils, DecoLog, Profiler;
 
 constructor DPerk.Create;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   inherited Create;
   //Image := DStaticImage.create(self);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {---------------------------------------------------------------------------}
 
 destructor DPerk.Destroy;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   inherited Destroy;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {---------------------------------------------------------------------------}
 
 constructor DMultiPerk.Create;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   inherited Create;
   Children := DPerksList.Create;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {---------------------------------------------------------------------------}
 
 destructor DMultiPerk.Destroy;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   FreeAndNil(Children);
   inherited Destroy;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {============================================================================}
@@ -150,7 +150,7 @@ procedure InitPerks;
 var
   TmpPerk: DPerk;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Log(LogInitCharacters, _CurrentRoutine, 'Loading perks...');
   Perks := DPerksList.Create(True);
@@ -158,19 +158,19 @@ begin
   //TmpPerk.image.LoadThread(PerksFolder+'crossed-swords.png');
   Perks.add(TmpPerk);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {---------------------------------------------------------------------------}
 
 procedure FreePerks;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Log(LogInitCharacters, _CurrentRoutine, 'Freeing perks...');
   FreeAndNil(Perks);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 end.

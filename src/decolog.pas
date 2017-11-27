@@ -98,19 +98,19 @@ uses CastleLog, SysUtils,
 
 procedure Log(const LogLevel: boolean; const aPrefix, aMessage: string);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   if not doLog then Exit;
   if LogLevel then WriteLnLog(aPrefix,aMessage);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {---------------------------------------------------------------------------}
 
 procedure InitLog;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   if not doLog then Exit;
   //initialize the log
@@ -131,7 +131,7 @@ begin
   WriteLnLog('(i) Allow rescale',{$IFDEF AllowRescale}'ON'{$ELSE}'OFF'{$ENDIF});
   WriteLnLog('(i) Pointer is',IntToStr(SizeOf(Pointer)*8)+' bit');
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 end.

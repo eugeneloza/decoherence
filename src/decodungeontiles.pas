@@ -189,7 +189,7 @@ uses SysUtils, CastleURIUtils,
 
 function TileKindToStr(const Value: TTileKind): string;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   case Value of
     tkNone: Result := 'NA';
@@ -203,12 +203,12 @@ begin
       raise Exception.Create('Unknown TileKind in TileKindToStr');
   end;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 function StrToTileKind(const Value: string): TTileKind;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   case Value of
     'NA': Result := tkNone;
@@ -222,14 +222,14 @@ begin
       raise Exception.Create('Unknown TileKind in StrToTileKind');
   end;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {---------------------------------------------------------------------------}
 
 function TileFaceToStr(const Value: TTileFace): string;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   case Value of
     tfNone: Result := 'none';
@@ -239,12 +239,12 @@ begin
       raise Exception.Create('Unknown TTileFace Value in TileFaceToStr');
   end;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 function StrToTileFace(const Value: string): TTileFace;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   case Value of
     'none': Result := tfNone;
@@ -253,14 +253,14 @@ begin
       Result := StrToInt(Value);
   end;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {---------------------------------------------------------------------------}
 
 function AngleToStr(const Value: TAngle): string;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   case Value of
     aTop: Result := 'top';
@@ -271,12 +271,12 @@ begin
     aDown: Result := 'down';
   end;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 function StrToAngle(const Value: string): TAngle;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   case Value of
     'top': Result := aTop;
@@ -287,7 +287,7 @@ begin
     'down': Result := aDown;
   end;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {---------------------------------------------------------------------------}
@@ -400,7 +400,7 @@ var
   j: TAngle;
   FullURL: string;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   //inherited;
   TileName := DeleteURIExt(ExtractURIName(URL));
@@ -458,7 +458,7 @@ begin
     Img[jz] := LoadImage(ChangeURIExt(URL, '_' + IntToStr(jz) + '.png'),
       [TRGBAlphaImage]) as TRGBAlphaImage;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
@@ -467,23 +467,23 @@ procedure DMap.FreeMinimap;
 var
   jz: integer;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   if Length(Img) > 0 then
     for jz := 0 to Length(Img) - 1 do
       FreeAndNil(Img[jz]);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 destructor DMap.Destroy;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   FreeMinimap;
   inherited Destroy;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
@@ -491,7 +491,7 @@ end;
 procedure DMap.SetSize(const tx: integer = 1; const ty: integer = 1;
   const tz: integer = 1);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   SizeX := tx;
   SizeY := ty;
@@ -504,7 +504,7 @@ begin
     //in case this is a "blocker" tile we still need a complete 1x1x1 base
     raise Exception.Create('DMap.setsize: Tilesize is zero!');
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
@@ -513,7 +513,7 @@ procedure DMap.GetMapMemory;
 var
   ix, iy: integer;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   {set length of 3d dynamic array}
   SetLength(Map, SizeX);
@@ -524,7 +524,7 @@ begin
       SetLength(Map[ix, iy], SizeZ);
   end;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
@@ -534,7 +534,7 @@ var
   jx, jy, jz: integer;
   a: TAngle;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   for jx := 0 to SizeX - 1 do
     for jy := 0 to SizeY - 1 do
@@ -567,7 +567,7 @@ begin
           Map[jx, jy, jz].Faces[aDown] := tfWall;
       end;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {-------------------------------------------------------------------------}

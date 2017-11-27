@@ -87,7 +87,7 @@ uses CastleFilesUtils, DecoFont,
 
 procedure DLoadScreen.SpawnChildren;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   //inherited SpawnChildren; <------ nothing to inherit
   SetFullScreen;
@@ -104,14 +104,14 @@ begin
   MainLabel := DLabel.Create;
   Grab(MainLabel);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {---------------------------------------------------------------------------}
 
 procedure DLoadScreen.ArrangeChildren;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   //inherited ArrangeChildren; <------ nothing to inherit
   Floater.SetBaseSize(0, 0, 1, 1);
@@ -125,14 +125,14 @@ begin
 
   ReloadFact;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {---------------------------------------------------------------------------}
 
 procedure DLoadScreen.ReloadFact;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   MainLabel.SetBaseSize(0.03, 0.8, 0.4, 0.1);
   MainLabel.Text := LoadScreenMainText;
@@ -142,7 +142,7 @@ begin
   FloaterLabel.Phase := 0;
   Floater.Load(ApplicationData(LoadScreenFolder + GetRandomFactImage));
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {=============================================================================}
@@ -151,7 +151,7 @@ end;
 
 {constructor DCharacterSpace.Create;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   inherited Create;
 
@@ -174,14 +174,14 @@ begin
   StatBars.OnMouseLeave := @SlideOut;
   Grab(StatBars);
 
-  StopProfiler;
+  {StopProfiler}
 end;}
 
 {---------------------------------------------------------------------------}
 
 {procedure DCharacterSpace.ArrangeChildren;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   //inherited ArrangeChildren(animate); //not needed here as this element doesn't have a frame
   {********** INTERFACE DESIGN BY Saito00 ******************}
@@ -209,14 +209,14 @@ begin
   Slided := true;
   doSlideOut;
 
-  StopProfiler;
+  {StopProfiler}
 end; }
 
 {---------------------------------------------------------------------------}
 
 {procedure DCharacterSpace.SetTarget(value: DPlayerCharacter);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   if fTarget <> Value then begin
     Self.fTarget := Value;
@@ -224,7 +224,7 @@ begin
     Portrait.Target := Self.fTarget;
   end;
 
-  StopProfiler;
+  {StopProfiler}
 end;}
 
 {---------------------------------------------------------------------------}
@@ -232,7 +232,7 @@ end;}
 {procedure DCharacterSpace.DoSlideIn;
 var myx: float;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Slided := true;
   if not Odd(self.ID) then
@@ -249,7 +249,7 @@ begin
   Portrait.setbasesize(myx,Portrait.base.fy,Portrait.base.fw,Portrait.base.fh,1,asDefault);
   Portrait.rescale;
 
-  StopProfiler;
+  {StopProfiler}
 end;}
 
 {---------------------------------------------------------------------------}
@@ -257,7 +257,7 @@ end;}
 {procedure DCharacterSpace.DoSlideOut;
 var myx: float;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   slided := false;
   if not odd(self.ID) then
@@ -275,46 +275,46 @@ begin
   Portrait.SetBaseSize(myx,Portrait.base.fy,Portrait.base.fw,Portrait.base.fh,0,asDefault);
   Portrait.Rescale;
 
-  StopProfiler;
+  {StopProfiler}
 end;}
 
 {---------------------------------------------------------------------------}
 
 {procedure DCharacterSpace.SlideIn(Sender: DAbstractElement; x,y: integer);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   if not slided then
     if MouseOverTree(x,y) then doSlideIn;
 
-  StopProfiler;
+  {StopProfiler}
 end;}
 
 {---------------------------------------------------------------------------}
 
 {procedure DCharacterSpace.slideOut(Sender: DAbstractElement; x,y: integer);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   if slided then
     if not MouseOverTree(x,y) then timer.settimeout(PortraitTimeOut){doSlideOut};
   //if selected then timeout 10-30 seconds, else just doslideout
 
-  StopProfiler;
+  {StopProfiler}
 end;}
 
 {---------------------------------------------------------------------------}
 
 {procedure DCharacterSpace.doTimeout;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   if slided then begin
     if not IsMouseOverTree then doSlideOut;
     dLog('timer out');
   end;
 
-  StopProfiler;
+  {StopProfiler}
 end;}
 
 {=============================================================================}
@@ -324,7 +324,7 @@ end;}
 {procedure DPartyView.ArrangeChildren(animate: TAnimationStyle);
 var i: integer;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   //inherited ArrangeChildren(animate); //not needed here as this element doesn't have a frame
   {********** INTERFACE DESIGN BY Saito00 ******************}
@@ -339,7 +339,7 @@ begin
 //      CharacterSpace[i].setBaseSize(0,0,fullwidth,fullheight,1,animate);
   end;
 
-  StopProfiler;
+  {StopProfiler}
 end;}
 
 {-----------------------------------------------------------------------------}
@@ -347,7 +347,7 @@ end;}
 {constructor DPartyView.Create(AOwner: TComponent);
 var i: integer;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   inherited Create(AOwner);
   for i := 0 to CurrentParty.Character.Count-1 do begin
@@ -362,7 +362,7 @@ begin
   SetBaseSize(0,0,FullWidth,FullHeight,1,Appear_Animation);
 //  ArrangeChildren(false); //automatically arranged on TCompositeElement.setbasesize
 
-  StopProfiler;
+  {StopProfiler}
 end;}
 
 end.

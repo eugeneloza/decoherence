@@ -133,7 +133,7 @@ uses SysUtils, CastleVectors,
 function MCE(NewTarget: TContextTarget; NewContextElement: TContextRecord;
   NewImportance: float = 1; NewMin: float = 0; NewMax: float = 1): DContextElement;
 begin
-  StopProfiler;
+  {StopProfiler}
 
   Result := DContextElement.Create;
   Result.Target := NewTarget;
@@ -142,26 +142,26 @@ begin
   Result.Min := NewMin;
   Result.Max := NewMax;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
 
 function Maximum(a, b: float): float;
 begin
-  StartProfiler;
+  {StartProfiler}
   if a > b then
     Result := a
   else
     Result := b;
-  StopProfiler;
+  {StopProfiler}
 end;
 
 function CompareElements(e1, e2: DContextElement): float; {boolean}
 var
   Dist: float;
 begin
-  StartProfiler;
+  {StartProfiler}
   //fatal: comparing incompatible elements
   if e1.Name <> e2.Name then
   begin
@@ -185,35 +185,35 @@ begin
     Result := 1 - Maximum(e1.Importance, e2.Importance);
   //minimum(1-self.Importance,1-cmp.Importance); // include dist here?
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {==========================  Context  ===============================}
 
 constructor DContext.Create;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   //inherited Create; <------- nothing to inherit
   Demand := TContextList.Create(True);
   Allow := TContextList.Create(True);
   Deny := TContextList.Create(True);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {--------------------------------------------------------------------------}
 
 destructor DContext.Destroy;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   FreeAndNil(Demand);
   FreeAndNil(Allow);
   FreeAndNil(Deny);
   inherited Destroy;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {--------------------------------------------------------------------------}
@@ -223,7 +223,7 @@ function DContext.FindByName(FindTarget: TContextTarget;
 var
   i: integer;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Result := nil;
   //find only the first matching element
@@ -240,31 +240,31 @@ begin
       Exit;
     end;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {============================ DIALOGUE Context ===============================}
 
 constructor DDialogueContext.Create;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   //inherited Create; <------- nothing to inherit
   Context := DContext.Create;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {--------------------------------------------------------------------------}
 
 destructor DDialogueContext.Destroy;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   FreeAndNil(Context);
   inherited Destroy;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {--------------------------------------------------------------------------}
@@ -273,14 +273,14 @@ procedure DDialogueContext.CopyContext(const NewContext: DContext);
 var
   i: integer;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   for i := 0 to NewContext.Demand.Count - 1 do
     Context.Demand.Add(NewContext.Demand[i]);
   for i := 0 to NewContext.Allow.Count - 1 do
     Context.Allow.Add(NewContext.Allow[i]);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {--------------------------------------------------------------------------}
@@ -289,13 +289,13 @@ procedure DDialogueContext.Extract(const NewContext: DContext);
 var
   temp: DContext;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   temp := NewContext;
   Self.CopyContext(temp);
   FreeAndNil(temp); //mmm? What did I mean by this?
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {--------------------------------------------------------------------------}
@@ -305,7 +305,7 @@ var
   i: integer;
   tmp: DContextElement;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Result := 1;
   {$HINT process deny first, as it's most "severe"}
@@ -332,7 +332,7 @@ begin
   end;
   {search across demand/allow not made? Fix it relevant to the logic.}
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {--------------------------------------------------------------------------}

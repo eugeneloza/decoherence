@@ -319,36 +319,36 @@ uses SysUtils,
 
 procedure DSimpleActor.TeleportTo(const aNav: TNavID);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   if LastNav <> UnitinializedNav then
     CurrentWorld.ReleaseNav(LastNav);
   CurrentWorld.BlockNav(aNav);
   LastNav := aNav;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 { ----------------------------------------------------------------------------- }
 
 procedure DSimpleActor.Manage;
 begin
-  StartProfiler;
+  {StartProfiler}
   {$HINT todo}
-  StopProfiler;
+  {StopProfiler}
 end;
 
 { ----------------------------------------------------------------------------- }
 
 constructor DSimpleActor.Create;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   // inherited; <------ nothing to inherit
   isPlayer := False;
   // nothing to create yet
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 { =========================================================================== }
@@ -359,20 +359,20 @@ procedure DCoordActor.GetRandomDirection;
 var
   rDir: Float;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   rDir := DRND.Random * 2 * Pi;
   Direction := Vector3(sin(rDir), cos(rDir), 0);
   toDir := Direction;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 { ----------------------------------------------------------------------------- }
 
 procedure DCoordActor.doRotate;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   {$WARNING dummy}
   if not TVector3.Equals(Direction, toDir) then
@@ -380,14 +380,14 @@ begin
     Direction := toDir;
   end;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 { ----------------------------------------------------------------------------- }
 
 procedure DCoordActor.doMove;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   {$WARNING dummy}
   if TVector3.Equals(Direction, toDir) then
@@ -395,49 +395,49 @@ begin
     Position := toPos;
   end;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 { ----------------------------------------------------------------------------- }
 
 procedure DCoordActor.TeleportTo(const aPosition: TVector3);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   GetRandomDirection;
   Position := aPosition;
   toPos := Position;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 procedure DCoordActor.TeleportTo(const aPosition, aDirection: TVector3);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Direction := aDirection;
   toDir := Direction;
   Position := aPosition;
   toPos := Position;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 procedure DCoordActor.TeleportTo(const aNav: TNavID);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   inherited TeleportTo(aNav);
   TeleportTo(CurrentWorld.NavToVector3(aNav));
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 { ----------------------------------------------------------------------------- }
 
 procedure DCoordActor.FixZeroDirection; {$IFDEF SUPPORTS_INLINE}inline; {$ENDIF}
 begin
-  StartProfiler;
+  {StartProfiler}
 
   { this is a critical, very rare and nearly unfixable error, so making just
     some precautions to forget about it forever. }
@@ -450,19 +450,19 @@ begin
     Log(LogActorError, _CurrentRoutine, 'ERROR: Direction is zero!');
   end;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 { ----------------------------------------------------------------------------- }
 
 constructor DCoordActor.Create;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   inherited Create;
   LastNav := UnitinializedNav;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 { =========================================================================== }
@@ -471,41 +471,41 @@ end;
 
 procedure DActorPhysics.doGravity;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   if InternalCamera = nil then
     Exit;
   if CanMoveDir(CurrentGravityDown - Vector3(0, 0, Height)) then
     Position := Position + CurrentGravityDown;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 { ---------------------------------------------------------------------------- }
 
 constructor DActorPhysics.Create;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   inherited Create;
   Height := 0;
   CurrentGravityDown := Vector3(0, 0, 1);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 { ---------------------------------------------------------------------------- }
 
 procedure DActorPhysics.Manage;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   CurrentGravityDown := -DeltaTLocal * CurrentWorld.GetGravity(Position) *
     CurrentWorld.GravityAcceleration;
   inherited Manage;
   doGravity;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 { ---------------------------------------------------------------------------- }
@@ -516,12 +516,12 @@ function DActorPhysics.CanMovePos(const aPos: TVector3): boolean;
 var
   tmp: TVector3;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   // InternalCamera may be nil, but we skip the check for speed. Be careful.
   Result := InternalCamera.DoMoveAllowed(aPos, tmp, False);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 function DActorPhysics.CanMoveDir(const aDir: TVector3): boolean;
@@ -530,12 +530,12 @@ function DActorPhysics.CanMoveDir(const aDir: TVector3): boolean;
 var
   tmp: TVector3;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   // InternalCamera may be nil, but we skip the check for speed. Be careful.
   Result := InternalCamera.DoMoveAllowed(InternalCamera.Position + aDir, tmp, False);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 { =========================================================================== }
@@ -544,7 +544,7 @@ end;
 
 constructor DBasicActor.Create;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   inherited Create;
   Nickname := 'abc';
@@ -558,20 +558,20 @@ begin
   AttackRandom := TCastleRandom.Create;
   ResetAll;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 { ---------------------------------------------------------------------------- }
 
 destructor DBasicActor.Destroy;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   FreeAndNil(DefenseRandom);
   FreeAndNil(AttackRandom);
   inherited Destroy;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 { ---------------------------------------------------------------------------- }
@@ -878,32 +878,32 @@ end;
 
 constructor DActorBody.Create;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   inherited Create;
   {$WARNING dummy, should set LastTime here}
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 { ----------------------------------------------------------------------------- }
 
 destructor DActorBody.Destroy;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Window.SceneManager.Items.Remove(Body); // looks afwul
   FreeAndNil(Body);
   inherited Destroy;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 { ----------------------------------------------------------------------------- }
 
 procedure DActorBody.SpawnBodyHere(const SpawnBody: DBodyResource);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Body := DBody.Create(nil);
   // No one owns Body, so we'll free it manually in DActor.destroy
@@ -918,96 +918,96 @@ begin
   InternalCamera := Body.Camera;
   ForceAnimation(atIdle);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 { ----------------------------------------------------------------------------- }
 
 procedure DActorBody.Spawn(const aNav: TNavID; const SpawnBody: DBodyResource);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   TeleportTo(aNav);
   SpawnBodyHere(SpawnBody);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 procedure DActorBody.Spawn(const aPosition: TVector3; const SpawnBody: DBodyResource);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   TeleportTo(aPosition);
   SpawnBodyHere(SpawnBody);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 { ----------------------------------------------------------------------------- }
 
 procedure DActorBody.SetVisible(const Value: boolean);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Body.Exists := Value;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 function DActorBody.GetVisible: boolean;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Result := Body.Exists;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 { ----------------------------------------------------------------------------- }
 
 procedure DActorBody.ForceAnimation(const at: TAnimationType);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Body.CurrentAnimationName := AnimationToString(at);
   Body.ResetAnimation;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 procedure DActorBody.ForceAnimation(const at: string);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Body.CurrentAnimationName := at;
   Body.ResetAnimation;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 procedure DActorBody.Animation(const at: TAnimationType);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Body.NextAnimationName := AnimationToString(at);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 procedure DActorBody.Animation(const at: string);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Body.NextAnimationName := at;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 { ----------------------------------------------------------------------------- }
 
 procedure DActorBody.Manage;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   { dt := DecoNow - LastT;
     dtl := DecoNowLocal - LastTLocal;
@@ -1026,7 +1026,7 @@ begin
     Body.Direction := Direction;
   end;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 { =========================================================================== }
@@ -1035,21 +1035,21 @@ end;
 
 function DActor.GetTarget: DCoordActor;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   if fTarget = nil then
     GetEnemyTarget; // todo
   // dLog(LogActorError,Self,_CurrentRoutine,'Warning: Autoselecting target not implemented yet...');
   Result := fTarget;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 { ----------------------------------------------------------------------------- }
 
 function isEnemyFaction(const f1, f2: TFaction): boolean;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   // todo
   if f1 <> f2 then
@@ -1057,19 +1057,19 @@ begin
   else
     Result := False;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 function isEnemy(const a1, a2: DSimpleActor): boolean;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   if isEnemyFaction(a1.Faction, a2.Faction) then
     Result := True
   else
     Result := False;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 procedure DActor.GetEnemyTarget;
@@ -1077,7 +1077,7 @@ var
   a, e: DSimpleActor;
   d, d_min: Float;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   fTarget := nil;
   fTargetGroup := nil;
@@ -1100,42 +1100,42 @@ begin
     end;
   fTarget := DCoordActor(e);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 { ----------------------------------------------------------------------------- }
 
 procedure DActor.RequestSoftPause;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   {$WARNING todo}
   {$HINT and player in THIS battle}
   if PlayerInBattle then
     RequestSoftPauseByAction(1);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 { ----------------------------------------------------------------------------- }
 
 function DActor.CanSee(const a1: DCoordActor): boolean;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   if (TVector3.DotProduct(Self.Direction, (a1.Position - Self.Position)) > 0) then
     Result := True
   else
     Result := False;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 { ----------------------------------------------------------------------------- }
 
 procedure DActor.PerformAction(const doAction: DMultiPerk);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   if fTarget = nil then
   begin
@@ -1155,14 +1155,14 @@ begin
     Log(LogActorError, _CurrentRoutine,
       'ERROR: Trying to preform action on invalid actor...');
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 { ----------------------------------------------------------------------------- }
 
 procedure DActor.LookAt;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   if fTarget <> nil then
     LookAt(Target.Position)
@@ -1170,55 +1170,55 @@ begin
     Log(LogActorError, _CurrentRoutine,
       'Warning: trying to look at a nil target...');
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 procedure DActor.LookAt(const aPosition: TVector3);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   toDir := aPosition - Position;
   toDir[2] := 0; // cut-off z component
   FixZeroDirection;
   toDir.NormalizeMe;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 { ----------------------------------------------------------------------------- }
 
 procedure DActor.RecoverAll;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   // dummy, should also reset all active statuses
   ResetAll;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 { ----------------------------------------------------------------------------- }
 
 constructor DActor.Create;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   inherited Create;
   Actions := DPerksList.Create(False);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 { ----------------------------------------------------------------------------- }
 
 destructor DActor.Destroy;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   FreeAndNil(Actions);
   inherited Destroy;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 { =========================================================================== }
@@ -1227,7 +1227,7 @@ end;
 
 procedure DMonster.doAI;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   { if the target is close enough look at it }
   if fTarget = nil then
@@ -1256,27 +1256,27 @@ begin
   // (body.Items[0] as TCastleScene).PlayAnimation('attack', paForceNotLooping);
   // Scene.AnimationTimeSensor('my_animation').EventIsActive.OnReceive.Add(@AnimationIsActiveChanged)
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 { ----------------------------------------------------------------------------- }
 
 constructor DMonster.Create;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   inherited Create;
   Self.onHit := @Self.doHit;
   Faction := ffHostile;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 { ----------------------------------------------------------------------------- }
 
 procedure DMonster.doHit(const Dam: Float; const Damtype: TDamageType);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   if Self.HP > 0 then
     Self.ForceAnimation(atHurt);
@@ -1284,18 +1284,18 @@ begin
   // and show numeric representation of Dam
   // ? and negative status applied ?
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 { ----------------------------------------------------------------------------- }
 
 procedure DMonster.Die;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Self.ForceAnimation(atDie);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 { =========================================================================== }
@@ -1304,21 +1304,21 @@ end;
 
 constructor DActorGroup.Create;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   inherited Create; // <------- actually may be unneeded if parent is DObject
   Members := TActorList.Create(False);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 destructor DActorGroup.Destroy;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   FreeAndNil(Members);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 end.

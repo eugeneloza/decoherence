@@ -140,7 +140,7 @@ uses SysUtils, CastleImages,
 
 constructor DLabel.Create;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   inherited Create;
   Base.ScaleItem := False;
@@ -149,26 +149,26 @@ begin
   Font := DefaultFont;
   //fText := ''; //autoinitialized
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
 
 destructor DLabel.Destroy;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   FreeAndNil(BrokenString);
   inherited Destroy;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
 
 procedure DLabel.SetText(const Value: string);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   if fText <> Value then
   begin
@@ -176,7 +176,7 @@ begin
     PrepareTextImage;
   end;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
@@ -185,7 +185,7 @@ procedure DLabel.PrepareTextImage;
 var
   tmpflg: boolean;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   ImageReady := False;
   ImageLoaded := False;
@@ -218,14 +218,14 @@ begin
 
   Rescale;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
 
 function DLabel.RescaleContent: boolean;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   {$IFNDEF AllowRescale}
   if SourceImage = nil then
@@ -255,7 +255,7 @@ begin
         Log(LogLabelError, _CurrentRoutine, 'ERROR: Base.Initialized = false');
   end;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 
@@ -265,12 +265,12 @@ end;
 
 procedure DIntegerLabel.Update;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   inherited Update;
   Text := IntToStr(Target^);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {=============================================================================}
@@ -279,12 +279,12 @@ end;
 
 procedure DStringLabel.Draw;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Text := Target^;
   inherited Draw;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {=============================================================================}
@@ -293,19 +293,19 @@ end;
 
 constructor DFloatLabel.Create;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   inherited Create;
   Digits := 0;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {---------------------------------------------------------------------------}
 
 procedure DFloatLabel.Draw;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   case Digits of
     1: Text := IntToStr(Trunc(Target^)) + '.' + IntToStr(Round(Frac(Target^) * 10));
@@ -315,7 +315,7 @@ begin
   end;
   inherited Draw;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {=============================================================================}
@@ -324,7 +324,7 @@ end;
 
 constructor DFPSLabel.Create;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   inherited Create;
   FPSCount := 0;
@@ -339,14 +339,14 @@ begin
 
   Text := 'X'; //initialize the label, so that it always has an image
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {---------------------------------------------------------------------------}
 
 procedure DFPSLabel.CountFPS;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   if LastRenderTime < 0 then
     LastRenderTime := DecoNow;
@@ -361,7 +361,7 @@ begin
     Inc(FPSCount);
   Draw;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {=============================================================================}
@@ -370,7 +370,7 @@ end;
 
 constructor DPhasedLabel.Create;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   inherited Create;
   Base.AnchorToWindow := True;
@@ -378,7 +378,7 @@ begin
   PhaseSpeed := 0.1;
   Self.ShadowIntensity := 1.0;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
@@ -387,7 +387,7 @@ procedure DPhasedLabel.CyclePhase;
 var
   PhaseShift: float;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   PhaseShift := DeltaT * PhaseSpeed;
   Phase += PhaseShift * (1 + 0.1 * DRND.Random);
@@ -399,19 +399,19 @@ begin
     OpacityPhase := 1;
   {not sure about this... but let it be this way for now}
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
 
 procedure DPhasedLabel.Update;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   inherited Update;
   CyclePhase;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
@@ -420,7 +420,7 @@ procedure DPhasedLabel.doDraw;
 var
   y: integer;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   //inherited <---------- this render is different
   GLImage.Color[3] := Current.Opacity * Sin(Pi * Phase);
@@ -428,7 +428,7 @@ begin
   y := round((1 + 5 * Phase) * Window.Height / 17);
   GLImage.Draw(2 * Window.Width div 3, y);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 end.

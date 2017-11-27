@@ -46,7 +46,7 @@ procedure Generate3DWorld;
 var
   GENERATOR: D3dDungeonGenerator;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   GENERATOR := D3dDungeonGenerator.Create;
   GENERATOR.parameters.load(ApplicationData(GetScenarioFolder + MapsFolder +
@@ -60,7 +60,7 @@ begin
 
   tmpLoadKnightCreature;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {---------------------------------------------------------------------------}
@@ -70,7 +70,7 @@ var
 
 procedure LoadTestLevel;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Generate3DWorld;
 
@@ -86,14 +86,14 @@ begin
 
   Log(LogInitData, _CurrentRoutine, 'Finished');
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {---------------------------------------------------------------------------}
 
 procedure InitTestLevel;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   if not LoadCompleted then
     Exit;
@@ -108,7 +108,7 @@ begin
     SetGameMode(gmTravel);
   end;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 

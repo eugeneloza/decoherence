@@ -93,9 +93,9 @@ uses SysUtils, CastleFilesUtils, CastleLog,
 
 procedure DDungeonWorld.ManageTiles; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
-  StartProfiler;
+  {StartProfiler}
   {$WARNING dummy}
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
@@ -105,7 +105,7 @@ function DDungeonWorld.UpdatePlayerCoordinates(const x, y, z: float): boolean;
 {$ENDIF}
   //var nx,ny,nz: TIntCoordinate;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   {todo: may be optimized, at the moment we have here: 6 assignments,
    using nx,ny,nz we will have *MORE* work *IF* the tile has changed,
@@ -137,14 +137,14 @@ begin
     {current tile hasn't changed}
     Result := False;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
 
 procedure DDungeonWorld.Manage(const Position: TVector3);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   inherited Manage(Position);
   if FirstRender then
@@ -157,23 +157,23 @@ begin
   if UpdatePlayerCoordinates(Position[0], Position[1], Position[2]) then
     ManageTiles;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
 
 function DDungeonWorld.GetGravity(const aPosition: TVector3): TVector3;
 begin
-  StartProfiler;
+  {StartProfiler}
   Result := Vector3(0, 0, 1);
-  StopProfiler;
+  {StopProfiler}
 end;
 
 function DDungeonWorld.GetGravity(const aNav: TNavID): TVector3;
 begin
-  StartProfiler;
+  {StartProfiler}
   Result := Vector3(0, 0, 1);
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
@@ -182,7 +182,7 @@ procedure DDungeonWorld.Load(const Generator: DAbstractGenerator);
 var
   DG: D3dDungeonGenerator;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   inherited Load(Generator);
   fGravityAcceleration := 10;
@@ -198,23 +198,23 @@ begin
    however, loading from generator is *not* a normal case
    (used mostly for testing in pre-alpha), so such redundancy will be ok
    normally World should load from a file and loading tiles will happen only once}
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
 
 procedure DDungeonWorld.Load(const URL: string);
 begin
-  StartProfiler;
+  {StartProfiler}
   {$Warning dummy}
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
 
 procedure DDungeonWorld.Activate;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   inherited Activate;
   {$WARNING todo}
@@ -224,7 +224,7 @@ begin
   {why does it get a wrong GRAVITY_UP if called from Self.Activate?????}
   SpawnActors; //must go after BuildNav;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
@@ -234,7 +234,7 @@ var
   i: integer;
   Transform: TTransformNode;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   WorldObjects := TTransformList.Create(False); //scene will take care of freeing
   for i := 0 to High(Steps) do
@@ -249,14 +249,14 @@ begin
     WorldObjects.Add(Transform);
   end;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
 
 constructor DDungeonWorld.Create;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   inherited Create;
   px := UninitializedCoordinate;
@@ -267,14 +267,14 @@ begin
   py0 := UninitializedCoordinate;
   pz0 := UninitializedCoordinate;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
 
 destructor DDungeonWorld.Destroy;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   {$hint freeandnil(window.scenemanager)?}
 
@@ -285,7 +285,7 @@ begin
 
   inherited Destroy;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 end.

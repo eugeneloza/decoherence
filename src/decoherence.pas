@@ -54,7 +54,7 @@ uses Classes, SysUtils,
 {$PUSH}{$WARN 5024 off : Parameter "$1" not used}
 procedure WindowManage(Container: TUIContainer);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   doTime; {advance time for this frame}
 
@@ -68,7 +68,7 @@ begin
   if Music <> nil then
     Music.Manage;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {$POP}
@@ -81,11 +81,11 @@ end;
 {$PUSH}{$WARN 5024 off : Parameter "$1" not used}
 procedure GuiResize(Container: TUIContainer);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   GUI.Rescale;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {$POP}
@@ -98,11 +98,11 @@ end;
 {$PUSH}{$WARN 5024 off : Parameter "$1" not used}
 procedure GuiRender(Container: TUIContainer);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   GUI.Draw;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {$POP}
@@ -112,7 +112,7 @@ end;
 {$PUSH}{$WARN 5024 off : Parameter "$1" not used}
 procedure doPress(Container: TUIContainer; const Event: TInputPressRelease);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   // todo Joystick
   if Event.EventType = itMouseButton then
@@ -142,7 +142,7 @@ begin
   //  SetGameMode(gmCharacterGeneration);
   InitTestLevel;                         //ugly! I'll fix this soon.
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {$POP}
@@ -152,7 +152,7 @@ end;
 {$PUSH}{$WARN 5024 off : Parameter "$1" not used}
 procedure doRelease(Container: TUIContainer; const Event: TInputPressRelease);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   if Event.EventType = itMouseButton then
     doMouseRelease(Event)
@@ -160,7 +160,7 @@ begin
   if Event.EventType = itKey then
     doKeyboardRelease(Event.Key);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {$POP}
@@ -170,11 +170,11 @@ end;
 {$PUSH}{$WARN 5024 off : Parameter "$1" not used}
 procedure doMotion(Container: TUIContainer; const Event: TInputMotion);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   doMouseMotion(Event);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {$POP}
@@ -183,7 +183,7 @@ end;
 
 procedure LoadAndInitData;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   InitMusicManager;
   SetGameMode(gmLoadScreen);
@@ -200,12 +200,12 @@ begin
 
   LoadCompleted := True;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 procedure ApplicationInitialize;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   InitLog;
   Log(LogInit, _CurrentRoutine, 'Init');
@@ -227,14 +227,14 @@ begin
   //finally we're ready to show game loading screen
   {$IFDEF AllowRescale}
   Window.onResize := @GuiResize;
-{$ENDIF}
+  {$ENDIF}
   Window.onRender := @GuiRender;
 
   Log(LogInit, _CurrentRoutine, 'Init finished');
 
   LoadAndInitData;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {==========================================================================}
@@ -246,7 +246,7 @@ end;
 
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 initialization
-  StartProfiler;
+  {StartProfiler}
 
   OnGetApplicationName := @MyGetApplicationName;
 
@@ -258,7 +258,7 @@ initialization
 
   {$IFNDEF AllowRescale}
   window.ResizeAllowed := raOnlyAtOpen;
-{$ENDIF}
+  {$ENDIF}
   {$IFDEF Fullscreen}
   Window.FullScreen := True;
   {$ELSE}
@@ -269,10 +269,10 @@ initialization
   Application.MainWindow := Window;
   Application.OnInitialize := @ApplicationInitialize;
 
-  StopProfiler;
+  {StopProfiler}
 
 finalization
-  StartProfiler;
+  {StartProfiler}
 
   Log(LogInit, _CurrentRoutine, 'Going down...');
   { free all assigned memory }
@@ -289,5 +289,5 @@ finalization
   //FreeTextureProperties;
   Log(LogInit, _CurrentRoutine, 'Bye...');
 
-  StopProfiler;
+  {StopProfiler}
 end.

@@ -49,7 +49,7 @@ uses SysUtils,
 
 function LanguageDir(const Lang: TLanguage): string;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   case Lang of
     Language_English: Result := 'ENG/';
@@ -59,14 +59,14 @@ begin
   end;
   Result := GetScenarioFolder + TextFolder + Result;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
 
 function SayLanguage(const Lang: TLanguage): string;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   case Lang of
     Language_English: Result := 'English';
@@ -75,7 +75,7 @@ begin
       Result := 'Unknown Language';
   end;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
@@ -83,7 +83,7 @@ end;
 {thanks to Michalis, it's simple :) see https://github.com/eugeneloza/decoherence/issues/22}
 procedure SetLoadingImage;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   {no need yet}
   //Theme.LoadingBackgroundColor := Black; // adjust as needed
@@ -98,7 +98,7 @@ begin
 
   Theme.OwnsImages[tiLoading] := False;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 end.

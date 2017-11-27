@@ -53,7 +53,7 @@ uses DecoGui, DecoAbstractWorld, DecoAbstractWorld3d,
 
 procedure SetGameMode(const GM: TGameMode);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   if GM = LastGameMode then
     Exit;
@@ -88,30 +88,30 @@ begin
     if is3DGameMode then Window.SceneManager.exists := true
                     else Window.SceneManager.exists := false;}
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {------------------------------------------------------------}
 
 function is3DGameMode: boolean;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Result := (CurrentGameMode = gmTravel) or (CurrentGameMode = gmBattle);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {------------------------------------------------------------}
 
 function GameModeNeedsClearingScreen: boolean;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   {$HINT something more efficient, or world-attached might be here}
   Result := (Window.SceneManager = nil) or not Window.SceneManager.Exists;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 

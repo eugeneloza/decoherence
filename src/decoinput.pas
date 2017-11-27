@@ -140,7 +140,7 @@ end;
 
 procedure doKeyboardRelease(const aKey: TKey);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   case aKey of
     k_W: Player.InputRelease(mdForward);
@@ -149,14 +149,14 @@ begin
     k_D: Player.InputRelease(mdRight);
   end;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure doKeyboardPress(const aKey: TKey);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   case aKey of
     k_W: Player.InputMove(mdForward);
@@ -166,7 +166,7 @@ begin
   end;
   KeyRecorder(aKey);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
@@ -176,7 +176,7 @@ var
   tmpLink: DAbstractElement;
   Dragging: boolean;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   if doMouseLook(Event) then
     Exit;
@@ -194,39 +194,39 @@ begin
       Log(logVerbose, _CurrentRoutine, 'Motion caught ' + tmpLink.ClassName);
   end;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {================================= TOUCH ====================================}
 
 constructor DTouch.Create(const xx, yy: single; const Finger: integer);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   x0 := Round(xx);
   y0 := Round(yy);
   FingerIndex := Finger;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure DTouch.Update(const Event: TInputMotion);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   x0 := Round(Event.Position[0]);
   y0 := Round(Event.Position[1]);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
 
 function GetFingerIndex(const Event: TInputPressRelease): integer;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   if Event.MouseButton = mbLeft then
     Result := Event.FingerIndex
@@ -237,7 +237,7 @@ begin
   else
     raise Exception.Create('Unknown event.MouseButton in decomouse.GetFingerIndex!');
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
@@ -251,7 +251,7 @@ var
   i, FingerIndex: integer;
   Found: boolean;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   if TouchArray.Count > 0 then
   begin
@@ -290,7 +290,7 @@ begin
   else
     Log(LogMouseError, _CurrentRoutine, 'ERROR: Touch event list is empty!');
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
@@ -303,7 +303,7 @@ var
   InterfaceCaughtEvent: boolean;
   i: integer;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   InterfaceCaughtEvent := False;
 
@@ -341,7 +341,7 @@ begin
 
   Log(LogMouseInfo, _CurrentRoutine, 'Caught mouse press finger=' + IntToStr(FingerIndex));
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
@@ -351,7 +351,7 @@ var
 
 function doMouseLook(const Event: TInputMotion): boolean;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   if Camera = nil then
   begin
@@ -389,7 +389,7 @@ begin
     doMouseLook := False;
   end;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
@@ -405,7 +405,7 @@ function doMouseDrag(const Event: TInputMotion): boolean;
 var
   i: integer;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   {check for drag-n-drops}
   Result := False;
@@ -432,7 +432,7 @@ begin
 
   end;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 

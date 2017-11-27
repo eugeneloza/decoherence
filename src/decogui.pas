@@ -64,7 +64,7 @@ uses SysUtils,
 
 constructor DInterfaceContainer.Create;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Log(LogInitInterface, _CurrentRoutine, 'Creating interface.');
   inherited Create;
@@ -73,28 +73,28 @@ begin
 
   FPSLabel := DFPSLAbel.Create;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
 
 destructor DInterfaceContainer.Destroy;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Log(LogInitInterface, _CurrentRoutine, 'Game over...');
   { Free special elements that are not freed automatically (are not Children) }
   FreeAndNil(FPSLabel);
   inherited Destroy;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure DInterfaceContainer.Rescale;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   if (Window.Width = Width) and (Window.Height = Height) then
   begin
@@ -125,14 +125,14 @@ begin
   { rescale special elements }
   FPSLabel.Rescale;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure DInterfaceContainer.Draw;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   { clear the screen depending on the game mode
     in case SceneManager doesn't clear it }
@@ -144,7 +144,7 @@ begin
   { draw special elements }
   FPSLabel.CountFPS;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {===========================================================================}
@@ -153,12 +153,12 @@ end;
 
 procedure DInterfaceContainer.LoadScreen;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Self.Clear;
   Grab(DLoadScreen.Create);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
@@ -167,7 +167,7 @@ procedure DInterfaceContainer.PartyInterface;
 var
   tmp: DSingleInterfaceElement;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Self.Clear; //make it more optimal?
   {tmp := DPlayerBarsFull.Create;
@@ -191,7 +191,7 @@ begin
   //(tmp as DFramedImage).RearrangeChildren; //<------- doesn't matter
   Grab(tmp);                   }
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 end.

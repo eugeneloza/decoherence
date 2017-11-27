@@ -89,7 +89,7 @@ function GetRandomFact: string;
 var
   NewFact: integer;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   if Facts.Count = 0 then
     raise Exception.Create('GetRandomFact ERROR: No facts loaded!');
@@ -107,7 +107,7 @@ begin
   CurrentFact := Facts[NewFact];
   LastFact := NewFact;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
@@ -119,7 +119,7 @@ function GetRandomFactImage: string;
 var
   LoadImageNew: string;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   if CurrentFact = nil then
     raise Exception.Create('GetRandomFactImage ERROR: Get Fact before getting the image!');
@@ -135,7 +135,7 @@ begin
   Result := LoadImageNew;
   CurrentFact := nil;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {---------------------------------------------------------------------------------}
@@ -149,7 +149,7 @@ var
   F: DFact;
   LI: DLoadImage;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   if Facts <> nil then
   begin
@@ -203,49 +203,49 @@ begin
   Log(LogInitInterface, Facts.ClassName + '>' + _CurrentRoutine,
     'Reading file finished.');
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {---------------------------------------------------------------------------}
 
 destructor DFact.Destroy;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   FreeAndNil(Compatibility);
   inherited Destroy;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {---------------------------------------------------------------------------}
 
 procedure InitLoadScreen;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   //LoadFacts does everything, jsut providing it a correct filename.
   LoadFacts(ApplicationData(LanguageDir(CurrentLanguage) + 'facts.xml' + gz_ext));
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {---------------------------------------------------------------------------------}
 
 procedure FreeLoadScreen;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   FreeAndNil(Facts);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {--------------------------------------------------------------------------}
 
 function LoadScreenMainText: string;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   {remake it some day into something useful}
   case CurrentLanguage of
@@ -260,7 +260,7 @@ begin
       Result := 'Language unavailable'
   end;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 end.

@@ -97,7 +97,7 @@ var
 
 procedure SetFonts;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   DefaultFont := RegularFont16;
   DebugFont := RegularFont12;
@@ -109,7 +109,7 @@ begin
 
   PlayerDamageFont := RegularFont100;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 procedure InitializeFonts;
@@ -119,7 +119,7 @@ var
   NumCharSet: TUnicodeCharList;
 {$ENDIF}
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Log(LogInitInterface, _CurrentRoutine, 'Init started');
    {$IFDEF Android}
@@ -155,20 +155,20 @@ begin
 
   SetFonts;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
 
 procedure DestroyFonts;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   FreeAndNil(RegularFont12);
   FreeAndNil(RegularFont16);
   FreeAndNil(RegularFont100);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
@@ -178,7 +178,7 @@ var
   P: Pvector2byte;
   i: integer;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Result := TGrayscaleAlphaImage.Create;
   Result.SetSize(TextWidth(s), TextHeight(s) + Self.Gap);  //including baseline
@@ -200,7 +200,7 @@ begin
     Inc(P);
   end;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {---------------------------------------------------------------------------}
@@ -211,7 +211,7 @@ var
   i: integer;
   MaxH, MaxHb, MaxW: integer;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   MaxH := 0;
   MaxHb := 0;
@@ -238,7 +238,7 @@ begin
     FreeAndNil(DummyImage);
   end;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {---------------------------------------------------------------------------}
@@ -250,7 +250,7 @@ var
   Iteration, i: integer;
   p: PVector2byte;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   DummyImage := BrokenStringToImage(s);
   if (ShadowStrength > 0) and (ShadowLength > 0) then
@@ -278,7 +278,7 @@ begin
   else
     Result := DummyImage;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {---------------------------------------------------------------------------}
@@ -288,7 +288,7 @@ var
   i1, i2, i_break: integer;
   NewString: DString;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Result := DStringList.Create;
   i1 := 1;
@@ -318,7 +318,7 @@ begin
   NewString.Width := TextWidth(NewString.Value);
   Result.Add(NewString);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 end.

@@ -3,7 +3,7 @@ var ix,iy,iz: integer;
     f: TTileFace;
     tmpDock: DDockPoint;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   if Dock = nil then Dock := TDockPointList.Create else Dock.Clear;
   fFreeFaces := 0;
@@ -46,5 +46,5 @@ begin
   {$ENDIF}
   Result := FreeFaces;
 
-  StopProfiler;
+  {StopProfiler}
 end;

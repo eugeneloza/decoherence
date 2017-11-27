@@ -376,12 +376,12 @@ uses SysUtils, CastleFilesUtils, CastleImages, CastleVectors,
 
 procedure DDungeonGenerator.ForceReady;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Parameters.isReady := true;
   Log(LogWorldInitSoftError,_CurrentRoutine,'Warning: Be careful, parameters might not be initialized correctly.');
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
@@ -390,7 +390,7 @@ procedure DDungeonGenerator.InitParameters;
 var tmp: DGeneratorTile;
     i : integer;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   if not Parameters.isReady then
     raise Exception.Create('DDungeonGenerator.Generate FATAL - parameters are not loaded!');
@@ -454,7 +454,7 @@ begin
   MinSteps := CurrentStep+1;
   fisInitialized := true;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
@@ -564,7 +564,7 @@ procedure DDungeonGenerator.Generate;
 var i: integer;
     t1,t2: DTime;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   //if Self is DDungeonGenerator then fMult := 1 else fMult := 2;
   //fProgress := 0;
@@ -638,7 +638,7 @@ begin
   fisFinished := true;
   //if Self is DDungeonGenerator then UpdateProgress('Done',1);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
@@ -646,7 +646,7 @@ end;
 function DDungeonGenerator.ExportMap: DMap;
 var ix,iy,iz: TIntCoordinate;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   if not isFinished then raise Exception.Create('DDungeonGenerator.ExportMap: ERROR! Trying to access an unfinished Generator');
   {Result := Map;
@@ -661,7 +661,7 @@ begin
   for iz := 0 to Map.SizeZ-1 do
     Result.Img[iz] := Map.Img[iz].MakeCopy as TRGBAlphaImage;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
@@ -669,25 +669,25 @@ end;
 function DDungeonGenerator.ExportTiles: TStringList;
 var s: string;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Result := TStringList.Create;
   for s in Self.Parameters.TilesList do
     Result.Add(ApplicationData(TilesFolder+s+'.x3d'+GZ_ext));
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
 
 function DDungeonGenerator.ExportSteps: TGeneratorStepsArray;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Result := Gen;
   Gen := nil;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
@@ -794,7 +794,7 @@ procedure DDungeonGenerator.MakeMinimap;
 var i: integer;
     iz: TIntCoordinate;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Map.FreeMinimap;
   SetLength(Map.Img,Map.SizeZ);
@@ -815,7 +815,7 @@ begin
     end;
   Log(LogGenerateWorld,_CurrentRoutine,IntToStr(Length(Map.Img)));
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {-------------------------------------------------------------------------}
@@ -825,7 +825,7 @@ procedure DDungeonGenerator.ShrinkMap;
     maxx,maxy,maxz: TIntCoordinate;
     minx,miny,minz: TIntCoordinate;}
 begin
-  StartProfiler;
+  {StartProfiler}
 
   {only z-resize now. Maybe I won't make xy-resizes
    due to possible blockers problems
@@ -835,7 +835,7 @@ begin
     Map.SetSize(Map.SizeX,Map.SizeY,Map.SizeZ);
   end;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {-------------------------------------------------------------------------}
@@ -846,7 +846,7 @@ var ix,iy,iz: TIntCoordinate;
     aNav: TNavID;
     a: TAngle;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   NavMap := ZeroIntegerMap(Map.SizeX,Map.SizeY,Map.SizeZ);
 
@@ -880,7 +880,7 @@ begin
         end;
       end;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {-------------------------------------------------------------------------}
@@ -889,7 +889,7 @@ procedure DDungeonGenerator.BuildWeenies;
 var w: DWeenie;
     i,j,k: integer;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   {$hint All weenies actually will be defined by CONSTRUCTOR in first steps, not here!}
   Weenies := TWeeniesList.create;
@@ -910,7 +910,7 @@ begin
       end;
     end;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {================== 3D DUNGEON GENERATOR ROUTINES ===========================}
@@ -918,7 +918,7 @@ end;
 function ZeroIntegerMap(const sx,sy,sz: integer): TIntMapArray;
 var ix,iy,iz: TIntCoordinate;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   SetLength(Result,sx);
   for ix := 0 to sx-1 do begin
@@ -930,7 +930,7 @@ begin
     end;
   end;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
@@ -938,7 +938,7 @@ end;
 function D3DDungeonGenerator.NilIndexMap: TNeighboursMapArray;
 var ix,iy{,iz}: TIntCoordinate;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   SetLength(Result,Map.SizeX);
   for ix := 0 to Map.SizeX-1 do begin
@@ -948,7 +948,7 @@ begin
     end;
   end;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
@@ -957,7 +957,7 @@ procedure D3DDungeonGenerator.MakeTileIndexMap;
 var i: integer;
     ix,iy,iz: TIntCoordinate;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   TileIndexMap := ZeroIntegerMap(Map.SizeX,Map.SizeY,Map.SizeZ);
   for i := 0 to MaxSteps-1 do
@@ -968,7 +968,7 @@ begin
           if Tiles[Gen[i].Tile].Map[ix,iy,iz].Base <> tkNone then
             TileIndexMap[ix+Gen[i].x,iy+Gen[i].y,iz+Gen[i].z] := i;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
@@ -1096,7 +1096,7 @@ var
         end;
     end;}
 begin
-  StartProfiler;
+  {StartProfiler}
 
   //init HelperMap and raycast list
   RaycastList := TRaycastList.Create;
@@ -1170,7 +1170,7 @@ begin
   inc(RaycastCount);
   //UpdateProgress('Raycasting',1+(RaycastCount/Map.Volume)*0.8);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
@@ -1214,7 +1214,7 @@ var i: integer;
     ix,iy,iz: TIntCoordinate;
     dx,dy,dz: TIntCoordinate;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   NeighboursMap := NilIndexMap;
 
@@ -1235,7 +1235,7 @@ begin
         RemoveDuplicatesNeighbours(NeighboursMap[ix,iy,iz]);
       end;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------}
@@ -1244,7 +1244,7 @@ end;
 procedure D3DDungeonGenerator.Raycast;
 var ix,iy,iz: TIntCoordinate;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   RaycastCount := 0;
   tmpNeighboursMap := NilIndexMap; //create a nil-initialized neighbours lists of all accessible map tiles
@@ -1264,7 +1264,7 @@ begin
 
   //UpdateProgress('Finishing',0.9);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {------------------------------------------------------------------------}
@@ -1294,7 +1294,7 @@ var i,j,g: integer;
     tIndex: DIndexRec;
     TilesUsed: array of boolean;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   {this part of the code will combine tiles in larger groups to boost FPS
   also this will provide for LOD of the whole group generation and far land support for overworld later
@@ -1368,7 +1368,7 @@ begin
 
   FreeAndNil(HitCount);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {------------------------------------------------------------------------}
@@ -1376,7 +1376,7 @@ end;
 procedure D3DDungeonGenerator.Generate;
 var t,t0: DTime;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   t0 := GetNow;
 
@@ -1406,7 +1406,7 @@ begin
   Log(LogGenerateWorld,_CurrentRoutine,'Finished. Everything done in '+IntToStr(Round((GetNow-t0)*1000))+'ms.');
   //UpdateProgress('Done',2);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {------------------------------------------------------------------------}
@@ -1414,7 +1414,7 @@ end;
 function D3DDungeonGenerator.ExportGroups: TIndexGroups;
 var i: integer;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   if not isFinished then raise Exception.Create('D3DDungeonGenerator.ExportGroups: ERROR! Trying to access an unfinished Generator');
   Result := TIndexGroups.Create(true);
@@ -1422,20 +1422,20 @@ begin
     Result.Add(Groups[i]);
   Groups := nil;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {------------------------------------------------------------------------}
 
 function D3DDungeonGenerator.ExportNeighbours: TNeighboursMapArray;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   if not isFinished then raise Exception.Create('Generator.ExportNeighbours: ERROR! Trying to access an unfinished Generator');
   Result := NeighboursMap;
   NeighboursMap := nil;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {========================== DGENERATOR TILE ================================}
@@ -1455,7 +1455,7 @@ function DGeneratorMap.CalculateFaces: integer; {$IFDEF SUPPORTS_INLINE}inline;{
 procedure DGeneratorMap.ProcessBlockers;
 var a: TAngle;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   if Blocker then begin
     {this works only for 1x1x1 blockers with only ONE face and only HORIZONTAL!}
@@ -1466,19 +1466,19 @@ begin
       end;
   end;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {--------------------------------------------------------------------------}
 
 destructor DGeneratorMap.Destroy;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   FreeAndNil(Dock);
   inherited Destroy;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {========================= OTHER ROUTINES ===================================}
@@ -1489,7 +1489,7 @@ var XMLdoc: TXMLDocument;
     Iterator: TXMLElementIterator;
     FS: DFirstStep;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Log(LogGenerateWorld,_CurrentRoutine,URL);
 
@@ -1554,7 +1554,7 @@ begin
   {initialize generator parameters}
   isReady := true;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
@@ -1562,7 +1562,7 @@ end;
 {Function DDungeonGenerator.GetTileByName(TileName: string): DGeneratorMap;
 var i: DGeneratorMap;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Result := nil;
   for i in Tiles do if i.TileName = TileName then begin
@@ -1571,12 +1571,12 @@ begin
   end;
   raise Exception.Create('DDungeonGenerator.GetTileByName: FATAL! Tile cannot be found!');
 
-  StopProfiler;
+  {StopProfiler}
 end;}
 Function DDungeonGenerator.GetTileByName(const TileName: string): TTileType;
 var i: integer;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   for i := 0 to Tiles.Count do if tiles[i].TileName = TileName then begin
     Result := i;
@@ -1584,27 +1584,27 @@ begin
   end;
   raise Exception.Create('DDungeonGenerator.GetTileByName: FATAL! Tile cannot be found!');
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
 
 constructor DDungeonGeneratorParameters.Create;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   inherited Create;
   TilesList := TStringList.Create;
   FirstSteps := TFirstStepsArray.Create;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
 
 constructor DDungeonGenerator.Create;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   inherited Create;
   Map := DGeneratorMap.Create;
@@ -1617,14 +1617,14 @@ begin
   RichTiles    := TIndexList.Create;
   PoorTiles    := TIndexList.Create;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure DDungeonGenerator.FreeLists;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   FreeAndNil(NormalTiles);
   FreeAndNil(PoorTiles);
@@ -1632,14 +1632,14 @@ begin
   FreeAndNil(RichTiles);
   FreeAndNil(DownTiles);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
 
 destructor DDungeonGenerator.Destroy;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   FreeAndNil(Map);
   FreeAndNil(Tiles);
@@ -1647,35 +1647,35 @@ begin
   FreeLists;
   inherited Destroy;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
 
 destructor DDungeonGeneratorParameters.Destroy;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   FreeAndNil(TilesList);
   FreeAndNil(FirstSteps);
 
   inherited Destroy;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
 
 destructor D3DDungeonGenerator.Destroy;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   FreeNeighboursMap(tmpNeighboursMap);
   FreeNeighboursMap(NeighboursMap);
   FreeGroups(Groups);
   inherited Destroy;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {============================ FREEING ROUTINES ==============================}
@@ -1683,13 +1683,13 @@ end;
 procedure FreeGroups(const nGroups: TGroupsArray);
 var i: integer;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   if nGroups <> nil then
     for i := 0 to high(nGroups) do
       FreeAndNil(nGroups[i]);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {------------------------------------------------------------------------}
@@ -1697,7 +1697,7 @@ end;
 procedure FreeNeighboursMap(var nMap: TNeighboursMapArray);
 var ix,iy,iz: TIntCoordinate;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   if nMap = nil then Exit;
   //just to be safe (in case the nmap was not initialized completely)
@@ -1711,7 +1711,7 @@ begin
 
   nMap := nil; //this will automatically free the array
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 end.

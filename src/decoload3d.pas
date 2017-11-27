@@ -63,7 +63,7 @@ var
 
 procedure MakeDefaultTextureProperties;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   {$PUSH}{$WARN 6018 OFF}//hide "unreachable code" warning, it's ok here
   {freeandnil?}
@@ -81,7 +81,7 @@ begin
     TextureProperties := nil;
   {$POP}
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
@@ -123,18 +123,18 @@ procedure AddMaterial(const Root: TX3DRootNode);
   end;
 
 begin
-  StartProfiler;
+  {StartProfiler}
 
   ScanNodesRecoursive(Root);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {---------------------------------------------------------------------------}
 
 function LoadBlenderX3D(const URL: string): TX3DRootNode;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Log(LogInitData, _CurrentRoutine, 'Reading file ' + URL);
   if TextureProperties = nil then
@@ -142,42 +142,42 @@ begin
   Result := Load3D(URL);
   AddMaterial(Result);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {=================== Ambient Intensity List ==========================}
 
 constructor DMaterialContainer.Create;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Value := TMaterialList.Create(False);
   fAmbient := 0;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 destructor DMaterialContainer.Destroy;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   FreeAndNil(Value);
   inherited Destroy;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 procedure DMaterialContainer.SetAmbientIntensity(const v: float);
 var
   i: TMaterialNode;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   fAmbient := v;
   for i in Value do
     i.AmbientIntensity := v;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 initialization

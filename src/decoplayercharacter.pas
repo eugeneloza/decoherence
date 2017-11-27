@@ -168,20 +168,20 @@ procedure FreePlayer;
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
-uses SysUtils, Math,
+uses SysUtils, Math, {$WARNING Math redefines float}
   DecoNavigation, DecoAbstractWorld, DecoAbstractWorld3d,
   DecoInput,
   DecoGameMode, DecoTime, DecoLog, Profiler;
 
 constructor DParty.Create;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   //inherited Create;
   Character := DCharList.Create(True);
   CameraMan := DCameraMan.Create;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
@@ -191,7 +191,7 @@ var
   i: integer;
   NewMember: DPlayerCharacter;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   for i := 0 to MaxParty do
   begin
@@ -209,7 +209,7 @@ begin
     Character.Add(NewMember);
   end;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
@@ -218,26 +218,26 @@ procedure DParty.Rest;
 var
   c: DPlayerCharacter;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   {for now it just resets the Actor to its initial state}
   for c in Character do
     c.RecoverAll;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
 
 destructor DParty.Destroy;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   FreeAndNil(Character); //it will auto free all its components
   FreeAndNil(CameraMan);
   inherited Destroy;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
@@ -246,7 +246,7 @@ procedure DParty.UpdateCamera;
 var
   aFriction: float;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   doMove1;
   doMove2;
@@ -276,20 +276,20 @@ begin
     CameraInitialized := True;
   end;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
 
 procedure DParty.Manage;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   UpdateCamera;
   //teleport all characters to CameraMan position;
   CollectCharacters;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
@@ -298,7 +298,7 @@ procedure DParty.CollectCharacters;
 var
   c: DPlayerCharacter;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   for c in Character do
   begin
@@ -308,14 +308,14 @@ begin
   {$hint collect battle state from char}
   PlayerInBattle := True;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
 
 procedure DParty.TeleportTo(const aPosition, aDirection: TVector3);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   CameraMan.TeleportTo(aPosition, aDirection);
   CameraMan.ResetUp;
@@ -328,28 +328,28 @@ begin
 
   UpdateCamera;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 procedure DParty.TeleportTo(const aNav: TNavId);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   CameraMan.TeleportTo(aNav);
   //this is redundant, but blocking navNet would be more stable
   TeleportTo(CurrentWorld.NavToVector3(aNav), Vector3(0, 1, 0));
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 procedure DParty.TeleportTo(const aNav: TNavId; const aDirection: TVector3);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   CameraMan.TeleportTo(aNav);
   TeleportTo(CurrentWorld.NavToVector3(aNav), aDirection);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
@@ -379,7 +379,7 @@ var
   end;
 
 begin
-  StartProfiler;
+  {StartProfiler}
 
   MoveVector := CameraMan.Direction;
   MoveVector[2] := 0;
@@ -395,7 +395,7 @@ begin
     Acceleration += Right90(MoveVector);
   Acceleration.Normalize;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
@@ -425,7 +425,7 @@ var
   end;
 
 begin
-  StartProfiler;
+  {StartProfiler}
 
   CameraMan.Manage;
 
@@ -446,99 +446,99 @@ begin
         if not TryDirection(0, -Pi / 2) then
   ;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {======================== DPlayerCharacter ==================================}
 
 constructor DPlayerCharacter.Create;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   inherited Create;
   isPlayer := True;
   Faction := ffPlayer;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
 
 procedure DPlayerCharacter.Die;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Log(LogTemp, _CurrentRoutine, 'Character has entered clinical death state');
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
 
 procedure DPlayerCharacter.doAI;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   //inherited doAI; <---------- player characters have unique AI
   //just do nothing for now;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
 
 destructor DPlayerCharacter.Destroy;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   inherited Destroy;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {============================================================================}
 
 constructor DCameraMan.Create;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   inherited Create;
   ResetUp;
   Theta := 0;
   phi := 0;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
 
 procedure DCameraMan.ResetUp;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Up := CurrentWorld.GetGravity(Position);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
 
 procedure DCameraMan.ResetAngles;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Theta := ArcSin(Direction[2] / Direction.Length);
   Phi := Sign(Direction[1]) * ArcCos(Direction[0] / (sqr(Direction[0]) + sqr(Direction[1])));
   CenterMouseCursor;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {============================================================================}
 
 constructor DPlayerControl.Create;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   //inherited Create;
   Parties := DPartyList.Create(True);
@@ -548,19 +548,19 @@ begin
   Parties.Add(CurrentParty);
   ResetMoveInput;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
 
 destructor DPlayerControl.Destroy;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   FreeAndNil(Parties);
   inherited Destroy;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
@@ -570,7 +570,7 @@ var
   TraverseAxis: TVector3;
   UpVector, ForwardVector: TVector3;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   begin
     {based on CastleCameras implementation}
@@ -602,19 +602,19 @@ begin
       TraverseAxis);
   end;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
 
 procedure DPlayerControl.Manage;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   {todo}
   CurrentParty.Manage;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 
@@ -622,61 +622,61 @@ end;
 
 procedure DPlayerControl.InputMove(const MoveDir: TMoveDirection);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   MovePress[MoveDir] := True;
   isAccelerating := MovePress[mdForward] or MovePress[mdBack] or
     MovePress[mdLeft] or MovePress[mdRight];
-  StopProfiler;
+  {StopProfiler}
 end;
 
 procedure DPlayerControl.InputRelease(const MoveDir: TMoveDirection);
 begin
-  StartProfiler;
+  {StartProfiler}
   MovePress[MoveDir] := False;
   isAccelerating := MovePress[mdForward] or MovePress[mdBack] or
     MovePress[mdLeft] or MovePress[mdRight];
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 procedure DPlayerControl.ResetMoveInput;
 var
   I: TMoveDirection;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   for I := Low(TMoveDirection) to High(TMoveDirection) do
     MovePress[I] := False;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
 
 procedure DPlayerControl.Stop;
 begin
-  StartProfiler;
+  {StartProfiler}
   isAccelerating := False;
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {============================================================================}
 
 procedure InitPlayer;
 begin
-  StartProfiler;
+  {StartProfiler}
   Player := DPlayerControl.Create;
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
 
 procedure FreePlayer;
 begin
-  StartProfiler;
+  {StartProfiler}
   FreeAndNil(Player);
-  StopProfiler;
+  {StopProfiler}
 end;
 
 end.

@@ -424,7 +424,7 @@ uses SysUtils,
 
 constructor DIntContainer.Create(aOwner: DAnchoredObject);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   //inherited Create;
   Owner := aOwner;
@@ -435,14 +435,14 @@ begin
   y2 := UninitializedIntCoord;
   //Opacity := 1;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
 
 procedure DIntContainer.SetIntCoord(const ax1, ay1, ax2, ay2: integer);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   x1 := ax1;
   y1 := ay1;
@@ -454,78 +454,78 @@ begin
   IntegerToFloat;}
   {$WARNING Integers are not converted to float}
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 procedure DIntContainer.SetIntFull(const ax1, ay1, ax2, ay2: integer;
   const aOpacity: float);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   {$WARNING Base opacity is not set!}
   Opacity := aOpacity;
   SetIntCoord(ax1, ay1, ax2, ay2);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 procedure DIntContainer.SetIntFull(const ax1, ay1, ax2, ay2: float; const aOpacity: float);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   {$WARNING Base opacity is not set!}
   Opacity := aOpacity;
   SetIntCoord(Round(ax1), Round(ay1), Round(ax2), Round(ay2));
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 procedure DIntContainer.SetIntSize(const ax1, ay1, aWidth, aHeight: integer);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   SetIntCoord(ax1, ay1, ax1 + aWidth, ay1 + aHeight);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {procedure DIntegerContainer.SetWidth(const aWidth: integer);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   {unoptimal and might be wrong}
   //SetIntCoord(x1,y1,x1+aWidth,y2);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 procedure DIntegerContainer.SetHeight(const aHeight: integer);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   {unoptimal and might be wrong}
   //SetIntCoord(x1,y1,x2,y1+aHeight);
 
-  StopProfiler;
+  {StopProfiler}
 end;}
 
 {----------------------------------------------------------------------------}
 
 function DIntContainer.GetWidth: integer;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Result := x2 - x1;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 function DIntContainer.GetHeight: integer;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Result := y2 - y1;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
@@ -534,7 +534,7 @@ procedure DIntContainer.Assign(const Source: DIntContainer);
 var
   aa: TAnchorSide;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Self.x1 := Source.x1;
   Self.y1 := Source.y1;
@@ -547,14 +547,14 @@ begin
       'WARNING: NotifyAnchor should be copied, do it!');
   end;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 procedure DIntContainer.AssignTo(const Dest: DIntContainer);
 var
   aa: TAnchorSide;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Dest.x1 := Self.x1;
   Dest.y1 := Self.y1;
@@ -567,7 +567,7 @@ begin
       _CurrentRoutine, 'WARNING: NotifyAnchor should be copied, do it!');
   end;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {=============================================================================}
@@ -578,7 +578,7 @@ constructor DFloatContainer.Create(aOwner: DAnchoredObject);
 var
   aa: TAnchorSide;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   inherited Create(aOwner);
   AnchorToWindow := False;
@@ -596,26 +596,26 @@ begin
   ProportionalScale := psNone;
   ScaleItem := True;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
 
 procedure DFloatContainer.GetWindowAnchor;{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
-  StartProfiler;
+  {StartProfiler}
 
   cx1 := 0;
   cy1 := 0;
   cx2 := Window.Width;
   cy2 := Window.Height;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 procedure DFloatContainer.GetAnchors;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   if AnchorToWindow then
     GetWindowAnchor
@@ -673,14 +673,14 @@ begin
   else
     cValid := False;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
 
 procedure DFloatContainer.IntegerToFloat;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   GetAnchors;
 
@@ -698,20 +698,20 @@ begin
   else
     fInitialized := False;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
 
 procedure DFloatContainer.AdjustToRealSize;{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
-  StartProfiler;
+  {StartProfiler}
 
   x2 := x1 + RealWidth;
   y2 := y1 + RealHeight;
   fInitialized := True;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
@@ -720,7 +720,7 @@ procedure DFloatContainer.FloatToInteger;
 var
   Ratio: float;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   GetAnchors;
 
@@ -759,14 +759,14 @@ begin
   else
     fInitialized := False;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
 
 procedure DFloatContainer.SetFloatCoord(const afx1, afy1, afx2, afy2: float);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   fx1 := afx1;
   fy1 := afy1;
@@ -775,22 +775,22 @@ begin
 
   FloatToInteger;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 procedure DFloatContainer.SetFloatFull(const afx1, afy1, afx2, afy2, aOpacity: float);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   BaseOpacity := aOpacity;
   SetFloatCoord(afx1, afy1, afx2, afy2);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 procedure DFloatContainer.SetFloatSize(const afx1, afy1, afWidth, afHeight: float);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   fx1 := afx1;
   fy1 := afy1;
@@ -799,53 +799,53 @@ begin
 
   FloatToInteger;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 procedure DFloatContainer.SetFloatSizeFull(
   const afx1, afy1, afWidth, afHeight, aOpacity: float);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   BaseOpacity := aOpacity;
   SetFloatSize(afx1, afy1, afWidth, afHeight);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
 
 procedure DFloatContainer.SetIntWidthHeight(const aWidth, aHeight: integer);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   {not sure about this}
   SetIntSize(x1, y1, aWidth, aHeight);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
 
 procedure DFloatContainer.ResetToReal;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   SetIntWidthHeight(RealWidth, RealHeight);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
 
 procedure DFloatContainer.SetRealSize(const aWidth, aHeight: integer);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   RealWidth := aWidth;
   RealHeight := aHeight;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
@@ -853,7 +853,7 @@ end;
 procedure DFloatContainer.AnchorTo(const aParent: DFloatContainer;
   const Gap: integer = 0);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Anchor[asLeft].Anchor := aParent;
   Anchor[asLeft].Gap := Gap;
@@ -870,13 +870,13 @@ begin
   OpacityAnchor := aParent;
   aParent.Owner.AddAnchor(Self.Owner);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 procedure DFloatContainer.AnchorChild(const aChild: DFloatContainer;
   const Gap: integer = 0);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   aChild.Anchor[asLeft].Anchor := Self;
   aChild.Anchor[asLeft].Gap := Gap;
@@ -893,7 +893,7 @@ begin
   aChild.OpacityAnchor := Self;
   Self.Owner.AddAnchor(aChild.Owner);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
@@ -901,54 +901,54 @@ end;
 procedure DFloatContainer.AnchorSide(const aSide: TAnchorSide;
   const aParent: DFloatContainer; const aAlign: TAnchorAlign; const Gap: integer = 0);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Anchor[aSide].Anchor := aParent;
   Anchor[aSide].AlignTo := aAlign;
   Anchor[aSide].Gap := Gap;
   aParent.Owner.AddAnchor(Self.Owner);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 procedure DFloatContainer.AnchorTop(const aParent: DFloatContainer;
   const aAlign: TAnchorAlign; const Gap: integer = 0);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   AnchorSide(asTop, aParent, aAlign, Gap);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 procedure DFloatContainer.AnchorBottom(const aParent: DFloatContainer;
   const aAlign: TAnchorAlign; const Gap: integer = 0);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   AnchorSide(asBottom, aParent, aAlign, Gap);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 procedure DFloatContainer.AnchorLeft(const aParent: DFloatContainer;
   const aAlign: TAnchorAlign; const Gap: integer = 0);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   AnchorSide(asLeft, aParent, aAlign, Gap);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 procedure DFloatContainer.AnchorRight(const aParent: DFloatContainer;
   const aAlign: TAnchorAlign; const Gap: integer = 0);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   AnchorSide(asRight, aParent, aAlign, Gap);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
@@ -957,7 +957,7 @@ procedure DFloatContainer.Assign(const Source: DFloatContainer);
 var
   aa: TAnchorSide;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Self.x1 := Source.x1;
   Self.y1 := Source.y1;
@@ -985,14 +985,14 @@ begin
       'WARNING: NotifyAnchor should be copied, do it!');
   end;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 procedure DFloatContainer.AssignTo(const Dest: DFloatContainer);
 var
   aa: TAnchorSide;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Dest.x1 := Self.x1;
   Dest.y1 := Self.y1;
@@ -1020,14 +1020,14 @@ begin
       _CurrentRoutine, 'WARNING: NotifyAnchor should be copied, do it!');
   end;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
 
 function DFloatContainer.AnchorsEqual(const aCompare: DFloatContainer): boolean;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   { we don't care to which part of Parent we Anchor?
     Or should we? }
@@ -1041,14 +1041,14 @@ begin
   else
     Result := False;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
 
 function DFloatContainer.GetInitialized: boolean;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   if fInitialized then
   begin
@@ -1059,7 +1059,7 @@ begin
   end;
   Result := fInitialized;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {============================================================================}
@@ -1068,13 +1068,13 @@ end;
 
 {function DAbstractElement.ProcessRescaleResult(var r1: TRescaleResult; const r2: TRescaleResult): TRescaleResult;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   if (r1 = rrInvalid) or (r2 = rrInvalid) then Result := rrInvalid else
   if (r1 = rrDirty  ) or (r2 = rrDirty  ) then Result := rrDirty   else
                                                Result := rrOk;
 
-  StopProfiler;
+  {StopProfiler}
 end;}
 
 {----------------------------------------------------------------------------}
@@ -1083,7 +1083,7 @@ function DAbstractElement.RescaleContainer: boolean;
 var
   TmpSize: Txy;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   {ugly/temporary fix to check if container size has changed}
   TmpSize.x1 := Base.x1;
@@ -1122,30 +1122,30 @@ begin
    {$WARNING All angors are attached to current, not to base!!!! Should notify all chidren of current has changed???}
   GetAnimationState; //Get Self.Current (required to scale Anchored elements accordingly!)
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
 
 function DAbstractElement.RescaleContent: boolean;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   {at this abstract level it does nothing}
   Result := False;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
 
 procedure DAbstractElement.RescaleRecoursive;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Rescale; //just rescale self and do nothing more
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
@@ -1154,7 +1154,7 @@ procedure DAbstractElement.Rescale;
 var
   ContainerSizeChanged: boolean;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   ContainerSizeChanged := RescaleContainer;
   ContainerSizeChanged := RescaleContent or ContainerSizeChanged;
@@ -1164,18 +1164,18 @@ begin
   if (ContainerSizeChanged) then
     NotifyRescale;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
 
 procedure DAbstractElement.SetVisible(const Value: boolean);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   fVisible := Value;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
@@ -1185,7 +1185,7 @@ procedure DAbstractElement.AnimateTo(const Animate: TAnimationStyle;
 var
   mx, my: float;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   begin
     GetAnimationState;
@@ -1275,7 +1275,7 @@ begin
     end;
   end;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
@@ -1283,25 +1283,25 @@ end;
 procedure DAbstractElement.SetBaseSize(const NewX, NewY, NewW, NewH: float; NewO: float = 1;
   const Animate: TAnimationStyle = asNone);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Base.SetFloatSizeFull(NewX, NewY, NewW, NewH, NewO);
   AnimateTo(Animate);
   Rescale;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
 
 procedure DAbstractElement.AnchorTo(const aElement: DAbstractElement);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   {$WARNING not working}
   Base.AnchorTo(aElement.Base);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
@@ -1310,7 +1310,7 @@ procedure DAbstractElement.GetAnimationState;
 var
   Phase: float;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   if Base.isInitialized then
   begin
@@ -1358,44 +1358,44 @@ begin
       'Base is uninitialized, falling back to Current=Base');
   end;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
 
 procedure DAbstractElement.Update;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   GetAnimationState;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
 
 procedure DAbstractElement.SetFullScreen;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Base.AnchorToWindow := True;
   SetBaseSize(0, 0, 1, 1);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
 
 function DAbstractElement.GetSize: Txy;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Result.x1 := Base.x1;
   Result.x2 := Base.x2;
   Result.y1 := Base.y1;
   Result.y2 := Base.y2;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
@@ -1404,7 +1404,7 @@ procedure DAbstractElement.AddAnchor(aAnchor: DAnchoredObject);
 var
   a: DAnchoredObject;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   //check if the Anchor isn't already available in NotifyAnchors
   for a in NotifyAnchors do
@@ -1412,7 +1412,7 @@ begin
       Exit;
   NotifyAnchors.Add(aAnchor);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
@@ -1421,19 +1421,19 @@ procedure DAbstractElement.NotifyRescale;
 var
   a: DAnchoredObject;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   for a in NotifyAnchors do
     a.Rescale;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
 
 constructor DAbstractElement.Create;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   inherited Create;
   fVisible := True;
@@ -1445,14 +1445,14 @@ begin
 
   NotifyAnchors := TAnchorList.Create(False);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
 
 destructor DAbstractElement.Destroy;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   FreeAndNil(Base);
   FreeAndNil(Last);
@@ -1462,7 +1462,7 @@ begin
   FreeAndNil(NotifyAnchors);
   inherited Destroy;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {=============================================================================}
@@ -1471,20 +1471,20 @@ end;
 
 constructor DTimer.Create;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   inherited Create;
   Enabled := False;
   StartTime := -1;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure DTimer.Update;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   if StartTime < 0 then
     StartTime := DecoNow
@@ -1496,72 +1496,72 @@ begin
       onTimer;
   end;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure DTimer.SetTimeout(const Seconds: DTime);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   StartTime := -1;
   Enabled := True;
   Interval := Seconds;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {============================================================================}
 
 constructor DSingleInterfaceElement.Create;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   inherited Create;
   isMouseOver := False;
   CanMouseOver := False;
   CanDrag := False;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
 
 destructor DSingleInterfaceElement.Destroy;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   FreeAndNil(Timer);
   inherited Destroy;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
 
 procedure DSingleInterfaceElement.SetTimeOut(const Seconds: DTime);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   if Timer = nil then
     Timer := DTimer.Create;
   Timer.SetTimeOut(Seconds);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
 
 procedure DSingleInterfaceElement.Update;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   inherited Update;
   if (Timer <> nil) and (Timer.Enabled) then
     Timer.Update;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {==============================  Mouse handling =============================}
@@ -1570,7 +1570,7 @@ function DSingleInterfaceElement.IAmHere(const xx, yy: integer): boolean;
  {$IFDEF SUPPORTS_INLINE}inline;
 {$ENDIF}
 begin
-  StartProfiler;
+  {StartProfiler}
 
   if (xx >= Base.x1) and (xx <= Base.x2) and (yy >= Base.y1) and
     (yy <= Base.y2) then
@@ -1578,7 +1578,7 @@ begin
   else
     Result := False;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
@@ -1586,7 +1586,7 @@ end;
 function DSingleInterfaceElement.ifMouseOver(const xx, yy: integer;
   const RaiseEvents: boolean; const AllTree: boolean): DAbstractElement;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Result := nil;
   if IAmHere(xx, yy) then
@@ -1615,7 +1615,7 @@ begin
     end;
   end;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 function DInterfaceElement.ifMouseOver(const xx, yy: integer;
@@ -1624,7 +1624,7 @@ var
   i: integer;
   tmpLink: DAbstractElement;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Result := inherited ifMouseOver(xx, yy, RaiseEvents, AllTree);
   //if rsult<>nil ... *or drag-n-drop should get the lowest child?
@@ -1641,29 +1641,29 @@ begin
     end;
   end;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure DSingleInterfaceElement.StartDrag(const xx, yy: integer);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   DragX := Base.x1 - xx;
   DragY := Base.y1 - yy;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 procedure DSingleInterfaceElement.Drag(const xx, yy: integer);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Base.x1 := DragX + xx;
   Base.y1 := DragY + yy;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {=============================================================================}
@@ -1672,25 +1672,25 @@ end;
 
 constructor DInterfaceElement.Create;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   inherited Create;
   Children := DInterfaceElementsList.Create(True);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
 
 destructor DInterfaceElement.Destroy;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   //this should fire as recoursive because children owns elements, which in turn will fire their destructors onfree
   FreeAndNil(Children);
   inherited Destroy;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
@@ -1699,13 +1699,13 @@ procedure DInterfaceElement.RescaleRecoursive;
 var
   i: integer;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   inherited RescaleRecoursive;
   for i := 0 to Children.Count - 1 do
     Children[i].RescaleRecoursive;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
@@ -1716,7 +1716,7 @@ var
   tmp: Txy;
   c: DAbstractElement;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   //inherited <------- no inheritance, this procedure works a bit differently
   tx1 := Base.x1;
@@ -1743,7 +1743,7 @@ begin
   Result.y1 := ty1;
   Result.y2 := ty2;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
@@ -1752,7 +1752,7 @@ procedure DInterfaceElement.RescaleToChildren;
 var
   TrueSize: Txy;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   {This procedure is basic, however, there's no need to move it "up" by inheritance level
    as it's called only for elements containing children}
@@ -1772,7 +1772,7 @@ begin
     //if Base.isInitialized then Rescale;
   end;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
@@ -1781,7 +1781,7 @@ procedure DInterfaceElement.Draw;
 var
   i: integer;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   //inherited Draw; <---------- parent is abstract
   if isVisible then
@@ -1791,32 +1791,32 @@ begin
       Children[i].Draw;
   end;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
 
 procedure DInterfaceElement.Grab(const Child: DSingleInterfaceElement);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Children.Add(Child);
   if (Child is DSingleInterfaceElement) then
     DSingleInterfaceElement(Child).Parent := Self;
   //{Child.ID := }InterfaceList.Add(Child); //global ID of the element
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
 
 procedure DInterfaceElement.Clear;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Children.Clear;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------}
@@ -1825,7 +1825,7 @@ function DInterfaceElement.MouseOverTree(const xx, yy: integer): boolean;
 var
   tmp: DAbstractElement;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   // maybe rewrite it using isMouseOver - the idea is still a little different
   tmp := Self.ifMouseOver(xx, yy, False, False);
@@ -1837,7 +1837,7 @@ begin
   //base.opacity breaks the algorithm, if transparent item is above (i.e. below) the opaque element
   Result := isMouseOverTree;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 end.

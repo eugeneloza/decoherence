@@ -125,7 +125,7 @@ uses SysUtils, Classes,
 
 constructor DAbstractWorld.Create;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   inherited Create;
   Log(LogWorldInit, _CurrentRoutine, 'Creating the World');
@@ -135,14 +135,14 @@ begin
 
   fNavMinStep := -1;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {------------------------------------------------------------------------------}
 
 destructor DAbstractWorld.Destroy;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Log(LogWorldInit, _CurrentRoutine, 'Freeing the World');
   FreeAndNil(RNDM);
@@ -150,27 +150,27 @@ begin
   FreeAndNil(Weenies);
   inherited Destroy;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {------------------------------------------------------------------------------}
 
 procedure DAbstractWorld.Build;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   if fSeed = 0 then
     raise Exception.Create('DAbstractWorld.Build: World random must be predefined!');
   RNDM.Initialize(fSeed);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {------------------------------------------------------------------------------}
 
 procedure DAbstractWorld.Activate;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Log(LogWorldInit, _CurrentRoutine, 'Activating the World.');
   if (CurrentWorld <> nil) and (CurrentWorld <> Self) then
@@ -179,32 +179,32 @@ begin
   LastRender := -1;
   FirstRender := True;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {------------------------------------------------------------------------------}
 
 procedure DAbstractWorld.Render;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   {this is an abstract routine,
   it must be overridden by DRenderedWorld}
   Log(LogWorldError, _CurrentRoutine,
     'Warning: This shouldn''t happen in normal situation, it''s abstract');
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {------------------------------------------------------------------------------}
 
 function DAbstractWorld.NavToVector3(const aNav: TNavID): TVector3;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Result := Nav[aNav].Pos;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {------------------------------------------------------------------------------}
@@ -215,7 +215,7 @@ var
   Count: integer;
   d, min, sum: float;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   //warning, this will significantly changed after "LINKS" between navs will be implemented
   min := (Nav[0].Pos - Nav[1].Pos).Length;
@@ -233,7 +233,7 @@ begin
   fNavAvgStep := sum / Count;
   fNavMinStep := min;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 function DAbstractWorld.PositionToNav(const aPosition: TVector3): TNavID;
@@ -241,7 +241,7 @@ var
   i, m: TNavID;
   d, min_d: float;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   if fNavMinStep < 0 then
     CacheNavDistance; //maybe throw this into BuildNav?
@@ -266,25 +266,25 @@ begin
     end;
   Result := m;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {------------------------------------------------------------------------------}
 
 procedure DAbstractWorld.BlockNav(const aNav: TNavId);
 begin
-  StartProfiler;
+  {StartProfiler}
   Nav.L[aNav].Blocked := True;
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {------------------------------------------------------------------------------}
 
 procedure DAbstractWorld.ReleaseNav(const aNav: TNavId);
 begin
-  StartProfiler;
+  {StartProfiler}
   Nav.L[aNav].Blocked := False;
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {------------------------------------------------------------------------------}
@@ -293,18 +293,18 @@ procedure DAbstractWorld.ClearNavBlocks;
 var
   i: integer;
 begin
-  StartProfiler;
+  {StartProfiler}
   //actually, it seems redundant for now
   for i := 0 to Nav.Count - 1 do
     Nav.L[i].Blocked := False;
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {------------------------------------------------------------------------------}
 
 procedure DAbstractWorld.Load(const Generator: DAbstractGenerator);
 begin
-  StartProfiler;
+  {StartProfiler}
   if Generator = nil then
     raise Exception.Create('DAbstractWorld.Load: Generator is nil!');
   fSeed := DRND.Random32bit; //maybe other algorithm?
@@ -316,30 +316,30 @@ begin
   Nav := Generator.ExportNav;
   ClearNavBlocks;
   Weenies := Generator.ExportWeenies;
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {------------------------------------------------------------------------------}
 
 procedure DAbstractWorld.Load(const URL: string);
 begin
-  StartProfiler;
+  {StartProfiler}
   if not URLValid(URL) then
     Log(LogWorldInit, _CurrentRoutine, 'World is not nil, freeing');
   {$hint dummy}
   //load seed and Nav
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {------------------------------------------------------------------------------}
 
 procedure FreeWorld;
 begin
-  StartProfiler;
+  {StartProfiler}
   if CurrentWorld <> nil then
     Log(LogWorldInit, _CurrentRoutine, 'World is not nil, freeing');
   FreeAndNil(CurrentWorld);
-  StopProfiler;
+  {StopProfiler}
 end;
 
 end.

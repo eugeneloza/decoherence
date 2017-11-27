@@ -35,7 +35,7 @@ uses CastleVectors,
 
 function CheckImageValid(const aImage: TCastleImage): boolean;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Result := True;
   if (aImage = nil) or (aImage.isEmpty) then
@@ -52,14 +52,14 @@ begin
     Exit;
   end;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {------------------------------------------------------------------------}
 
 function Clamp255(const a: integer): byte;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   { maybe, make it "softer"? It'll require knowing "max" (which is actually mult*255 = 255+20% default)}
   if a < 255 then
@@ -67,7 +67,7 @@ begin
   else
     Result := 255;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {------------------------------------------------------------------------}
@@ -78,7 +78,7 @@ var
   p: PVector4byte;
   i: integer;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   if not CheckImageValid(aImage) then
     Exit;
@@ -95,7 +95,7 @@ begin
   end;
   Result := IMG;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {------------------------------------------------------------------------}

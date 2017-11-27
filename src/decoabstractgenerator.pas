@@ -120,61 +120,61 @@ uses SysUtils, DecoLog, Profiler;
 
 constructor DAbstractGenerator.Create;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   //inherited Create;
   {we create an non-initialized random (i.e. initialized by a stupid constant integer)
   Just to make sure we don't waste any time (<1ms) on initialization now}
   RNDM := TCastleRandom.Create(1);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
 
 destructor DAbstractGenerator.Destroy;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   FreeAndNil(RNDM);
   inherited Destroy;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure DAbstractGenerator.InitSeed(const NewSeed: longword = 0);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   RNDM.Initialize(NewSeed);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
 
 function DAbstractGenerator.ExportNav: TNavList;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Result := NavList;
   NavList := nil;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
 
 function DAbstractGenerator.ExportWeenies: TWeeniesList;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Result := Weenies;
   Weenies := nil;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 

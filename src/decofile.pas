@@ -110,21 +110,21 @@ uses SysUtils,
 
 function DDataModule.WriteModule: TDOMNode;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Result := nil;  //to avoid Result not set warning
   isChanged := False;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 procedure DDataModule.ReadModule(const aParent: TDOMElement);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   isChanged := False;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 
@@ -132,7 +132,7 @@ end;
 
 procedure DAbstractFile.AssignFileName(FileName: string; ToGameFolder: boolean);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   {$WARNING this is wrong! As reader/writer will be used in game also}
   {make a @procedure for formatting URLs properly dependless of constructor/game}
@@ -141,101 +141,101 @@ begin
   else
     URL := ConstructorData(FileName,ToGameFolder); }
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {==============================================================================}
 
 procedure DFileWriter.WriteHeader;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   //to be overriden in children
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {------------------------------------------------------------------------------}
 
 procedure DFileWriter.OpenFile;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   XMLdoc := TXMLDocument.Create;
   RootNode := XMLdoc.CreateElement('Root'); // create Root
   XMLdoc.Appendchild(RootNode); // and add Root node to the document
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {------------------------------------------------------------------------------}
 
 procedure DFileWriter.CloseFile;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   URLWriteXML(XMLdoc, URL);
   FreeAndNil(XMLdoc);
   Log(LogConstructorInfo, _CurrentRoutine, 'File Written: ' + URL);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {------------------------------------------------------------------------------}
 
 procedure DFileWriter.WriteFile;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   OpenFile;
   WriteHeader;
   //Write content
   CloseFile;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {==============================================================================}
 
 procedure DFileReader.ReadHeader;
 begin
-  StartProfiler;
+  {StartProfiler}
   //to be overriden in children
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {------------------------------------------------------------------------------}
 
 procedure DFileReader.OpenFile;
 begin
-  StartProfiler;
+  {StartProfiler}
   XMLdoc := URLReadXML(URL);
   RootNode := XMLdoc.DocumentElement;
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {------------------------------------------------------------------------------}
 
 procedure DFileReader.CloseFile;
 begin
-  StartProfiler;
+  {StartProfiler}
   FreeAndNil(XMLdoc);
   Log(LogInitInterface, _CurrentRoutine, 'File read:' + URL);
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {------------------------------------------------------------------------------}
 
 procedure DFileReader.ReadFile;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   OpenFile;
   ReadHeader;
   //...
   CloseFile;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 {------------------------------------------------------------------------------}
@@ -244,7 +244,7 @@ procedure DFileReader.ReadBlock(aParent: TDOMElement; ReadContent: TSimpleMethod
 var
   Iterator: TXMLElementIterator;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   Iterator := aParent.ChildrenIterator;
   try
@@ -254,7 +254,7 @@ begin
     FreeAndNil(Iterator);
   end;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 end.

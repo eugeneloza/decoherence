@@ -61,7 +61,7 @@ procedure LoadRaceProfessionData;
 var
   i: integer;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   {Todo: load from file}
   SetLength(Races, 1);
@@ -94,36 +94,36 @@ begin
       Inc(StatsSum, Stats.Value[i]);
   end;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 constructor DRaceProfession.Create(AOwner: TComponent);
 begin
-  StartProfiler;
+  {StartProfiler}
 
   inherited Create(AOwner);
   Stats := DStats.Create(True);
   Bonus := DStats.Create(True);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 destructor DRaceProfession.Destroy;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   FreeAndNil(Stats);
   FreeAndNil(Bonus);
   inherited Destroy;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 function CheckCompatibiliyGeneration(const race, Profession: DRaceProfession): Float;
 var //flg: boolean;
   i, DiffBonus, DiffStats: integer;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   DiffBonus := 0;
   for i := 0 to MaxStats do
@@ -170,7 +170,7 @@ begin
     end;
   end;}
 
-  StopProfiler;
+  {StopProfiler}
 end;
 // Float! <0 - impossible 0..1 - compatible
 

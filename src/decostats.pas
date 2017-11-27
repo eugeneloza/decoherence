@@ -58,7 +58,7 @@ uses DecoLog, Profiler;
 
 constructor DStats.Create(SetFullStats: boolean);
 begin
-  StartProfiler;
+  {StartProfiler}
   //inherited Create;
 
   if SetFullStats then
@@ -67,17 +67,17 @@ begin
     Count := MaxBaseStats + 1;
   SetLength(Value, Count);
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 destructor DStats.Destroy;
 begin
-  StartProfiler;
+  {StartProfiler}
 
   SetLength(Value, 0); //redundant
   inherited Destroy;
 
-  StopProfiler;
+  {StopProfiler}
 end;
 
 end.
