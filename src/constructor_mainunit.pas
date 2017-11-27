@@ -34,7 +34,8 @@ uses
   DecoTranslation,
   Constructor_Global;
 
-type TFormList = specialize TObjectList<TWriterForm>;
+type
+  TFormList = specialize TObjectList<TWriterForm>;
 
 type
   { main form for launching other editors }
@@ -54,6 +55,7 @@ type
     procedure MapEditorButtonClick(Sender: TObject);
     procedure PlaceholdersEditorButtonClick(Sender: TObject);
     procedure SaveButtonClick(Sender: TObject);
+
   public
     { Generic list of all editor forms }
     AllForms: TFormList;
@@ -70,6 +72,7 @@ var
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
+
 {$R *.lfm}
 
 uses
@@ -103,7 +106,7 @@ end;
 
 procedure TMainForm.MakeFormsList;
 begin
-  AllForms := TFormList.Create(false);
+  AllForms := TFormList.Create(False);
   //add all future forms here
   AllForms.Add(FactsEditor);
   AllForms.Add(DungeonTilesEditor);
@@ -114,23 +117,28 @@ end;
 {-----------------------------------------------------------------------------}
 
 procedure TMainForm.WriteMe(const ToGameFolder: boolean);
-var WF: TWriterForm;
+var
+  WF: TWriterForm;
 begin
-  Log(LogConstructorInfo,_CurrentRoutine,'Started.');
-  if AllForms = nil then MakeFormsList; //not optimal...
+  Log(LogConstructorInfo, _CurrentRoutine, 'Started.');
+  if AllForms = nil then
+    MakeFormsList; //not optimal...
 
   for WF in AllForms do
-    if not ToGameFolder then begin
+    if not ToGameFolder then
+    begin
       // if we're saving the constructor's own data, we save only changed data
       if WF.isLoaded {and WF.isChanged} then
         WF.WriteMe(ToGameFolder);
     end
-    else begin
+    else
+    begin
       // when compiling we have to save everything
-      if not WF.isLoaded then WF.LoadMe;
+      if not WF.isLoaded then
+        WF.LoadMe;
       WF.WriteMe(ToGameFolder);
     end;
-  Log(LogConstructorInfo,_CurrentRoutine,'Finished.');
+  Log(LogConstructorInfo, _CurrentRoutine, 'Finished.');
 end;
 
 {-----------------------------------------------------------------------------}
@@ -151,23 +159,28 @@ end;
 
 
 procedure TMainForm.FormClose(Sender: TObject; var CloseAction: TCloseAction);
-var WF: TWriterForm;
-    UnsavedData: boolean;
-    UnsavedString: string;
+var
+  WF: TWriterForm;
+  UnsavedData: boolean;
+  UnsavedString: string;
 begin
-  UnsavedData := false;
+  UnsavedData := False;
   UnsavedString := '';
-  if AllForms = nil then MakeFormsList;
+  if AllForms = nil then
+    MakeFormsList;
 
   for WF in AllForms do
-    if WF.isChanged then begin
-      UnsavedData := true;
+    if WF.isChanged then
+    begin
+      UnsavedData := True;
       UnsavedString += WF.Name + ' ';
       //break;
     end;
 
   if UnsavedData then
-    if MessageDlg('There is unsaved data in ' + UnsavedString + '! Really exit?', mtCustom, [mbYes,mbNo], 0) = MrNo then begin
+    if MessageDlg('There is unsaved data in ' + UnsavedString +
+      '! Really exit?', mtCustom, [mbYes, mbNo], 0) = mrNo then
+    begin
       CloseAction := caNone;
       Exit;
     end;
@@ -210,10 +223,8 @@ end;
 
 {===========================================================================}
 
-Initialization
+initialization
 
-InitLog;
-
+  InitLog;
 
 end.
-

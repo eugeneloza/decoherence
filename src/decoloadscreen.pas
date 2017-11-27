@@ -153,12 +153,14 @@ begin
 
   if Facts <> nil then
   begin
-    Log(LogInitError, Facts.ClassName + '>' + _CurrentRoutine, 'Facts is not nil. Freeing...');
+    Log(LogInitError, Facts.ClassName + '>' + _CurrentRoutine,
+      'Facts is not nil. Freeing...');
     FreeAndNil(Facts);
   end;
   Facts := TFactList.Create(True);
 
-  Log(LogInitInterface, Facts.ClassName + '>' + _CurrentRoutine, 'Reading file ' + FileName);
+  Log(LogInitInterface, Facts.ClassName + '>' + _CurrentRoutine,
+    'Reading file ' + FileName);
 
   FactsDoc := URLReadXML(FileName);
   BaseElement := FactsDoc.DocumentElement;
@@ -198,7 +200,8 @@ begin
     FreeAndNil(Iterator);
   end;
   FreeAndNil(FactsDoc);
-  Log(LogInitInterface, Facts.ClassName + '>' + _CurrentRoutine, 'Reading file finished.');
+  Log(LogInitInterface, Facts.ClassName + '>' + _CurrentRoutine,
+    'Reading file finished.');
 
   StopProfiler;
 end;
@@ -247,13 +250,12 @@ begin
   {remake it some day into something useful}
   case CurrentLanguage of
     Language_English: Result :=
-        'Welcome to Decoherence :)' + dlinebreak +
-        'Loading completed,' + dlinebreak +
-        'just press any key...';
+        'Welcome to Decoherence :)' + dlinebreak + 'Loading completed,' +
+        dlinebreak + 'just press any key...';
     Language_Russian: Result :=
-        'Добро пожаловать в Decoherence :)' + dlinebreak +
-        'Загрузка завершена,' + dlinebreak +
-        'просто нажмите любую клавишу...';
+        'Добро пожаловать в Decoherence :)' +
+        dlinebreak + 'Загрузка завершена,' +
+        dlinebreak + 'просто нажмите любую клавишу...';
     else
       Result := 'Language unavailable'
   end;

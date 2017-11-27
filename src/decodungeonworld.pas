@@ -115,7 +115,8 @@ begin
   pz0 := pz;
   px := Round(x / WorldScale);
   py := Round(-y / WorldScale);     //pay attention: y-coordinate is inversed!
-  pz := Round(-(z - 1) / WorldScale); //pay attention: z-coordinate is inversed and shifted!
+  pz := Round(-(z - 1) / WorldScale);
+  //pay attention: z-coordinate is inversed and shifted!
   if px < 0 then
     px := 0
   else if px > Map.SizeX - 1 then
@@ -240,8 +241,8 @@ begin
   begin
     Transform := TTransformNode.Create;
     //put current tile into the world. Pay attention to y and z coordinate inversion.
-    Transform.Translation := Vector3(WorldScale * (Steps[i].x), -WorldScale *
-      (Steps[i].y), -WorldScale * (steps[i].z));
+    Transform.Translation := Vector3(WorldScale * (Steps[i].x),
+      -WorldScale * (Steps[i].y), -WorldScale * (steps[i].z));
     {$Warning this is ugly}
     Transform.Scale := Vector3(MyScale, MyScale, MyScale);
     AddRecoursive(Transform, WorldElements3d[Steps[i].Tile]);

@@ -455,8 +455,8 @@ begin
 
   SetLength(Img, SizeZ);
   for jz := 0 to SizeZ - 1 do
-    Img[jz] := LoadImage(ChangeURIExt(URL, '_' + IntToStr(jz) + '.png'), [TRGBAlphaImage]) as
-      TRGBAlphaImage;
+    Img[jz] := LoadImage(ChangeURIExt(URL, '_' + IntToStr(jz) + '.png'),
+      [TRGBAlphaImage]) as TRGBAlphaImage;
 
   StopProfiler;
 end;

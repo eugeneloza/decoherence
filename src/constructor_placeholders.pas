@@ -15,7 +15,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 
 {---------------------------------------------------------------------------}
 
-{ Editor for placeholders and placeholders atlas }   
+{ Editor for placeholders and placeholders atlas }
 unit Constructor_PlaceHolders;
 
 {$INCLUDE compilerconfig.inc}
@@ -44,13 +44,14 @@ var
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
+
 {$R *.lfm}
 
 procedure TPlaceholdersEditor.LoadMe;
 begin
   {$Warning dummy}
-  isLoaded := true;
-  isChanged := false;
+  isLoaded := True;
+  isChanged := False;
 end;
 
 {------------------------------------------------------------------------------}
@@ -59,6 +60,7 @@ procedure TPlaceholdersEditor.FreeMe;
 begin
   {$Warning dummy}
 end;
+
 procedure TPlaceholdersEditor.FormDestroy(Sender: TObject);
 begin
   FreeMe;
@@ -81,4 +83,3 @@ begin
 end;
 
 end.
-

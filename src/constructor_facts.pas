@@ -27,9 +27,10 @@ uses
   DecoLoadScreen, DecoTranslation,
   Constructor_Global;
 
-type TLoadImageListHelper = class helper for TLoadImageList
-  function FindByName(const FindName: string): boolean;
-end;
+type
+  TLoadImageListHelper = class helper for TLoadImageList
+    function FindByName(const FindName: string): boolean;
+  end;
 
 type
   {Form to edit facts and corresponding loadscreen images}
@@ -53,6 +54,7 @@ type
     procedure LoadScreensListBoxClickCheck(Sender: TObject);
     procedure Memo1Change(Sender: TObject);
     procedure SelectAllButtonClick(Sender: TObject);
+
   public
     {lists of facts in all available languages.
      If file not found then the Value is nil}
@@ -73,6 +75,7 @@ var
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
+
 {$R *.lfm}
 
 uses DOM, CastleXMLUtils,
@@ -82,32 +85,35 @@ uses DOM, CastleXMLUtils,
 
 procedure TFactsEditor.LoadMe;
 var
-    CurrentFile: string;
-    L: TLanguage;
-    LI: DLoadImage;
-    Rec: TSearchRec;
+  CurrentFile: string;
+  L: TLanguage;
+  LI: DLoadImage;
+  Rec: TSearchRec;
     {LI2: DLoadImage;
     F: DFact;}
 begin
-  for L in TLanguage do begin
+  for L in TLanguage do
+  begin
     FreeAndNil(Facts[L]);
 
     try
-      CurrentFile := ConstructorData(LanguageDir(L)+'facts.xml',false);
+      CurrentFile := ConstructorData(LanguageDir(L) + 'facts.xml', False);
       LoadFacts(CurrentFile);
       Facts[L] := DecoLoadScreen.Facts;
       DecoLoadScreen.Facts := nil;
     except
       FreeAndNil(DecoLoadScreen.Facts);
-      Log(LogConstructorError,_CurrentRoutine,'Exception reading '+CurrentFile);
+      Log(LogConstructorError, _CurrentRoutine, 'Exception reading ' + CurrentFile);
     end;
   end;
 
   {load directly from the game data folder and not save anywhere intermediately.
    Maybe, this'll need "add an image from this computer" button/feature}
   LoadScreensListBox.Clear;
-  LoadImages := TLoadImageList.Create(true);
-  if FindFirst (FakeConstructorData(LoadScreenFolder + '*.jpg',true), faAnyFile - faDirectory, Rec) = 0 then begin
+  LoadImages := TLoadImageList.Create(True);
+  if FindFirst(FakeConstructorData(LoadScreenFolder + '*.jpg', True),
+    faAnyFile - faDirectory, Rec) = 0 then
+  begin
     try
       repeat
         LI := DLoadImage.Create;
@@ -117,10 +123,11 @@ begin
     finally
       FindClose(Rec);
     end;
-    Log(LogConstructorInfo,_CurrentRoutine,'Images loaded = '+IntToStr(LoadImages.Count));
+    Log(LogConstructorInfo, _CurrentRoutine, 'Images loaded = ' + IntToStr(
+      LoadImages.Count));
   end
   else
-    Log(LogConstructorError,_CurrentRoutine,'ERROR: Unable to load LoadScreen images');
+    Log(LogConstructorError, _CurrentRoutine, 'ERROR: Unable to load LoadScreen images');
 
 
   {for L in TLanguage do if Facts[L]<>nil then
@@ -132,8 +139,8 @@ begin
       end;}
 
   MyLanguage := ConstructorLanguage;    (*not sure about it*)
-  isLoaded := true;
-  isChanged := false;
+  isLoaded := True;
+  isChanged := False;
 
   ReloadContent;
 end;
@@ -141,8 +148,9 @@ end;
 {-----------------------------------------------------------------------------}
 
 procedure TFactsEditor.ReloadContent;
-var F: DFact;
-    LI: DLoadImage;
+var
+  F: DFact;
+  LI: DLoadImage;
 begin
   Memo1.Clear;
   FactsListbox.Clear;
@@ -164,29 +172,33 @@ end;
 {-----------------------------------------------------------------------------}
 
 procedure TFactsEditor.SaveFacts(const ToGameFolder: boolean);
-var XMLdoc: TXMLDocument;
-    RootNode, ContainerNode, ValueNode, Value2node, TextNode: TDOMNode;
-    i: DFact;
-    j: DLoadImage;
-    L: TLanguage;
-    f: string;
+var
+  XMLdoc: TXMLDocument;
+  RootNode, ContainerNode, ValueNode, Value2node, TextNode: TDOMNode;
+  i: DFact;
+  j: DLoadImage;
+  L: TLanguage;
+  f: string;
 begin
   for L in TLanguage do
     if Facts[L] = nil then
-      Log(LogConstructorError,_CurrentRoutine,'LANGUAGE IS NIL!')
-    else begin
+      Log(LogConstructorError, _CurrentRoutine, 'LANGUAGE IS NIL!')
+    else
+    begin
       XMLdoc := TXMLDocument.Create;
       RootNode := XMLdoc.CreateElement('FactsList');
       XMLdoc.Appendchild(RootNode);
 
-      for i in Facts[L] do begin
+      for i in Facts[L] do
+      begin
         ContainerNode := XMLdoc.CreateElement('Fact');
         ValueNode := XMLdoc.CreateElement('Value');
         TextNode := XMLdoc.CreateTextNode(UTF8decode(i.Value));
         ValueNode.AppendChild(TextNode);
         ContainerNode.AppendChild(ValueNode);
         ValueNode := XMLdoc.CreateElement('ImageList');
-        for j in i.Compatibility do begin
+        for j in i.Compatibility do
+        begin
           Value2Node := XMLdoc.CreateElement('Image');
           TextNode := XMLdoc.CreateTextNode(UTF8decode(j.Value));
           Value2Node.AppendChild(TextNode);
@@ -197,11 +209,11 @@ begin
       end;
 
       if ToGameFolder then
-        f := ConstructorData(LanguageDir(L)+'facts.xml'+gz_ext,ToGameFolder)
+        f := ConstructorData(LanguageDir(L) + 'facts.xml' + gz_ext, ToGameFolder)
       else
-        f := ConstructorData(LanguageDir(L)+'facts.xml',ToGameFolder);
+        f := ConstructorData(LanguageDir(L) + 'facts.xml', ToGameFolder);
       URLWriteXML(XMLdoc, f);
-      Log(LogConstructorInfo,_CurrentRoutine,'File Written: '+f);
+      Log(LogConstructorInfo, _CurrentRoutine, 'File Written: ' + f);
 
       FreeAndNil(XMLdoc);
     end;
@@ -212,27 +224,33 @@ end;
 
 procedure TFactsEditor.FormShow(Sender: TObject);
 begin
-  if (not isLoaded) then LoadMe;
+  if (not isLoaded) then
+    LoadMe;
   ResetLanguageSwitch;
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure TFactsEditor.Memo1Change(Sender: TObject);
-var CurrentFactText: string;
+var
+  CurrentFactText: string;
 begin
-  if FactsListBox.ItemIndex<0 then Exit; //fool's check
+  if FactsListBox.ItemIndex < 0 then
+    Exit; //fool's check
 
   CurrentFactText := Trim(Memo1.Text);
 
-  if Length(CurrentFactText)<=350 then FactLengthLabel.Color := clDefault
-  else FactLengthLabel.Color := clRed;
-  FactLengthLabel.Caption := 'Total symbol: '+IntToStr(Length(CurrentFactText));
+  if Length(CurrentFactText) <= 350 then
+    FactLengthLabel.Color := clDefault
+  else
+    FactLengthLabel.Color := clRed;
+  FactLengthLabel.Caption := 'Total symbol: ' + IntToStr(Length(CurrentFactText));
 
-  if Facts[MyLanguage][FactsListBox.ItemIndex].Value <> CurrentFactText then begin
+  if Facts[MyLanguage][FactsListBox.ItemIndex].Value <> CurrentFactText then
+  begin
     Facts[MyLanguage][FactsListBox.ItemIndex].Value := CurrentFactText;
     {$HINT may optimize here and set/Clear "isChanged" flag based on whether there is unsaved data}
-    Self.isChanged := true;
+    Self.isChanged := True;
     //update the fact displayed in the list
     FactsListBox.Items[FactsListBox.ItemIndex] := CurrentFactText;
   end;
@@ -245,6 +263,7 @@ begin
   LoadScreensListBox.CheckAll(cbChecked);
   LoadScreensListBoxClickCheck(nil);
 end;
+
 procedure TFactsEditor.DeselectAllButtonClick(Sender: TObject);
 begin
   LoadScreensListBox.CheckAll(cbUnchecked);
@@ -252,22 +271,25 @@ begin
 end;
 
 procedure TFactsEditor.AddFactButtonClick(Sender: TObject);
-var NewFact: DFact;
-    L: TLanguage;
+var
+  NewFact: DFact;
+  L: TLanguage;
 begin
-  Log(LogConstructorInfo,_CurrentRoutine,'Creating a new empty fact');
-  for L in TLanguage do begin
+  Log(LogConstructorInfo, _CurrentRoutine, 'Creating a new empty fact');
+  for L in TLanguage do
+  begin
     NewFact := DFact.Create;
-    NewFact.Compatibility := TLoadImageList.Create(true);
+    NewFact.Compatibility := TLoadImageList.Create(True);
     NewFact.Value := 'Empty: ' + SayLanguage(L);
     Facts[L].Add(NewFact);
   end;
 
-  ReloadContent; {$HINT not optimal}
+  ReloadContent;
+{$HINT not optimal}
   //  FactsListbox.Items.Add(NewFact[MyLanguage]);
 
   //and select the last item (i.e. the one we've just added)
-  FactsListbox.Selected[FactsListBox.Count-1] := true;
+  FactsListbox.Selected[FactsListBox.Count - 1] := True;
 
   {$WARNING and alert all other open forms}
 end;
@@ -290,7 +312,8 @@ end;
 {----------------------------------------------------------------------------}
 
 procedure TFactsEditor.FreeMe;
-var L: TLanguage;
+var
+  L: TLanguage;
 begin
   for L in TLanguage do
     FreeAndNil(Facts[L]);
@@ -300,30 +323,32 @@ end;
 {----------------------------------------------------------------------------}
 
 function TLoadImageListHelper.FindByName(const FindName: string): boolean;
-var i: integer;
+var
+  i: integer;
 begin
-  Result := false;
-  for i := 0 to Self.Count-1  do
-    if Self.Items[i].Value = FindName then begin
-      Result := true;
+  Result := False;
+  for i := 0 to Self.Count - 1 do
+    if Self.Items[i].Value = FindName then
+    begin
+      Result := True;
       Exit;
     end;
 end;
 
 {----------------------------------------------------------------------------}
 
-procedure TFactsEditor.FactsListboxSelectionChange(Sender: TObject;
-  User: boolean);
+procedure TFactsEditor.FactsListboxSelectionChange(Sender: TObject; User: boolean);
 var
-    i: integer;
+  i: integer;
 begin
   Memo1.Clear;
-  Memo1.Lines.Add( Facts[MyLanguage][FactsListBox.ItemIndex].Value );
-  for i := 0 to LoadScreensListBox.Count-1 do
-    if Facts[MyLanguage][FactsListBox.ItemIndex].Compatibility.FindByName(LoadScreensListBox.Items[i]) then
-      LoadScreensListBox.Checked[i] := true
+  Memo1.Lines.Add(Facts[MyLanguage][FactsListBox.ItemIndex].Value);
+  for i := 0 to LoadScreensListBox.Count - 1 do
+    if Facts[MyLanguage][FactsListBox.ItemIndex].Compatibility.FindByName(
+      LoadScreensListBox.Items[i]) then
+      LoadScreensListBox.Checked[i] := True
     else
-      LoadScreensListBox.Checked[i] := false
+      LoadScreensListBox.Checked[i] := False;
   //compatibility
 end;
 
@@ -331,24 +356,27 @@ end;
 {----------------------------------------------------------------------------}
 
 procedure TFactsEditor.LoadScreensListBoxClickCheck(Sender: TObject);
-var i: integer;
-    LI: DLoadImage;
+var
+  i: integer;
+  LI: DLoadImage;
 begin
-  if FactsListBox.ItemIndex >=0 then begin
+  if FactsListBox.ItemIndex >= 0 then
+  begin
     //very inefficient, but don't bother
     FreeAndNil(Facts[MyLanguage][FactsListBox.ItemIndex].Compatibility);
-    Facts[MyLanguage][FactsListBox.ItemIndex].Compatibility := TLoadImageList.Create(true);
-    for i := 0 to LoadScreensListBox.Count-1 do
-      if LoadScreensListBox.Checked[i] then begin
+    Facts[MyLanguage][FactsListBox.ItemIndex].Compatibility :=
+      TLoadImageList.Create(True);
+    for i := 0 to LoadScreensListBox.Count - 1 do
+      if LoadScreensListBox.Checked[i] then
+      begin
         LI := DLoadImage.Create;
         LI.Value := LoadScreensListBox.Items[i];
         Facts[MyLanguage][FactsListBox.ItemIndex].Compatibility.Add(LI);
       end;
-    isChanged := true;
+    isChanged := True;
   end;
 end;
 
 
 
 end.
-

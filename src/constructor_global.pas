@@ -27,7 +27,6 @@ uses
   StdCtrls,
   DecoFile,
   DecoTranslation,
-
   DOM, CastleXMLUtils;
 
 const
@@ -35,9 +34,10 @@ const
   LocalFolder = 'local/';
 
 type
-  { }
+
   DHeaderModule = class(DDataModule)
-  strict private const
+  strict private
+  const
     s_Module = 'Header';
     s_FriendlyName = 'FriendlyName';
     s_Comment = 'Comment';
@@ -65,9 +65,9 @@ type
     //procedure Log(const LogLevel: boolean; const aProcedure, aMessage: string);
   public
     {if the TWriterForm instance is loaded from the Architect?}
-    property isLoaded: boolean read fisLoaded write fisLoaded default false;
+    property isLoaded: boolean read fisLoaded write fisLoaded default False;
     {Was the TWriterForm changed since last save/load?}
-    property isChanged: boolean read fisChanged write fisChanged default false;
+    property isChanged: boolean read fisChanged write fisChanged default False;
     {TWriterForm abstract load procedure}
     procedure LoadMe; virtual; abstract;
     {TWriterForm abstract save procedure}
@@ -76,10 +76,11 @@ type
     procedure FreeMe; virtual; abstract;
   end;
 
-type LanguageChangeCallback = procedure of object;
+type
+  LanguageChangeCallback = procedure of object;
 
 type
-  TLanguageForm = class (TWriterForm)
+  TLanguageForm = class(TWriterForm)
   private
     fMyLanguage: TLanguage;
   public
@@ -89,14 +90,15 @@ type
     {TWriterForm current displayed language}
     property MyLanguage: TLanguage read fMyLanguage write fMyLanguage;
 
-    Procedure MakeLanguageSwitch;
+    procedure MakeLanguageSwitch;
     {sets MyLanguage to ConstructorLanguage and returns "true" if they were different}
-    Function ResetLanguageSwitch: boolean;
-    Procedure DetectLanguageSelect; virtual;
+    function ResetLanguageSwitch: boolean;
+    procedure DetectLanguageSelect; virtual;
     procedure LanguageSelectChange(Sender: TObject);
   end;
 
-var ConstructorLanguage: TLanguage;
+var
+  ConstructorLanguage: TLanguage;
 
 {analogue to castleFilesUtils.ApplicationData (and made based on it)
  but points to ARCHITECT directory (true) or ApplicationData (false)
@@ -125,11 +127,13 @@ uses CastleFilesUtils, StrUtils,
 
 {case-sensitive replace the last occurence of searchstring to replacestring}
 procedure ReplaceStringReverse(var s: string; const SearchString, ReplaceString: string);
-var i: integer;
+var
+  i: integer;
 begin
-  for i := Length(s)-Length(SearchString) downto 0 do
-    if Copy(s,i,Length(SearchString)) = SearchString then begin
-      s := Copy(s,0,i-1) + ReplaceString + Copy(s,i+Length(SearchString),Length(s));
+  for i := Length(s) - Length(SearchString) downto 0 do
+    if Copy(s, i, Length(SearchString)) = SearchString then
+    begin
+      s := Copy(s, 0, i - 1) + ReplaceString + Copy(s, i + Length(SearchString), Length(s));
       Break;
     end;
 end;
@@ -139,12 +143,15 @@ end;
 function ConstructorData(const URL: string; const ToGameFolder: boolean): string;
 begin
   Result := ApplicationData(URL);
-  if not ToGameFolder then begin
-    ReplaceStringReverse(Result,'/data/','/architect/');
+  if not ToGameFolder then
+  begin
+    ReplaceStringReverse(Result, '/data/', '/architect/');
     //{$Warning folder names cannot contain /data/ folder!}
     //result := AnsiReplaceText(Result,'/data/','/architect/');
     //invoke data compression
-    {$IFDEF gzipdata}result := AnsiReplaceText(Result,'.gz','.xml');{$ENDIF}
+    {$IFDEF gzipdata}
+    Result := AnsiReplaceText(Result, '.gz', '.xml');
+{$ENDIF}
   end;
 end;
 
@@ -153,50 +160,57 @@ end;
 function FakeConstructorData(const URL: string; const ToGameFolder: boolean): string;
 begin
   if ToGameFolder then
-    Result := 'data/'+URL
+    Result := 'data/' + URL
   else
-    Result := 'architect/'+URL;
-  Result := AnsiReplaceText(Result,'/',PathDelim); //we're using native OS file access
+    Result := 'architect/' + URL;
+  Result := AnsiReplaceText(Result, '/', PathDelim); //we're using native OS file access
 end;
 
 {-----------------------------------------------------------------------------}
 
 function StringListContains(const SL: TStringList; const Search: string): boolean;
-var s: string;
+var
+  s: string;
 begin
-  Result := false;
-  if SL = nil then begin
-    Log(LogConstructorError,_CurrentRoutine,'ERROR: String List is nil!');
+  Result := False;
+  if SL = nil then
+  begin
+    Log(LogConstructorError, _CurrentRoutine, 'ERROR: String List is nil!');
     Exit;
   end;
-  for s in SL do if s = Search then begin
-    Result := true;
-    Break;
-  end;
+  for s in SL do
+    if s = Search then
+    begin
+      Result := True;
+      Break;
+    end;
 end;
 
 {-----------------------------------------------------------------------------}
 
 function GetFilesList(const Path, Ext: string): TStringList;
-var Rec: TSearchRec;
+var
+  Rec: TSearchRec;
 begin
   Result := TStringList.Create;
   // Android incompatible
-  if FindFirst (FakeConstructorData(Path + '*.'+Ext,false), faAnyFile - faDirectory, Rec) = 0 then
-   try
-     repeat
-       Result.Add(AnsiReplaceText(Rec.Name,'.'+Ext,''));
-     until FindNext(Rec) <> 0;
-   finally
-     FindClose(Rec);
-   end;
+  if FindFirst(FakeConstructorData(Path + '*.' + Ext, False), faAnyFile -
+    faDirectory, Rec) = 0 then
+    try
+      repeat
+        Result.Add(AnsiReplaceText(Rec.Name, '.' + Ext, ''));
+      until FindNext(Rec) <> 0;
+    finally
+      FindClose(Rec);
+    end;
 end;
 
 {============================================================================}
 
 procedure TWriterForm.WriteMe(const ToGameFolder: boolean);
 begin
-  if not ToGameFolder then isChanged := false;
+  if not ToGameFolder then
+    isChanged := False;
 end;
 
 {---------------------------------------------------------------------------}
@@ -209,62 +223,73 @@ end;}
 
 {============================================================================}
 
-Procedure TLanguageForm.MakeLanguageSwitch;
-var L: TLanguage;
+procedure TLanguageForm.MakeLanguageSwitch;
+var
+  L: TLanguage;
 begin
-  if LanguageSwitch = nil then begin
+  if LanguageSwitch = nil then
+  begin
     LanguageSwitch := TComboBox.Create(Self);
     LanguageSwitch.Parent := Self;  //required to be displayed on the form
     LanguageSwitch.Style := csDropDownList;
     LanguageSwitch.Hint := 'Select current displayed language.';
-    LanguageSwitch.ShowHint := true;
+    LanguageSwitch.ShowHint := True;
     LanguageSwitch.Left := 208;
     LanguageSwitch.Top := 8;
     LanguageSwitch.Width := 100;
     LanguageSwitch.Height := 21;
-    LanguageSwitch.Visible := true;
-    LanguageSwitch.Enabled := true;
+    LanguageSwitch.Visible := True;
+    LanguageSwitch.Enabled := True;
     for L in TLanguage do
       LanguageSwitch.Items.Add(SayLanguage(L));
     LanguageSwitch.ItemIndex := 0;
     LanguageSwitch.OnChange := @LanguageSelectChange;
-  end else Log(LogConstructorError,_CurrentRoutine,'ERROR: LanguageSelect already exists.');
+  end
+  else
+    Log(LogConstructorError, _CurrentRoutine, 'ERROR: LanguageSelect already exists.');
   ResetLanguageSwitch;
 end;
 
 {---------------------------------------------------------------------------}
 
 function TLanguageForm.ResetLanguageSwitch: boolean;
-var i: integer;
+var
+  i: integer;
 begin
   Result := MyLanguage <> ConstructorLanguage;
-  if Result then begin
+  if Result then
+  begin
     MyLanguage := ConstructorLanguage;
-    if Assigned(Self.OnLanguageChange) then Self.OnLanguageChange;
-    For i := 0 to LanguageSwitch.Items.Count-1 do
+    if Assigned(Self.OnLanguageChange) then
+      Self.OnLanguageChange;
+    for i := 0 to LanguageSwitch.Items.Count - 1 do
       if Trim(LanguageSwitch.Items[i]) = SayLanguage(MyLanguage) then
-              LanguageSwitch.ItemIndex := i;
+        LanguageSwitch.ItemIndex := i;
   end;
 end;
 
 {---------------------------------------------------------------------------}
 
-Procedure TLanguageForm.DetectLanguageSelect;
-var L: TLanguage;
-    NL: TLanguage;
+procedure TLanguageForm.DetectLanguageSelect;
+var
+  L: TLanguage;
+  NL: TLanguage;
 begin
   //not optimal
   NL := MyLanguage;
-  For L in TLanguage do
+  for L in TLanguage do
     if Trim(LanguageSwitch.Items[LanguageSwitch.ItemIndex]) = SayLanguage(L) then
-    NL := L;
-  if NL <> MyLanguage then begin
+      NL := L;
+  if NL <> MyLanguage then
+  begin
     MyLanguage := NL;
-    if Assigned(Self.OnLanguageChange) then Self.OnLanguageChange;
+    if Assigned(Self.OnLanguageChange) then
+      Self.OnLanguageChange;
   end;
   //what should happen in case of no language found?
 end;
-Procedure TLanguageForm.LanguageSelectChange(Sender: TObject);
+
+procedure TLanguageForm.LanguageSelectChange(Sender: TObject);
 begin
   DetectLanguageSelect;
 end;
@@ -272,7 +297,8 @@ end;
 {============================================================================}
 
 function DHeaderModule.WriteModule: TDOMNode;
-var ValueNode, TextNode: TDOMNode;
+var
+  ValueNode, TextNode: TDOMNode;
 begin
   inherited WriteModule;
   Result := Parent.CreateElement(s_Module);
@@ -291,7 +317,8 @@ end;
 {---------------------------------------------------------------------------}
 
 procedure DHeaderModule.ReadModule(const aParent: TDOMElement);
-var ContainerNode, ValueNode: TDOMElement;
+var
+  ContainerNode, ValueNode: TDOMElement;
 begin
   inherited ReadModule(aParent);
   ContainerNode := aParent.ChildElement(s_Module);
@@ -320,4 +347,3 @@ end;
 {$ENDIF}
 
 end.
-

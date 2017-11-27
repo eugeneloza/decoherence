@@ -74,6 +74,7 @@ type
     procedure SaveButtonClick(Sender: TObject);
     procedure VolumeEditChange(Sender: TObject);
     procedure ZScrollChange(Sender: TObject);
+
   public
     {List of tiles names}
     MapsList: TStringList;
@@ -111,6 +112,7 @@ var
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
+
 {$R *.lfm}
 
 uses CastleImages, CastleVectors,
@@ -121,16 +123,18 @@ uses CastleImages, CastleVectors,
 {-------------------------------------------------------------------------}
 
 function TMapEditor.GetMapParameters: DDungeonGeneratorParameters;
-var i: integer;
-    fs: DFirstStep;
+var
+  i: integer;
+  fs: DFirstStep;
 begin
   Result := DDungeonGeneratorParameters.Create; //this creates tiles and first steps
-  with Result do begin
+  with Result do
+  begin
     MaxX := StrToInt(EditSizeX.Text);
     MaxY := StrToInt(EditSizeY.Text);
     MaxZ := StrToInt(EditSizeZ.Text);
 
-    Volume := round(MaxX*MaxY*MaxZ * strToFloat(VolumeEdit.Text)/100);
+    Volume := round(MaxX * MaxY * MaxZ * strToFloat(VolumeEdit.Text) / 100);
     MaxFaces := StrToInt(EditMaxF.Text);
     MinFaces := StrToInt(EditMinF.Text);
 
@@ -140,9 +144,10 @@ begin
 
     Seed := 0;
 
-    AbsoluteURL := true;
-    for i := 0 to TilesBox.Items.Count-1 do
-      if TilesBox.Checked[i] then TilesList.Add(ConstructorData(TilesFolder+TilesBox.Items[i], false));
+    AbsoluteURL := True;
+    for i := 0 to TilesBox.Items.Count - 1 do
+      if TilesBox.Checked[i] then
+        TilesList.Add(ConstructorData(TilesFolder + TilesBox.Items[i], False));
 
     fs.Tile := 'library1_16_P';
     fs.x := MaxX div 2;
@@ -155,9 +160,10 @@ end;
 {-------------------------------------------------------------------------}
 
 procedure TMapEditor.GenerateButtonClick(Sender: TObject);
-var GENERATOR: D3dDungeonGenerator;
+var
+  GENERATOR: D3dDungeonGenerator;
 begin
-  GenerateButton.Enabled := false;
+  GenerateButton.Enabled := False;
   FreeAndNil(DungeonMap);
   GENERATOR := D3dDungeonGenerator.Create;
   //GENERATOR.load('');
@@ -177,12 +183,12 @@ begin
   ZScroll.Max := DungeonMap.SizeZ - 1;
   DrawMap;
 
-  GenerateButton.Enabled := true;
+  GenerateButton.Enabled := True;
 end;
 
 procedure TMapEditor.SaveButtonClick(Sender: TObject);
 begin
-  SaveMap('',false);
+  SaveMap('', False);
 end;
 
 procedure TMapEditor.ZScrollChange(Sender: TObject);
@@ -192,18 +198,20 @@ end;
 
 {------------------------------------------------------------------------}
 
-Procedure TMapEditor.DrawMap;
-var CurrentZ: integer;
+procedure TMapEditor.DrawMap;
+var
+  CurrentZ: integer;
 begin
-  if DungeonMap<>nil then begin
+  if DungeonMap <> nil then
+  begin
     CurrentZ := ZScroll.Position;
     ZLabel.Caption := IntToStr(CurrentZ);
     //TileImage.Image.FreeInstance;
     //FreeAndNil(TileImage.Image);
-    TileImage.OwnsImage := false;
+    TileImage.OwnsImage := False;
     TileImage.Image := DungeonMap.Img[CurrentZ];//.MakeCopy;
-    MapDisplay.Width :=  TileImage.Image.Width;
-    MapDisplay.Height :=  TileImage.Image.Height;
+    MapDisplay.Width := TileImage.Image.Width;
+    MapDisplay.Height := TileImage.Image.Height;
   end;
 end;
 
@@ -215,8 +223,8 @@ begin
   FillTilesList;
   ReadMapsList;
   FillMapsList;
-  isChanged := false;
-  isLoaded := true;
+  isChanged := False;
+  isLoaded := True;
 end;
 
 {-------------------------------------------------------------------------}
@@ -227,6 +235,7 @@ begin
   FreeAndNil(TilesList);
   FreeAndNil(DungeonMap);
 end;
+
 procedure TMapEditor.FormDestroy(Sender: TObject);
 begin
   FreeMe;
@@ -244,108 +253,141 @@ end;
 {================== EDITORS CHANGE ==========================================}
 
 procedure TMapEditor.EditSizeZChange(Sender: TObject);
-var MaxZ,MinZ,k1,k2: integer;
+var
+  MaxZ, MinZ, k1, k2: integer;
 begin
-  val(EditSizeZ.Text,MaxZ,k1);
-  val(EditSizeZ1.Text,MinZ,k2);
-  if (k1 = 0) and (k2 = 0) then begin
-    if MinZ > MaxZ then EditSizeZ1.Text := IntToStr(MaxZ);
-    isChanged := true;
+  val(EditSizeZ.Text, MaxZ, k1);
+  val(EditSizeZ1.Text, MinZ, k2);
+  if (k1 = 0) and (k2 = 0) then
+  begin
+    if MinZ > MaxZ then
+      EditSizeZ1.Text := IntToStr(MaxZ);
+    isChanged := True;
   end;
 end;
 
 procedure TMapEditor.EditSizeZ1Change(Sender: TObject);
-var MaxZ,MinZ,k1,k2: integer;
+var
+  MaxZ, MinZ, k1, k2: integer;
 begin
-  val(EditSizeZ.Text,MaxZ,k1);
-  val(EditSizeZ1.Text,MinZ,k2);
-  if (k1 = 0) and (k2 = 0) then begin
-    if MinZ > MaxZ then EditSizeZ.Text := IntToStr(MinZ);
+  val(EditSizeZ.Text, MaxZ, k1);
+  val(EditSizeZ1.Text, MinZ, k2);
+  if (k1 = 0) and (k2 = 0) then
+  begin
+    if MinZ > MaxZ then
+      EditSizeZ.Text := IntToStr(MinZ);
     //if (MaxZ>(MaxX+MaxY) div 2) then EditSizeZ.Color := clRed else EditMinF.Color := clDefault;
-    isChanged := true;
+    isChanged := True;
   end;
 end;
 
 procedure TMapEditor.EditSizeYChange(Sender: TObject);
-var MaxY,MinY,k1,k2: integer;
+var
+  MaxY, MinY, k1, k2: integer;
 begin
-  val(EditSizeY.Text,MaxY,k1);
-  val(EditSizeY1.Text,MinY,k2);
-  if (k1 = 0) and (k2 = 0) then begin
-    if MinY > MaxY then EditSizeY1.Text := IntToStr(MaxY);
+  val(EditSizeY.Text, MaxY, k1);
+  val(EditSizeY1.Text, MinY, k2);
+  if (k1 = 0) and (k2 = 0) then
+  begin
+    if MinY > MaxY then
+      EditSizeY1.Text := IntToStr(MaxY);
     //if (MaxZ>(MaxX+MaxY) div 2) then EditSizeZ.Color := clRed else EditMinF.Color := clDefault;
-    isChanged := true;
+    isChanged := True;
   end;
 end;
 
 procedure TMapEditor.EditSizeY1Change(Sender: TObject);
-var MaxY,MinY,k1,k2: integer;
+var
+  MaxY, MinY, k1, k2: integer;
 begin
-  val(EditSizeY.Text,MaxY,k1);
-  val(EditSizeY1.Text,MinY,k2);
-  if (k1 = 0) and (k2 = 0) then begin
-    if MinY > MaxY then EditSizeY.Text := IntToStr(MinY);
+  val(EditSizeY.Text, MaxY, k1);
+  val(EditSizeY1.Text, MinY, k2);
+  if (k1 = 0) and (k2 = 0) then
+  begin
+    if MinY > MaxY then
+      EditSizeY.Text := IntToStr(MinY);
     //if (MaxZ>(MaxX+MaxY) div 2) then EditSizeZ.Color := clRed else EditMinF.Color := clDefault;
-    isChanged := true;
+    isChanged := True;
   end;
 end;
 
 procedure TMapEditor.EditSizeXChange(Sender: TObject);
-var MaxX,MinX,k1,k2: integer;
+var
+  MaxX, MinX, k1, k2: integer;
 begin
-  val(EditSizeX.Text,MaxX,k1);
-  val(EditSizeX1.Text,MinX,k2);
-  if (k1 = 0) and (k2 = 0) then begin
-    if MinX > MaxX then EditSizeX1.Text := IntToStr(MaxX);
+  val(EditSizeX.Text, MaxX, k1);
+  val(EditSizeX1.Text, MinX, k2);
+  if (k1 = 0) and (k2 = 0) then
+  begin
+    if MinX > MaxX then
+      EditSizeX1.Text := IntToStr(MaxX);
     //if (MaxZ>(MaxX+MaxY) div 2) then EditSizeZ.Color := clRed else EditMinF.Color := clDefault;
-    isChanged := true;
+    isChanged := True;
   end;
 end;
 
 procedure TMapEditor.EditSizeX1Change(Sender: TObject);
-var MaxX,MinX,k1,k2: integer;
+var
+  MaxX, MinX, k1, k2: integer;
 begin
-  val(EditSizeX.Text,MaxX,k1);
-  val(EditSizeX1.Text,MinX,k2);
-  if (k1 = 0) and (k2 = 0) then begin
-    if MinX > MaxX then EditSizeX1.Text := IntToStr(MaxX);
+  val(EditSizeX.Text, MaxX, k1);
+  val(EditSizeX1.Text, MinX, k2);
+  if (k1 = 0) and (k2 = 0) then
+  begin
+    if MinX > MaxX then
+      EditSizeX1.Text := IntToStr(MaxX);
     //if (MaxZ>(MaxX+MaxY) div 2) then EditSizeZ.Color := clRed else EditMinF.Color := clDefault;
-    isChanged := true;
+    isChanged := True;
   end;
 end;
 
 procedure TMapEditor.EditMaxFChange(Sender: TObject);
-var MaxF,MinF,k1,k2: integer;
+var
+  MaxF, MinF, k1, k2: integer;
 begin
-  val(EditMaxF.Text,MaxF,k1);
-  val(EditMinF.Text,MinF,k2);
-  if (k1 = 0) and (k2 = 0) then begin
-    if MinF > MaxF then EditMinF.Text := IntToStr(MaxF);
-    if (MaxF < 5) then EditMaxF.Color := clRed else EditMinF.Color := clDefault;
-    isChanged := true;
+  val(EditMaxF.Text, MaxF, k1);
+  val(EditMinF.Text, MinF, k2);
+  if (k1 = 0) and (k2 = 0) then
+  begin
+    if MinF > MaxF then
+      EditMinF.Text := IntToStr(MaxF);
+    if (MaxF < 5) then
+      EditMaxF.Color := clRed
+    else
+      EditMinF.Color := clDefault;
+    isChanged := True;
   end;
 end;
 
 procedure TMapEditor.EditMinFChange(Sender: TObject);
-var MaxF,MinF,k1,k2: integer;
+var
+  MaxF, MinF, k1, k2: integer;
 begin
-  val(EditMaxF.Text,MaxF,k1);
-  val(EditMinF.Text,MinF,k2);
-  if (k1 = 0) and (k2 = 0) then begin
-    if MinF > MaxF then EditMaxF.Text := IntToStr(MinF);
-    if (MinF < 3) then EditMinF.Color := clRed else EditMinF.Color := clDefault;
-    isChanged := true;
+  val(EditMaxF.Text, MaxF, k1);
+  val(EditMinF.Text, MinF, k2);
+  if (k1 = 0) and (k2 = 0) then
+  begin
+    if MinF > MaxF then
+      EditMaxF.Text := IntToStr(MinF);
+    if (MinF < 3) then
+      EditMinF.Color := clRed
+    else
+      EditMinF.Color := clDefault;
+    isChanged := True;
   end;
 end;
 
 procedure TMapEditor.VolumeEditChange(Sender: TObject);
-var Vol,k: integer;
+var
+  Vol, k: integer;
 begin
   VolumeEdit.Color := clDefault;
-  val(VolumeEdit.Text,Vol,k);
-  if k = 0 then begin
-    if (Vol < 2) or (Vol > 50) then VolumeEdit.Color := clRed;
-    isChanged := true;
+  val(VolumeEdit.Text, Vol, k);
+  if k = 0 then
+  begin
+    if (Vol < 2) or (Vol > 50) then
+      VolumeEdit.Color := clRed;
+    isChanged := True;
   end;
 end;
 
@@ -353,7 +395,8 @@ end;
 
 procedure TMapEditor.FormShow(Sender: TObject);
 begin
-  if (not isLoaded) then LoadMe;
+  if (not isLoaded) then
+    LoadMe;
 end;
 
 {-------------------------------------------------------------------------}
@@ -363,26 +406,29 @@ begin
   if ToGameFolder then
     SaveAll
   else
-    SaveMap('',ToGameFolder);   //empty string is "current file"
+    SaveMap('', ToGameFolder);   //empty string is "current file"
   inherited WriteMe(ToGameFolder);
 end;
 
 {------------------------------------------------------------------------------}
 
 procedure TMapEditor.SaveMap(FileName: string; const ToGameFolder: boolean);
-var GParam: DDungeonGeneratorParameters;
-    XMLdoc: TXMLDocument;
-    RootNode: TDOMNode;
-    LargeContainer, SmallContainer: TDOMElement;
-    TextNode: TDOMNode;
-    {s,}f: string;
-    //j: DFirstStep;
-    i: integer;
-    //flg: boolean;
+var
+  GParam: DDungeonGeneratorParameters;
+  XMLdoc: TXMLDocument;
+  RootNode: TDOMNode;
+  LargeContainer, SmallContainer: TDOMElement;
+  TextNode: TDOMNode;
+  {s,}f: string;
+  //j: DFirstStep;
+  i: integer;
+  //flg: boolean;
 begin
-  if FileName = '' then begin
+  if FileName = '' then
+  begin
     FileName := MapSelector.Text;
-    if FileName = '' then begin
+    if FileName = '' then
+    begin
       ShowMessage('Please, specify a map name!');
       MapEditor.SetFocusedControl(MapSelector);
       Exit;
@@ -394,9 +440,11 @@ begin
     //if not duplicate
     MapSelector.Items.Add(FileName);
     GParam := Self.GetMapParameters;
-  end else begin
+  end
+  else
+  begin
     GParam := DDungeonGeneratorParameters.Create;
-    GParam.Load(ConstructorData(GetScenarioFolder+MapsFolder+FileName+'.xml',false));
+    GParam.Load(ConstructorData(GetScenarioFolder + MapsFolder + FileName + '.xml', False));
   end;
 
   XMLdoc := TXMLDocument.Create;
@@ -406,27 +454,27 @@ begin
   //write generation parameters
   LargeContainer := XMLdoc.CreateElement('Parameters');
   SmallContainer := XMLdoc.CreateElement('Size');
-  SmallContainer.AttributeSet('MaxX',GParam.MaxX);
-  SmallContainer.AttributeSet('MaxY',GParam.MaxY);
-  SmallContainer.AttributeSet('MaxZ',GParam.MaxZ);
-  SmallContainer.AttributeSet('MinX',GParam.MinX);
-  SmallContainer.AttributeSet('MinY',GParam.MinY);
-  SmallContainer.AttributeSet('MinZ',GParam.MinZ);
+  SmallContainer.AttributeSet('MaxX', GParam.MaxX);
+  SmallContainer.AttributeSet('MaxY', GParam.MaxY);
+  SmallContainer.AttributeSet('MaxZ', GParam.MaxZ);
+  SmallContainer.AttributeSet('MinX', GParam.MinX);
+  SmallContainer.AttributeSet('MinY', GParam.MinY);
+  SmallContainer.AttributeSet('MinZ', GParam.MinZ);
   LargeContainer.AppendChild(SmallContainer);
 
   SmallContainer := XMLdoc.CreateElement('Volume');
-  SmallContainer.AttributeSet('Value',GParam.Volume);
+  SmallContainer.AttributeSet('Value', GParam.Volume);
   LargeContainer.AppendChild(SmallContainer);
 
   LargeContainer.AppendChild(SmallContainer);
   SmallContainer := XMLdoc.CreateElement('Faces');
-  SmallContainer.AttributeSet('Max',GParam.MaxFaces);
-  SmallContainer.AttributeSet('Min',GParam.MinFaces);
+  SmallContainer.AttributeSet('Max', GParam.MaxFaces);
+  SmallContainer.AttributeSet('Min', GParam.MinFaces);
   LargeContainer.AppendChild(SmallContainer);
 
   LargeContainer.AppendChild(SmallContainer);
   SmallContainer := XMLdoc.CreateElement('Seed');
-  SmallContainer.AttributeSet('Value',GParam.Seed);
+  SmallContainer.AttributeSet('Value', GParam.Seed);
   LargeContainer.AppendChild(SmallContainer);
 
   RootNode.AppendChild(LargeContainer);
@@ -437,18 +485,22 @@ begin
    using a copy of the algorithm to make non-absolute URLs
    it is guaranteed to produce exactly the same result
    (as long as self.GetMapParameters is not changed)}
-  if not ToGameFolder then begin
-    for i := 0 to TilesBox.Items.Count-1 do if TilesBox.Checked[i] then begin
-      SmallContainer := XMLdoc.CreateElement('Tile');
-      TextNode := XMLdoc.CreateTextNode(UTF8decode(TilesBox.Items[i]));
-      SmallContainer.AppendChild(TextNode);
-      LargeContainer.AppendChild(SmallContainer);
-    end
+  if not ToGameFolder then
+  begin
+    for i := 0 to TilesBox.Items.Count - 1 do
+      if TilesBox.Checked[i] then
+      begin
+        SmallContainer := XMLdoc.CreateElement('Tile');
+        TextNode := XMLdoc.CreateTextNode(UTF8decode(TilesBox.Items[i]));
+        SmallContainer.AppendChild(TextNode);
+        LargeContainer.AppendChild(SmallContainer);
+      end;
   end
   else
   {else use "normal" way
    because "load" will load non-absolute URLs}
-    for i := 0 to GParam.TilesList.Count-1 {s in GParam.TilesList} do begin
+    for i := 0 to GParam.TilesList.Count - 1 {s in GParam.TilesList} do
+    begin
       SmallContainer := XMLdoc.CreateElement('Tile');
       TextNode := XMLdoc.CreateTextNode(UTF8decode(GParam.TilesList[i]));
       SmallContainer.AppendChild(TextNode);
@@ -458,11 +510,12 @@ begin
 
   //write first steps
   LargeContainer := XMLdoc.CreateElement('FirstSteps');
-  for i := 0 to GParam.FirstSteps.Count-1{j in GParam.FirstSteps} do begin
+  for i := 0 to GParam.FirstSteps.Count - 1{j in GParam.FirstSteps} do
+  begin
     SmallContainer := XMLdoc.CreateElement('Tile');
-    SmallContainer.AttributeSet('x',GParam.FirstSteps.Items[i].x);
-    SmallContainer.AttributeSet('y',GParam.FirstSteps.Items[i].y);
-    SmallContainer.AttributeSet('z',GParam.FirstSteps.Items[i].z);
+    SmallContainer.AttributeSet('x', GParam.FirstSteps.Items[i].x);
+    SmallContainer.AttributeSet('y', GParam.FirstSteps.Items[i].y);
+    SmallContainer.AttributeSet('z', GParam.FirstSteps.Items[i].z);
     TextNode := XMLdoc.CreateTextNode(UTF8decode(GParam.FirstSteps.Items[i].Tile));
     SmallContainer.AppendChild(TextNode);
     LargeContainer.AppendChild(SmallContainer);
@@ -471,12 +524,13 @@ begin
 
   //write the file
   if ToGameFolder then
-    f := ConstructorData(GetScenarioFolder+MapsFolder+FileName+'.xml'+gz_ext,ToGameFolder)
+    f := ConstructorData(GetScenarioFolder + MapsFolder + FileName + '.xml' +
+      gz_ext, ToGameFolder)
   else
-    f := ConstructorData(GetScenarioFolder+MapsFolder+FileName+'.xml',ToGameFolder);
+    f := ConstructorData(GetScenarioFolder + MapsFolder + FileName + '.xml', ToGameFolder);
   URLWriteXML(XMLdoc, f);
 
-  Log(LogConstructorInfo,_CurrentRoutine,'File Written: '+f);
+  Log(LogConstructorInfo, _CurrentRoutine, 'File Written: ' + f);
 
   FreeAndNil(XMLdoc);
   FreeAndNil(GParam);
@@ -485,9 +539,12 @@ end;
 {------------------------------------------------------------------------------}
 
 procedure TMapEditor.SaveAll;
-var s: string;
+var
+  s: string;
 begin
-  for s in MapSelector.Items do if s<>'' then SaveMap(s,true);
+  for s in MapSelector.Items do
+    if s <> '' then
+      SaveMap(s, True);
 end;
 
 {------------------------------------------------------------------------------}
@@ -495,8 +552,8 @@ end;
 procedure TMapEditor.ReadMapsList;
 begin
   FreeAndNil(MapsList);
-  MapsList := GetFilesList(GetScenarioFolder+MapsFolder,'xml');
-  Log(LogConstructorInfo,_CurrentRoutine,'Maps found = '+IntToStr(MapsList.Count));
+  MapsList := GetFilesList(GetScenarioFolder + MapsFolder, 'xml');
+  Log(LogConstructorInfo, _CurrentRoutine, 'Maps found = ' + IntToStr(MapsList.Count));
 end;
 
 {------------------------------------------------------------------------------}
@@ -504,14 +561,15 @@ end;
 procedure TMapEditor.ReadTilesList;
 begin
   FreeAndNil(TilesList);
-  TilesList := GetFilesList(TilesFolder,'map');
-  Log(LogConstructorInfo,_CurrentRoutine,'Tiles found = '+IntToStr(TilesList.Count));
+  TilesList := GetFilesList(TilesFolder, 'map');
+  Log(LogConstructorInfo, _CurrentRoutine, 'Tiles found = ' + IntToStr(TilesList.Count));
 end;
 
 {------------------------------------------------------------------------}
 
 procedure TMapEditor.FillTilesList;
-var s: string;
+var
+  s: string;
 begin
   TilesBox.Clear;
   for s in TilesList do
@@ -522,7 +580,8 @@ end;
 {------------------------------------------------------------------------}
 
 procedure TMapEditor.FillMapsList;
-var s: string;
+var
+  s: string;
 begin
   MapSelector.Clear;
   for s in MapsList do
@@ -530,4 +589,3 @@ begin
 end;
 
 end.
-

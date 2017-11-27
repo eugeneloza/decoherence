@@ -107,7 +107,8 @@ procedure AddMaterial(const Root: TX3DRootNode);
           // assign TextureProperties (anisotropic smoothing) for the imagetexture
           //{$Warning WHY THE TextureProperties keeps automatically released????}
           (TShapeNode(Source.FdChildren[i]).fdAppearance.Value.FindNode(
-            TImageTextureNode, False) as TImageTextureNode).{Fd}TextureProperties{.Value} :=
+            TImageTextureNode, False) as TImageTextureNode).{Fd}
+          TextureProperties{.Value} :=
             TextureProperties{.DeepCopy};
           {create a link to each and every material loaded}
           Material := (TShapeNode(Source.FdChildren[i]).FdAppearance.Value.FindNode(
