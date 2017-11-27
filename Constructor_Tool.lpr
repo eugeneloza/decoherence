@@ -15,19 +15,26 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 
 {---------------------------------------------------------------------------}
 
-{ Editor for all game data }   
+{ Editor for all game data }
 program Constructor_Tool;
 
-{$IFDEF Windows}{$APPTYPE Console}{$ENDIF} //it's always console
+{$IFDEF Windows}{$APPTYPE Console}{$ENDIF}//it's always console
 {$INCLUDE src/compilerconfig.inc}
 
 uses
-  {$IFDEF UNIX}cThreads,{$ENDIF}
+ {$IFDEF UNIX}cThreads, {$ENDIF}
   Interfaces, // this includes the LCL widgetset
-  Forms, Castle_Base, Castle_Window, Castle_Components,
+  Forms,
+  Castle_Base,
+  Castle_Window,
+  Castle_Components,
   Constructor_MainUnit,
-  Constructor_Facts, Constructor_Global, DecoTranslation,
-  Constructor_Tiles, Constructor_Map, Constructor_Placeholders;
+  Constructor_Facts,
+  Constructor_Global,
+  DecoTranslation,
+  Constructor_Tiles,
+  Constructor_Map,
+  Constructor_Placeholders;
 
 {$R *.res}
 
@@ -41,4 +48,3 @@ begin
   Application.CreateForm(TPlaceholdersEditor, PlaceholdersEditor);
   Application.Run;
 end.
-
