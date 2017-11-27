@@ -54,6 +54,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 *)
 
 unit Profiler;
+
 interface
 
 {$INCLUDE compilerconfig.inc}
@@ -64,10 +65,12 @@ interface
 { Tries to find a profiler entry for aFunction or creates it otherwise
   assigns CurrentLevel to this function
   and starts counting time for the current function }
-procedure doStartProfiler(const aFunction: string); {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+procedure doStartProfiler(const aFunction: string);
+ {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 { Stops counting time for the current function
   and records results}
-procedure doStopProfiler(const aFunction: string); {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+procedure doStopProfiler(const aFunction: string);
+ {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 {$ENDIF}
 
 implementation
@@ -86,8 +89,10 @@ type
     { Number of procedure calls }
     EntryHits: integer;
   end;
+
   { List of profiler records }
-  TProfilerList = specialize TObjectList<TProfilerChild>; //for some stupid reason it won't allow recoursive type definition
+  TProfilerList = specialize TObjectList<TProfilerChild>;
+  //for some stupid reason it won't allow recoursive type definition
   { A profiler tree }
   TProfiler = class(TProfilerChild)
     { Higher level element }
@@ -105,16 +110,16 @@ var
   TopProfiler: TProfiler;
   { Current profiler level }
   CurrentLevel: TProfiler;
-  { }
+
   ProgramStartTime: TTimerResult;
-  { }
+
   SelfUsedTime: TFloatTime;
 
 
 constructor TProfiler.Create;
 begin
   //inherited Create; <-- nothing to inherit
-  Children := TProfilerList.Create(true);
+  Children := TProfilerList.Create(True);
   EntryTime := 0; //redundant
   EntryHits := 0;
 end;
@@ -125,7 +130,9 @@ begin
   inherited Destroy;
 end;
 
-procedure doStartProfiler(const aFunction: string); {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+procedure doStartProfiler(const aFunction: string);
+ {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+
   function FindEntry: TProfiler; inline;
   var
     i: integer;
@@ -133,8 +140,9 @@ procedure doStartProfiler(const aFunction: string); {$IFDEF SUPPORTS_INLINE}inli
   begin
     Result := nil;
     //try to find if the requested function is already in the Children
-    for i := 0 to CurrentLevel.Children.Count-1 do
-      if CurrentLevel.Children[i].EntryName = aFunction then begin
+    for i := 0 to CurrentLevel.Children.Count - 1 do
+      if CurrentLevel.Children[i].EntryName = aFunction then
+      begin
         Result := CurrentLevel.Children[i] as TProfiler;
         Exit;
       end;
@@ -145,6 +153,7 @@ procedure doStartProfiler(const aFunction: string); {$IFDEF SUPPORTS_INLINE}inli
     CurrentLevel.Children.Add(NewEntry);
     Result := NewEntry;
   end;
+
 var
   CurrentElement: TProfiler;
   CurrentTimer: TTimerResult;
@@ -158,10 +167,11 @@ begin
   //and switch down a level
   CurrentLevel := CurrentElement;
 
-  SelfUsedTime += TimerSeconds(Timer,CurrentTimer);
+  SelfUsedTime += TimerSeconds(Timer, CurrentTimer);
 end;
 
-procedure doStopProfiler(const aFunction: string); {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+procedure doStopProfiler(const aFunction: string);
+ {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 var
   CurrentTimer: TTimerResult;
 begin
@@ -171,34 +181,46 @@ begin
     //stop counting time and record the result
     CurrentLevel.EntryTime += TimerSeconds(Timer, CurrentLevel.TimerStart);
     //increase number of accesses to the function
-    inc(CurrentLevel.EntryHits);
+    Inc(CurrentLevel.EntryHits);
     //and return to upper level profiler
-    if CurrentLevel.EntryName <> aFunction then CurrentLevel := CurrentLevel.Parent;
+    if CurrentLevel.EntryName <> aFunction then
+      CurrentLevel := CurrentLevel.Parent;
 
     if CurrentLevel = nil then
-      raise Exception.Create('FATAL. No matching StartProfiler...StopProfiler found in '+aFunction);
+      raise Exception.Create('FATAL. No matching StartProfiler...StopProfiler found in ' +
+        aFunction);
   until CurrentLevel.EntryName = aFunction;
   //and return to upper level profiler
   CurrentLevel := CurrentLevel.Parent;
 
-  SelfUsedTime += TimerSeconds(Timer,CurrentTimer);
+  SelfUsedTime += TimerSeconds(Timer, CurrentTimer);
 end;
 
 {$IFDEF SortProfilerResults}
 //used to sort profiler results if requested
 function CompareProfiles(constref p1, p2: TProfilerChild): integer;
 begin
-  if p1.EntryTime > p2.EntryTime then Result := -1 else
-  if p1.EntryTime < p2.EntryTime then Result := 1 else Result := 0;
+  if p1.EntryTime > p2.EntryTime then
+    Result := -1
+  else
+  if p1.EntryTime < p2.EntryTime then
+    Result := 1
+  else
+    Result := 0;
 end;
-type TProfilerComparer = specialize TComparer<TProfilerChild>;
+
+type
+  TProfilerComparer = specialize TComparer<TProfilerChild>;
+
 {$ENDIF}
 
 procedure DisplayProfilerResult;
+
   function DisplayTime(t: TFloatTime): string;
   begin
-    Result := FloatToStr(Round(t*1000)/1000) + 's';
+    Result := FloatToStr(Round(t * 1000) / 1000) + 's';
   end;
+
   procedure DisplayRecoursive(const aProfiler: TProfiler; const aPrefix: string);
   var
     i: integer;
@@ -206,20 +228,23 @@ procedure DisplayProfilerResult;
     {$IFDEF SortProfilerResults}
     aProfiler.Children.Sort(TProfilerComparer.Construct(@CompareProfiles));
     {$ENDIF}
-    for i := 0 to aProfiler.Children.Count-1 do begin
+    for i := 0 to aProfiler.Children.Count - 1 do
+    begin
       WriteLnLog(aPrefix + aProfiler.Children[i].EntryName +
-        '(x'+IntToStr(aProfiler.Children[i].EntryHits) + ')' + ' : ' +
+        '(x' + IntToStr(aProfiler.Children[i].EntryHits) + ')' + ' : ' +
         DisplayTime(aProfiler.Children[i].EntryTime));
 
-      DisplayRecoursive(aProfiler.Children[i] as TProfiler,aPrefix+'...');
+      DisplayRecoursive(aProfiler.Children[i] as TProfiler, aPrefix + '...');
     end;
   end;
+
 begin
   WriteLnLog('--------- Profiler analysis --------');
-  WriteLnLog('Total Execution Time = '+DisplayTime(TimerSeconds(Timer, ProgramStartTime)));
-  WriteLnLog('Profiler itself consumed '+ DisplayTime(SelfUsedTime));
+  WriteLnLog('Total Execution Time = ' + DisplayTime(TimerSeconds(Timer,
+    ProgramStartTime)));
+  WriteLnLog('Profiler itself consumed ' + DisplayTime(SelfUsedTime));
   //the top element is not displayed, only its children
-  DisplayRecoursive(TopProfiler,'');
+  DisplayRecoursive(TopProfiler, '');
   WriteLnLog('------------------------------------');
 end;
 
@@ -234,4 +259,3 @@ finalization
   FreeAndNil(TopProfiler); //will recoursively free all its Children
 {$ENDIF}
 end.
-

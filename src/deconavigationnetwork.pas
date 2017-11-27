@@ -24,24 +24,24 @@ unit DecoNavigationNetwork;
 
 interface
 
-uses Generics.Collections, CastleUtils {for TStructList} ,
+uses Generics.Collections, CastleUtils {for TStructList},
   CastleVectors,
   DecoGlobal;
 
 type
-  TNavID = Integer;
+  TNavID = integer;
 
 const
   UnitinializedNav: TNavID = -1;
 
 {$HINT not sure how to work correctly here, specialized lists must be managed (from a class constructor/destructor)}
 
-  { looks like 8 nav points links is enough }
+{ looks like 8 nav points links is enough }
 type
   TLinksList = array [0 .. 7] of TNavID;
-  // specialize TGenericStructList<TNavID>;
+// specialize TGenericStructList<TNavID>;
 
-Type
+type
   DNavPt = record
     { Absolute Coordinates of pathPoint }
     Pos: TVector3;
@@ -49,11 +49,11 @@ Type
     Tile: TTileType;
     }
     { Link of tiles adjacent to this tile }
-      LinksCount: ShortInt;
-    IsSafe: Boolean;
+    LinksCount: shortint;
+    IsSafe: boolean;
     Links: TLinksList;
     { is somebody standing over this Nav? }
-    Blocked: Boolean;
+    Blocked: boolean;
   end;
 
 type

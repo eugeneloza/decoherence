@@ -28,13 +28,15 @@ uses Classes,
   DecoGlobal;
 
 { at this moment it works fine. So no need to "upgrade" it }
-type DBodyResource = T3DResource;
+type
+  DBodyResource = T3DResource;
 
 {not sure about it, it would cover basic enemies animations, but
  some Actors, player characters and npcs first of all, may use advanced set
  of animations, therefore just calling the animation by name might be better
  at least for now.}
-type TAnimationType = (atIdle, atWalk, atAttack, atHurt, atDie);
+type
+  TAnimationType = (atIdle, atWalk, atAttack, atHurt, atDie);
 {type TAnimationType = string;
 const atIdle = 'idle';
       atWalk = 'walk';
@@ -42,7 +44,8 @@ const atIdle = 'idle';
       atHurt = 'hurt';
       atDie = 'die';}
 
-const AnimationExtension = '.castle-anim-frames';
+const
+  AnimationExtension = '.castle-anim-frames';
 
 type
   { Body is a 3D manifestation of an Actor in the 3D world.
@@ -51,7 +54,7 @@ type
     however, the exact ancestor choise is not clear yet.
     Each Actor gets a unique body, which references to a specific body resource }
   DBody = class(T3DOrient)
-  { animation display routines }
+    { animation display routines }
   private
     CurrentChild: T3D;
 
@@ -60,9 +63,10 @@ type
       As animations are managed internally in Castle Game Engine,
       we follow their specification of "single" time management for now.
       At the moment it is absolutely identical to our implementation of time }
-    Time: Single;
+    Time: single;
     { Move Actor's time forward }
-    procedure AdvanceTime(const SecondsPassed: single);{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+    procedure AdvanceTime(const SecondsPassed: single);
+{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
   public
     { Name of current and next animation }
     CurrentAnimationName, NextAnimationName: string;
@@ -78,12 +82,13 @@ type
 
     { Advances time and recalculates the geometry
       Engine-specific }
-    procedure Update(const SecondsPassed: Single; var RemoveMe: TRemoveType); override;
+    procedure Update(const SecondsPassed: single; var RemoveMe: TRemoveType); override;
 
     constructor Create(AOwner: TComponent); override;
   end;
 
-var tmpKnightCreature: DBodyResource;
+var
+  tmpKnightCreature: DBodyResource;
 
 
 {what to do after animation has ended?
@@ -92,7 +97,9 @@ var tmpKnightCreature: DBodyResource;
  aeIdle - switch to idle (after any action finished)
  mind that this determines automatic management of animations,
  "Walk" animation loops forever and is managed by Actor AI}
-type TAnimationEnd = (aeLoop, aeStop, aeIdle);
+type
+  TAnimationEnd = (aeLoop, aeStop, aeIdle);
+
 function AnimationEnd(const at: TAnimationType): TAnimationEnd;
 function AnimationEnd(const at: string): TAnimationEnd;
 function AnimationToString(const at: TAnimationType): string;
@@ -101,6 +108,7 @@ procedure tmpLoadKnightCreature;
 procedure FreeCreatures;
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
+
 uses SysUtils, CastleFilesUtils,
   {DecoHDD,} DecoLog, Profiler;
 
@@ -109,24 +117,27 @@ begin
   StartProfiler;
 
   case at of
-    atIdle:   Result := aeLoop;
-    atWalk:   Result := aeLoop;
+    atIdle: Result := aeLoop;
+    atWalk: Result := aeLoop;
     atAttack: Result := aeIdle;
-    atHurt:   Result := aeIdle;
-    atDie:    Result := aeStop;
-    else Log(LogAnimationError,_CurrentRoutine,'ERROR: Unknown animation '+AnimationToString(at));
+    atHurt: Result := aeIdle;
+    atDie: Result := aeStop;
+    else
+      Log(LogAnimationError, _CurrentRoutine, 'ERROR: Unknown animation ' + AnimationToString(at));
   end;
 
   StopProfiler;
 end;
+
 function AnimationEnd(const at: string): TAnimationEnd;
 begin
   StartProfiler;
 
   case at of
-    'idle','walk': Result := aeLoop;
+    'idle', 'walk': Result := aeLoop;
     'die': Result := aeStop;
-    else Result := aeIdle;
+    else
+      Result := aeIdle;
   end;
 
   StopProfiler;
@@ -139,12 +150,13 @@ begin
   StartProfiler;
 
   case at of
-    atIdle:   Result := 'idle';
-    atWalk:   Result := 'walk';
+    atIdle: Result := 'idle';
+    atWalk: Result := 'walk';
     atAttack: Result := 'attack';
-    atHurt:   Result := 'hurt';
-    atDie:    Result := 'die';
-    else Log(LogAnimationError,_CurrentRoutine,'ERROR: Unknown animation '+AnimationToString(at));
+    atHurt: Result := 'hurt';
+    atDie: Result := 'die';
+    else
+      Log(LogAnimationError, _CurrentRoutine, 'ERROR: Unknown animation ' + AnimationToString(at));
   end;
 
   StopProfiler;
@@ -159,8 +171,10 @@ begin
   StartProfiler;
 
   //if not (GetExists and Resource.Prepared) then Exit;
-  if Resource = nil then Exit; //if the actor has no body, just hang up
-  CurrentAnimation := (Resource.Animations.FindName(CurrentAnimationName)) as T3DResourceAnimation{DAnimation};
+  if Resource = nil then
+    Exit; //if the actor has no body, just hang up
+  CurrentAnimation := (Resource.Animations.FindName(CurrentAnimationName)) as
+    T3DResourceAnimation{DAnimation};
   Time := 0;
 
   StopProfiler;
@@ -168,40 +182,48 @@ end;
 
 {---------------------------------------------------------------------------}
 
-procedure DBody.AdvanceTime(const SecondsPassed: single);{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+procedure DBody.AdvanceTime(const SecondsPassed: single);
+{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 begin
   StartProfiler;
 
   Time += SecondsPassed * SlowTimeRate;
 
   // manage end of the animation
-  if (CurrentAnimation<>nil) and (Time>CurrentAnimation.Duration) then begin
-    if NextAnimationName<>'' then begin
+  if (CurrentAnimation <> nil) and (Time > CurrentAnimation.Duration) then
+  begin
+    if NextAnimationName <> '' then
+    begin
       CurrentAnimationName := NextAnimationName;
       ResetAnimation;
       NextAnimationName := '';
-    end else
+    end
+    else
       case AnimationEnd(CurrentAnimationName) of
         aeLoop: Time -= CurrentAnimation.Duration;
-        aeIdle: begin
-                  CurrentAnimationName := 'idle';
-                  ResetAnimation;
-                end;
-        aeStop: Time := CurrentAnimation.Duration-0.01; //this is ugly, fix it soon
+        aeIdle:
+        begin
+          CurrentAnimationName := 'idle';
+          ResetAnimation;
+        end;
+        aeStop: Time := CurrentAnimation.Duration - 0.01; //this is ugly, fix it soon
       end;
   end;
 
   StopProfiler;
 end;
-procedure DBody.Update(const SecondsPassed: Single; var RemoveMe: TRemoveType);
+
+procedure DBody.Update(const SecondsPassed: single; var RemoveMe: TRemoveType);
 
   { Returns current frame of the animation
     Engine-specific }
   function GetChild: T3D;
   begin
-    if not (GetExists and Resource.Prepared) then Exit;
-    if CurrentAnimation = nil then ResetAnimation;
-    Result := CurrentAnimation.Scene(Time, true);
+    if not (GetExists and Resource.Prepared) then
+      Exit;
+    if CurrentAnimation = nil then
+      ResetAnimation;
+    Result := CurrentAnimation.Scene(Time, True);
   end;
 
   procedure UpdateChild;
@@ -243,7 +265,8 @@ begin
     1: CurrentAnimationName := 'hurt';
     2: CurrentAnimationName := 'attack';
     3: CurrentAnimationName := 'die';
-    else CurrentAnimationName := 'idle';
+    else
+      CurrentAnimationName := 'idle';
   end;
   //ResetAnimation;
   StopProfiler;
@@ -254,13 +277,14 @@ end;
 {****************************************************************************}
 
 procedure tmpLoadKnightCreature;
-var CreatureName: string;
+var
+  CreatureName: string;
 begin
   StartProfiler;
 
   CreatureName := 'knight';
 
-  Resources.LoadFromFiles(ApplicationData(CreaturesFolder+CreatureName));
+  Resources.LoadFromFiles(ApplicationData(CreaturesFolder + CreatureName));
   tmpKnightCreature := Resources.FindName('Knight') as DBodyResource;
   tmpKnightCreature.Prepare(nil);
 
@@ -272,7 +296,7 @@ end;
 procedure FreeCreatures;
 begin
   StartProfiler;
-  Log(LogInitData,_CurrentRoutine,'Freeing creature resources...');
+  Log(LogInitData, _CurrentRoutine, 'Freeing creature resources...');
   //nothing here
   StopProfiler;
 end;
@@ -280,4 +304,3 @@ end;
 
 
 end.
-

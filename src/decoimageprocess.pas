@@ -29,6 +29,7 @@ uses CastleImages,
 function Brighter(const aImage: TCastleImage; const Mult: float = 1.2): TCastleImage;
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
+
 uses CastleVectors,
   DecoLog, Profiler;
 
@@ -36,15 +37,18 @@ function CheckImageValid(const aImage: TCastleImage): boolean;
 begin
   StartProfiler;
 
-  Result := true;
-  if (aImage=nil) or (aImage.isEmpty) then begin
-    Result := false;
-    Log(LogInterfaceError,_CurrentRoutine,'FATAL: Image is nil');
+  Result := True;
+  if (aImage = nil) or (aImage.isEmpty) then
+  begin
+    Result := False;
+    Log(LogInterfaceError, _CurrentRoutine, 'FATAL: Image is nil');
     Exit;
   end;
-  if not (aImage is TRGBAlphaImage) then begin
-    Result := false;
-    Log(LogInterfaceError,aImage.className+'>'+_CurrentRoutine,'FATAL: Image type '+aImage.ClassName+' is not supported for operation.');
+  if not (aImage is TRGBAlphaImage) then
+  begin
+    Result := False;
+    Log(LogInterfaceError, aImage.ClassName + '>' + _CurrentRoutine,
+      'FATAL: Image type ' + aImage.ClassName + ' is not supported for operation.');
     Exit;
   end;
 
@@ -58,7 +62,10 @@ begin
   StartProfiler;
 
   { maybe, make it "softer"? It'll require knowing "max" (which is actually mult*255 = 255+20% default)}
-  if a<255 then Result := a else Result := 255;
+  if a < 255 then
+    Result := a
+  else
+    Result := 255;
 
   StopProfiler;
 end;
@@ -66,22 +73,25 @@ end;
 {------------------------------------------------------------------------}
 
 function Brighter(const aImage: TCastleImage; const Mult: float = 1.2): TCastleImage;
-var IMG: TRGBAlphaImage;
+var
+  IMG: TRGBAlphaImage;
   p: PVector4byte;
   i: integer;
 begin
   StartProfiler;
 
-  if not CheckImageValid(aImage) then Exit;
+  if not CheckImageValid(aImage) then
+    Exit;
   IMG := aImage.MakeCopy as TRGBAlphaImage;
   p := IMG.Pixels;
-  for i := 0 to (IMG.Size div IMG.PixelSize) do begin
-    p^[0] := Clamp255(Round(p^[0]*Mult));
-    p^[1] := Clamp255(Round(p^[1]*Mult));
-    p^[2] := Clamp255(Round(p^[2]*Mult));
+  for i := 0 to (IMG.Size div IMG.PixelSize) do
+  begin
+    p^[0] := Clamp255(Round(p^[0] * Mult));
+    p^[1] := Clamp255(Round(p^[1] * Mult));
+    p^[2] := Clamp255(Round(p^[2] * Mult));
     {no alpha processing?}
     //p^[3]
-    inc(p,IMG.PixelSize);
+    Inc(p, IMG.PixelSize);
   end;
   Result := IMG;
 
@@ -93,4 +103,3 @@ end;
 
 
 end.
-

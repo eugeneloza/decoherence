@@ -32,8 +32,8 @@ type
     Value: string;
   end;
 
-{ Actually this one looks like a TStringList for now, but may be extended in future }
-TLoadImageList = specialize TObjectList<DLoadImage>;
+  { Actually this one looks like a TStringList for now, but may be extended in future }
+  TLoadImageList = specialize TObjectList<DLoadImage>;
 
 type
   { A fact with control of displayed frequency and a list of compatible images }
@@ -49,13 +49,14 @@ type
     (* TODO: REQUIREMENTS: some facts may appear only after the fact has been
        discovered in-game. Not done yet. *)
     destructor Destroy; override;
-end;
+  end;
 
-Type TFactList = specialize TObjectList<DFact>;
+type
+  TFactList = specialize TObjectList<DFact>;
 
 var
-    {a list of all loaded facts and links to compatible loadscreen images}
-    Facts: TFactList;
+  {a list of all loaded facts and links to compatible loadscreen images}
+  Facts: TFactList;
 
 {initialize LoadScreens}
 procedure InitLoadScreen;
@@ -80,23 +81,28 @@ uses SysUtils, CastleFilesUtils,
   DecoFont,
   DecoLog, Profiler;
 
-var LastFact: integer = -1;
-    CurrentFact: DFact = nil;      //looks ugly! Maybe I should remake it?
+var
+  LastFact: integer = -1;
+  CurrentFact: DFact = nil;      //looks ugly! Maybe I should remake it?
+
 function GetRandomFact: string;
-var NewFact: integer;
+var
+  NewFact: integer;
 begin
   StartProfiler;
 
-  if Facts.Count = 0 then raise Exception.Create('GetRandomFact ERROR: No facts loaded!');
+  if Facts.Count = 0 then
+    raise Exception.Create('GetRandomFact ERROR: No facts loaded!');
 
   if Facts.Count > 1 then
     repeat
       NewFact := DRND.Random(Facts.Count);
-    until (NewFact <> LastFact) and (DRND.Random < 1/Facts[NewFact].Frequency)
+    until (NewFact <> LastFact) and (DRND.Random < 1 / Facts[NewFact].Frequency)
   else
     NewFact := 0;
 
-  inc(Facts[NewFact].Frequency,7);      //todo balance facts frequency, now chance is 1,1/8,1/15,1/22...
+  Inc(Facts[NewFact].Frequency, 7);
+  //todo balance facts frequency, now chance is 1,1/8,1/15,1/22...
   Result := Facts[NewFact].Value;
   CurrentFact := Facts[NewFact];
   LastFact := NewFact;
@@ -106,19 +112,23 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-var LoadImageOld: string = '';
+var
+  LoadImageOld: string = '';
+
 function GetRandomFactImage: string;
-var LoadImageNew: string;
+var
+  LoadImageNew: string;
 begin
   StartProfiler;
 
   if CurrentFact = nil then
     raise Exception.Create('GetRandomFactImage ERROR: Get Fact before getting the image!');
-  if CurrentFact.Compatibility.Count>0 then
+  if CurrentFact.Compatibility.Count > 0 then
     repeat
       //as ugly as it might ever be...
-      LoadImageNew := CurrentFact.Compatibility[DRND.Random(CurrentFact.Compatibility.Count)].Value;
-    until (LoadImageOld <> LoadImageNew) or (CurrentFact.Compatibility.Count=1)
+      LoadImageNew := CurrentFact.Compatibility[DRND.Random(
+        CurrentFact.Compatibility.Count)].Value;
+    until (LoadImageOld <> LoadImageNew) or (CurrentFact.Compatibility.Count = 1)
   else
     raise Exception.Create('GetRandomFactImage ERROR: No images to load!');
   LoadImageOld := LoadImageNew;
@@ -131,22 +141,24 @@ end;
 {---------------------------------------------------------------------------------}
 
 procedure LoadFacts(const FileName: string);
-var FactsDoc: TXMLDocument;
-    BaseElement: TDOMElement;
-    ValueNode: TDOMElement;
-    Iterator,Iterator2: TXMLElementIterator;
-    F: DFact;
-    LI: DLoadImage;
+var
+  FactsDoc: TXMLDocument;
+  BaseElement: TDOMElement;
+  ValueNode: TDOMElement;
+  Iterator, Iterator2: TXMLElementIterator;
+  F: DFact;
+  LI: DLoadImage;
 begin
   StartProfiler;
 
-  if Facts <> nil then begin
-    Log(LogInitError,Facts.ClassName+'>'+_CurrentRoutine,'Facts is not nil. Freeing...');
+  if Facts <> nil then
+  begin
+    Log(LogInitError, Facts.ClassName + '>' + _CurrentRoutine, 'Facts is not nil. Freeing...');
     FreeAndNil(Facts);
   end;
-  Facts := TFactList.Create(true);
+  Facts := TFactList.Create(True);
 
-  Log(LogInitInterface,Facts.ClassName+'>'+_CurrentRoutine,'Reading file '+FileName);
+  Log(LogInitInterface, Facts.ClassName + '>' + _CurrentRoutine, 'Reading file ' + FileName);
 
   FactsDoc := URLReadXML(FileName);
   BaseElement := FactsDoc.DocumentElement;
@@ -156,15 +168,24 @@ begin
     begin
       F := DFact.Create;
       F.Frequency := 1;
-      F.Compatibility := TLoadImageList.Create(true);
-      ValueNode := Iterator.Current.ChildElement('Value', true);  //todo: required=false and catch nil value
-      F.Value := {$IFDEF UTF8Encode}UTF8encode{$ENDIF}(ValueNode.TextData);
+      F.Compatibility := TLoadImageList.Create(True);
+      ValueNode := Iterator.Current.ChildElement('Value', True);
+      //todo: required=false and catch nil value
+      F.Value :=
+{$IFDEF UTF8Encode}
+        UTF8encode
+{$ENDIF}
+        (ValueNode.TextData);
       try
-        Iterator2 := Iterator.Current.ChildElement('ImageList', true).ChildrenIterator;
+        Iterator2 := Iterator.Current.ChildElement('ImageList', True).ChildrenIterator;
         while Iterator2.GetNext do
         begin
           LI := DLoadImage.Create;
-          LI.Value := {$IFDEF UTF8Encode}UTF8encode{$ENDIF}(Iterator2.Current.TextData);
+          LI.Value :=
+{$IFDEF UTF8Encode}
+            UTF8encode
+{$ENDIF}
+            (Iterator2.Current.TextData);
           F.Compatibility.Add(LI);
         end;
       finally
@@ -177,7 +198,7 @@ begin
     FreeAndNil(Iterator);
   end;
   FreeAndNil(FactsDoc);
-  Log(LogInitInterface,Facts.ClassName+'>'+_CurrentRoutine,'Reading file finished.');
+  Log(LogInitInterface, Facts.ClassName + '>' + _CurrentRoutine, 'Reading file finished.');
 
   StopProfiler;
 end;
@@ -201,7 +222,7 @@ begin
   StartProfiler;
 
   //LoadFacts does everything, jsut providing it a correct filename.
-  LoadFacts(ApplicationData(LanguageDir(CurrentLanguage)+'facts.xml'+gz_ext));
+  LoadFacts(ApplicationData(LanguageDir(CurrentLanguage) + 'facts.xml' + gz_ext));
 
   StopProfiler;
 end;
@@ -225,17 +246,19 @@ begin
 
   {remake it some day into something useful}
   case CurrentLanguage of
-    Language_English: Result := 'Welcome to Decoherence :)'+dlinebreak+
-                                'Loading completed,'+dlinebreak+
-                                'just press any key...';
-    Language_Russian: Result := 'Добро пожаловать в Decoherence :)'+dlinebreak+
-                                'Загрузка завершена,'+dlinebreak+
-                                'просто нажмите любую клавишу...';
-    else Result := 'Language unavailable'
+    Language_English: Result :=
+        'Welcome to Decoherence :)' + dlinebreak +
+        'Loading completed,' + dlinebreak +
+        'just press any key...';
+    Language_Russian: Result :=
+        'Добро пожаловать в Decoherence :)' + dlinebreak +
+        'Загрузка завершена,' + dlinebreak +
+        'просто нажмите любую клавишу...';
+    else
+      Result := 'Language unavailable'
   end;
 
   StopProfiler;
 end;
 
 end.
-

@@ -4,8 +4,12 @@ program Decoherence_Desktop;
 
 {$IFDEF Windows}{$IFDEF RELEASE}{$APPTYPE GUI}{$ELSE}{$APPTYPE CONSOLE}{$ENDIF}{$ENDIF}
 
-Uses {$IFDEF useCMEM}cmem,{$ENDIF}{$IFDEF UNIX}cthreads,{$ENDIF} SysUtils,
-  DecoGlobal, Decoherence;
+uses
+ {$IFDEF useCMEM}cmem,
+ {$ENDIF} {$IFDEF UNIX}cthreads,
+ {$ENDIF} SysUtils,
+  DecoGlobal,
+  Decoherence;
 
 {$R *.res}
 
@@ -20,4 +24,3 @@ begin
 
   Window.OpenAndRun;
 end.
-

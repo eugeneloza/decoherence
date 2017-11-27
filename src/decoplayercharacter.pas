@@ -28,7 +28,8 @@ uses Classes, Generics.Collections, CastleVectors,
   DecoImages,
   DecoGlobal;
 
-const MaxParty = 6; {0..6 = 7 characters}
+const
+  MaxParty = 6; {0..6 = 7 characters}
 
 type
   { Extension of DCoordActor with Up vector required for Camera to work properly }
@@ -47,7 +48,8 @@ type
   end;
 
 { at this point portraits are static }
-type DPlayerPortrait = DStaticImage;
+type
+  DPlayerPortrait = DStaticImage;
 
 type
   {player character - the most complex actor available :)}
@@ -57,13 +59,15 @@ type
     procedure Die; override;
     constructor Create; override;
     destructor Destroy; override;
-end;
+  end;
 
 { List of the party characters, a bit better than DActorList }
-type DCharList = specialize TObjectList<DPlayerCharacter>;
+type
+  DCharList = specialize TObjectList<DPlayerCharacter>;
 
 { todo: remake it }
-type TMoveDirection = (mdForward,mdBack,mdLeft,mdRight);
+type
+  TMoveDirection = (mdForward, mdBack, mdLeft, mdRight);
 
 type
   {Player party containing and managing a group of a few characters (no less than one)
@@ -72,11 +76,14 @@ type
   private
     { Some day these will become variables / todo }
     { Speed in meters per second }
-    const Speed = 10;
+  const
+    Speed = 10;
     { Speed fade ratio, in ~meters per second^2, 0 never stops }
-    const Friction = 40;
+  const
+    Friction = 40;
     { Rotation fade ratio. ~radians per second, rather hard to explain :) adds some inertion to camera, the higher this value the faster is rotation}
-    const AngularFriction = 40;
+  const
+    AngularFriction = 40;
   private
     { Updates game camera with CameraMan coordinates }
     procedure UpdateCamera;
@@ -111,7 +118,8 @@ type
   end;
 
 { A list of player's parties }
-type DPartyList = specialize TObjectList<DParty>;
+type
+  DPartyList = specialize TObjectList<DParty>;
 
 
 type
@@ -120,7 +128,8 @@ type
   DPlayerControl = class(DObject)
   public
     { Mouse sensivity }
-    const MouseSensivity = 1/1800;
+  const
+    MouseSensivity = 1 / 1800;
   public
     {A list of player's parties (should contain at least 1 record)}
     Parties: DPartyList;
@@ -150,13 +159,15 @@ type
     destructor Destroy; override;
   end;
 
-var Player: DPlayerControl;
+var
+  Player: DPlayerControl;
 
 { Temporary to init/free the PlayerControl }
 procedure InitPlayer;
 procedure FreePlayer;
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
+
 uses SysUtils, Math,
   DecoNavigation, DecoAbstractWorld, DecoAbstractWorld3d,
   DecoInput,
@@ -167,7 +178,7 @@ begin
   StartProfiler;
 
   //inherited Create;
-  Character := DCharList.Create(true);
+  Character := DCharList.Create(True);
   CameraMan := DCameraMan.Create;
 
   StopProfiler;
@@ -175,21 +186,24 @@ end;
 
 {----------------------------------------------------------------------------}
 
-Procedure DParty.tmpParty;
-var i: integer;
-    NewMember: DPlayerCharacter;
+procedure DParty.tmpParty;
+var
+  i: integer;
+  NewMember: DPlayerCharacter;
 begin
   StartProfiler;
 
-  for i := 0 to MaxParty do begin
+  for i := 0 to MaxParty do
+  begin
     NewMember := DPlayerCharacter.Create;
     NewMember.MaxMaxMPH := 0;
-    NewMember.Hit(DRND.Random(80),1);
-    NewMember.DrainCNC(DRND.Random(80),1);
-    NewMember.DrainMPH(DRND.Random(80),1);
-    NewMember.DrainSTA(DRND.Random(80),1);
+    NewMember.Hit(DRND.Random(80), 1);
+    NewMember.DrainCNC(DRND.Random(80), 1);
+    NewMember.DrainMPH(DRND.Random(80), 1);
+    NewMember.DrainSTA(DRND.Random(80), 1);
 
-    if (Perks = nil) or (Perks.Count = 0) then Log(logInit,_CurrentRoutine,'FATAL ERROR: Perks is empty!');
+    if (Perks = nil) or (Perks.Count = 0) then
+      Log(logInit, _CurrentRoutine, 'FATAL ERROR: Perks is empty!');
     NewMember.Actions.Add(Perks[0]);
 
     Character.Add(NewMember);
@@ -201,12 +215,14 @@ end;
 {----------------------------------------------------------------------------}
 
 procedure DParty.Rest;
-var c: DPlayerCharacter;
+var
+  c: DPlayerCharacter;
 begin
   StartProfiler;
 
   {for now it just resets the Actor to its initial state}
-  for c in Character do c.RecoverAll;
+  for c in Character do
+    c.RecoverAll;
 
   StopProfiler;
 end;
@@ -227,14 +243,17 @@ end;
 {----------------------------------------------------------------------------}
 
 procedure DParty.UpdateCamera;
-var aFriction: float;
+var
+  aFriction: float;
 begin
   StartProfiler;
 
-  doMove1; doMove2;
-  if Camera = nil then begin
+  doMove1;
+  doMove2;
+  if Camera = nil then
+  begin
     // InitNavigation;
-    Log(LogNavigationError,_CurrentRoutine,'Camera is Nil!');
+    Log(LogNavigationError, _CurrentRoutine, 'Camera is Nil!');
     Exit;
   end;
 
@@ -242,15 +261,19 @@ begin
   Camera.Position[2] := Camera.Position[2] + CameraMan.Height;
   {soften climb/fall here?}
 
-  if CameraInitialized then begin
-    aFriction := AngularFriction*DeltaT;
-    if aFriction>1 then aFriction := 1;
-    Camera.Direction := (1-aFriction) * Camera.Direction + aFriction*CameraMan.Direction;
-    Camera.Up := (1-aFriction) * Camera.Up + aFriction*CameraMan.Up;
-  end else begin
+  if CameraInitialized then
+  begin
+    aFriction := AngularFriction * DeltaT;
+    if aFriction > 1 then
+      aFriction := 1;
+    Camera.Direction := (1 - aFriction) * Camera.Direction + aFriction * CameraMan.Direction;
+    Camera.Up := (1 - aFriction) * Camera.Up + aFriction * CameraMan.Up;
+  end
+  else
+  begin
     Camera.Direction := CameraMan.Direction;
     Camera.Up := CameraMan.Up;
-    CameraInitialized := true;
+    CameraInitialized := True;
   end;
 
   StopProfiler;
@@ -272,16 +295,18 @@ end;
 {----------------------------------------------------------------------------}
 
 procedure DParty.CollectCharacters;
-var c: DPlayerCharacter;
+var
+  c: DPlayerCharacter;
 begin
   StartProfiler;
 
-  for c in Character do begin
+  for c in Character do
+  begin
     c.Position := CameraMan.Position;
     c.Direction := CameraMan.Direction;
   end;
   {$hint collect battle state from char}
-  PlayerInBattle := true;
+  PlayerInBattle := True;
 
   StopProfiler;
 end;
@@ -294,32 +319,35 @@ begin
 
   CameraMan.TeleportTo(aPosition, aDirection);
   CameraMan.ResetUp;
-  CameraMan.Height := PlayerHeight*(CurrentWorld as DAbstractWorld3d).MyScale;
+  CameraMan.Height := PlayerHeight * (CurrentWorld as DAbstractWorld3d).MyScale;
   CameraMan.InternalCamera := Camera;  {maybe, store camera in Controlled Party}
 
   CameraMan.ResetAngles;
 
-  CameraInitialized := false;
+  CameraInitialized := False;
 
   UpdateCamera;
 
   StopProfiler;
 end;
+
 procedure DParty.TeleportTo(const aNav: TNavId);
 begin
   StartProfiler;
 
-  CameraMan.TeleportTo(aNav); //this is redundant, but blocking navNet would be more stable
-  TeleportTo(CurrentWorld.NavToVector3(aNav),Vector3(0,1,0));
+  CameraMan.TeleportTo(aNav);
+  //this is redundant, but blocking navNet would be more stable
+  TeleportTo(CurrentWorld.NavToVector3(aNav), Vector3(0, 1, 0));
 
   StopProfiler;
 end;
+
 procedure DParty.TeleportTo(const aNav: TNavId; const aDirection: TVector3);
 begin
   StartProfiler;
 
   CameraMan.TeleportTo(aNav);
-  TeleportTo(CurrentWorld.NavToVector3(aNav),aDirection);
+  TeleportTo(CurrentWorld.NavToVector3(aNav), aDirection);
 
   StopProfiler;
 end;
@@ -327,19 +355,29 @@ end;
 {----------------------------------------------------------------------------}
 
 procedure DParty.doMove1;
-var MoveVector: TVector3;
-  function Right90(var v: TVector3): TVector3; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+var
+  MoveVector: TVector3;
+
+  function Right90(var v: TVector3): TVector3;
+{$IFDEF SUPPORTS_INLINE}
+  inline;
+{$ENDIF}
   begin
-    Result[0] :=  v[1];
+    Result[0] := v[1];
     Result[1] := -v[0];
-    Result[2] :=  v[2];
+    Result[2] := v[2];
   end;
-  function Left90(var v: TVector3): TVector3; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+
+  function Left90(var v: TVector3): TVector3;
+{$IFDEF SUPPORTS_INLINE}
+  inline;
+{$ENDIF}
   begin
     Result[0] := -v[1];
-    Result[1] :=  v[0];
-    Result[2] :=  v[2];
+    Result[1] := v[0];
+    Result[2] := v[2];
   end;
+
 begin
   StartProfiler;
 
@@ -347,10 +385,14 @@ begin
   MoveVector[2] := 0;
   Acceleration := TVector3.Zero;
 
-  if Player.MovePress[mdForward] then Acceleration += MoveVector;
-  if Player.MovePress[mdBack]    then Acceleration += -MoveVector;
-  if Player.MovePress[mdLeft]    then Acceleration += Left90(MoveVector);
-  if Player.MovePress[mdRight]   then Acceleration += Right90(MoveVector);
+  if Player.MovePress[mdForward] then
+    Acceleration += MoveVector;
+  if Player.MovePress[mdBack] then
+    Acceleration += -MoveVector;
+  if Player.MovePress[mdLeft] then
+    Acceleration += Left90(MoveVector);
+  if Player.MovePress[mdRight] then
+    Acceleration += Right90(MoveVector);
   Acceleration.Normalize;
 
   StopProfiler;
@@ -359,21 +401,29 @@ end;
 {----------------------------------------------------------------------------}
 
 procedure DParty.doMove2;
-var FixedFriction: float;
-  function TryDirection(climb,slide: float): boolean;
-  var NewPosAdjusted, NewPosHeightAdjusted, ProposedDir: TVector3;
+var
+  FixedFriction: float;
+
+  function TryDirection(climb, slide: float): boolean;
+  var
+    NewPosAdjusted, NewPosHeightAdjusted, ProposedDir: TVector3;
   begin
-    NewPosAdjusted := CameraMan.Position + (Speed*DeltaTLocal)*RotatePointAroundAxisRad(slide, MoveSpeed, vector3(0,0,1));
+    NewPosAdjusted := CameraMan.Position + (Speed * DeltaTLocal) *
+      RotatePointAroundAxisRad(slide, MoveSpeed, vector3(0, 0, 1));
     NewPosAdjusted[2] := NewPosAdjusted[2] + climb;
     NewPosHeightAdjusted := NewPosAdjusted;
-    NewPosHeightAdjusted[2] := NewPosHeightAdjusted[2]+CameraMan.Height; {ugly fix for difference in CameraMan height}
-    if Camera.DoMoveAllowed(NewPosHeightAdjusted,ProposedDir,false) then begin
+    NewPosHeightAdjusted[2] := NewPosHeightAdjusted[2] + CameraMan.Height;
+    {ugly fix for difference in CameraMan height}
+    if Camera.DoMoveAllowed(NewPosHeightAdjusted, ProposedDir, False) then
+    begin
       CameraMan.Position := NewPosAdjusted;
-      Result := true;
-    end else
-      Result := false;
+      Result := True;
+    end
+    else
+      Result := False;
 
   end;
+
 begin
   StartProfiler;
 
@@ -382,16 +432,19 @@ begin
   {this is not a correct way to account for friction/innertia, but actually
    it doesn't really matter. We're not driving a car, it just adds some
    softness for movement and, maybe, provides for slippery ice surface}
-  FixedFriction := Friction*DeltaTLocal;
-  if FixedFriction > 1 then FixedFriction := 1;
-  MoveSpeed := (1-FixedFriction)*MoveSpeed+FixedFriction*Acceleration;
-  if not Player.isAccelerating then Acceleration := TVector3.Zero;
+  FixedFriction := Friction * DeltaTLocal;
+  if FixedFriction > 1 then
+    FixedFriction := 1;
+  MoveSpeed := (1 - FixedFriction) * MoveSpeed + FixedFriction * Acceleration;
+  if not Player.isAccelerating then
+    Acceleration := TVector3.Zero;
 
   {todo: extremely ugly wall/stairs sliding algorithm }
-  if not TryDirection(0,0) then
-  if not TryDirection(1,0) then
-  if not TryDirection(0,Pi/2) then
-  if not TryDirection(0,-Pi/2) then ;
+  if not TryDirection(0, 0) then
+    if not TryDirection(1, 0) then
+      if not TryDirection(0, Pi / 2) then
+        if not TryDirection(0, -Pi / 2) then
+  ;
 
   StopProfiler;
 end;
@@ -403,7 +456,7 @@ begin
   StartProfiler;
 
   inherited Create;
-  isPlayer := true;
+  isPlayer := True;
   Faction := ffPlayer;
 
   StopProfiler;
@@ -411,11 +464,11 @@ end;
 
 {----------------------------------------------------------------------------}
 
-Procedure DPlayerCharacter.Die;
+procedure DPlayerCharacter.Die;
 begin
   StartProfiler;
 
-  Log(LogTemp,_CurrentRoutine,'Character has entered clinical death state');
+  Log(LogTemp, _CurrentRoutine, 'Character has entered clinical death state');
 
   StopProfiler;
 end;
@@ -474,8 +527,8 @@ procedure DCameraMan.ResetAngles;
 begin
   StartProfiler;
 
-  Theta := ArcSin(Direction[2]/Direction.Length);
-  Phi := Sign(Direction[1])*ArcCos(Direction[0]/(sqr(Direction[0])+sqr(Direction[1])));
+  Theta := ArcSin(Direction[2] / Direction.Length);
+  Phi := Sign(Direction[1]) * ArcCos(Direction[0] / (sqr(Direction[0]) + sqr(Direction[1])));
   CenterMouseCursor;
 
   StopProfiler;
@@ -488,8 +541,8 @@ begin
   StartProfiler;
 
   //inherited Create;
-  Parties := DPartyList.Create(true);
-  isAccelerating := false;
+  Parties := DPartyList.Create(True);
+  isAccelerating := False;
   CurrentParty := DParty.Create;
   CurrentParty.tmpParty;
   Parties.Add(CurrentParty);
@@ -513,28 +566,40 @@ end;
 {----------------------------------------------------------------------------}
 
 procedure DPlayerControl.InputMouse(const Delta: TVector2);
-var TraverseAxis: TVector3;
-    UpVector,ForwardVector: TVector3;
+var
+  TraverseAxis: TVector3;
+  UpVector, ForwardVector: TVector3;
 begin
   StartProfiler;
 
   begin
     {based on CastleCameras implementation}
-    UpVector := Vector3(0,0,1);
-    ForwardVector := Vector3(1,0,0);
+    UpVector := Vector3(0, 0, 1);
+    ForwardVector := Vector3(1, 0, 0);
     {rotate horizontal}
-    CurrentParty.CameraMan.Phi += -Delta[0]*MouseSensivity;
-    if CurrentParty.CameraMan.Phi> Pi then CurrentParty.CameraMan.Phi -= 2*Pi else
-    if CurrentParty.CameraMan.Phi<-Pi then CurrentParty.CameraMan.Phi += 2*Pi;
-    CurrentParty.CameraMan.Theta += Delta[1]*MouseSensivity;
-    if CurrentParty.CameraMan.Theta> Pi/3 then CurrentParty.CameraMan.Theta :=  Pi/3 else
-    if CurrentParty.CameraMan.Theta<-Pi/3 then CurrentParty.CameraMan.Theta := -Pi/3;
+    CurrentParty.CameraMan.Phi += -Delta[0] * MouseSensivity;
+    if CurrentParty.CameraMan.Phi > Pi then
+      CurrentParty.CameraMan.Phi -= 2 * Pi
+    else
+    if CurrentParty.CameraMan.Phi < -Pi then
+      CurrentParty.CameraMan.Phi += 2 * Pi;
+    CurrentParty.CameraMan.Theta += Delta[1] * MouseSensivity;
+    if CurrentParty.CameraMan.Theta > Pi / 3 then
+      CurrentParty.CameraMan.Theta := Pi / 3
+    else
+    if CurrentParty.CameraMan.Theta < -Pi / 3 then
+      CurrentParty.CameraMan.Theta := -Pi / 3;
 
     CurrentParty.CameraMan.Up := UpVector;
-    CurrentParty.CameraMan.Direction := RotatePointAroundAxisRad(CurrentParty.CameraMan.Phi, ForwardVector, UpVector);
+    CurrentParty.CameraMan.Direction :=
+      RotatePointAroundAxisRad(CurrentParty.CameraMan.Phi, ForwardVector, UpVector);
     TraverseAxis := TVector3.CrossProduct(CurrentParty.CameraMan.Direction, UpVector);
-    CurrentParty.CameraMan.Direction := RotatePointAroundAxisRad(CurrentParty.CameraMan.Theta, CurrentParty.CameraMan.Direction, TraverseAxis);
-    CurrentParty.CameraMan.Up := RotatePointAroundAxisRad(CurrentParty.CameraMan.Theta, CurrentParty.CameraMan.Up, TraverseAxis);
+    CurrentParty.CameraMan.Direction :=
+      RotatePointAroundAxisRad(CurrentParty.CameraMan.Theta,
+      CurrentParty.CameraMan.Direction, TraverseAxis);
+    CurrentParty.CameraMan.Up :=
+      RotatePointAroundAxisRad(CurrentParty.CameraMan.Theta, CurrentParty.CameraMan.Up,
+      TraverseAxis);
   end;
 
   StopProfiler;
@@ -559,22 +624,18 @@ procedure DPlayerControl.InputMove(const MoveDir: TMoveDirection);
 begin
   StartProfiler;
 
-  MovePress[MoveDir] := true;
-  isAccelerating := MovePress[mdForward] or
-                    MovePress[mdBack] or
-                    MovePress[mdLeft] or
-                    MovePress[mdRight];
+  MovePress[MoveDir] := True;
+  isAccelerating := MovePress[mdForward] or MovePress[mdBack] or
+    MovePress[mdLeft] or MovePress[mdRight];
   StopProfiler;
 end;
 
 procedure DPlayerControl.InputRelease(const MoveDir: TMoveDirection);
 begin
   StartProfiler;
-  MovePress[MoveDir] := false;
-  isAccelerating := MovePress[mdForward] or
-                    MovePress[mdBack] or
-                    MovePress[mdLeft] or
-                    MovePress[mdRight];
+  MovePress[MoveDir] := False;
+  isAccelerating := MovePress[mdForward] or MovePress[mdBack] or
+    MovePress[mdLeft] or MovePress[mdRight];
 
   StopProfiler;
 end;
@@ -586,7 +647,7 @@ begin
   StartProfiler;
 
   for I := Low(TMoveDirection) to High(TMoveDirection) do
-    MovePress[I] := false;
+    MovePress[I] := False;
 
   StopProfiler;
 end;
@@ -596,7 +657,7 @@ end;
 procedure DPlayerControl.Stop;
 begin
   StartProfiler;
-  isAccelerating := false;
+  isAccelerating := False;
   StopProfiler;
 end;
 
@@ -619,4 +680,3 @@ begin
 end;
 
 end.
-

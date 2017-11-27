@@ -26,7 +26,7 @@ uses Classes, CastleVectors,
   DecoInterfaceCore, DecoLabels, DecoPlayerCharacter,
   DecoGlobal;
 
-Type
+type
   { GUI container, manages all other GUI elements }
   DInterfaceContainer = class(DInterfaceElement)
   private
@@ -38,15 +38,16 @@ Type
     constructor Create; override;
     destructor Destroy; override;
   public
-    Width,Height: integer;
+    Width, Height: integer;
     Center: TVector2;
     {Initialize and show animated loadscreen}
     procedure LoadScreen;
     {Initialize and show Party interface}
     procedure PartyInterface;
-end;
+  end;
 
-var GUI: DInterfaceContainer;
+var
+  GUI: DInterfaceContainer;
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
@@ -65,10 +66,10 @@ constructor DInterfaceContainer.Create;
 begin
   StartProfiler;
 
-  Log(LogInitInterface,_CurrentRoutine,'Creating interface.');
+  Log(LogInitInterface, _CurrentRoutine, 'Creating interface.');
   inherited Create;
 
-  Base.AnchorToWindow := true;
+  Base.AnchorToWindow := True;
 
   FPSLabel := DFPSLAbel.Create;
 
@@ -81,7 +82,7 @@ destructor DInterfaceContainer.Destroy;
 begin
   StartProfiler;
 
-  Log(LogInitInterface,_CurrentRoutine,'Game over...');
+  Log(LogInitInterface, _CurrentRoutine, 'Game over...');
   { Free special elements that are not freed automatically (are not Children) }
   FreeAndNil(FPSLabel);
   inherited Destroy;
@@ -95,12 +96,13 @@ procedure DInterfaceContainer.Rescale;
 begin
   StartProfiler;
 
-  if (Window.Width = Width) and (Window.Height = Height) then begin
-    Log(LogInterfaceInfo,_CurrentRoutine,'No need in rescale, abort.');
+  if (Window.Width = Width) and (Window.Height = Height) then
+  begin
+    Log(LogInterfaceInfo, _CurrentRoutine, 'No need in rescale, abort.');
     Exit;
   end;
 
-  Log(LogInterfaceInfo,_CurrentRoutine,
+  Log(LogInterfaceInfo, _CurrentRoutine,
     IntToStr(Window.Width) + 'x' + IntToStr(Window.Height));
 
   Width := Window.Width;
@@ -134,7 +136,8 @@ begin
 
   { clear the screen depending on the game mode
     in case SceneManager doesn't clear it }
-  if GameModeNeedsClearingScreen then RenderContext.Clear([cbColor], Black);
+  if GameModeNeedsClearingScreen then
+    RenderContext.Clear([cbColor], Black);
 
   inherited Draw;
 
@@ -161,7 +164,8 @@ end;
 {-----------------------------------------------------------------------------}
 
 procedure DInterfaceContainer.PartyInterface;
-var tmp: DSingleInterfaceElement;
+var
+  tmp: DSingleInterfaceElement;
 begin
   StartProfiler;
 
@@ -191,4 +195,3 @@ begin
 end;
 
 end.
-

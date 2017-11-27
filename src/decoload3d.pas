@@ -26,27 +26,28 @@ interface
 uses X3DNodes, Generics.Collections,
   DecoGlobal;
 
-Type
+type
   TMaterialList = specialize TObjectList<TMaterialNode>;
 
-Type
+type
   { a link for easy acessing the material of EACH model loaded
     at the moment it operates only AmbientIntensity }
   DMaterialContainer = class
-    private
-      fAmbient: float;
-    public
-      { a list of materials }
-      Value: TMaterialList;
-      { used only to "Get" value}
-      property Ambient: float read fAmbient;
-      { set Ambient Intensity for all models }
-      procedure SetAmbientIntensity(const v: float);
-      constructor Create;
-      destructor Destroy; override;
+  private
+    fAmbient: float;
+  public
+    { a list of materials }
+    Value: TMaterialList;
+    { used only to "Get" value}
+    property Ambient: float read fAmbient;
+    { set Ambient Intensity for all models }
+    procedure SetAmbientIntensity(const v: float);
+    constructor Create;
+    destructor Destroy; override;
   end;
 
-var AmbientIntensity: DMaterialContainer;
+var
+  AmbientIntensity: DMaterialContainer;
 
 { adds requested TTexturePropertiesNode and creates corresponding lists}
 function LoadBlenderX3D(const URL: string): TX3DRootNode;
@@ -57,15 +58,17 @@ implementation
 uses SysUtils, {StrUtils,} CastleVectors, X3DLoad,
   DecoLog, Profiler;
 
-var TextureProperties: TTexturePropertiesNode;
+var
+  TextureProperties: TTexturePropertiesNode;
 
 procedure MakeDefaultTextureProperties;
 begin
   StartProfiler;
 
-  {$PUSH}{$WARN 6018 OFF} //hide "unreachable code" warning, it's ok here
+  {$PUSH}{$WARN 6018 OFF}//hide "unreachable code" warning, it's ok here
   {freeandnil?}
-  if AnisotropicSmoothing > 0 then begin
+  if AnisotropicSmoothing > 0 then
+  begin
     TextureProperties := TTexturePropertiesNode.Create;
     TextureProperties.AnisotropicDegree := AnisotropicSmoothing;
     TextureProperties.FdMagnificationFilter.Value := 'DEFAULT';
@@ -73,7 +76,9 @@ begin
 
     {do not free this node automatically! Required for constructor}
     TextureProperties.KeepExisting := 1;
-  end else TextureProperties := nil;
+  end
+  else
+    TextureProperties := nil;
   {$POP}
 
   StopProfiler;
@@ -85,30 +90,37 @@ end;
  attaches texture properties (anisotropic smoothing) to the texture of the object.
  TODO: Normal map still doesn't work. I should fix it one day...}
 procedure AddMaterial(const Root: TX3DRootNode);
+
   procedure ScanNodesRecoursive(const Source: TAbstractX3DGroupingNode);
-  var i: integer;
-      Material: TMaterialNode;
+  var
+    i: integer;
+    Material: TMaterialNode;
   begin
-    for i := 0 to source.FdChildren.Count-1 do
-    if Source.FdChildren[i] is TAbstractX3DGroupingNode then
-      ScanNodesRecoursive(TAbstractX3DGroupingNode(Source.FdChildren[i]))
-    else
+    for i := 0 to Source.FdChildren.Count - 1 do
+      if Source.FdChildren[i] is TAbstractX3DGroupingNode then
+        ScanNodesRecoursive(TAbstractX3DGroupingNode(Source.FdChildren[i]))
+      else
       {NOT FOUND exception is a normal error here, it's processed internally,
        set it to "always ignore this type of exceptions"}
       if (Source.FdChildren[i] is TShapeNode) then
         try
           // assign TextureProperties (anisotropic smoothing) for the imagetexture
           //{$Warning WHY THE TextureProperties keeps automatically released????}
-          (TShapeNode(source.FdChildren[i]).fdAppearance.Value.FindNode(TImageTextureNode,false) as TImageTextureNode).{Fd}TextureProperties{.Value} := TextureProperties{.DeepCopy};
+          (TShapeNode(Source.FdChildren[i]).fdAppearance.Value.FindNode(
+            TImageTextureNode, False) as TImageTextureNode).{Fd}TextureProperties{.Value} :=
+            TextureProperties{.DeepCopy};
           {create a link to each and every material loaded}
-          Material := (TShapeNode(Source.FdChildren[i]).FdAppearance.Value.FindNode(TMaterialNode,false) as TMaterialNode);
+          Material := (TShapeNode(Source.FdChildren[i]).FdAppearance.Value.FindNode(
+            TMaterialNode, False) as TMaterialNode);
           // set material ambient intensity to zero for complete darkness :)
           Material.AmbientIntensity := 0;
           AmbientIntensity.Value.Add(Material);
         except
-          Log(Log3DLoadSoftError,Source.X3DName+'('+Source.ClassName+')'+'>'+_CurrentRoutine,'try..except fired');
+          Log(Log3DLoadSoftError, Source.X3DName + '(' + Source.ClassName +
+            ')' + '>' + _CurrentRoutine, 'try..except fired');
         end;
   end;
+
 begin
   StartProfiler;
 
@@ -123,8 +135,9 @@ function LoadBlenderX3D(const URL: string): TX3DRootNode;
 begin
   StartProfiler;
 
-  Log(LogInitData,_CurrentRoutine,'Reading file '+URL);
-  if TextureProperties = nil then MakeDefaultTextureProperties;
+  Log(LogInitData, _CurrentRoutine, 'Reading file ' + URL);
+  if TextureProperties = nil then
+    MakeDefaultTextureProperties;
   Result := Load3D(URL);
   AddMaterial(Result);
 
@@ -137,11 +150,12 @@ constructor DMaterialContainer.Create;
 begin
   StartProfiler;
 
-  Value := TMaterialList.Create(false);
+  Value := TMaterialList.Create(False);
   fAmbient := 0;
 
   StopProfiler;
 end;
+
 destructor DMaterialContainer.Destroy;
 begin
   StartProfiler;
@@ -151,13 +165,16 @@ begin
 
   StopProfiler;
 end;
+
 procedure DMaterialContainer.SetAmbientIntensity(const v: float);
-var i: TMaterialNode;
+var
+  i: TMaterialNode;
 begin
   StartProfiler;
 
   fAmbient := v;
-  for i in Value do i.AmbientIntensity := v;
+  for i in Value do
+    i.AmbientIntensity := v;
 
   StopProfiler;
 end;
@@ -169,6 +186,4 @@ finalization
   FreeAndNil(TextureProperties); //WATCH OUT FOR SIGSEGVS here!
   FreeAndNil(AmbientIntensity);
 
-
 end.
-

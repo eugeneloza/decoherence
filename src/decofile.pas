@@ -26,27 +26,30 @@ interface
 uses DecoGlobal, CastleFilesUtils,
   DOM, CastleXMLUtils;
 
-type TSimpleMethod = procedure of object;
+type
+  TSimpleMethod = procedure of object;
 
 type
   { the most generic data module }
   DDataModule = class abstract(DObject)
   public
     Parent: TXMLDocument;
-    { }
-    {$IFDEF Constructor}ToGameFolder: boolean;{$ELSE}const ToGameFolder = true;{$ENDIF}
+
+    {$IFDEF Constructor}ToGameFolder: boolean;
+{$ELSE}const
+    ToGameFolder = True;{$ENDIF}
   public
-    { }
+
     isChanged: boolean;
-    { }
+
     function WriteModule: TDOMNode; virtual;
-    { }
+
     procedure ReadModule(const aParent: TDOMElement); virtual;
   {$IFDEF Constructor}
   public
-    { }
+
     procedure ConstructInterface; virtual; abstract;
-    { }
+
     procedure ReadInterface; virtual; abstract;
   {$ENDIF}
   end;
@@ -74,7 +77,7 @@ type
     procedure OpenFile;
     { Closes the file and frees internal stuff }
     procedure CloseFile;
-    { }
+
     procedure ReadBlock(aParent: TDOMElement; ReadContent: TSimpleMethod);
   public
     { Reads header from the file. Must be overriden in children. }
@@ -101,6 +104,7 @@ type
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
+
 uses SysUtils,
   DecoLog, Profiler;
 
@@ -109,15 +113,16 @@ begin
   StartProfiler;
 
   Result := nil;  //to avoid Result not set warning
-  isChanged := false;
+  isChanged := False;
 
   StopProfiler;
 end;
+
 procedure DDataModule.ReadModule(const aParent: TDOMElement);
 begin
   StartProfiler;
 
-  isChanged := false;
+  isChanged := False;
 
   StopProfiler;
 end;
@@ -171,7 +176,7 @@ begin
 
   URLWriteXML(XMLdoc, URL);
   FreeAndNil(XMLdoc);
-  Log(LogConstructorInfo,_CurrentRoutine,'File Written: '+URL);
+  Log(LogConstructorInfo, _CurrentRoutine, 'File Written: ' + URL);
 
   StopProfiler;
 end;
@@ -215,7 +220,7 @@ procedure DFileReader.CloseFile;
 begin
   StartProfiler;
   FreeAndNil(XMLdoc);
-  Log(LogInitInterface,_CurrentRoutine,'File read:'+URL);
+  Log(LogInitInterface, _CurrentRoutine, 'File read:' + URL);
   StopProfiler;
 end;
 
@@ -236,7 +241,8 @@ end;
 {------------------------------------------------------------------------------}
 
 procedure DFileReader.ReadBlock(aParent: TDOMElement; ReadContent: TSimpleMethod);
-var Iterator: TXMLElementIterator;
+var
+  Iterator: TXMLElementIterator;
 begin
   StartProfiler;
 
@@ -252,4 +258,3 @@ begin
 end;
 
 end.
-

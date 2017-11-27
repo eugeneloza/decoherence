@@ -22,25 +22,25 @@ unit DecoInterfaceLoader;
 {$INCLUDE compilerconfig.inc}
 
 interface
+
 uses CastleImages, CastleVectors,
   DecoImages;
 
-
-var HpBarImage, StaBarImage, CncBarImage, MphBarImage: TCastleImage; //todo not freed automatically!!!
-    WindImage1,WindImage2: TCastleImage;
+var
+  HpBarImage, StaBarImage, CncBarImage, MphBarImage: TCastleImage;
+  //todo not freed automatically!!!
+  WindImage1, WindImage2: TCastleImage;
 
   { Just black background with no frame }
   BlackFrame: DRectagonalFrame;
 
   StatBarsFrame: DRectagonalFrame;
 
-  CharacterBar_Top, CharacterBar_Mid, CharacterBar_Bottom,
-  PortraitFrame_Left, PortraitFrame_Right,
-  DecorationFrame1_Left, DecorationFrame1_Right,
-  DecorationFrame2_Left, DecorationFrame2_Right,
-  DecorationFrame2_BottomLeft, DecorationFrame2_BottomRight,
-  DecorationFrame3_Bottom
-                                                         : DRectagonalFrame;
+  CharacterBar_Top, CharacterBar_Mid, CharacterBar_Bottom, PortraitFrame_Left,
+  PortraitFrame_Right, DecorationFrame1_Left, DecorationFrame1_Right,
+  DecorationFrame2_Left, DecorationFrame2_Right, DecorationFrame2_BottomLeft,
+  DecorationFrame2_BottomRight, DecorationFrame3_Bottom
+  : DRectagonalFrame;
   Portrait_img: array of TCastleImage; //todo!!!
   DamageOverlay_Img: TCastleImage;
   { a GL shade color imposed on all interface elements }
@@ -52,6 +52,7 @@ procedure FreeInterface;
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
+
 uses Classes, SysUtils, CastleFilesUtils,
   DecoFont, {$IFDEF BurnerImage}DecoBurner,{$ENDIF}
   DecoGlobal, DecoLog, Profiler;
@@ -59,9 +60,10 @@ uses Classes, SysUtils, CastleFilesUtils,
 {-------------------- INIT INTERFACE ------------------------------------------}
 
 procedure InitInterface;
-var i: integer;
-    s: string;
-    fName: string;
+var
+  i: integer;
+  s: string;
+  fName: string;
 begin
   StartProfiler;
 
@@ -70,62 +72,83 @@ begin
   InitBurnerImage;
   {$ENDIF}
 
-  Log(LogInit,_CurrentRoutine,'Started');
+  Log(LogInit, _CurrentRoutine, 'Started');
 
-  WindImage1 := LoadImage(ApplicationData(WindFolder+'WindClouds1_GIMP.jpg'));
-  WindImage2 := LoadImage(ApplicationData(WindFolder+'WindClouds2_GIMP.jpg'));
+  WindImage1 := LoadImage(ApplicationData(WindFolder + 'WindClouds1_GIMP.jpg'));
+  WindImage2 := LoadImage(ApplicationData(WindFolder + 'WindClouds2_GIMP.jpg'));
 
-  InterfaceColor := Vector4(1,1,1,1);
+  InterfaceColor := Vector4(1, 1, 1, 1);
 
-  BlackFrame := DRectagonalFrame.Create('blackframe.png',0,0,0,1);
+  BlackFrame := DRectagonalFrame.Create('blackframe.png', 0, 0, 0, 1);
 
-  HpBarImage := LoadImage(ApplicationData(ProgressBarFolder+'hp_bar_CC-BY-SA_by_Saito00.png'));
-  StaBarImage := LoadImage(ApplicationData(ProgressBarFolder+'en_bar_CC-BY-SA_by_Saito00.png'));
-  CncBarImage := LoadImage(ApplicationData(ProgressBarFolder+'m_bar_CC-BY-SA_by_Saito00.png'));
-  MphBarImage := LoadImage(ApplicationData(ProgressBarFolder+'mph_bar_CC-BY-SA_by_Saito00.png'));
-  StatBarsFrame := DRectagonalFrame.Create('blackframe.png',0,0,0,1);
+  HpBarImage := LoadImage(ApplicationData(ProgressBarFolder +
+    'hp_bar_CC-BY-SA_by_Saito00.png'));
+  StaBarImage := LoadImage(ApplicationData(ProgressBarFolder +
+    'en_bar_CC-BY-SA_by_Saito00.png'));
+  CncBarImage := LoadImage(ApplicationData(ProgressBarFolder +
+    'm_bar_CC-BY-SA_by_Saito00.png'));
+  MphBarImage := LoadImage(ApplicationData(ProgressBarFolder +
+    'mph_bar_CC-BY-SA_by_Saito00.png'));
+  StatBarsFrame := DRectagonalFrame.Create('blackframe.png', 0, 0, 0, 1);
 
-  DamageOverlay_Img := LoadImage(ApplicationData(DamageFolder+'damageOverlay_CC0_by_EugeneLoza[GIMP].png'));
+  DamageOverlay_Img := LoadImage(ApplicationData(
+    DamageFolder + 'damageOverlay_CC0_by_EugeneLoza[GIMP].png'));
 
-  Setlength(Portrait_Img,20);
-  for i := 0 to Length(Portrait_Img)-1 do begin
-    s := IntToStr(i+1);
-    if i+1<10 then s := '0'+s;
-    fName := PortraitFolder+'UNKNOWN_p'+s+'.jpg';
+  Setlength(Portrait_Img, 20);
+  for i := 0 to Length(Portrait_Img) - 1 do
+  begin
+    s := IntToStr(i + 1);
+    if i + 1 < 10 then
+      s := '0' + s;
+    fName := PortraitFolder + 'UNKNOWN_p' + s + '.jpg';
     try
       Portrait_Img[i] := LoadImage(ApplicationData(fName));
     except
       { If the file does not exist, load the placeholder portrait.
         This is signalled by EFOpenError now, although in the future LoadImage may re-raise
         it as some EImageLoadError descendant. }
-      on EFOpenError do begin
-        Portrait_Img[i] := LoadImage(ApplicationData(PortraitFolder+'placeholder.png'));
-        Log(LogInitError,_CurrentRoutine,'ERROR loading portrait '+fName);
+      on EFOpenError do
+      begin
+        Portrait_Img[i] := LoadImage(ApplicationData(PortraitFolder + 'placeholder.png'));
+        Log(LogInitError, _CurrentRoutine, 'ERROR loading portrait ' + fName);
       end;
-      on EImageLoadError do begin
-        Portrait_Img[i] := LoadImage(ApplicationData(PortraitFolder+'placeholder.png'));
-        Log(LogInitError,_CurrentRoutine,'ERROR loading portrait '+fName);
+      on EImageLoadError do
+      begin
+        Portrait_Img[i] := LoadImage(ApplicationData(PortraitFolder + 'placeholder.png'));
+        Log(LogInitError, _CurrentRoutine, 'ERROR loading portrait ' + fName);
       end;
     end;
   end;
 
 
   {load artwork by Saito00}
-  PortraitFrame_Left := DRectagonalFrame.Create('frameborder_left_CC-BY-SA_by_Saito00.png',4,4,3,4);
-  PortraitFrame_Right := DRectagonalFrame.Create('frameborder_right_CC-BY-SA_by_Saito00.png',4,4,4,3);
-  DecorationFrame1_Left := DRectagonalFrame.Create('frame_1_left_CC-BY-SA_by_Saito00.png',3,23,2,6);
-  DecorationFrame1_Right := DRectagonalFrame.Create('frame_1_right_CC-BY-SA_by_Saito00.png',3,23,6,2);
-  DecorationFrame2_Left := DRectagonalFrame.Create('frame_2_left_CC-BY-SA_by_Saito00.png',6,9,2,6);
-  DecorationFrame2_Right := DRectagonalFrame.Create('frame_2_right_CC-BY-SA_by_Saito00.png',6,9,6,2);
-  DecorationFrame2_Bottomleft := DRectagonalFrame.Create('frame_2_bottomleft_CC-BY-SA_by_Saito00.png',6,2,0,9);
-  DecorationFrame2_Bottomright := DRectagonalFrame.Create('frame_2_bottomright_CC-BY-SA_by_Saito00.png',6,2,9,0);
-  DecorationFrame3_Bottom := DRectagonalFrame.Create('frame_3_bottom_CC-BY-SA_by_Saito00.png',10,10,23,23);
+  PortraitFrame_Left := DRectagonalFrame.Create(
+    'frameborder_left_CC-BY-SA_by_Saito00.png', 4, 4, 3, 4);
+  PortraitFrame_Right := DRectagonalFrame.Create(
+    'frameborder_right_CC-BY-SA_by_Saito00.png', 4, 4, 4, 3);
+  DecorationFrame1_Left := DRectagonalFrame.Create(
+    'frame_1_left_CC-BY-SA_by_Saito00.png', 3, 23, 2, 6);
+  DecorationFrame1_Right := DRectagonalFrame.Create(
+    'frame_1_right_CC-BY-SA_by_Saito00.png', 3, 23, 6, 2);
+  DecorationFrame2_Left := DRectagonalFrame.Create(
+    'frame_2_left_CC-BY-SA_by_Saito00.png', 6, 9, 2, 6);
+  DecorationFrame2_Right := DRectagonalFrame.Create(
+    'frame_2_right_CC-BY-SA_by_Saito00.png', 6, 9, 6, 2);
+  DecorationFrame2_Bottomleft :=
+    DRectagonalFrame.Create('frame_2_bottomleft_CC-BY-SA_by_Saito00.png', 6, 2, 0, 9);
+  DecorationFrame2_Bottomright :=
+    DRectagonalFrame.Create('frame_2_bottomright_CC-BY-SA_by_Saito00.png', 6, 2, 9, 0);
+  DecorationFrame3_Bottom := DRectagonalFrame.Create(
+    'frame_3_bottom_CC-BY-SA_by_Saito00.png', 10, 10, 23, 23);
 
-  Characterbar_Top := DRectagonalFrame.Create('character_bar_top_CC-BY-SA_by_Saito00.png',5,5,4,4);
-  Characterbar_Mid := DRectagonalFrame.Create('character_bar_mid_CC-BY-SA_by_Saito00.png',0,0,4,4);
-  Characterbar_Bottom := DRectagonalFrame.Create('character_bar_bottom_CC-BY-SA_by_Saito00.png',5,5,4,4);
+  Characterbar_Top := DRectagonalFrame.Create(
+    'character_bar_top_CC-BY-SA_by_Saito00.png', 5, 5, 4, 4);
+  Characterbar_Mid := DRectagonalFrame.Create(
+    'character_bar_mid_CC-BY-SA_by_Saito00.png', 0, 0, 4, 4);
+  Characterbar_Bottom := DRectagonalFrame.Create(
+    'character_bar_bottom_CC-BY-SA_by_Saito00.png', 5, 5, 4, 4);
 
-  Log(LogInitInterface,_CurrentRoutine,'finished');
+  Log(LogInitInterface, _CurrentRoutine, 'finished');
 
   StopProfiler;
 end;
@@ -133,11 +156,12 @@ end;
 {----------------------------------------------------------------------------}
 
 procedure FreeInterface;
-var i: integer;
+var
+  i: integer;
 begin
   StartProfiler;
 
-  Log(LogInitInterface,_CurrentRoutine,'Freeing...');
+  Log(LogInitInterface, _CurrentRoutine, 'Freeing...');
   FreeAndNil(WindImage1);
   FreeAndNil(WindImage2);
 
@@ -146,7 +170,7 @@ begin
   FreeAndNil(CncBarImage);
   FreeAndNil(MphBarImage);
   FreeAndNil(DamageOverlay_Img);
-  for i := 0 to Length(Portrait_Img)-1 do
+  for i := 0 to Length(Portrait_Img) - 1 do
     FreeAndNil(Portrait_Img[i]);
   Portrait_Img := nil;
 
@@ -157,4 +181,3 @@ end;
 
 
 end.
-

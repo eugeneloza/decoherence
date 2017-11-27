@@ -36,6 +36,7 @@ unit DecoSound;
 
 {$INCLUDE compilerconfig.inc}
 interface
+
 uses Classes, Generics.Collections,
   CastleSoundEngine, CastleTimeUtils,
   DecoGlobal;
@@ -53,7 +54,7 @@ type
 
 type
   {store and manage music track}
-  DSoundFile = class (DObject)
+  DSoundFile = class(DObject)
   private
     {thread to load the sound file. Auto freed on terminate. Sets isLoaded flag}
     //LoadThread: DSoundLoadThread;
@@ -68,7 +69,7 @@ type
     Duration: TFloatTime;
 
     {if the file is loaded and ready to play}
-    property isLoaded: boolean read fisLoaded default false;
+    property isLoaded: boolean read fisLoaded default False;
     {creates and starts LoadThread. When finished runs LoadFinished}
     procedure Load;
     procedure Load(const URL: string);
@@ -95,12 +96,14 @@ type
     procedure doFade;
   private
     {gain volume 0..1}
-    const fGain = 1; {maybe, global music volume?}
+  const
+    fGain = 1; {maybe, global music volume?}
     {fade out time}
-    const FadeTime = 3; {in seconds}
+  const
+    FadeTime = 3; {in seconds}
   public
     {if the current music is playing at the moment?}
-    property isPlaying: boolean read fisPlaying default false;
+    property isPlaying: boolean read fisPlaying default False;
     {prepare and start the music}
     procedure Start;
     {softly stop the music with a fade-out}
@@ -115,7 +118,8 @@ type
 
 {situation differentiator. Best if assigned to const mysituation = 0.
  situations must start from zero and be sequential. // todo?}
-type TSituation = byte;
+type
+  TSituation = byte;
 
 type
   {describes and manages music intended to have a loop-part [a..b]
@@ -134,10 +138,10 @@ type
 type
   {the most abstract features of the playlist}
   DAbstractPlaylist = class(DObject)
-    public
-      {manage the playlist (loading, start, stop, fade)}
-      procedure Manage; virtual; abstract;
-    end;
+  public
+    {manage the playlist (loading, start, stop, fade)}
+    procedure Manage; virtual; abstract;
+  end;
 
 type
   {abstract music tracks manager}
@@ -156,50 +160,52 @@ type
   {Tracks sequentially change each other with pre-loading and no fading
    also supports occasional silence (silence will never be the first track playing)}
   DSequentialPlaylist = class(DPlayList)
-    protected
-      {tracks of this playlist}
-      Tracks: TTrackList;  {$hint it looks wrong! Only 2 (now playing & fading + there might be >1 fading) tracks are needed at every moment of time}
-      {number of the previous track, stored not to repeat that track again if possible}
-      PreviousTrack: integer;
-    public
-      {(prepare to) load the next random track from the playlist}
-      procedure LoadNext;
-      constructor Create; override;
-      destructor Destroy; override;
-    end;
+  protected
+    {tracks of this playlist}
+    Tracks: TTrackList;
+  {$hint it looks wrong! Only 2 (now playing & fading + there might be >1 fading) tracks are needed at every moment of time}
+    {number of the previous track, stored not to repeat that track again if possible}
+    PreviousTrack: integer;
+  public
+    {(prepare to) load the next random track from the playlist}
+    procedure LoadNext;
+    constructor Create; override;
+    destructor Destroy; override;
+  end;
 
 {"tension" of the current track which determines which of the synchronized
  tracks should be used at this moment.}
-type TTension = single;
+type
+  TTension = single;
 
 type
   {Synchronized playlist for combat.
    Softly changes the synchronized tracks according to current situation.
    BeatList is optional, but recommended that fades will happen on beats change}
   DSyncPlaylist = class(DPlayList)
-    private
-      TensionChanged: boolean;
-      fTension: TTension;
-      procedure SetTension(const Value: TTension);
-      function GetTrack(const NewTension: TTension): integer;
-    protected
+  private
+    TensionChanged: boolean;
+    fTension: TTension;
+    procedure SetTension(const Value: TTension);
+    function GetTrack(const NewTension: TTension): integer;
+  protected
       {list of tracks in the playlist. All the tracks are horizontally synchronized
        and MUST have the same rhythm,
        the melody line should also be blendable.
        On the other hand, playing together with MultiSyncPlaylist in case the
        tension changes only on situation change, then the tracks must only have
        the same beat, and can be unblendable between one another}
-      Tracks: TLoopTrackList;
-    public
+    Tracks: TLoopTrackList;
+  public
       {current music tension. It's a good idea to keep this value in 0..1 range,
        however it's not mandatory}
-      property Tension: TTension read fTension write SetTension;
+    property Tension: TTension read fTension write SetTension;
 
-      procedure Manage; override;
+    procedure Manage; override;
 
-      constructor Create; override;
-      destructor Destroy; override;
-    end;
+    constructor Create; override;
+    destructor Destroy; override;
+  end;
 
 type
   {This is a set of several "vertically synchronized" synchronized playlists
@@ -211,20 +217,20 @@ type
    blend harmony of all the tracks in the playlists, only different possible
    situation changes should blend flawlessly.}
   DMultiSyncPlaylist = class(DAbstractPlaylist)
-    private
-      fSituation: TSituation;
-      SituationChanged: boolean;
-      procedure SetSituation(const Value: TSituation);
-    public
+  private
+    fSituation: TSituation;
+    SituationChanged: boolean;
+    procedure SetSituation(const Value: TSituation);
+  public
       {vertically synchronized synchronized playlists :)
        You have to manage their blendability based on possible situation change,
        e.g. an incoming nuke might happen only on enemy's turn, there's no need
        to blend it with player's turn.}
-      PlayLists: array of DSyncPlaylist;
-      { }
-      property Situation: TSituation read fsituation write setsituation;
-      procedure Manage; override;
-    end;
+    PlayLists: array of DSyncPlaylist;
+
+    property Situation: TSituation read fsituation write setsituation;
+    procedure Manage; override;
+  end;
 
 
 type
@@ -257,6 +263,7 @@ procedure InitMusicManager;
 procedure FreeMusicManager;
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
+
 uses SysUtils, castleFilesUtils,
   CastleVectors,
   //DecoHDD, //used for safe threaded loading of sound buffer
@@ -268,11 +275,12 @@ procedure DSoundLoadThread.Execute;
 begin
   StartProfiler;
 
-   //issue HDD lock
-  (Parent as DSoundFile).Buffer := SoundEngine.LoadBuffer((Parent as DSoundFile).fURL, (Parent as DSoundFile).Duration);
+  //issue HDD lock
+  (Parent as DSoundFile).Buffer :=
+    SoundEngine.LoadBuffer((Parent as DSoundFile).fURL, (Parent as DSoundFile).Duration);
   (Parent as DSoundFile).LoadFinished;
 
-  StopProfiler
+  StopProfiler;
 end;
 
 {============================= DSoundFile ==================================}
@@ -287,6 +295,7 @@ begin
 
   StopProfiler;
 end;
+
 constructor DSoundFile.Create(const URL: string);
 begin
   StartProfiler;
@@ -300,7 +309,7 @@ end;
 
 {---------------------------------------------------------------------------}
 
-procedure DSoundFile.Load(const URL :string);
+procedure DSoundFile.Load(const URL: string);
 begin
   StartProfiler;
 
@@ -309,12 +318,14 @@ begin
 
   StopProfiler;
 end;
+
 procedure DSoundFile.Load;
 begin
   StartProfiler;
 
-  if fURL='' then begin
-    Log(LogSoundError,_CurrentRoutine,'ERROR: No valid URL provided. Exiting...');
+  if fURL = '' then
+  begin
+    Log(LogSoundError, _CurrentRoutine, 'ERROR: No valid URL provided. Exiting...');
     Exit;
   end;
   {if not ThreadLocked then begin
@@ -330,10 +341,11 @@ begin
 
   StopProfiler;
 end;
+
 procedure DSoundFile.LoadFinished;
 begin
   StartProfiler;
-  fisLoaded := true;
+  fisLoaded := True;
   StopProfiler;
 end;
 
@@ -352,13 +364,16 @@ end;
 procedure DMusicTrack.Start;
 begin
   StartProfiler;
-  if not isLoaded then begin
-    Log(LogSoundError,_CurrentRoutine,'ERROR: Music is not loaded!');
+  if not isLoaded then
+  begin
+    Log(LogSoundError, _CurrentRoutine, 'ERROR: Music is not loaded!');
     Exit;
   end;
-  fCurrent := SoundEngine.PlaySound(Self.Buffer, false, fLoop, 10, fGain, 0, 1, TVector3.Zero);
-  if fCurrent = nil then Log(LogSoundError,_CurrentRoutine,'ERROR: Unable to allocate music!');
-  fisPlaying := true;
+  fCurrent := SoundEngine.PlaySound(Self.Buffer, False, fLoop, 10,
+    fGain, 0, 1, TVector3.Zero);
+  if fCurrent = nil then
+    Log(LogSoundError, _CurrentRoutine, 'ERROR: Unable to allocate music!');
+  fisPlaying := True;
   StopProfiler;
 end;
 
@@ -377,7 +392,8 @@ procedure DMusicTrack.Manage;
 begin
   StartProfiler;
   if isPlaying then
-    if FadeStart>0 then doFade;
+    if FadeStart > 0 then
+      doFade;
   StopProfiler;
 end;
 
@@ -390,6 +406,7 @@ begin
   FadeStart := -1;
   StopProfiler;
 end;
+
 constructor DMusicTrack.Create(const URL: string);
 begin
   StartProfiler;
@@ -403,12 +420,15 @@ end;
 procedure DMusicTrack.doFade;
 begin
   StartProfiler;
-  if DecoNow-FadeStart < FadeTime then begin
-    SetGain(1-(decoNow-FadeStart)/FadeTime);
-  end else begin
+  if DecoNow - FadeStart < FadeTime then
+  begin
+    SetGain(1 - (decoNow - FadeStart) / FadeTime);
+  end
+  else
+  begin
     SetGain(0);       //fade to zero
     fCurrent.Release; //stop the music
-    fisPlaying := false;
+    fisPlaying := False;
   end;
   StopProfiler;
 end;
@@ -420,9 +440,11 @@ begin
   StartProfiler;
   if Assigned(fCurrent) and fCurrent.PlayingOrPaused then
     fCurrent.Gain := Value
-  else begin
+  else
+  begin
     //fGain := value;
-    Log(LogSoundError,_CurrentRoutine,'Warning: Setting gain of a non-playing music track...');
+    Log(LogSoundError, _CurrentRoutine,
+      'Warning: Setting gain of a non-playing music track...');
   end;
   StopProfiler;
 end;
@@ -465,14 +487,16 @@ end;}
 {---------------------------------------------------------------------------}
 
 procedure DSequentialPlaylist.LoadNext;
-var NewTrack: integer;
+var
+  NewTrack: integer;
 begin
   StartProfiler;
-  if URLs.Count=1 then PreviousTrack := -1; //if only one track is available, then forget about shuffling
+  if URLs.Count = 1 then
+    PreviousTrack := -1; //if only one track is available, then forget about shuffling
   //shuffle tracks, but don't repeat the previous one
   repeat
     NewTrack := DRND.Random(URLs.Count);
-  until NewTrack<>PreviousTrack;
+  until NewTrack <> PreviousTrack;
   {$hint process silence here}
   //load here
   StopProfiler;
@@ -502,7 +526,8 @@ end;
 procedure DSyncPlaylist.SetTension(const Value: TTension);
 begin
   StartProfiler;
-  if GetTrack(fTension){current track playing}<>GetTrack(Value) then TensionChanged := true;
+  if GetTrack(fTension){current track playing} <> GetTrack(Value) then
+    TensionChanged := True;
   fTension := Value;
   StopProfiler;
 end;
@@ -510,8 +535,9 @@ end;
 {---------------------------------------------------------------------------}
 
 function DSyncPlaylist.GetTrack(const NewTension: TTension): integer;
-var i: integer;
-    TensionDist: single;
+var
+  i: integer;
+  TensionDist: single;
 begin
   StartProfiler;
   TensionDist := 9999; //some arbitrary large value
@@ -519,7 +545,8 @@ begin
   {$WARNING the track may be not loaded yet!}
   //select a track that fits the new tension best //todo: optmize?
   for i := 0 to Tracks.Count do
-    if Abs(Tracks[i].Tension - NewTension) < TensionDist then begin
+    if Abs(Tracks[i].Tension - NewTension) < TensionDist then
+    begin
       TensionDist := Abs(Tracks[i].Tension - NewTension);
       Result := i;
     end;
@@ -531,7 +558,7 @@ end;
 procedure DSyncPlaylist.Manage;
 begin
   StartProfiler;
-  TensionChanged := false;
+  TensionChanged := False;
   StopProfiler;
 end;
 
@@ -560,8 +587,9 @@ end;
 procedure DMultiSyncPlaylist.SetSituation(const Value: TSituation);
 begin
   StartProfiler;
-  if fSituation <> Value then begin
-    SituationChanged := true;
+  if fSituation <> Value then
+  begin
+    SituationChanged := True;
     fSituation := Value;
   end;
   StopProfiler;
@@ -572,7 +600,7 @@ end;
 procedure DMultiSyncPlaylist.Manage;
 begin
   StartProfiler;
-  SituationChanged := false;
+  SituationChanged := False;
   StopProfiler;
 end;
 
@@ -610,7 +638,7 @@ end;
 procedure InitMusicManager;
 begin
   StartProfiler;
-  Log(LogInitSound,_CurrentRoutine,'Creating music manager...');
+  Log(LogInitSound, _CurrentRoutine, 'Creating music manager...');
   Music := DMusicManager.Create;
   StopProfiler;
 end;
@@ -620,7 +648,7 @@ end;
 procedure FreeMusicManager;
 begin
   StartProfiler;
-  Log(LogInitSound,_CurrentRoutine,'Freeing music manager...');
+  Log(LogInitSound, _CurrentRoutine, 'Freeing music manager...');
   FreeAndNil(Music);
   StopProfiler;
 end;
@@ -631,4 +659,3 @@ initialization
 finalization
 }
 end.
-

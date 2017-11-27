@@ -22,6 +22,7 @@ unit DecoStats;
 {$INCLUDE compilerconfig.inc}
 
 interface
+
 uses
   DecoGlobal;
 
@@ -52,6 +53,7 @@ type
   end;
 
 implementation
+
 uses DecoLog, Profiler;
 
 constructor DStats.Create(SetFullStats: boolean);
@@ -60,13 +62,13 @@ begin
   //inherited Create;
 
   if SetFullStats then
-    Count := MaxStats+1
+    Count := MaxStats + 1
   else
-    Count := MaxBaseStats+1;
+    Count := MaxBaseStats + 1;
   SetLength(Value, Count);
 
   StopProfiler;
-End;
+end;
 
 destructor DStats.Destroy;
 begin
@@ -79,4 +81,3 @@ begin
 end;
 
 end.
-

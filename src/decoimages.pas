@@ -26,7 +26,9 @@ uses Classes,
   DecoInterfaceCore, DecoActor,
   DecoGlobal, DecoTime;
 
-const InterfaceScalingMethod: TResizeInterpolation = riBilinear;  //to quickly change it. Maybe will be a variable some day to support older PCs.
+const
+  InterfaceScalingMethod: TResizeInterpolation = riBilinear;
+//to quickly change it. Maybe will be a variable some day to support older PCs.
 
 type
   { General routines shared by images, frames and labels }
@@ -72,8 +74,8 @@ type
     CornerTop, CornerBottom, CornerLeft, CornerRight: integer;
     destructor Destroy; override;
     constructor Create;
-    constructor Create(const FileName: string; const cTop,cBottom,cLeft,CRight: integer);
-    procedure Load(const FileName: string; const cTop,cBottom,cLeft,CRight: integer);
+    constructor Create(const FileName: string; const cTop, cBottom, cLeft, CRight: integer);
+    procedure Load(const FileName: string; const cTop, cBottom, cLeft, CRight: integer);
   end;
 
 type
@@ -121,13 +123,14 @@ type
   DPhasedImage = class abstract(DStaticImage)
   strict protected
     {current phases of the image}
-    Phase, PhaseShift: float; //we need to store PhaseShift for override CyclePhase procedure
+    Phase, PhaseShift: float;
+    //we need to store PhaseShift for override CyclePhase procedure
     procedure CyclePhase; virtual;
   public
     procedure Update; override;
   public
     { 1/seconds to scroll the full screen }
-    PhaseSpeed: float;   
+    PhaseSpeed: float;
     procedure Load(const URL: string); override;
     procedure Load(const CopyImage: TCastleImage); override;
   end;
@@ -142,10 +145,12 @@ type
   public
     { completely overrides the default drawing procedure }
     procedure doDraw; override;
-    constructor Create; Override;
+    constructor Create; override;
   end;
 
-type TImageProcedure = procedure of Object;
+type
+  TImageProcedure = procedure of object;
+
 type
   { A floating image for LoadScreens
     warning: floater images are scaled relative to Window }
@@ -156,10 +161,11 @@ type
     { Call back after one cycle is finished, usually it should call re-loading of the image }
     onCycleFinish: TImageProcedure;
     procedure doDraw; override;
-    constructor Create; Override;
+    constructor Create; override;
   end;
 
-type TBarStyle = (bsVertical, bsHorizontal);
+type
+  TBarStyle = (bsVertical, bsHorizontal);
 
 type
   { Generic bar used for progress bars and health bars }
@@ -185,6 +191,7 @@ type
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
+
 uses SysUtils, Generics.Collections, CastleFilesUtils,
   {$IFDEF BurnerImage}DecoBurner,{$ENDIF} DecoInterfaceLoader, DecoLog, Profiler;
 
@@ -205,9 +212,9 @@ begin
    but should keep an eye on it!}
   FreeAndNil(ScaledImage); //scaledImage is automatically freed by GlImage
 
-  ImageReady := false;
-  ImageLoaded := false;
-  InitGLPending := false;
+  ImageReady := False;
+  ImageLoaded := False;
+  InitGLPending := False;
 
   StopProfiler;
 end;
@@ -218,14 +225,18 @@ procedure DAbstractImage.InitGL;
 begin
   StartProfiler;
 
-  if InitGLPending then begin
-    InitGLPending := false;
-    if ScaledImage<>nil then begin
+  if InitGLPending then
+  begin
+    InitGLPending := False;
+    if ScaledImage <> nil then
+    begin
       FreeAndNil(GLImage);
-      GLImage := TGLImage.Create(ScaledImage,true,true);
+      GLImage := TGLImage.Create(ScaledImage, True, True);
       ScaledImage := nil;
-      ImageReady := true;
-    end else Log(LogInterfaceGLError,_CurrentRoutine,'ERROR: Scaled Image is nil!');
+      ImageReady := True;
+    end
+    else
+      Log(LogInterfaceGLError, _CurrentRoutine, 'ERROR: Scaled Image is nil!');
   end;
 
   StopProfiler;
@@ -238,9 +249,9 @@ begin
   StartProfiler;
 
   inherited Create;
-  InitGLPending := false;
-  ImageReady := false;
-  ImageLoaded := false;
+  InitGLPending := False;
+  ImageReady := False;
+  ImageLoaded := False;
 
   StopProfiler;
 end;
@@ -264,11 +275,13 @@ begin
   StartProfiler;
 
   inherited Update;
-  if GLImage <> nil then begin
+  if GLImage <> nil then
+  begin
     GLImage.Color := InterfaceColor;
     GLImage.Color[3] := Current.Opacity;
-  end else
-    Log(LogInterfaceGLError,_CurrentRoutine,'ERROR: GL image is nil in "update"');
+  end
+  else
+    Log(LogInterfaceGLError, _CurrentRoutine, 'ERROR: GL image is nil in "update"');
 
   StopProfiler;
 end;
@@ -279,7 +292,7 @@ procedure DAbstractImage.doDraw;
 begin
   StartProfiler;
 
-  GLIMage.Draw(Current.x1,Current.y1,Current.w,Current.h);
+  GLIMage.Draw(Current.x1, Current.y1, Current.w, Current.h);
 
   StopProfiler;
 end;
@@ -291,14 +304,18 @@ begin
   StartProfiler;
 
   //inherited Draw; //<------------ here we rewrite the draw sequence completely
-  if not ImageReady then InitGL;
-  if ImageReady then begin
-    if not isVisible then Exit;
+  if not ImageReady then
+    InitGL;
+  if ImageReady then
+  begin
+    if not isVisible then
+      Exit;
     Update; //Caution, Floater image might de-initialize the image in Update>CyclePhase
     {if ImageReady then // checking that in doDraw of Floater Image}
     doDraw;
-  end else
-    Log(LogInterfaceScaleHint,_CurrentRoutine,'Gl image wasn''t initialized properly');
+  end
+  else
+    Log(LogInterfaceScaleHint, _CurrentRoutine, 'Gl image wasn''t initialized properly');
 
   StopProfiler;
 end;
@@ -319,14 +336,18 @@ end;
 
 {----------------------------------------------------------------------------}
 
-type TFrameThrash = specialize TObjectList<DRectagonalFrame>;
-var FrameThrash: TFrameThrash;
+type
+  TFrameThrash = specialize TObjectList<DRectagonalFrame>;
+
+var
+  FrameThrash: TFrameThrash;
 
 constructor DRectagonalFrame.Create;
 begin
   StartProfiler;
 
-  if FrameThrash = nil then FrameThrash := TFrameThrash.Create(true);
+  if FrameThrash = nil then
+    FrameThrash := TFrameThrash.Create(True);
   FrameThrash.Add(Self);
 
   StopProfiler;
@@ -334,23 +355,26 @@ end;
 
 {----------------------------------------------------------------------------}
 
-constructor DRectagonalFrame.Create(const FileName: string; const cTop,cBottom,cLeft,CRight: integer);
+constructor DRectagonalFrame.Create(const FileName: string;
+  const cTop, cBottom, cLeft, CRight: integer);
 begin
   StartProfiler;
 
   Create;
-  Load(FileName, cTop,cBottom,cLeft,CRight);
+  Load(FileName, cTop, cBottom, cLeft, CRight);
 
   StopProfiler;
 end;
 
 {----------------------------------------------------------------------------}
 
-procedure DRectagonalFrame.Load(const FileName: string; const cTop,cBottom,cLeft,CRight: integer);
+procedure DRectagonalFrame.Load(const FileName: string;
+  const cTop, cBottom, cLeft, CRight: integer);
 begin
   StartProfiler;
 
-  FrameImage := LoadImage(ApplicationData(FramesFolder+FileName),[TRGBAlphaImage]) as TRGBAlphaImage;
+  FrameImage := LoadImage(ApplicationData(FramesFolder + FileName), [TRGBAlphaImage]) as
+    TRGBAlphaImage;
   CornerTop := cTop;
   CornerBottom := cBottom;
   CornerLeft := cLeft;
@@ -362,25 +386,28 @@ end;
 {----------------------------------------------------------------------------}
 
 function DFrameImage.RescaleContent: boolean;
-var ScaledImageParts: array [0..2,0..2] of TCastleImage;
-    ix, iy: integer;
-    UnscaledWidth, UnscaledHeight: integer;
-    SourceXs, SourceYs, DestXs, DestYs: TVector4Integer;
+var
+  ScaledImageParts: array [0..2, 0..2] of TCastleImage;
+  ix, iy: integer;
+  UnscaledWidth, UnscaledHeight: integer;
+  SourceXs, SourceYs, DestXs, DestYs: TVector4Integer;
 begin
   StartProfiler;
 
   //inherited; <------ this procedure works completely different
-  if Frame = nil then begin
-    Log(LogInterfaceError,_CurrentRoutine,'Error: Frame is nil!');
+  if Frame = nil then
+  begin
+    Log(LogInterfaceError, _CurrentRoutine, 'Error: Frame is nil!');
     Exit;
   end;
-  Result := true;
+  Result := True;
 
-  ImageReady := false;
+  ImageReady := False;
   FreeAndNil(GLImage);
   FreeAndNil(ScaledImage); //redundant, but let it be here
 
-  SourceImage := Frame.FrameImage.CreateCopy as TRGBAlphaImage; //ugly bugfix! It's actually dangerous to just assign SourceImage to FrameImage
+  SourceImage := Frame.FrameImage.CreateCopy as TRGBAlphaImage;
+  //ugly bugfix! It's actually dangerous to just assign SourceImage to FrameImage
 
   ScaledImage := SourceImage.CreateCopy as TRGBAlphaImage;
 
@@ -388,60 +415,73 @@ begin
   UnscaledHeight := ScaledImage.Height;
 
   {check if minimal frame size is larger than the requested frame size}
-  if Frame.CornerLeft+Frame.CornerRight+1 > Base.w then begin
+  if Frame.CornerLeft + Frame.CornerRight + 1 > Base.w then
+  begin
     {$WARNING not working}
-    Log(LogInterfaceScaleHint,_CurrentRoutine,'Reset backwards base.w = '+IntToStr(Base.w)+' / cornerLeft+cornerRight = '+IntToStr(Frame.CornerLeft+Frame.CornerRight));
+    Log(LogInterfaceScaleHint, _CurrentRoutine, 'Reset backwards base.w = ' +
+      IntToStr(Base.w) + ' / cornerLeft+cornerRight = ' + IntToStr(
+      Frame.CornerLeft + Frame.CornerRight));
     //Base.SetWidth(Frame.CornerLeft+Frame.CornerRight+1);
-    Result := true;
+    Result := True;
   end;
-  if Frame.CornerTop+Frame.CornerBottom+1 > Base.h then begin
+  if Frame.CornerTop + Frame.CornerBottom + 1 > Base.h then
+  begin
     {$WARNING not working}
-    Log(LogInterfaceScaleHint,_CurrentRoutine,'Reset backwards base.h = '+IntToStr(Base.h)+' / cornerTop+cornerBottom = '+inttostr(Frame.CornerTop+Frame.CornerBottom));
+    Log(LogInterfaceScaleHint, _CurrentRoutine, 'Reset backwards base.h = ' +
+      IntToStr(Base.h) + ' / cornerTop+cornerBottom = ' + IntToStr(
+      Frame.CornerTop + Frame.CornerBottom));
     //Base.SetHeight(Frame.CornerTop+Frame.CornerBottom+1);
-    Result := true;
+    Result := True;
   end;
 
   SourceXs[0] := 0;
   SourceXs[1] := Frame.CornerLeft;
-  SourceXs[2] := UnscaledWidth-Frame.CornerRight;
+  SourceXs[2] := UnscaledWidth - Frame.CornerRight;
   SourceXs[3] := UnscaledWidth;
   SourceYs[0] := 0;
   SourceYs[1] := Frame.cornerBottom;
-  SourceYs[2] := UnscaledHeight-Frame.CornerTop;
+  SourceYs[2] := UnscaledHeight - Frame.CornerTop;
   SourceYs[3] := UnscaledHeight;
   DestXs[0] := 0;
   DestXs[1] := Frame.CornerLeft;
-  DestXs[2] := Base.w-Frame.CornerRight;
+  DestXs[2] := Base.w - Frame.CornerRight;
   DestXs[3] := Base.w;
   DestYs[0] := 0;
   DestYs[1] := Frame.CornerBottom;
-  DestYs[2] := Base.h-Frame.CornerTop;
+  DestYs[2] := Base.h - Frame.CornerTop;
   DestYs[3] := Base.h;
 
   for ix := 0 to 2 do
-   for iy := 0 to 2 do begin
-     ScaledImageParts[ix,iy] := TRGBAlphaImage.Create;
-     ScaledImageParts[ix,iy].SetSize(SourceXs[ix+1]-SourceXs[ix],SourceYs[iy+1]-SourceYs[iy]);
-     ScaledImageParts[ix,iy].Clear(Vector4Byte(0,0,0,0));
-     ScaledImageParts[ix,iy].DrawFrom(SourceImage,0,0,SourceXs[ix],SourceYs[iy],SourceXs[ix+1]-SourceXs[ix],SourceYs[iy+1]-SourceYs[iy],dmBlendSmart);
-     ScaledImageParts[ix,iy].Resize(DestXs[ix+1]-DestXs[ix],DestYs[iy+1]-DestYs[iy],riNearest);
-   end;
+    for iy := 0 to 2 do
+    begin
+      ScaledImageParts[ix, iy] := TRGBAlphaImage.Create;
+      ScaledImageParts[ix, iy].SetSize(SourceXs[ix + 1] - SourceXs[ix],
+        SourceYs[iy + 1] - SourceYs[iy]);
+      ScaledImageParts[ix, iy].Clear(Vector4Byte(0, 0, 0, 0));
+      ScaledImageParts[ix, iy].DrawFrom(SourceImage, 0, 0, SourceXs[ix],
+        SourceYs[iy], SourceXs[ix + 1] - SourceXs[ix], SourceYs[iy + 1] - SourceYs[iy], dmBlendSmart);
+      ScaledImageParts[ix, iy].Resize(DestXs[ix + 1] - DestXs[ix], DestYs[iy + 1] -
+        DestYs[iy], riNearest);
+    end;
 
-  ScaledImage.SetSize(Base.w,Base.h,1);
-  ScaledImage.Clear(Vector4byte(0,0,0,0));
+  ScaledImage.SetSize(Base.w, Base.h, 1);
+  ScaledImage.Clear(Vector4byte(0, 0, 0, 0));
   for ix := 0 to 2 do
-    for iy := 0 to 2 do ScaledImage.DrawFrom(ScaledImageParts[ix,iy],DestXs[ix],DestYs[iy],0,0,DestXs[ix+1]-DestXs[ix],DestYs[iy+1]-DestYs[iy],dmBlendSmart);
+    for iy := 0 to 2 do
+      ScaledImage.DrawFrom(ScaledImageParts[ix, iy], DestXs[ix], DestYs[iy],
+        0, 0, DestXs[ix + 1] - DestXs[ix], DestYs[iy + 1] - DestYs[iy], dmBlendSmart);
 
   {$IFDEF BurnerImage}
-  Burn(ScaledImage,Base);
+  Burn(ScaledImage, Base);
   {$ENDIF}
 
   for ix := 0 to 2 do
-    for iy := 0 to 2 do FreeAndNil(ScaledImageParts[ix,iy]);
+    for iy := 0 to 2 do
+      FreeAndNil(ScaledImageParts[ix, iy]);
 
   FreeAndNil(SourceImage); //ugly bugfix!
 
-  InitGLPending := true;
+  InitGLPending := True;
 
   StopProfiler;
 end;
@@ -452,23 +492,28 @@ procedure DFrameAnchorHelper.AnchorToFrame(const aFrame: DFrameImage);
 begin
   StartProfiler;
 
-  if aFrame = nil then begin
-    Log(LogInterfaceError,_CurrentRoutine,'ERROR: Frame is nil!');
+  if aFrame = nil then
+  begin
+    Log(LogInterfaceError, _CurrentRoutine, 'ERROR: Frame is nil!');
     Exit;
   end;
   Base.AnchorTo(aFrame.Base);
-  if aFrame.Frame <> nil then begin
+  if aFrame.Frame <> nil then
+  begin
     Base.Anchor[asLeft].Gap := aFrame.Frame.CornerLeft;
     Base.Anchor[asRight].Gap := aFrame.Frame.CornerRight;
     Base.Anchor[asTop].Gap := aFrame.Frame.CornerTop;
     Base.Anchor[asBottom].Gap := aFrame.Frame.CornerBottom;
-  end else begin
-    Log(LogInterfaceError,_CurrentRoutine,'ERROR: Frame image is nil! Assuming zero gaps');
+  end
+  else
+  begin
+    Log(LogInterfaceError, _CurrentRoutine,
+      'ERROR: Frame image is nil! Assuming zero gaps');
     Base.Anchor[asLeft].Gap := 0;
     Base.Anchor[asRight].Gap := 0;
     Base.Anchor[asTop].Gap := 0;
     Base.Anchor[asBottom].Gap := 0;
-   end;
+  end;
 
   StopProfiler;
 end;
@@ -482,25 +527,30 @@ begin
   StartProfiler;
 
   {$IFNDEF AllowRescale}
-  If SourceImage = nil then begin
-   Log(LogInterfaceSceleError,_CurrentRoutine,'Source Image is nil!');
-   Exit;
+  if SourceImage = nil then
+  begin
+    Log(LogInterfaceSceleError, _CurrentRoutine, 'Source Image is nil!');
+    Exit;
   end;
   {$ENDIF}
-  if ImageLoaded then begin
-   if Base.isInitialized then begin
-     ImageReady := false;
-     FreeAndNil(GLImage);
-     FreeAndNil(ScaledImage); //redundant, but let it be here
-     ScaledImage := SourceImage.CreateCopy as TCastleImage;
-     {$IFNDEF AllowRescale}FreeAndNil(SourceImage);{$ENDIF}
-     ScaledImage.Resize(Base.w,Base.h,InterfaceScalingMethod);
-     InitGLPending := true;
-   end
-   else
-     Log(LogInterfaceScaleError,_CurrentRoutine,'ERROR: Base.Initialized = false');
+  if ImageLoaded then
+  begin
+    if Base.isInitialized then
+    begin
+      ImageReady := False;
+      FreeAndNil(GLImage);
+      FreeAndNil(ScaledImage); //redundant, but let it be here
+      ScaledImage := SourceImage.CreateCopy as TCastleImage;
+     {$IFNDEF AllowRescale}
+      FreeAndNil(SourceImage);
+{$ENDIF}
+      ScaledImage.Resize(Base.w, Base.h, InterfaceScalingMethod);
+      InitGLPending := True;
+    end
+    else
+      Log(LogInterfaceScaleError, _CurrentRoutine, 'ERROR: Base.Initialized = false');
   end;
-  Result := false;
+  Result := False;
 
   StopProfiler;
 end;
@@ -515,44 +565,48 @@ begin
   StartProfiler;
 
   FreeImage;
-  Log(LogInitInterface,_CurrentRoutine,URL);
+  Log(LogInitInterface, _CurrentRoutine, URL);
   SourceImage := LoadImage(URL);
   AfterLoad;
   Rescale;
 
   StopProfiler;
 end;
+
 procedure DStaticImage.Load(const CopyImage: TCastleImage);
 begin
   StartProfiler;
 
   FreeImage;
-  Log(LogInitInterface,_CurrentRoutine,'Copying image from '+CopyImage.ClassName);
+  Log(LogInitInterface, _CurrentRoutine, 'Copying image from ' + CopyImage.ClassName);
   SourceImage := CopyImage.MakeCopy;
   AfterLoad;
   Rescale;
 
   StopProfiler;
 end;
+
 procedure DStaticImage.AfterLoad;
 begin
   StartProfiler;
 
   try
-    if (SourceImage = nil) or (SourceImage.IsEmpty) then raise Exception.Create('Image is not loaded!');
+    if (SourceImage = nil) or (SourceImage.IsEmpty) then
+      raise Exception.Create('Image is not loaded!');
     Base.RealWidth := SourceImage.Width;
     Base.RealHeight := SourceImage.Height;
   except
     on E: Exception do
     begin
-      Log(LogInitError,_CurrentRoutine,'FATAL: Image has been freed before load completed. ABORT. '{+E.Message});
+      Log(LogInitError, _CurrentRoutine,
+        'FATAL: Image has been freed before load completed. ABORT. '{+E.Message});
       FreeImage;
       Exit;
     end;
   end;
 
-  ImageLoaded := true;
-  ImageReady := false;
+  ImageLoaded := True;
+  ImageReady := False;
 
   StopProfiler;
 end;
@@ -561,7 +615,7 @@ end;
 {======================== phased image =======================================}
 {=============================================================================}
 
-procedure DPhasedImage.Load(const URL:string);
+procedure DPhasedImage.Load(const URL: string);
 begin
   StartProfiler;
 
@@ -570,6 +624,7 @@ begin
 
   StopProfiler;
 end;
+
 procedure DPhasedImage.Load(const CopyImage: TCastleImage);
 begin
   StartProfiler;
@@ -586,8 +641,8 @@ procedure DPhasedImage.CyclePhase;
 begin
   StartProfiler;
 
-  PhaseShift := DeltaT*PhaseSpeed;
-  Phase += PhaseShift*(1+0.1*DRND.Random);
+  PhaseShift := DeltaT * PhaseSpeed;
+  Phase += PhaseShift * (1 + 0.1 * DRND.Random);
 
   StopProfiler;
 end;
@@ -613,8 +668,8 @@ begin
   StartProfiler;
 
   inherited Create;
-  Base.AnchorToWindow := true;
-  SetBaseSize(0,0,1,1,0.1);
+  Base.AnchorToWindow := True;
+  SetBaseSize(0, 0, 1, 1, 0.1);
 
   StopProfiler;
 end;
@@ -626,11 +681,14 @@ begin
   StartProfiler;
 
   inherited CyclePhase;
-  if Phase > 1 then Phase -= 1;
-  OpacityPhase += PhaseShift/2*(1+0.2*DRND.Random);
-  if OpacityPhase>1 then OpacityPhase -= 1;
+  if Phase > 1 then
+    Phase -= 1;
+  OpacityPhase += PhaseShift / 2 * (1 + 0.2 * DRND.Random);
+  if OpacityPhase > 1 then
+    OpacityPhase -= 1;
 
-  if PhaseShift > 0.5 then begin
+  if PhaseShift > 0.5 then
+  begin
     //if pause was too long reinitialize with random phases.
     Phase := DRND.Random;
     OpacityPhase := DRND.Random;
@@ -642,25 +700,26 @@ end;
 {----------------------------------------------------------------------------}
 
 procedure DWindImage.doDraw;
-var PhaseScaled:integer;
+var
+  PhaseScaled: integer;
 begin
   StartProfiler;
 
   //inherited <---------- this render is different
-  GLImage.Color[3] := Current.Opacity + Current.Opacity/4 * Sin(2*Pi*OpacityPhase);
+  GLImage.Color[3] := Current.Opacity + Current.Opacity / 4 * Sin(2 * Pi * OpacityPhase);
 
-  PhaseScaled := Round((1-Phase)*Window.Width);
+  PhaseScaled := Round((1 - Phase) * Window.Width);
 
   //draw first part of the image
-  GLImage.Draw(PhaseScaled,0,
-               Window.Width-PhaseScaled,Window.Height,
-               0,0,
-               Window.Width-PhaseScaled,Window.Height);
+  GLImage.Draw(PhaseScaled, 0,
+    Window.Width - PhaseScaled, Window.Height,
+    0, 0,
+    Window.Width - PhaseScaled, Window.Height);
   //draw second part of the image
-  GLImage.Draw(0,0,
-               PhaseScaled,Window.Height,
-               Window.Width-PhaseScaled,0,
-               PhaseScaled,Window.Height);
+  GLImage.Draw(0, 0,
+    PhaseScaled, Window.Height,
+    Window.Width - PhaseScaled, 0,
+    PhaseScaled, Window.Height);
 
   StopProfiler;
 end;
@@ -674,7 +733,7 @@ begin
   StartProfiler;
 
   inherited Create;
-  Base.AnchorToWindow := true;
+  Base.AnchorToWindow := True;
   Base.ProportionalScale := psWidth;
   PhaseSpeed := 0.1;
 
@@ -688,10 +747,12 @@ begin
   StartProfiler;
 
   inherited CyclePhase;
-  if Phase > 1 then begin
+  if Phase > 1 then
+  begin
     Phase := 1;
-    ImageLoaded := false;
-    if Assigned(onCycleFinish) then onCycleFinish;
+    ImageLoaded := False;
+    if Assigned(onCycleFinish) then
+      onCycleFinish;
   end;
 
   StopProfiler;
@@ -700,16 +761,18 @@ end;
 {----------------------------------------------------------------------------}
 
 procedure DFloatImage.doDraw;
-var x: integer;
+var
+  x: integer;
 begin
   StartProfiler;
 
   //inherited <---------- this render is different
-  if not ImageReady then Exit; //image has been reloaded! //BUG
+  if not ImageReady then
+    Exit; //image has been reloaded! //BUG
 
-  GLImage.Color[3] := Current.Opacity*Sin(Pi*Phase);
-  x := Round((Window.Width-Base.w)*Phase);
-  GLImage.Draw(x,0);
+  GLImage.Color[3] := Current.Opacity * Sin(Pi * Phase);
+  x := Round((Window.Width - Base.w) * Phase);
+  GLImage.Draw(x, 0);
 
   StopProfiler;
 end;
@@ -719,21 +782,26 @@ end;
 {=============================================================================}
 
 procedure DBarImage.doDraw;
-var xx: integer;
+var
+  xx: integer;
 begin
   StartProfiler;
 
   //inherited <---------- this render is different
-  if Max = Min then begin
-    Log(LogInterfaceError,_CurrentRoutine,'ERROR: Division by zero!');
+  if Max = Min then
+  begin
+    Log(LogInterfaceError, _CurrentRoutine, 'ERROR: Division by zero!');
     Exit;
   end;
-  if Kind = bsVertical then begin
-    xx := Round(Base.h * Position/(Max-Min));
-    GLImage.Draw(Base.x1,Base.y1,Base.w,xx);
-  end else begin
-    xx := Round(Base.w * Position/(Max-Min));
-    GLImage.Draw(Base.x1,Base.y1,xx,Base.h);
+  if Kind = bsVertical then
+  begin
+    xx := Round(Base.h * Position / (Max - Min));
+    GLImage.Draw(Base.x1, Base.y1, Base.w, xx);
+  end
+  else
+  begin
+    xx := Round(Base.w * Position / (Max - Min));
+    GLImage.Draw(Base.x1, Base.y1, xx, Base.h);
   end;
 
   StopProfiler;
@@ -757,14 +825,23 @@ end;
 {================ Stat Bar image =========================================}
 
 procedure DStatBarImage.Update;
-  function AboveZero(const a: float): float; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+
+  function AboveZero(const a: float): float;
+{$IFDEF SUPPORTS_INLINE}
+  inline;
+{$ENDIF}
   begin
-    if a > 0 then Result := a else Result := 0;
+    if a > 0 then
+      Result := a
+    else
+      Result := 0;
   end;
+
 begin
   StartProfiler;
 
-  if Target = nil then Exit; //don't waste time if target isn't present
+  if Target = nil then
+    Exit; //don't waste time if target isn't present
   inherited Update;
 
   Min := 0;
@@ -776,7 +853,6 @@ begin
 end;
 
 finalization
-FreeAndNil(FrameThrash);
+  FreeAndNil(FrameThrash);
 
 end.
-

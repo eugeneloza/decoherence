@@ -54,7 +54,8 @@ begin
   case Lang of
     Language_English: Result := 'ENG/';
     Language_Russian: Result := 'RUS/';
-    else raise Exception.Create('Unknown Language in DecoTranslation.LanguageDir!');
+    else
+      raise Exception.Create('Unknown Language in DecoTranslation.LanguageDir!');
   end;
   Result := GetScenarioFolder + TextFolder + Result;
 
@@ -70,7 +71,8 @@ begin
   case Lang of
     Language_English: Result := 'English';
     Language_Russian: Result := 'Russian';
-    else              Result := 'Unknown Language';
+    else
+      Result := 'Unknown Language';
   end;
 
   StopProfiler;
@@ -89,13 +91,14 @@ begin
   case CurrentLanguage of
     Language_English: Theme.Images[tiLoading] := Loading_eng;
     Language_Russian: Theme.Images[tiLoading] := Loading_rus;
-    else              Theme.Images[tiLoading] := Loading_eng; //we don't have Log initialized here yet. So, don't report this error, just fall back to English.
+    else
+      Theme.Images[tiLoading] := Loading_eng;
+      //we don't have Log initialized here yet. So, don't report this error, just fall back to English.
   end;
 
-  Theme.OwnsImages[tiLoading] := false;
+  Theme.OwnsImages[tiLoading] := False;
 
   StopProfiler;
 end;
 
 end.
-

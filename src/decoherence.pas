@@ -17,6 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 
 { Core file of the game }
 unit Decoherence;
+
 {$INCLUDE compilerconfig.inc}
 
 interface
@@ -25,30 +26,26 @@ interface
 implementation
 
 uses Classes, SysUtils,
-     CastleWindow, {CastleWindowTouch,} CastleKeysMouse,
+  CastleWindow, {CastleWindowTouch,} CastleKeysMouse,
+  CastleScene,
+  DecoThrash,
 
-     CastleScene,
+  {---- temporary units (for testing) -----}
+  DecoSound,
+  DecoContext,
+  DecoFile,
+  DecoPerks,
+  DecoActorBody,
+  DecoLoad3d,
+  DecoNavigation, {should be in DecoPlayerCharacter}
+  DecoLoadScreen, {should be in DecoInterfaceLoader}
+  {---- end temporary units here ----------}
 
-     DecoThrash,
-
-     {---- temporary units (for testing) -----}
-     DecoSound,
-     DecoContext,
-     DecoFile,
-     DecoPerks,
-     DecoActorBody,
-     DecoLoad3d,
-     DecoNavigation, {should be in DecoPlayerCharacter}
-     DecoLoadScreen, {should be in DecoInterfaceLoader}
-     {---- end temporary units here ----------}
-
-     DecoGui,
-     DecoLevel, DecoAbstractWorld,
-
-     DecoInterfaceLoader,
-     DecoPlayerCharacter, DecoInput,
-
-     DecoGlobal, DecoTranslation, DecoGamemode, DecoTime, DecoLog, Profiler;
+  DecoGui,
+  DecoLevel, DecoAbstractWorld,
+  DecoInterfaceLoader,
+  DecoPlayerCharacter, DecoInput,
+  DecoGlobal, DecoTranslation, DecoGamemode, DecoTime, DecoLog, Profiler;
 
 {==========================================================================}
 
@@ -61,15 +58,19 @@ begin
 
   doTime; {advance time for this frame}
 
-  if Player <> nil then begin
+  if Player <> nil then
+  begin
     Player.Manage;
-    if CurrentWorld <> nil then CurrentWorld.Manage(Camera.Position);
+    if CurrentWorld <> nil then
+      CurrentWorld.Manage(Camera.Position);
   end;
 
-  if Music <> nil then Music.Manage;
+  if Music <> nil then
+    Music.Manage;
 
   StopProfiler;
 end;
+
 {$POP}
 
 {==========================================================================}
@@ -86,6 +87,7 @@ begin
 
   StopProfiler;
 end;
+
 {$POP}
 {$ENDIF}
 
@@ -102,6 +104,7 @@ begin
 
   StopProfiler;
 end;
+
 {$POP}
 
 {======================== Mouse & keyboard =================================}
@@ -115,30 +118,33 @@ begin
   if Event.EventType = itMouseButton then
     doMousePress(Event)
   else
-  if Event.EventType = itKey then begin
+  if Event.EventType = itKey then
+  begin
     {some generic buttons here}
     case Event.key of
-       K_P,K_PrintScreen:                //k_printscreen doesn't work in x-window system if assigned to some external program like scrot
-                         Window.SaveScreen('deco_'+NiceDate+'.jpg');
-       K_r: Player.CurrentParty.Rest;
-       k_i: if AmbientIntensity.Ambient = 0 then
-               AmbientIntensity.SetAmbientIntensity(3)
-            else
-               AmbientIntensity.SetAmbientIntensity(0);
+      K_P, K_PrintScreen:
+        //k_printscreen doesn't work in x-window system if assigned to some external program like scrot
+        Window.SaveScreen('deco_' + NiceDate + '.jpg');
+      K_r: Player.CurrentParty.Rest;
+      k_i: if AmbientIntensity.Ambient = 0 then
+          AmbientIntensity.SetAmbientIntensity(3)
+        else
+          AmbientIntensity.SetAmbientIntensity(0);
        {k_1: shaders.WhichChoice := 0;
        k_2: shaders.WhichChoice := 1;
        k_3: shaders.WhichChoice := 2;}
 
     end;
 
-    if (CurrentGameMode=gmTravel) and (Player<>nil) then
+    if (CurrentGameMode = gmTravel) and (Player <> nil) then
       doKeyboardPress(Event.Key);
   end;
-//  SetGameMode(gmCharacterGeneration);
+  //  SetGameMode(gmCharacterGeneration);
   InitTestLevel;                         //ugly! I'll fix this soon.
 
   StopProfiler;
 end;
+
 {$POP}
 
 {--------------------------------------------------------------------------}
@@ -156,6 +162,7 @@ begin
 
   StopProfiler;
 end;
+
 {$POP}
 
 {--------------------------------------------------------------------------}
@@ -169,6 +176,7 @@ begin
 
   StopProfiler;
 end;
+
 {$POP}
 
 {======================= initialization routines ==============================}
@@ -190,7 +198,7 @@ begin
   Window.onRelease := @doRelease;
   Window.onMotion := @doMotion;
 
-  LoadCompleted := true;
+  LoadCompleted := True;
 
   StopProfiler;
 end;
@@ -200,12 +208,12 @@ begin
   StartProfiler;
 
   InitLog;
-  Log(LogInit,_CurrentRoutine,'Init');
+  Log(LogInit, _CurrentRoutine, 'Init');
 
   //Application.LimitFPS := 60;
 
   //create GUI
-  Log(LogInit,_CurrentRoutine,'Create interface');
+  Log(LogInit, _CurrentRoutine, 'Create interface');
   //fLog(true,BackTraceStrFunc(Get_Frame),'');
   InitInterface;
   InitLoadScreen;
@@ -214,13 +222,15 @@ begin
 
   GUI.LoadScreen;
 
-  Log(LogInit,_CurrentRoutine,'Initialize interface');
+  Log(LogInit, _CurrentRoutine, 'Initialize interface');
 
   //finally we're ready to show game loading screen
-  {$IFDEF AllowRescale}Window.onResize := @GuiResize;{$ENDIF}
+  {$IFDEF AllowRescale}
+  Window.onResize := @GuiResize;
+{$ENDIF}
   Window.onRender := @GuiRender;
 
-  Log(LogInit,_CurrentRoutine,'Init finished');
+  Log(LogInit, _CurrentRoutine, 'Init finished');
 
   LoadAndInitData;
 
@@ -231,38 +241,40 @@ end;
 
 function MyGetApplicationName: string;
 begin
-  Result  :=  'Decoherence 1';
+  Result := 'Decoherence 1';
 end;
 
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
-Initialization
+initialization
   StartProfiler;
 
-  OnGetApplicationName  :=  @MyGetApplicationName;
+  OnGetApplicationName := @MyGetApplicationName;
 
   SetLoadingImage;
 
   Window := TCastleWindow.Create(Application);
 
-  Window.DoubleBuffer := true;
+  Window.DoubleBuffer := True;
 
-  {$IFNDEF AllowRescale}window.ResizeAllowed := raOnlyAtOpen;{$ENDIF}
+  {$IFNDEF AllowRescale}
+  window.ResizeAllowed := raOnlyAtOpen;
+{$ENDIF}
   {$IFDEF Fullscreen}
-    Window.FullScreen := true;
+  Window.FullScreen := True;
   {$ELSE}
-    Window.Width := 1024;
-    Window.Height := 600;
+  Window.Width := 1024;
+  Window.Height := 600;
   {$ENDIF}
 
-  Application.MainWindow  :=  Window;
-  Application.OnInitialize  :=  @ApplicationInitialize;
+  Application.MainWindow := Window;
+  Application.OnInitialize := @ApplicationInitialize;
 
   StopProfiler;
 
-Finalization
+finalization
   StartProfiler;
 
-  Log(LogInit,_CurrentRoutine,'Going down...');
+  Log(LogInit, _CurrentRoutine, 'Going down...');
   { free all assigned memory }
   FreeAndNil(GUI);
 
@@ -275,8 +287,7 @@ Finalization
   FreeCreatures;
   FreeInterface;
   //FreeTextureProperties;
-  Log(LogInit,_CurrentRoutine,'Bye...');
+  Log(LogInit, _CurrentRoutine, 'Bye...');
 
   StopProfiler;
 end.
-

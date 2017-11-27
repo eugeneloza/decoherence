@@ -47,7 +47,8 @@ type
     //Requirements for research
     constructor Create; virtual;//override;
     destructor Destroy; override;
-end;
+  end;
+
 (*
 Type
   {Active perk must be chosen to take effect and it's availability depends
@@ -76,22 +77,26 @@ Type
 
 
 {list of perks}
-type DPerksList = specialize TObjectList<DPerk>;
+type
+  DPerksList = specialize TObjectList<DPerk>;
 
-type DMultiPerk = class(DPerk)
-  Children: DPerksList;
-  constructor Create; override;
-  destructor Destroy; override;
-end;
+type
+  DMultiPerk = class(DPerk)
+    Children: DPerksList;
+    constructor Create; override;
+    destructor Destroy; override;
+  end;
 
-    {lists all perks possible ingame}
-var Perks: DPerksList;
+{lists all perks possible ingame}
+var
+  Perks: DPerksList;
 
 {loads perks data and images}
 procedure InitPerks;
 procedure FreePerks;
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
-Implementation
+implementation
+
 uses SysUtils, DecoLog, Profiler;
 
 constructor DPerk.Create;
@@ -142,13 +147,14 @@ end;
 {============================================================================}
 
 procedure InitPerks;
-var TmpPerk: DPerk;
+var
+  TmpPerk: DPerk;
 begin
   StartProfiler;
 
-  Log(LogInitCharacters,_CurrentRoutine,'Loading perks...');
-  Perks := DPerksList.create(true);
-  TmpPerk := DPerk.create;
+  Log(LogInitCharacters, _CurrentRoutine, 'Loading perks...');
+  Perks := DPerksList.Create(True);
+  TmpPerk := DPerk.Create;
   //TmpPerk.image.LoadThread(PerksFolder+'crossed-swords.png');
   Perks.add(TmpPerk);
 
@@ -161,11 +167,10 @@ procedure FreePerks;
 begin
   StartProfiler;
 
-  Log(LogInitCharacters,_CurrentRoutine,'Freeing perks...');
+  Log(LogInitCharacters, _CurrentRoutine, 'Freeing perks...');
   FreeAndNil(Perks);
 
   StopProfiler;
 end;
 
 end.
-

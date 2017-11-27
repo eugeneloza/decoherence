@@ -21,6 +21,7 @@ unit DecoRaceProfession;
 {$INCLUDE compilerconfig.inc}
 
 interface
+
 uses Classes, DecoPerks, DecoStats,
   DecoGlobal;
 
@@ -43,8 +44,9 @@ type
     destructor Destroy; override;
   end;
 
-  { make them generic lists }
-var Races, Professions: array of DRaceProfession;
+{ make them generic lists }
+var
+  Races, Professions: array of DRaceProfession;
 
 {Loads data for all in-game races and Professions}
 procedure LoadRaceProfessionData;
@@ -52,36 +54,44 @@ procedure LoadRaceProfessionData;
 function CheckCompatibiliyGeneration(const Race, Profession: DRaceProfession): Float;
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
+
 uses SysUtils, DecoLog, Profiler;
 
 procedure LoadRaceProfessionData;
-var i: integer;
+var
+  i: integer;
 begin
   StartProfiler;
 
   {Todo: load from file}
-  SetLength(Races,1);
+  SetLength(Races, 1);
   Races[0] := DRaceProfession.Create(Window);
-  with races[0] do begin
+  with races[0] do
+  begin
     Name := '';
     Shortname := '';
     Description := '';
-    Stats.Value[st_str] := 12; Bonus.Value[st_str] := 0;
+    Stats.Value[st_str] := 12;
+    Bonus.Value[st_str] := 0;
     //...
   end;
-  SetLength(Professions,1);
+  SetLength(Professions, 1);
   Professions[0] := DRaceProfession.Create(Window);
-  with Professions[0] do begin
+  with Professions[0] do
+  begin
     Name := '';
     Shortname := '';
     Description := '';
-    Stats.Value[st_str] := 0; Bonus.Value[st_str] := 0;
+    Stats.Value[st_str] := 0;
+    Bonus.Value[st_str] := 0;
     //...
     {Calculate bonus sum for Profession}
     BonusSum := 0;
-    for i := 0 to MaxStats do inc(BonusSum,Bonus.Value[i]);
+    for i := 0 to MaxStats do
+      Inc(BonusSum, Bonus.Value[i]);
     StatsSum := 0;
-    for i := 0 to MaxStats do inc(StatsSum,Stats.Value[i]);
+    for i := 0 to MaxStats do
+      Inc(StatsSum, Stats.Value[i]);
   end;
 
   StopProfiler;
@@ -92,13 +102,13 @@ begin
   StartProfiler;
 
   inherited Create(AOwner);
-  Stats := DStats.Create(true);
-  Bonus := DStats.Create(true);
+  Stats := DStats.Create(True);
+  Bonus := DStats.Create(True);
 
   StopProfiler;
 end;
 
-Destructor DRaceProfession.destroy;
+destructor DRaceProfession.Destroy;
 begin
   StartProfiler;
 
@@ -111,17 +121,27 @@ end;
 
 function CheckCompatibiliyGeneration(const race, Profession: DRaceProfession): Float;
 var //flg: boolean;
-    i, DiffBonus, DiffStats: integer;
+  i, DiffBonus, DiffStats: integer;
 begin
   StartProfiler;
 
   DiffBonus := 0;
-  for i := 0 to MaxStats do if Race.Bonus.Value[i] < Profession.Bonus.Value[i] then inc(DiffBonus);
-  if DiffBonus > Profession.BonusSum then Result := -1 else begin
+  for i := 0 to MaxStats do
+    if Race.Bonus.Value[i] < Profession.Bonus.Value[i] then
+      Inc(DiffBonus);
+  if DiffBonus > Profession.BonusSum then
+    Result := -1
+  else
+  begin
     DiffStats := 0;
-    for i := 0 to MaxStats do if Race.Stats.Value[i] < Profession.Stats.Value[i] then inc(DiffStats, Profession.Stats.Value[i] - Race.Stats.Value[i]);
-    if DiffBonus > 0 then Result := 0.5 else Result := 1;
-    Result := Result*(1-DiffStats/Profession.StatsSum);
+    for i := 0 to MaxStats do
+      if Race.Stats.Value[i] < Profession.Stats.Value[i] then
+        Inc(DiffStats, Profession.Stats.Value[i] - Race.Stats.Value[i]);
+    if DiffBonus > 0 then
+      Result := 0.5
+    else
+      Result := 1;
+    Result := Result * (1 - DiffStats / Profession.StatsSum);
   end;
 {  ....
 
@@ -155,4 +175,3 @@ end;
 // Float! <0 - impossible 0..1 - compatible
 
 end.
-

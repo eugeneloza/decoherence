@@ -22,19 +22,21 @@ unit DecoGameMode;
 
 interface
 
-type TGameMode = (gmNone,
-  { displays load screen }
-  gmLoadScreen,
-  gmCharacterGeneration,
-  { any travel mode displaying 3D World }
-  gmTravel,
-  { any battle mode displaying 3D World }
-  gmBattle);
+type
+  TGameMode = (gmNone,
+    { displays load screen }
+    gmLoadScreen,
+    gmCharacterGeneration,
+    { any travel mode displaying 3D World }
+    gmTravel,
+    { any battle mode displaying 3D World }
+    gmBattle);
 
-var CurrentGameMode: TGameMode = gmNone;
-    LastGameMode: TGameMode = gmNone;
+var
+  CurrentGameMode: TGameMode = gmNone;
+  LastGameMode: TGameMode = gmNone;
 
-    PlayerInBattle: boolean = false;
+  PlayerInBattle: boolean = False;
 
 { Correctly sets the current game mode and initializes all the corresponding
   routines }
@@ -45,6 +47,7 @@ function GameModeNeedsClearingScreen: boolean;
 
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
+
 uses DecoGui, DecoAbstractWorld, DecoAbstractWorld3d,
   DecoGlobal, Profiler;
 
@@ -52,7 +55,8 @@ procedure SetGameMode(const GM: TGameMode);
 begin
   StartProfiler;
 
-  if GM = LastGameMode then Exit;
+  if GM = LastGameMode then
+    Exit;
 
   {release interface elements used by previous game mode}
 
@@ -72,13 +76,13 @@ begin
   end;}
 
   if GM = gmTravel then
-  GUI.PartyInterface;
+    GUI.PartyInterface;
 
   LastGameMode := CurrentGameMode;
   CurrentGameMode := GM;
 
   { set 3D world rendering }
-  if (CurrentWorld<>nil) and (CurrentWorld is DAbstractWorld3d) then
+  if (CurrentWorld <> nil) and (CurrentWorld is DAbstractWorld3d) then
     (CurrentWorld as DAbstractWorld3d).ToggleSceneManager(is3DGameMode);
 {  if Window.SceneManager <> nil then
     if is3DGameMode then Window.SceneManager.exists := true
@@ -112,4 +116,3 @@ end;
 
 
 end.
-

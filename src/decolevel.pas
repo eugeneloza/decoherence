@@ -25,32 +25,35 @@ interface
 uses CastleWindow, {CastleWindowTouch,} CastleScene, X3DNodes,
   DecoLoad3d,
   SysUtils,
-
   DecoAbstractWorld, decodungeonworld, DecoDungeonGenerator,
   DecoNavigation, decoglobal;
 
 procedure LoadTestLevel;
 procedure InitTestLevel;
 
-var LoadCompleted: boolean = false;
+var
+  LoadCompleted: boolean = False;
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
+
 uses CastleFilesUtils,
   DecoPlayerCharacter,
   DecoActorBody,
   DecoGameMode, DecoLog, Profiler;
 
 procedure Generate3DWorld;
-var GENERATOR: D3dDungeonGenerator;
+var
+  GENERATOR: D3dDungeonGenerator;
 begin
   StartProfiler;
 
   GENERATOR := D3dDungeonGenerator.Create;
-  GENERATOR.parameters.load(ApplicationData(GetScenarioFolder+MapsFolder+'1'+'.xml'+GZ_ext));
+  GENERATOR.parameters.load(ApplicationData(GetScenarioFolder + MapsFolder +
+    '1' + '.xml' + GZ_ext));
   GENERATOR.InitParameters;
   GENERATOR.Generate;
-  CurrentWorld := DDungeonWorld.create;
+  CurrentWorld := DDungeonWorld.Create;
   CurrentWorld.Load(Generator);
   FreeAndNil(GENERATOR);
   CurrentWorld.Build;
@@ -62,14 +65,16 @@ end;
 
 {---------------------------------------------------------------------------}
 
-var LoadedLevel: boolean = false;
+var
+  LoadedLevel: boolean = False;
+
 procedure LoadTestLevel;
 begin
   StartProfiler;
 
   Generate3DWorld;
 
-  Log(LogInitData,_CurrentRoutine,'Scene');
+  Log(LogInitData, _CurrentRoutine, 'Scene');
 
   Window.ShadowVolumes := ShadowVolumesEnabled;
   Window.ShadowVolumesRender := ShadowVolumesEnabled;
@@ -79,7 +84,7 @@ begin
   InitPlayer;
   InitNavigation;
 
-  Log(LogInitData,_CurrentRoutine,'Finished');
+  Log(LogInitData, _CurrentRoutine, 'Finished');
 
   StopProfiler;
 end;
@@ -90,14 +95,17 @@ procedure InitTestLevel;
 begin
   StartProfiler;
 
-  if not LoadCompleted then Exit;
-  if not LoadedLevel then begin
-     Log(LogInitData,_CurrentRoutine,'Init');
-     LoadedLevel := true;
-     if CurrentWorld = nil then Exit;
-     CurrentWorld.Activate;
-     //Window.TouchInterface := {$IFDEF Android}tiCtlWalkDragRotate{$ELSE}tiNone{$ENDIF};
-     SetGameMode(gmTravel);
+  if not LoadCompleted then
+    Exit;
+  if not LoadedLevel then
+  begin
+    Log(LogInitData, _CurrentRoutine, 'Init');
+    LoadedLevel := True;
+    if CurrentWorld = nil then
+      Exit;
+    CurrentWorld.Activate;
+    //Window.TouchInterface := {$IFDEF Android}tiCtlWalkDragRotate{$ELSE}tiNone{$ENDIF};
+    SetGameMode(gmTravel);
   end;
 
   StopProfiler;
@@ -105,4 +113,3 @@ end;
 
 
 end.
-

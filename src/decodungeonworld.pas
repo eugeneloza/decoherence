@@ -31,7 +31,8 @@ uses Classes, Generics.Collections, CastleVectors,
 
 
 {list of "normal" tiles}
-type TTilesList = specialize TObjectList<DTileMap>;
+type
+  TTilesList = specialize TObjectList<DTileMap>;
 
 //type TContainer = TTransformNode;//{$IFDEF UseSwitches}TSwitchNode{$ELSE}TTransformNode{$ENDIF}
 
@@ -40,12 +41,14 @@ type
   DDungeonWorld = class(DAbstractWorldManaged)
   private
     {some ugly fix for coordinate uninitialized at the beginning of the world}
-    const UninitializedCoordinate = -1000000;
+  const
+    UninitializedCoordinate = -1000000;
   private
-    px,py,pz,px0,py0,pz0: TIntCoordinate;
+    px, py, pz, px0, py0, pz0: TIntCoordinate;
     {converts x,y,z to px,py,pz and returns true if changed
      *time-critical procedure}
-    function UpdatePlayerCoordinates(const x,y,z: float): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+    function UpdatePlayerCoordinates(const x, y, z: float): boolean;
+ {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
     {Manages tiles (show/hide/trigger events) *time-critical procedure}
     procedure ManageTiles; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
   protected
@@ -61,7 +64,7 @@ type
 
     {Detects if the current tile has been changed and launches manage_tiles
      position is CAMERA.position}
-    Procedure Manage(const Position: TVector3); override;
+    procedure Manage(const Position: TVector3); override;
     {Sorts tiles into chunks}
     //Procedure chunk_n_slice; override;
     {loads the world from a running generator}
@@ -84,6 +87,7 @@ type
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
+
 uses SysUtils, CastleFilesUtils, CastleLog,
   DecoPlayerCharacter, DecoTime, DecoLog, Profiler;
 
@@ -96,8 +100,10 @@ end;
 
 {----------------------------------------------------------------------------}
 
-function DDungeonWorld.UpdatePlayerCoordinates(const x,y,z: float): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
-//var nx,ny,nz: TIntCoordinate;
+function DDungeonWorld.UpdatePlayerCoordinates(const x, y, z: float): boolean;
+ {$IFDEF SUPPORTS_INLINE}inline;
+{$ENDIF}
+  //var nx,ny,nz: TIntCoordinate;
 begin
   StartProfiler;
 
@@ -107,19 +113,28 @@ begin
   px0 := px;
   py0 := py;
   pz0 := pz;
-  px := Round( x/WorldScale);
-  py := Round(-y/WorldScale);     //pay attention: y-coordinate is inversed!
-  pz := Round(-(z-1)/WorldScale); //pay attention: z-coordinate is inversed and shifted!
-  if px<0 then px :=0 else if px>Map.SizeX-1 then px := map.SizeX-1;
-  if py<0 then py :=0 else if py>Map.SizeY-1 then py := map.SizeY-1;
-  if pz<0 then pz :=0 else if pz>Map.SizeZ-1 then pz := map.SizeZ-1;
-  if (px<>px0) or (py<>py0) or (pz<>pz0) then {begin}
+  px := Round(x / WorldScale);
+  py := Round(-y / WorldScale);     //pay attention: y-coordinate is inversed!
+  pz := Round(-(z - 1) / WorldScale); //pay attention: z-coordinate is inversed and shifted!
+  if px < 0 then
+    px := 0
+  else if px > Map.SizeX - 1 then
+    px := map.SizeX - 1;
+  if py < 0 then
+    py := 0
+  else if py > Map.SizeY - 1 then
+    py := map.SizeY - 1;
+  if pz < 0 then
+    pz := 0
+  else if pz > Map.SizeZ - 1 then
+    pz := map.SizeZ - 1;
+  if (px <> px0) or (py <> py0) or (pz <> pz0) then {begin}
     {current tile has changed}
-    Result := true
+    Result := True
   {end}
   else
     {current tile hasn't changed}
-    Result := false;
+    Result := False;
 
   StopProfiler;
 end;
@@ -131,13 +146,14 @@ begin
   StartProfiler;
 
   inherited Manage(Position);
-  if FirstRender then begin
+  if FirstRender then
+  begin
     {$warning reset all tiles visibility here}
     LastRender := decoNow; //GetNow or ResetNowThread
-    FirstRender := false;
+    FirstRender := False;
   end;
 
-  if UpdatePlayerCoordinates(Position[0],Position[1],Position[2]) then
+  if UpdatePlayerCoordinates(Position[0], Position[1], Position[2]) then
     ManageTiles;
 
   StopProfiler;
@@ -148,20 +164,22 @@ end;
 function DDungeonWorld.GetGravity(const aPosition: TVector3): TVector3;
 begin
   StartProfiler;
-  Result := Vector3(0,0,1);
+  Result := Vector3(0, 0, 1);
   StopProfiler;
 end;
+
 function DDungeonWorld.GetGravity(const aNav: TNavID): TVector3;
 begin
   StartProfiler;
-  Result := Vector3(0,0,1);
+  Result := Vector3(0, 0, 1);
   StopProfiler;
 end;
 
 {----------------------------------------------------------------------------}
 
 procedure DDungeonWorld.Load(const Generator: DAbstractGenerator);
-var DG: D3dDungeonGenerator;
+var
+  DG: D3dDungeonGenerator;
 begin
   StartProfiler;
 
@@ -172,7 +190,7 @@ begin
   Neighbours := DG.ExportNeighbours;
   Steps := DG.ExportSteps;
   {$HINT this is ugly. WorldScale must support different scales}
-  WorldScale := TileScale*MyScale;
+  WorldScale := TileScale * MyScale;
   RescaleNavigationNetwork;
 
   {yes, we load tiles twice in this case (once in the generator and now here),
@@ -211,19 +229,22 @@ end;
 {----------------------------------------------------------------------------}
 
 procedure DDungeonWorld.BuildTransforms;
-var i: integer;
+var
+  i: integer;
   Transform: TTransformNode;
 begin
   StartProfiler;
 
-  WorldObjects := TTransformList.Create(false); //scene will take care of freeing
-  for i := 0 to High(Steps) do begin
+  WorldObjects := TTransformList.Create(False); //scene will take care of freeing
+  for i := 0 to High(Steps) do
+  begin
     Transform := TTransformNode.Create;
     //put current tile into the world. Pay attention to y and z coordinate inversion.
-    Transform.Translation := Vector3(WorldScale*(Steps[i].x),-WorldScale*(Steps[i].y),-WorldScale*(steps[i].z));
+    Transform.Translation := Vector3(WorldScale * (Steps[i].x), -WorldScale *
+      (Steps[i].y), -WorldScale * (steps[i].z));
     {$Warning this is ugly}
-    Transform.Scale := Vector3(MyScale,MyScale,MyScale);
-    AddRecoursive(Transform,WorldElements3d[Steps[i].Tile]);
+    Transform.Scale := Vector3(MyScale, MyScale, MyScale);
+    AddRecoursive(Transform, WorldElements3d[Steps[i].Tile]);
     WorldObjects.Add(Transform);
   end;
 
@@ -237,10 +258,11 @@ begin
   StartProfiler;
 
   inherited Create;
-  px  := UninitializedCoordinate;
-  py  := UninitializedCoordinate;
-  pz  := UninitializedCoordinate;
-  px0 := UninitializedCoordinate;        //we use px0 := px at the moment, so these are not needed, but it might change in future
+  px := UninitializedCoordinate;
+  py := UninitializedCoordinate;
+  pz := UninitializedCoordinate;
+  px0 := UninitializedCoordinate;
+  //we use px0 := px at the moment, so these are not needed, but it might change in future
   py0 := UninitializedCoordinate;
   pz0 := UninitializedCoordinate;
 
@@ -254,7 +276,7 @@ begin
   StartProfiler;
 
   {$hint freeandnil(window.scenemanager)?}
-  
+
   //free basic map parameters
   FreeAndNil(Map);
   FreeAndNil(Groups);
@@ -266,4 +288,3 @@ begin
 end;
 
 end.
-

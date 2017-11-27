@@ -30,7 +30,8 @@ uses Classes,
   DecoPlayerCharacter,
   DecoGlobal;
 
-const appear_animation = asFadeIn;
+const
+  appear_animation = asFadeIn;
 
 type
   DLoadScreen = class(DCompositeElement)
@@ -70,7 +71,7 @@ type
 
 type
   {presents 7 characters with health bars, portraits and characters control space }
-  DPartyView = class (DInterfaceElement)
+  DPartyView = class(DInterfaceElement)
   public
     {CharacterSpace: array [0..maxparty] of DCharacterSpace;
     procedure ArrangeChildren(const animate: TAnimationStyle); override;
@@ -79,6 +80,7 @@ type
 
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
+
 uses CastleFilesUtils, DecoFont,
   DecoLoadScreen,
   DecoLog, Profiler;
@@ -112,12 +114,12 @@ begin
   StartProfiler;
 
   //inherited ArrangeChildren; <------ nothing to inherit
-  Floater.SetBaseSize(0,0,1,1);
+  Floater.SetBaseSize(0, 0, 1, 1);
   Floater.onCycleFinish := @ReloadFact;
 
   FloaterLabel.Font := LoadScreenFont;
 
-  MainLabel.Base.AnchorToWindow := true;
+  MainLabel.Base.AnchorToWindow := True;
   MainLabel.Font := LoadScreenFont;
   MainLabel.ShadowIntensity := 1;
 
@@ -132,13 +134,13 @@ procedure DLoadScreen.ReloadFact;
 begin
   StartProfiler;
 
-  MainLabel.SetBaseSize(0.03,0.8,0.4,0.1);
-  MainLabel.text := LoadScreenMainText;
+  MainLabel.SetBaseSize(0.03, 0.8, 0.4, 0.1);
+  MainLabel.Text := LoadScreenMainText;
 
-  FloaterLabel.SetBaseSize(0,2/3,0.3,0.1); //need to reset it each time
+  FloaterLabel.SetBaseSize(0, 2 / 3, 0.3, 0.1); //need to reset it each time
   FloaterLabel.Text := GetRandomFact;
   FloaterLabel.Phase := 0;
-  Floater.Load(ApplicationData(LoadScreenFolder+GetRandomFactImage));
+  Floater.Load(ApplicationData(LoadScreenFolder + GetRandomFactImage));
 
   StopProfiler;
 end;
@@ -364,4 +366,3 @@ begin
 end;}
 
 end.
-

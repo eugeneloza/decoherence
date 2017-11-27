@@ -35,9 +35,12 @@ interface
 
 uses Generics.Collections, DecoGlobal;
 
-type TContextRecord = string;   //todo: integer; read from xml list of possible Context elements
+type
+  TContextRecord = string;
+//todo: integer; read from xml list of possible Context elements
 
-type TContextTarget = (ctSpeaker, ctListener, ctTopic);
+type
+  TContextTarget = (ctSpeaker, ctListener, ctTopic);
 
 type
   { A single record that represents a single Context element }
@@ -59,7 +62,8 @@ type
     //function Compare;
   end;
 
-type TContextList = specialize TObjectList<DContextElement>;
+type
+  TContextList = specialize TObjectList<DContextElement>;
 
 //todo: some Context elements may and should be dynamically generated only when requested!!!!!!!!
 type
@@ -85,11 +89,12 @@ type
 
     constructor Create; //override;
     destructor Destroy; override;
-  
+
     { find a Context element by Name (identifier)
       * Maybe, should be split into FindAllowDemand and FindDeny as they're very different in nature }
-    function FindByName(FindTarget: TContextTarget; FindRecord: TContextRecord): DContextElement;
-end;
+    function FindByName(FindTarget: TContextTarget;
+      FindRecord: TContextRecord): DContextElement;
+  end;
 
 type
   { Not sure if this one is needed at this point, as this class is Oazis-specific
@@ -98,7 +103,7 @@ type
     and based on Result it will be "available" or "unavailable" }
   DDialogueContext = class(DObject)
   public
-    { }
+
     Context: DContext;
 
     //speaker, listener, about
@@ -116,7 +121,8 @@ type
   end;
 
 { make Context element }
-function MCE(NewTarget: TContextTarget; NewContextElement: TContextRecord; NewImportance: float = 1; NewMin: float = 0; NewMax: float = 1): DContextElement;
+function MCE(NewTarget: TContextTarget; NewContextElement: TContextRecord;
+  NewImportance: float = 1; NewMin: float = 0; NewMax: float = 1): DContextElement;
 
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
@@ -124,7 +130,8 @@ implementation
 uses SysUtils, CastleVectors,
   DecoLog, Profiler{, Math};
 
-function MCE(NewTarget: TContextTarget; NewContextElement: TContextRecord; NewImportance: float = 1; NewMin: float = 0; NewMax: float = 1): DContextElement;
+function MCE(NewTarget: TContextTarget; NewContextElement: TContextRecord;
+  NewImportance: float = 1; NewMin: float = 0; NewMax: float = 1): DContextElement;
 begin
   StopProfiler;
 
@@ -143,30 +150,40 @@ end;
 function Maximum(a, b: float): float;
 begin
   StartProfiler;
-  if a > b then Result := a else Result := b;
+  if a > b then
+    Result := a
+  else
+    Result := b;
   StopProfiler;
 end;
 
 function CompareElements(e1, e2: DContextElement): float; {boolean}
-var Dist: float;
+var
+  Dist: float;
 begin
   StartProfiler;
   //fatal: comparing incompatible elements
-  if e1.Name <> e2.Name then begin
+  if e1.Name <> e2.Name then
+  begin
     { actually such stuff should never happen }
     Result := 0;
-    Log(LogContextError,_CurrentRoutine,'Error: comparing incompatible elements '+e1.Name+' vs '+e2.Name);
+    Log(LogContextError, _CurrentRoutine, 'Error: comparing incompatible elements ' +
+      e1.Name + ' vs ' + e2.Name);
     Exit;
   end;
 
   Dist := 0;
-  if e1.Min > e2.Max then Dist := e1.Min - e2.Max else
-  if e1.Max < e2.Min then Dist := e2.Min - e1.Max;
+  if e1.Min > e2.Max then
+    Dist := e1.Min - e2.Max
+  else
+  if e1.Max < e2.Min then
+    Dist := e2.Min - e1.Max;
 
   if Zero(Dist) then
     Result := 1
   else
-    Result := 1 - Maximum(e1.Importance, e2.Importance); //minimum(1-self.Importance,1-cmp.Importance); // include dist here?
+    Result := 1 - Maximum(e1.Importance, e2.Importance);
+  //minimum(1-self.Importance,1-cmp.Importance); // include dist here?
 
   StopProfiler;
 end;
@@ -178,9 +195,9 @@ begin
   StartProfiler;
 
   //inherited Create; <------- nothing to inherit
-  Demand := TContextList.Create(true);
-  Allow := TContextList.Create(true);
-  Deny := TContextList.Create(true);
+  Demand := TContextList.Create(True);
+  Allow := TContextList.Create(True);
+  Deny := TContextList.Create(True);
 
   StopProfiler;
 end;
@@ -201,20 +218,24 @@ end;
 
 {--------------------------------------------------------------------------}
 
-function DContext.FindByName(FindTarget: TContextTarget; FindRecord: TContextRecord): DContextElement;
-var i: integer;
+function DContext.FindByName(FindTarget: TContextTarget;
+  FindRecord: TContextRecord): DContextElement;
+var
+  i: integer;
 begin
   StartProfiler;
 
   Result := nil;
   //find only the first matching element
-  for i := 0 to Demand.Count-1 do
-    if (Demand[i].Target = FindTarget) and (Demand[i].Name = FindRecord) then begin
+  for i := 0 to Demand.Count - 1 do
+    if (Demand[i].Target = FindTarget) and (Demand[i].Name = FindRecord) then
+    begin
       Result := Demand[i];
       Exit;
     end;
-  for i := 0 to Allow.Count-1 do
-    if (Allow[i].Target = FindTarget) and (Allow[i].Name = FindRecord) then begin
+  for i := 0 to Allow.Count - 1 do
+    if (Allow[i].Target = FindTarget) and (Allow[i].Name = FindRecord) then
+    begin
       Result := Allow[i];
       Exit;
     end;
@@ -249,13 +270,14 @@ end;
 {--------------------------------------------------------------------------}
 
 procedure DDialogueContext.CopyContext(const NewContext: DContext);
-var i: integer;
+var
+  i: integer;
 begin
   StartProfiler;
 
-  for i := 0 to NewContext.Demand.Count-1 do
+  for i := 0 to NewContext.Demand.Count - 1 do
     Context.Demand.Add(NewContext.Demand[i]);
-  for i := 0 to NewContext.Allow.Count-1 do
+  for i := 0 to NewContext.Allow.Count - 1 do
     Context.Allow.Add(NewContext.Allow[i]);
 
   StopProfiler;
@@ -264,7 +286,8 @@ end;
 {--------------------------------------------------------------------------}
 
 procedure DDialogueContext.Extract(const NewContext: DContext);
-var temp: DContext;
+var
+  temp: DContext;
 begin
   StartProfiler;
 
@@ -278,24 +301,34 @@ end;
 {--------------------------------------------------------------------------}
 
 function DDialogueContext.Compare(const CheckContext: DContext): float;
-var i: integer;
-    tmp: DContextElement;
+var
+  i: integer;
+  tmp: DContextElement;
 begin
   StartProfiler;
 
   Result := 1;
   {$HINT process deny first, as it's most "severe"}
-  for i := 0 to Context.Demand.Count-1 do begin
-    tmp := CheckContext.FindByName(Context.Demand[i].Target,Context.Demand[i].Name);
-    if tmp = nil then Result := 0 else
-                      Result *= CompareElements(tmp, Context.Demand[i]);
-    if Zero(Result) then Exit;
+  for i := 0 to Context.Demand.Count - 1 do
+  begin
+    tmp := CheckContext.FindByName(Context.Demand[i].Target, Context.Demand[i].Name);
+    if tmp = nil then
+      Result := 0
+    else
+      Result *= CompareElements(tmp, Context.Demand[i]);
+    if Zero(Result) then
+      Exit;
   end;
-  for i := 0 to CheckContext.Demand.Count-1 do begin
-    tmp := Context.FindByName(CheckContext.Demand[i].Target, CheckContext.Demand[i].Name);
-    if tmp = nil then Result := 0 else
-                      Result *= CompareElements(tmp, CheckContext.Demand[i]);
-    if Zero(Result) then Exit;
+  for i := 0 to CheckContext.Demand.Count - 1 do
+  begin
+    tmp := Context.FindByName(CheckContext.Demand[i].Target,
+      CheckContext.Demand[i].Name);
+    if tmp = nil then
+      Result := 0
+    else
+      Result *= CompareElements(tmp, CheckContext.Demand[i]);
+    if Zero(Result) then
+      Exit;
   end;
   {search across demand/allow not made? Fix it relevant to the logic.}
 
@@ -305,4 +338,3 @@ end;
 {--------------------------------------------------------------------------}
 
 end.
-

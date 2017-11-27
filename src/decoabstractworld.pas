@@ -26,7 +26,7 @@ uses CastleRandom, CastleVectors,
   DecoAbstractGenerator, DecoNavigationNetwork,
   DecoGlobal;
 
-Type
+type
   {The most abstract World implementation.
    Used as external interface for the World}
   DAbstractWorld = class(DObject)
@@ -36,7 +36,7 @@ Type
     fNavMinStep, fNavAvgStep: float;
     procedure CacheNavDistance;
   protected
-    fSeed: LongWord;
+    fSeed: longword;
     { xorshift random generator,
       used by BUILD (maybe freed afterwards?) }
     RNDM: TCastleRandom;
@@ -57,12 +57,12 @@ Type
       in m/s^2 }
     property GravityAcceleration: float read fGravityAcceleration;
     { Seed used to "build" the World if it requires random}
-    property Seed: LongWord read fSeed write fSeed;
+    property Seed: longword read fSeed write fSeed;
     { World management routine. Called every frame;
       Most important thing it does is managing LODs of tiles/landscape
       And hiding/LODding World chunks
       x,y,z are current World coordinates of render camera }
-    Procedure Manage(const Position: TVector3); virtual; abstract;
+    procedure Manage(const Position: TVector3); virtual; abstract;
     {Builds a PathTree for the World}
     //Function pathfind: DPathTree;
     { Load the World from a file}
@@ -94,10 +94,12 @@ Type
 
   public
     { scaling factor, required to set up FOV properly / or a bug? }
-    const myScale = 3;
+  const
+    myScale = 3;
     {scale used to define a tile size. Usually 1 is man-height.
       CAUTION this scale must correspond to tiles model scale, otherwise it'll mess everything up}
-    var WorldScale: float;
+  var
+    WorldScale: float;
   public
     Nav: TNavList;
     Weenies: TWeeniesList;
@@ -108,12 +110,13 @@ Type
     procedure ClearNavBlocks;
   end;
 
-var CurrentWorld: DAbstractWorld;
+var
+  CurrentWorld: DAbstractWorld;
 
 procedure FreeWorld;
 
 
-{procedure FreeRootList(List: TRootList);} //unneeded as list "owns" children
+{procedure FreeRootList(List: TRootList);}//unneeded as list "owns" children
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
@@ -125,7 +128,7 @@ begin
   StartProfiler;
 
   inherited Create;
-  Log(LogWorldInit,_CurrentRoutine,'Creating the World');
+  Log(LogWorldInit, _CurrentRoutine, 'Creating the World');
   {we create an non-initialized random (i.e. initialized by a stupid constant integer)
   Just to make sure we don't waste any time (<1ms) on initialization now}
   RNDM := TCastleRandom.Create(1);
@@ -141,7 +144,7 @@ destructor DAbstractWorld.Destroy;
 begin
   StartProfiler;
 
-  Log(LogWorldInit,_CurrentRoutine,'Freeing the World');
+  Log(LogWorldInit, _CurrentRoutine, 'Freeing the World');
   FreeAndNil(RNDM);
   FreeAndNil(Nav);
   FreeAndNil(Weenies);
@@ -156,7 +159,8 @@ procedure DAbstractWorld.Build;
 begin
   StartProfiler;
 
-  if fSeed = 0 then raise Exception.Create('DAbstractWorld.Build: World random must be predefined!');
+  if fSeed = 0 then
+    raise Exception.Create('DAbstractWorld.Build: World random must be predefined!');
   RNDM.Initialize(fSeed);
 
   StopProfiler;
@@ -164,28 +168,30 @@ end;
 
 {------------------------------------------------------------------------------}
 
-Procedure DAbstractWorld.Activate;
+procedure DAbstractWorld.Activate;
 begin
   StartProfiler;
 
-  Log(LogWorldInit,_CurrentRoutine,'Activating the World.');
-  if (CurrentWorld<>nil) and (CurrentWorld<>Self) then
-    raise Exception.Create('ERROR: Free and nil the previous World before activating this one!');
+  Log(LogWorldInit, _CurrentRoutine, 'Activating the World.');
+  if (CurrentWorld <> nil) and (CurrentWorld <> Self) then
+    raise Exception.Create(
+      'ERROR: Free and nil the previous World before activating this one!');
   LastRender := -1;
-  FirstRender := true;
+  FirstRender := True;
 
   StopProfiler;
 end;
 
 {------------------------------------------------------------------------------}
 
-Procedure DAbstractWorld.Render;
+procedure DAbstractWorld.Render;
 begin
   StartProfiler;
 
   {this is an abstract routine,
   it must be overridden by DRenderedWorld}
-  Log(LogWorldError,_CurrentRoutine,'Warning: This shouldn''t happen in normal situation, it''s abstract');
+  Log(LogWorldError, _CurrentRoutine,
+    'Warning: This shouldn''t happen in normal situation, it''s abstract');
 
   StopProfiler;
 end;
@@ -204,46 +210,56 @@ end;
 {------------------------------------------------------------------------------}
 
 procedure DAbstractWorld.CacheNavDistance;
-var i,j: TNavID;
-    Count: integer;
-    d, min, sum: float;
+var
+  i, j: TNavID;
+  Count: integer;
+  d, min, sum: float;
 begin
   StartProfiler;
 
   //warning, this will significantly changed after "LINKS" between navs will be implemented
-  min := (Nav[0].Pos-Nav[1].Pos).Length;
+  min := (Nav[0].Pos - Nav[1].Pos).Length;
   sum := min;
   Count := 0;
-  for i := 0 to Nav.Count-1 do
-    for j := 0 to Nav[i].LinksCount do begin
-      d := (Nav[i].Pos-Nav[Nav[i].Links[j]].Pos).Length;
-      if d < min then min := d;
+  for i := 0 to Nav.Count - 1 do
+    for j := 0 to Nav[i].LinksCount do
+    begin
+      d := (Nav[i].Pos - Nav[Nav[i].Links[j]].Pos).Length;
+      if d < min then
+        min := d;
       sum += d;
-      inc(Count);
+      Inc(Count);
     end;
-  fNavAvgStep := sum/Count;
+  fNavAvgStep := sum / Count;
   fNavMinStep := min;
 
   StopProfiler;
 end;
+
 function DAbstractWorld.PositionToNav(const aPosition: TVector3): TNavID;
-var i, m: TNavID;
-    d, min_d: float;
+var
+  i, m: TNavID;
+  d, min_d: float;
 begin
   StartProfiler;
 
-  if fNavMinStep<0 then CacheNavDistance; //maybe throw this into BuildNav?
-  min_d := (aPosition-Nav[0].Pos).Length;
+  if fNavMinStep < 0 then
+    CacheNavDistance; //maybe throw this into BuildNav?
+  min_d := (aPosition - Nav[0].Pos).Length;
   m := 0;
   { we've already included "0" in the min, starting from "1" }
-  if min_d > fNavMinStep/2 then
-    for i := 1 to Nav.Count-1 do begin
-      d := (aPosition-Nav[i].Pos).Length;
-      if d <= fNavMinStep/2 then begin
+  if min_d > fNavMinStep / 2 then
+    for i := 1 to Nav.Count - 1 do
+    begin
+      d := (aPosition - Nav[i].Pos).Length;
+      if d <= fNavMinStep / 2 then
+      begin
         m := i;
         Break;
-      end else
-      if d < min_d then begin
+      end
+      else
+      if d < min_d then
+      begin
         m := i;
         min_d := d;
       end;
@@ -258,7 +274,7 @@ end;
 procedure DAbstractWorld.BlockNav(const aNav: TNavId);
 begin
   StartProfiler;
-  Nav.L[aNav].Blocked := true;
+  Nav.L[aNav].Blocked := True;
   StopProfiler;
 end;
 
@@ -267,18 +283,20 @@ end;
 procedure DAbstractWorld.ReleaseNav(const aNav: TNavId);
 begin
   StartProfiler;
-  Nav.L[aNav].Blocked := false;
+  Nav.L[aNav].Blocked := False;
   StopProfiler;
 end;
 
 {------------------------------------------------------------------------------}
 
 procedure DAbstractWorld.ClearNavBlocks;
-var i: integer;
+var
+  i: integer;
 begin
   StartProfiler;
   //actually, it seems redundant for now
-  for i := 0 to Nav.Count-1 do Nav.L[i].Blocked := false;
+  for i := 0 to Nav.Count - 1 do
+    Nav.L[i].Blocked := False;
   StopProfiler;
 end;
 
@@ -287,10 +305,12 @@ end;
 procedure DAbstractWorld.Load(const Generator: DAbstractGenerator);
 begin
   StartProfiler;
-  if Generator = nil then raise Exception.Create('DAbstractWorld.Load: Generator is nil!');
+  if Generator = nil then
+    raise Exception.Create('DAbstractWorld.Load: Generator is nil!');
   fSeed := DRND.Random32bit; //maybe other algorithm?
-  if Nav<>nil then begin
-    Log(LogWorldInitSoftError,_CurrentRoutine,'WARNING: Nav is not nil! Freeing...');
+  if Nav <> nil then
+  begin
+    Log(LogWorldInitSoftError, _CurrentRoutine, 'WARNING: Nav is not nil! Freeing...');
     FreeAndNil(Nav);
   end;
   Nav := Generator.ExportNav;
@@ -304,7 +324,8 @@ end;
 procedure DAbstractWorld.Load(const URL: string);
 begin
   StartProfiler;
-  if not URLValid(URL) then Log(LogWorldInit,_CurrentRoutine,'World is not nil, freeing');
+  if not URLValid(URL) then
+    Log(LogWorldInit, _CurrentRoutine, 'World is not nil, freeing');
   {$hint dummy}
   //load seed and Nav
   StopProfiler;
@@ -315,10 +336,10 @@ end;
 procedure FreeWorld;
 begin
   StartProfiler;
-  if CurrentWorld<>nil then Log(LogWorldInit,_CurrentRoutine,'World is not nil, freeing');
+  if CurrentWorld <> nil then
+    Log(LogWorldInit, _CurrentRoutine, 'World is not nil, freeing');
   FreeAndNil(CurrentWorld);
   StopProfiler;
 end;
 
 end.
-

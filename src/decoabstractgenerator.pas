@@ -30,8 +30,11 @@ type
   TTileType = word;
   TIntCoordinate = integer;
 
-type TIndexList = specialize TList<TTileType>;
-type TIndexGroups = specialize TObjectList<TIndexList>;
+type
+  TIndexList = specialize TList<TTileType>;
+
+type
+  TIndexGroups = specialize TObjectList<TIndexList>;
 
 type
   {a two-value description of a "neighbour" tile}
@@ -42,7 +45,8 @@ type
     Visible: integer;
   end;
 
-type TNeighboursList = specialize TList<DNeighbour>;
+type
+  TNeighboursList = specialize TList<DNeighbour>;
 
 type
   { abstract level of Generator Parameters,
@@ -52,12 +56,12 @@ type
     fisReady: boolean;
   public
     {random generation seed}
-    Seed: LongWord;
+    Seed: longword;
     {are links in TilesList absolute URL or just a tile name}
     AbsoluteURL: boolean;
     {is the generator ready to wrok?
      Generate will raise an exception if it isn't}
-    property isReady: boolean read fisReady write fisReady default false;
+    property isReady: boolean read fisReady write fisReady default False;
   end;
 
 type
@@ -74,9 +78,9 @@ type
     procedure InitSeed(const NewSeed: longword = 0);
   public
     {are the parameters initialized?}
-    property isInitialized: boolean read fisInitialized default false;
+    property isInitialized: boolean read fisInitialized default False;
     {if the generation finished successfully?}
-    property isFinished: boolean read fisFinished default false;
+    property isFinished: boolean read fisFinished default False;
 
     {MUST BE MANUALLY RUN BEFORE GENERATION
      initialize parameters and load pre-generated tiles
@@ -175,4 +179,3 @@ end;
 
 
 end.
-

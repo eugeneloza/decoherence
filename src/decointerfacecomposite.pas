@@ -32,7 +32,8 @@ uses
   DecoActor, DecoPlayerCharacter, DecoPerks,
   DecoGlobal;
 
-const PortraitTimeOut = 1; {seconds}
+const
+  PortraitTimeOut = 1; {seconds}
 
 type
   { Draws two cycling wind images overlaying each other, moving with different speed }
@@ -57,7 +58,7 @@ type
     { Creates (spawns) elements in this container }
     procedure SpawnChildren; virtual; abstract;
   public
-    { }
+
     procedure RearrangeChildren;
     constructor Create; override;
 
@@ -103,11 +104,11 @@ type
       used only to check if the image=Value}
     OldImage: TCastleImage;
     { Two images for "mouse out" and "mouse over" states }
-    Image_out,Image_over: DStaticImage;
+    Image_out, Image_over: DStaticImage;
     procedure SetImage(const Value: TCastleImage);
     { mouse over and mouse out events }
-    procedure MouseOver(const Sender: DAbstractElement; const x,y: integer);
-    procedure MouseLeave(const Sender: DAbstractElement; const x,y: integer);
+    procedure MouseOver(const Sender: DAbstractElement; const x, y: integer);
+    procedure MouseLeave(const Sender: DAbstractElement; const x, y: integer);
     procedure SetEnabled(const Value: boolean);
   strict protected
     procedure ArrangeChildren; override;
@@ -201,7 +202,7 @@ type
   public
     {the character being monitored}
     property Target: DBasicActor read fTarget write SetTarget;
-end;
+  end;
 
 type
   { Nickname + PlayerBars + NumericHP }
@@ -241,11 +242,11 @@ type
     the 3d character face :) Only 2D inanimated image for now... }
   DPortrait = class(DFramedElement)
   private
-    { }
+
     Portrait: DPlayerPortrait;
-    { }
+
     DamageOverlay: DStaticImage; //static at this moment
-    { }
+
     DamageLabel: DDamageLabel;
   private
     { Player character }
@@ -288,7 +289,7 @@ type
 
 type
   {A displayer for a single perk}
-  DPerkInterfaceItem =  class (DFramedElement)
+  DPerkInterfaceItem = class(DFramedElement)
   private
  {   PerkImage: DSingleInterfaceElement; {animated image}
     fTarget: DPerk;
@@ -302,12 +303,12 @@ type
     property Target: DPerk read ftarget write settarget;
     //property Character: DPlayerCharacter read fCharacter write setcharacter;
     {proedure getSelectedStatus -----> update}}
-end;
+  end;
 
 type
- {sorts in n rows and m lines the list of interface elements within self.base. Without specific data management and sorting parameters it is abstract and should parent DPerkSorter and DItemSorter}
- DAbstractSorter = class(DCompositeElement)
-   private
+  {sorts in n rows and m lines the list of interface elements within self.base. Without specific data management and sorting parameters it is abstract and should parent DPerkSorter and DItemSorter}
+  DAbstractSorter = class(DCompositeElement)
+  private
   {
    public
      lines{,rows}: integer;
@@ -315,12 +316,13 @@ type
      procedure ArrangeChildren; override;
      procedure SpawnChildren; override;
      }
-   end;
+  end;
 
 //type TPerkContainerStyle = (pcActions,pcActive,pcGlobal);
 
-type DPerksContainer = class(DAbstractSorter)
-  {container for buffs-debuffs, perks and actions}
+type
+  DPerksContainer = class(DAbstractSorter)
+    {container for buffs-debuffs, perks and actions}
   private
    { fTarget: DPlayerCharacter;
     procedure settarget(const value: DPlayerCharacter);
@@ -353,10 +355,11 @@ type
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 
 implementation
+
 uses SysUtils,
-   DecoFont, DecoImageProcess,
-   //DecoInterfaceBlocks,
-   DecoInterfaceLoader, DecoLog, Profiler;
+  DecoFont, DecoImageProcess,
+  //DecoInterfaceBlocks,
+  DecoInterfaceLoader, DecoLog, Profiler;
 
 {===========================================================================}
 {====================== D Wind Element =====================================}
@@ -378,8 +381,8 @@ begin
   //load (copy) wind images
   Wind1.Load(WindImage1);
   Wind2.Load(WindImage2);
-  Wind1.PhaseSpeed := 1/(15+DRND.Random);
-  Wind2.PhaseSpeed := 1/(10+DRND.Random);
+  Wind1.PhaseSpeed := 1 / (15 + DRND.Random);
+  Wind2.PhaseSpeed := 1 / (10 + DRND.Random);
 
   RescaleRecoursive;
 
@@ -395,10 +398,10 @@ constructor DCompositeElement.Create;
 begin
   StartProfiler;
 
-  isSpawned := false;
+  isSpawned := False;
   inherited Create;
   SpawnChildren;
-  isSpawned := true;
+  isSpawned := True;
   ArrangeChildren;
   //Rescale;
 
@@ -411,7 +414,8 @@ procedure DCompositeElement.RearrangeChildren;
 begin
   StartProfiler;
 
-  if isSpawned then begin
+  if isSpawned then
+  begin
     ArrangeChildren;
     //Rescale;
   end;
@@ -440,7 +444,8 @@ procedure DFramedElement.SetFrame(const Value: DRectagonalFrame);
 begin
   StartProfiler;
 
-  if fFrame.Frame <> Value then begin
+  if fFrame.Frame <> Value then
+  begin
     fFrame.Frame := Value;
     //fFrame.Rescale;
     RearrangeChildren;
@@ -469,7 +474,7 @@ begin
 
   //inherited ArrangeChildren;
   fFrame.AnchorTo(Self);
-  fFrame.SetBaseSize(0,0,1,1);
+  fFrame.SetBaseSize(0, 0, 1, 1);
 
   StopProfiler;
 end;
@@ -497,7 +502,7 @@ begin
 
   inherited ArrangeChildren;
   Image.AnchorToFrame(fFrame);
-  Image.SetBaseSize(0,0,1,1);
+  Image.SetBaseSize(0, 0, 1, 1);
 
   StopProfiler;
 end;
@@ -510,11 +515,11 @@ procedure DButton.SetImage(const Value: TCastleImage);
 begin
   StartProfiler;
 
-  if OldImage<>Value then
+  if OldImage <> Value then
   begin
     OldImage := Value;
     Image_out.Load(Value);
-    Image_over.Load(Brighter(Value,1.2));
+    Image_over.Load(Brighter(Value, 1.2));
   end;
 
   StopProfiler;
@@ -535,18 +540,19 @@ begin
   //assign button mouse over/out events
   Self.OnMouseOver := @Self.MouseOver;
   Self.OnMouseLeave := @Self.MouseLeave;
-  SetEnabled(true);
+  SetEnabled(True);
 
   StopProfiler;
 end;
 
 {-----------------------------------------------------------------------------}
 
-procedure DButton.MouseOver(const Sender: DAbstractElement; const x,y: integer);
+procedure DButton.MouseOver(const Sender: DAbstractElement; const x, y: integer);
 begin
   StartProfiler;
 
-  if fisEnabled then begin
+  if fisEnabled then
+  begin
     Image_out.AnimateTo(asFadeOut);
     Image_over.AnimateTo(asFadeIn);
   end;
@@ -554,7 +560,7 @@ begin
   StopProfiler;
 end;
 
-procedure DButton.MouseLeave(const Sender: DAbstractElement; const x,y: integer);
+procedure DButton.MouseLeave(const Sender: DAbstractElement; const x, y: integer);
 begin
   StartProfiler;
 
@@ -571,13 +577,17 @@ begin
   StartProfiler;
 
   {emm... Value isn't used here? Rename method to "toggleEnabled" or use Value?}
-  if Value = fisEnabled then Exit; //let's fix it this way for now.
+  if Value = fisEnabled then
+    Exit; //let's fix it this way for now.
 
-  if fisEnabled then begin
-    fisEnabled := false;
-    Self.MouseLeave(nil,0,0); {and fade out in case enabled is set to false} //should go to "disabled" brightness
-  end else 
-    fisEnabled := true;
+  if fisEnabled then
+  begin
+    fisEnabled := False;
+    Self.MouseLeave(nil, 0, 0);
+    {and fade out in case enabled is set to false}//should go to "disabled" brightness
+  end
+  else
+    fisEnabled := True;
   CanMouseOver := fisEnabled;
 
   StopProfiler;
@@ -591,9 +601,9 @@ begin
 
   inherited ArrangeChildren;
   Image_out.AnchorToFrame(fFrame);
-  Image_out.SetBaseSize(0,0,1,1);
+  Image_out.SetBaseSize(0, 0, 1, 1);
   Image_over.AnchorToFrame(fFrame);
-  Image_over.SetBaseSize(0,0,1,1);
+  Image_over.SetBaseSize(0, 0, 1, 1);
 
   StopProfiler;
 end;
@@ -619,7 +629,7 @@ begin
 
   inherited ArrangeChildren;
   fLabel.AnchorToFrame(fFrame);
-  fLabel.SetBaseSize(0,0,1,1);
+  fLabel.SetBaseSize(0, 0, 1, 1);
   //fLabel.Base.Anchor[...] := acCenter;
 
   StopProfiler;
@@ -673,7 +683,7 @@ begin
 
   inherited ArrangeChildren;
   fLabel.AnchorToFrame(fFrame);
-  fLabel.SetBaseSize(0,0,1,1);
+  fLabel.SetBaseSize(0, 0, 1, 1);
 
   StopProfiler;
 end;
@@ -684,7 +694,8 @@ procedure DHealthLabel.SetTarget(const Value: DBasicActor);
 begin
   StartProfiler;
 
-  if fTarget <> Value then begin
+  if fTarget <> Value then
+  begin
     fTarget := Value;
     fLabel.Target := @Value.HP;
   end;
@@ -718,7 +729,7 @@ begin
 
   inherited ArrangeChildren;
   fLabel.AnchorToFrame(fFrame);
-  fLabel.SetBaseSize(0,0,1,1);
+  fLabel.SetBaseSize(0, 0, 1, 1);
 
   StopProfiler;
 end;
@@ -729,7 +740,8 @@ procedure DNameLabel.SetTarget(const Value: DBasicActor);
 begin
   StartProfiler;
 
-  if fTarget <> Value then begin
+  if fTarget <> Value then
+  begin
     fTarget := Value;
     fLabel.Target := @Value.Nickname;
   end;
@@ -745,7 +757,8 @@ procedure DFramedBar.SetTarget(const Value: PStatValue);
 begin
   StartProfiler;
 
-  if fTarget <> Value then begin
+  if fTarget <> Value then
+  begin
     fTarget := Value;
     fBar.Target := Value;
   end;
@@ -775,7 +788,7 @@ begin
 
   inherited ArrangeChildren;
   fBar.AnchorToFrame(fFrame);
-  fBar.SetBaseSize(0,0,1,1);
+  fBar.SetBaseSize(0, 0, 1, 1);
 
   StopProfiler;
 end;
@@ -818,28 +831,32 @@ end;
 {-----------------------------------------------------------------------------}
 
 procedure DStatBars.ArrangeChildren;
-var ScaleX: float;
+var
+  ScaleX: float;
 begin
   StartProfiler;
 
   inherited ArrangeChildren;
 
-  HP_bar. AnchorToFrame(fFrame);
+  HP_bar.AnchorToFrame(fFrame);
   STA_bar.AnchorToFrame(fFrame);
   CNC_bar.AnchorToFrame(fFrame);
   MPH_bar.AnchorToFrame(fFrame);
 
-  if (fTarget <> nil) and (fTarget.MaxMaxMPH > 0) then begin
-    ScaleX := 1/4;
-    MPH_bar.isVisible := true;
-  end else begin
-    ScaleX := 1/3;
-    MPH_bar.isVisible := false;
+  if (fTarget <> nil) and (fTarget.MaxMaxMPH > 0) then
+  begin
+    ScaleX := 1 / 4;
+    MPH_bar.isVisible := True;
+  end
+  else
+  begin
+    ScaleX := 1 / 3;
+    MPH_bar.isVisible := False;
   end;
-  HP_bar. SetBaseSize(       0,0,ScaleX,1);
-  STA_bar.SetBaseSize(  ScaleX,0,ScaleX,1);
-  CNC_bar.SetBaseSize(2*ScaleX,0,ScaleX,1);
-  MPH_bar.SetBaseSize(3*ScaleX,0,ScaleX,1);
+  HP_bar.SetBaseSize(0, 0, ScaleX, 1);
+  STA_bar.SetBaseSize(ScaleX, 0, ScaleX, 1);
+  CNC_bar.SetBaseSize(2 * ScaleX, 0, ScaleX, 1);
+  MPH_bar.SetBaseSize(3 * ScaleX, 0, ScaleX, 1);
 
   StopProfiler;
 end;
@@ -850,7 +867,8 @@ procedure DStatBars.SetTarget(const Value: DBasicActor);
 begin
   StartProfiler;
 
-  if fTarget <> Value then begin
+  if fTarget <> Value then
+  begin
     fTarget := Value;
     //and copy the target to all children
     HP_bar.Target := fTarget.HPRef;
@@ -871,12 +889,13 @@ procedure DPlayerBarsFull.SetTarget(const Value: DBasicActor);
 begin
   StartProfiler;
 
-  if fTarget <> Value then begin
+  if fTarget <> Value then
+  begin
     fTarget := Value;
     //and copy the target to all children
     PlayerBars.Target := Value;
-    Health.Target  := Value;
-    NickName.Target   := Value;
+    Health.Target := Value;
+    NickName.Target := Value;
   end;
 
   StopProfiler;
@@ -891,7 +910,7 @@ begin
   //inherited SpawnChildren;  <----- nothing to inherit
   PlayerBars := DStatBars.Create;
   Health := DHealthLabel.Create;
-  NickName  := DNameLabel.Create;
+  NickName := DNameLabel.Create;
 
   Grab(Health);
   Grab(NickName);
@@ -909,15 +928,15 @@ begin
   //inherited ArrangeChildren;
 
   NickName.AnchorTo(Self); //AnchorToFrame(fFrame);
-  NickName.SetBaseSize(0,0.9,1,0.1);
+  NickName.SetBaseSize(0, 0.9, 1, 0.1);
   //NickName.Base.Anchor[asBottom].AlignTo := noAlign;
   Health.AnchorTo(Self);
-  Health.SetBaseSize(0,0,1,0.1);
+  Health.SetBaseSize(0, 0, 1, 0.1);
   //Health.Base.Anchor[asTop].AlignTo := noAlign;
   PlayerBars.Base.AnchorTo(Self.Base);
-  PlayerBars.SetBaseSize(0,0.1,1,0.8);
-  PlayerBars.Base.AnchorTop(NickName.Base,vaBottom);
-  PlayerBars.Base.AnchorBottom(Health.Base,vaTop);
+  PlayerBars.SetBaseSize(0, 0.1, 1, 0.8);
+  PlayerBars.Base.AnchorTop(NickName.Base, vaBottom);
+  PlayerBars.Base.AnchorBottom(Health.Base, vaTop);
 
   {********** INTERFACE DESIGN BY Saito00 ******************}
 
@@ -1003,10 +1022,11 @@ procedure DPortrait.SetTarget(const Value: DPlayerCharacter);
 begin
   StartProfiler;
 
-  if fTarget <> Value then begin
-    fTarget := value;
+  if fTarget <> Value then
+  begin
+    fTarget := Value;
     //DStaticImage(content).FreeImage;
-    Log(LogInitInterface,_CurrentRoutine,'Load from portrait');
+    Log(LogInitInterface, _CurrentRoutine, 'Load from portrait');
     //DStaticImage(content).Load(Portrait_img[DRND.Random(Length(Portrait_img))]);  //todo
     fTarget.onHit := @Self.doHit;
     RearrangeChildren;
@@ -1022,11 +1042,11 @@ begin
   StartProfiler;
 
   inherited SpawnChildren;
-  Portrait:= DPlayerPortrait.Create;
+  Portrait := DPlayerPortrait.Create;
   Grab(Portrait);
-  DamageOverlay:= DStaticImage.Create;
+  DamageOverlay := DStaticImage.Create;
   Grab(DamageOverlay);
-  DamageLabel:= DDamageLabel.Create;
+  DamageLabel := DDamageLabel.Create;
   Grab(DamageLabel);
 
   StopProfiler;
@@ -1284,4 +1304,3 @@ end;}
 {---------------------------------------------------------------------}
 
 end.
-
