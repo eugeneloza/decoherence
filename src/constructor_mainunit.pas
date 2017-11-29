@@ -40,6 +40,7 @@ type
 type
   { main form for launching other editors }
   TMainForm = class(TLanguageForm)
+    FontEditorButton: TButton;
     PlaceholdersEditorButton: TButton;
     MapEditorButton: TButton;
     DungeonTilesEditorButton: TButton;
@@ -49,6 +50,7 @@ type
     procedure CompileButtonClick(Sender: TObject);
     procedure DungeonTilesEditorButtonClick(Sender: TObject);
     procedure FactsEditorButtonClick(Sender: TObject);
+    procedure FontEditorButtonClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -194,6 +196,11 @@ procedure TMainForm.FactsEditorButtonClick(Sender: TObject);
 begin
   //Application.CreateForm(TFactsEditor, FactsEditor);
   FactsEditor.Show;
+end;
+
+procedure TMainForm.FontEditorButtonClick(Sender: TObject);
+begin
+
 end;
 
 {----------------------------------------------------------------------------}

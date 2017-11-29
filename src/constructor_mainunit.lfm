@@ -11,11 +11,11 @@ object MainForm: TMainForm
   OnDestroy = FormDestroy
   LCLVersion = '1.9.0.0'
   object FactsEditorButton: TButton
-    Left = 208
+    Left = 168
     Height = 25
     Hint = 'Edit facts and images appearing at load screens'
-    Top = 40
-    Width = 99
+    Top = 48
+    Width = 139
     Caption = 'Load Screens'
     OnClick = FactsEditorButtonClick
     ParentShowHint = False
@@ -27,7 +27,7 @@ object MainForm: TMainForm
     Height = 25
     Hint = 'Save all the data to game folder. The data will be available in game.'
     Top = 212
-    Width = 75
+    Width = 92
     Caption = 'Compile'
     OnClick = CompileButtonClick
     ParentShowHint = False
@@ -35,11 +35,11 @@ object MainForm: TMainForm
     TabOrder = 1
   end
   object SaveButton: TButton
-    Left = 22
+    Left = 8
     Height = 25
     Hint = 'Save the source of the data to constructor folder for future editing. This data will not be available in-game until compiled.'
-    Top = 213
-    Width = 75
+    Top = 212
+    Width = 104
     Caption = 'Save'
     OnClick = SaveButtonClick
     ParentShowHint = False
@@ -50,8 +50,8 @@ object MainForm: TMainForm
     Left = 8
     Height = 25
     Hint = 'Edit dungeon tiles maps and other parameters'
-    Top = 40
-    Width = 112
+    Top = 48
+    Width = 152
     Caption = 'Dungeon Tiles'
     OnClick = DungeonTilesEditorButtonClick
     ParentShowHint = False
@@ -61,8 +61,8 @@ object MainForm: TMainForm
   object MapEditorButton: TButton
     Left = 8
     Height = 25
-    Top = 72
-    Width = 112
+    Top = 80
+    Width = 152
     Caption = 'Dungeon Map'
     OnClick = MapEditorButtonClick
     TabOrder = 4
@@ -70,10 +70,19 @@ object MainForm: TMainForm
   object PlaceholdersEditorButton: TButton
     Left = 8
     Height = 25
-    Top = 104
-    Width = 112
+    Top = 112
+    Width = 152
     Caption = 'Placeholders'
     OnClick = PlaceholdersEditorButtonClick
     TabOrder = 5
+  end
+  object FontEditorButton: TButton
+    Left = 168
+    Height = 25
+    Top = 80
+    Width = 139
+    Caption = 'Fonts'
+    OnClick = FontEditorButtonClick
+    TabOrder = 6
   end
 end
