@@ -193,7 +193,8 @@ type
 implementation
 
 uses SysUtils, Generics.Collections, CastleFilesUtils,
-  {$IFDEF BurnerImage}DecoBurner,{$ENDIF} DecoInterfaceLoader, DecoLog, Profiler;
+  {$IFDEF BurnerImage}DecoBurner,{$ENDIF} DecoInterfaceLoader, DecoMath,
+  DecoLog, Profiler;
 
 {=============================================================================}
 {============================= Abstract Image ================================}
@@ -826,13 +827,7 @@ end;
 
 procedure DStatBarImage.Update;
 
-  function AboveZero(const a: DFloat): DFloat; TryInline
-  begin
-    if a > 0 then
-      Result := a
-    else
-      Result := 0;
-  end;
+
 
 begin
   {StartProfiler}

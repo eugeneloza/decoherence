@@ -127,8 +127,8 @@ function MCE(NewTarget: TContextTarget; NewContextElement: TContextRecord;
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
-uses SysUtils, CastleVectors,
-  DecoLog, Profiler{, Math};
+uses SysUtils,
+  DecoLog, Profiler, DecoMath;
 
 function MCE(NewTarget: TContextTarget; NewContextElement: TContextRecord;
   NewImportance: DFloat = 1; NewMin: DFloat = 0; NewMax: DFloat = 1): DContextElement;
@@ -146,16 +146,6 @@ begin
 end;
 
 {-----------------------------------------------------------------------------}
-
-function Maximum(a, b: DFloat): DFloat;
-begin
-  {StartProfiler}
-  if a > b then
-    Result := a
-  else
-    Result := b;
-  {StopProfiler}
-end;
 
 function CompareElements(e1, e2: DContextElement): DFloat; {boolean}
 var
@@ -179,7 +169,7 @@ begin
   if e1.Max < e2.Min then
     Dist := e2.Min - e1.Max;
 
-  if Zero(Dist) then
+  if dZero(Dist) then
     Result := 1
   else
     Result := 1 - Maximum(e1.Importance, e2.Importance);
@@ -287,13 +277,13 @@ end;
 
 procedure DDialogueContext.Extract(const NewContext: DContext);
 var
-  temp: DContext;
+  Temp: DContext;
 begin
   {StartProfiler}
 
-  temp := NewContext;
-  Self.CopyContext(temp);
-  FreeAndNil(temp); //mmm? What did I mean by this?
+  Temp := NewContext;
+  Self.CopyContext(Temp);
+  FreeAndNil(Temp); //mmm? What did I mean by this?
 
   {StopProfiler}
 end;
@@ -316,7 +306,7 @@ begin
       Result := 0
     else
       Result *= CompareElements(tmp, Context.Demand[i]);
-    if Zero(Result) then
+    if dZero(Result) then
       Exit;
   end;
   for i := 0 to CheckContext.Demand.Count - 1 do
@@ -327,7 +317,7 @@ begin
       Result := 0
     else
       Result *= CompareElements(tmp, CheckContext.Demand[i]);
-    if Zero(Result) then
+    if dZero(Result) then
       Exit;
   end;
   {search across demand/allow not made? Fix it relevant to the logic.}

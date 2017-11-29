@@ -101,8 +101,6 @@ function GetRandomSeed: LongWord;
 
 function GetScenarioFolder: string;
 
-{ inlined equivalent of FloatEquals / Math.equals }
-function dEqual(const a, b: DFloat): Boolean; TryInline
 { check if URL is valid }
 function URLValid(const aURL: string): Boolean;
 
@@ -178,25 +176,6 @@ begin
   {StartProfiler}
 
   Result := ScenarioBaseFolder + CurrentScenarioFolder;
-
-  {StopProfiler}
-end;
-
-{ ---------------------------------------------------------------------------- }
-
-function dEqual(const a, b: DFloat): Boolean; TryInline
-Const
-  Epsilon = 1E-4;
-  { EZeroResolution = 1E-16;
-    DZeroResolution = 1E-12;
-    SZeroResolution = 1E-4; }
-begin
-  {StartProfiler}
-
-  if (a > b) then
-    Result := ((a - b) <= Epsilon)
-  else
-    Result := ((b - a) <= Epsilon);
 
   {StopProfiler}
 end;
