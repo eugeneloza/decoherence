@@ -202,6 +202,7 @@ begin
   {StartProfiler}
 
   FreeAndNil(LoadedFonts); //will free children
+  FreeAndNil(Fonts);
 
   {StopProfiler}
 end;
