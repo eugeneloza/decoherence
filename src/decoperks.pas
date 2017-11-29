@@ -40,7 +40,7 @@ type
     //PerkKind: TPerkKind;
     //PerkType: TPerkType;
     //Effect: TPerkEffect;
-    Strength: Float;
+    Strength: DFloat;
     PerkName: string;
     //Efficiency  modifier
     //Requirements

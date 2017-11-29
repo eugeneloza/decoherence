@@ -34,14 +34,14 @@ type
     at the moment it operates only AmbientIntensity }
   DMaterialContainer = class
   private
-    fAmbient: float;
+    fAmbient: DFloat;
   public
     { a list of materials }
     Value: TMaterialList;
     { used only to "Get" value}
-    property Ambient: float read fAmbient;
+    property Ambient: DFloat read fAmbient;
     { set Ambient Intensity for all models }
-    procedure SetAmbientIntensity(const v: float);
+    procedure SetAmbientIntensity(const v: DFloat);
     constructor Create;
     destructor Destroy; override;
   end;
@@ -167,7 +167,7 @@ begin
   {StopProfiler}
 end;
 
-procedure DMaterialContainer.SetAmbientIntensity(const v: float);
+procedure DMaterialContainer.SetAmbientIntensity(const v: DFloat);
 var
   i: TMaterialNode;
 begin

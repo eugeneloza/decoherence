@@ -104,7 +104,7 @@ type
   public
     { Real size of the Container }
     x1, y1, x2, y2: integer;
-    Opacity: float;
+    Opacity: DFloat;
 
 
     //procedure SetWidth(const aWidth: integer);
@@ -117,8 +117,8 @@ type
     procedure AssignTo(const Dest: DIntContainer);
 
     procedure SetIntCoord(const ax1, ay1, ax2, ay2: integer);
-    procedure SetIntFull(const ax1, ay1, ax2, ay2: integer; const aOpacity: float);
-    procedure SetIntFull(const ax1, ay1, ax2, ay2: float; const aOpacity: float);
+    procedure SetIntFull(const ax1, ay1, ax2, ay2: integer; const aOpacity: DFloat);
+    procedure SetIntFull(const ax1, ay1, ax2, ay2: DFloat; const aOpacity: DFloat);
     procedure SetIntSize(const ax1, ay1, aWidth, aHeight: integer);
 
     constructor Create(aOwner: DAnchoredObject); virtual;
@@ -134,7 +134,7 @@ type
     cx1, cx2, cy1, cy2, cw, ch: integer;
     cValid: boolean;
     { Parent container opacity }
-    co: float;
+    co: DFloat;
     { Determine and cache parent container size }
     procedure GetAnchors;
     { Anchor this Container to Window }
@@ -171,9 +171,9 @@ type
       However, maybe, reintroduction or manual scaling would be prefferable? }
     AnchorToWindow: boolean;
     { Float size of the Container }
-    fx1, fy1, fx2, fy2{,fw,fh}: float;
+    fx1, fy1, fx2, fy2{,fw,fh}: DFloat;
     { Base value of the opacity of the container }
-    BaseOpacity: float; //deprecated;
+    BaseOpacity: DFloat; //deprecated;
     { Keep proportions of the container }
     RealWidth, RealHeight: integer; //deprecated;
     { Can this item be scaled? Otherwise its w, h is always RealWidth, RealHeight}
@@ -186,10 +186,10 @@ type
     procedure Assign(const Source: DFloatContainer);
     procedure AssignTo(const Dest: DFloatContainer);
     { Set container position and size }
-    procedure SetFloatCoord(const afx1, afy1, afx2, afy2: float);
-    procedure SetFloatFull(const afx1, afy1, afx2, afy2, aOpacity: float);
-    procedure SetFloatSize(const afx1, afy1, afWidth, afHeight: float);
-    procedure SetFloatSizeFull(const afx1, afy1, afWidth, afHeight, aOpacity: float);
+    procedure SetFloatCoord(const afx1, afy1, afx2, afy2: DFloat);
+    procedure SetFloatFull(const afx1, afy1, afx2, afy2, aOpacity: DFloat);
+    procedure SetFloatSize(const afx1, afy1, afWidth, afHeight: DFloat);
+    procedure SetFloatSizeFull(const afx1, afy1, afWidth, afHeight, aOpacity: DFloat);
 
     { Sets int width/height for scaling animations }
     procedure SetIntWidthHeight(const aWidth, aHeight: integer); deprecated;
@@ -276,7 +276,7 @@ type
     Base: DFloatContainer;
     {source width/height of the element. Used to preserve proportions while scaling}
 
-    procedure SetBaseSize(const NewX, NewY, NewW, NewH: float; NewO: float = 1;
+    procedure SetBaseSize(const NewX, NewY, NewW, NewH: DFloat; NewO: DFloat = 1;
       const Animate: TAnimationStyle = asNone); virtual;
     //procedure SetIntSize(const x1,y1,x2,y2:integer; Animate: TAnimationStyle); virtual;
     { If the element is visible, if false then draw will not be called.
@@ -289,7 +289,7 @@ type
       Important: GetAnimationState must be called before setting basesize
       of the element as AnimateTo uses currentAnimationState}
     procedure AnimateTo(const Animate: TAnimationStyle;
-      const Duration: float = DefaultAnimationDuration);
+      const Duration: DFloat = DefaultAnimationDuration);
     procedure AnchorTo(const aElement: DAbstractElement);
   public
     constructor Create; virtual;//override;
@@ -458,7 +458,7 @@ begin
 end;
 
 procedure DIntContainer.SetIntFull(const ax1, ay1, ax2, ay2: integer;
-  const aOpacity: float);
+  const aOpacity: DFloat);
 begin
   {StartProfiler}
 
@@ -469,7 +469,7 @@ begin
   {StopProfiler}
 end;
 
-procedure DIntContainer.SetIntFull(const ax1, ay1, ax2, ay2: float; const aOpacity: float);
+procedure DIntContainer.SetIntFull(const ax1, ay1, ax2, ay2: DFloat; const aOpacity: DFloat);
 begin
   {StartProfiler}
 
@@ -718,7 +718,7 @@ end;
 
 procedure DFloatContainer.FloatToInteger;
 var
-  Ratio: float;
+  Ratio: DFloat;
 begin
   {StartProfiler}
 
@@ -764,7 +764,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DFloatContainer.SetFloatCoord(const afx1, afy1, afx2, afy2: float);
+procedure DFloatContainer.SetFloatCoord(const afx1, afy1, afx2, afy2: DFloat);
 begin
   {StartProfiler}
 
@@ -778,7 +778,7 @@ begin
   {StopProfiler}
 end;
 
-procedure DFloatContainer.SetFloatFull(const afx1, afy1, afx2, afy2, aOpacity: float);
+procedure DFloatContainer.SetFloatFull(const afx1, afy1, afx2, afy2, aOpacity: DFloat);
 begin
   {StartProfiler}
 
@@ -788,7 +788,7 @@ begin
   {StopProfiler}
 end;
 
-procedure DFloatContainer.SetFloatSize(const afx1, afy1, afWidth, afHeight: float);
+procedure DFloatContainer.SetFloatSize(const afx1, afy1, afWidth, afHeight: DFloat);
 begin
   {StartProfiler}
 
@@ -803,7 +803,7 @@ begin
 end;
 
 procedure DFloatContainer.SetFloatSizeFull(
-  const afx1, afy1, afWidth, afHeight, aOpacity: float);
+  const afx1, afy1, afWidth, afHeight, aOpacity: DFloat);
 begin
   {StartProfiler}
 
@@ -1181,9 +1181,9 @@ end;
 {----------------------------------------------------------------------------}
 
 procedure DAbstractElement.AnimateTo(const Animate: TAnimationStyle;
-  const Duration: float = DefaultAnimationDuration);
+  const Duration: DFloat = DefaultAnimationDuration);
 var
-  mx, my: float;
+  mx, my: DFloat;
 begin
   {StartProfiler}
 
@@ -1280,7 +1280,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DAbstractElement.SetBaseSize(const NewX, NewY, NewW, NewH: float; NewO: float = 1;
+procedure DAbstractElement.SetBaseSize(const NewX, NewY, NewW, NewH: DFloat; NewO: DFloat = 1;
   const Animate: TAnimationStyle = asNone);
 begin
   {StartProfiler}
@@ -1308,7 +1308,7 @@ end;
 
 procedure DAbstractElement.GetAnimationState;
 var
-  Phase: float;
+  Phase: DFloat;
 begin
   {StartProfiler}
 

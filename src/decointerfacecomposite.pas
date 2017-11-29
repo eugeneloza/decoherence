@@ -259,7 +259,7 @@ type
     { Player character which portrait is displayed }
     property Target: DPlayerCharacter read fTarget write SetTarget;
     { Call-back for character being hit }
-    procedure doHit(const Dam: float; const DamType: TDamageType);
+    procedure doHit(const Dam: DFloat; const DamType: TDamageType);
   end;
 
 {
@@ -832,7 +832,7 @@ end;
 
 procedure DStatBars.ArrangeChildren;
 var
-  ScaleX: float;
+  ScaleX: DFloat;
 begin
   {StartProfiler}
 
@@ -1066,7 +1066,7 @@ end;
 
 {---------------------------------------------------------------------------}
 
-procedure DPortrait.doHit(const dam: float; const damtype: TDamageType);
+procedure DPortrait.doHit(const dam: DFloat; const damtype: TDamageType);
 begin
   {StartProfiler}
 

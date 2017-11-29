@@ -123,14 +123,14 @@ type
   DPhasedImage = class abstract(DStaticImage)
   strict protected
     {current phases of the image}
-    Phase, PhaseShift: float;
+    Phase, PhaseShift: DFloat;
     //we need to store PhaseShift for override CyclePhase procedure
     procedure CyclePhase; virtual;
   public
     procedure Update; override;
   public
     { 1/seconds to scroll the full screen }
-    PhaseSpeed: float;
+    PhaseSpeed: DFloat;
     procedure Load(const URL: string); override;
     procedure Load(const CopyImage: TCastleImage); override;
   end;
@@ -140,7 +140,7 @@ type
     warning: wind images are scaled relative to Window }
   DWindImage = class(DPhasedImage)
   strict protected
-    OpacityPhase: float;
+    OpacityPhase: DFloat;
     procedure CyclePhase; override;
   public
     { completely overrides the default drawing procedure }
@@ -173,7 +173,7 @@ type
   public
     { minimmum, maximum, current maximum and current position
       minimum usually is zero and automatically set in constructor }
-    Min, Max, CurrentMax, Position: float;
+    Min, Max, CurrentMax, Position: DFloat;
     { vertical or horizontal style of the bar }
     Kind: TBarStyle;
     procedure doDraw; override;
@@ -826,7 +826,7 @@ end;
 
 procedure DStatBarImage.Update;
 
-  function AboveZero(const a: float): float; TryInline
+  function AboveZero(const a: DFloat): DFloat; TryInline
   begin
     if a > 0 then
       Result := a

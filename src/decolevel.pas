@@ -26,7 +26,7 @@ uses CastleWindow, {CastleWindowTouch,} CastleScene, X3DNodes,
   DecoLoad3d,
   SysUtils,
   DecoAbstractWorld, decodungeonworld, DecoDungeonGenerator,
-  DecoNavigation, decoglobal;
+  DecoNavigation, DecoGlobal;
 
 procedure LoadTestLevel;
 procedure InitTestLevel;

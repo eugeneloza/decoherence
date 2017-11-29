@@ -47,7 +47,7 @@ type
     px, py, pz, px0, py0, pz0: TIntCoordinate;
     {converts x,y,z to px,py,pz and returns true if changed
      *time-critical procedure}
-    function UpdatePlayerCoordinates(const x, y, z: float): boolean; TryInline
+    function UpdatePlayerCoordinates(const x, y, z: DFloat): boolean; TryInline
     {Manages tiles (show/hide/trigger events) *time-critical procedure}
     procedure ManageTiles; TryInline
   protected
@@ -99,7 +99,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-function DDungeonWorld.UpdatePlayerCoordinates(const x, y, z: float): boolean; TryInline
+function DDungeonWorld.UpdatePlayerCoordinates(const x, y, z: DFloat): boolean; TryInline
   //var nx,ny,nz: TIntCoordinate;
 begin
   {StartProfiler}

@@ -53,11 +53,11 @@ type
     Target: TContextTarget;
     { max and min values of the context element, e.g. that might go for
       disposition between 0.3 and 0.6 or for time between 3pm and 6pm }
-    Max, Min: float;
+    Max, Min: DFloat;
     { importance of this context element
       1 is critically important (default)
       0 is not important at all }
-    Importance: float;
+    Importance: DFloat;
     //constructor Create;
     //function Compare;
   end;
@@ -114,7 +114,7 @@ type
       just to grab and free the function Result }
     procedure Extract(const NewContext: DContext);
     { if the given context is compatible with this dialogue? }
-    function Compare(const CheckContext: DContext): float;
+    function Compare(const CheckContext: DContext): DFloat;
 
     constructor Create; //override;
     destructor Destroy; override;
@@ -122,7 +122,7 @@ type
 
 { make Context element }
 function MCE(NewTarget: TContextTarget; NewContextElement: TContextRecord;
-  NewImportance: float = 1; NewMin: float = 0; NewMax: float = 1): DContextElement;
+  NewImportance: DFloat = 1; NewMin: DFloat = 0; NewMax: DFloat = 1): DContextElement;
 
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
@@ -131,7 +131,7 @@ uses SysUtils, CastleVectors,
   DecoLog, Profiler{, Math};
 
 function MCE(NewTarget: TContextTarget; NewContextElement: TContextRecord;
-  NewImportance: float = 1; NewMin: float = 0; NewMax: float = 1): DContextElement;
+  NewImportance: DFloat = 1; NewMin: DFloat = 0; NewMax: DFloat = 1): DContextElement;
 begin
   {StopProfiler}
 
@@ -147,7 +147,7 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-function Maximum(a, b: float): float;
+function Maximum(a, b: DFloat): DFloat;
 begin
   {StartProfiler}
   if a > b then
@@ -157,9 +157,9 @@ begin
   {StopProfiler}
 end;
 
-function CompareElements(e1, e2: DContextElement): float; {boolean}
+function CompareElements(e1, e2: DContextElement): DFloat; {boolean}
 var
-  Dist: float;
+  Dist: DFloat;
 begin
   {StartProfiler}
   //fatal: comparing incompatible elements
@@ -300,7 +300,7 @@ end;
 
 {--------------------------------------------------------------------------}
 
-function DDialogueContext.Compare(const CheckContext: DContext): float;
+function DDialogueContext.Compare(const CheckContext: DContext): DFloat;
 var
   i: integer;
   tmp: DContextElement;

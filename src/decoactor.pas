@@ -32,7 +32,7 @@ type
   TDamageType = (dtHealth);
 
 type
-  TDamageProcedure = procedure(const Dam: Float;
+  TDamageProcedure = procedure(const Dam: DFloat;
     const Damtype: TDamageType) of object;
 
 type
@@ -114,7 +114,7 @@ type
   public
     { Height of this actor, usually should be zero,
       Mostly needed for player's camera height }
-    Height: Float;
+    Height: DFloat;
     { Determine gravity influence on this Actor }
     procedure doGravity;
     procedure Manage; override;
@@ -163,7 +163,7 @@ type
 
 type
   DStatValue = record
-    Current, Max, MaxMax: Float;
+    Current, Max, MaxMax: DFloat;
   end;
 
   PStatValue = ^DStatValue;
@@ -177,35 +177,35 @@ type
     fSTA: DStatValue;
     fCNC: DStatValue;
     fMPH: DStatValue;
-    procedure SetHP(const Value: Float);
-    procedure SetMaxHP(const Value: Float);
-    procedure SetMaxMaxHP(const Value: Float);
-    procedure SetSTA(const Value: Float);
-    procedure SetMaxSTA(const Value: Float);
-    procedure SetMaxMaxSTA(const Value: Float);
-    procedure SetCNC(const Value: Float);
-    procedure SetMaxCNC(const Value: Float);
-    procedure SetMaxMaxCNC(const Value: Float);
-    procedure SetMPH(const Value: Float);
-    procedure SetMaxMPH(const Value: Float);
-    procedure SetMaxMaxMPH(const Value: Float);
+    procedure SetHP(const Value: DFloat);
+    procedure SetMaxHP(const Value: DFloat);
+    procedure SetMaxMaxHP(const Value: DFloat);
+    procedure SetSTA(const Value: DFloat);
+    procedure SetMaxSTA(const Value: DFloat);
+    procedure SetMaxMaxSTA(const Value: DFloat);
+    procedure SetCNC(const Value: DFloat);
+    procedure SetMaxCNC(const Value: DFloat);
+    procedure SetMaxMaxCNC(const Value: DFloat);
+    procedure SetMPH(const Value: DFloat);
+    procedure SetMaxMPH(const Value: DFloat);
+    procedure SetMaxMaxMPH(const Value: DFloat);
   public
     { getters and setters }
-    property HP: Float read fHP.Current write SetHP;
-    property MaxHP: Float read fHP.Max write SetMaxHP;
-    property MaxMaxHP: Float read fHP.MaxMax write SetMaxMaxHP;
+    property HP: DFloat read fHP.Current write SetHP;
+    property MaxHP: DFloat read fHP.Max write SetMaxHP;
+    property MaxMaxHP: DFloat read fHP.MaxMax write SetMaxMaxHP;
     procedure ResetHP;
-    property STA: Float read fSTA.Current write SetSTA;
-    property MaxSTA: Float read fSTA.Max write SetMaxSTA;
-    property MaxMaxSTA: Float read fSTA.MaxMax write SetMaxMaxSTA;
+    property STA: DFloat read fSTA.Current write SetSTA;
+    property MaxSTA: DFloat read fSTA.Max write SetMaxSTA;
+    property MaxMaxSTA: DFloat read fSTA.MaxMax write SetMaxMaxSTA;
     procedure ResetSTA;
-    property CNC: Float read fCNC.Current write SetCNC;
-    property MaxCNC: Float read fCNC.Max write SetMaxCNC;
-    property MaxMaxCNC: Float read fCNC.MaxMax write SetMaxMaxCNC;
+    property CNC: DFloat read fCNC.Current write SetCNC;
+    property MaxCNC: DFloat read fCNC.Max write SetMaxCNC;
+    property MaxMaxCNC: DFloat read fCNC.MaxMax write SetMaxMaxCNC;
     procedure ResetCNC;
-    property MPH: Float read fMPH.Current write SetMPH;
-    property MaxMPH: Float read fMPH.Max write SetMaxMPH;
-    property MaxMaxMPH: Float read fMPH.MaxMax write SetMaxMaxMPH;
+    property MPH: DFloat read fMPH.Current write SetMPH;
+    property MaxMPH: DFloat read fMPH.Max write SetMaxMPH;
+    property MaxMaxMPH: DFloat read fMPH.MaxMax write SetMaxMaxMPH;
     procedure ResetMPH;
     procedure ResetAll;
 
@@ -215,9 +215,9 @@ type
     function MPHRef: PStatValue;
 
     { Hit equals to consume+drain }
-    procedure Hit(const Damage: Float; const Skill: Float); // =consumeHP
+    procedure Hit(const Damage: DFloat; const Skill: DFloat); // =consumeHP
     { Returns true if healed or false if nothing to heal }
-    function Heal(const Value: Float; const Skill: Float): boolean;
+    function Heal(const Value: DFloat; const Skill: DFloat): boolean;
     // =restoreHP
 
     { Abstract action preformed on Actor's death }
@@ -226,15 +226,15 @@ type
     { "consumption" procedures return true if success and false if failed,
       "restoration" procedures return true if something has been restored,
       "drain" procedures can drain Values below zero }
-    function ConsumeSTA(const Consumption: Float; const Skill: Float): boolean;
-    function RestoreSTA(const Restoration: Float; const Skill: Float): boolean;
-    procedure DrainSTA(const Drain: Float; const Skill: Float);
-    function ConsumeCNC(const Consumption: Float; const Skill: Float): boolean;
-    function RestoreCNC(const Restoration: Float; const Skill: Float): boolean;
-    procedure DrainCNC(const Drain: Float; const Skill: Float);
-    function ConsumeMPH(const Consumption: Float; const Skill: Float): boolean;
-    function RestoreMPH(const Restoration: Float; const Skill: Float): boolean;
-    procedure DrainMPH(const Drain: Float; const Skill: Float);
+    function ConsumeSTA(const Consumption: DFloat; const Skill: DFloat): boolean;
+    function RestoreSTA(const Restoration: DFloat; const Skill: DFloat): boolean;
+    procedure DrainSTA(const Drain: DFloat; const Skill: DFloat);
+    function ConsumeCNC(const Consumption: DFloat; const Skill: DFloat): boolean;
+    function RestoreCNC(const Restoration: DFloat; const Skill: DFloat): boolean;
+    procedure DrainCNC(const Drain: DFloat; const Skill: DFloat);
+    function ConsumeMPH(const Consumption: DFloat; const Skill: DFloat): boolean;
+    function RestoreMPH(const Restoration: DFloat; const Skill: DFloat): boolean;
+    procedure DrainMPH(const Drain: DFloat; const Skill: DFloat);
   public
     { events }
     onHit: TDamageProcedure;
@@ -295,7 +295,7 @@ type
   protected
     procedure doAI; override;
     { Call-back to react to external damage }
-    procedure doHit(const Dam: Float; const Damtype: TDamageType);
+    procedure doHit(const Dam: DFloat; const Damtype: TDamageType);
   public
     procedure Die; override;
     // procedure Manage; override;
@@ -355,7 +355,7 @@ end;
 
 procedure DCoordActor.GetRandomDirection;
 var
-  rDir: Float;
+  rDir: DFloat;
 begin
   {StartProfiler}
 
@@ -570,7 +570,7 @@ end;
 
 { ---------------------------------------------------------------------------- }
 
-procedure DBasicActor.SetHP(const Value: Float);
+procedure DBasicActor.SetHP(const Value: DFloat);
 begin
   if Value < fHP.Max then
     fHP.Current := Value
@@ -580,7 +580,7 @@ begin
     Die;
 end;
 
-procedure DBasicActor.SetMaxHP(const Value: Float);
+procedure DBasicActor.SetMaxHP(const Value: DFloat);
 begin
   if Value < fHP.MaxMax then
     fHP.Max := Value
@@ -590,7 +590,7 @@ begin
     Die;
 end;
 
-procedure DBasicActor.SetMaxMaxHP(const Value: Float);
+procedure DBasicActor.SetMaxMaxHP(const Value: DFloat);
 begin
   if fHP.MaxMax < Value then
     Heal(Value - fHP.MaxMax, 1);
@@ -607,7 +607,7 @@ end;
 
 { --------------------------------------------------------------------------- }
 
-procedure DBasicActor.SetSTA(const Value: Float);
+procedure DBasicActor.SetSTA(const Value: DFloat);
 begin
   if Value < fSTA.Max then
     fSTA.Current := Value
@@ -617,7 +617,7 @@ begin
     { EXAUSTED STATE };
 end;
 
-procedure DBasicActor.SetMaxSTA(const Value: Float);
+procedure DBasicActor.SetMaxSTA(const Value: DFloat);
 begin
   if Value < fSTA.MaxMax then
     fSTA.Max := Value
@@ -627,7 +627,7 @@ begin
     { EXAUSTED STATE };
 end;
 
-procedure DBasicActor.SetMaxMaxSTA(const Value: Float);
+procedure DBasicActor.SetMaxMaxSTA(const Value: DFloat);
 begin
   if fSTA.MaxMax < Value then
     RestoreSTA(Value - fSTA.MaxMax, 1);
@@ -644,7 +644,7 @@ end;
 
 { ----------------------------------------------------------------------------- }
 
-procedure DBasicActor.SetCNC(const Value: Float);
+procedure DBasicActor.SetCNC(const Value: DFloat);
 begin
   if Value < fCNC.Max then
     fCNC.Current := Value
@@ -654,7 +654,7 @@ begin
     { BURN-OUT STATE };
 end;
 
-procedure DBasicActor.SetMaxCNC(const Value: Float);
+procedure DBasicActor.SetMaxCNC(const Value: DFloat);
 begin
   if Value < fCNC.MaxMax then
     fCNC.Max := Value
@@ -664,7 +664,7 @@ begin
     { BURN-OUT STATE };
 end;
 
-procedure DBasicActor.SetMaxMaxCNC(const Value: Float);
+procedure DBasicActor.SetMaxMaxCNC(const Value: DFloat);
 begin
   if fCNC.MaxMax < Value then
     RestoreCNC(Value - fCNC.MaxMax, 1);
@@ -681,7 +681,7 @@ end;
 
 { --------------------------------------------------------------------------- }
 
-procedure DBasicActor.SetMPH(const Value: Float);
+procedure DBasicActor.SetMPH(const Value: DFloat);
 begin
   if Value < fMPH.Max then
     fMPH.Current := Value
@@ -691,7 +691,7 @@ begin
     { * STATE };
 end;
 
-procedure DBasicActor.SetMaxMPH(const Value: Float);
+procedure DBasicActor.SetMaxMPH(const Value: DFloat);
 begin
   if Value < fMPH.MaxMax then
     fMPH.Max := Value
@@ -701,7 +701,7 @@ begin
     { * STATE };
 end;
 
-procedure DBasicActor.SetMaxMaxMPH(const Value: Float);
+procedure DBasicActor.SetMaxMaxMPH(const Value: DFloat);
 begin
   if fMPH.MaxMax < Value then
     RestoreMPH(Value - fMPH.MaxMax, 1);
@@ -750,7 +750,7 @@ end;
 
 { --------------------------------------------------------------------------- }
 
-procedure DBasicActor.Hit(const Damage: Float; const Skill: Float);
+procedure DBasicActor.Hit(const Damage: DFloat; const Skill: DFloat);
 begin
   SetHP(HP - Damage);
   SetMaxHP(MaxHP - Damage * Skill); // todo
@@ -758,7 +758,7 @@ begin
     Self.onHit(Damage, dtHealth);
 end;
 
-function DBasicActor.Heal(const Value: Float; const Skill: Float): boolean;
+function DBasicActor.Heal(const Value: DFloat; const Skill: DFloat): boolean;
 begin
   if (HP < MaxHP) or ((MaxHP < MaxMaxHP) and (Skill > 0)) then
   begin
@@ -772,7 +772,7 @@ end;
 
 { ----------------------------------------------------------------------------- }
 
-function DBasicActor.ConsumeSTA(const Consumption: Float; const Skill: Float): boolean;
+function DBasicActor.ConsumeSTA(const Consumption: DFloat; const Skill: DFloat): boolean;
 begin
   if (STA > Consumption) then
   begin
@@ -784,7 +784,7 @@ begin
     Result := False;
 end;
 
-function DBasicActor.RestoreSTA(const Restoration: Float; const Skill: Float): boolean;
+function DBasicActor.RestoreSTA(const Restoration: DFloat; const Skill: DFloat): boolean;
 begin
   if (STA < MaxSTA) or ((MaxSTA < MaxMaxSTA) and (Skill > 0)) then
   begin
@@ -796,7 +796,7 @@ begin
     Result := False;
 end;
 
-procedure DBasicActor.DrainSTA(const Drain: Float; const Skill: Float);
+procedure DBasicActor.DrainSTA(const Drain: DFloat; const Skill: DFloat);
 begin
   SetSTA(STA - Drain);
   SetMaxSTA(MaxSTA - Drain * Skill); // todo
@@ -804,7 +804,7 @@ end;
 
 { ----------------------------------------------------------------------------- }
 
-function DBasicActor.ConsumeCNC(const Consumption: Float; const Skill: Float): boolean;
+function DBasicActor.ConsumeCNC(const Consumption: DFloat; const Skill: DFloat): boolean;
 begin
   if (CNC > Consumption) then
   begin
@@ -816,7 +816,7 @@ begin
     Result := False;
 end;
 
-function DBasicActor.RestoreCNC(const Restoration: Float; const Skill: Float): boolean;
+function DBasicActor.RestoreCNC(const Restoration: DFloat; const Skill: DFloat): boolean;
 begin
   if (CNC < MaxCNC) or ((MaxCNC < MaxMaxCNC) and (Skill > 0)) then
   begin
@@ -828,7 +828,7 @@ begin
     Result := False;
 end;
 
-procedure DBasicActor.DrainCNC(const Drain: Float; const Skill: Float);
+procedure DBasicActor.DrainCNC(const Drain: DFloat; const Skill: DFloat);
 begin
   SetCNC(CNC - Drain);
   SetMaxCNC(MaxCNC - Drain * Skill); // todo
@@ -836,7 +836,7 @@ end;
 
 { ----------------------------------------------------------------------------- }
 
-function DBasicActor.ConsumeMPH(const Consumption: Float; const Skill: Float): boolean;
+function DBasicActor.ConsumeMPH(const Consumption: DFloat; const Skill: DFloat): boolean;
 begin
   if (MPH > Consumption) then
   begin
@@ -848,7 +848,7 @@ begin
     Result := False;
 end;
 
-function DBasicActor.RestoreMPH(const Restoration: Float; const Skill: Float): boolean;
+function DBasicActor.RestoreMPH(const Restoration: DFloat; const Skill: DFloat): boolean;
 begin
   if (MPH < MaxMPH) or ((MaxMPH < MaxMaxMPH) and (Skill > 0)) then
   begin
@@ -860,7 +860,7 @@ begin
     Result := False;
 end;
 
-procedure DBasicActor.DrainMPH(const Drain: Float; const Skill: Float);
+procedure DBasicActor.DrainMPH(const Drain: DFloat; const Skill: DFloat);
 begin
   SetMPH(MPH - Drain);
   SetMaxMPH(MaxMPH - Drain * Skill); // todo
@@ -1069,7 +1069,7 @@ end;
 procedure DActor.GetEnemyTarget;
 var
   a, e: DSimpleActor;
-  d, d_min: Float;
+  d, d_min: DFloat;
 begin
   {StartProfiler}
 
@@ -1268,7 +1268,7 @@ end;
 
 { ----------------------------------------------------------------------------- }
 
-procedure DMonster.doHit(const Dam: Float; const Damtype: TDamageType);
+procedure DMonster.doHit(const Dam: DFloat; const Damtype: TDamageType);
 begin
   {StartProfiler}
 

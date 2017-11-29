@@ -38,7 +38,7 @@ type
     { CameraMan reqruies different handling of "up" vector }
     Up: TVector3;
     { Rotations of the CameraMan, required for smoother camera rotations }
-    Theta, Phi: float;
+    Theta, Phi: DFloat;
     { Sets Up to GravityUp }
     procedure ResetUp;
     { Resets Theta and Phi to match CameraMan.Direction
@@ -168,7 +168,7 @@ procedure FreePlayer;
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
-uses SysUtils, Math, {$WARNING Math redefines float}
+uses SysUtils, Math,
   DecoNavigation, DecoAbstractWorld, DecoAbstractWorld3d,
   DecoInput,
   DecoGameMode, DecoTime, DecoLog, Profiler;
@@ -244,7 +244,7 @@ end;
 
 procedure DParty.UpdateCamera;
 var
-  aFriction: float;
+  aFriction: DFLoat;
 begin
   {StartProfiler}
 
@@ -396,9 +396,9 @@ end;
 
 procedure DParty.doMove2;
 var
-  FixedFriction: float;
+  FixedFriction: DFLoat;
 
-  function TryDirection(climb, slide: float): boolean;
+  function TryDirection(Climb, Slide: DFloat): boolean;
   var
     NewPosAdjusted, NewPosHeightAdjusted, ProposedDir: TVector3;
   begin

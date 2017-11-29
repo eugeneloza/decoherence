@@ -33,7 +33,7 @@ type
   private
     { Average and Min distance between nav points
       Warning, this might go very,very wrong if 2 nav poinst are too close }
-    fNavMinStep, fNavAvgStep: float;
+    fNavMinStep, fNavAvgStep: DFloat;
     procedure CacheNavDistance;
   protected
     fSeed: longword;
@@ -47,7 +47,7 @@ type
     {$HINT todo: LastRender = -1 does the same job, optimize it}
     {$HINT allow first initialization flow during load without caring for FPS!}
     FirstRender: boolean;
-    fGravityAcceleration: float;
+    fGravityAcceleration: DFloat;
   protected
     { Spawns Actors in the World }
     procedure SpawnActors; virtual; abstract;
@@ -55,7 +55,7 @@ type
     { Acceleration of gravity in this World
       Pay attention, nothing special happens (yet) if it is zero
       in m/s^2 }
-    property GravityAcceleration: float read fGravityAcceleration;
+    property GravityAcceleration: DFloat read fGravityAcceleration;
     { Seed used to "build" the World if it requires random}
     property Seed: longword read fSeed write fSeed;
     { World management routine. Called every frame;
@@ -99,7 +99,7 @@ type
     {scale used to define a tile size. Usually 1 is man-height.
       CAUTION this scale must correspond to tiles model scale, otherwise it'll mess everything up}
   var
-    WorldScale: float;
+    WorldScale: DFloat;
   public
     Nav: TNavList;
     Weenies: TWeeniesList;
@@ -213,7 +213,7 @@ procedure DAbstractWorld.CacheNavDistance;
 var
   i, j: TNavID;
   Count: integer;
-  d, min, sum: float;
+  d, min, sum: DFloat;
 begin
   {StartProfiler}
 
@@ -239,7 +239,7 @@ end;
 function DAbstractWorld.PositionToNav(const aPosition: TVector3): TNavID;
 var
   i, m: TNavID;
-  d, min_d: float;
+  d, min_d: DFloat;
 begin
   {StartProfiler}
 

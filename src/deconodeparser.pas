@@ -34,11 +34,11 @@ type
     {is this node visible? (default=true)}
     Visible: boolean;
     {random chance to be placed (default=1.0)}
-    Rand: float;
+    Rand: DFloat;
     {symmetry group / autoassigned; -1 is no symmetry}
     Symmetry: integer;
     {possible deviation angle in radians (default = 0.0)}
-    Deviationangle: float;
+    Deviationangle: DFloat;
     {placeholder marker}
     Placeholder: string;
     {name marker}

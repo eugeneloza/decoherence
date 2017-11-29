@@ -51,7 +51,7 @@ var
 {Loads data for all in-game races and Professions}
 procedure LoadRaceProfessionData;
 {Checks compatibility of the race and Profession in 0..1 range; returns "-1" if and  race combination is impossible}
-function CheckCompatibiliyGeneration(const Race, Profession: DRaceProfession): Float;
+function CheckCompatibiliyGeneration(const Race, Profession: DRaceProfession): DFloat;
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
@@ -119,7 +119,7 @@ begin
   {StopProfiler}
 end;
 
-function CheckCompatibiliyGeneration(const race, Profession: DRaceProfession): Float;
+function CheckCompatibiliyGeneration(const race, Profession: DRaceProfession): DFloat;
 var //flg: boolean;
   i, DiffBonus, DiffStats: integer;
 begin

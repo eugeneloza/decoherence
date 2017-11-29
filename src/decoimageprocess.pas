@@ -26,7 +26,7 @@ uses CastleImages,
 
 { Makes the image brighter (default 20%)
  warning: creates a copy of the image!}
-function Brighter(const aImage: TCastleImage; const Mult: float = 1.2): TCastleImage;
+function Brighter(const aImage: TCastleImage; const Mult: DFloat = 1.2): TCastleImage;
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
@@ -72,7 +72,7 @@ end;
 
 {------------------------------------------------------------------------}
 
-function Brighter(const aImage: TCastleImage; const Mult: float = 1.2): TCastleImage;
+function Brighter(const aImage: TCastleImage; const Mult: DFloat = 1.2): TCastleImage;
 var
   IMG: TRGBAlphaImage;
   p: PVector4byte;

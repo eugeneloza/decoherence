@@ -74,7 +74,7 @@ type
     Resource: DBodyResource;
     { Coefficient to slow the time. E.g. 0.9 will slow time by 10% for this
       actor's body animations }
-    SlowTimeRate: float;
+    SlowTimeRate: DFloat;
     { Resets the current playing animation }
     procedure ResetAnimation;
 

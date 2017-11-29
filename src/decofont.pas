@@ -68,7 +68,7 @@ type
     function BrokenStringToImage(const s: DStringList): TGrayscaleAlphaImage;
     { Converts a broken string into a single image with shadow }
     function BrokenStringToImageWithShadow(const s: DStringList;
-      ShadowStrength: float; ShadowLength: integer): TGrayscaleAlphaImage;
+      ShadowStrength: DFloat; ShadowLength: integer): TGrayscaleAlphaImage;
     { Breaks a string to a DStringList }
     function BreakStings(const s: string; const w: integer): DStringList;
   end;
@@ -280,7 +280,7 @@ end;
 {---------------------------------------------------------------------------}
 
 function DFont.BrokenStringToImageWithShadow(const s: DStringList;
-  ShadowStrength: float; ShadowLength: integer): TGrayscaleAlphaImage;
+  ShadowStrength: DFloat; ShadowLength: integer): TGrayscaleAlphaImage;
 var
   DummyImage, ShadowImage: TGrayscaleAlphaImage;
   Iteration, i: integer;

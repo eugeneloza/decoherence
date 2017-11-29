@@ -55,9 +55,9 @@ var { analogue to Now function, but a fast-access variable, representing
     DecoNowLocal: DTime;
     DeltaTLocal: DTime;
 
-    SoftPause: float = 0.0;
-    SoftPauseCoefficient: float = 1.0;
-    LocalTimeFlowSpeed: float = 1.0;
+    SoftPause: DFloat = 0.0;
+    SoftPauseCoefficient: DFloat = 1.0;
+    LocalTimeFlowSpeed: DFloat = 1.0;
 
 { Returns a nice date and time as a string (e.g. for naming files) }
 function NiceDate: string;

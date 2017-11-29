@@ -43,7 +43,7 @@ type
     { Font to print the label }
     Font: DFont;
     { Shadow intensity. Shadow=0 is no shadow (strictly) }
-    ShadowIntensity: Float;
+    ShadowIntensity: DFloat;
     { Shadow length in pixels }
     ShadowLength: integer;
     constructor Create; override;
@@ -120,14 +120,14 @@ type
     procedure CyclePhase; //virtual;
   public
     {current phases of the Label}
-    Phase, OpacityPhase: float;
+    Phase, OpacityPhase: DFloat;
     //we need to store PhaseShift for override CyclePhase procedure
     procedure Update; override;
     procedure doDraw; override;
     constructor Create; override;
   public
     { 1/seconds to scroll the full screen }
-    PhaseSpeed: float;
+    PhaseSpeed: DFloat;
   end;
 
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
@@ -385,7 +385,7 @@ end;
 
 procedure DPhasedLabel.CyclePhase;
 var
-  PhaseShift: float;
+  PhaseShift: DFloat;
 begin
   {StartProfiler}
 
