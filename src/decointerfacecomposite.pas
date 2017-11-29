@@ -669,7 +669,7 @@ begin
   Frame := Characterbar_Bottom;
   fLabel := DFloatLabel.Create; //scale=false
   fLabel.Digits := 0;
-  fLabel.Font := PlayerHealthFont;
+  fLabel.Font := GetFont('PlayerHealth');
   Grab(fLabel);
 
   {StopProfiler}
@@ -715,7 +715,7 @@ begin
   inherited SpawnChildren;
   Frame := Characterbar_Top;
   fLabel := DStringLabel.Create;  //scale=false
-  fLabel.Font := PlayerNameFont;
+  fLabel.Font := GetFont('PlayerName');;
   Grab(fLabel);
 
   {StopProfiler}

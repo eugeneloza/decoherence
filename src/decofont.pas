@@ -73,14 +73,18 @@ type
     function BreakStings(const s: string; const w: integer): DStringList;
   end;
 
-var
-  DefaultFont: DFont;
+type
+  { }
+  DLoadedFonts = specialize TObjectDictionary<string, DFont>;
+  DFontList = specialize TDictionary<string, DFont>;
 
-  PlayerHealthFont, PlayerNameFont: DFont;
-  LoadScreenFont: DFont;
-  PlayerDamageFont: DFont;
+var
+  Fonts: DFontList;
+
+  DefaultFont: DFont;
   DebugFont: DFont;
 
+function GetFont(const FontString: string): DFont; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
 procedure InitializeFonts;
 procedure DestroyFonts;
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
@@ -91,23 +95,47 @@ uses DecoLog, Profiler;
 {these are internal variables which are managed,
  "external" fonts variables are assigned to these}
 var
-  RegularFont12, RegularFont16, RegularFont100: DFont;
+  LoadedFonts: DLoadedFonts;
+
+{------------------------------------------------------------------------------}
+
+function GetFont(const FontString: string): DFont; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+begin
+  Result := nil; //to avoid uninitialized variable hint
+  if not Fonts.TryGetValue(FontString, Result) then
+  begin
+    Log(LogInterfaceError, _CurrentRoutine, 'Unknown Font: '+FontString);
+    Result := DefaultFont;
+  end;
+end;
 
 {------------------------------------------------------------------------------}
 
 procedure SetFonts;
+  function GetLoadedFont(const FontString: string): DFont;
+  begin
+    Result := nil; //to avoid uninitialized variable hint
+    if not LoadedFonts.TryGetValue(FontString, Result) then
+    begin
+      Log(LogInterfaceError, _CurrentRoutine, 'Unknown Font: '+FontString);
+      Result := DefaultFont;
+    end;
+  end;
 begin
   {StartProfiler}
 
-  DefaultFont := RegularFont16;
-  DebugFont := RegularFont12;
+  Fonts := DFontList.Create;
 
-  PlayerHealthFont := RegularFont12;
-  PlayerNameFont := RegularFont12;
+  //make DebugFont more fail-proof!!! e.g. by using UIFont
+  LoadedFonts.TryGetValue('xolonium-12', DebugFont);
 
-  LoadScreenFont := RegularFont16;
+  if not LoadedFonts.TryGetValue('xolonium-16', DefaultFont) then
+    raise Exception.Create('FATAL: cannot create default font!');
 
-  PlayerDamageFont := RegularFont100;
+  Fonts.Add('PlayerHealth',GetLoadedFont('xolonium-12'));
+  Fonts.Add('PlayerName',GetLoadedFont('xolonium-12'));
+  Fonts.Add('LoadScreen',GetLoadedFont('xolonium-16'));
+  Fonts.Add('PlayerDamage',GetLoadedFont('xolonium-num-99'));
 
   {StopProfiler}
 end;
@@ -117,9 +145,22 @@ procedure InitializeFonts;
 var
   FullCharSet: TUnicodeCharList;
   NumCharSet: TUnicodeCharList;
+  {maybe also ASCII-only? char list}
+
+  function GetFontFile(const FontName: string; const FullChar: boolean; const FontSize: integer; const FontGap: integer = 0): DFont;
+  var
+    CharSet: TUnicodeCharList;
+  begin
+    if FullChar then CharSet := FullCharSet else CharSet := NumCharSet;
+    Result := DFont.Create(ApplicationData(FontFolder + FontName),
+      FontSize, True, CharSEt);
+    Result.Gap := FontGap;
+  end;
 {$ENDIF}
 begin
   {StartProfiler}
+
+  LoadedFonts := DLoadedFonts.Create([doOwnsValues]);
 
   Log(LogInitInterface, _CurrentRoutine, 'Init started');
    {$IFDEF Android}
@@ -132,20 +173,16 @@ begin
   //MyCharSet := AllChars;
   FullCharSet.Add(SimpleAsciiCharacters);
   FullCharSet.Add(
-    'ЁЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮёйцукенгшщзхъфывапролджэячсмитьбюІЇЄіїє');
+    'ЁЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮёйцукенгшщзхъфывапролджэячсмитьбю'); {ІЇЄіїє}
   NumCharSet := TUnicodeCharList.Create;
   NumCharSet.Add('1234567890');
 
   //load the font files
-  RegularFont12 := DFont.Create(ApplicationData(FontFolder + NormalFontFile),
-    12, True, FullCharSet);
-  RegularFont12.Gap := 3;
-  RegularFont16 := DFont.Create(ApplicationData(FontFolder + NormalFontFile),
-    16, True, FullCharSet);
-  RegularFont16.Gap := 3;
-  RegularFont100 := DFont.Create(ApplicationData(FontFolder + NormalFontFile),
-    100, True, NumCharSet);
-  RegularFont100.Gap := 3;
+
+
+  LoadedFonts.Add('xolonium-12',GetFontFile(NormalFontFile, true, 12, 3));
+  LoadedFonts.Add('xolonium-16',GetFontFile(NormalFontFile, true, 16, 3));
+  LoadedFonts.Add('xolonium-num-99',GetFontFile(NormalFontFile, false, 99, 3));
 
   //release char sets
   FreeAndNil(FullCharSet);
@@ -164,9 +201,7 @@ procedure DestroyFonts;
 begin
   {StartProfiler}
 
-  FreeAndNil(RegularFont12);
-  FreeAndNil(RegularFont16);
-  FreeAndNil(RegularFont100);
+  FreeAndNil(LoadedFonts); //will free children
 
   {StopProfiler}
 end;

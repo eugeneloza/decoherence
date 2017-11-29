@@ -117,10 +117,10 @@ begin
   Floater.SetBaseSize(0, 0, 1, 1);
   Floater.onCycleFinish := @ReloadFact;
 
-  FloaterLabel.Font := LoadScreenFont;
+  FloaterLabel.Font := GetFont('LoadScreen');
 
   MainLabel.Base.AnchorToWindow := True;
-  MainLabel.Font := LoadScreenFont;
+  MainLabel.Font := GetFont('LoadScreen');
   MainLabel.ShadowIntensity := 1;
 
   ReloadFact;
