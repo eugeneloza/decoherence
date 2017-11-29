@@ -75,7 +75,8 @@ implementation
 
 {$IFDEF UseProfiler}
 uses SysUtils, CastleLog,
-  Generics.Defaults, Generics.Collections, CastleTimeUtils;
+  Generics.Defaults, Generics.Collections,
+  DecoTime;
 
 type
   { A profiler record }
@@ -83,7 +84,7 @@ type
     { Profiled procedure name }
     EntryName: string;
     { Total procedure time }
-    EntryTime: TFloatTime;
+    EntryTime: DTime;
     { Number of procedure calls }
     EntryHits: integer;
   end;
@@ -96,7 +97,7 @@ type
     { Higher level element }
     Parent: TProfiler;
     { Last access time (assigned by StartProfiler)}
-    TimerStart: TTimerResult;
+    TimerStart: DTime;
     { Tree of children }
     Children: TProfilerList;
     constructor Create; //override;
@@ -109,9 +110,9 @@ var
   { Current profiler level }
   CurrentLevel: TProfiler;
 
-  ProgramStartTime: TTimerResult;
+  ProgramStartTime: DTime;
 
-  SelfUsedTime: TFloatTime;
+  SelfUsedTime: DTime;
 
 
 constructor TProfiler.Create;
@@ -153,29 +154,29 @@ procedure doStartProfiler(const aFunction: string); TryInline
 
 var
   CurrentElement: TProfiler;
-  CurrentTimer: TTimerResult;
+  CurrentTimer: DTime;
 begin
-  CurrentTimer := Timer;
+  CurrentTimer := GetNow;
 
   //find entry for aFunction
   CurrentElement := FindEntry;
   //start counting time for it
-  CurrentElement.TimerStart := Timer;
+  CurrentElement.TimerStart := GetNow;
   //and switch down a level
   CurrentLevel := CurrentElement;
 
-  SelfUsedTime += TimerSeconds(Timer, CurrentTimer);
+  SelfUsedTime += GetNow - CurrentTimer;
 end;
 
 procedure doStopProfiler(const aFunction: string); TryInline
 var
-  CurrentTimer: TTimerResult;
+  CurrentTimer: DTime;
 begin
-  CurrentTimer := Timer;
+  CurrentTimer := GetNow;
 
   repeat
     //stop counting time and record the result
-    CurrentLevel.EntryTime += TimerSeconds(Timer, CurrentLevel.TimerStart);
+    CurrentLevel.EntryTime += GetNow - CurrentLevel.TimerStart;
     //increase number of accesses to the function
     Inc(CurrentLevel.EntryHits);
     //and return to upper level profiler
@@ -189,7 +190,7 @@ begin
   //and return to upper level profiler
   CurrentLevel := CurrentLevel.Parent;
 
-  SelfUsedTime += TimerSeconds(Timer, CurrentTimer);
+  SelfUsedTime += GetNow - CurrentTimer;
 end;
 
 {$IFDEF SortProfilerResults}
@@ -212,7 +213,7 @@ type
 
 procedure DisplayProfilerResult;
 
-  function DisplayTime(t: TFloatTime): string;
+  function DisplayTime(t: DTime): string;
   begin
     Result := FloatToStr(Round(t * 1000) / 1000) + 's';
   end;
@@ -236,8 +237,7 @@ procedure DisplayProfilerResult;
 
 begin
   WriteLnLog('--------- Profiler analysis --------');
-  WriteLnLog('Total Execution Time = ' + DisplayTime(TimerSeconds(Timer,
-    ProgramStartTime)));
+  WriteLnLog('Total Execution Time = ' + DisplayTime(GetNow - ProgramStartTime));
   WriteLnLog('Profiler itself consumed ' + DisplayTime(SelfUsedTime));
   //the top element is not displayed, only its children
   DisplayRecoursive(TopProfiler, '');
@@ -246,7 +246,7 @@ end;
 
 initialization
   SelfUsedTime := 0;
-  ProgramStartTime := Timer;
+  ProgramStartTime := GetNow;
   TopProfiler := TProfiler.Create;
   CurrentLevel := TopProfiler;
 
