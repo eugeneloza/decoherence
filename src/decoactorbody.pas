@@ -65,8 +65,7 @@ type
       At the moment it is absolutely identical to our implementation of time }
     Time: single;
     { Move Actor's time forward }
-    procedure AdvanceTime(const SecondsPassed: single);
-{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+    procedure AdvanceTime(const SecondsPassed: single); TryInline
   public
     { Name of current and next animation }
     CurrentAnimationName, NextAnimationName: string;
@@ -182,8 +181,7 @@ end;
 
 {---------------------------------------------------------------------------}
 
-procedure DBody.AdvanceTime(const SecondsPassed: single);
-{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+procedure DBody.AdvanceTime(const SecondsPassed: single); TryInline
 begin
   {StartProfiler}
 

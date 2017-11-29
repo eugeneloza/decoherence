@@ -66,14 +66,14 @@ procedure doTime;
 {Requests a soft-pause (animations run, but actors do not preform actions)}
 procedure RequestSoftPauseByAction(const PauseSeconds: DTime);
 { Gets CastleTimeUtils.Timer value from some "starting point" in a thread-safe way }
-function GetNow: DTime; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
-function GetNowInt: DIntTime; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+function GetNow: DTime; TryInline
+function GetNowInt: DIntTime; TryInline
 { This is a less accurate but accelerated (~130 times) version
   of the timer by using threads. Should be used after ForceGetNowThread.
   Should be used only in time-critical cases, such as World.Manage }
-function GetNowThread: DThreadedTime; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+function GetNowThread: DThreadedTime; TryInline
 { Forces initialization of the threaded timer value. }
-function ForceGetNowThread: DThreadedTime; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+function ForceGetNowThread: DThreadedTime; TryInline
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 uses SysUtils, Classes{$IFDEF Windows}, SyncObjs{$ENDIF};
@@ -137,7 +137,7 @@ var
   TimerFrequency: TTimerFrequency;
   TimerLock: TCriticalSection;  //we'll need a critical section as we access FTimerState.
 
-function Timer: DIntTime; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+function Timer: DIntTime; TryInline
 var QueryPerformance: boolean;
 begin
   TimerLock.Acquire;   //maybe, this is redundant, but let it be here for now...
@@ -160,7 +160,7 @@ type
 const
   TimerFrequency: TTimerFrequency = 1000000;
 
-function Timer: DIntTime; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+function Timer: DIntTime; TryInline
 var
   tv: TTimeval;
 begin
@@ -171,11 +171,11 @@ end;
 
 {============================= GET TIME DIRECTLY =============================}
 
-function GetNow: DTime; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+function GetNow: DTime; TryInline
 begin
   Result := Timer / TimerFrequency;
 end;
-function GetNowInt: DIntTime; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+function GetNowInt: DIntTime; TryInline
 begin
   Result := Timer;
 end;
@@ -199,7 +199,7 @@ end;
 {----------------------------------------------------------------------------}
 
 var LastTime: DThreadedTime;
-function GetNowThread: DThreadedTime; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+function GetNowThread: DThreadedTime; TryInline
 begin
   if ThreadedTimer.Finished then begin
     LastTime := ThreadedTimer.Time {$IFDEF UseFloatTimer}/ TimerFrequency{$ENDIF};
@@ -214,7 +214,7 @@ end;
   and must always be used once before starting accessing the GetNowThread sequentially
   so that the first value will be correct (otherwise it might be extermely wrong,
   which is bad for World.Manage) }
-function ForceGetNowThread: DThreadedTime; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+function ForceGetNowThread: DThreadedTime; TryInline
 begin
   if ThreadedTimer.Finished then begin
     LastTime := {$IFDEF UseFloatTimer}GetNow{$ELSE}GetNowInt{$ENDIF};

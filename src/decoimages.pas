@@ -111,7 +111,7 @@ type
       capable of loading from a file }
   DStaticImage = class(DSimpleImage)
   private
-    procedure Afterload; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+    procedure Afterload; TryInline
   public
     { loads image in realtime }
     procedure Load(const URL: string); virtual;
@@ -826,10 +826,7 @@ end;
 
 procedure DStatBarImage.Update;
 
-  function AboveZero(const a: float): float;
-{$IFDEF SUPPORTS_INLINE}
-  inline;
-{$ENDIF}
+  function AboveZero(const a: float): float; TryInline
   begin
     if a > 0 then
       Result := a

@@ -358,20 +358,14 @@ procedure DParty.doMove1;
 var
   MoveVector: TVector3;
 
-  function Right90(var v: TVector3): TVector3;
-{$IFDEF SUPPORTS_INLINE}
-  inline;
-{$ENDIF}
+  function Right90(var v: TVector3): TVector3; TryInline
   begin
     Result[0] := v[1];
     Result[1] := -v[0];
     Result[2] := v[2];
   end;
 
-  function Left90(var v: TVector3): TVector3;
-{$IFDEF SUPPORTS_INLINE}
-  inline;
-{$ENDIF}
+  function Left90(var v: TVector3): TVector3; TryInline
   begin
     Result[0] := -v[1];
     Result[1] := v[0];

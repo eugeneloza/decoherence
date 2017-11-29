@@ -47,10 +47,9 @@ type
     px, py, pz, px0, py0, pz0: TIntCoordinate;
     {converts x,y,z to px,py,pz and returns true if changed
      *time-critical procedure}
-    function UpdatePlayerCoordinates(const x, y, z: float): boolean;
- {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+    function UpdatePlayerCoordinates(const x, y, z: float): boolean; TryInline
     {Manages tiles (show/hide/trigger events) *time-critical procedure}
-    procedure ManageTiles; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+    procedure ManageTiles; TryInline
   protected
     {neighbours array}
     Neighbours: TNeighboursMapArray;
@@ -91,7 +90,7 @@ implementation
 uses SysUtils, CastleFilesUtils, CastleLog,
   DecoPlayerCharacter, DecoTime, DecoLog, Profiler;
 
-procedure DDungeonWorld.ManageTiles; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+procedure DDungeonWorld.ManageTiles; TryInline
 begin
   {StartProfiler}
   {$WARNING dummy}
@@ -100,9 +99,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-function DDungeonWorld.UpdatePlayerCoordinates(const x, y, z: float): boolean;
- {$IFDEF SUPPORTS_INLINE}inline;
-{$ENDIF}
+function DDungeonWorld.UpdatePlayerCoordinates(const x, y, z: float): boolean; TryInline
   //var nx,ny,nz: TIntCoordinate;
 begin
   {StartProfiler}

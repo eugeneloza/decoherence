@@ -22,3 +22,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 //a universal macro to represent current routine name for logging and/or profiling
 //works only in FPC3.1.1 and later
 {$DEFINE _CurrentRoutine:={$IF DECLARED(ClassName)}ClassName+'.'+{$ENDIF}{$I %CURRENTROUTINE%}}
+
+//maybe changing the order of $IFDEF and macro $DEFINE would be better
+{$DEFINE TryInline:={$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}}

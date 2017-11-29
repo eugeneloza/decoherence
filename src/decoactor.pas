@@ -77,7 +77,7 @@ type
     and Base for Player camera mangement }
   DCoordActor = class(DSimpleActor)
   private
-    procedure FixZeroDirection; {$IFDEF SUPPORTS_INLINE}inline; {$ENDIF}
+    procedure FixZeroDirection; TryInline
   public
     { Position, direction and rotate_to_direction of the Body }
     Position, Direction: TVector3;
@@ -109,10 +109,8 @@ type
     { DActorPhysics does not set the camera, but uses it! It's defined in descendants }
     InternalCamera: TWalkCamera;
     { Is movement to this direction or position is allowed? }
-    function CanMovePos(const aPos: TVector3): boolean;
-{$IFDEF SUPPORTS_INLINE}inline; {$ENDIF}
-    function CanMoveDir(const aDir: TVector3): boolean;
-{$IFDEF SUPPORTS_INLINE}inline; {$ENDIF}
+    function CanMovePos(const aPos: TVector3): boolean; TryInline
+    function CanMoveDir(const aDir: TVector3): boolean; TryInline
   public
     { Height of this actor, usually should be zero,
       Mostly needed for player's camera height }
@@ -435,7 +433,7 @@ end;
 
 { ----------------------------------------------------------------------------- }
 
-procedure DCoordActor.FixZeroDirection; {$IFDEF SUPPORTS_INLINE}inline; {$ENDIF}
+procedure DCoordActor.FixZeroDirection; TryInline
 begin
   {StartProfiler}
 
@@ -510,9 +508,7 @@ end;
 
 { ---------------------------------------------------------------------------- }
 
-function DActorPhysics.CanMovePos(const aPos: TVector3): boolean;
-{$IFDEF SUPPORTS_INLINE}inline;
-{$ENDIF}
+function DActorPhysics.CanMovePos(const aPos: TVector3): boolean; TryInline
 var
   tmp: TVector3;
 begin
@@ -524,9 +520,7 @@ begin
   {StopProfiler}
 end;
 
-function DActorPhysics.CanMoveDir(const aDir: TVector3): boolean;
-{$IFDEF SUPPORTS_INLINE}inline;
-{$ENDIF}
+function DActorPhysics.CanMoveDir(const aDir: TVector3): boolean; TryInline
 var
   tmp: TVector3;
 begin

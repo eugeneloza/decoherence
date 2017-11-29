@@ -65,12 +65,10 @@ interface
 { Tries to find a profiler entry for aFunction or creates it otherwise
   assigns CurrentLevel to this function
   and starts counting time for the current function }
-procedure doStartProfiler(const aFunction: string);
- {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+procedure doStartProfiler(const aFunction: string); TryInline
 { Stops counting time for the current function
   and records results}
-procedure doStopProfiler(const aFunction: string);
- {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+procedure doStopProfiler(const aFunction: string); TryInline
 {$ENDIF}
 
 implementation
@@ -130,10 +128,9 @@ begin
   inherited Destroy;
 end;
 
-procedure doStartProfiler(const aFunction: string);
- {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+procedure doStartProfiler(const aFunction: string); TryInline
 
-  function FindEntry: TProfiler; inline;
+  function FindEntry: TProfiler; TryInline
   var
     i: integer;
     NewEntry: TProfiler;
@@ -170,8 +167,7 @@ begin
   SelfUsedTime += TimerSeconds(Timer, CurrentTimer);
 end;
 
-procedure doStopProfiler(const aFunction: string);
- {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+procedure doStopProfiler(const aFunction: string); TryInline
 var
   CurrentTimer: TTimerResult;
 begin

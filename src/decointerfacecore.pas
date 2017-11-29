@@ -138,11 +138,11 @@ type
     { Determine and cache parent container size }
     procedure GetAnchors;
     { Anchor this Container to Window }
-    procedure GetWindowAnchor;{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+    procedure GetWindowAnchor; TryInline
     { Converts integer size to float. }
     procedure IntegerToFloat;
     { Resets x2,y2,w,h to fit RealWidth,RealHeight This suggest use of only Left anchor! }
-    procedure AdjustToRealSize;{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF} deprecated;
+    procedure AdjustToRealSize; TryInline deprecated;
 
     function GetInitialized: boolean;
   public
@@ -601,7 +601,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DFloatContainer.GetWindowAnchor;{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+procedure DFloatContainer.GetWindowAnchor; TryInline
 begin
   {StartProfiler}
 
@@ -703,7 +703,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DFloatContainer.AdjustToRealSize;{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+procedure DFloatContainer.AdjustToRealSize; TryInline
 begin
   {StartProfiler}
 
@@ -1566,9 +1566,7 @@ end;
 
 {==============================  Mouse handling =============================}
 
-function DSingleInterfaceElement.IAmHere(const xx, yy: integer): boolean;
- {$IFDEF SUPPORTS_INLINE}inline;
-{$ENDIF}
+function DSingleInterfaceElement.IAmHere(const xx, yy: integer): boolean; TryInline
 begin
   {StartProfiler}
 

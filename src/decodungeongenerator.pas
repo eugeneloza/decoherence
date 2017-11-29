@@ -76,7 +76,7 @@ type
       property MaxDepth: integer read fMaxDepth;
       {calculates faces&volume of the tile/map and prepares it for work
        optimized for DGeneratorMap}
-      function CalculateFaces: integer; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+      function CalculateFaces: integer; TryInline
 
       destructor Destroy; override;
   end;
@@ -90,7 +90,7 @@ type
     property HasStairsDown: boolean read fHasStairsDown;
     {calculates faces&volume of the tile/map and prepares it for work
      full version}
-    function CalculateFaces: integer; reintroduce; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+    function CalculateFaces: integer; reintroduce; TryInline
 end;
 type TGeneratorTileList = specialize TObjectList<DGeneratorTile>;
 
@@ -193,17 +193,17 @@ type
     function GetTileByName(const TileName: string): TTileType;
 
     {gets a "normal" tile, not a blocker}
-    function GetNormalTile: TTileType; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+    function GetNormalTile: TTileType; TryInline
     {gets a "blocker", not a normal tile}
-    //function GetBlockerTile: TTileType; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+    //function GetBlockerTile: TTileType; TryInline
     {gets a tile with stairs down}
-    function GetDownTile: TTileType; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+    function GetDownTile: TTileType; TryInline
     {gets a tile with 3 and more free faces
      in case we need to "broaden" the map}
-    function GetRichTile: TTileType; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+    function GetRichTile: TTileType; TryInline
     {gets a tile with 1 or 2 free faces
      in case we need to "narrow" the map}
-    function GetPoorTile: TTileType; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+    function GetPoorTile: TTileType; TryInline
   private
     {the main operating item - map of the resulting dungeon}
     Map: DGeneratorMap;
@@ -219,23 +219,23 @@ type
      so conversion is min/maxStep = CurrentStep+1}
     CurrentStep: integer;
     {adds +1 to CurrentStep and resizes the array if necessary}
-    procedure IncCurrentStep; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+    procedure IncCurrentStep; TryInline
     {resizes the dynamic array - adds 100 steps if needed}
-    procedure ResizeSteps; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+    procedure ResizeSteps; TryInline
 
     {checks if the selected 1x1x1 element is compatible to the already-generated map
      usually should not be added manually, but is used inline in "AddTile"
      Returns false if tile mismatches Map
      Returns True if tile matches Map and can be placed }
-    function CheckCompatibility(const Tile: BasicTile; const x,y,z: TIntCoordinate): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+    function CheckCompatibility(const Tile: BasicTile; const x,y,z: TIntCoordinate): boolean; TryInline
     {Core of the algorithm : Tries to add a random tile to the map}
-    procedure AddRandomTile; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+    procedure AddRandomTile; TryInline
     {checks tile compatibility to the map and adds it if its possible
      returns true if tile is put successfully
      and false if the tile cannot be placed at these coordinates  }
     function AddTile(Tile: TTileType; x,y,z: TIntCoordinate): boolean;
     {When we're sure what we are doing, we're not making any checks, just add the tile as fast as it is possible}
-    procedure AddTileUnsafe(const Tile: DGeneratorTile; const x, y, z: TIntCoordinate); {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+    procedure AddTileUnsafe(const Tile: DGeneratorTile; const x, y, z: TIntCoordinate); TryInline
     {overloaded version that accepts a DGeneratorStep;}
     procedure AddTileUnsafe(const Step: DGeneratorStep);
     {creates a minimap as Map.img}
@@ -337,11 +337,11 @@ type
      and returns Neighbours array}
     procedure Raycast;
     {preforms all possible raycasting from a given tile}
-    procedure RaycastTile(const mx,my,mz: TIntCoordinate); {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+    procedure RaycastTile(const mx,my,mz: TIntCoordinate); TryInline
     {raycasts a single ray from x1y1z1 to x2y2z2
      returns true if ray can pass, false otherwise}
     {$WARNING Ray is temporarily un-inlined}
-    function Ray(const x1,y1,z1,x2,y2,z2: float): boolean; {{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF} }
+    function Ray(const x1,y1,z1,x2,y2,z2: float): boolean; {TryInline }
     {chunks the map according to the visibility of the tiles}
     procedure Chunk_N_Slice;
   public
@@ -459,30 +459,30 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-function DDungeonGenerator.GetNormalTile: TTileType; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+function DDungeonGenerator.GetNormalTile: TTileType; TryInline
 begin
   Result := NormalTiles[RNDM.Random(NormalTiles.Count)];
 end;
-{function DDungeonGenerator.GetBlockerTile: TTileType; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+{function DDungeonGenerator.GetBlockerTile: TTileType; TryInline
 begin
   Result := BlockerTiles[RNDM.Random(BlockerTiles.Count)];
 end;}
-function DDungeonGenerator.GetDownTile: TTileType; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+function DDungeonGenerator.GetDownTile: TTileType; TryInline
 begin
   Result := DownTiles[RNDM.Random(DownTiles.Count)];
 end;
-function DDungeonGenerator.GetRichTile: TTileType; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+function DDungeonGenerator.GetRichTile: TTileType; TryInline
 begin
   Result := RichTiles[RNDM.Random(RichTiles.Count)];
 end;
-function DDungeonGenerator.GetPoorTile: TTileType; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+function DDungeonGenerator.GetPoorTile: TTileType; TryInline
 begin
   Result := PoorTiles[RNDM.Random(PoorTiles.Count)];
 end;
 
 {-----------------------------------------------------------------------------}
 
-procedure DDungeonGenerator.AddRandomTile; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+procedure DDungeonGenerator.AddRandomTile; TryInline
 var d,t,td: integer;
     tt: integer;
     Success: boolean;
@@ -692,14 +692,14 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-procedure DDungeonGenerator.ResizeSteps; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+procedure DDungeonGenerator.ResizeSteps; TryInline
 begin
   if CurrentStep+1>=MaxSteps then begin
     inc(MaxSteps,GeneratorShift);
     SetLength(Gen, MaxSteps);
   end;
 end;
-procedure DDungeonGenerator.incCurrentStep; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+procedure DDungeonGenerator.incCurrentStep; TryInline
 begin
   inc(CurrentStep);
   ResizeSteps;
@@ -731,7 +731,7 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-procedure DDungeonGenerator.AddTileUnsafe(const Tile: DGeneratorTile; const x,y,z: TIntCoordinate); {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+procedure DDungeonGenerator.AddTileUnsafe(const Tile: DGeneratorTile; const x,y,z: TIntCoordinate); TryInline
 var jx,jy,jz: TIntCoordinate;
     a: TAngle;
 begin
@@ -756,7 +756,7 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-function DDungeonGenerator.CheckCompatibility(const Tile: BasicTile; const x,y,z: TIntCoordinate): boolean; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+function DDungeonGenerator.CheckCompatibility(const Tile: BasicTile; const x,y,z: TIntCoordinate): boolean; TryInline
 var TmpTile: BasicTile;
     a: TAngle;
 begin
@@ -974,7 +974,7 @@ end;
 {----------------------------------------------------------------------------}
 
 {$WARNING Ray is temporarily un-inlined}
-function D3DDungeonGenerator.Ray(const x1,y1,z1,x2,y2,z2: float): boolean; {{$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}}
+function D3DDungeonGenerator.Ray(const x1,y1,z1,x2,y2,z2: float): boolean; {TryInline}
 var //anglex,angley,anglez: TAngle;
     vx,vy,vz,a: float;
     ix,iy,iz: integer;
@@ -1044,7 +1044,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure D3DDungeonGenerator.RaycastTile(const mx,my,mz: TIntCoordinate); {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+procedure D3DDungeonGenerator.RaycastTile(const mx,my,mz: TIntCoordinate); TryInline
 var
     HelperMap: TIntMapArray;
     RaycastList,OldList: TRaycastList;
@@ -1054,7 +1054,7 @@ var
     Neighbour: DNeighbour;
 
     {safely set a tile candidate}
-    procedure SetCandidate(x,y,z: TIntCoordinate); {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+    procedure SetCandidate(x,y,z: TIntCoordinate); TryInline
     var NewCandidate: Txyz;
     begin
       //dLog(IntToStr(HelperMap[x,y,z]));
@@ -1072,7 +1072,7 @@ var
       end;
     end;
     {advance a next step of candidate tiles}
-    procedure GrowHelperMap; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+    procedure GrowHelperMap; TryInline
     var i: integer;
         a: TAngle;
     begin
@@ -1443,11 +1443,11 @@ end;
 {we're making two almost identical copies of the procedure to
  optimize things for DGenerationMap}
 {$DEFINE CompleteGen} //this will separate implementations for Map and Tile
-function DGeneratorTile.CalculateFaces: integer; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+function DGeneratorTile.CalculateFaces: integer; TryInline
 {$INCLUDE decodungeongenerator_calculatefaces.inc}
 
 {$UNDEF CompleteGen}
-function DGeneratorMap.CalculateFaces: integer; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+function DGeneratorMap.CalculateFaces: integer; TryInline
 {$INCLUDE decodungeongenerator_calculatefaces.inc}
 
 {--------------------------------------------------------------------------}

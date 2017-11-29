@@ -84,7 +84,7 @@ var
   DefaultFont: DFont;
   DebugFont: DFont;
 
-function GetFont(const FontString: string): DFont; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+function GetFont(const FontString: string): DFont; TryInline
 procedure InitializeFonts;
 procedure DestroyFonts;
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
@@ -99,7 +99,7 @@ var
 
 {------------------------------------------------------------------------------}
 
-function GetFont(const FontString: string): DFont; {$IFDEF SUPPORTS_INLINE}inline;{$ENDIF}
+function GetFont(const FontString: string): DFont; TryInline
 begin
   Result := nil; //to avoid uninitialized variable hint
   if not Fonts.TryGetValue(FontString, Result) then
