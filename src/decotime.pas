@@ -36,28 +36,29 @@ uses
   CastleTimeUtils,
   DecoGlobal;
 
-type DTime = TFloatTime;
-     {see note for CastleTimeUtils.TTimerResult}
-     DIntTime = int64;
+type
+  DTime = TFloatTime;
+  {see note for CastleTimeUtils.TTimerResult}
+  DIntTime = int64;
 
-     DThreadedTime = {$IFDEF UseFloatTimer}DTime{$ELSE}DIntTime{$ENDIF};
+  DThreadedTime = {$IFDEF UseFloatTimer}DTime{$ELSE}DIntTime{$ENDIF};
 
 
 var { analogue to Now function, but a fast-access variable, representing
       current global time (time where animations take place)
       works ~200 times faster than SysUtils.Now so should be used anywhere possible
       Updated once per frame}
-    DecoNow: DTime;
-    DeltaT: DTime;
+  DecoNow: DTime;
+  DeltaT: DTime;
     { analogue to Now function, but a fast-access variable, representing
       current in-game time (time where actions take place)
       Updated once per frame }
-    DecoNowLocal: DTime;
-    DeltaTLocal: DTime;
+  DecoNowLocal: DTime;
+  DeltaTLocal: DTime;
 
-    SoftPause: DFloat = 0.0;
-    SoftPauseCoefficient: DFloat = 1.0;
-    LocalTimeFlowSpeed: DFloat = 1.0;
+  SoftPause: DFloat = 0.0;
+  SoftPauseCoefficient: DFloat = 1.0;
+  LocalTimeFlowSpeed: DFloat = 1.0;
 
 { Returns a nice date and time as a string (e.g. for naming files) }
 function NiceDate: string;
@@ -76,40 +77,56 @@ function GetNowThread: DThreadedTime; TryInline
 function ForceGetNowThread: DThreadedTime; TryInline
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
+
 uses SysUtils, Classes{$IFDEF Windows}, SyncObjs{$ENDIF};
 
 function NiceDate: string;
-var s: string;
-    i: integer;
+var
+  s: string;
+  i: integer;
 begin
   s := DateTimeToAtStr(Now); //only place where I'm using SysUtils.Now
   Result := '';
   for i := 1 to Length(s) do
-    if Copy(s,i,1) = ' ' then Result += '_' else
-    if Copy(s,i,1) = ':' then Result += '-' else
-    Result += Copy(s,i,1);
+    if Copy(s, i, 1) = ' ' then
+      Result += '_'
+    else
+    if Copy(s, i, 1) = ':' then
+      Result += '-'
+    else
+      Result += Copy(s, i, 1);
 end;
-  
-{----------------------------------------------------------------------------}  
 
-var LastGlobalTime: DTime = -1;
-const LocalTimeRestoreSpeed = 1/2; {requires 2 seconds to restore to normal time speed}
+{----------------------------------------------------------------------------}
+
+var
+  LastGlobalTime: DTime = -1;
+
+const
+  LocalTimeRestoreSpeed = 1 / 2; {requires 2 seconds to restore to normal time speed}
+
 procedure doTime;
 begin
   DecoNow := GetNow;
-  If LastGlobalTime = -1 then LastGlobalTime := DecoNow;
+  if LastGlobalTime = -1 then
+    LastGlobalTime := DecoNow;
   DeltaT := DecoNow - LastGlobalTime;
 
-  if SoftPause < deltaT then begin
+  if SoftPause < deltaT then
+  begin
     SoftPause := -1;
     DeltaTLocal := DeltaT * LocalTimeFlowSpeed;
     DecoNowLocal := DecoNowLocal + DeltaTLocal;
     //if local time is slowed, then accelerate it softly
-    if LocalTimeFlowSpeed < 1 then begin
-      LocalTimeFlowSpeed += LocalTimeRestoreSpeed*DeltaT;
-      if LocalTimeFlowSpeed > 1 then LocalTimeFlowSpeed := 1;
+    if LocalTimeFlowSpeed < 1 then
+    begin
+      LocalTimeFlowSpeed += LocalTimeRestoreSpeed * DeltaT;
+      if LocalTimeFlowSpeed > 1 then
+        LocalTimeFlowSpeed := 1;
     end;
-  end else begin
+  end
+  else
+  begin
     //if softpause is issued, then don't perform any actions in local time
     SoftPause -= DeltaT;
     DeltaTLocal := 0;
@@ -121,7 +138,8 @@ end;
 
 procedure RequestSoftPauseByAction(const PauseSeconds: DTime);
 begin
-  SoftPause := PauseSeconds*SoftPauseCoefficient; {request PauseSeconds seconds of pause for some animations}
+  SoftPause := PauseSeconds * SoftPauseCoefficient;
+  {request PauseSeconds seconds of pause for some animations}
   LocalTimeFlowSpeed := 0; {and slow down local time for next ~2 seconds}
 end;
 
@@ -129,8 +147,9 @@ end;
 
 {$IFDEF Windows}
 {************************* WINDOWS TIME **************************************}
-type TTimerFrequency = Int64;
-     TTimerState = (tsQueryPerformance, tsGetTickCount64);
+type
+  TTimerFrequency = int64;
+  TTimerState = (tsQueryPerformance, tsGetTickCount64);
 
 var
   FTimerState: TTimerState;
@@ -138,25 +157,36 @@ var
   TimerLock: TCriticalSection;  //we'll need a critical section as we access FTimerState.
 
 function Timer: DIntTime; TryInline
-var QueryPerformance: boolean;
+var
+  QueryPerformance: boolean;
 begin
   TimerLock.Acquire;   //maybe, this is redundant, but let it be here for now...
   QueryPerformance := FTimerState = tsQueryPerformance;
   TimerLock.Release;
 
   if QueryPerformance then
-    QueryPerformanceCounter({$hints off}Result{$hints on})
+    QueryPerformanceCounter(
+{$hints off}
+      Result
+{$hints on}
+      )
   else
     {in case of ancient Windows version fall back to GetTickCount :)}
-    Result := {$warnings off} GetTickCount64 {$warnings on};
+    Result :=
+{$warnings off}
+      GetTickCount64
+{$warnings on}
+  ;
 end;
+
 {$ENDIF}
 
 {$IFDEF Unix}
 {************************* UNIX TIME **************************************}
 
 type
-  TTimerFrequency = LongWord;
+  TTimerFrequency = longword;
+
 const
   TimerFrequency: TTimerFrequency = 1000000;
 
@@ -167,6 +197,7 @@ begin
   FpGettimeofday(@tv, nil);
   Result := int64(tv.tv_sec) * 1000000 + int64(tv.tv_usec);
 end;
+
 {$ENDIF}
 
 {============================= GET TIME DIRECTLY =============================}
@@ -175,6 +206,7 @@ function GetNow: DTime; TryInline
 begin
   Result := Timer / TimerFrequency;
 end;
+
 function GetNowInt: DIntTime; TryInline
 begin
   Result := Timer;
@@ -182,14 +214,16 @@ end;
 
 {========================== GET TIME IN A THREAD =============================}
 
-type TTimerThread = class(TThread)
+type
+  TTimerThread = class(TThread)
   protected
     procedure Execute; override;
   public
     Time: DIntTime;
   end;
 
-var ThreadedTimer: TTimerThread;
+var
+  ThreadedTimer: TTimerThread;
 
 procedure TTimerThread.Execute;
 begin
@@ -198,11 +232,18 @@ end;
 
 {----------------------------------------------------------------------------}
 
-var LastTime: DThreadedTime;
+var
+  LastTime: DThreadedTime;
+
 function GetNowThread: DThreadedTime; TryInline
 begin
-  if ThreadedTimer.Finished then begin
-    LastTime := ThreadedTimer.Time {$IFDEF UseFloatTimer}/ TimerFrequency{$ENDIF};
+  if ThreadedTimer.Finished then
+  begin
+    LastTime := ThreadedTimer.Time
+{$IFDEF UseFloatTimer}
+      / TimerFrequency
+{$ENDIF}
+    ;
     ThreadedTimer.Start;
   end;
   Result := LastTime;
@@ -216,7 +257,8 @@ end;
   which is bad for World.Manage) }
 function ForceGetNowThread: DThreadedTime; TryInline
 begin
-  if ThreadedTimer.Finished then begin
+  if ThreadedTimer.Finished then
+  begin
     LastTime := {$IFDEF UseFloatTimer}GetNow{$ELSE}GetNowInt{$ENDIF};
     ThreadedTimer.Start;
   end;
@@ -225,15 +267,16 @@ end;
 
 initialization
   //create threaded timer and run it immediately to make sure everything is initialized properly
-  ThreadedTimer := TTimerThread.Create(true);
+  ThreadedTimer := TTimerThread.Create(True);
   ThreadedTimer.Priority := tpLower;
-  ThreadedTimer.FreeOnTerminate := false;
+  ThreadedTimer.FreeOnTerminate := False;
   ForceGetNowThread;
 
   {$IFDEF Windows}
   //initialize the timer in Windows and determine TimerFrequency
   if QueryPerformanceFrequency(TimerFrequency) then
-    FTimerState := tsQueryPerformance else
+    FTimerState := tsQueryPerformance
+  else
   begin
     FTimerState := tsGetTickCount64;
     TimerFrequency := 1000;
