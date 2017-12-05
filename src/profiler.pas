@@ -90,7 +90,7 @@ type
   end;
 
   { List of profiler records }
-  TProfilerList = specialize TObjectList<TProfilerChild>;
+  TProfilerList = specialize TObjectDictionary<string, TProfilerChild>;
   //for some stupid reason it won't allow recoursive type definition
   { A profiler tree }
   TProfiler = class(TProfilerChild)
@@ -118,7 +118,7 @@ var
 constructor TProfiler.Create;
 begin
   //inherited Create; <-- nothing to inherit
-  Children := TProfilerList.Create(True);
+  Children := TProfilerList.Create([doOwnsValues]);
   EntryTime := 0; //redundant
   EntryHits := 0;
 end;
@@ -133,22 +133,22 @@ procedure doStartProfiler(const aFunction: string); TryInline
 
   function FindEntry: TProfiler; TryInline
   var
-    i: integer;
+    v: TProfilerChild;
     NewEntry: TProfiler;
   begin
     Result := nil;
     //try to find if the requested function is already in the Children
-    for i := 0 to CurrentLevel.Children.Count - 1 do
-      if CurrentLevel.Children[i].EntryName = aFunction then
+    for v in CurrentLevel.Children.Values do
+      if v.EntryName = aFunction then
       begin
-        Result := CurrentLevel.Children[i] as TProfiler;
+        Result := v as TProfiler;
         Exit;
       end;
     //else - function name is not found, create a new entry for it
     NewEntry := TProfiler.Create;
     NewEntry.EntryName := aFunction;
     NewEntry.Parent := CurrentLevel;
-    CurrentLevel.Children.Add(NewEntry);
+    CurrentLevel.Children.Add(aFunction, NewEntry);
     Result := NewEntry;
   end;
 
@@ -220,18 +220,18 @@ procedure DisplayProfilerResult;
 
   procedure DisplayRecoursive(const aProfiler: TProfiler; const aPrefix: string);
   var
-    i: integer;
+    v: TProfilerChild;
   begin
     {$IFDEF SortProfilerResults}
     aProfiler.Children.Sort(TProfilerComparer.Construct(@CompareProfiles));
     {$ENDIF}
-    for i := 0 to aProfiler.Children.Count - 1 do
+    for v in aProfiler.Children.Values do
     begin
-      WriteLnLog(aPrefix + aProfiler.Children[i].EntryName +
-        '(x' + IntToStr(aProfiler.Children[i].EntryHits) + ')' + ' : ' +
-        DisplayTime(aProfiler.Children[i].EntryTime));
+      WriteLnLog(aPrefix + v.EntryName +
+        '(x' + IntToStr(v.EntryHits) + ')' + ' : ' +
+        DisplayTime(v.EntryTime));
 
-      DisplayRecoursive(aProfiler.Children[i] as TProfiler, aPrefix + '...');
+      DisplayRecoursive(v as TProfiler, aPrefix + '...');
     end;
   end;
 
