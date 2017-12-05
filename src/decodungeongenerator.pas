@@ -1707,10 +1707,7 @@ begin
         begin
           SmallContainer := Iterator.Current;
           TilesList.add(
-{$IFDEF UTF8Encode}
-            UTF8encode
-{$ENDIF}
-            (SmallContainer.TextData));
+            {$IFDEF UTF8Encode}UTF8encode{$ENDIF}(SmallContainer.TextData));
         end;
     finally
       FreeAndNil(Iterator);
@@ -1767,7 +1764,7 @@ begin
   {StartProfiler}
 
   for i := 0 to Tiles.Count do
-    if tiles[i].TileName = TileName then
+    if Tiles[i].TileName = TileName then
     begin
       Result := i;
       Exit;

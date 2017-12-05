@@ -67,7 +67,7 @@ interface
   and starts counting time for the current function }
 procedure doStartProfiler(const aFunction: string); TryInline
 { Stops counting time for the current function
-  and records results}
+  and records results }
 procedure doStopProfiler(const aFunction: string); TryInline
 {$ENDIF}
 
@@ -96,7 +96,7 @@ type
   TProfiler = class(TProfilerChild)
     { Higher level element }
     Parent: TProfiler;
-    { Last access time (assigned by StartProfiler)}
+    { Last access time (assigned by StartProfiler) }
     TimerStart: DTime;
     { Tree of children }
     Children: TProfilerList;
