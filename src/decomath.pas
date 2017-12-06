@@ -38,6 +38,8 @@ function Maximum(a, b: DFloat): DFloat; TryInline
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
+uses Profiler;
+
 const
   Epsilon = 1E-4;
   { EZeroResolution = 1E-16;

@@ -138,7 +138,7 @@ procedure doStartProfiler(const aFunction: string); TryInline
   begin
     Result := nil;
     //try to find if the requested function is already in the Children
-    if not CurrentLevel.Children.TryGetValue(aFunction, v) then
+    if CurrentLevel.Children.TryGetValue(aFunction, v) then
       Result := v as TProfiler
     else begin
       //else - function name is not found, create a new entry for it
