@@ -138,18 +138,16 @@ procedure doStartProfiler(const aFunction: string); TryInline
   begin
     Result := nil;
     //try to find if the requested function is already in the Children
-    for v in CurrentLevel.Children.Values do
-      if v.EntryName = aFunction then
-      begin
-        Result := v as TProfiler;
-        Exit;
-      end;
-    //else - function name is not found, create a new entry for it
-    NewEntry := TProfiler.Create;
-    NewEntry.EntryName := aFunction;
-    NewEntry.Parent := CurrentLevel;
-    CurrentLevel.Children.Add(aFunction, NewEntry);
-    Result := NewEntry;
+    if not CurrentLevel.Children.TryGetValue(aFunction, v) then
+      Result := v as TProfiler
+    else begin
+      //else - function name is not found, create a new entry for it
+      NewEntry := TProfiler.Create;
+      NewEntry.EntryName := aFunction;
+      NewEntry.Parent := CurrentLevel;
+      CurrentLevel.Children.Add(aFunction, NewEntry);
+      Result := NewEntry;
+    end;
   end;
 
 var

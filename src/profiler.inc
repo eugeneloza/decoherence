@@ -7,7 +7,7 @@
 //this will stop profiling the procedure
 {$DEFINE StopProfiler:=doStopProfiler({$IF DECLARED(ClassName)}ClassName+'.'+{$ENDIF}{$I %CURRENTROUTINE%})}
 
-{$ELSE} //otherwise just replace fbegin/fend with begin/end
+{$ELSE} //otherwise just do nothing
 
 {$DEFINE StartProfiler:=}
 {$DEFINE StopProfiler:=}
