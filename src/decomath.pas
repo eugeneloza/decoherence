@@ -33,7 +33,8 @@ function dZero(const a: DFloat): Boolean; TryInline
 function AboveZero(const a: DFloat): DFloat; TryInline
 { Returns larger number of a, b }
 function Maximum(a, b: DFloat): DFloat; TryInline
-
+{ Returns sign of a }
+function Sign(a :DFloat): shortint; TryInline
 
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
