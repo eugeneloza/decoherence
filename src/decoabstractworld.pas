@@ -311,7 +311,7 @@ begin
   if Nav <> nil then
   begin
     Log(LogWorldInitSoftError, _CurrentRoutine, 'WARNING: Nav is not nil! Freeing...');
-    FreeAndNil(Nav);
+    Nav.Free;
   end;
   Nav := Generator.ExportNav;
   ClearNavBlocks;
@@ -325,7 +325,7 @@ procedure DAbstractWorld.Load(const URL: string);
 begin
   {StartProfiler}
   if not URLValid(URL) then
-    Log(LogWorldInit, _CurrentRoutine, 'World is not nil, freeing');
+    Log(LogWorldInit, _CurrentRoutine, 'URL is not valid');
   {$hint dummy}
   //load seed and Nav
   {StopProfiler}
@@ -336,9 +336,10 @@ end;
 procedure FreeWorld;
 begin
   {StartProfiler}
-  if CurrentWorld <> nil then
+  if CurrentWorld <> nil then begin
     Log(LogWorldInit, _CurrentRoutine, 'World is not nil, freeing');
-  FreeAndNil(CurrentWorld);
+    CurrentWorld.Free;
+  end;
   {StopProfiler}
 end;
 

@@ -55,7 +55,7 @@ function CheckCompatibiliyGeneration(const Race, Profession: DRaceProfession): D
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
-uses SysUtils, DecoLog, Profiler;
+uses DecoLog, Profiler;
 
 procedure LoadRaceProfessionData;
 var
@@ -112,8 +112,8 @@ destructor DRaceProfession.Destroy;
 begin
   {StartProfiler}
 
-  FreeAndNil(Stats);
-  FreeAndNil(Bonus);
+  Stats.Free;
+  Bonus.Free;
   inherited Destroy;
 
   {StopProfiler}

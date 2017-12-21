@@ -28,7 +28,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 {============================= profiler ======================================}
 
 {$IFDEF GAME}
-{$DEFINE UseProfiler}
+//{$DEFINE UseProfiler}
 {$ENDIF}
 
 {====================== LANGUAGE-SPECIFIC DIRECTIVES =========================}

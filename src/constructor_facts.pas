@@ -215,7 +215,7 @@ begin
       URLWriteXML(XMLdoc, f);
       Log(LogConstructorInfo, _CurrentRoutine, 'File Written: ' + f);
 
-      FreeAndNil(XMLdoc);
+      XMLdoc.Free;
     end;
 
 end;

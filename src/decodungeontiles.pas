@@ -429,7 +429,7 @@ begin
   except
     fReady := False;
   end;
-  FreeAndNil(TileDOC);
+  TileDOC.Free;
 
   if not Ready then
     raise Exception.Create('Fatal Error in DTileMap.Load! Unable to open file ' +

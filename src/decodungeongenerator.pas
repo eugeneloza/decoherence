@@ -1733,7 +1733,7 @@ begin
   except
     Log(LogWorldError, _CurrentRoutine, 'ERROR: Exception in GeneratorParameters load');
   end;
-  FreeAndNil(XMLdoc);
+  XMLdoc.Free;
 
   {initialize generator parameters}
   isReady := True;

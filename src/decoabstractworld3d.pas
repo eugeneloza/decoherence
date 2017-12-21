@@ -196,10 +196,10 @@ end;
 
 destructor DAppearVanishManagerThread.Destroy;
 begin
-  FreeAndNil(ObjectsAppear);
-  FreeAndNil(ObjectsVanish);
-  FreeAndNil(GroupsAppear);
-  FreeAndNil(GroupsVanish);
+  ObjectsAppear.Free;
+  ObjectsVanish.Free;
+  GroupsAppear.Free;
+  GroupsVanish.Free;
   inherited Destroy;
 end;
 
@@ -507,7 +507,7 @@ begin
   if Actors <> nil then
   begin
     Log(LogWorldInitSoftError, _CurrentRoutine, 'WARNING: Actors is not nil, freeing...');
-    FreeAndNil(Actors);
+    Actors.Free;
   end;
   Actors := TActorList.Create(True);
 

@@ -125,7 +125,7 @@ end;
 
 destructor TProfiler.Destroy;
 begin
-  FreeAndNil(Children);
+  Children.Free;
   inherited Destroy;
 end;
 
@@ -250,6 +250,6 @@ initialization
 
 finalization
   DisplayProfilerResult;
-  FreeAndNil(TopProfiler); //will recoursively free all its Children
+  TopProfiler.Free; //will recoursively free all its Children
 {$ENDIF}
 end.

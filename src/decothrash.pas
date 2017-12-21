@@ -23,7 +23,7 @@ unit DecoThrash;
 {$INCLUDE compilerconfig.inc}
 interface
 
-uses SysUtils, Generics.Collections;
+uses Generics.Collections;
 
 type
   TThrash = specialize TObjectList<TObject>;
@@ -37,6 +37,6 @@ initialization
   Thrash := TThrash.Create(True);
 
 finalization
-  FreeAndNil(Thrash);
+  Thrash.Free;
 
 end.

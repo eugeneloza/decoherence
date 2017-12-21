@@ -285,7 +285,7 @@ initialization
   {$ENDIF}
 
 finalization
-  FreeAndNil(ThreadedTimer);
+  ThreadedTimer.Free;
   {$IFDEF Windows}
   FreeAndNil(TimerLock);
   {$ENDIF}

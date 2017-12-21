@@ -55,7 +55,7 @@ begin
   GENERATOR.Generate;
   CurrentWorld := DDungeonWorld.Create;
   CurrentWorld.Load(Generator);
-  FreeAndNil(GENERATOR);
+  GENERATOR.Free;
   CurrentWorld.Build;
 
   tmpLoadKnightCreature;

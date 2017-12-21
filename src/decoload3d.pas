@@ -161,7 +161,7 @@ destructor DMaterialContainer.Destroy;
 begin
   {StartProfiler}
 
-  FreeAndNil(Value);
+  Value.Free;
   inherited Destroy;
 
   {StopProfiler}

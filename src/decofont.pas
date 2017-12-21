@@ -185,8 +185,8 @@ begin
   LoadedFonts.Add('xolonium-num-99',GetFontFile(NormalFontFile, false, 99, 3));
 
   //release char sets
-  FreeAndNil(FullCharSet);
-  FreeAndNil(NumCharSet);
+  FullCharSet.Free;
+  NumCharSet.Free;
    {$ENDIF}
   Log(LogInitInterface, _CurrentRoutine, 'Fonts loaded successfully.');
 
@@ -271,7 +271,7 @@ begin
     DummyImage := StringToImage(s[i].Value);
     Result.DrawFrom(DummyImage, 0, MaxH * (s.Count - 1 - i) + MaxHb -
       (s[i].Height - s[i].HeightBase), dmBlendSmart);
-    FreeAndNil(DummyImage);
+    DummyImage.Free;
   end;
 
   {StopProfiler}
@@ -308,8 +308,8 @@ begin
       Result.DrawFrom(ShadowImage, Iteration, ShadowLength - Iteration, dmBlendSmart);
     end;
     Result.DrawFrom(DummyImage, 0, ShadowLength, dmBlendSmart);
-    FreeAndNil(ShadowImage);
-    FreeAndNil(DummyImage);
+    ShadowImage.Free;
+    DummyImage.Free;
   end
   else
     Result := DummyImage;

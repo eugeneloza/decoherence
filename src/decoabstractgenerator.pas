@@ -136,7 +136,7 @@ destructor DAbstractGenerator.Destroy;
 begin
   {StartProfiler}
 
-  FreeAndNil(RNDM);
+  RNDM.Free;
   inherited Destroy;
 
   {StopProfiler}

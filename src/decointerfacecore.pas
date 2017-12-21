@@ -1454,12 +1454,12 @@ destructor DAbstractElement.Destroy;
 begin
   {StartProfiler}
 
-  FreeAndNil(Base);
-  FreeAndNil(Last);
-  FreeAndNil(Next);
-  FreeAndNil(Current);
+  Base.Free;
+  Last.Free;
+  Next.Free;
+  Current.Free;
 
-  FreeAndNil(NotifyAnchors);
+  NotifyAnchors.Free;
   inherited Destroy;
 
   {StopProfiler}
@@ -1685,7 +1685,7 @@ begin
   {StartProfiler}
 
   //this should fire as recoursive because children owns elements, which in turn will fire their destructors onfree
-  FreeAndNil(Children);
+  Children.Free;
   inherited Destroy;
 
   {StopProfiler}

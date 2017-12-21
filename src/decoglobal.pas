@@ -164,7 +164,7 @@ procedure DestroyGlobal;
 begin
   {StartProfiler}
 
-  FreeAndNil(DRND);
+  DRND.Free;
 
   {StopProfiler}
 end;

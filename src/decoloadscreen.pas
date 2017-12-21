@@ -155,7 +155,7 @@ begin
   begin
     Log(LogInitError, Facts.ClassName + '>' + _CurrentRoutine,
       'Facts is not nil. Freeing...');
-    FreeAndNil(Facts);
+    Facts.Free;
   end;
   Facts := TFactList.Create(True);
 
@@ -199,7 +199,7 @@ begin
   finally
     FreeAndNil(Iterator);
   end;
-  FreeAndNil(FactsDoc);
+  FactsDoc.Free;
   Log(LogInitInterface, Facts.ClassName + '>' + _CurrentRoutine,
     'Reading file finished.');
 

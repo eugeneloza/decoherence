@@ -464,7 +464,7 @@ end;
 destructor DPlayList.Destroy;
 begin
   {StartProfiler}
-  FreeAndNil(URLs);
+  URLs.Free;
   inherited Destroy;
   {StopProfiler}
 end;
@@ -516,7 +516,7 @@ end;
 destructor DSequentialPlaylist.Destroy;
 begin
   {StartProfiler}
-  FreeAndNil(Tracks);
+  Tracks.Free;
   inherited Destroy;
   {StopProfiler}
 end;
@@ -577,7 +577,7 @@ end;
 destructor DSyncPlaylist.Destroy;
 begin
   {StartProfiler}
-  FreeAndNil(Tracks);
+  Tracks.Free;
   inherited Destroy;
   {StopProfiler}
 end;

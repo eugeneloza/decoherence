@@ -440,6 +440,6 @@ initialization
   TouchArray := DTouchList.Create;
 
 finalization
-  FreeAndNil(TouchArray);
+  TouchArray.Free;
 
 end.

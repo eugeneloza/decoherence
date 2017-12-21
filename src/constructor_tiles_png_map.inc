@@ -268,13 +268,13 @@ begin
     end;
 
     SaveImage(PNG_Map,ConstructorData(TilesFolder+TileName+'_'+IntToStr(iz)+'.png',false));
-    FreeAndNil(PNG_Map);
+    PNG_Map.Free;
    end;
 
-   FreeAndNil(PNG_Tileset);
-   FreeAndNil(PNG_Up);
-   FreeAndNil(PNG_Down);
-   FreeAndNil(PNG_UpDown);
+   PNG_Tileset.Free;
+   PNG_Up.Free;
+   PNG_Down.Free;
+   PNG_UpDown.Free;
 
  end else with TileM.Map[0,0,0] do begin
    if IsPassable(Faces[aTop]) then
@@ -291,7 +291,7 @@ begin
 
    if PNG_Map <> nil then begin
      SaveImage(PNG_Map,ConstructorData(TilesFolder+TileName+'_'+IntToStr(0)+'.png',false));
-     FreeAndNil(PNG_Map);
+     PNG_Map.Free;
    end
    else raise Exception.Create('TDungeonTilesEditor.MakePNGMap blocker png is nil!');
  end;

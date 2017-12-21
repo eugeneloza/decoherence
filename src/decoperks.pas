@@ -138,7 +138,7 @@ destructor DMultiPerk.Destroy;
 begin
   {StartProfiler}
 
-  FreeAndNil(Children);
+  Children.Free;
   inherited Destroy;
 
   {StopProfiler}

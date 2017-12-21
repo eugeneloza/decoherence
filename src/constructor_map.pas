@@ -176,7 +176,7 @@ begin
 
   DungeonMap := GENERATOR.ExportMap;
 
-  FreeAndNil(GENERATOR);
+  GENERATOR.Free;
 
   ZScroll.Min := 0;
   ZScroll.Position := 0;
@@ -532,8 +532,8 @@ begin
 
   Log(LogConstructorInfo, _CurrentRoutine, 'File Written: ' + f);
 
-  FreeAndNil(XMLdoc);
-  FreeAndNil(GParam);
+  XMLdoc.Free;
+  GParam.Free;
 end;
 
 {------------------------------------------------------------------------------}
