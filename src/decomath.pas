@@ -38,7 +38,7 @@ function Maximum(a, b: DFloat): DFloat; TryInline
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
-uses Profiler;
+//uses Profiler;
 
 const
   Epsilon = 1E-4;
@@ -79,12 +79,10 @@ end;
 
 function Maximum(a, b: DFloat): DFloat; TryInline
 begin
-  {StartProfiler}
   if a > b then
     Result := a
   else
     Result := b;
-  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
