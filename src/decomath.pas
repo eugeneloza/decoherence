@@ -87,5 +87,18 @@ begin
   {StopProfiler}
 end;
 
+{-----------------------------------------------------------------------------}
+
+function Sign(a :DFloat): shortint; TryInline
+begin
+  if a > 0 then   {a < Epsilon?}
+    Result := +1
+  else
+  if a < 0 then
+    Result := -1
+  else
+    Result := 0;
+end;
+
 end.
 
