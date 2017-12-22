@@ -60,6 +60,7 @@
             <Verbosity>
               <ShoLineNum Value="True"/>
             </Verbosity>
+            <CustomOptions Value="-dGAME -dDEBUG"/>
           </Other>
         </CompilerOptions>
       </Item2>
@@ -90,6 +91,9 @@
             </Debugging>
             <LinkSmart Value="True"/>
           </Linking>
+          <Other>
+            <CustomOptions Value="-dGAME -dRELEASE"/>
+          </Other>
         </CompilerOptions>
       </Item3>
     </BuildModes>
@@ -131,6 +135,9 @@
         <AllowLabel Value="False"/>
       </SyntaxOptions>
     </Parsing>
+    <Other>
+      <CustomOptions Value="-dGAME"/>
+    </Other>
   </CompilerOptions>
   <Debugging>
     <Exceptions Count="3">
