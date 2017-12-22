@@ -31,6 +31,7 @@ deco_20*.jpg
 heap.trc
 todo
 pasdoc_gui
+obsolete
 
 # Executable and compiled files
 
@@ -38,6 +39,17 @@ pasdoc_gui
 *.exe
 html
 Release
+
+# DLLs
+
+freetype-6.dll
+libpng14-14.dll
+ogg.dll
+OpenAL32.dll
+vorbis.dll
+vorbisfile.dll
+wrap_oal.dll
+zlib1.dll
 
 # Linux executables
 

@@ -1,1 +1,0 @@
-This folder hosts tests for some game elements. Actually those are not true "tests", rather a usage example, that allows debugging some parts of the code without debugging the whole game.

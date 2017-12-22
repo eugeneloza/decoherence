@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<TileMap>
-  <Size size_x="1" size_y="1" size_z="1" blocker="False"/>
-  <Tile x="0" y="0" z="0">
-    <base tile_kind="FREE"/>
-    <faces up="wall" top="wall" down="wall" left="wall" right="2" bottom="2"/>
-  </Tile>
-</TileMap>

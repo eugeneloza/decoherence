@@ -1,10 +1,6 @@
-﻿Decoherence is a free and open-source phase-based RPG in the mood of Wizardry 8 in hard sci-fi setting written in Lazarus/FreePascal and Castle Game Engine.
+Decoherence is a free and open-source phase-based RPG in the mood of Wizardry 8 in hard sci-fi setting written in Lazarus/FreePascal and Castle Game Engine.
 
-Compiles to: Windows, Linux (Android support is suspended)
-
-# Multilingual
-
-Most of the game content is available only in Russian, but I will eventually translate everything into English too... At this moment English is included as a priority task (thanks to everybody for your interest!), so, hopefully, we'll have English version nearly up-to-date with Russian variant.
+Compiles to: Windows, Linux
 
 # Short introduction
 
@@ -47,6 +43,4 @@ You'll also need OpenGL drivers for your videocard. Usually it is libgl1-mesa-de
 
 # Links
 
-(Almost) Daily development blog: https://decoherencestudio.wordpress.com
-Russian-speaking Wizardry 8 community: https://vk.com/wizardry_8
-English-speaking Wizardry 8 community (It's not the only one): http://www.postcount.net/forum/forumdisplay.php?47-Wizardry-Series
+Development blog: https://decoherencestudio.wordpress.com
