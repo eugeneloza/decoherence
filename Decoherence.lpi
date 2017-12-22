@@ -105,7 +105,7 @@
         <FormatVersion Value="1"/>
       </local>
     </RunParams>
-    <Units Count="3">
+    <Units Count="4">
       <Unit0>
         <Filename Value="Decoherence.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -119,6 +119,11 @@
         <Filename Value="src/compilerconfig.inc"/>
         <IsPartOfProject Value="True"/>
       </Unit2>
+      <Unit3>
+        <Filename Value="src/core/decoglobal.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoGlobal"/>
+      </Unit3>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
