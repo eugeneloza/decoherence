@@ -6,7 +6,7 @@ find -type d -name 'lib' -prune -exec rm -rf {} \;
 
 # Remove ugly Linux-related bug with NTFS filesystem
 
-rm .fuse_hidden*
+find . -name '.fuse_hidden*' -delete
 
 # Remove logs
 
