@@ -2,11 +2,7 @@
 
 bash purge.sh
 
-# Remove compiled files and screenshots
-
-
-
-# Compiled executables
+# Remove compiled executables
 
 rm Decoherence
 rm Decoherence.exe

@@ -1,15 +1,8 @@
 # Remove compiler garbage, backups and etc.
 
-rm *.o
-rm *.ppu
-rm *.so
 rm *.dbg
-rm *.bak
-
-rm -r backup
-rm -r lib
-rm -r src/backup
-rm -r src/lib
+find -type d -name 'backup' -prune -exec rm -rf {} \;
+find -type d -name 'lib' -prune -exec rm -rf {} \;
 
 # Remove ugly Linux-related bug with NTFS filesystem
 
