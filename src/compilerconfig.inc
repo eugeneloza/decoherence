@@ -20,42 +20,22 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 //yes, I use this horrible stuff
 {$WARN 2005 off : Comment level $1 found}
 
-{============================= MACROS ========================================}
-
-//include some useful macros
-{$INCLUDE macro.inc}
-
-{============================= profiler ======================================}
-
-{$IFDEF GAME}
-//{$DEFINE UseProfiler}
-{$ENDIF}
-
 {====================== LANGUAGE-SPECIFIC DIRECTIVES =========================}
 
-{$mode objfpc}
-{$H+} //AnsiStrings
-{$J-} //non-writeable constants
+{$MODE objfpc}
+{$H+} // AnsiStrings
+{$J-} // non-writeable constants
+{$COPERATORS ON} // allow += style operators, I like them
+{$GOTO OFF} // disallow goto and label
 
 { Write heap trace to file or to log? }
 //{$DEFINE HEAP_FILE}
 
 { Use simple corba interfaces }
-{$interfaces corba}
+{$INTERFACES corba}
 
 { I should try using cmem some day. They say in some cases it may +30% speed and -50% RAM usage. However, I didn't test it yet. }
 //{$DEFINE useCMEM}
-
-{ Convenient global range-checking on/off. Redundand, as compiler mode already does that? }
-{$IFNDEF RELEASE}
-{$R+}{$Q+}
-{$ELSE}
-{$R-}{$Q-}
-{$ENDIF}
-
-{$IFDEF RELEASE}
-{$DEFINE WriteLog}
-{$ENDIF}
 
 {======================== ENGINE-SPECIFIC DIRECTIVES =========================}
 
@@ -66,25 +46,5 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 { Gzip or not gzip, that is the answer. }
 {$DEFINE gzipdata}
 
-{ If we attach additional Switch Nodes to 3d world management
-  (intermediate optimization) }
-{$DEFINE UseSwitches}
-
 { Fix a windows encoding bug }
 {$IFDEF Windows}{$DEFINE UTF8Encode}{$ENDIF}
-
-{========================= GAME-SPECIFIC DIRECTIVES ==========================}
-
-{ Defines fullscreen mode }
-//{$DEFINE Fullscreen}
-
-{ Automatically no rescale in fullscreen and Android modes }
-{$IFNDEF Android}{$IFNDEF Fullscreen}{$DEFINE AllowRescale}{$ENDIF}{$ENDIF}
-
-{ Undefine rescale to save memory. Temporary. }
-//{$UNDEF AllowRescale}
-
-{======================== EXPERIMENTAL ======================================}
-
-{ A burner image is applied to frames and some other interface elements }
-//{$DEFINE BurnerImage}
