@@ -48,3 +48,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 
 { Fix a windows encoding bug }
 {$IFDEF Windows}{$DEFINE UTF8Encode}{$ENDIF}
+
+{============================== ENABLE MACRO ================================}
+
+{ Activate useful macros }
+{$INCLUDE macro.inc}
+

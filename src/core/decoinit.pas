@@ -30,21 +30,24 @@ procedure FreeDecoherence;
 implementation
 
 uses
-  SysUtils, CastleWindow, DecoWindow, DecoGlobal;
+  SysUtils, CastleWindow,
+  DecoLog, DecoWindow, DecoGlobal;
 
 function MyGetApplicationName: string;
 begin
   Result := 'Decoherence 1';
 end;
 
-
 procedure ApplicationInitialize;
 begin
+  Log(LogInit,CurrentRoutine,'Main init sequence started.');
   InitGlobal;
 end;
 
 procedure InitDecoherence;
 begin
+  InitLog;
+  Log(LogInit,CurrentRoutine,'Initializing Application and Window.');
   OnGetApplicationName := @MyGetApplicationName;
   InitWindow;
   Application.MainWindow := Window;
@@ -54,7 +57,9 @@ end;
 
 procedure FreeDecoherence;
 begin
+  Log(LogInit,CurrentRoutine,'Game over. Freeing all data.');
   FreeGlobal;
+  Log(LogInit,CurrentRoutine,'Finished.');
 end;
 
 end.
