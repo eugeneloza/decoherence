@@ -24,10 +24,6 @@ unit DecoLog;
 
 interface
 
-{$IFDEF WriteLog}
-uses Classes;
-{$ENDIF}
-
 const
   Version = {$INCLUDE version.inc};
 
@@ -39,22 +35,23 @@ const
   LogInterfaceError = true;
   LogLanguageError = true;
 
-  {$IFDEF WriteLog}
-var
-  LogStream: TFileStream;
-  {$ENDIF}
-
 { Initializes Castle Log and display basic info }
 procedure InitLog;
+procedure FreeLog;
 { Writes a log string
   should be used like Log(true, CurrentRoutine, 'message');}
 procedure Log(const LogLevel: boolean; const aPrefix, aMessage: string);
-{++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
+{............................................................................}
 implementation
 
 uses SysUtils,
-  {$IFDEF WriteLog}DecoTime,{$ENDIF}
+  {$IFDEF WriteLog}Classes, DecoTime,{$ENDIF}
   CastleLog;
+
+{$IFDEF WriteLog}
+var
+  LogStream: TFileStream;
+{$ENDIF}
 
 procedure Log(const LogLevel: boolean; const aPrefix, aMessage: string);
 begin
@@ -62,7 +59,7 @@ begin
     WriteLnLog(aPrefix, aMessage);
 end;
 
-{---------------------------------------------------------------------------}
+{............................................................................}
 
 procedure InitLog;
 begin
@@ -78,6 +75,13 @@ begin
   WriteLnLog('(i) Compillation Date',{$I %DATE%} + ' Time: ' + {$I %TIME%});
   WriteLnLog('(i) FullScreen mode',{$IFDEF Fullscreen}'ON'{$ELSE}'OFF'{$ENDIF});
   WriteLnLog('(i) Pointer is', IntToStr(SizeOf(Pointer) * 8) + ' bit');
+end;
+
+procedure FreeLog;
+begin
+  {$IFDEF WriteLog}
+  LogStream.Free;
+  {$ENDIF}
 end;
 
 end.

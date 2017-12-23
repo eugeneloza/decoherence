@@ -90,6 +90,7 @@ begin
   FreeGlobal;
   FreeTime;
   Log(LogInit, CurrentRoutine, 'Finished.');
+  FreeLog;
 end;
 
 end.
