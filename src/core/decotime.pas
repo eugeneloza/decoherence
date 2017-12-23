@@ -15,12 +15,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 
 {---------------------------------------------------------------------------}
 
-{ Crop of Castle Game Engine Time utilities plus a threaded timer.
-  Provides for accurate and fast time access, hopefully thread-safe :)
-  GetNow should be used to access immediate time value.
-  Everywhere possible, DecoNow and DecoNowLocal should be used (updated once per frame).
-  GetNowThread and ForceGetNowThread are very specific and should be used
-  only in extremely time-critical routines often calculating time like World.Manage}
+(* Crop of Castle Game Engine Time utilities plus a threaded timer.
+   Provides for accurate and fast time access, hopefully thread-safe :)
+   GetNow should be used to access immediate time value.
+   Everywhere possible, DecoNow and DecoNowLocal should be used (updated once per frame).
+   GetNowThread and ForceGetNowThread are very specific and should be used
+   only in extremely time-critical routines often calculating time like World.Manage *)
+
 unit DecoTime;
 
 {$INCLUDE compilerconfig.inc}

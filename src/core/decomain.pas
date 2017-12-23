@@ -15,7 +15,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 
 {---------------------------------------------------------------------------}
 
-{ Core file of the game. Processes Window events and initializes the game }
+(* Core file of the game. Processes Window events and initializes the game *)
+
 unit DecoMain;
 
 {$INCLUDE compilerconfig.inc}

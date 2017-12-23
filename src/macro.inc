@@ -15,7 +15,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 
 {---------------------------------------------------------------------------}
 
-{ Some useful macros for Decoherence }
+(* Some useful macros for Decoherence *)
 
 {$MACRO ON}
 

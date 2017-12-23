@@ -15,7 +15,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 
 {---------------------------------------------------------------------------}
 
-{ Init file of the game. Here everything starts. }
+(* Init file of the game. Here everything starts. *)
 
 program Decoherence;
 {$INCLUDE compilerconfig.inc}
@@ -25,7 +25,11 @@ program Decoherence;
 uses
   {$IFDEF useCMEM}cmem,{$ENDIF}
   {$IFDEF UNIX}cthreads,{$ENDIF}
+
+  {$IFDEF DEBUG}{$IFDEF HEAP_FILE}
   SysUtils,
+  {$ENDIF}{$ENDIF}
+
   DecoMain,
   DecoWindow;
 

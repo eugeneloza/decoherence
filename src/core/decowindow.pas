@@ -15,7 +15,10 @@
 
 { --------------------------------------------------------------------------- }
 
-{ Handles window size and scale }
+(* Handles window size and scale
+   !!! NO RESCALES ALLOWED DURING THE GAME !!!
+   Changing FullScreen mode or Resolution only by rebooting! *)
+
 unit DecoWindow;
 
 {$INCLUDE compilerconfig.inc}

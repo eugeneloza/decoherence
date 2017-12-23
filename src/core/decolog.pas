@@ -15,8 +15,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 
 {---------------------------------------------------------------------------}
 
-{ Logging utility supporting different verbosity levels
- Most of it is just a wrapper to CastleLog }
+(* Logging utility supporting different verbosity levels
+   Most of it is just a wrapper to CastleLog *)
+
 unit DecoLog;
 
 {$INCLUDE compilerconfig.inc}

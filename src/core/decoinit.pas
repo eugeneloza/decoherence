@@ -15,7 +15,8 @@
 
 { --------------------------------------------------------------------------- }
 
-{ Initializes and frees the application }
+(* Initializes and frees the application *)
+
 unit DecoInit;
 
 {$INCLUDE compilerconfig.inc}
