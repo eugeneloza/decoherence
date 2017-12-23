@@ -25,7 +25,7 @@ unit DecoGlobal;
 interface
 
 uses
-  Classes, CastleWindow,
+  Classes,
   CastleRandom;
 
 type
@@ -39,8 +39,6 @@ type
   pFloat = ^DFloat;
 
 var
-  { Main window of the game }
-  Window: TCastleWindow;
   { random generator used for all interface random events }
   DRND: DRandom;
 
@@ -53,7 +51,7 @@ var
   We're not pursing cryptographic purposes, so /dev/urandom is perfectly enough }
 function GetRandomSeed: LongWord;
 
-{+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
+{............................................................................}
 implementation
 
 function GetRandomSeed: LongWord;

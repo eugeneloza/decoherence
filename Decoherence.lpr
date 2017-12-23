@@ -7,8 +7,8 @@ uses
   {$IFDEF useCMEM}cmem,{$ENDIF}
   {$IFDEF UNIX}cthreads,{$ENDIF}
   SysUtils,
-  { DecoGlobal, }
-  DecoMain, DecoGlobal;
+  DecoMain,
+  DecoWindow;
 
 {$R *.res}
 
