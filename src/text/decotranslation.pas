@@ -43,7 +43,8 @@ procedure InitTranslation;
 {............................................................................}
 implementation
 
-uses DecoLog;
+uses
+  DecoLog;
 
 function LanguageDir(const Lang: TLanguage): string;
 begin

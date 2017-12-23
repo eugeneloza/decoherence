@@ -25,9 +25,6 @@ unit DecoLog;
 interface
 
 const
-  Version = {$INCLUDE version.inc};
-
-const
   { normal log levels }
   LogInit = true;
 
@@ -44,7 +41,8 @@ procedure Log(const LogLevel: boolean; const aPrefix, aMessage: string);
 {............................................................................}
 implementation
 
-uses SysUtils,
+uses
+  SysUtils,
   {$IFDEF WriteLog}Classes, DecoTime,{$ENDIF}
   CastleLog;
 
@@ -62,6 +60,8 @@ end;
 {............................................................................}
 
 procedure InitLog;
+const
+  Version = {$INCLUDE version.inc};
 begin
   //initialize the log
   {$IFDEF WriteLog}
@@ -73,7 +73,6 @@ begin
 
   {this is basic information, so just output directly}
   WriteLnLog('(i) Compillation Date',{$I %DATE%} + ' Time: ' + {$I %TIME%});
-  WriteLnLog('(i) FullScreen mode',{$IFDEF Fullscreen}'ON'{$ELSE}'OFF'{$ENDIF});
   WriteLnLog('(i) Pointer is', IntToStr(SizeOf(Pointer) * 8) + ' bit');
 end;
 

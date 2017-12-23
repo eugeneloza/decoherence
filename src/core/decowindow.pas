@@ -37,7 +37,21 @@ procedure InitWindow;
 {............................................................................}
 implementation
 
-uses DecoGuiScale;
+uses
+  DecoGuiScale,
+  DecoLog;
+
+var
+  ConfigFullScreen: boolean;
+  ConfigWindowWidth: integer;
+  ConfigWindowHeight: integer;
+
+procedure ReadWindowConfiguration;
+begin
+  ConfigFullScreen := false;
+  ConfigWindowWidth := 1024;
+  ConfigWindowHeight := 600;
+end;
 
 procedure InitWindow;
 begin
@@ -45,12 +59,20 @@ begin
   Window.DoubleBuffer := True;
   Window.ResizeAllowed := raOnlyAtOpen;
 
-  {$IFDEF Fullscreen}
-  Window.FullScreen := True; {}
-  {$ELSE}
-  Window.Width := 1024;
-  Window.Height := 600;
-  {$ENDIF}
+  ReadWindowConfiguration;
+
+  Window.FullScreen := ConfigFullScreen;
+  if ConfigFullScreen then
+  begin
+    Log(LogInit, CurrentRoutine, 'FullScreen mode ON');
+  end
+  else
+  begin
+    Log(LogInit, CurrentRoutine, 'FullScreen mode OFF, Window resolution = ' +
+      ConfigWindowWidth.ToString + 'x' + ConfigWindowHeight.ToString);
+    Window.Width := ConfigWindowWidth;
+    Window.Height := ConfigWindowHeight;
+  end;
 
   ResetGUIScale;
 end;

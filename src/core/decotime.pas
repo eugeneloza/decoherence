@@ -80,7 +80,8 @@ procedure FreeTime;
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
-uses SysUtils, Classes{$IFDEF Windows}, SyncObjs{$ENDIF};
+uses
+  SysUtils, Classes{$IFDEF Windows}, SyncObjs{$ENDIF};
 
 function NiceDate: string;
 var

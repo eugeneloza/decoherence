@@ -25,7 +25,8 @@ unit DecoGuiScale;
 
 interface
 
-uses DecoGlobal;
+uses
+  DecoGlobal;
 
 var
   { Width and height of GUI }
@@ -43,7 +44,8 @@ procedure ResetGUIScale;
 {............................................................................}
 implementation
 
-uses DecoWindow, DecoLog;
+uses
+  DecoWindow, DecoLog;
 
 var GuiScaleInitialized: boolean = false;
 
