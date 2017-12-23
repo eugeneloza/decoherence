@@ -43,7 +43,7 @@ procedure InitTranslation;
 {............................................................................}
 implementation
 
-//uses SysUtils;
+uses DecoLog;
 
 function LanguageDir(const Lang: TLanguage): string;
 begin
@@ -53,7 +53,8 @@ begin
     Language_English: Result := 'ENG/';
     Language_Russian: Result := 'RUS/';
     else
-      raise Exception.Create('Unknown Language in DecoTranslation.LanguageDir!');
+      Result := 'ENG/';
+      Log(LogLanguageError, CurrentRoutine, 'ERROR: Unknown Language in DecoTranslation.LanguageDir! Falling back to English.');
   end;
   //Result := GetScenarioFolder + TextFolder + Result;
 

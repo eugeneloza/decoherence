@@ -34,7 +34,8 @@ const
   LogInit = true;
 
   { interface info and errors }
-  LogCriticalError = true;
+  LogInterfaceError = true;
+  LogLanguageError = true;
 
   {$IFDEF WriteLog}
 var

@@ -55,7 +55,7 @@ procedure ResetGUIScale;
   end;
 begin
   if GuiScaleInitialized then
-    Log(LogCriticalError, CurrentRoutine, 'WARNING: Reinitializing the GUI Scale!');
+    Log(LogInterfaceError, CurrentRoutine, 'WARNING: Reinitializing the GUI Scale!');
   GuiScaleInitialized := true;
 
   GUIWidth := Window.Width;
