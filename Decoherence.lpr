@@ -8,7 +8,7 @@ uses
   {$IFDEF UNIX}cthreads,{$ENDIF}
   SysUtils,
   { DecoGlobal, }
-  DecoMain;
+  DecoMain, DecoGlobal;
 
 {$R *.res}
 
@@ -21,6 +21,6 @@ begin
   SetHeapTraceOutput('heap.trc');
   {$ENDIF}{$ENDIF}
 
-  //Window.OpenAndRun;
+  Window.OpenAndRun;
 end.
 

@@ -23,9 +23,33 @@ unit DecoMain;
 interface
 
 uses
-  Classes, SysUtils;
+  CastleWindow, CastleKeysMouse, SysUtils,
+  DecoGlobal;
 
 implementation
+
+procedure ApplicationInitialize;
+begin
+
+end;
+
+{++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
+function MyGetApplicationName: string;
+begin
+  Result := 'Decoherence 1';
+end;
+
+initialization
+  OnGetApplicationName := @MyGetApplicationName;
+
+  Window := TCastleWindow.Create(Application);
+
+  Window.DoubleBuffer := True;
+
+  Application.MainWindow := Window;
+  Application.OnInitialize := @ApplicationInitialize;
+
+finalization
 
 end.
 
