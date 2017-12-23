@@ -31,13 +31,34 @@ procedure FreeDecoherence;
 implementation
 
 uses
-  SysUtils, CastleWindow,
+  SysUtils, CastleWindow, CastleControls,
+  DecoLoadEmbedded,
+  DecoTranslation,
   DecoTime, DecoLog, DecoWindow, DecoGlobal;
+
+{ Displays a "Loading..." image for the language
+  thanks to Michalis, it's simple :) see https://github.com/eugeneloza/decoherence/issues/22 }
+procedure SetLoadingImage;
+begin
+  case CurrentLanguage of
+    Language_English: Theme.Images[tiLoading] := Loading_eng;
+    Language_Russian: Theme.Images[tiLoading] := Loading_rus;
+    else
+      Theme.Images[tiLoading] := Loading_eng;
+      //we don't have Log initialized here yet. So, don't report this error, just fall back to English.
+  end;
+
+  Theme.OwnsImages[tiLoading] := False;
+end;
+
+{-----------------------------------------------------------------------------}
 
 function MyGetApplicationName: string;
 begin
   Result := 'Decoherence 1';
 end;
+
+{-----------------------------------------------------------------------------}
 
 procedure ApplicationInitialize;
 begin
@@ -47,11 +68,15 @@ begin
   Log(LogInit, CurrentRoutine, 'Init sequence finished.');
 end;
 
+{-----------------------------------------------------------------------------}
+
 procedure InitDecoherence;
 begin
   InitLog;
   Log(LogInit, CurrentRoutine, 'Initializing Application and Window.');
   OnGetApplicationName := @MyGetApplicationName;
+  InitTranslation;
+  SetLoadingImage;
   InitWindow;
   Application.MainWindow := Window;
   Application.OnInitialize := @ApplicationInitialize;
