@@ -24,7 +24,9 @@ unit DecoLog;
 
 interface
 
+{$IFDEF WriteLog}
 uses Classes;
+{$ENDIF}
 
 const
   Version = {$INCLUDE version.inc};

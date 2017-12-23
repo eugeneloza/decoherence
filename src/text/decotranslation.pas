@@ -23,7 +23,7 @@ unit DecoTranslation;
 
 interface
 
-uses DecoGlobal;
+//uses DecoGlobal;
 
 type
   { Enumerates all available languages. To add another language, first step
@@ -47,34 +47,27 @@ uses DecoLog;
 
 function LanguageDir(const Lang: TLanguage): string;
 begin
-  {StartProfiler}
-
   case Lang of
     Language_English: Result := 'ENG/';
     Language_Russian: Result := 'RUS/';
-    else
+    else begin
       Result := 'ENG/';
       Log(LogLanguageError, CurrentRoutine, 'ERROR: Unknown Language in DecoTranslation.LanguageDir! Falling back to English.');
+    end;
   end;
   //Result := GetScenarioFolder + TextFolder + Result;
-
-  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
 
 function SayLanguage(const Lang: TLanguage): string;
 begin
-  {StartProfiler}
-
   case Lang of
     Language_English: Result := 'English';
     Language_Russian: Result := 'Russian';
     else
       Result := 'Unknown Language';
   end;
-
-  {StopProfiler}
 end;
 
 {............................................................................}
@@ -83,6 +76,7 @@ procedure InitTranslation;
 begin
   {todo: read language here from settings}
   CurrentLanguage := Language_Russian;
+  Log(LogInit, CurrentRoutine, 'Current language: ' + SayLanguage(CurrentLanguage));
 end;
 
 end.

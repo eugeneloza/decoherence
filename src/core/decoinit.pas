@@ -43,9 +43,10 @@ begin
   case CurrentLanguage of
     Language_English: Theme.Images[tiLoading] := Loading_eng;
     Language_Russian: Theme.Images[tiLoading] := Loading_rus;
-    else
+    else begin
       Theme.Images[tiLoading] := Loading_eng;
-      //we don't have Log initialized here yet. So, don't report this error, just fall back to English.
+      Log(LogLanguageError, CurrentRoutine, 'WARNING: Unknown Language in DecoInit! Falling back to English.');
+    end;
   end;
 
   Theme.OwnsImages[tiLoading] := False;
