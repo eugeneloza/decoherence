@@ -31,7 +31,7 @@ implementation
 
 uses
   SysUtils, CastleWindow,
-  DecoLog, DecoWindow, DecoGlobal;
+  DecoTime, DecoLog, DecoWindow, DecoGlobal;
 
 function MyGetApplicationName: string;
 begin
@@ -40,14 +40,16 @@ end;
 
 procedure ApplicationInitialize;
 begin
-  Log(LogInit,CurrentRoutine,'Main init sequence started.');
+  Log(LogInit, CurrentRoutine, 'Init sequence started.');
   InitGlobal;
+  InitTime;
+  Log(LogInit, CurrentRoutine, 'Init sequence finished.');
 end;
 
 procedure InitDecoherence;
 begin
   InitLog;
-  Log(LogInit,CurrentRoutine,'Initializing Application and Window.');
+  Log(LogInit, CurrentRoutine, 'Initializing Application and Window.');
   OnGetApplicationName := @MyGetApplicationName;
   InitWindow;
   Application.MainWindow := Window;
@@ -57,9 +59,10 @@ end;
 
 procedure FreeDecoherence;
 begin
-  Log(LogInit,CurrentRoutine,'Game over. Freeing all data.');
+  Log(LogInit, CurrentRoutine, 'Game over. Freeing all data.');
   FreeGlobal;
-  Log(LogInit,CurrentRoutine,'Finished.');
+  FreeTime;
+  Log(LogInit, CurrentRoutine, 'Finished.');
 end;
 
 end.

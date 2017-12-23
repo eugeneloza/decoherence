@@ -23,7 +23,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 //works only in FPC3.1.1 and later
 {$DEFINE CurrentRoutine:={$IF DECLARED(ClassName)}ClassName+'.'+{$ENDIF}{$I %CURRENTROUTINE%}}
 
-{ define a inline replacer macro }
+{ define a inline replacer macro
+  pay attention that TryInline should not have a semicolon after it }
 {$IFDEF SUPPORTS_INLINE}
 {$DEFINE TryInline:=inline;}
 {$ELSE}

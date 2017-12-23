@@ -158,6 +158,7 @@
       <Unit9>
         <Filename Value="src/core/decotime.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoTime"/>
       </Unit9>
     </Units>
   </ProjectOptions>

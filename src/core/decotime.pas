@@ -23,8 +23,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
   only in extremely time-critical routines often calculating time like World.Manage}
 unit DecoTime;
 
-{$HINT Profiler not used here}
-
 {$INCLUDE compilerconfig.inc}
 {$DEFINE UseFloatTimer}
 
@@ -43,16 +41,16 @@ type
 
   DThreadedTime = {$IFDEF UseFloatTimer}DTime{$ELSE}DIntTime{$ENDIF};
 
-
-var { analogue to Now function, but a fast-access variable, representing
-      current global time (time where animations take place)
-      works ~200 times faster than SysUtils.Now so should be used anywhere possible
-      Updated once per frame}
+var
+  { analogue to Now function, but a fast-access variable, representing
+    current global time (time where animations take place)
+    works ~200 times faster than SysUtils.Now so should be used anywhere possible
+    Updated once per frame}
   DecoNow: DTime;
   DeltaT: DTime;
-    { analogue to Now function, but a fast-access variable, representing
-      current in-game time (time where actions take place)
-      Updated once per frame }
+  { analogue to Now function, but a fast-access variable, representing
+    current in-game time (time where actions take place)
+    Updated once per frame }
   DecoNowLocal: DTime;
   DeltaTLocal: DTime;
 
@@ -64,9 +62,9 @@ var { analogue to Now function, but a fast-access variable, representing
 function NiceDate: string;
 { Advance time for the frame }
 procedure doTime;
-{Requests a soft-pause (animations run, but actors do not preform actions)}
+{ Requests a soft-pause (animations run, but actors do not preform actions) }
 procedure RequestSoftPauseByAction(const PauseSeconds: DTime);
-{ Gets CastleTimeUtils.Timer value from some "starting point" in a thread-safe way }
+{ Gets Timer value from some "starting point" in a thread-safe way }
 function GetNow: DTime; TryInline
 function GetNowInt: DIntTime; TryInline
 { This is a less accurate but accelerated (~130 times) version
@@ -75,6 +73,9 @@ function GetNowInt: DIntTime; TryInline
 function GetNowThread: DThreadedTime; TryInline
 { Forces initialization of the threaded timer value. }
 function ForceGetNowThread: DThreadedTime; TryInline
+
+procedure InitTime;
+procedure FreeTime;
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
 
@@ -85,7 +86,7 @@ var
   s: string;
   i: integer;
 begin
-  s := DateTimeToAtStr(Now); //only place where I'm using SysUtils.Now
+  s := DateTimeToAtStr(Now); //the only place where I'm using SysUtils.Now
   Result := '';
   for i := 1 to Length(s) do
     if Copy(s, i, 1) = ' ' then
@@ -196,6 +197,7 @@ var
 begin
   FpGettimeofday(@tv, nil);
   Result := int64(tv.tv_sec) * 1000000 + int64(tv.tv_usec);
+  {$HINT overflows may occur here, as Thaddy@LazarusForum suggests}
 end;
 
 {$ENDIF}
@@ -239,11 +241,7 @@ function GetNowThread: DThreadedTime; TryInline
 begin
   if ThreadedTimer.Finished then
   begin
-    LastTime := ThreadedTimer.Time
-{$IFDEF UseFloatTimer}
-      / TimerFrequency
-{$ENDIF}
-    ;
+    LastTime := ThreadedTimer.Time{$IFDEF UseFloatTimer} / TimerFrequency{$ENDIF};
     ThreadedTimer.Start;
   end;
   Result := LastTime;
@@ -265,7 +263,10 @@ begin
   Result := LastTime;
 end;
 
-initialization
+{.............................................................................}
+
+procedure InitTime;
+begin
   //create threaded timer and run it immediately to make sure everything is initialized properly
   ThreadedTimer := TTimerThread.Create(True);
   ThreadedTimer.Priority := tpLower;
@@ -283,11 +284,14 @@ initialization
   end;
   TimerLock := TCriticalSection.Create;
   {$ENDIF}
+end;
 
-finalization
+procedure FreeTime;
+begin
   ThreadedTimer.Free;
   {$IFDEF Windows}
-  FreeAndNil(TimerLock);
+  TimerLock.Free;
   {$ENDIF}
+end;
 
 end.
