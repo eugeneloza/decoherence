@@ -30,7 +30,11 @@ const
   Version = {$INCLUDE version.inc};
 
 const
+  { normal log levels }
   LogInit = true;
+
+  { interface info and errors }
+  LogCriticalError = true;
 
   {$IFDEF WriteLog}
 var

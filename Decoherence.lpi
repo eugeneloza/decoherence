@@ -30,7 +30,7 @@
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir);src"/>
-            <OtherUnitFiles Value="src;src/core"/>
+            <OtherUnitFiles Value="src;src/core;src/gui"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
           <Parsing>
@@ -113,7 +113,7 @@
         <PackageName Value="castle_base"/>
       </Item2>
     </RequiredPackages>
-    <Units Count="10">
+    <Units Count="11">
       <Unit0>
         <Filename Value="Decoherence.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -160,6 +160,11 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="DecoTime"/>
       </Unit9>
+      <Unit10>
+        <Filename Value="src/gui/decoguiscale.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoGuiScale"/>
+      </Unit10>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

@@ -37,6 +37,8 @@ procedure InitWindow;
 {............................................................................}
 implementation
 
+uses DecoGuiScale;
+
 procedure InitWindow;
 begin
   Window := TCastleWindow.Create(Application);
@@ -49,6 +51,8 @@ begin
   Window.Width := 1024;
   Window.Height := 600;
   {$ENDIF}
+
+  ResetGUIScale;
 end;
 
 end.
