@@ -25,7 +25,6 @@ unit DecoGlobal;
 interface
 
 uses
-  Classes,
   CastleRandom;
 
 type
@@ -52,6 +51,8 @@ var
 function GetRandomSeed: LongWord;
 
 {............................................................................}
+procedure InitGlobal;
+procedure FreeGlobal;
 implementation
 
 function GetRandomSeed: LongWord;
@@ -78,11 +79,16 @@ begin
 end;
 {$ENDIF}
 
-initialization
+{.............................................................................}
+procedure InitGlobal;
+begin
   DRND := TCastleRandom.Create(GetRandomSeed);
+end;
 
-finalization
+procedure FreeGlobal;
+begin
   DRND.Free;
+end;
 
 end.
 

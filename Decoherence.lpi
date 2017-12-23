@@ -113,7 +113,7 @@
         <PackageName Value="castle_base"/>
       </Item2>
     </RequiredPackages>
-    <Units Count="5">
+    <Units Count="6">
       <Unit0>
         <Filename Value="Decoherence.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -137,6 +137,11 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="DecoWindow"/>
       </Unit4>
+      <Unit5>
+        <Filename Value="src/core/decoinit.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoInit"/>
+      </Unit5>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
