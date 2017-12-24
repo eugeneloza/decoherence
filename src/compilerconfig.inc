@@ -39,6 +39,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 
 {======================== ENGINE-SPECIFIC DIRECTIVES =========================}
 
+{$IFDEF RELEASE}
+{$DEFINE WriteLog}
+{$ENDIF}
+
 { Inline code? Just in case of bugs...
   e.g. freepascal debugger doesn't show line numbers in inlined code }
 {$DEFINE SUPPORTS_INLINE}
