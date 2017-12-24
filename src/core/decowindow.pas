@@ -38,6 +38,7 @@ procedure InitWindow;
 implementation
 
 uses
+  SysUtils,
   DecoGuiScale,
   DecoLog;
 

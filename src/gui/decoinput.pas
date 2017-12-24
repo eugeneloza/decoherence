@@ -15,7 +15,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 
 {---------------------------------------------------------------------------}
 
-{ Handles mouse behaviour }
+(* Handles keyboard and mouse behaviour *)
+
 unit DecoInput;
 
 {$INCLUDE compilerconfig.inc}
@@ -24,49 +25,55 @@ interface
 
 uses Classes, Generics.Collections, SysUtils,
   CastleFilesUtils, CastleKeysMouse,
-  DecoInterfaceCore, DecoGui,
   DecoGlobal;
 
 type
+  { todo: make it a class type }
   DTouch = class(DObject)
     FingerIndex: cardinal;
     x0, y0: integer;     //to handle sweeps, drags and cancels
-    ClickElement: DSingleInterfaceElement;
     constructor Create(const xx, yy: single; const Finger: integer);
     procedure Update(const Event: TInputMotion);
   end;
-
-type
   DTouchList = specialize TObjectList<DTouch>;
 
-{-------------------------------- vars --------------------------------------}
+type
+  DInputProcessor = class(DObject)
+  public
+    TouchArray: DTouchList;
+    constructor Create;
+    destructor Destroy; override;
 
-var
-  TouchArray: DTouchList;
+    function doMouseLook(const Event: TInputMotion): boolean;
+    function doMouseDrag(const Event: TInputMotion): boolean;
+    procedure doMouseMotion(const Event: TInputMotion);
+    procedure doMousePress(const Event: TInputPressRelease);
+    procedure doMouseRelease(const Event: TInputPressRelease);
+    function GetFingerIndex(const Event: TInputPressRelease): integer;
+    procedure doKeyboardPress(const aKey: TKey);
+    procedure doKeyboardRelease(const aKey: TKey);
+    procedure KeyRecorder(const aKey: TKey);
+    procedure CenterMouseCursor;
+  end;
 
-{------------------------------- procs --------------------------------------}
+var InputProcessor: DInputProcessor;
 
-procedure doMouseMotion(const Event: TInputMotion);
-procedure doKeyboardPress(const aKey: TKey);
-procedure doKeyboardRelease(const aKey: TKey);
 
-procedure doMousePress(const Event: TInputPressRelease);
-procedure doMouseRelease(const Event: TInputPressRelease);
-function doMouseLook(const Event: TInputMotion): boolean;
-function doMouseDrag(const Event: TInputMotion): boolean;
-procedure CenterMouseCursor;
-{+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
+{ Input must be initialized AFTER window is open }
+procedure InitInput;
+procedure FreeInput;
+{............................................................................}
 implementation
 
-uses CastleVectors,
-  DecoNavigation, DecoPlayerCharacter,
-  DecoGameMode, DecoLog, Profiler;
+uses CastleVectors, CastleWindow,
+  DecoTime, DecoWindow, DecoLog;
 
+{============================= INPUT PROCESSOR ============================}
 var
   RecordKeys: boolean = False;
   RecordedKeys: string;
 
-procedure KeyRecorder(const aKey: TKey);
+procedure DInputProcessor.KeyRecorder(const aKey: TKey);
 const
   test1 = 'DIIQI';
 const
@@ -105,7 +112,7 @@ const
   end;
 
 begin
-  if CurrentGameMode = gmTravel then
+  if {CurrentGameMode = gmTravel} true then
   begin
     if RecordKeys then
     begin
@@ -115,7 +122,7 @@ begin
         begin
           if (RecordedKeys = test1) or (RecordedKeys = test2) then
           begin
-            Log(LogVerbose, _CurrentRoutine, 'No! This is a different game!');
+            //Log(LogVerbose, _CurrentRoutine, 'No! This is a different game!');
             RecordKeys := False;
           end;
         end
@@ -138,46 +145,36 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-procedure doKeyboardRelease(const aKey: TKey);
+procedure DInputProcessor.doKeyboardRelease(const aKey: TKey);
 begin
-  {StartProfiler}
-
-  case aKey of
+{  case aKey of
     k_W: Player.InputRelease(mdForward);
     k_S: Player.InputRelease(mdBack);
     k_A: Player.InputRelease(mdLeft);
     k_D: Player.InputRelease(mdRight);
-  end;
-
-  {StopProfiler}
+  end;}
 end;
 
 {-----------------------------------------------------------------------------}
 
-procedure doKeyboardPress(const aKey: TKey);
+procedure DInputProcessor.doKeyboardPress(const aKey: TKey);
 begin
-  {StartProfiler}
-
-  case aKey of
+{  case aKey of
     k_W: Player.InputMove(mdForward);
     k_S: Player.InputMove(mdBack);
     k_A: Player.InputMove(mdLeft);
     k_D: Player.InputMove(mdRight);
   end;
-  KeyRecorder(aKey);
-
-  {StopProfiler}
+  KeyRecorder(aKey);}
 end;
 
 {-----------------------------------------------------------------------------}
 
-procedure doMouseMotion(const Event: TInputMotion);
+procedure DInputProcessor.doMouseMotion(const Event: TInputMotion);
 var
-  tmpLink: DAbstractElement;
+//  tmpLink: DAbstractElement;
   Dragging: boolean;
 begin
-  {StartProfiler}
-
   if doMouseLook(Event) then
     Exit;
 
@@ -186,48 +183,36 @@ begin
   {mouse over / if no drag-n-drop}
   //this is not needed at the moment, we'll turn here a bit later when implementing drag-n-drop
   //no mouseover is detected if no ifmouseover is run, so should still be here
-  if not Dragging then
+{  if not Dragging then
   begin
     tmpLink := GUI.IfMouseOver(Round(Event.Position[0]), Round(
       Event.Position[1]), True, True);
     if tmpLink <> nil then
       Log(logVerbose, _CurrentRoutine, 'Motion caught ' + tmpLink.ClassName);
-  end;
-
-  {StopProfiler}
+  end; }
 end;
 
 {================================= TOUCH ====================================}
 
 constructor DTouch.Create(const xx, yy: single; const Finger: integer);
 begin
-  {StartProfiler}
-
   x0 := Round(xx);
   y0 := Round(yy);
   FingerIndex := Finger;
-
-  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure DTouch.Update(const Event: TInputMotion);
 begin
-  {StartProfiler}
-
   x0 := Round(Event.Position[0]);
   y0 := Round(Event.Position[1]);
-
-  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
 
-function GetFingerIndex(const Event: TInputPressRelease): integer;
+function DInputProcessor.GetFingerIndex(const Event: TInputPressRelease): integer;
 begin
-  {StartProfiler}
-
   if Event.MouseButton = mbLeft then
     Result := Event.FingerIndex
   else if Event.MouseButton = mbRight then
@@ -236,8 +221,6 @@ begin
     Result := 200
   else
     raise Exception.Create('Unknown event.MouseButton in decomouse.GetFingerIndex!');
-
-  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
@@ -246,14 +229,12 @@ var
   { used to detect if mouse is in dragg-look mode }
   DragMouseLook: boolean = False;
 
-procedure doMouseRelease(const Event: TInputPressRelease);
+procedure DInputProcessor.doMouseRelease(const Event: TInputPressRelease);
 var
   i, FingerIndex: integer;
   Found: boolean;
 begin
-  {StartProfiler}
-
-  if TouchArray.Count > 0 then
+ { if TouchArray.Count > 0 then
   begin
     fingerindex := GetFingerIndex(Event);
     i := 0;
@@ -288,18 +269,16 @@ begin
       Log(LogMouseError, _CurrentRoutine, 'ERROR: Touch event not found!');
   end
   else
-    Log(LogMouseError, _CurrentRoutine, 'ERROR: Touch event list is empty!');
-
-  {StopProfiler}
+    Log(LogMouseError, _CurrentRoutine, 'ERROR: Touch event list is empty!'); }
 end;
 
 {-----------------------------------------------------------------------------}
 
-procedure doMousePress(const Event: TInputPressRelease);
+procedure DInputProcessor.doMousePress(const Event: TInputPressRelease);
 var
   NewEventTouch: DTouch;
   FingerIndex: integer;
-  tmpLink: DAbstractElement;
+  //tmpLink: DAbstractElement;
   InterfaceCaughtEvent: boolean;
   i: integer;
 begin
@@ -311,7 +290,7 @@ begin
   NewEventTouch := DTouch.Create(Event.Position[0], Event.Position[1], FingerIndex);
 
   //catch the element which has been pressed
-  tmpLink := GUI.IfMouseOver(Round(Event.Position[0]), Round(
+{  tmpLink := GUI.IfMouseOver(Round(Event.Position[0]), Round(
     Event.Position[1]), True, True);
   if (tmpLink is DSingleInterfaceElement) then
   begin
@@ -340,8 +319,7 @@ begin
   end;
 
   Log(LogMouseInfo, _CurrentRoutine, 'Caught mouse press finger=' + IntToStr(FingerIndex));
-
-  {StopProfiler}
+  }
 end;
 
 {----------------------------------------------------------------------------}
@@ -349,11 +327,9 @@ end;
 var
   CameraWarning: boolean = True;
 
-function doMouseLook(const Event: TInputMotion): boolean;
+function DInputProcessor.doMouseLook(const Event: TInputMotion): boolean;
 begin
-  {StartProfiler}
-
-  if Camera = nil then
+{  if Camera = nil then
   begin
     if CameraWarning then
     begin
@@ -387,30 +363,26 @@ begin
     {$HINT Why Event.OldPosition rotation style is MUCH slower than MouseLook style rotation???}
     Player.InputMouse(Event.OldPosition - Event.Position);
     doMouseLook := False;
-  end;
-
-  {StopProfiler}
+  end;}
 end;
 
 {----------------------------------------------------------------------------}
 
-procedure CenterMouseCursor;
+procedure DInputProcessor.CenterMouseCursor;
 begin
-  Window.MousePosition := GUI.Center;
+  {Window.MousePosition := GUI.Center;}
 end;
 
 {----------------------------------------------------------------------------}
 
-function doMouseDrag(const Event: TInputMotion): boolean;
+function DInputProcessor.doMouseDrag(const Event: TInputMotion): boolean;
 var
   i: integer;
 begin
-  {StartProfiler}
-
   {check for drag-n-drops}
   Result := False;
   {if Event.EventType = itMouseButton then }begin
-    if TouchArray.Count > 0 then
+{    if TouchArray.Count > 0 then
     begin
       i := 0;
       repeat
@@ -428,18 +400,89 @@ begin
         end;
         Inc(i);
       until (i >= TouchArray.Count);
-    end;
+    end; }
 
   end;
-
-  {StopProfiler}
 end;
 
 
-initialization
+constructor DInputProcessor.Create;
+begin
+  //inherited Create <------ nothing to inherit
   TouchArray := DTouchList.Create;
+end;
 
-finalization
+destructor DInputProcessor.Destroy;
+begin
   TouchArray.Free;
+  inherited Destroy;
+end;
+
+{======================== EVENTS =================================}
+
+{$PUSH}{$WARN 5024 off : Parameter "$1" not used}
+procedure doPress(Container: TUIContainer; const Event: TInputPressRelease);
+begin
+  // todo Joystick
+  if Event.EventType = itMouseButton then
+    InputProcessor.doMousePress(Event)
+  else
+  if Event.EventType = itKey then
+  begin
+    {some generic buttons here}
+    case Event.key of
+      K_P, K_PrintScreen:
+        //k_printscreen doesn't work in x-window system if assigned to some external program like scrot
+        Window.SaveScreen('deco_' + NiceDate + '.jpg');
+{      K_r: Player.CurrentParty.Rest;
+      k_i: if AmbientIntensity.Ambient = 0 then
+          AmbientIntensity.SetAmbientIntensity(3)
+        else
+          AmbientIntensity.SetAmbientIntensity(0);
+       {k_1: shaders.WhichChoice := 0;
+       k_2: shaders.WhichChoice := 1;
+       k_3: shaders.WhichChoice := 2;}}
+
+    end;
+
+{    if (CurrentGameMode = gmTravel) and (Player <> nil) then
+      doKeyboardPress(Event.Key); }
+  end;
+  //  SetGameMode(gmCharacterGeneration);
+ { InitTestLevel;                         //ugly! I'll fix this soon. }
+end;
+
+{--------------------------------------------------------------------------}
+
+procedure doRelease(Container: TUIContainer; const Event: TInputPressRelease);
+begin
+  if Event.EventType = itMouseButton then
+    InputProcessor.doMouseRelease(Event)
+  else
+  if Event.EventType = itKey then
+    InputProcessor.doKeyboardRelease(Event.Key);
+end;
+
+{--------------------------------------------------------------------------}
+
+procedure doMotion(Container: TUIContainer; const Event: TInputMotion);
+begin
+  InputProcessor.doMouseMotion(Event);
+end;
+{$POP}
+
+{............................................................................}
+procedure InitInput;
+begin
+  InputProcessor := DInputProcessor.Create;
+  Window.OnPress := @doPress;
+  Window.OnRelease := @doRelease;
+  Window.OnMotion := @doMotion;
+end;
+
+procedure FreeInput;
+begin
+  InputProcessor.Free;
+end;
 
 end.

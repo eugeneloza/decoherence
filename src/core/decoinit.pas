@@ -34,6 +34,7 @@ uses
   SysUtils, CastleWindow, CastleControls,
   DecoLoadEmbedded,
   DecoTranslation,
+  DecoInput,
   DecoTime, DecoLog, DecoWindow, DecoGlobal;
 
 { Displays a "Loading..." image for the language
@@ -64,6 +65,7 @@ end;
 procedure ApplicationInitialize;
 begin
   Log(LogInit, CurrentRoutine, 'Init sequence started.');
+  InitInput;
   InitGlobal;
   InitTime;
   Log(LogInit, CurrentRoutine, 'Init sequence finished.');
@@ -84,11 +86,14 @@ begin
   Window.Caption := MyGetApplicationName;
 end;
 
+{-----------------------------------------------------------------------------}
+
 procedure FreeDecoherence;
 begin
   Log(LogInit, CurrentRoutine, 'Game over. Freeing all data.');
-  FreeGlobal;
   FreeTime;
+  FreeGlobal;
+  FreeInput;
   Log(LogInit, CurrentRoutine, 'Finished.');
   FreeLog;
 end;
