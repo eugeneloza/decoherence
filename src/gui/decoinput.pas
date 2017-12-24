@@ -27,12 +27,10 @@ uses Classes, Generics.Collections, SysUtils,
   CastleFilesUtils, CastleKeysMouse,
   DecoGlobal;
 
-
 type
   DInputProcessor = class(DObject)
   strict private
   type
-    { todo: make it a class type }
     DTouch = class(DObject)
       FingerIndex: cardinal;
       x0, y0: integer;     //to handle sweeps, drags and cancels
@@ -59,8 +57,15 @@ type
     procedure CenterMouseCursor;
   end;
 
-var InputProcessor: DInputProcessor;
+type
+  DKeyBindings = record
+    MoveForward, MoveBackward, StrafeLeft, StrafeRight: TKey;
+    ScreenShotKey: TKey;
+  end;
 
+var
+  InputProcessor: DInputProcessor;
+  KeysBindings: DKeyBindings;
 
 { Input must be initialized AFTER window is open }
 procedure InitInput;
@@ -70,6 +75,23 @@ implementation
 
 uses CastleVectors, CastleWindow,
   DecoTime, DecoWindow, DecoLog;
+
+{================================= TOUCH ====================================}
+
+constructor DInputProcessor.DTouch.Create(const xx, yy: single; const Finger: integer);
+begin
+  x0 := Round(xx);
+  y0 := Round(yy);
+  FingerIndex := Finger;
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DInputProcessor.DTouch.Update(const Event: TInputMotion);
+begin
+  x0 := Round(Event.Position[0]);
+  y0 := Round(Event.Position[1]);
+end;
 
 {============================= INPUT PROCESSOR ============================}
 var
@@ -150,25 +172,37 @@ end;
 
 procedure DInputProcessor.doKeyboardRelease(const aKey: TKey);
 begin
-{  case aKey of
-    k_W: Player.InputRelease(mdForward);
-    k_S: Player.InputRelease(mdBack);
-    k_A: Player.InputRelease(mdLeft);
-    k_D: Player.InputRelease(mdRight);
-  end;}
+  if aKey = KeysBindings.MoveForward then
+  //
+  else
+  if aKey = KeysBindings.MoveBackward then
+  //
+  else
+  if aKey = KeysBindings.StrafeLeft then
+  //
+  else
+  if aKey = KeysBindings.StrafeRight then
+  //
+  ;
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure DInputProcessor.doKeyboardPress(const aKey: TKey);
 begin
-{  case aKey of
-    k_W: Player.InputMove(mdForward);
-    k_S: Player.InputMove(mdBack);
-    k_A: Player.InputMove(mdLeft);
-    k_D: Player.InputMove(mdRight);
-  end;
-  KeyRecorder(aKey);}
+  if aKey = KeysBindings.MoveForward then
+  //
+  else
+  if aKey = KeysBindings.MoveBackward then
+  //
+  else
+  if aKey = KeysBindings.StrafeLeft then
+  //
+  else
+  if aKey = KeysBindings.StrafeRight then
+  //
+  ;
+  KeyRecorder(aKey);
 end;
 
 {-----------------------------------------------------------------------------}
@@ -193,23 +227,6 @@ begin
     if tmpLink <> nil then
       Log(logVerbose, _CurrentRoutine, 'Motion caught ' + tmpLink.ClassName);
   end; }
-end;
-
-{================================= TOUCH ====================================}
-
-constructor DInputProcessor.DTouch.Create(const xx, yy: single; const Finger: integer);
-begin
-  x0 := Round(xx);
-  y0 := Round(yy);
-  FingerIndex := Finger;
-end;
-
-{-----------------------------------------------------------------------------}
-
-procedure DInputProcessor.DTouch.Update(const Event: TInputMotion);
-begin
-  x0 := Round(Event.Position[0]);
-  y0 := Round(Event.Position[1]);
 end;
 
 {-----------------------------------------------------------------------------}
@@ -237,7 +254,7 @@ var
   i, FingerIndex: integer;
   Found: boolean;
 begin
- { if TouchArray.Count > 0 then
+  if TouchArray.Count > 0 then
   begin
     fingerindex := GetFingerIndex(Event);
     i := 0;
@@ -253,11 +270,11 @@ begin
     if i = 0 then
       DragMouseLook := False;
 
-    Log(LogMouseInfo, _CurrentRoutine, 'Caught mouse release finger=' +
+    Log(LogMouseInfo, CurrentRoutine, 'Caught mouse release finger=' +
       IntToStr(FingerIndex) + ' n=' + IntToStr(i));
     if Found then
     begin
-      if (TouchArray[i].ClickElement <> nil) then
+      {if (TouchArray[i].ClickElement <> nil) then
       begin
         if Assigned(touchArray[i].ClickElement.OnMouseRelease) then
           TouchArray[i].ClickElement.OnMouseRelease(
@@ -265,14 +282,14 @@ begin
         if Assigned(TouchArray[i].ClickElement.OnDrop) then
           TouchArray[i].ClickElement.OnDrop(TouchArray[i].ClickElement,
             TouchArray[i].x0, TouchArray[i].y0);
-      end;
+      end;}
       TouchArray.Remove(TouchArray[i]);
     end
     else
-      Log(LogMouseError, _CurrentRoutine, 'ERROR: Touch event not found!');
+      Log(LogMouseError, CurrentRoutine, 'ERROR: Touch event not found!');
   end
   else
-    Log(LogMouseError, _CurrentRoutine, 'ERROR: Touch event list is empty!'); }
+    Log(LogMouseError, CurrentRoutine, 'ERROR: Touch event list is empty!');
 end;
 
 {-----------------------------------------------------------------------------}
@@ -306,12 +323,12 @@ begin
     end;
     if NewEventTouch.ClickElement.CanDrag then
       NewEventTouch.ClickElement.StartDrag(Round(Event.Position[0]), Round(Event.Position[1]));
-  end;
+  end; }
 
   i := TouchArray.Add(NewEventTouch);
 
   {todo: if interface didn't catch the click then}
-  if (CurrentGameMode = gmTravel) and (not InterfaceCaughtEvent) then
+ { if (CurrentGameMode = gmTravel) and (not InterfaceCaughtEvent) then
   begin
     //switch control mode
     if Event.MouseButton = mbRight then
@@ -319,10 +336,10 @@ begin
     //start dragging mouse look
     if i = 0 then
       DragMouseLook := True;
-  end;
+  end; }
 
-  Log(LogMouseInfo, _CurrentRoutine, 'Caught mouse press finger=' + IntToStr(FingerIndex));
-  }
+  Log(LogMouseInfo, CurrentRoutine, 'Caught mouse press finger=' + IntToStr(FingerIndex));
+
 end;
 
 {----------------------------------------------------------------------------}
@@ -408,6 +425,7 @@ begin
   end;
 end;
 
+{----------------------------------------------------------------------------}
 
 constructor DInputProcessor.Create;
 begin
@@ -415,10 +433,26 @@ begin
   TouchArray := DTouchList.Create;
 end;
 
+{----------------------------------------------------------------------------}
+
 destructor DInputProcessor.Destroy;
 begin
   TouchArray.Free;
   inherited Destroy;
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure LoadInputConfig;
+begin
+  with KeysBindings do
+  begin
+    MoveForward := K_W;
+    MoveBackward := K_S;
+    StrafeLeft := K_A;
+    StrafeRight := K_D;
+    ScreenShotKey := K_P;
+  end;
 end;
 
 {======================== EVENTS =================================}
@@ -477,6 +511,7 @@ end;
 {............................................................................}
 procedure InitInput;
 begin
+  LoadInputConfig;
   InputProcessor := DInputProcessor.Create;
   Window.OnPress := @doPress;
   Window.OnRelease := @doRelease;

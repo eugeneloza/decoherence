@@ -32,6 +32,10 @@ const
   LogInterfaceError = true;
   LogLanguageError = true;
 
+  { input }
+  LogMouseError = true;
+  LogMouseInfo = true;
+
 { Initializes Castle Log and display basic info }
 procedure InitLog;
 procedure FreeLog;
