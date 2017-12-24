@@ -27,32 +27,35 @@ uses Classes, Generics.Collections, SysUtils,
   CastleFilesUtils, CastleKeysMouse,
   DecoGlobal;
 
-type
-  { todo: make it a class type }
-  DTouch = class(DObject)
-    FingerIndex: cardinal;
-    x0, y0: integer;     //to handle sweeps, drags and cancels
-    constructor Create(const xx, yy: single; const Finger: integer);
-    procedure Update(const Event: TInputMotion);
-  end;
-  DTouchList = specialize TObjectList<DTouch>;
 
 type
   DInputProcessor = class(DObject)
-  public
+  strict private
+  type
+    { todo: make it a class type }
+    DTouch = class(DObject)
+      FingerIndex: cardinal;
+      x0, y0: integer;     //to handle sweeps, drags and cancels
+      constructor Create(const xx, yy: single; const Finger: integer);
+      procedure Update(const Event: TInputMotion);
+    end;
+    DTouchList = specialize TObjectList<DTouch>;
+  strict private
     TouchArray: DTouchList;
+    function GetFingerIndex(const Event: TInputPressRelease): integer;
+    function doMouseLook(const Event: TInputMotion): boolean;
+    function doMouseDrag(const Event: TInputMotion): boolean;
+    procedure KeyRecorder(const aKey: TKey);
+  public
     constructor Create;
     destructor Destroy; override;
 
-    function doMouseLook(const Event: TInputMotion): boolean;
-    function doMouseDrag(const Event: TInputMotion): boolean;
     procedure doMouseMotion(const Event: TInputMotion);
     procedure doMousePress(const Event: TInputPressRelease);
     procedure doMouseRelease(const Event: TInputPressRelease);
-    function GetFingerIndex(const Event: TInputPressRelease): integer;
     procedure doKeyboardPress(const aKey: TKey);
     procedure doKeyboardRelease(const aKey: TKey);
-    procedure KeyRecorder(const aKey: TKey);
+
     procedure CenterMouseCursor;
   end;
 
@@ -194,7 +197,7 @@ end;
 
 {================================= TOUCH ====================================}
 
-constructor DTouch.Create(const xx, yy: single; const Finger: integer);
+constructor DInputProcessor.DTouch.Create(const xx, yy: single; const Finger: integer);
 begin
   x0 := Round(xx);
   y0 := Round(yy);
@@ -203,7 +206,7 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-procedure DTouch.Update(const Event: TInputMotion);
+procedure DInputProcessor.DTouch.Update(const Event: TInputMotion);
 begin
   x0 := Round(Event.Position[0]);
   y0 := Round(Event.Position[1]);
