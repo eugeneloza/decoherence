@@ -27,6 +27,13 @@ uses Classes, Generics.Collections, SysUtils,
   CastleFilesUtils, CastleKeysMouse,
   DecoGlobal;
 
+
+type
+  DKeyBindings = record
+    MoveForward, MoveBackward, StrafeLeft, StrafeRight: TKey;
+    ScreenShotKey: TKey;
+  end;
+
 type
   DInputProcessor = class(DObject)
   strict private
@@ -45,9 +52,7 @@ type
     function doMouseDrag(const Event: TInputMotion): boolean;
     procedure KeyRecorder(const aKey: TKey);
   public
-    constructor Create;
-    destructor Destroy; override;
-
+    KeysBindings: DKeyBindings;
     procedure doMouseMotion(const Event: TInputMotion);
     procedure doMousePress(const Event: TInputPressRelease);
     procedure doMouseRelease(const Event: TInputPressRelease);
@@ -55,17 +60,15 @@ type
     procedure doKeyboardRelease(const aKey: TKey);
 
     procedure CenterMouseCursor;
+  public
+    constructor Create;
+    destructor Destroy; override;
+    procedure LoadInputConfig;
   end;
 
-type
-  DKeyBindings = record
-    MoveForward, MoveBackward, StrafeLeft, StrafeRight: TKey;
-    ScreenShotKey: TKey;
-  end;
 
 var
   InputProcessor: DInputProcessor;
-  KeysBindings: DKeyBindings;
 
 { Input must be initialized AFTER window is open }
 procedure InitInput;
@@ -221,13 +224,13 @@ begin
   {mouse over / if no drag-n-drop}
   //this is not needed at the moment, we'll turn here a bit later when implementing drag-n-drop
   //no mouseover is detected if no ifmouseover is run, so should still be here
-{  if not Dragging then
+  if not Dragging then
   begin
-    tmpLink := GUI.IfMouseOver(Round(Event.Position[0]), Round(
+    {tmpLink := GUI.IfMouseOver(Round(Event.Position[0]), Round(
       Event.Position[1]), True, True);
     if tmpLink <> nil then
-      Log(logVerbose, _CurrentRoutine, 'Motion caught ' + tmpLink.ClassName);
-  end; }
+      Log(logVerbose, _CurrentRoutine, 'Motion caught ' + tmpLink.ClassName);}
+  end;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -399,27 +402,25 @@ var
 begin
   {check for drag-n-drops}
   Result := False;
-  {if Event.EventType = itMouseButton then }begin
-{    if TouchArray.Count > 0 then
-    begin
-      i := 0;
-      repeat
-        if TouchArray[i].FingerIndex = Event.FingerIndex then
-        begin
-          TouchArray[i].Update(Event);
-          if (TouchArray[i].ClickElement <> nil) and
-            (TouchArray[i].ClickElement.CanDrag) then
-          begin
-            TouchArray[i].ClickElement.Drag(Round(Event.Position[0]),
-              Round(Event.Position[1]));
-            Result := True;
-          end;
-          Break;
-        end;
-        Inc(i);
-      until (i >= TouchArray.Count);
-    end; }
 
+  if TouchArray.Count > 0 then
+  begin
+    i := 0;
+    repeat
+      if TouchArray[i].FingerIndex = Event.FingerIndex then
+      begin
+        TouchArray[i].Update(Event);
+        {if (TouchArray[i].ClickElement <> nil) and
+          (TouchArray[i].ClickElement.CanDrag) then
+        begin
+          TouchArray[i].ClickElement.Drag(Round(Event.Position[0]),
+            Round(Event.Position[1]));
+          Result := True;
+        end;  }
+        Break;
+      end;
+      Inc(i);
+    until (i >= TouchArray.Count);
   end;
 end;
 
@@ -441,7 +442,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure LoadInputConfig;
+procedure DInputProcessor.LoadInputConfig;
 begin
   with KeysBindings do
   begin
@@ -509,8 +510,8 @@ end;
 {............................................................................}
 procedure InitInput;
 begin
-  LoadInputConfig;
   InputProcessor := DInputProcessor.Create;
+  InputProcessor.LoadInputConfig;
   Window.OnPress := @doPress;
   Window.OnRelease := @doRelease;
   Window.OnMotion := @doMotion;
