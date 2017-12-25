@@ -23,8 +23,8 @@ unit DecoInput;
 
 interface
 
-uses Classes, Generics.Collections, SysUtils,
-  CastleFilesUtils, CastleKeysMouse,
+uses Classes, SysUtils, Generics.Collections,
+  CastleVectors, CastleFilesUtils, CastleKeysMouse,
   DecoGlobal;
 
 
@@ -40,8 +40,8 @@ type
   type
     DTouch = class(DObject)
       FingerIndex: cardinal;
-      x0, y0: integer;     //to handle sweeps, drags and cancels
-      constructor Create(const xx, yy: single; const Finger: integer);
+      OldPos: TVector2;     //to handle sweeps, drags and cancels
+      constructor Create(const Pos: TVector2; const Finger: integer);
       procedure Update(const Event: TInputMotion);
     end;
     DTouchList = specialize TObjectList<DTouch>;
@@ -76,16 +76,15 @@ procedure FreeInput;
 {............................................................................}
 implementation
 
-uses CastleVectors, CastleWindow,
+uses CastleWindow,
   DecoGuiScale,
   DecoTime, DecoWindow, DecoLog;
 
 {================================= TOUCH ====================================}
 
-constructor DInputProcessor.DTouch.Create(const xx, yy: single; const Finger: integer);
+constructor DInputProcessor.DTouch.Create(const Pos: TVector2; const Finger: integer);
 begin
-  x0 := Round(xx);
-  y0 := Round(yy);
+  OldPos := Pos;
   FingerIndex := Finger;
 end;
 
@@ -93,8 +92,7 @@ end;
 
 procedure DInputProcessor.DTouch.Update(const Event: TInputMotion);
 begin
-  x0 := Round(Event.Position[0]);
-  y0 := Round(Event.Position[1]);
+  OldPos := Event.Position;
 end;
 
 {============================= INPUT PROCESSOR ============================}
@@ -309,7 +307,7 @@ begin
   InterfaceCaughtEvent := False;
 
   FingerIndex := GetFingerIndex(Event);
-  NewEventTouch := DTouch.Create(Event.Position[0], Event.Position[1], FingerIndex);
+  NewEventTouch := DTouch.Create(Event.Position, FingerIndex);
 
   //catch the element which has been pressed
 {  tmpLink := GUI.IfMouseOver(Round(Event.Position[0]), Round(
@@ -484,8 +482,6 @@ begin
 {    if (CurrentGameMode = gmTravel) and (Player <> nil) then
       doKeyboardPress(Event.Key); }
   end;
-  //  SetGameMode(gmCharacterGeneration);
- { InitTestLevel;                         //ugly! I'll fix this soon. }
 end;
 
 {--------------------------------------------------------------------------}
