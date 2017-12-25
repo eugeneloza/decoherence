@@ -74,6 +74,7 @@ procedure FreeInput;
 implementation
 
 uses CastleVectors, CastleWindow,
+  DecoGuiScale,
   DecoTime, DecoWindow, DecoLog;
 
 {================================= TOUCH ====================================}
@@ -302,8 +303,6 @@ var
   InterfaceCaughtEvent: boolean;
   i: integer;
 begin
-  {StartProfiler}
-
   InterfaceCaughtEvent := False;
 
   FingerIndex := GetFingerIndex(Event);
@@ -339,7 +338,6 @@ begin
   end; }
 
   Log(LogMouseInfo, CurrentRoutine, 'Caught mouse press finger=' + IntToStr(FingerIndex));
-
 end;
 
 {----------------------------------------------------------------------------}
@@ -390,7 +388,7 @@ end;
 
 procedure DInputProcessor.CenterMouseCursor;
 begin
-  {Window.MousePosition := GUI.Center;}
+  Window.MousePosition := GUICenter;
 end;
 
 {----------------------------------------------------------------------------}

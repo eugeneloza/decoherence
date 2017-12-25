@@ -26,6 +26,7 @@ unit DecoGuiScale;
 interface
 
 uses
+  CastleVectors,
   DecoGlobal;
 
 var
@@ -38,6 +39,8 @@ var
   GUILargeGap: integer;
   { reference size of a clickable action button }
   GUIUnit: integer;
+
+  GUICenter: TVector2;
 
 { Resets all scale variables to match Window.Width, Window.Height }
 procedure ResetGUIScale;
@@ -67,6 +70,9 @@ begin
   GUILargeGap := RoundOne(3/768 * GUIHeight);
 
   GUIUnit := Round(GUIHeight / 13);
+
+  GUICenter[0] := GUIWidth / 2;
+  GUICenter[1] := GUIHeight / 2;
 end;
 
 
