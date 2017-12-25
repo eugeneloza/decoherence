@@ -362,17 +362,17 @@ begin
   if Camera.MouseLook then
   begin
 
-    Camera.Cursor := mcForceNone; {do it only once}
-    if not TVector2.PerfectlyEquals(Event.Position, GUI.Center) then
+    Camera.Cursor := mcForceNone; {do it only once}  }
+    if not TVector2.PerfectlyEquals(Event.Position, GUICenter) then
     begin
-      Player.InputMouse(Event.Position - GUI.Center);
-      doMouseLook := False;
-      Window.MousePosition := GUI.Center; //=CenterMouseCursor inlined
+      //Player.InputMouse(Event.Position - GUICenter);
+      Result := False;
+      Window.MousePosition := GUICenter; //=CenterMouseCursor inlined
     end
     else
-      doMouseLook := True; {prevent onMotion call-back}
+      Result := True; {prevent onMotion call-back}
 
-  end
+ { end
   else
   if DragMouseLook then
   begin
@@ -381,7 +381,7 @@ begin
      - scroll it like Blender does}
     {$HINT Why Event.OldPosition rotation style is MUCH slower than MouseLook style rotation???}
     Player.InputMouse(Event.OldPosition - Event.Position);
-    doMouseLook := False;
+    Result := False;
   end;}
 end;
 
