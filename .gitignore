@@ -27,11 +27,14 @@ castle-engine-output/
 *.log
 *commit*
 log_*.txt
-deco_20*.jpg
 heap.trc
 todo
 pasdoc_gui
 obsolete
+
+# screenshots
+
+deco_*.png
 
 # Executable and compiled files
 
