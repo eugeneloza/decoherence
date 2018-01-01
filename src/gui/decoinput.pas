@@ -25,7 +25,7 @@ interface
 
 uses Classes, SysUtils, Generics.Collections,
   CastleVectors, CastleFilesUtils, CastleKeysMouse,
-  DecoGlobal;
+  DecoTime, DecoGlobal;
 
 
 type
@@ -39,6 +39,7 @@ type
   strict private
   type
     DTouch = class(DObject)
+      TouchStart: DTime;
       FingerIndex: cardinal;
       OldPos: TVector2;     //to handle sweeps, drags and cancels
       constructor Create(const Pos: TVector2; const Finger: integer);
@@ -78,14 +79,18 @@ implementation
 
 uses CastleWindow,
   DecoGuiScale,
-  DecoTime, DecoWindow, DecoLog;
+  DecoWindow, DecoLog;
 
 {================================= TOUCH ====================================}
+
+const
+  LongTouch = 0.5; {500 ms default long-tap}
 
 constructor DInputProcessor.DTouch.Create(const Pos: TVector2; const Finger: integer);
 begin
   OldPos := Pos;
   FingerIndex := Finger;
+  TouchStart := DecoNow;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -276,6 +281,9 @@ begin
       IntToStr(FingerIndex) + ' n=' + IntToStr(i));
     if Found then
     begin
+      if (DecoNow - TouchArray[i].TouchStart > LongTouch) then begin
+        Log(LogMouseInfo, CurrentRoutine, 'Long-touch caught!');
+      end;
       {if (TouchArray[i].ClickElement <> nil) then
       begin
         if Assigned(touchArray[i].ClickElement.OnMouseRelease) then
