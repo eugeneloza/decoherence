@@ -34,18 +34,24 @@ var
 
 { creates and initializes the Window }
 procedure InitWindow;
+procedure MakeScreenShot;
 {............................................................................}
 implementation
 
 uses
   SysUtils,
   DecoGuiScale,
-  DecoLog;
+  DecoLog, DecoTime;
 
 var
   ConfigFullScreen: boolean;
   ConfigWindowWidth: integer;
   ConfigWindowHeight: integer;
+
+procedure MakeScreenShot;
+begin
+  Window.SaveScreen('deco_' + NiceDate + '.png');
+end;
 
 procedure ReadWindowConfiguration;
 begin

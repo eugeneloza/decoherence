@@ -343,19 +343,12 @@ end;
 
 {----------------------------------------------------------------------------}
 
-var
-  CameraWarning: boolean = True;
-
 function DInputProcessor.doMouseLook(const Event: TInputMotion): boolean;
 begin
 {  if Camera = nil then
   begin
-    if CameraWarning then
-    begin
-      Log(LogMouseSoftError, _CurrentRoutine,
-        'Warning: Camera is not initialized for MouseLook');
-      CameraWarning := False;
-    end;
+    Log(LogMouseSoftError, _CurrentRoutine,
+      'Warning: Camera is not initialized for MouseLook');
     Exit;
   end;
 
@@ -467,7 +460,7 @@ begin
     case Event.key of
       K_P, K_PrintScreen:
         //k_printscreen doesn't work in x-window system if assigned to some external program like scrot
-        Window.SaveScreen('deco_' + NiceDate + '.jpg');
+        MakeScreenShot;
 {      K_r: Player.CurrentParty.Rest;
       k_i: if AmbientIntensity.Ambient = 0 then
           AmbientIntensity.SetAmbientIntensity(3)

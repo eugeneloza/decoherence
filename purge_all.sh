@@ -6,3 +6,7 @@ bash purge.sh
 
 rm Decoherence
 rm Decoherence.exe
+
+# Remove screenshots
+
+rm *.png
