@@ -35,6 +35,7 @@ uses
   DecoLoadEmbedded,
   DecoTranslation,
   DecoInput,
+  DecoMain,
   DecoTime, DecoLog, DecoWindow, DecoGlobal;
 
 { Displays a "Loading..." image for the language
@@ -68,6 +69,7 @@ begin
   InitInput;
   InitGlobal;
   InitTime;
+  Window.OnBeforeRender := @doBeforeRender;
   Log(LogInit, CurrentRoutine, 'Init sequence finished.');
 end;
 
