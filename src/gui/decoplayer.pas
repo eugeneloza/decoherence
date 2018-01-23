@@ -34,6 +34,7 @@ type
   DPlayer = class(DObject)
   private
     MoveKeys: array[DMoveKey] of boolean;
+    procedure doMove;
   public
     //CurrentParty
     //CameraMman
@@ -56,7 +57,8 @@ procedure InitPlayer;
 procedure FreePlayer;
 implementation
 uses
-  DecoInput;
+  DecoInput,
+  DecoMath;
 
 procedure DPlayer.ReleaseControls;
 var
@@ -82,10 +84,39 @@ end;
 
 {----------------------------------------------------------------------------}
 
+procedure DPlayer.doMove;
+var
+  InputAccelerationForward, InputAccelerationStrafe: DFloat;
+begin
+  //collect all sources of possible movement and adjust CameraMan position and location
+  InputAccelerationForward := 0;
+  InputAccelerationStrafe := 0;
+  //get keyboard input
+  if MoveKeys[KeyboardForward] then
+    InputAccelerationForward += 1;
+  if MoveKeys[KeyboardBackward] then
+    InputAccelerationForward += -1;
+  if MoveKeys[KeyboardStrafeLeft] then
+    InputAccelerationStrafe += 1;
+  if MoveKeys[KeyboardStrafeRight] then
+    InputAccelerationStrafe += -1;
+  //get mousedrag input
+  //get gamepad input
+  if Abs(InputAccelerationForward) > 1 then
+    InputAccelerationForward := Sign(InputAccelerationForward);
+  if Abs(InputAccelerationStrafe) > 1 then
+    InputAccelerationStrafe := Sign(InputAccelerationStrafe);
+
+end;
+
+{----------------------------------------------------------------------------}
+
 procedure DPlayer.Manage;
 begin
-  //todo
+  doMove;
 end;
+
+{----------------------------------------------------------------------------}
 
 procedure DPlayer.ToggleMouseLook;
 begin
