@@ -1,4 +1,4 @@
-{Copyright (C) 2012-2017 Yevhen Loza
+{Copyright (C) 2012-2018 Yevhen Loza
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -18,7 +18,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 (* Core file of the game. Processes Window events and initializes the game *)
 
 unit DecoMain;
-
 {$INCLUDE compilerconfig.inc}
 
 interface
@@ -27,7 +26,9 @@ uses
   CastleWindow, DecoGlobal;
 
 { not sure if it should be placed here? }
+{$PUSH}{$WARN 5024 off : Parameter "$1" not used}
 procedure doBeforeRender(Container: TUIContainer);
+
 {............................................................................}
 implementation
 
@@ -43,6 +44,7 @@ begin
   //Music.Manage;
   Player.Manage;
 end;
+{$POP}
 
 {............................................................................}
 initialization
