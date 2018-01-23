@@ -37,11 +37,13 @@ type
   public
     //CurrentParty
     //CameraMman
+    MouseLook: boolean;
     { Reset all input controls to initial values }
     procedure ReleaseControls;
     { Keyboard movement }
     procedure MoveKeyPress(const aKey: DMoveKey);
     procedure MoveKeyRelease(const aKey: DMoveKey);
+    procedure ToggleMouseLook;
   public
     procedure Manage;
     constructor Create;
@@ -54,7 +56,7 @@ procedure InitPlayer;
 procedure FreePlayer;
 implementation
 uses
-  SysUtils;
+  DecoInput;
 
 procedure DPlayer.ReleaseControls;
 var
@@ -82,7 +84,13 @@ end;
 
 procedure DPlayer.Manage;
 begin
+  //todo
+end;
 
+procedure DPlayer.ToggleMouseLook;
+begin
+  InputProcessor.CenterMouseCursor;
+  MouseLook := not MouseLook;
 end;
 
 {----------------------------------------------------------------------------}
@@ -103,7 +111,7 @@ end;
 
 procedure FreePlayer;
 begin
-  FreeAndNil(Player);
+  Player.Free; //not sure, maybe FreeAndNil?
 end;
 
 end.

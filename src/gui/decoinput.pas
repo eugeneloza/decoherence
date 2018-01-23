@@ -221,8 +221,9 @@ var
 //  tmpLink: DAbstractElement;
   Dragging: boolean;
 begin
-  if doMouseLook(Event) then
-    Exit;
+  if Player.MouseLook then
+    if doMouseLook(Event) then
+      Exit;
 
   Dragging := doMouseDrag(Event);
 
@@ -340,13 +341,14 @@ begin
   {todo: if interface didn't catch the click then}
  { if (CurrentGameMode = gmTravel) and (not InterfaceCaughtEvent) then
   begin
-    //switch control mode
-    if Event.MouseButton = mbRight then
-      Camera.MouseLook := not Camera.MouseLook;
     //start dragging mouse look
     if i = 0 then
       DragMouseLook := True;
   end; }
+
+  //switch control mode
+  if Event.MouseButton = mbRight then
+    Player.ToggleMouseLook;
 
   Log(LogMouseInfo, CurrentRoutine, 'Caught mouse press finger=' + IntToStr(FingerIndex));
 end;
@@ -519,6 +521,9 @@ end;
 procedure FreeInput;
 begin
   InputProcessor.Free;
+  Window.OnPress := nil; //to be on the safe side
+  Window.OnRelease := nil;
+  Window.OnMotion := nil;
 end;
 
 end.
