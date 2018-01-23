@@ -23,8 +23,45 @@ unit DecoPlayer;
 
 interface
 
+uses
+  DecoGlobal;
 
+
+type
+  { Handling of player movement }
+  DPlayer = class(TObject)
+    //CurrentParty
+    //CameraMman
+    procedure MovePlayer(const VelocityX, VelocityY: DFloat);
+  end;
+
+var
+  Player: DPlayer;
+
+procedure InitPlayer;
+procedure FreePlayer;
 implementation
+uses
+  SysUtils;
+
+procedure DPlayer.MovePlayer(const VelocityX, VelocityY: DFloat);
+begin
+  //adjust position according to direction
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure InitPlayer;
+begin
+  Player := DPlayer.Create;
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure FreePlayer;
+begin
+  FreeAndNil(Player);
+end;
 
 end.
 

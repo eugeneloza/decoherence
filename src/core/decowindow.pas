@@ -53,12 +53,16 @@ begin
   Window.SaveScreen('deco_' + NiceDate + '.png');
 end;
 
+{----------------------------------------------------------------------------}
+
 procedure ReadWindowConfiguration;
 begin
   ConfigFullScreen := false;
   ConfigWindowWidth := 1024;
   ConfigWindowHeight := 600;
 end;
+
+{----------------------------------------------------------------------------}
 
 procedure InitWindow;
 begin
