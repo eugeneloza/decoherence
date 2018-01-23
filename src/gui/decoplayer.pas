@@ -31,16 +31,20 @@ type
 
 type
   { Handling of player movement }
-  DPlayer = class(TObject)
+  DPlayer = class(DObject)
   private
     MoveKeys: array[DMoveKey] of boolean;
   public
     //CurrentParty
     //CameraMman
+    { Reset all input controls to initial values }
+    procedure ReleaseControls;
+    { Keyboard movement }
     procedure MoveKeyPress(const aKey: DMoveKey);
     procedure MoveKeyRelease(const aKey: DMoveKey);
   public
     procedure Manage;
+    constructor Create;
   end;
 
 var
@@ -51,6 +55,16 @@ procedure FreePlayer;
 implementation
 uses
   SysUtils;
+
+procedure DPlayer.ReleaseControls;
+var
+  k: DMoveKey;
+begin
+  for k in DMoveKey do
+    MoveKeys[k] := false;
+end;
+
+{----------------------------------------------------------------------------}
 
 procedure DPlayer.MoveKeyPress(const aKey: DMoveKey);
 begin
@@ -69,6 +83,13 @@ end;
 procedure DPlayer.Manage;
 begin
 
+end;
+
+{----------------------------------------------------------------------------}
+
+constructor DPlayer.Create;
+begin
+  ReleaseControls;
 end;
 
 {----------------------------------------------------------------------------}
