@@ -30,7 +30,7 @@ uses Classes, SysUtils, Generics.Collections,
 
 type
   DKeyBindings = record
-    MoveForward, MoveBackward, StrafeLeft, StrafeRight: TKey;
+    MoveForwardKey, MoveBackwardKey, StrafeLeftKey, StrafeRightKey: TKey;
     ScreenShotKey: TKey;
   end;
 
@@ -180,34 +180,36 @@ end;
 
 procedure DInputProcessor.doKeyboardRelease(const aKey: TKey);
 begin
-  if aKey = KeysBindings.MoveForward then
-    Player.MoveKeyRelease(KForward)
+  {if context is 3D then }
+  if aKey = KeysBindings.MoveForwardKey then
+    Player.MoveKeyRelease(KeyboardForward)
   else
-  if aKey = KeysBindings.MoveBackward then
-    Player.MoveKeyRelease(KBackward)
+  if aKey = KeysBindings.MoveBackwardKey then
+    Player.MoveKeyRelease(KeyboardBackward)
   else
-  if aKey = KeysBindings.StrafeLeft then
-    Player.MoveKeyRelease(KStrafeLeft)
+  if aKey = KeysBindings.StrafeLeftKey then
+    Player.MoveKeyRelease(KeyboardStrafeLeft)
   else
-  if aKey = KeysBindings.StrafeRight then
-    Player.MoveKeyRelease(KStrafeRight);
+  if aKey = KeysBindings.StrafeRightKey then
+    Player.MoveKeyRelease(KeyboardStrafeRight);
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure DInputProcessor.doKeyboardPress(const aKey: TKey);
 begin
-  if aKey = KeysBindings.MoveForward then
-    Player.MoveKeyPress(KForward)
+  {if context is 3D then }
+  if aKey = KeysBindings.MoveForwardKey then
+    Player.MoveKeyPress(KeyboardForward)
   else
-  if aKey = KeysBindings.MoveBackward then
-    Player.MoveKeyPress(KBackward)
+  if aKey = KeysBindings.MoveBackwardKey then
+    Player.MoveKeyPress(KeyboardBackward)
   else
-  if aKey = KeysBindings.StrafeLeft then
-    Player.MoveKeyPress(KStrafeLeft)
+  if aKey = KeysBindings.StrafeLeftKey then
+    Player.MoveKeyPress(KeyboardStrafeLeft)
   else
-  if aKey = KeysBindings.StrafeRight then
-    Player.MoveKeyPress(KStrafeRight);
+  if aKey = KeysBindings.StrafeRightKey then
+    Player.MoveKeyPress(KeyboardStrafeRight);
 
   KeyRecorder(aKey);
 end;
@@ -247,7 +249,7 @@ begin
   else if Event.MouseButton = mbMiddle then
     Result := 200
   else
-    raise Exception.Create('Unknown event.MouseButton in decomouse.GetFingerIndex!');
+    Log(LogMouseError, CurrentRoutine, 'Unknown Event.FingerIndex');
 end;
 
 {-----------------------------------------------------------------------------}
@@ -445,10 +447,10 @@ procedure DInputProcessor.LoadInputConfig;
 begin
   with KeysBindings do
   begin
-    MoveForward := K_W;
-    MoveBackward := K_S;
-    StrafeLeft := K_A;
-    StrafeRight := K_D;
+    MoveForwardKey := K_W;
+    MoveBackwardKey := K_S;
+    StrafeLeftKey := K_A;
+    StrafeRightKey := K_D;
     ScreenShotKey := K_P;
   end;
 end;

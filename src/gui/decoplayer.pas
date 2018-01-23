@@ -27,7 +27,7 @@ uses
   DecoGlobal;
 
 type
-  DMoveKey = (KForward, KBackward, KStrafeLeft, KStrafeRight);
+  DMoveKey = (KeyboardForward, KeyboardBackward, KeyboardStrafeLeft, KeyboardStrafeRight);
 
 type
   { Handling of player movement }
