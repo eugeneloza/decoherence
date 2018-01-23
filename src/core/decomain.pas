@@ -27,7 +27,7 @@ uses
   CastleWindow;
 
 { not sure if it should be placed here? }
-procedure doBeforeRender (Container: TUIContainer);
+procedure doBeforeRender(Container: TUIContainer);
 {............................................................................}
 implementation
 
@@ -35,7 +35,7 @@ uses
   DecoInit,
   DecoTime, DecoGlobal;
 
-procedure doBeforeRender (Container: TUIContainer);
+procedure doBeforeRender(Container: TUIContainer);
 begin
   doTime;
   //World.Manage
