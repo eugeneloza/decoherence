@@ -34,7 +34,7 @@ uses
   SysUtils, CastleWindow, CastleControls,
   DecoLoadEmbedded,
   DecoTranslation,
-  DecoInput,
+  DecoInput, DecoPlayer,
   DecoMain,
   DecoTime, DecoLog, DecoWindow, DecoGlobal;
 
@@ -66,6 +66,7 @@ end;
 procedure ApplicationInitialize;
 begin
   Log(LogInit, CurrentRoutine, 'Init sequence started.');
+  InitPlayer;
   InitInput;
   InitGlobal;
   InitTime;
@@ -96,6 +97,7 @@ begin
   FreeTime;
   FreeGlobal;
   FreeInput;
+  FreePlayer;
   Log(LogInit, CurrentRoutine, 'Finished.');
   FreeLog;
 end;
