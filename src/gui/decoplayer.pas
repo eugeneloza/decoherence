@@ -26,13 +26,21 @@ interface
 uses
   DecoGlobal;
 
+type
+  DMoveKey = (KForward, KBackward, KStrafeLeft, KStrafeRight);
 
 type
   { Handling of player movement }
   DPlayer = class(TObject)
+  private
+    MoveKeys: array[DMoveKey] of boolean;
+  public
     //CurrentParty
     //CameraMman
-    procedure MovePlayer(const VelocityX, VelocityY: DFloat);
+    procedure MoveKeyPress(const aKey: DMoveKey);
+    procedure MoveKeyRelease(const aKey: DMoveKey);
+  public
+    procedure Manage;
   end;
 
 var
@@ -44,9 +52,23 @@ implementation
 uses
   SysUtils;
 
-procedure DPlayer.MovePlayer(const VelocityX, VelocityY: DFloat);
+procedure DPlayer.MoveKeyPress(const aKey: DMoveKey);
 begin
-  //adjust position according to direction
+  MoveKeys[aKey] := true;
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DPlayer.MoveKeyRelease(const aKey: DMoveKey);
+begin
+  MoveKeys[aKey] := false;
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DPlayer.Manage;
+begin
+
 end;
 
 {----------------------------------------------------------------------------}

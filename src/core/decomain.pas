@@ -24,7 +24,7 @@ unit DecoMain;
 interface
 
 uses
-  CastleWindow;
+  CastleWindow, DecoGlobal;
 
 { not sure if it should be placed here? }
 procedure doBeforeRender(Container: TUIContainer);
@@ -32,16 +32,16 @@ procedure doBeforeRender(Container: TUIContainer);
 implementation
 
 uses
-  DecoInit,
-  DecoTime, DecoGlobal;
+  DecoInit, DecoPlayer,
+  DecoTime;
 
 procedure doBeforeRender(Container: TUIContainer);
 begin
   doTime;
-  //World.Manage
-  //Actors.Manage
-  //Music.Manage
-  //Player.Manage
+  //World.Manage;
+  //Actors.Manage;
+  //Music.Manage;
+  Player.Manage;
 end;
 
 {............................................................................}

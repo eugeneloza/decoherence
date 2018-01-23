@@ -181,17 +181,16 @@ end;
 procedure DInputProcessor.doKeyboardRelease(const aKey: TKey);
 begin
   if aKey = KeysBindings.MoveForward then
-  //
+    Player.MoveKeyRelease(KForward)
   else
   if aKey = KeysBindings.MoveBackward then
-  //
+    Player.MoveKeyRelease(KBackward)
   else
   if aKey = KeysBindings.StrafeLeft then
-  //
+    Player.MoveKeyRelease(KStrafeLeft)
   else
   if aKey = KeysBindings.StrafeRight then
-  //
-  ;
+    Player.MoveKeyRelease(KStrafeRight);
 end;
 
 {-----------------------------------------------------------------------------}
@@ -199,17 +198,17 @@ end;
 procedure DInputProcessor.doKeyboardPress(const aKey: TKey);
 begin
   if aKey = KeysBindings.MoveForward then
-  //
+    Player.MoveKeyPress(KForward)
   else
   if aKey = KeysBindings.MoveBackward then
-  //
+    Player.MoveKeyPress(KBackward)
   else
   if aKey = KeysBindings.StrafeLeft then
-  //
+    Player.MoveKeyPress(KStrafeLeft)
   else
   if aKey = KeysBindings.StrafeRight then
-  //
-  ;
+    Player.MoveKeyPress(KStrafeRight);
+
   KeyRecorder(aKey);
 end;
 
