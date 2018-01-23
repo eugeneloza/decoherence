@@ -15,7 +15,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 
 {---------------------------------------------------------------------------}
 
-(* Handles keyboard and mouse behaviour *)
+(* Handles keyboard, mouse, gamepad, touch behaviour *)
 
 unit DecoInput;
 
@@ -78,6 +78,7 @@ procedure FreeInput;
 implementation
 
 uses CastleWindow,
+  DecoPlayer,
   DecoGuiScale,
   DecoWindow, DecoLog;
 
