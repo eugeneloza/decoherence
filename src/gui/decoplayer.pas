@@ -59,6 +59,7 @@ var
 procedure InitPlayer;
 { Frees Player }
 procedure FreePlayer;
+{.......................................................................}
 implementation
 uses
   DecoInput,
@@ -135,7 +136,7 @@ begin
   ReleaseControls;
 end;
 
-{----------------------------------------------------------------------------}
+{.......................................................................}
 
 procedure InitPlayer;
 begin

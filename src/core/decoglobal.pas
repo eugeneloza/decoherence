@@ -57,11 +57,11 @@ var
   We're not pursing cryptographic purposes, so /dev/urandom is perfectly enough }
 function GetRandomSeed: LongWord;
 
-{............................................................................}
 { Initialize global elements, such as Random }
 procedure InitGlobal;
 { Free global elements, such as Random }
 procedure FreeGlobal;
+{............................................................................}
 implementation
 
 function GetRandomSeed: LongWord;

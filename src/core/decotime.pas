@@ -79,7 +79,7 @@ function ForceGetNowThread: DThreadedTime; TryInline
 procedure InitTime;
 { Free Time routines/classes }
 procedure FreeTime;
-{+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
+{.......................................................................}
 implementation
 
 uses

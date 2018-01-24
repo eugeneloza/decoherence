@@ -27,7 +27,6 @@ interface
 uses
   DecoGlobal;
 
-{.......................................................................}
 { Inlined equivalent of Math.Equals }
 function dEqual(const a, b: DFloat): Boolean; TryInline
 { Inlined equivalent of Math.isZero }
@@ -38,6 +37,7 @@ function AboveZero(const a: DFloat): DFloat; TryInline
 function Maximum(a, b: DFloat): DFloat; TryInline
 { Returns sign of a in +1,0,-1 }
 function Sign(a: DFloat): shortint; TryInline
+{.......................................................................}
 implementation
 
 const

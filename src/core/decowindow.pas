@@ -41,7 +41,7 @@ implementation
 
 uses
   SysUtils,
-  DecoGuiScale,
+  DecoGUIScale,
   DecoLog, DecoTime;
 
 var
@@ -54,7 +54,7 @@ begin
   Window.SaveScreen('deco_' + NiceDate + '.png');
 end;
 
-{----------------------------------------------------------------------------}
+{.......................................................................}
 
 procedure ReadWindowConfiguration;
 begin

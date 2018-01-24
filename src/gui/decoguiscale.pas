@@ -19,7 +19,7 @@
    !!! NO RESCALES ALLOWED DURING THE GAME !!!
    Changing FullScreen mode or Resolution only by rebooting! *)
 
-unit DecoGuiScale;
+unit DecoGUIScale;
 
 {$INCLUDE compilerconfig.inc}
 

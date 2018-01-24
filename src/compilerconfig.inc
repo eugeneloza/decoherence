@@ -17,7 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 
 (* Compiler directives/options to include in every unit *)
 
-//yes, I use this horrible stuff
+//yes, I use this horrible stuff {hmm... why doesn't it work???}
 {$WARN 2005 off : Comment level $1 found}
 
 {====================== LANGUAGE-SPECIFIC DIRECTIVES =========================}
