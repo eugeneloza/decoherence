@@ -28,12 +28,19 @@ uses
   CastleRandom;
 
 type
+  { At this moment it's just a copy of TOjbect, might change in future,
+    warning: keep an eye for non-virtual TObject.Create here as it's
+    considered non-virtual in DObject descendants }
   DObject = TObject;
 
 type
+  { Internal random feature. Mostly for convenience.
+    At this point only a copy of TCastleRandom }
   DRandom = TCastleRandom;
 
 type
+  { Convenient definition of "float" accuracy for easy changing
+    (hardly will ever change into something different than single) }
   DFloat = Single;
   pFloat = ^DFloat;
 
@@ -51,7 +58,9 @@ var
 function GetRandomSeed: LongWord;
 
 {............................................................................}
+{ Initialize global elements, such as Random }
 procedure InitGlobal;
+{ Free global elements, such as Random }
 procedure FreeGlobal;
 implementation
 

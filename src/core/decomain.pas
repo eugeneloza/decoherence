@@ -25,7 +25,9 @@ interface
 uses
   CastleWindow, DecoGlobal;
 
+{ Assign Window.OnBeforeRender event }
 procedure InitManagement;
+{ Release Window.OnBeforeRender event }
 procedure FreeManagement;
 {............................................................................}
 implementation

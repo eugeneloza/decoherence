@@ -23,9 +23,9 @@ unit DecoInit;
 
 interface
 
-{ initializes all generic stuff }
+{ Initializes all generic stuff }
 procedure InitDecoherence;
-{ frees everything initialized before }
+{ Frees everything initialized before }
 procedure FreeDecoherence;
 {............................................................................}
 implementation
@@ -66,10 +66,10 @@ end;
 procedure ApplicationInitialize;
 begin
   Log(LogInit, CurrentRoutine, 'Init sequence started.');
+  InitTime;
   InitPlayer;
   InitInput;
   InitGlobal;
-  InitTime;
   InitManagement;
   Log(LogInit, CurrentRoutine, 'Init sequence finished.');
 end;
@@ -95,10 +95,10 @@ procedure FreeDecoherence;
 begin
   Log(LogInit, CurrentRoutine, 'Game over. Freeing all data.');
   FreeManagement;
-  FreeTime;
   FreeGlobal;
   FreeInput;
   FreePlayer;
+  FreeTime;
   Log(LogInit, CurrentRoutine, 'Finished.');
   FreeLog;
 end;
