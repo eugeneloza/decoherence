@@ -25,17 +25,17 @@ interface
 uses
   CastleWindow, DecoGlobal;
 
-{ not sure if it should be placed here? }
-{$PUSH}{$WARN 5024 off : Parameter "$1" not used}
-procedure doBeforeRender(Container: TUIContainer);
-
+procedure InitManagement;
+procedure FreeManagement;
 {............................................................................}
 implementation
 
 uses
   DecoInit, DecoPlayer,
-  DecoTime;
+  DecoTime, DecoWindow;
 
+{$PUSH}{$WARN 5024 off : Parameter "$1" not used}
+{ not sure if it should be placed here? }
 procedure doBeforeRender(Container: TUIContainer);
 begin
   doTime;
@@ -45,6 +45,20 @@ begin
   Player.Manage;
 end;
 {$POP}
+
+{-----------------------------------------------------------------------------}
+
+procedure InitManagement;
+begin
+  Window.OnBeforeRender := @doBeforeRender;
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure FreeManagement;
+begin
+  Window.OnBeforeRender := nil;
+end;
 
 {............................................................................}
 initialization

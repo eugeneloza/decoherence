@@ -70,7 +70,7 @@ begin
   InitInput;
   InitGlobal;
   InitTime;
-  Window.OnBeforeRender := @doBeforeRender;
+  InitManagement;
   Log(LogInit, CurrentRoutine, 'Init sequence finished.');
 end;
 
@@ -94,6 +94,7 @@ end;
 procedure FreeDecoherence;
 begin
   Log(LogInit, CurrentRoutine, 'Game over. Freeing all data.');
+  FreeManagement;
   FreeTime;
   FreeGlobal;
   FreeInput;

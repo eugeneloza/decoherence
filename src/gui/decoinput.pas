@@ -469,18 +469,17 @@ begin
   if Event.EventType = itKey then
   begin
     {some generic buttons here}
-    case Event.key of
-      K_P, K_PrintScreen:
-        //k_printscreen doesn't work in x-window system if assigned to some external program like scrot
+    if Event.Key = InputProcessor.KeysBindings.ScreenShotKey then
+      MakeScreenShot;
+    //hardcoded keys
+    case Event.Key of
+      K_PrintScreen: //k_printscreen doesn't work in x-window system if assigned to some external program like scrot
         MakeScreenShot;
 {      K_r: Player.CurrentParty.Rest;
       k_i: if AmbientIntensity.Ambient = 0 then
           AmbientIntensity.SetAmbientIntensity(3)
         else
-          AmbientIntensity.SetAmbientIntensity(0);
-       {k_1: shaders.WhichChoice := 0;
-       k_2: shaders.WhichChoice := 1;
-       k_3: shaders.WhichChoice := 2;}}
+          AmbientIntensity.SetAmbientIntensity(0);}
 
     end;
 
@@ -521,7 +520,7 @@ end;
 procedure FreeInput;
 begin
   InputProcessor.Free;
-  Window.OnPress := nil; //to be on the safe side
+  Window.OnPress := nil; //to be on the safe side so that already-freed Player won't get input
   Window.OnRelease := nil;
   Window.OnMotion := nil;
 end;
