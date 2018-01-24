@@ -44,6 +44,11 @@ type
   DFloat = Single;
   pFloat = ^DFloat;
 
+type
+  { Simple procedures for simple events }
+  TSimpleProcedure = procedure of object;
+
+
 var
   { random generator used for all interface random events }
   DRND: DRandom;
