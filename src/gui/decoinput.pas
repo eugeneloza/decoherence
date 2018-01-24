@@ -18,7 +18,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 (* Handles keyboard, mouse, gamepad, touch behaviour *)
 
 unit DecoInput;
-
 {$INCLUDE compilerconfig.inc}
 
 interface
@@ -96,7 +95,7 @@ implementation
 
 uses CastleWindow,
   DecoPlayer,
-  DecoGuiScale,
+  DecoGUIScale, DecoGUI,
   DecoWindow, DecoLog;
 
 {================================= TOUCH ====================================}
@@ -122,9 +121,9 @@ var
 
 procedure DInputProcessor.KeyRecorder(const aKey: TKey);
 const
-  test1 = 'DIIQI';
+  Test1 = 'DIIQI';
 const
-  test2 = 'DIKFA';
+  Test2 = 'DIKFA';
 
   function AddKey: boolean;
   begin
@@ -147,12 +146,12 @@ const
 
     function ifCorresponds(a: string): boolean;
     begin
-      Result := (RecordedKeys = copy(a, 1, length(RecordedKeys))) and
+      Result := (RecordedKeys = Copy(a, 1, Length(RecordedKeys))) and
         (Length(RecordedKeys) <= Length(a));
     end;
 
   begin
-    if ifCorresponds(test1) or ifCorresponds(test2) then
+    if ifCorresponds(Test1) or ifCorresponds(Test2) then
       Result := True
     else
       Result := False;
@@ -167,9 +166,9 @@ begin
       begin
         if TestRecord then
         begin
-          if (RecordedKeys = test1) or (RecordedKeys = test2) then
+          if (RecordedKeys = Test1) or (RecordedKeys = Test2) then
           begin
-            Log(true, CurrentRoutine, 'No! This is a different game!');
+            GUI.ShowMessage('No! This is a different game!');
             RecordKeys := False;
           end;
         end

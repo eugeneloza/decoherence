@@ -34,7 +34,7 @@ uses
   SysUtils, CastleWindow, CastleControls,
   DecoLoadEmbedded,
   DecoTranslation,
-  DecoInput, DecoPlayer,
+  DecoInput, DecoPlayer, DecoGUI,
   DecoMain,
   DecoTime, DecoLog, DecoWindow, DecoGlobal;
 
@@ -70,6 +70,7 @@ begin
     as some units require others being already initialized }
   Log(LogInit, CurrentRoutine, 'Init sequence started.');
   InitTime;
+  InitGUI;
   InitPlayer;
   InitInput;
   InitGlobal;
@@ -104,6 +105,7 @@ begin
   FreeGlobal;
   FreeInput;
   FreePlayer;
+  FreeGUI;
   FreeTime;
   Log(LogInit, CurrentRoutine, 'Finished.');
   FreeLog;
