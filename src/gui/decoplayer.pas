@@ -31,7 +31,7 @@ type
 
 type
   { Handling of player movement }
-  DPlayer = class(DObject)
+  DPlayerControl = class(DObject)
   private
     MoveKeys: array[DMoveKey] of boolean;
     procedure doMove;
@@ -53,7 +53,7 @@ type
 
 var
   { Player input and camera }
-  Player: DPlayer;
+  Player: DPlayerControl;
 
 { Creates and initializes Player instance }
 procedure InitPlayer;
@@ -62,10 +62,11 @@ procedure FreePlayer;
 {.......................................................................}
 implementation
 uses
-  DecoInput,
+  CastleKeysMouse,
+  DecoInput, DecoWindow,
   DecoMath;
 
-procedure DPlayer.ReleaseControls;
+procedure DPlayerControl.ReleaseControls;
 var
   k: DMoveKey;
 begin
@@ -75,21 +76,21 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DPlayer.MoveKeyPress(const aKey: DMoveKey);
+procedure DPlayerControl.MoveKeyPress(const aKey: DMoveKey);
 begin
   MoveKeys[aKey] := true;
 end;
 
 {----------------------------------------------------------------------------}
 
-procedure DPlayer.MoveKeyRelease(const aKey: DMoveKey);
+procedure DPlayerControl.MoveKeyRelease(const aKey: DMoveKey);
 begin
   MoveKeys[aKey] := false;
 end;
 
 {----------------------------------------------------------------------------}
 
-procedure DPlayer.doMove;
+procedure DPlayerControl.doMove;
 var
   InputAccelerationForward, InputAccelerationStrafe: DFloat;
 begin
@@ -116,35 +117,36 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DPlayer.Manage;
+procedure DPlayerControl.Manage;
 begin
   doMove;
 end;
 
 {----------------------------------------------------------------------------}
 
-procedure DPlayer.ToggleMouseLook;
+procedure DPlayerControl.ToggleMouseLook;
 begin
   InputProcessor.CenterMouseCursor;
   MouseLook := not MouseLook;
+  //todo own cursor!
   if MouseLook then
-    {Camera.Cursor := mcForceNone; {do it only once}  }
+    Window.SceneManager.Camera.Cursor := mcForceNone
   else
-    ;
+    Window.SceneManager.Camera.Cursor := mcStandard;
 end;
 
 {----------------------------------------------------------------------------}
 
-constructor DPlayer.Create;
+constructor DPlayerControl.Create;
 begin
   ReleaseControls;
 end;
 
-{.......................................................................}
+{............................................................................}
 
 procedure InitPlayer;
 begin
-  Player := DPlayer.Create;
+  Player := DPlayerControl.Create;
 end;
 
 {----------------------------------------------------------------------------}
