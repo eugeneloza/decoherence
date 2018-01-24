@@ -83,6 +83,9 @@ end;
 procedure InitDecoherence;
 begin
   InitLog;
+  {$IF FPC_FULLVERSION < 30101}
+  Log(true, 'CRITICAL WARNING', 'FPC version 3.1.1+ is required!');
+  {$ENDIF}
   Log(LogInit, CurrentRoutine, 'Initializing Application and Window.');
   OnGetApplicationName := @MyGetApplicationName;
   InitTranslation;
