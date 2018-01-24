@@ -36,7 +36,7 @@ uses
 {$R *.res}
 
 begin
-  //if heap requested to be written in a file
+  { if heap requested to be written in a file }
   {$IFDEF DEBUG}{$IFDEF HEAP_FILE}
   if FileExists('heap.trc') then
     DeleteFile('heap.trc');
@@ -44,6 +44,7 @@ begin
   SetHeapTraceOutput('heap.trc');
   {$ENDIF}{$ENDIF}
 
+  { Actually start the game }
   Window.OpenAndRun;
 end.
 

@@ -44,16 +44,20 @@ type
     { Keyboard movement }
     procedure MoveKeyPress(const aKey: DMoveKey);
     procedure MoveKeyRelease(const aKey: DMoveKey);
+    { Turn MouseLook on/off }
     procedure ToggleMouseLook;
   public
     procedure Manage;
-    constructor Create;
+    constructor Create; //override;
   end;
 
 var
+  { Player input and camera }
   Player: DPlayer;
 
+{ Creates and initializes Player instance }
 procedure InitPlayer;
+{ Frees Player }
 procedure FreePlayer;
 implementation
 uses
@@ -142,7 +146,7 @@ end;
 
 procedure FreePlayer;
 begin
-  Player.Free; //not sure, maybe FreeAndNil?
+  Player.Free; //not sure, maybe FreeAndNil to be safe?
 end;
 
 end.

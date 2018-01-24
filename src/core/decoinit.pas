@@ -65,6 +65,9 @@ end;
 
 procedure ApplicationInitialize;
 begin
+  { Be careful with init sequence and do not change the init order
+    unless you know what you are doing
+    as some units require others being already initialized }
   Log(LogInit, CurrentRoutine, 'Init sequence started.');
   InitTime;
   InitPlayer;
@@ -93,6 +96,9 @@ end;
 
 procedure FreeDecoherence;
 begin
+  { Be careful with free sequence and do not change the init order
+    unless you know what you are doing
+    as some units might accidentally (thou unlikely) send a call to already-freed instance }
   Log(LogInit, CurrentRoutine, 'Game over. Freeing all data.');
   FreeManagement;
   FreeGlobal;

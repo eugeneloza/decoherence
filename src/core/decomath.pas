@@ -32,11 +32,11 @@ uses
 function dEqual(const a, b: DFloat): Boolean; TryInline
 { Inlined equivalent of Math.isZero }
 function dZero(const a: DFloat): Boolean; TryInline
-{ Returns a if a>0 or zero if a<0 }
+{ Returns "a" if a>0 or "0" if a<0 }
 function AboveZero(const a: DFloat): DFloat; TryInline
 { Returns larger number of a, b }
 function Maximum(a, b: DFloat): DFloat; TryInline
-{ Returns sign of a }
+{ Returns sign of a in +1,0,-1 }
 function Sign(a: DFloat): shortint; TryInline
 implementation
 

@@ -32,8 +32,9 @@ var
   { Main window of the game }
   Window: TCastleWindow;
 
-{ creates and initializes the Window }
+{ Creates and initializes the Window }
 procedure InitWindow;
+{ Make a screenshot of current screen and save it to a file }
 procedure MakeScreenShot;
 {............................................................................}
 implementation

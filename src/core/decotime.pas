@@ -75,7 +75,9 @@ function GetNowThread: DThreadedTime; TryInline
 { Forces initialization of the threaded timer value. }
 function ForceGetNowThread: DThreadedTime; TryInline
 
+{ Initialize Time routines/classes }
 procedure InitTime;
+{ Free Time routines/classes }
 procedure FreeTime;
 {+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 implementation
