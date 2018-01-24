@@ -127,6 +127,10 @@ procedure DPlayer.ToggleMouseLook;
 begin
   InputProcessor.CenterMouseCursor;
   MouseLook := not MouseLook;
+  if MouseLook then
+    {Camera.Cursor := mcForceNone; {do it only once}  }
+  else
+    ;
 end;
 
 {----------------------------------------------------------------------------}

@@ -18,6 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 (* Handles keyboard, mouse, gamepad, touch behaviour *)
 
 unit DecoInput;
+
 {$INCLUDE compilerconfig.inc}
 
 interface
@@ -86,7 +87,7 @@ var
   InputProcessor: DInputProcessor;
 
 { Initializes Input events and loads key bindings
-  Input must be initialized AFTER window is open }
+  Input must be initialized AFTER window is created }
 procedure InitInput;
 { Releases Input events and InputProcessor }
 procedure FreeInput;
@@ -98,10 +99,15 @@ uses CastleWindow,
   DecoGUIScale, DecoGUI,
   DecoWindow, DecoLog;
 
+const
+  RightButtonFingerIndex = 100;
+  MiddleButtonFingerIndex = 200;
+
 {================================= TOUCH ====================================}
 
 constructor DInputProcessor.DTouch.Create(const Pos: TVector2; const Finger: integer);
 begin
+  //inherited Create <------- nothing to inherit
   OldPos := Pos;
   FingerIndex := Finger;
   TouchStart := DecoNow;
@@ -259,9 +265,9 @@ begin
   if Event.MouseButton = mbLeft then
     Result := Event.FingerIndex
   else if Event.MouseButton = mbRight then
-    Result := 100
+    Result := RightButtonFingerIndex
   else if Event.MouseButton = mbMiddle then
-    Result := 200
+    Result := MiddleButtonFingerIndex
   else
     Log(LogMouseError, CurrentRoutine, 'Unknown Event.FingerIndex');
 end;
@@ -352,12 +358,12 @@ begin
   i := TouchArray.Add(NewEventTouch);
 
   {todo: if interface didn't catch the click then}
- { if (CurrentGameMode = gmTravel) and (not InterfaceCaughtEvent) then
+ { if (CurrentGameMode = gmTravel) and (not InterfaceCaughtEvent) then  }
   begin
     //start dragging mouse look
     if i = 0 then
       DragMouseLook := True;
-  end; }
+  end;
 
   //switch control mode
   if Event.MouseButton = mbRight then
@@ -375,12 +381,10 @@ begin
     Log(LogMouseSoftError, _CurrentRoutine,
       'Warning: Camera is not initialized for MouseLook');
     Exit;
-  end;
+  end; }
 
-  if Camera.MouseLook then
+  if Player.MouseLook then
   begin
-
-    Camera.Cursor := mcForceNone; {do it only once}  }
     if not TVector2.PerfectlyEquals(Event.Position, GUICenter) then
     begin
       //Player.InputMouse(Event.Position - GUICenter);
@@ -390,7 +394,7 @@ begin
     else
       Result := True; {prevent onMotion call-back}
 
- { end
+  end
   else
   if DragMouseLook then
   begin
@@ -398,9 +402,9 @@ begin
     {however, it's a good idea to catch DragMouseLook not to go outside window
      - scroll it like Blender does}
     {$HINT Why Event.OldPosition rotation style is MUCH slower than MouseLook style rotation???}
-    Player.InputMouse(Event.OldPosition - Event.Position);
+    //Player.InputMouse(Event.OldPosition - Event.Position);
     Result := False;
-  end;}
+  end;
 end;
 
 {----------------------------------------------------------------------------}
@@ -467,7 +471,7 @@ begin
     StrafeLeftKey := K_A;
     StrafeRightKey := K_D;
     ScreenShotKey := K_P;
-    LongTouch := 0.5; { in seconds // this is standart for Android }
+    LongTouch := 0.5; { in seconds // 500ms is standard for Android }
   end;
 end;
 

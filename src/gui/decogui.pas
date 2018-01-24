@@ -31,6 +31,11 @@ type
   DGUI = class(DInterfaceElement)
   public
     procedure ShowMessage(const aMessage: string);
+  public
+    procedure Draw; override;
+  public
+    constructor Create; override;
+    destructor Destroy; override;
   end;
 
 var
@@ -50,6 +55,38 @@ procedure DGUI.ShowMessage(const aMessage: string);
 begin
   Log(true, CurrentRoutine, aMessage); //temporary
   { will create a message window with text }
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DGUI.Draw;
+begin
+  { clear the screen depending on the game mode
+    in case SceneManager doesn't clear it }
+//  if GameModeNeedsClearingScreen then
+//    RenderContext.Clear([cbColor], Black);
+
+  { draw children elements }
+  //inherited Draw;
+
+  { draw special elements }
+  //FPSLabel.CountFPS;
+end;
+
+{-----------------------------------------------------------------------------}
+
+constructor DGUI.Create;
+begin
+  inherited Create;
+  //...
+end;
+
+{-----------------------------------------------------------------------------}
+
+destructor DGUI.Destroy;
+begin
+  //...
+  inherited Destroy;
 end;
 
 {............................................................................}
