@@ -1,4 +1,4 @@
-{Copyright (C) 2012-2017 Yevhen Loza
+{Copyright (C) 2012-2018 Yevhen Loza
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -24,11 +24,11 @@ unit DecoGUI;
 interface
 
 uses
-  DecoGlobal, DecoGUIScale;
+  DecoGlobal, DecoGUIScale, DecoInterfaceCore;
 
 type
   { GUI container, manages all other GUI elements }
-  DGUI = class(DObject) //as child of DInterfaceElement
+  DGUI = class(DInterfaceElement)
   public
     procedure ShowMessage(const aMessage: string);
   end;
@@ -36,8 +36,10 @@ type
 var
   GUI: DGUI;
 
-procedure FreeGUI;
+{ Initialize GUI instance }
 procedure InitGUI;
+{ Free GUI instance }
+procedure FreeGUI;
 {............................................................................}
 implementation
 uses
