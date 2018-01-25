@@ -42,7 +42,7 @@ type
     { Draw the GUI and all its child elements }
     procedure Draw; override;
     { Updates cursor position and image }
-    procedure UpdateCursor(const CursorX, CursorY: single);
+    procedure UpdateCursor(const CursorX, CursorY: single; const MousePressed: boolean);
   public
     constructor Create; override;
     destructor Destroy; override;
@@ -90,12 +90,17 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-procedure DGUI.UpdateCursor(const CursorX, CursorY: single);
+procedure DGUI.UpdateCursor(const CursorX, CursorY: single; const MousePressed: boolean);
 begin
   if Player.MouseLook then
     Cursor.CurrentCursor := ctMouseLook
   else
-    Cursor.CurrentCursor := ctDefault;
+  begin
+    if MousePressed then
+      Cursor.CurrentCursor := ctDefault_Pressed
+    else
+      Cursor.CurrentCursor := ctDefault;
+  end;
 
   if Player.MouseLook then
   begin

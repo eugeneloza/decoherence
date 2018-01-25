@@ -26,7 +26,8 @@ interface
 uses
   CastleVectors, CastleGlImages;
 
-type TCursorType = (ctNone, ctDefault, ctMouseLook);
+type TCursorType = (ctNone, ctDefault, ctMouseLook,
+  ctDefault_pressed);
 
 type
   DCursor = class(TObject)
@@ -54,6 +55,9 @@ begin
   CursorImg[ctDefault] := TGLImage.Create(LoadImage(ApplicationData('GUI/Cursors/cursor.png')), true, true);
   CursorShift[ctDefault].Data[0] := -1;
   CursorShift[ctDefault].Data[1] := +1;
+  CursorImg[ctDefault_pressed] := TGLImage.Create(LoadImage(ApplicationData('GUI/Cursors/cursor_pressed.png')), true, true);
+  CursorShift[ctDefault_pressed].Data[0] := -1;
+  CursorShift[ctDefault_pressed].Data[1] := +1;
   CursorImg[ctMouseLook] := TGLImage.Create(LoadImage(ApplicationData('GUI/Cursors/mouselook.png')), true, true);
   CursorShift[ctMouseLook].Data[0] := -15;
   CursorShift[ctMouseLook].Data[1] := +15;
@@ -77,7 +81,7 @@ end;
 procedure DCursor.HideOSCursor;
 begin
   Window.SceneManager.Camera.Cursor := mcForceNone;
-  Window.SceneManager.Camera.ExclusiveEvents := false
+  Window.SceneManager.Camera.ExclusiveEvents := False;
 end;
 
 {-----------------------------------------------------------------------------}

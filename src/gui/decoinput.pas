@@ -164,7 +164,7 @@ const
   end;
 
 begin
-  if {CurrentGameMode = gmTravel} true then
+  if {CurrentGameMode = gmTravel} True then
   begin
     if RecordKeys then
     begin
@@ -257,7 +257,7 @@ begin
       Log(logVerbose, _CurrentRoutine, 'Motion caught ' + tmpLink.ClassName);}
   end;
 
-  GUI.UpdateCursor(Event.Position[0],Event.Position[1]);
+  GUI.UpdateCursor(Event.Position[0], Event.Position[1], TouchArray.Count > 0);
 end;
 
 {-----------------------------------------------------------------------------}
@@ -287,7 +287,7 @@ var
 begin
   if TouchArray.Count > 0 then
   begin
-    fingerindex := GetFingerIndex(Event);
+    FingerIndex := GetFingerIndex(Event);
     i := 0;
     Found := False;
     repeat
@@ -324,6 +324,8 @@ begin
   end
   else
     Log(LogMouseError, CurrentRoutine, 'ERROR: Touch event list is empty!');
+
+  GUI.UpdateCursor(Event.Position[0], Event.Position[1], TouchArray.Count > 0);
 end;
 
 {-----------------------------------------------------------------------------}
@@ -336,8 +338,6 @@ var
   InterfaceCaughtEvent: boolean;
   i: integer;
 begin
-  GUI.UpdateCursor(Event.Position[0], Event.Position[1]);
-
   InterfaceCaughtEvent := False;
 
   FingerIndex := GetFingerIndex(Event);
@@ -372,6 +372,8 @@ begin
   //switch control mode
   if Event.MouseButton = mbRight then
     Player.ToggleMouseLook;
+
+  GUI.UpdateCursor(Event.Position[0], Event.Position[1], TouchArray.Count > 0);
 
   Log(LogMouseInfo, CurrentRoutine, 'Caught mouse press finger=' + IntToStr(FingerIndex));
 end;
