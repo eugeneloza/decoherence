@@ -25,7 +25,7 @@ unit DecoGlobal;
 interface
 
 uses
-  CastleRandom;
+  CastleRandom, CastleColors;
 
 type
   { At this moment it's just a copy of TOjbect, might change in future,
@@ -50,8 +50,10 @@ type
 
 
 var
-  { random generator used for all interface random events }
+  { Random generator used for all interface random events }
   DRND: DRandom;
+  { Tint of the Interface (including cursor) }
+  InterfaceTint: TCastleColor;
 
 {$IFDEF LINUX}
 {$DEFINE USE_DEV_URANDOM}
