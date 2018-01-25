@@ -25,15 +25,17 @@ unit DecoImages;
 interface
 
 uses
-  CastleGLImages, CastleImages;
+  CastleGLImages, CastleImages, CastleVectors;
 
 type
   { Wrapper for TGLImage }
   DImage = class(TObject)
   strict private
     FImage: TGLImage;
+    procedure SetColor(const aColor: TVector4);
   public
     Width, Height: integer;
+    property Color: TVector4 write SetColor;
     procedure Draw(const X, Y: Single); TryInline
     procedure Draw(const X, Y, DrawWidth, DrawHeight: Single); TryInline
   public
@@ -64,6 +66,13 @@ end;
 procedure DImage.Draw(const X, Y, DrawWidth, DrawHeight: Single); TryInline
 begin
   FImage.Draw(X, Y, DrawWidth, DrawHeight);
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DImage.SetColor(const aColor: TVector4);
+begin
+  FImage.Color := aColor;
 end;
 
 {-----------------------------------------------------------------------------}
