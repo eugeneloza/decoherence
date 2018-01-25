@@ -36,9 +36,12 @@ type
     { Some post-initialization routines, that require graphics context fully available }
     procedure FirstRender;
   public
+    { A pop-up window, showing a message }
     procedure ShowMessage(const aMessage: string);
   public
+    { Draw the GUI and all its child elements }
     procedure Draw; override;
+    { Updates cursor position and image }
     procedure UpdateCursor(const CursorX, CursorY: single);
   public
     constructor Create; override;
@@ -55,7 +58,8 @@ procedure FreeGUI;
 {............................................................................}
 implementation
 uses
-  SysUtils,
+  SysUtils, CastleColors, CastleGLUtils,
+  DecoPlayer,
   DecoTime, DecoLog;
 
 procedure DGUI.ShowMessage(const aMessage: string);
@@ -73,7 +77,7 @@ begin
   { clear the screen depending on the game mode
     in case SceneManager doesn't clear it }
 //  if GameModeNeedsClearingScreen then
-//    RenderContext.Clear([cbColor], Black);
+    RenderContext.Clear([cbColor], Black);
 
   { draw children elements }
   //inherited Draw;
@@ -88,14 +92,28 @@ end;
 
 procedure DGUI.UpdateCursor(const CursorX, CursorY: single);
 begin
-  Cursor.x := CursorX;
-  Cursor.y := CursorY;
+  if Player.MouseLook then
+    Cursor.CurrentCursor := ctMouseLook
+  else
+    Cursor.CurrentCursor := ctDefault;
+
+  if Player.MouseLook then
+  begin
+    Cursor.x := GUICenter[0];
+    Cursor.y := GUICenter[1];
+  end
+  else
+  begin
+    Cursor.x := CursorX;
+    Cursor.y := CursorY;
+  end;
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure DGUI.FirstRender;
 begin
+  FFirstRender := false;
   Cursor.HideOSCursor;
 end;
 

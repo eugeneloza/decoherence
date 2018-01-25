@@ -257,10 +257,7 @@ begin
       Log(logVerbose, _CurrentRoutine, 'Motion caught ' + tmpLink.ClassName);}
   end;
 
-  if Player.MouseLook then
-    GUI.UpdateCursor(GUICenter[0], GUICenter[1])
-  else
-    GUI.UpdateCursor(Event.Position[0],Event.Position[1]);
+  GUI.UpdateCursor(Event.Position[0],Event.Position[1]);
 end;
 
 {-----------------------------------------------------------------------------}
@@ -339,6 +336,8 @@ var
   InterfaceCaughtEvent: boolean;
   i: integer;
 begin
+  GUI.UpdateCursor(Event.Position[0], Event.Position[1]);
+
   InterfaceCaughtEvent := False;
 
   FingerIndex := GetFingerIndex(Event);
