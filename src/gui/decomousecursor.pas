@@ -26,7 +26,7 @@ interface
 uses
   CastleGlImages;
 
-type TCursorType = (ctDefault);
+type TCursorType = (ctNone, ctDefault);
 
 type
   DCursor = class(TObject)
@@ -57,9 +57,12 @@ end;
 {-----------------------------------------------------------------------------}
 
 destructor DCursor.Destroy;
+var
+  c: TCursorType;
 begin
   Window.SceneManager.Camera.Cursor := mcStandard;
-  FreeAndNil(CursorImg);
+  for c in TCursorType do
+    FreeAndNil(CursorImg[c]);
   inherited Destroy;
 end;
 
@@ -74,7 +77,8 @@ end;
 
 procedure DCursor.Draw;
 begin
-  CursorImg[CurrentCursor].Draw(x, y - CursorImg[CurrentCursor].Height);
+  if CurrentCursor <> ctNone then
+    CursorImg[CurrentCursor].Draw(x, y - CursorImg[CurrentCursor].Height);
 end;
 
 end.
