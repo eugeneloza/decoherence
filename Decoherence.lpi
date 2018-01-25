@@ -115,7 +115,7 @@
         <PackageName Value="castle_base"/>
       </Item2>
     </RequiredPackages>
-    <Units Count="20">
+    <Units Count="21">
       <Unit0>
         <Filename Value="Decoherence.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -210,6 +210,11 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="DecoMouseCursor"/>
       </Unit19>
+      <Unit20>
+        <Filename Value="src/gui/decoimages.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoImages"/>
+      </Unit20>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

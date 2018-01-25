@@ -24,7 +24,8 @@ unit DecoMouseCursor;
 interface
 
 uses
-  CastleVectors, CastleGlImages;
+  CastleVectors,
+  DecoImages;
 
 type TCursorType = (ctNone, ctDefault, ctMouseLook,
   ctDefault_pressed);
@@ -32,7 +33,7 @@ type TCursorType = (ctNone, ctDefault, ctMouseLook,
 type
   DCursor = class(TObject)
   private
-    CursorImg: array[TCursorType] of TGLImage;
+    CursorImg: array[TCursorType] of DAnimatedImage;
     CursorShift: array[TCursorType] of TVector2Integer;
   public
     x, y: single;
@@ -46,19 +47,20 @@ type
 {............................................................................}
 implementation
 uses
-  SysUtils, CastleImages, CastleFilesUtils, CastleKeysMouse,
+  SysUtils, CastleFilesUtils, CastleKeysMouse,
+  CastleImages, //temp
   DecoWindow;
 
 constructor DCursor.Create;
 begin
   //inherited Create;
-  CursorImg[ctDefault] := TGLImage.Create(LoadImage(ApplicationData('GUI/Cursors/cursor.png')), true, true);
+  CursorImg[ctDefault] := DAnimatedImage.Create(LoadImage(ApplicationData('GUI/Cursors/cursor.png')), true, true);
   CursorShift[ctDefault].Data[0] := -1;
   CursorShift[ctDefault].Data[1] := +1;
-  CursorImg[ctDefault_pressed] := TGLImage.Create(LoadImage(ApplicationData('GUI/Cursors/cursor_pressed.png')), true, true);
+  CursorImg[ctDefault_pressed] := DAnimatedImage.Create(LoadImage(ApplicationData('GUI/Cursors/cursor_pressed.png')), true, true);
   CursorShift[ctDefault_pressed].Data[0] := -1;
   CursorShift[ctDefault_pressed].Data[1] := +1;
-  CursorImg[ctMouseLook] := TGLImage.Create(LoadImage(ApplicationData('GUI/Cursors/mouselook.png')), true, true);
+  CursorImg[ctMouseLook] := DAnimatedImage.Create(LoadImage(ApplicationData('GUI/Cursors/mouselook.png')), true, true);
   CursorShift[ctMouseLook].Data[0] := -15;
   CursorShift[ctMouseLook].Data[1] := +15;
   CurrentCursor := ctDefault;
