@@ -256,6 +256,8 @@ begin
     if tmpLink <> nil then
       Log(logVerbose, _CurrentRoutine, 'Motion caught ' + tmpLink.ClassName);}
   end;
+
+  GUI.UpdateCursor(Event.Position[0],Event.Position[1]);
 end;
 
 {-----------------------------------------------------------------------------}

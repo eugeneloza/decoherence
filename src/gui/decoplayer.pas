@@ -128,11 +128,6 @@ procedure DPlayerControl.ToggleMouseLook;
 begin
   InputProcessor.CenterMouseCursor;
   MouseLook := not MouseLook;
-  //todo own cursor!
-  if MouseLook then
-    Window.SceneManager.Camera.Cursor := mcForceNone
-  else
-    Window.SceneManager.Camera.Cursor := mcStandard;
 end;
 
 {----------------------------------------------------------------------------}

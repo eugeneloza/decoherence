@@ -24,15 +24,30 @@ unit DecoGUI;
 interface
 
 uses
+  CastleGlImages, //temp
   DecoGlobal, DecoGUIScale, DecoInterfaceCore;
+
+type
+  DCursor = class(TObject)
+  private
+    CursorImg: TGLImage;
+  public
+    x, y: single;
+    procedure Draw;
+    constructor Create; //override;
+    destructor Destroy; override;
+  end;
 
 type
   { GUI container, manages all other GUI elements }
   DGUI = class(DInterfaceElement)
+  private
+    Cursor: DCursor;
   public
     procedure ShowMessage(const aMessage: string);
   public
     procedure Draw; override;
+    procedure UpdateCursor(const CursorX, CursorY: single);
   public
     constructor Create; override;
     destructor Destroy; override;
@@ -48,8 +63,10 @@ procedure FreeGUI;
 {............................................................................}
 implementation
 uses
+  CastleImages, CastleFilesUtils, //temp
+  CastleKeysMouse,
   SysUtils,
-  DecoTime, DecoLog;
+  DecoTime, DecoLog, DecoWindow;
 
 procedure DGUI.ShowMessage(const aMessage: string);
 begin
@@ -69,8 +86,18 @@ begin
   { draw children elements }
   //inherited Draw;
 
+  Cursor.Draw;
+
   { draw special elements }
   //FPSLabel.CountFPS;
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DGUI.UpdateCursor(const CursorX, CursorY: single);
+begin
+  Cursor.x := CursorX;
+  Cursor.y := CursorY;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -78,6 +105,7 @@ end;
 constructor DGUI.Create;
 begin
   inherited Create;
+  Cursor := DCursor.Create;
   //...
 end;
 
@@ -85,7 +113,33 @@ end;
 
 destructor DGUI.Destroy;
 begin
+  FreeAndNil(Cursor);
   //...
+  inherited Destroy;
+end;
+
+{============================================================================}
+
+procedure DCursor.Draw;
+begin
+  CursorImg.Draw(x, y - CursorIMG.Height);
+end;
+
+{-----------------------------------------------------------------------------}
+
+constructor DCursor.Create;
+begin
+  //inherited Create;
+  //Window.SceneManager.Camera.Cursor := mcForceNone;
+  CursorImg := TGLImage.Create(LoadImage(ApplicationData('GUI/Cursors/cursor.png')), true, true);
+end;
+
+{-----------------------------------------------------------------------------}
+
+destructor DCursor.Destroy;
+begin
+  Window.SceneManager.Camera.Cursor := mcStandard;
+  FreeAndNil(CursorImg);
   inherited Destroy;
 end;
 

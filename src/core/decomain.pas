@@ -33,7 +33,7 @@ procedure FreeManagement;
 implementation
 
 uses
-  DecoInit, DecoPlayer,
+  DecoInit, DecoPlayer, DecoGUI,
   DecoTime, DecoWindow;
 
 {$PUSH}{$WARN 5024 off : Parameter "$1" not used}
@@ -46,6 +46,11 @@ begin
   //Music.Manage;
   Player.Manage;
 end;
+
+procedure doRender(Container: TUIContainer);
+begin
+  GUI.Draw;
+end;
 {$POP}
 
 {............................................................................}
@@ -53,6 +58,7 @@ end;
 procedure InitManagement;
 begin
   Window.OnBeforeRender := @doBeforeRender;
+  Window.OnRender := @doRender;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -60,6 +66,7 @@ end;
 procedure FreeManagement;
 begin
   Window.OnBeforeRender := nil;
+  Window.OnRender := nil;
 end;
 
 
