@@ -77,6 +77,7 @@ end;
 procedure DCursor.HideOSCursor;
 begin
   Window.SceneManager.Camera.Cursor := mcForceNone;
+  Window.SceneManager.Camera.ExclusiveEvents := false
 end;
 
 {-----------------------------------------------------------------------------}
