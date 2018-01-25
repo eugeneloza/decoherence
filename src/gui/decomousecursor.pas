@@ -24,14 +24,15 @@ unit DecoMouseCursor;
 interface
 
 uses
-  CastleGlImages;
+  CastleVectors, CastleGlImages;
 
-type TCursorType = (ctNone, ctDefault);
+type TCursorType = (ctNone, ctDefault, ctMouseLook);
 
 type
   DCursor = class(TObject)
   private
     CursorImg: array[TCursorType] of TGLImage;
+    CursorShift: array[TCursorType] of TVector2Integer;
   public
     x, y: single;
     CurrentCursor: TCursorType;
@@ -51,6 +52,11 @@ constructor DCursor.Create;
 begin
   //inherited Create;
   CursorImg[ctDefault] := TGLImage.Create(LoadImage(ApplicationData('GUI/Cursors/cursor.png')), true, true);
+  CursorShift[ctDefault].Data[0] := -1;
+  CursorShift[ctDefault].Data[1] := +1;
+  CursorImg[ctMouseLook] := TGLImage.Create(LoadImage(ApplicationData('GUI/Cursors/mouselook.png')), true, true);
+  CursorShift[ctMouseLook].Data[0] := -15;
+  CursorShift[ctMouseLook].Data[1] := +15;
   CurrentCursor := ctDefault;
 end;
 
@@ -78,7 +84,8 @@ end;
 procedure DCursor.Draw;
 begin
   if CurrentCursor <> ctNone then
-    CursorImg[CurrentCursor].Draw(x, y - CursorImg[CurrentCursor].Height);
+    CursorImg[CurrentCursor].Draw(x + CursorShift[CurrentCursor].Data[0],
+      y - CursorImg[CurrentCursor].Height + CursorShift[CurrentCursor].Data[1]);
 end;
 
 end.
