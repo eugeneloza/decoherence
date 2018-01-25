@@ -257,7 +257,10 @@ begin
       Log(logVerbose, _CurrentRoutine, 'Motion caught ' + tmpLink.ClassName);}
   end;
 
-  GUI.UpdateCursor(Event.Position[0],Event.Position[1]);
+  if Player.MouseLook then
+    GUI.UpdateCursor(GUICenter[0], GUICenter[1])
+  else
+    GUI.UpdateCursor(Event.Position[0],Event.Position[1]);
 end;
 
 {-----------------------------------------------------------------------------}
