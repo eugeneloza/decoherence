@@ -35,6 +35,7 @@ type
     FFirstRender: boolean;
     { Some post-initialization routines, that require graphics context fully available }
     procedure FirstRender;
+    procedure SetGUITint;
   public
     { A pop-up window, showing a message }
     procedure ShowMessage(const aMessage: string);
@@ -116,6 +117,14 @@ end;
 
 {-----------------------------------------------------------------------------}
 
+procedure DGUI.SetGUITint;
+begin
+  GUITint := Green;
+  Cursor.SetTint;
+end;
+
+{-----------------------------------------------------------------------------}
+
 procedure DGUI.FirstRender;
 begin
   FFirstRender := false;
@@ -129,6 +138,7 @@ begin
   inherited Create;
   FFirstRender := true;
   Cursor := DCursor.Create;
+  SetGUITint;
   //...
 end;
 

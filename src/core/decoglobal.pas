@@ -53,7 +53,7 @@ var
   { Random generator used for all interface random events }
   DRND: DRandom;
   { Tint of the Interface (including cursor) }
-  InterfaceTint: TCastleColor;
+  GUITint: TCastleColor;
 
 {$IFDEF LINUX}
 {$DEFINE USE_DEV_URANDOM}

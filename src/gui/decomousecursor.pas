@@ -25,7 +25,8 @@ interface
 
 uses
   CastleVectors,
-  DecoImages;
+  DecoImages,
+  DecoGlobal;
 
 type TCursorType = (ctNone, ctDefault, ctMouseLook,
   ctDefault_pressed);
@@ -38,6 +39,7 @@ type
   public
     x, y: single;
     CurrentCursor: TCursorType;
+    procedure SetTint;
     procedure Draw;
     procedure HideOSCursor;
     constructor Create; //override;
@@ -95,6 +97,15 @@ begin
   if CurrentCursor <> ctNone then
     CursorImg[CurrentCursor].Draw(x + CursorShift[CurrentCursor].Data[0],
       y - CursorImg[CurrentCursor].Height + CursorShift[CurrentCursor].Data[1]);
+end;
+
+procedure DCursor.SetTint;
+var
+  c: TCursorType;
+begin
+  for c in TCursorType do
+    if CursorImg[c] <> nil then
+      CursorImg[c].Color := GUITint;
 end;
 
 end.
