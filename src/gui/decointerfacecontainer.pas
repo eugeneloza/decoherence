@@ -20,7 +20,7 @@
 
 unit DecoInterfaceContainer;
 
-{$mode objfpc}{$H+}
+{$INCLUDE compilerconfig.inc}
 
 interface
 
@@ -34,9 +34,12 @@ type
     x, y, w, h: integer;
     a: DFloat;
     { Copy current container's xywha to aDest }
-    procedure AssignTo(const aDest: DInterfaceContainer);
+    procedure AssignTo(const aDest: DInterfaceContainer); TryInline
     { Copy current container's xywha from aSource }
-    procedure AssignFrom(const aSource: DInterfaceContainer);
+    procedure AssignFrom(const aSource: DInterfaceContainer); TryInline
+    { Mix this container's xywha from aLast and aNext with aPhase as a weight }
+    procedure AssignMix(const aLast, aNext: DInterfaceContainer; const aPhase: DFloat); TryInline
+
     { Initialize current container with float coordinates }
     procedure SetFloatSize(const ax, ay, aw, ah: DFloat; const aAlpha: DFloat = 1);
     procedure SetFloatCoord(const ax1, ay1, ax2, ay2: DFloat; const aAlpha: DFloat = 1);
@@ -48,7 +51,7 @@ uses
   DecoGUIScale,
   DecoLog;
 
-procedure DInterfaceContainer.AssignTo(const aDest: DInterfaceContainer);
+procedure DInterfaceContainer.AssignTo(const aDest: DInterfaceContainer); TryInline
 begin
   aDest.x := Self.x;
   aDest.y := Self.y;
@@ -59,13 +62,24 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-procedure DInterfaceContainer.AssignFrom(const aSource: DInterfaceContainer);
+procedure DInterfaceContainer.AssignFrom(const aSource: DInterfaceContainer); TryInline
 begin
   Self.x := aSource.x;
   Self.y := aSource.y;
   Self.w := aSource.w;
   Self.h := aSource.h;
   Self.a := aSource.a;
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DInterfaceContainer.AssignMix(const aLast, aNext: DInterfaceContainer; const aPhase: DFloat); TryInline
+begin
+  Self.x := Round(aLast.x + (aNext.x - aLast.x) * aPhase);
+  Self.y := Round(aLast.y + (aNext.y - aLast.y) * aPhase);
+  Self.w := Round(aLast.w + (aNext.w - aLast.w) * aPhase);
+  Self.h := Round(aLast.h + (aNext.h - aLast.h) * aPhase);
+  Self.a :=      (aLast.a + (aNext.a - aLast.a) * aPhase);
 end;
 
 {-----------------------------------------------------------------------------}

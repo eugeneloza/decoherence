@@ -28,15 +28,31 @@ uses
   DecoInterfaceTimer, DecoInterfaceContainer,
   DecoGlobal, DecoTime;
 
+const
+  { Default duration of all animations (in seconds),
+    unless otherwise specified }
+  DefaultAnimationDuration = 0.3;
+
+type
+  { Style of the animation.
+    asLinear is just linear interpolation,
+    asSquare is slower in the beginning and end, and faster in the middle}
+  TAnimationCurve = (acLinear, acSquare);
+
 type
   { Most abstract container for interface elements
     Defines size, scaling and animation state }
   DAbstractElement = class abstract(DObject)
   strict private
-    //...
+    AnimationStart: DTime;
+    AnimationDuration: DTime;
+    AnimationCurve: TAnimationCurve;
+    Last: DInterfaceContainer;
+    procedure GetAnimationState;
   public
     { Location and size of this element }
-    Last, Next, Current: DInterfaceContainer;
+    Next, Current: DInterfaceContainer;
+  public
     { Draw the element / as abstract as it might be :) }
     procedure Draw; virtual; abstract;
     { Set tint of the element }
@@ -97,6 +113,7 @@ begin
   Last := DInterfaceContainer.Create;
   Next := DInterfaceContainer.Create;
   Current := DInterfaceContainer.Create;
+  AnimationCurve := acSquare;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -107,6 +124,36 @@ begin
   Next.Free;
   Last.Free;
   inherited Destroy;
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DAbstractElement.GetAnimationState;
+var
+  Phase: DFloat;
+begin
+  //if this is start of the animation - init time
+  if AnimationStart < 0 then
+    AnimationStart := DecoNow;
+
+  if (DecoNow - AnimationStart < AnimationDuration) then
+  begin
+    //determine the animation time passed relative to AnimationDuration
+    Phase := (DecoNow - AnimationStart) / AnimationDuration;
+    //determine the animation phase
+    case AnimationCurve of
+      //acLinear: ; //<- change nothing.
+      acSquare: if Phase < 0.5 then
+          Phase := Sqr(2 * Phase) / 2
+        else
+          Phase := 1 - Sqr(2 * (1 - Phase)) / 2;
+    end;
+    Current.AssignMix(Last, Next, Phase);
+  end
+  else
+  begin
+    Current.AssignFrom(Next);
+  end;
 end;
 
 {============================================================================}
