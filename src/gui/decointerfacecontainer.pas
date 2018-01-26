@@ -31,6 +31,7 @@ type
   { Determines coordinates and size of a interface element }
   DInterfaceContainer = class(DObject)
   public
+    isInitialized: boolean;
     x, y, w, h: integer;
     a: DFloat;
     { Copy current container's xywha to aDest }
@@ -40,9 +41,17 @@ type
     { Mix this container's xywha from aLast and aNext with aPhase as a weight }
     procedure AssignMix(const aLast, aNext: DInterfaceContainer; const aPhase: DFloat); TryInline
 
-    { Initialize current container with float coordinates }
+    { Initialize current container with float coordinates,
+      providing negative ax will count it from RIGHT side. }
+    procedure SetIntSize(const ax, ay, aw, ah: integer; const aAlpha: DFloat = 1);
+    procedure SetIntCoord(const ax1, ay1, ax2, ay2: integer; const aAlpha: DFloat = 1);
+    { Initialize current container with float coordinates,
+      providing negative ax will count it from RIGHT side.
+      Both coordinates are scaled against GUIHeight = 1.0 }
     procedure SetFloatSize(const ax, ay, aw, ah: DFloat; const aAlpha: DFloat = 1);
     procedure SetFloatCoord(const ax1, ay1, ax2, ay2: DFloat; const aAlpha: DFloat = 1);
+  public
+    constructor Create;
   end;
 
 {............................................................................}
@@ -58,6 +67,7 @@ begin
   aDest.w := Self.w;
   aDest.h := Self.h;
   aDest.a := Self.a;
+  Self.isInitialized := aDest.isInitialized;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -69,6 +79,7 @@ begin
   Self.w := aSource.w;
   Self.h := aSource.h;
   Self.a := aSource.a;
+  Self.isInitialized := aSource.isInitialized;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -80,6 +91,28 @@ begin
   Self.w := Round(aLast.w + (aNext.w - aLast.w) * aPhase);
   Self.h := Round(aLast.h + (aNext.h - aLast.h) * aPhase);
   Self.a :=      (aLast.a + (aNext.a - aLast.a) * aPhase);
+  Self.isInitialized := aNext.isInitialized;
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DInterfaceContainer.SetIntSize(const ax, ay, aw, ah: integer; const aAlpha: DFloat = 1);
+begin
+  x := ax;
+  y := ay;
+  w := aw;
+  h := ah;
+  if ax < 0 then
+    x := x + GUIWidth - w;
+  a := aAlpha;
+  isInitialized := true;
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DInterfaceContainer.SetIntCoord(const ax1, ay1, ax2, ay2: integer; const aAlpha: DFloat = 1);
+begin
+  SetFloatSize(ax1, ay1, ax2 - ax1, ay2 - ay1, aAlpha);
 end;
 
 {-----------------------------------------------------------------------------}
@@ -93,6 +126,7 @@ begin
   if ax < 0 then
     x := x + GUIWidth - w;
   a := aAlpha;
+  isInitialized := true;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -102,6 +136,13 @@ begin
   SetFloatSize(ax1, ay1, ax2 - ax1, ay2 - ay1, aAlpha);
 end;
 
+{-----------------------------------------------------------------------------}
+
+constructor DInterfaceContainer.Create;
+begin
+  //inherited <------ Nothing to inherit
+  isInitialized := false;
+end;
 
 end.
 
