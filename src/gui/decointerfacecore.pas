@@ -40,6 +40,18 @@ type
   TAnimationCurve = (acLinear, acSquare);
 
 type
+  { Animation style of the object. asDefault means "animate from previous state",
+    presuming that there was some "previous state"}
+  TAnimationStyle = (asNone, asDefault,
+    asFadeIn, asFadeOut,// asFadeOutSuicide,
+    asZoomIn, asZoomOut,// asZoomOutSuicide,
+    asFlyInRandom, asFlyOutRandom,// asFlyOutRandomSuicide,
+    asFlyInTop, asFlyOutTop,
+    asFlyInBottom, asFlyOutBottom,
+    asFlyInLeft, asFlyOutLeft,
+    asFlyInRight, asFlyOutRight);
+
+type
   { Most abstract container for interface elements
     Defines size, scaling and animation state }
   DAbstractElement = class abstract(DObject)
@@ -47,20 +59,21 @@ type
     AnimationStart: DTime;
     AnimationDuration: DTime;
     AnimationCurve: TAnimationCurve;
-    Last: DInterfaceContainer;
+    { Location and size of this element / not sure about visibility level }
+    Last, Next, Current: DInterfaceContainer;
     procedure GetAnimationState; TryInline
   strict protected
+    KillMePlease: Boolean;
     { updates the data of the class with current external data,
       here it just gets the current animation state }
     procedure Update; virtual;
-  public
-    { Location and size of this element }
-    Next, Current: DInterfaceContainer;
   public
     { Draw the element / as abstract as it might be :) }
     procedure Draw; virtual; abstract;
     { Set tint of the element }
     procedure SetTint; virtual; abstract;
+
+    procedure SetSize(const ax, ay, aw, ah: integer; const aAlpha: DFloat = 1.0; const Animate: TAnimationStyle = asNone);
   public
     //...
   public
@@ -94,6 +107,7 @@ type
   strict protected
     { List of the children of this interface element }
     Children: DInterfaceElementsList;
+    procedure Update; override;
   public
     procedure SetTint; override;
     procedure Draw; override;
@@ -115,6 +129,7 @@ uses
 constructor DAbstractElement.Create;
 begin
   //inherited <------- nothing to inherit
+  KillMePlease := false;
   Last := DInterfaceContainer.Create;
   Next := DInterfaceContainer.Create;
   Current := DInterfaceContainer.Create;
@@ -167,6 +182,15 @@ procedure DAbstractElement.Update;
 begin
   GetAnimationState;
 end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DAbstractElement.SetSize(const ax, ay, aw, ah: integer; const aAlpha: DFloat = 1.0; const Animate: TAnimationStyle = asNone);
+begin
+  Next.SetIntSize(ax, ay, aw, ah, aAlpha);
+  //AnimateTo(Next);
+end;
+
 
 {============================================================================}
 {===================== D SINGLE INTERFACE ELEMENT ===========================}
@@ -221,6 +245,26 @@ begin
   //this should fire as recoursive because children owns elements, which in turn will fire their destructors onfree
   Children.Free;
   inherited Destroy;
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DInterfaceElement.Update;
+var
+  i: integer;
+  c: DSingleInterfaceElement;
+begin
+  i := 0;
+  repeat
+    if Children[i].KillMePlease then
+    begin
+      c := Children[i];
+      Children.Remove(c);
+      c.Free;
+    end
+    else
+      Inc(i);
+  until i = Children.Count;
 end;
 
 {----------------------------------------------------------------------------}
