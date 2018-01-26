@@ -36,6 +36,7 @@ type
   public
     { draw the element / as abstract as it might be :) }
     procedure Draw; virtual; abstract;
+    procedure SetTint; virtual; abstract;
   public
     //...
   public
@@ -91,6 +92,7 @@ type
   public
     { List of the children of this interface element }
     Children: DInterfaceElementsList;
+    procedure SetTint; override;
     procedure Draw; override;
   public
     constructor Create; override;
@@ -198,6 +200,17 @@ begin
   //this should fire as recoursive because children owns elements, which in turn will fire their destructors onfree
   Children.Free;
   inherited Destroy;
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DInterfaceElement.SetTint;
+var
+  i: integer;
+begin
+  //inherited SetTint; <---------- parent is abstract
+  for i := 0 to Children.Count - 1 do
+    Children[i].SetTint;
 end;
 
 {----------------------------------------------------------------------------}

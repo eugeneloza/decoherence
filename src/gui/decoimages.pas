@@ -49,7 +49,7 @@ type
     However, in future AnimatedImage will implement looping between
     multiple FImages during some time, however, I'm not yet sure, how to
     load it. Maybe, it'd be something like loading from XML
-    with determination of frame files, and frame durations }
+    with determination of frame files, and frame durations. }
   DAnimatedImage = class(DImage)
   end;
 
