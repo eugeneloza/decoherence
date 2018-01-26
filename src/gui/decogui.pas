@@ -35,11 +35,12 @@ type
     FFirstRender: boolean;
     { Some post-initialization routines, that require graphics context fully available }
     procedure FirstRender;
-    procedure SetTint; override;
   public
     { A pop-up window, showing a message }
     procedure ShowMessage(const aMessage: string);
   public
+    { (Re)sets the tint of the whole interface }
+    procedure SetTint; override;
     { Draw the GUI and all its child elements }
     procedure Draw; override;
     { Updates cursor position and image }
@@ -61,7 +62,7 @@ implementation
 uses
   SysUtils, CastleColors, CastleGLUtils,
   DecoPlayer,
-  DecoTime, DecoLog;
+  DecoLog;
 
 procedure DGUI.ShowMessage(const aMessage: string);
 begin

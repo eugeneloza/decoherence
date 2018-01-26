@@ -115,7 +115,7 @@
         <PackageName Value="castle_base"/>
       </Item2>
     </RequiredPackages>
-    <Units Count="21">
+    <Units Count="22">
       <Unit0>
         <Filename Value="Decoherence.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -165,7 +165,7 @@
       <Unit10>
         <Filename Value="src/gui/decoguiscale.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="DecoGuiScale"/>
+        <UnitName Value="DecoGUIScale"/>
       </Unit10>
       <Unit11>
         <Filename Value="src/text/decotranslation.pas"/>
@@ -215,6 +215,11 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="DecoImages"/>
       </Unit20>
+      <Unit21>
+        <Filename Value="src/gui/decointerfacetimer.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoInterfaceTimer"/>
+      </Unit21>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

@@ -25,6 +25,7 @@ interface
 
 uses
   Generics.Collections,
+  DecoInterfaceTimer,
   DecoGlobal, DecoTime;
 
 type
@@ -42,27 +43,6 @@ type
   public
     constructor Create; virtual; //override;
     destructor Destroy; override;
-  end;
-
-type
-  { A simple time-out mechanisms to preform some timed events on interface
-    elements }
-  DTimer = class(DObject)
-  private
-    { Set automatically, date of the timer count start }
-    StartTime: DTime;
-  public
-    { If the timer is running }
-    Enabled: boolean;
-    { How long (in seconds) will it take the timer to fire }
-    Interval: DTime;
-    { Action to preform }
-    onTimer: TSimpleProcedure;
-    constructor Create;
-    { A simple way to set and run timer }
-    procedure SetTimeOut(const Seconds: DTime);
-    { Check if the timer finished and run onTimer if true }
-    procedure Update;
   end;
 
 type
@@ -121,39 +101,6 @@ destructor DAbstractElement.Destroy;
 begin
 
   inherited Destroy;
-end;
-
-{================================ D TIMER ===================================}
-
-constructor DTimer.Create;
-begin
-  inherited Create;
-  Enabled := False;
-  StartTime := -1;
-end;
-
-{-----------------------------------------------------------------------------}
-
-procedure DTimer.Update;
-begin
-  if StartTime < 0 then
-    StartTime := DecoNow
-  else
-  if (DecoNow - StartTime) >= Interval then
-  begin
-    Enabled := False;
-    if Assigned(onTimer) then
-      onTimer;
-  end;
-end;
-
-{-----------------------------------------------------------------------------}
-
-procedure DTimer.SetTimeout(const Seconds: DTime);
-begin
-  StartTime := -1;
-  Enabled := True;
-  Interval := Seconds;
 end;
 
 {============================================================================}
