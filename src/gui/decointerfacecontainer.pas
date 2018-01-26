@@ -45,6 +45,7 @@ type
       providing negative ax will count it from RIGHT side. }
     procedure SetIntSize(const ax, ay, aw, ah: integer; const aAlpha: DFloat = 1);
     procedure SetIntCoord(const ax1, ay1, ax2, ay2: integer; const aAlpha: DFloat = 1);
+    procedure SetIntWidthHeight(const aw, ah: integer; const aAlpha: DFloat = 1);
     { Initialize current container with float coordinates,
       providing negative ax will count it from RIGHT side.
       Both coordinates are scaled against GUIHeight = 1.0 }
@@ -106,6 +107,17 @@ begin
     x := x + GUIWidth - w;
   a := aAlpha;
   isInitialized := true;
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DInterfaceContainer.SetIntWidthHeight(const aw, ah: integer; const aAlpha: DFloat = 1);
+begin
+  x := x - (w - aw) div 2;
+  y := y - (h - ah) div 2;
+  w := aw;
+  h := ah;
+  a := aAlpha;
 end;
 
 {-----------------------------------------------------------------------------}

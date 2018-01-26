@@ -43,13 +43,8 @@ type
   { Animation style of the object. asDefault means "animate from previous state",
     presuming that there was some "previous state"}
   TAnimationStyle = (asNone, asDefault,
-    asFadeIn, asFadeOut,// asFadeOutSuicide,
-    asZoomIn, asZoomOut,// asZoomOutSuicide,
-    asFlyInRandom, asFlyOutRandom,// asFlyOutRandomSuicide,
-    asFlyInTop, asFlyOutTop,
-    asFlyInBottom, asFlyOutBottom,
-    asFlyInLeft, asFlyOutLeft,
-    asFlyInRight, asFlyOutRight);
+    asFadeIn, asFadeOut,
+    asZoomIn, asZoomOut);
 
 type
   { Most abstract container for interface elements
@@ -59,9 +54,13 @@ type
     AnimationStart: DTime;
     AnimationDuration: DTime;
     AnimationCurve: TAnimationCurve;
+    AnimationSuicide: boolean;
     { Location and size of this element / not sure about visibility level }
     Last, Next, Current: DInterfaceContainer;
     procedure GetAnimationState; TryInline
+    { Animate this element to Next state }
+    procedure AnimateTo(const Animate: TAnimationStyle;
+      const Duration: DFloat = DefaultAnimationDuration);
   strict protected
     KillMePlease: Boolean;
     { updates the data of the class with current external data,
@@ -73,7 +72,7 @@ type
     { Set tint of the element }
     procedure SetTint; virtual; abstract;
 
-    procedure SetSize(const ax, ay, aw, ah: integer; const aAlpha: DFloat = 1.0; const Animate: TAnimationStyle = asNone);
+    procedure SetSize(const ax, ay, aw, ah: integer; const aAlpha: DFloat = 1.0; const Animate: TAnimationStyle = asDefault);
   public
     //...
   public
@@ -97,10 +96,9 @@ type
     constructor Create; override;
     destructor Destroy; override;
   end;
-
-type
   { List of DSingleInterfaceElement instances }
   DInterfaceElementsList = specialize TObjectList<DSingleInterfaceElement>;
+
 type
   { An interface element, that can contain "Children" }
   DInterfaceElement = class(DSingleInterfaceElement)
@@ -120,7 +118,7 @@ type
 implementation
 uses
   SysUtils,
-  DecoLog;
+  DecoGUIScale, DecoLog;
 
 {============================================================================}
 {======================== D ABSTRACT ELEMENT ================================}
@@ -134,6 +132,7 @@ begin
   Next := DInterfaceContainer.Create;
   Current := DInterfaceContainer.Create;
   AnimationCurve := acSquare;
+  AnimationSuicide := false;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -156,7 +155,10 @@ begin
   if AnimationStart < 0 then
     AnimationStart := DecoNow;
 
-  if (DecoNow - AnimationStart < AnimationDuration) then
+  if not Next.isInitialized then
+    Log(LogInterfaceError, CurrentRoutine, 'Warning: NEXT is not initialized!');
+
+  if (DecoNow - AnimationStart < AnimationDuration) or (not Last.isInitialized) then
   begin
     //determine the animation time passed relative to AnimationDuration
     Phase := (DecoNow - AnimationStart) / AnimationDuration;
@@ -173,6 +175,33 @@ begin
   else
   begin
     Current.AssignFrom(Next);
+    {if this was a suicide animation then kill this element}
+    if AnimationSuicide then
+      Self.KillMePlease := true;
+  end;
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DAbstractElement.AnimateTo(const Animate: TAnimationStyle;
+  const Duration: DFloat = DefaultAnimationDuration);
+begin
+  { Next must be set before the AnimateTo! }
+  GetAnimationState;
+  Last.AssignFrom(Current);   //to current animation state
+
+  AnimationStart := -1;
+  AnimationDuration := Duration;
+
+  case Animate of
+    asNone: AnimationDuration := -1; //no animation will just assign Current = Next on next frame
+    //asDefault: <------ will simply animate from "Last = Current (= Next if uninitialized)" to "Next"
+    {fades in/out element}
+    asFadeIn: Last.a := 0;
+    asFadeOut: Next.a := 0;
+    {zooms in/out element}
+    asZoomIn: Last.SetIntWidthHeight(1, 1, 0);
+    asZoomOut: Next.SetIntWidthHeight(1, 1 , 0);
   end;
 end;
 
@@ -185,10 +214,10 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-procedure DAbstractElement.SetSize(const ax, ay, aw, ah: integer; const aAlpha: DFloat = 1.0; const Animate: TAnimationStyle = asNone);
+procedure DAbstractElement.SetSize(const ax, ay, aw, ah: integer; const aAlpha: DFloat = 1.0; const Animate: TAnimationStyle = asDefault);
 begin
   Next.SetIntSize(ax, ay, aw, ah, aAlpha);
-  //AnimateTo(Next);
+  AnimateTo(Animate);
 end;
 
 
@@ -282,15 +311,12 @@ end;
 
 procedure DInterfaceElement.Draw;
 var
-  i: integer;
+  c: DSingleInterfaceElement;
 begin
   //inherited Draw; <---------- parent is abstract
-  {if isVisible then
-  begin
-    Update; }
-    for i := 0 to Children.Count - 1 do
-      Children[i].Draw;
-  {end;}
+  Update;
+  for c in Children do
+    c.Draw;
 end;
 
 end.
