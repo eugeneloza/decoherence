@@ -40,11 +40,12 @@ type
     Interval: DTime;
     { Action to preform }
     onTimer: TSimpleProcedure;
-    constructor Create;
     { A simple way to set and run timer }
     procedure SetTimeOut(const Seconds: DTime);
     { Check if the timer finished and run onTimer if true }
     procedure Update;
+  public
+    constructor Create;
   end;
 
 {............................................................................}

@@ -48,7 +48,11 @@ type
     AnimationDuration: DTime;
     AnimationCurve: TAnimationCurve;
     Last: DInterfaceContainer;
-    procedure GetAnimationState;
+    procedure GetAnimationState; TryInline
+  strict protected
+    { updates the data of the class with current external data,
+      here it just gets the current animation state }
+    procedure Update; virtual;
   public
     { Location and size of this element }
     Next, Current: DInterfaceContainer;
@@ -72,6 +76,7 @@ type
     //...
     { A simple timer to fire some event on time-out }
     Timer: DTimer;
+    procedure Update; override;
   public
     { Activate and initialize timer }
     procedure SetTimeOut(const Seconds: DTime);
@@ -128,7 +133,7 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-procedure DAbstractElement.GetAnimationState;
+procedure DAbstractElement.GetAnimationState; TryInline
 var
   Phase: DFloat;
 begin
@@ -156,6 +161,13 @@ begin
   end;
 end;
 
+{-----------------------------------------------------------------------------}
+
+procedure DAbstractElement.Update;
+begin
+  GetAnimationState;
+end;
+
 {============================================================================}
 {===================== D SINGLE INTERFACE ELEMENT ===========================}
 {============================================================================}
@@ -172,6 +184,15 @@ destructor DSingleInterfaceElement.Destroy;
 begin
   FreeAndNil(Timer);
   inherited Destroy;
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DSingleInterfaceElement.Update;
+begin
+  inherited Update;
+  if (Timer <> nil) and (Timer.Enabled) then
+    Timer.Update;
 end;
 
 {-----------------------------------------------------------------------------}
