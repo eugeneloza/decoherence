@@ -32,14 +32,16 @@ uses
 var
   { Width and height of GUI }
   GUIWidth, GUIHeight: integer;
-  { what is considered a 1 pixel gap between some dense GUI elements
+  { =1/GUIHeight }
+  GUIScale: DFloat;
+  { What is considered a 1 pixel gap between some dense GUI elements
     It can become larger if resolution (window size) is large }
   GUISmallGap: integer;
-  { a bit larger than GUISmallGap }
+  { A bit larger than GUISmallGap }
   GUILargeGap: integer;
-  { reference size of a clickable action button }
+  { Reference size of a clickable action button }
   GUIUnit: integer;
-
+  { Center of the GUI/Window }
   GUICenter: TVector2;
 
 { Resets all scale variables to match Window.Width, Window.Height }
@@ -65,6 +67,8 @@ begin
 
   GUIWidth := Window.Width;
   GUIHeight := Window.Height;
+  //GUIScaleW := 1/GUIWidth;
+  GUIScale := 1/GUIHeight;
 
   GUISmallGap := RoundOne(1/768 * GUIHeight);
   GUILargeGap := RoundOne(3/768 * GUIHeight);

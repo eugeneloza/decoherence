@@ -25,18 +25,21 @@ interface
 
 uses
   Generics.Collections,
-  DecoInterfaceTimer,
+  DecoInterfaceTimer, DecoInterfaceContainer,
   DecoGlobal, DecoTime;
 
 type
-  { most abstract container for interface elements
+  { Most abstract container for interface elements
     Defines size, scaling and animation state }
   DAbstractElement = class abstract(DObject)
   strict private
     //...
   public
-    { draw the element / as abstract as it might be :) }
+    { Location and size of this element }
+    Last, Next, Current: DInterfaceContainer;
+    { Draw the element / as abstract as it might be :) }
     procedure Draw; virtual; abstract;
+    { Set tint of the element }
     procedure SetTint; virtual; abstract;
   public
     //...
@@ -68,10 +71,9 @@ type
   { An interface element, that can contain "Children" }
   DInterfaceElement = class(DSingleInterfaceElement)
   strict protected
-    //...
-  public
     { List of the children of this interface element }
     Children: DInterfaceElementsList;
+  public
     procedure SetTint; override;
     procedure Draw; override;
   public
@@ -92,14 +94,18 @@ uses
 constructor DAbstractElement.Create;
 begin
   //inherited <------- nothing to inherit
-
+  Last := DInterfaceContainer.Create;
+  Next := DInterfaceContainer.Create;
+  Current := DInterfaceContainer.Create;
 end;
 
 {-----------------------------------------------------------------------------}
 
 destructor DAbstractElement.Destroy;
 begin
-
+  Current.Free;
+  Next.Free;
+  Last.Free;
   inherited Destroy;
 end;
 
