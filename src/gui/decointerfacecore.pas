@@ -131,6 +131,8 @@ type
   public
     procedure SetTint; override;
     procedure Draw; override;
+    { Assign given element as a child }
+    procedure Grab(const Child: DSingleInterfaceElement);
 
     (* Mouse routines *)
   public
@@ -394,6 +396,13 @@ begin
   Update;
   for c in Children do
     c.Draw;
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DInterfaceElement.Grab(const Child: DSingleInterfaceElement);
+begin
+  Children.Add(Child);
 end;
 
 {----------------------------------------------------------------------------}
