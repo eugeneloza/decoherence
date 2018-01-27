@@ -34,6 +34,8 @@ type
     isInitialized: boolean;
     x, y, w, h: integer;
     a: DFloat;
+    { cached to accelerate things, never assign them }
+    x2, y2: integer;
     { Copy current container's xywha to aDest }
     procedure AssignTo(const aDest: DInterfaceContainer); TryInline
     { Copy current container's xywha from aSource }
@@ -67,6 +69,8 @@ begin
   aDest.y := Self.y;
   aDest.w := Self.w;
   aDest.h := Self.h;
+  aDest.x2 := Self.x2;
+  aDest.y2 := Self.y2;
   aDest.a := Self.a;
   Self.isInitialized := aDest.isInitialized;
 end;
@@ -79,6 +83,8 @@ begin
   Self.y := aSource.y;
   Self.w := aSource.w;
   Self.h := aSource.h;
+  Self.x2 := aSource.x2;
+  Self.y2 := aSource.y2;
   Self.a := aSource.a;
   Self.isInitialized := aSource.isInitialized;
 end;
@@ -91,6 +97,8 @@ begin
   Self.y := Round(aLast.y + (aNext.y - aLast.y) * aPhase);
   Self.w := Round(aLast.w + (aNext.w - aLast.w) * aPhase);
   Self.h := Round(aLast.h + (aNext.h - aLast.h) * aPhase);
+  Self.x2 := x + w;
+  Self.y2 := y + h;
   Self.a :=      (aLast.a + (aNext.a - aLast.a) * aPhase);
   Self.isInitialized := aNext.isInitialized;
 end;
@@ -105,6 +113,8 @@ begin
   h := ah;
   if ax < 0 then
     x := x + GUIWidth - w;
+  x2 := x + w; //cache x2,y2
+  y2 := y + h;
   a := aAlpha;
   isInitialized := true;
 end;
@@ -117,6 +127,8 @@ begin
   y := y - (h - ah) div 2;
   w := aw;
   h := ah;
+  x2 := x + w; //cache x2,y2
+  y2 := y + h;
   a := aAlpha;
 end;
 
@@ -138,6 +150,8 @@ begin
   if ax < 0 then
     x := x + GUIWidth - w;
   a := aAlpha;
+  x2 := x + w; //cache x2,y2
+  y2 := y + h;
   isInitialized := true;
 end;
 
