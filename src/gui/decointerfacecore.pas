@@ -295,9 +295,12 @@ end;
 {==============================  Mouse handling =============================}
 
 function DSingleInterfaceElement.IAmHere(const xx, yy: integer): boolean; TryInline
+const
+  CutTransparency = 0.3;
 begin
   if (xx >= Current.x) and (xx <= Current.x2) and
-    (yy >= Current.y) and (yy <= Current.y2) then
+    (yy >= Current.y) and (yy <= Current.y2) and
+    (Current.a > CutTransparency) then
     Result := True
   else
     Result := False;
