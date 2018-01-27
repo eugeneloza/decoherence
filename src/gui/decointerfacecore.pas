@@ -62,6 +62,8 @@ type
     Last, Next, Current: DInterfaceContainer;
     procedure AnimateTo(const Animate: TAnimationStyle;
       const Duration: DFloat = DefaultAnimationDuration);
+    { Stops any animation, and sets Last = Next }
+    procedure ResetAnimation;
   strict protected
     KillMePlease: Boolean;
     { updates the data of the class with current external data,
@@ -99,14 +101,19 @@ type
   public
     { If this element is active (clickable) }
     CanMouseOver: boolean;
+    { Can this element be dragged? }
+    CanDrag: boolean;
     { Are these coordinates in this element's box? }
     function IAmHere(const xx, yy: integer): boolean;
     { Returns self if IAmHere and runs all possible events }
     function ifMouseOver(const xx, yy: integer; const RaiseEvents: boolean;
       const AllTree: boolean): DAbstractElement; virtual;
-  private
+  strict private
     { If mouse is over this element }
     isMouseOver: boolean;
+    DragX, DragY: integer;
+    procedure Drag(const xx, yy: integer);
+    procedure StartDrag(const xx, yy: integer);
   public
     { Mouse/touch Events }
     OnMouseEnter: TXYProcedure;
@@ -114,6 +121,8 @@ type
     OnMouseOver: TXYProcedure;
     OnMousePress: TXYProcedure;
     OnMouseRelease: TXYProcedure;
+    { Dragg-n-drop routines }
+//    OnDrop: TXYProcedure;
   public
     constructor Create; override;
     destructor Destroy; override;
@@ -241,6 +250,14 @@ end;
 
 {-----------------------------------------------------------------------------}
 
+procedure DAbstractElement.ResetAnimation;
+begin
+  Last.AssignFrom(Next);
+  AnimationDuration := -1;
+end;
+
+{-----------------------------------------------------------------------------}
+
 procedure DAbstractElement.Update;
 begin
   GetAnimationState;
@@ -298,9 +315,9 @@ function DSingleInterfaceElement.IAmHere(const xx, yy: integer): boolean; TryInl
 const
   CutTransparency = 0.3;
 begin
-  if (xx >= Current.x) and (xx <= Current.x2) and
-    (yy >= Current.y) and (yy <= Current.y2) and
-    (Current.a > CutTransparency) then
+  if (xx >= Next.x) and (xx <= Next.x2) and
+    (yy >= Next.y) and (yy <= Next.y2) and
+    (Next.a > CutTransparency) then
     Result := True
   else
     Result := False;
@@ -337,6 +354,24 @@ begin
       isMouseOver := False;
     end;
   end;
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DSingleInterfaceElement.StartDrag(const xx, yy: integer);
+begin
+  ResetAnimation;
+  DragX := Next.x - xx;
+  DragY := Next.y - yy;
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DSingleInterfaceElement.Drag(const xx, yy: integer);
+begin
+  Next.x := DragX + xx;
+  Next.y := DragY + yy;
+  ResetAnimation;
 end;
 
 {============================================================================}
