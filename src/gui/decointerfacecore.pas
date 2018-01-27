@@ -55,10 +55,11 @@ type
     AnimationDuration: DTime;
     AnimationCurve: TAnimationCurve;
     AnimationSuicide: boolean;
-    { Location and size of this element / not sure about visibility level }
-    Last, Next, Current: DInterfaceContainer;
     procedure GetAnimationState; TryInline
     { Animate this element to Next state }
+  strict protected
+    { Location and size of this element / not sure about visibility level }
+    Last, Next, Current: DInterfaceContainer;
     procedure AnimateTo(const Animate: TAnimationStyle;
       const Duration: DFloat = DefaultAnimationDuration);
   strict protected
@@ -74,24 +75,45 @@ type
 
     procedure SetSize(const ax, ay, aw, ah: integer; const aAlpha: DFloat = 1.0; const Animate: TAnimationStyle = asDefault);
   public
-    //...
-  public
     constructor Create; virtual; //override;
     destructor Destroy; override;
   end;
+
+type
+  { A simple procedure which reports Sender and clicked x,y }
+  TXYProcedure = procedure(const Sender: DAbstractElement; const ax, ay: integer) of object;
 
 type
   { Fully-featured Interface Element with Mouse/Touch support
     It lacks only "Children" or specific "Draw" to be used }
   DSingleInterfaceElement = class abstract(DAbstractElement)
   strict protected
-    //...
     { A simple timer to fire some event on time-out }
     Timer: DTimer;
     procedure Update; override;
   public
     { Activate and initialize timer }
     procedure SetTimeOut(const Seconds: DTime);
+
+    (* Mouse routines *)
+  public
+    { If this element is active (clickable) }
+    CanMouseOver: boolean;
+    { Are these coordinates in this element's box? }
+    function IAmHere(const xx, yy: integer): boolean;
+    { Returns self if IAmHere and runs all possible events }
+    function ifMouseOver(const xx, yy: integer; const RaiseEvents: boolean;
+      const AllTree: boolean): DAbstractElement; virtual;
+  private
+    { If mouse is over this element }
+    isMouseOver: boolean;
+  public
+    { Mouse/touch Events }
+    OnMouseEnter: TXYProcedure;
+    OnMouseLeave: TXYProcedure;
+    OnMouseOver: TXYProcedure;
+    OnMousePress: TXYProcedure;
+    OnMouseRelease: TXYProcedure;
   public
     constructor Create; override;
     destructor Destroy; override;
@@ -109,6 +131,16 @@ type
   public
     procedure SetTint; override;
     procedure Draw; override;
+
+    (* Mouse routines *)
+  public
+    { Returns last (cached) call to MouseOverTree result, may be invalid! }
+    isMouseOverTree: boolean;
+    { Returns Self if IAmHere and runs all possible events + scans all children }
+    function ifMouseOver(const xx, yy: integer; const RaiseEvents: boolean;
+      const AllTree: boolean): DAbstractElement; override;
+    { Returns true if mouse is over any "canmouseover" child of this element }
+    function MouseOverTree(const xx, yy: integer): boolean;
   public
     constructor Create; override;
     destructor Destroy; override;
@@ -228,7 +260,8 @@ end;
 constructor DSingleInterfaceElement.Create;
 begin
   inherited Create;
-  //...
+  isMouseOver := False;
+  CanMouseOver := False;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -255,6 +288,50 @@ begin
   if Timer = nil then
     Timer := DTimer.Create;
   Timer.SetTimeOut(Seconds);
+end;
+
+{==============================  Mouse handling =============================}
+
+function DSingleInterfaceElement.IAmHere(const xx, yy: integer): boolean; TryInline
+begin
+  if (xx >= Current.x) and (xx <= Current.x2) and
+    (yy >= Current.y) and (yy <= Current.y2) then
+    Result := True
+  else
+    Result := False;
+end;
+
+{-----------------------------------------------------------------------------}
+
+function DSingleInterfaceElement.ifMouseOver(const xx, yy: integer;
+  const RaiseEvents: boolean; const AllTree: boolean): DAbstractElement;
+begin
+  Result := nil;
+  if IAmHere(xx, yy) then
+  begin
+    if RaiseEvents then
+    begin
+      if isMouseOver = False then
+      begin
+        if Assigned(onMouseEnter) then
+          onMouseEnter(Self, xx, yy);
+        isMouseOver := True;
+      end;
+      if Assigned(onMouseOver) then
+        onMouseOver(self, xx, yy);
+    end;
+    if CanMouseOver then  //todo
+      Result := Self;
+  end
+  else
+  begin
+    if isMouseOver and RaiseEvents then
+    begin
+      if Assigned(onMouseLeave) then
+        onMouseLeave(Self, xx, yy);
+      isMouseOver := False;
+    end;
+  end;
 end;
 
 {============================================================================}
@@ -317,6 +394,47 @@ begin
   Update;
   for c in Children do
     c.Draw;
+end;
+
+{----------------------------------------------------------------------------}
+
+function DInterfaceElement.ifMouseOver(const xx, yy: integer;
+  const RaiseEvents: boolean; const AllTree: boolean): DAbstractElement;
+var
+  i: integer;
+  tmpLink: DAbstractElement;
+begin
+  Result := inherited ifMouseOver(xx, yy, RaiseEvents, AllTree);
+  //if rsult<>nil ... *or drag-n-drop should get the lowest child?
+
+  // recoursively scan all children
+  for i := 0 to Children.Count - 1 do
+  begin
+    tmpLink := Children[i].ifMouseOver(xx, yy, RaiseEvents, AllTree);
+    if tmpLink <> nil then
+    begin
+      Result := tmpLink;
+      if not AllTree then
+        Break; // if drag-n-drop one is enough
+    end;
+  end;
+end;
+
+{-----------------------------------------------------------------------------}
+
+function DInterfaceElement.MouseOverTree(const xx, yy: integer): boolean;
+var
+  tmp: DAbstractElement;
+begin
+  // maybe rewrite it using isMouseOver - the idea is still a little different
+  tmp := Self.ifMouseOver(xx, yy, False, False);
+  if (tmp <> nil) and (tmp is DSingleInterfaceElement) and
+    (DSingleInterfaceElement(tmp).CanMouseOver) then
+    isMouseOverTree := True
+  else
+    isMouseOverTree := False;
+
+  Result := isMouseOverTree;
 end;
 
 end.
