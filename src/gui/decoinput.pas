@@ -514,6 +514,7 @@ begin
   Window.OnPress := @doPress;
   Window.OnRelease := @doRelease;
   Window.OnMotion := @doMotion;
+  InputProcessor.CenterMouseCursor;
 end;
 
 procedure FreeInput;
