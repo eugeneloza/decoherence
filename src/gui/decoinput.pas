@@ -25,6 +25,7 @@ interface
 
 uses Classes, SysUtils, Generics.Collections,
   CastleVectors, CastleFilesUtils, CastleKeysMouse,
+  DecoInterfaceCore,
   DecoTime, DecoGlobal;
 
 
@@ -45,6 +46,7 @@ type
       TouchStart: DTime;
       FingerIndex: cardinal;
       OldPos: TVector2;     //to handle sweeps, drags and cancels
+      ClickElement: DSingleInterfaceElement;
       constructor Create(const Pos: TVector2; const Finger: integer);
       procedure Update(const Event: TInputMotion);
     end;
@@ -237,7 +239,6 @@ end;
 
 procedure DInputProcessor.doMouseMotion(const Event: TInputMotion);
 var
-//  tmpLink: DAbstractElement;
   Dragging: boolean;
 begin
   if Player.MouseLook then
@@ -245,17 +246,6 @@ begin
       Exit;
 
   Dragging := doMouseDrag(Event);
-
-  {mouse over / if no drag-n-drop}
-  //this is not needed at the moment, we'll turn here a bit later when implementing drag-n-drop
-  //no mouseover is detected if no ifmouseover is run, so should still be here
-  if not Dragging then
-  begin
-    {tmpLink := GUI.IfMouseOver(Round(Event.Position[0]), Round(
-      Event.Position[1]), True, True);
-    if tmpLink <> nil then
-      Log(logVerbose, _CurrentRoutine, 'Motion caught ' + tmpLink.ClassName);}
-  end;
 
   GUI.UpdateCursor(Event.Position[0], Event.Position[1], TouchArray.Count > 0);
 end;
@@ -308,15 +298,16 @@ begin
       if (DecoNow - TouchArray[i].TouchStart > InputOptions.LongTouch) then begin
         Log(LogMouseInfo, CurrentRoutine, 'Long-touch caught!');
       end;
-      {if (TouchArray[i].ClickElement <> nil) then
+      if (TouchArray[i].ClickElement <> nil) then
       begin
         if Assigned(touchArray[i].ClickElement.OnMouseRelease) then
           TouchArray[i].ClickElement.OnMouseRelease(
-            TouchArray[i].ClickElement, TouchArray[i].x0, TouchArray[i].y0);
+            TouchArray[i].ClickElement, Round(TouchArray[i].OldPos[0]),
+            Round(TouchArray[i].OldPos[1]));
         if Assigned(TouchArray[i].ClickElement.OnDrop) then
           TouchArray[i].ClickElement.OnDrop(TouchArray[i].ClickElement,
-            TouchArray[i].x0, TouchArray[i].y0);
-      end;}
+            Round(TouchArray[i].OldPos[0]), Round(TouchArray[i].OldPos[1]));
+      end;
       TouchArray.Remove(TouchArray[i]);
     end
     else
@@ -334,7 +325,7 @@ procedure DInputProcessor.doMousePress(const Event: TInputPressRelease);
 var
   NewEventTouch: DTouch;
   FingerIndex: integer;
-  //tmpLink: DAbstractElement;
+  tmpLink: DAbstractElement;
   InterfaceCaughtEvent: boolean;
   i: integer;
 begin
@@ -344,8 +335,8 @@ begin
   NewEventTouch := DTouch.Create(Event.Position, FingerIndex);
 
   //catch the element which has been pressed
-{  tmpLink := GUI.IfMouseOver(Round(Event.Position[0]), Round(
-    Event.Position[1]), True, True);
+  tmpLink := GUI.IfMouseOver(Round(Event.Position[0]),
+    Round(Event.Position[1]), True, True);
   if (tmpLink is DSingleInterfaceElement) then
   begin
     NewEventTouch.ClickElement := DSingleInterfaceElement(tmpLink);
@@ -357,21 +348,19 @@ begin
     end;
     if NewEventTouch.ClickElement.CanDrag then
       NewEventTouch.ClickElement.StartDrag(Round(Event.Position[0]), Round(Event.Position[1]));
-  end; }
+  end;
 
   i := TouchArray.Add(NewEventTouch);
 
-  {todo: if interface didn't catch the click then}
- { if (CurrentGameMode = gmTravel) and (not InterfaceCaughtEvent) then  }
+  if (not InterfaceCaughtEvent) then
   begin
+    if Event.MouseButton = mbRight then
+      Player.ToggleMouseLook
+    else
     //start dragging mouse look
     if i = 0 then
       DragMouseLook := True;
   end;
-
-  //switch control mode
-  if Event.MouseButton = mbRight then
-    Player.ToggleMouseLook;
 
   GUI.UpdateCursor(Event.Position[0], Event.Position[1], TouchArray.Count > 0);
 
@@ -382,13 +371,7 @@ end;
 
 function DInputProcessor.doMouseLook(const Event: TInputMotion): boolean;
 begin
-{  if Camera = nil then
-  begin
-    Log(LogMouseSoftError, _CurrentRoutine,
-      'Warning: Camera is not initialized for MouseLook');
-    Exit;
-  end; }
-
+  //if gamemode ... then Exit;
   if Player.MouseLook then
   begin
     if not TVector2.PerfectlyEquals(Event.Position, GUICenter) then
@@ -436,13 +419,13 @@ begin
       if TouchArray[i].FingerIndex = Event.FingerIndex then
       begin
         TouchArray[i].Update(Event);
-        {if (TouchArray[i].ClickElement <> nil) and
+        if (TouchArray[i].ClickElement <> nil) and
           (TouchArray[i].ClickElement.CanDrag) then
         begin
           TouchArray[i].ClickElement.Drag(Round(Event.Position[0]),
             Round(Event.Position[1]));
           Result := True;
-        end;  }
+        end;
         Break;
       end;
       Inc(i);
@@ -486,7 +469,6 @@ end;
 {$PUSH}{$WARN 5024 off : Parameter "$1" not used}
 procedure doPress(Container: TUIContainer; const Event: TInputPressRelease);
 begin
-  // todo Joystick
   if Event.EventType = itMouseButton then
     InputProcessor.doMousePress(Event)
   else
@@ -499,16 +481,9 @@ begin
     case Event.Key of
       K_PrintScreen: //k_printscreen doesn't work in x-window system if assigned to some external program like scrot
         MakeScreenShot;
-{      K_r: Player.CurrentParty.Rest;
-      k_i: if AmbientIntensity.Ambient = 0 then
-          AmbientIntensity.SetAmbientIntensity(3)
-        else
-          AmbientIntensity.SetAmbientIntensity(0);}
-
     end;
 
-{    if (CurrentGameMode = gmTravel) and (Player <> nil) then }
-      InputProcessor.doKeyboardPress(Event.Key);
+    InputProcessor.doKeyboardPress(Event.Key);
   end;
 end;
 

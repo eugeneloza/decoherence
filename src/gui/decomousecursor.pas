@@ -88,6 +88,9 @@ procedure DCursor.HideOSCursor;
 begin
   Window.SceneManager.Camera.Cursor := mcForceNone;
   Window.SceneManager.Camera.ExclusiveEvents := False;
+  //Window.MousePosition = (-1, -1) at this moment
+{  x := Window.MousePosition[0];
+  y := Window.MousePosition[1];}
 end;
 
 {-----------------------------------------------------------------------------}

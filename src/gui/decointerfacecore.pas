@@ -112,6 +112,7 @@ type
     { If mouse is over this element }
     isMouseOver: boolean;
     DragX, DragY: integer;
+  public
     procedure Drag(const xx, yy: integer);
     procedure StartDrag(const xx, yy: integer);
   public
@@ -122,7 +123,7 @@ type
     OnMousePress: TXYProcedure;
     OnMouseRelease: TXYProcedure;
     { Dragg-n-drop routines }
-//    OnDrop: TXYProcedure;
+    OnDrop: TXYProcedure;
   public
     constructor Create; override;
     destructor Destroy; override;
