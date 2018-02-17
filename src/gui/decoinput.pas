@@ -390,7 +390,6 @@ begin
     //DragMouseLook doesn't change cursor.position
     {however, it's a good idea to catch DragMouseLook not to go outside window
      - scroll it like Blender does}
-    {$HINT Why Event.OldPosition rotation style is MUCH slower than MouseLook style rotation???}
     //Player.InputMouse(Event.OldPosition - Event.Position);
     Result := False;
   end;

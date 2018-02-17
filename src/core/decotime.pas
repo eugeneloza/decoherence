@@ -201,7 +201,7 @@ var
 begin
   FpGettimeofday(@tv, nil);
   Result := int64(tv.tv_sec) * 1000000 + int64(tv.tv_usec);
-  {$HINT overflows may occur here, as Thaddy@LazarusForum suggests}
+  {overflows may occur here, as Thaddy@LazarusForum suggests}
 end;
 
 {$ENDIF}
