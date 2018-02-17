@@ -8,6 +8,7 @@ The constructor is aimed at possibility to create nearly a new game, which follo
 #System requirements
 
 Constructor is a Desktop-only tool, it is not compatible with Android. Other system requirements are identical to the game.
+Linux version of the Constructor tool requires GTK+2 (Thanks Akien for the information).
 
 #Features
 

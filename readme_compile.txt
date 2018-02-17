@@ -10,21 +10,21 @@ You can install latest Lazarus+FPC+cross-compilation tools with fpcupdeluxe. See
 
 ##Linux
 
-You need both normal and development versions of the libraries required for Castle Game Engine to run properly. These are: (Debian/Ubuntu package reference):
+You need both normal and development versions of the libraries required for Castle Game Engine to run properly. These are (Debian/Ubuntu package reference):
 libopenal1
 libopenal-dev
-libpng
+libpng16-16
 libpng-dev
 zlib1g
 zlib1g-dev
-libvorbis
+libvorbis0a
 libvorbis-dev
 libfreetype6
 libfreetype6-dev
 libgtkglext1
 libgtkglext1-dev
-You will also need dev version of OpenGL drivers for your video card. In general case it is libgl1-mesa-dev.
-Linux version of the Constructor tool requires GTK+2 (Thanks Akien for the information).
+You will also need dev version of OpenGL drivers for your video card. Usually it is libgl1-mesa-dev.
+Note: the libraries versions may change and not every library has a meta-package.
 
 ##Windows
 
