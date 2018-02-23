@@ -31,7 +31,7 @@ procedure FreeDecoherence;
 implementation
 
 uses
-  SysUtils, CastleWindow, CastleControls,
+  SysUtils, CastleWindow, CastleControls, CastleGLImages,
   DecoLoadEmbedded,
   DecoTranslation,
   DecoInput, DecoPlayer, DecoGUI,
@@ -75,6 +75,7 @@ begin
   InitInput;
   InitGlobal;
   InitManagement;
+  Log(LogInit, CurrentRoutine, TextureMemoryProfiler.Summary);
   Log(LogInit, CurrentRoutine, 'Init sequence finished.');
 end;
 
@@ -88,6 +89,7 @@ begin
   {$ENDIF}
   Log(LogInit, CurrentRoutine, 'Initializing Application and Window.');
   OnGetApplicationName := @MyGetApplicationName;
+  TextureMemoryProfiler.Enabled := true;
   InitTranslation;
   SetLoadingImage;
   InitWindow;
