@@ -97,9 +97,10 @@ end;
 
 procedure DCursor.Draw;
 begin
-  if CurrentCursor <> ctNone then
-    CursorImg[CurrentCursor].Draw(x + CursorShift[CurrentCursor].Data[0],
-      y - CursorImg[CurrentCursor].Height + CursorShift[CurrentCursor].Data[1]);
+  if not ScreenShotPending then //hide cursor for screenshots
+    if CurrentCursor <> ctNone then
+      CursorImg[CurrentCursor].Draw(x + CursorShift[CurrentCursor].Data[0],
+        y - CursorImg[CurrentCursor].Height + CursorShift[CurrentCursor].Data[1]);
 end;
 
 procedure DCursor.SetTint;

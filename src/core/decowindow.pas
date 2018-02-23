@@ -32,6 +32,8 @@ var
   { Main window of the game }
   Window: TCastleWindow;
 
+  ScreenShotPending: boolean;
+
 { Creates and initializes the Window }
 procedure InitWindow;
 { Make a screenshot of current screen and save it to a file }
@@ -51,8 +53,12 @@ var
 
 procedure MakeScreenShot;
 begin
+  ScreenShotPending := true;
+  //pay attention SaveScreen directly calls a render!
   Window.SaveScreen('deco_' + NiceDate + '.png');
+  ScreenShotPending := false;
 end;
+
 
 {.......................................................................}
 
@@ -87,6 +93,8 @@ begin
   end;
 
   ResetGUIScale;
+
+  ScreenShotPending := false;
 end;
 
 end.
