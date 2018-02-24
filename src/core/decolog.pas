@@ -48,7 +48,7 @@ implementation
 uses
   SysUtils,
   {$IFDEF WriteLog}Classes, DecoTime,{$ENDIF}
-  CastleLog;
+  CastleApplicationProperties, CastleLog;
 
 {$IFDEF WriteLog}
 var
@@ -70,9 +70,10 @@ begin
   //initialize the log
   {$IFDEF WriteLog}
   LogStream := TFileStream.Create(NiceDate + '.log', fmCreate);
-  InitializeLog(Version, LogStream, ltTime);
+  InitializeLog(LogStream, ltTime);
   {$ELSE}
-  InitializeLog(Version, nil, ltTime);
+  ApplicationProperties.Version := Version;
+  InitializeLog(nil, ltTime);
   {$ENDIF}
 
   {this is basic information, so just output directly}

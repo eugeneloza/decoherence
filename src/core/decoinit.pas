@@ -32,6 +32,7 @@ implementation
 
 uses
   SysUtils, CastleWindow, CastleControls, CastleGLImages,
+  CastleApplicationProperties,
   DecoLoadEmbedded,
   DecoTranslation,
   DecoInput, DecoPlayer, DecoGUI,
@@ -56,7 +57,7 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-function MyGetApplicationName: string;
+function GetApplicationName: string;
 begin
   Result := 'Decoherence 1';
 end;
@@ -83,19 +84,20 @@ end;
 
 procedure InitDecoherence;
 begin
+  ApplicationProperties(true).ApplicationName := GetApplicationName;
   InitLog;
   {$IF FPC_FULLVERSION < 30101}
   Log(true, 'CRITICAL WARNING', 'FPC version 3.1.1+ is required!');
   {$ENDIF}
   Log(LogInit, CurrentRoutine, 'Initializing Application and Window.');
-  OnGetApplicationName := @MyGetApplicationName;
+  OnGetApplicationName := @GetApplicationName;
   TextureMemoryProfiler.Enabled := true;
   InitTranslation;
   SetLoadingImage;
   InitWindow;
   Application.MainWindow := Window;
   Application.OnInitialize := @ApplicationInitialize;
-  Window.Caption := MyGetApplicationName;
+  Window.Caption := GetApplicationName;
 end;
 
 {-----------------------------------------------------------------------------}
