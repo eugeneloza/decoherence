@@ -101,6 +101,8 @@ begin
         y - CursorImg[CurrentCursor].Height + CursorShift[CurrentCursor].Data[1]);
 end;
 
+{-----------------------------------------------------------------------------}
+
 procedure DCursor.SetTint;
 var
   c: TCursorType;

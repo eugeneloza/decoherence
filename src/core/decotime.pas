@@ -86,20 +86,8 @@ uses
   SysUtils, Classes{$IFDEF Windows}, SyncObjs{$ENDIF};
 
 function NiceDate: string;
-var
-  s: string;
-  i: integer;
 begin
-  s := DateTimeToAtStr(Now); //the only place where I'm using SysUtils.Now
-  Result := '';
-  for i := 1 to Length(s) do
-    if Copy(s, i, 1) = ' ' then
-      Result += '_'
-    else
-    if Copy(s, i, 1) = ':' then
-      Result += '-'
-    else
-      Result += Copy(s, i, 1);
+  Result := FormatDateTime('YYYY-MM-DD_hh-nn-ss', Now); //the only place where I'm using SysUtils.Now
 end;
 
 {----------------------------------------------------------------------------}
