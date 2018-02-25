@@ -44,6 +44,10 @@ begin
   SetHeapTraceOutput('heap.trc');
   {$ENDIF}{$ENDIF}
 
+  {$IF FPC_FULLVERSION < 30101}
+  {$ERROR FPC version 3.1.1+ is required!}
+  {$ENDIF}
+
   { Actually start the game }
   Window.OpenAndRun;
 end.
