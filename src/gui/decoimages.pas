@@ -39,8 +39,8 @@ type
     procedure Draw(const X, Y: Single); TryInline
     procedure Draw(const X, Y, DrawWidth, DrawHeight: Single); TryInline
   public
-    constructor Create(const AImage: TEncodedImage; const ASmoothScaling: boolean = True;
-      const AOwnsImage: boolean = True);
+    constructor Create(const AImage: TEncodedImage; const ASmoothScaling: boolean = true;
+      const AOwnsImage: boolean = true);
     destructor Destroy; override;
   end;
 
@@ -78,7 +78,7 @@ end;
 {-----------------------------------------------------------------------------}
 
 constructor DImage.Create(const AImage: TEncodedImage; const ASmoothScaling: boolean = true;
-  const AOwnsImage: boolean = True);
+  const AOwnsImage: boolean = true);
 begin
   FImage := TGLImage.Create(AImage, ASmoothScaling, AOwnsImage);
   Width := FImage.Width;

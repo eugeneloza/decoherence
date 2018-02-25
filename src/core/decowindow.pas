@@ -54,8 +54,8 @@ var
 procedure MakeScreenShot;
 begin
   ScreenShotPending := true;
-  //pay attention SaveScreen directly calls a render!
-  Window.SaveScreen('deco_' + NiceDate + '.png');
+  //careful: onBeforeRender and onRender are called here.
+  Window.SaveScreen('Deco_' + NiceDate + '.png');
   ScreenShotPending := false;
 end;
 
@@ -74,7 +74,7 @@ end;
 procedure InitWindow;
 begin
   Window := TCastleWindow.Create(Application);
-  Window.DoubleBuffer := True;
+  Window.DoubleBuffer := true;
   Window.ResizeAllowed := raOnlyAtOpen;
 
   ReadWindowConfiguration;

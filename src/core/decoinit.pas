@@ -52,7 +52,7 @@ begin
     end;
   end;
 
-  Theme.OwnsImages[tiLoading] := False;
+  Theme.OwnsImages[tiLoading] := false;
 end;
 
 {-----------------------------------------------------------------------------}

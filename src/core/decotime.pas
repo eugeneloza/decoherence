@@ -260,9 +260,9 @@ end;
 procedure InitTime;
 begin
   //create threaded timer and run it immediately to make sure everything is initialized properly
-  ThreadedTimer := TTimerThread.Create(True);
+  ThreadedTimer := TTimerThread.Create(true);
   ThreadedTimer.Priority := tpLower;
-  ThreadedTimer.FreeOnTerminate := False;
+  ThreadedTimer.FreeOnTerminate := false;
   ForceGetNowThread;
 
   {$IFDEF Windows}

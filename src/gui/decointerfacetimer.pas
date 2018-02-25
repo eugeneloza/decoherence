@@ -54,7 +54,7 @@ implementation
 constructor DTimer.Create;
 begin
   inherited Create;
-  Enabled := False;
+  Enabled := false;
   StartTime := -1;
 end;
 
@@ -67,7 +67,7 @@ begin
   else
   if (DecoNow - StartTime) >= Interval then
   begin
-    Enabled := False;
+    Enabled := false;
     if Assigned(onTimer) then
       onTimer;
   end;
@@ -78,7 +78,7 @@ end;
 procedure DTimer.SetTimeout(const Seconds: DTime);
 begin
   StartTime := -1;
-  Enabled := True;
+  Enabled := true;
   Interval := Seconds;
 end;
 

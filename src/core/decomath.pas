@@ -59,9 +59,9 @@ end;
 function dZero(const a: DFloat): Boolean; TryInline
 begin
   if abs(a) <= Epsilon then
-    Result := True
+    Result := true
   else
-    Result := False;
+    Result := false;
 
 end;
 

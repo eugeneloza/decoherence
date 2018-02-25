@@ -124,7 +124,7 @@ end;
 
 {============================= INPUT PROCESSOR ============================}
 var
-  RecordKeys: boolean = False;
+  RecordKeys: boolean = false;
   RecordedKeys: string;
 
 procedure DInputProcessor.KeyRecorder(const aKey: TKey);
@@ -135,7 +135,7 @@ const
 
   function AddKey: boolean;
   begin
-    Result := True;
+    Result := true;
     case aKey of
       k_A: RecordedKeys += 'A';
       k_F: RecordedKeys += 'F';
@@ -145,7 +145,7 @@ const
       k_D: RecordedKeys += 'I';
       k_I: RecordedKeys += 'D';
       else
-        Result := False;
+        Result := false;
     end;
     //dLog(LogVerbose,nil,_CurrentRoutine,RecordedKeys);
   end;
@@ -160,13 +160,13 @@ const
 
   begin
     if ifCorresponds(Test1) or ifCorresponds(Test2) then
-      Result := True
+      Result := true
     else
-      Result := False;
+      Result := false;
   end;
 
 begin
-  if {CurrentGameMode = gmTravel} True then
+  if {CurrentGameMode = gmTravel} true then
   begin
     if RecordKeys then
     begin
@@ -177,20 +177,20 @@ begin
           if (RecordedKeys = Test1) or (RecordedKeys = Test2) then
           begin
             GUI.ShowMessage('No! This is a different game!');
-            RecordKeys := False;
+            RecordKeys := false;
           end;
         end
         else
-          RecordKeys := False;
+          RecordKeys := false;
       end
       else
-        RecordKeys := False;
+        RecordKeys := false;
     end
     else
     if (aKey = k_I) then
     begin
       RecordedKeys := '';
-      RecordKeys := True;
+      RecordKeys := true;
       AddKey;
     end;
 
@@ -268,7 +268,7 @@ end;
 
 var
   { used to detect if mouse is in dragg-look mode }
-  DragMouseLook: boolean = False;
+  DragMouseLook: boolean = false;
 
 procedure DInputProcessor.doMouseRelease(const Event: TInputPressRelease);
 var
@@ -279,17 +279,17 @@ begin
   begin
     FingerIndex := GetFingerIndex(Event);
     i := 0;
-    Found := False;
+    Found := false;
     repeat
       if TouchArray[i].FingerIndex = FingerIndex then
-        Found := True
+        Found := true
       else
-        Inc(i);
+        inc(i);
     until (i > TouchArray.Count - 1) or Found;
 
     //stop dragging
     if i = 0 then
-      DragMouseLook := False;
+      DragMouseLook := false;
 
     Log(LogMouseInfo, CurrentRoutine, 'Caught mouse release finger=' +
       IntToStr(FingerIndex) + ' n=' + IntToStr(i));
@@ -329,14 +329,14 @@ var
   InterfaceCaughtEvent: boolean;
   i: integer;
 begin
-  InterfaceCaughtEvent := False;
+  InterfaceCaughtEvent := false;
 
   FingerIndex := GetFingerIndex(Event);
   NewEventTouch := DTouch.Create(Event.Position, FingerIndex);
 
   //catch the element which has been pressed
   tmpLink := GUI.IfMouseOver(Round(Event.Position[0]),
-    Round(Event.Position[1]), True, True);
+    Round(Event.Position[1]), true, true);
   if (tmpLink is DSingleInterfaceElement) then
   begin
     NewEventTouch.ClickElement := DSingleInterfaceElement(tmpLink);
@@ -344,7 +344,7 @@ begin
     begin
       NewEventTouch.ClickElement.OnMousePress(
         tmpLink, Round(Event.Position[0]), Round(Event.Position[1]));
-      InterfaceCaughtEvent := True;
+      InterfaceCaughtEvent := true;
     end;
     if NewEventTouch.ClickElement.CanDrag then
       NewEventTouch.ClickElement.StartDrag(Round(Event.Position[0]), Round(Event.Position[1]));
@@ -359,7 +359,7 @@ begin
     else
     //start dragging mouse look
     if i = 0 then
-      DragMouseLook := True;
+      DragMouseLook := true;
   end;
 
   GUI.UpdateCursor(Event.Position[0], Event.Position[1], TouchArray.Count > 0);
@@ -377,11 +377,11 @@ begin
     if not TVector2.PerfectlyEquals(Event.Position, GUICenter) then
     begin
       //Player.InputMouse(Event.Position - GUICenter);
-      Result := False;
+      Result := false;
       Window.MousePosition := GUICenter; //=CenterMouseCursor inlined
     end
     else
-      Result := True; {prevent onMotion call-back}
+      Result := true; {prevent onMotion call-back}
 
   end
   else
@@ -391,7 +391,7 @@ begin
     {however, it's a good idea to catch DragMouseLook not to go outside window
      - scroll it like Blender does}
     //Player.InputMouse(Event.OldPosition - Event.Position);
-    Result := False;
+    Result := false;
   end;
 end;
 
@@ -409,7 +409,7 @@ var
   i: integer;
 begin
   {check for drag-n-drops}
-  Result := False;
+  Result := false;
 
   if TouchArray.Count > 0 then
   begin
@@ -423,11 +423,11 @@ begin
         begin
           TouchArray[i].ClickElement.Drag(Round(Event.Position[0]),
             Round(Event.Position[1]));
-          Result := True;
+          Result := true;
         end;
         Break;
       end;
-      Inc(i);
+      inc(i);
     until (i >= TouchArray.Count);
   end;
 end;

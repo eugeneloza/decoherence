@@ -280,8 +280,8 @@ end;
 constructor DSingleInterfaceElement.Create;
 begin
   inherited Create;
-  isMouseOver := False;
-  CanMouseOver := False;
+  isMouseOver := false;
+  CanMouseOver := false;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -319,9 +319,9 @@ begin
   if (xx >= Next.x) and (xx <= Next.x2) and
     (yy >= Next.y) and (yy <= Next.y2) and
     (Next.a > CutTransparency) then
-    Result := True
+    Result := true
   else
-    Result := False;
+    Result := false;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -334,14 +334,14 @@ begin
   begin
     if RaiseEvents then
     begin
-      if isMouseOver = False then
+      if isMouseOver = false then
       begin
         if Assigned(onMouseEnter) then
           onMouseEnter(Self, xx, yy);
-        isMouseOver := True;
+        isMouseOver := true;
       end;
       if Assigned(onMouseOver) then
-        onMouseOver(self, xx, yy);
+        onMouseOver(Self, xx, yy);
     end;
     if CanMouseOver then  //todo
       Result := Self;
@@ -352,7 +352,7 @@ begin
     begin
       if Assigned(onMouseLeave) then
         onMouseLeave(Self, xx, yy);
-      isMouseOver := False;
+      isMouseOver := false;
     end;
   end;
 end;
@@ -382,7 +382,7 @@ end;
 constructor DInterfaceElement.Create;
 begin
   inherited Create;
-  Children := DInterfaceElementsList.Create(True);
+  Children := DInterfaceElementsList.Create(true);
 end;
 
 {----------------------------------------------------------------------------}
@@ -410,7 +410,7 @@ begin
       c.Free;
     end
     else
-      Inc(i);
+      inc(i);
   until i = Children.Count;
 end;
 
@@ -475,12 +475,12 @@ var
   tmp: DAbstractElement;
 begin
   // maybe rewrite it using isMouseOver - the idea is still a little different
-  tmp := Self.ifMouseOver(xx, yy, False, False);
+  tmp := Self.ifMouseOver(xx, yy, false, false);
   if (tmp <> nil) and (tmp is DSingleInterfaceElement) and
     (DSingleInterfaceElement(tmp).CanMouseOver) then
-    isMouseOverTree := True
+    isMouseOverTree := true
   else
-    isMouseOverTree := False;
+    isMouseOverTree := false;
 
   Result := isMouseOverTree;
 end;
