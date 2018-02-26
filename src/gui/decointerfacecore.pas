@@ -55,26 +55,33 @@ type
     AnimationDuration: DTime;
     AnimationCurve: TAnimationCurve;
     AnimationSuicide: boolean;
+    { Updates/caches Current container }
     procedure GetAnimationState; TryInline
-    { Animate this element to Next state }
   strict protected
-    { Location and size of this element / not sure about visibility level }
-    Last, Next, Current: DInterfaceContainer;
+    { Container of this inhterface element determined based on
+      Last and Next state of the animation}
+    Current: DInterfaceContainer;
+    { Last and Next state of the container during the animation
+      in case the animation is over, Next container is used }
+    Last, Next: DInterfaceContainer;
+    { Init the animation of this element }
     procedure AnimateTo(const Animate: TAnimationStyle;
       const Duration: DFloat = DefaultAnimationDuration);
     { Stops any animation, and sets Last = Next }
     procedure ResetAnimation;
   strict protected
+    { Enables suicide of this element in case it has vanished }
     KillMePlease: Boolean;
-    { updates the data of the class with current external data,
-      here it just gets the current animation state }
+    { updates the class each frame,
+      (e.g. gets the current animation state) }
     procedure Update; virtual;
   public
     { Draw the element / as abstract as it might be :) }
     procedure Draw; virtual; abstract;
     { Set tint of the element }
     procedure SetTint; virtual; abstract;
-
+    { Initialize this element with specific coordinates/size/alpha
+      optionally animation may be specified }
     procedure SetSize(const ax, ay, aw, ah: integer; const aAlpha: DFloat = 1.0; const Animate: TAnimationStyle = asDefault);
   public
     constructor Create; virtual; //override;
