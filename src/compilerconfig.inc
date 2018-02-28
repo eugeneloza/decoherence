@@ -22,11 +22,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 
 {====================== LANGUAGE-SPECIFIC DIRECTIVES =========================}
 
+{$SMARTLINK ON} // Enable smart-linking
+
 {$MODE objfpc}
 {$H+} // AnsiStrings
 {$J-} // non-writeable constants
 {$COPERATORS ON} // allow += style operators, I like them
-{$GOTO OFF} // disallow goto and label
+{$GOTO OFF} // Disallow goto and label
 
 { Write heap trace to file or to log? }
 //{$DEFINE HEAP_FILE}
