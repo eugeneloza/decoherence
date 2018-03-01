@@ -37,7 +37,8 @@ uses
   DecoTime, DecoWindow;
 
 {$PUSH}{$WARN 5024 off : Parameter "$1" not used}
-{ not sure if it should be placed here? }
+{ not sure if it should be placed here?
+  see https://github.com/eugeneloza/decoherence/issues/397 }
 procedure doBeforeRender(Container: TUIContainer);
 begin
   doTime;

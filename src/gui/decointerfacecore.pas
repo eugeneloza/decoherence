@@ -418,7 +418,7 @@ begin
     end
     else
       inc(i);
-  until i = Children.Count;
+  until i >= Children.Count;
 end;
 
 {----------------------------------------------------------------------------}
@@ -428,7 +428,7 @@ var
   i: integer;
 begin
   //inherited SetTint; <---------- parent is abstract
-  for i := 0 to Children.Count - 1 do
+  for i := 0 to Pred(Children.Count) do
     Children[i].SetTint;
 end;
 
@@ -463,7 +463,7 @@ begin
   //if rsult<>nil ... *or drag-n-drop should get the lowest child?
 
   // recoursively scan all children
-  for i := 0 to Children.Count - 1 do
+  for i := 0 to Pred(Children.Count) do
   begin
     tmpLink := Children[i].ifMouseOver(xx, yy, RaiseEvents, AllTree);
     if tmpLink <> nil then

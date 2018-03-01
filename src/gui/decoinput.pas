@@ -285,7 +285,7 @@ begin
         Found := true
       else
         inc(i);
-    until (i > TouchArray.Count - 1) or Found;
+    until (i >= TouchArray.Count) or Found;
 
     //stop dragging
     if i = 0 then
