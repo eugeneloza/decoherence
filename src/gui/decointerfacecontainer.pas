@@ -60,8 +60,7 @@ type
 {............................................................................}
 implementation
 uses
-  DecoGUIScale,
-  DecoLog;
+  DecoGUIScale;
 
 procedure DInterfaceContainer.AssignTo(const aDest: DInterfaceContainer); TryInline
 begin

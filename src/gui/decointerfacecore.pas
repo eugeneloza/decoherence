@@ -149,7 +149,7 @@ type
     procedure SetTint; override;
     procedure Draw; override;
     { Assign given element as a child }
-    procedure Grab(const Child: DSingleInterfaceElement);
+    procedure Grab(const aChild: DSingleInterfaceElement);
 
     (* Mouse routines *)
   public
@@ -169,7 +169,7 @@ type
 implementation
 uses
   SysUtils,
-  DecoGUIScale, DecoLog;
+  DecoLog;
 
 {============================================================================}
 {======================== D ABSTRACT ELEMENT ================================}
@@ -333,6 +333,8 @@ end;
 
 {-----------------------------------------------------------------------------}
 
+{$PUSH}
+{$WARN 5024 off} //AllTree is not used and it's ok. It's used in DInterfaceElement later
 function DSingleInterfaceElement.ifMouseOver(const xx, yy: integer;
   const RaiseEvents: boolean; const AllTree: boolean): DAbstractElement;
 begin
@@ -363,6 +365,7 @@ begin
     end;
   end;
 end;
+{$POP}
 
 {-----------------------------------------------------------------------------}
 
@@ -379,6 +382,7 @@ procedure DSingleInterfaceElement.Drag(const xx, yy: integer);
 begin
   Next.x := DragX + xx;
   Next.y := DragY + yy;
+  //this is ugly!
   ResetAnimation;
 end;
 
@@ -446,9 +450,9 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DInterfaceElement.Grab(const Child: DSingleInterfaceElement);
+procedure DInterfaceElement.Grab(const aChild: DSingleInterfaceElement);
 begin
-  Children.Add(Child);
+  Children.Add(aChild);
 end;
 
 {----------------------------------------------------------------------------}
