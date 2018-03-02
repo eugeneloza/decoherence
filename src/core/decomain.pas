@@ -23,7 +23,11 @@ unit DecoMain;
 interface
 
 uses
+  {<temporary included for debugging>}
+  DecoInterfaceImages,
+  {</temporary>}
   CastleWindow, DecoGlobal;
+
 
 { Assign Window.OnBeforeRender event }
 procedure InitManagement;

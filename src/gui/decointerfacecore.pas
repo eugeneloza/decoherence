@@ -334,7 +334,7 @@ end;
 {-----------------------------------------------------------------------------}
 
 {$PUSH}
-{$WARN 5024 off} //AllTree is not used and it's ok. It's used in DInterfaceElement later
+{$WARN 5024 off} //AllTree is not used here and it's ok. It's used in DInterfaceElement later
 function DSingleInterfaceElement.ifMouseOver(const xx, yy: integer;
   const RaiseEvents: boolean; const AllTree: boolean): DAbstractElement;
 begin
