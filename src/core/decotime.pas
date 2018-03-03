@@ -55,6 +55,8 @@ var
   DecoNowLocal: DTime;
   DeltaTLocal: DTime;
 
+  FrameStart: DThreadedTime;
+
   SoftPause: DFloat = 0.0;
   SoftPauseCoefficient: DFloat = 1.0;
   LocalTimeFlowSpeed: DFloat = 1.0;
@@ -125,6 +127,8 @@ begin
     DeltaTLocal := 0;
   end;
   LastGlobalTime := DecoNow;
+
+  FrameStart := ForceGetNowThread;
 end;
 
 {----------------------------------------------------------------------------}
@@ -264,6 +268,7 @@ begin
   ThreadedTimer.Priority := tpLower;
   ThreadedTimer.FreeOnTerminate := false;
   ForceGetNowThread;
+  FrameStart := -1;
 
   {$IFDEF Windows}
   //initialize the timer in Windows and determine TimerFrequency

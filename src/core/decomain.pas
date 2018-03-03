@@ -41,11 +41,14 @@ uses
   DecoTime, DecoWindow;
 
 {$PUSH}{$WARN 5024 off : Parameter "$1" not used}
-{ not sure if it should be placed here?
-  see https://github.com/eugeneloza/decoherence/issues/397 }
-procedure doBeforeRender(Container: TUIContainer);
+procedure doUpdate(Container: TUIContainer);
 begin
-  doTime;
+  {if (FrameStart < 0) then
+    doTime; // this is the first initialization of time
+    FrameStart += SecondEquivalent; //first frame is fine to wait a mintue for management
+  }
+  {if (GetNowThread - FrameStart < Goal_FPS_time) then...}
+  //DecoNow := GetNowThread;
   //World.Manage;
   //Actors.Manage;
   //Music.Manage;
@@ -54,6 +57,7 @@ end;
 
 procedure doRender(Container: TUIContainer);
 begin
+  doTime; //will init FrameStart = ForceThreadedTime
   GUI.Draw;
 end;
 {$POP}
@@ -62,7 +66,7 @@ end;
 
 procedure InitManagement;
 begin
-  Window.OnBeforeRender := @doBeforeRender;
+  Window.OnUpdate := @doUpdate;
   Window.OnRender := @doRender;
 end;
 
