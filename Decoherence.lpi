@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
   <ProjectOptions>
-    <Version Value="10"/>
+    <Version Value="11"/>
     <General>
       <Flags>
         <MainUnitHasUsesSectionForAllUnits Value="False"/>
@@ -103,9 +103,10 @@
       <Version Value="2"/>
     </PublishOptions>
     <RunParams>
-      <local>
-        <FormatVersion Value="1"/>
-      </local>
+      <FormatVersion Value="2"/>
+      <Modes Count="1">
+        <Mode0 Name="default"/>
+      </Modes>
     </RunParams>
     <RequiredPackages Count="2">
       <Item1>
@@ -115,7 +116,7 @@
         <PackageName Value="castle_base"/>
       </Item2>
     </RequiredPackages>
-    <Units Count="23">
+    <Units Count="24">
       <Unit0>
         <Filename Value="Decoherence.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -225,6 +226,11 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="DecoInterfaceContainer"/>
       </Unit22>
+      <Unit23>
+        <Filename Value="src/gui/decointerfaceimages.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoInterfaceImages"/>
+      </Unit23>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
