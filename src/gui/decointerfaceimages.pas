@@ -25,7 +25,7 @@ interface
 
 uses
   CastleGLImages, CastleImages, CastleVectors,
-  DecoInterfaceCore,
+  DecoInterfaceCore, DecoImages,
   DecoGlobal, DecoTime;
 
 const
@@ -35,11 +35,54 @@ const
 type
   { General routines shared by images, frames and labels }
   DAbstractImage = class abstract(DSingleInterfaceElement)
-
+  strict protected
+    { GL Image displayed by this interface element, may be animated }
+    Image: DImage;
+  public
+    procedure Draw; override;
+    procedure SetTint; override;
+  public
+    destructor Destroy; override;
   end;
 
 {............................................................................}
 implementation
+uses
+  SysUtils;
+
+{============================================================================}
+{========================== D ABSTRACT IMAGE ================================}
+{============================================================================}
+
+destructor DAbstractImage.Destroy;
+begin
+  FreeAndNil(Image);
+  inherited Destroy;
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DAbstractImage.SetTint;
+begin
+  //inherited SetTint; <---------- parent is abstract
+  if Image <> nil then begin
+    Update;
+    Image.Color := GUITint;
+  end;
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DAbstractImage.Draw;
+begin
+  //inherited SetTint; <---------- parent is abstract
+  if Image <> nil then
+    Image.Draw(Current.x, Current.y, Current.w, Current.h);
+end;
+
+{============================================================================}
+{=========================== D SIMPLE IMAGE =================================}
+{============================================================================}
 
 end.
 
