@@ -34,8 +34,11 @@ type
     FImage: TGLImage;
     procedure SetColor(const aColor: TCastleColor);
   public
+    { Cached values of width/height }
     Width, Height: integer;
+    { Assign tint color of this image }
     property Color: TCastleColor write SetColor;
+    { Wrappers for Drawing TGLImage }
     procedure Draw(const X, Y: Single); TryInline
     procedure Draw(const X, Y, DrawWidth, DrawHeight: Single); TryInline
   public

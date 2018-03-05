@@ -35,12 +35,15 @@ const
 type
   { General routines shared by images, frames and labels }
   DAbstractImage = class abstract(DSingleInterfaceElement)
+  strict private
+    function GetWidth: integer;
+    function GetHeight: integer;
   strict protected
     { GL Image displayed by this interface element, may be animated }
     Image: DImage;
   public
-    //property RealWidth: integer read GetWidth;
-    //property RealHeight: integer read GetHeight;
+    property RealWidth: integer read GetWidth;
+    property RealHeight: integer read GetHeight;
     procedure Draw; override;
     procedure SetTint; override;
   public
@@ -92,6 +95,23 @@ begin
   //inherited Draw; <---------- parent is abstract
   if Image <> nil then
     Image.Draw(Current.x, Current.y, Current.w, Current.h);
+end;
+
+{-----------------------------------------------------------------------------}
+
+function DAbstractImage.GetWidth: integer;
+begin
+  if Image <> nil then
+    Result := Image.Width
+  else
+    Result := -1;
+end;
+function DAbstractImage.GetHeight: integer;
+begin
+  if Image <> nil then
+    Result := Image.Height
+  else
+    Result := -1;
 end;
 
 {============================================================================}
