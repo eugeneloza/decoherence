@@ -30,6 +30,7 @@ const
 
   { interface info and errors }
   LogInterfaceError = true;
+  LogImageScaleError = true;
   LogLanguageError = true;
 
   { input }

@@ -39,16 +39,30 @@ type
     { GL Image displayed by this interface element, may be animated }
     Image: DImage;
   public
+    //property RealWidth: integer read GetWidth;
+    //property RealHeight: integer read GetHeight;
     procedure Draw; override;
     procedure SetTint; override;
   public
     destructor Destroy; override;
   end;
 
+type
+  { Most basic image type, capable of loading and scaling }
+  DSimpleImage = class(DAbstractImage)
+  public
+    { Load the image and scale it to given aWidth and aHeight if non-zero
+      Doesn't claim ownership of the image! }
+    procedure Load(const aImage: TEncodedImage; const aWidth: integer = 0;
+      const aHeight: integer = 0; const KeepProportions: boolean = false);
+  end;
+
+
 {............................................................................}
 implementation
 uses
-  SysUtils;
+  SysUtils,
+  DecoLog;
 
 {============================================================================}
 {========================== D ABSTRACT IMAGE ================================}
@@ -75,7 +89,7 @@ end;
 
 procedure DAbstractImage.Draw;
 begin
-  //inherited SetTint; <---------- parent is abstract
+  //inherited Draw; <---------- parent is abstract
   if Image <> nil then
     Image.Draw(Current.x, Current.y, Current.w, Current.h);
 end;
@@ -83,6 +97,46 @@ end;
 {============================================================================}
 {=========================== D SIMPLE IMAGE =================================}
 {============================================================================}
+
+procedure DSimpleImage.Load(const aImage: TEncodedImage; const aWidth: integer = 0;
+  const aHeight: integer = 0; const KeepProportions: boolean = false);
+var
+  ScaledImage: TCastleImage;
+  ScaledWidth, ScaledHeight: integer;
+begin
+  if (aImage = nil) or (aImage.IsEmpty) then
+  begin
+    Log(LogImageScaleError, CurrentRoutine, 'ERROR: No image to load.');
+    Exit;
+  end;
+
+  FreeAndNil(Image);
+  if aWidth = 0 then
+    Image := DImage.Create(aImage, true, false)
+  else
+  begin
+    if not (aImage is TCastleImage) then
+    begin
+      Log(LogImageScaleError, CurrentRoutine, 'ERROR: Cannot Scale image ' + aImage.ClassName);
+      Exit;
+    end;
+
+    ScaledWidth := aWidth;
+    ScaledHeight := aHeight;
+    if KeepProportions then
+    begin
+      if aHeight / aWidth > aImage.Height / aImage.Width then
+        ScaledHeight := Round(aHeight * aImage.Height / aImage.Width)
+      else
+        ScaledWidth := Round(aWidth * aImage.Width / aImage.Height);
+    end;
+    ScaledImage := aImage.CreateCopy as TCastleImage;
+    ScaledImage.Resize(ScaledWidth, ScaledHeight, InterfaceScalingMethod);
+
+    Image := DImage.Create(ScaledImage, true, true); //now Image owns the content because it's a copy
+    //ScaledImage := nil; //redundant
+  end;
+end;
 
 end.
 
