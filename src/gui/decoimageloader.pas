@@ -28,13 +28,24 @@ uses
   DecoImages,
   DecoGlobal;
 
+{ Loads a TCastleImage and scales into DImage
+  the resulting DImage is freed automatically as the game ends }
+function LoadDecoImage(const aImage: TEncodedImage; const aWidth: integer = 0;
+  const aHeight: integer = 0; const KeepProportions: boolean = false): DImage;
+{ Loads a DImage from an URL
+  the resulting DImage is freed automatically as the game ends }
+function LoadDecoImage(const FileURL: string; const aWidth: integer = 0;
+  const aHeight: integer = 0; const KeepProportions: boolean = false): DImage;
+{ A wrapper for TCastleImage loading
+  automatically frees the image as the game ends}
+function LoadCastleImage(const FileURL: string): TCastleImage;
 {............................................................................}
 implementation
 
 uses
-  //DecoThrash,
+  CastleFilesUtils,
+  DecoTrash,
   DecoLog;
-
 
 function LoadDecoImage(const aImage: TEncodedImage; const aWidth: integer = 0;
   const aHeight: integer = 0; const KeepProportions: boolean = false): DImage;
@@ -48,8 +59,7 @@ begin
     Exit;
   end;
 
-  //FreeAndNil(Image);
-  if aWidth = 0 then
+  if (aWidth <= 0) or (aHeight <= 0) then
     Result := DImage.Create(aImage, true, false) // no ownership
   else
   begin
@@ -72,8 +82,24 @@ begin
     ScaledImage.Resize(ScaledWidth, ScaledHeight, InterfaceScalingMethod);
 
     Result := DImage.Create(ScaledImage, true, true); //now Image owns the content because it's a copy
-    //ScaledImage := nil; //redundant
   end;
+  AutoFree.Add(Result);
+end;
+
+{-----------------------------------------------------------------------------}
+
+function LoadDecoImage(const FileURL: string; const aWidth: integer = 0;
+  const aHeight: integer = 0; const KeepProportions: boolean = false): DImage;
+begin
+  LoadDecoImage(LoadCastleImage(FileURL), aWidth, aHeight, KeepProportions);
+end;
+
+{-----------------------------------------------------------------------------}
+
+function LoadCastleImage(const FileURL: string): TCastleImage;
+begin
+  Result := LoadImage(ApplicationData(FileUrl));
+  AutoFree.Add(Result);
 end;
 
 end.
