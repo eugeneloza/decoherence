@@ -83,7 +83,7 @@ procedure DCursor.HideOSCursor;
 begin
   Window.SceneManager.Camera.Cursor := mcForceNone;
   Window.SceneManager.Camera.ExclusiveEvents := false;
-  //InitInput will take care of providing cursor coordinates initialization
+  //InitInput will take care of providing cursor coordinates initialization to window center
 end;
 
 {-----------------------------------------------------------------------------}

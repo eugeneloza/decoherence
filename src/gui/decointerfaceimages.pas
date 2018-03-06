@@ -41,6 +41,8 @@ type
   strict protected
     { GL Image displayed by this interface element, may be animated }
     Image: DImage;
+    { Is this image "owned" by parent? False for interface images
+      and true for Labels (generated temporary images) }
     OwnsImage: boolean;
   public
     property RealWidth: integer read GetWidth;
@@ -67,8 +69,7 @@ type
 {............................................................................}
 implementation
 uses
-  SysUtils,
-  DecoLog;
+  SysUtils;
 
 {============================================================================}
 {========================== D ABSTRACT IMAGE ================================}
@@ -129,9 +130,6 @@ begin
 end;
 
 {-----------------------------------------------------------------------------}
-
-{
-}
 
 procedure DSimpleImage.Load(const aImage: DImage);
 begin
