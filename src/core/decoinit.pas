@@ -36,7 +36,7 @@ uses
   DecoLoadEmbedded,
   DecoTranslation,
   DecoInput, DecoPlayer, DecoGUI,
-  DecoImageLoader,
+  DecoTrash,
   DecoMain,
   DecoTime, DecoLog, DecoWindow, DecoGlobal;
 
@@ -71,6 +71,7 @@ begin
     unless you know what you are doing
     as some units require others being already initialized }
   Log(LogInit, CurrentRoutine, 'Init sequence started.');
+  InitTrash;
   InitTime;
   InitGUI;
   InitPlayer;
@@ -112,6 +113,7 @@ begin
   FreePlayer;
   FreeGUI;
   FreeTime;
+  FreeTrash;
   Log(LogInit, CurrentRoutine, 'Finished.');
   FreeLog;
 end;

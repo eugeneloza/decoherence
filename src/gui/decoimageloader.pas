@@ -15,8 +15,7 @@
 
 {---------------------------------------------------------------------------}
 
-(* A stuipd wrapper for CastleGlImages with hope to provide for
-   equal API for both animated and non-animated GL images *)
+(* Loading of TCastleImage -> DImage, scaling, ownership and thrash *)
 
 unit DecoImageLoader;
 
@@ -75,18 +74,6 @@ begin
     Result := DImage.Create(ScaledImage, true, true); //now Image owns the content because it's a copy
     //ScaledImage := nil; //redundant
   end;
-end;
-
-{............................................................................}
-
-procedure InitImageLoader;
-begin
-
-end;
-
-procedure FreeImageLoader;
-begin
-
 end;
 
 end.
