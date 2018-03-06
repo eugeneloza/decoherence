@@ -91,14 +91,14 @@ end;
 function LoadDecoImage(const FileURL: string; const aWidth: integer = 0;
   const aHeight: integer = 0; const KeepProportions: boolean = false): DImage;
 begin
-  LoadDecoImage(LoadCastleImage(FileURL), aWidth, aHeight, KeepProportions);
+  Result := LoadDecoImage(LoadCastleImage(FileURL), aWidth, aHeight, KeepProportions);
 end;
 
 {-----------------------------------------------------------------------------}
 
 function LoadCastleImage(const FileURL: string): TCastleImage;
 begin
-  Result := LoadImage(ApplicationData(FileUrl));
+  Result := LoadImage(ApplicationData(FileURL));
   AutoFree.Add(Result);
 end;
 
