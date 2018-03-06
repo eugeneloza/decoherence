@@ -41,6 +41,7 @@ type
   strict protected
     { GL Image displayed by this interface element, may be animated }
     Image: DImage;
+    OwnsImage: boolean;
   public
     property RealWidth: integer read GetWidth;
     property RealHeight: integer read GetHeight;
@@ -51,13 +52,15 @@ type
   end;
 
 type
-  { Most basic image type, capable of loading and scaling }
+  { Most basic image type, capable of loading and scaling
+    Warning: for this image type "image" is only a reference
+    and must not be freed (specified by OwnsImage = false) }
   DSimpleImage = class(DAbstractImage)
   public
-    { Load the image and scale it to given aWidth and aHeight if non-zero
-      Doesn't claim ownership of the image! }
-    procedure Load(const aImage: TEncodedImage; const aWidth: integer = 0;
-      const aHeight: integer = 0; const KeepProportions: boolean = false);
+    { Load the image. Doesn't claim ownership of the image! }
+    procedure Load(const aImage: DImage);
+  public
+    constructor Create; override;
   end;
 
 
@@ -73,7 +76,8 @@ uses
 
 destructor DAbstractImage.Destroy;
 begin
-  FreeAndNil(Image);
+  if OwnsImage then
+    FreeAndNil(Image);
   inherited Destroy;
 end;
 
@@ -118,7 +122,15 @@ end;
 {=========================== D SIMPLE IMAGE =================================}
 {============================================================================}
 
-procedure DSimpleImage.Load(const aImage: TEncodedImage; const aWidth: integer = 0;
+constructor DSimpleImage.Create;
+begin
+  inherited Create;
+  OwnsImage := false;
+end;
+
+{-----------------------------------------------------------------------------}
+
+{procedure DSimpleImage.Load(const aImage: TEncodedImage; const aWidth: integer = 0;
   const aHeight: integer = 0; const KeepProportions: boolean = false);
 var
   ScaledImage: TCastleImage;
@@ -132,7 +144,7 @@ begin
 
   FreeAndNil(Image);
   if aWidth = 0 then
-    Image := DImage.Create(aImage, true, false)
+    Image := DImage.Create(aImage, true, false) // no ownership
   else
   begin
     if not (aImage is TCastleImage) then
@@ -156,6 +168,12 @@ begin
     Image := DImage.Create(ScaledImage, true, true); //now Image owns the content because it's a copy
     //ScaledImage := nil; //redundant
   end;
+end;
+}
+
+procedure DSimpleImage.Load(const aImage: DImage);
+begin
+  Image := aImage;
 end;
 
 end.
