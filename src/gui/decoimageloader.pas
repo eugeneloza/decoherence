@@ -43,7 +43,6 @@ function LoadCastleImage(const FileURL: string): TCastleImage;
 implementation
 
 uses
-  CastleFilesUtils,
   DecoTrash,
   DecoLog;
 
@@ -98,7 +97,7 @@ end;
 
 function LoadCastleImage(const FileURL: string): TCastleImage;
 begin
-  Result := LoadImage(ApplicationData(FileURL));
+  Result := LoadImage(GameFolder(FileURL));
   AutoFree.Add(Result);
 end;
 

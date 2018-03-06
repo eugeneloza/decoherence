@@ -73,8 +73,13 @@ function GetRandomSeed: LongWord;
 procedure InitGlobal;
 { Free global elements, such as Random }
 procedure FreeGlobal;
+{ Wrapper for CastleFilesUtils.ApplicationData
+  to be able to switch between Game and Architect folder }
+function GameFolder(const FileURL: string): string;
 {............................................................................}
 implementation
+uses
+  CastleFilesUtils;
 
 function GetRandomSeed: LongWord;
 {$IFDEF USE_DEV_URANDOM}
@@ -99,6 +104,13 @@ begin
   GetRandomSeed := 0;
 end;
 {$ENDIF}
+
+{-----------------------------------------------------------------------------}
+
+function GameFolder(const FileURL: string): string;
+begin
+  Result := ApplicationData(FileURL);
+end;
 
 {.............................................................................}
 procedure InitGlobal;
