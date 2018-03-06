@@ -25,7 +25,12 @@ unit DecoGlobal;
 interface
 
 uses
-  CastleRandom, CastleColors;
+  CastleRandom, CastleColors, CastleImages;
+
+const
+  { To quickly change Scaling Method. Maybe will be a variable some day to support older PCs. }
+  InterfaceScalingMethod: TResizeInterpolation = riBilinear;
+
 
 type
   { At this moment it's just a copy of TOjbect, might change in future,

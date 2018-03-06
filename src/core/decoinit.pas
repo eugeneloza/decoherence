@@ -36,6 +36,7 @@ uses
   DecoLoadEmbedded,
   DecoTranslation,
   DecoInput, DecoPlayer, DecoGUI,
+  DecoImageLoader,
   DecoMain,
   DecoTime, DecoLog, DecoWindow, DecoGlobal;
 

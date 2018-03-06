@@ -130,45 +130,7 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-{procedure DSimpleImage.Load(const aImage: TEncodedImage; const aWidth: integer = 0;
-  const aHeight: integer = 0; const KeepProportions: boolean = false);
-var
-  ScaledImage: TCastleImage;
-  ScaledWidth, ScaledHeight: integer;
-begin
-  if (aImage = nil) or (aImage.IsEmpty) then
-  begin
-    Log(LogImageScaleError, CurrentRoutine, 'ERROR: No image to load.');
-    Exit;
-  end;
-
-  FreeAndNil(Image);
-  if aWidth = 0 then
-    Image := DImage.Create(aImage, true, false) // no ownership
-  else
-  begin
-    if not (aImage is TCastleImage) then
-    begin
-      Log(LogImageScaleError, CurrentRoutine, 'ERROR: Cannot Scale image ' + aImage.ClassName);
-      Exit;
-    end;
-
-    ScaledWidth := aWidth;
-    ScaledHeight := aHeight;
-    if KeepProportions then
-    begin
-      if aHeight / aWidth > aImage.Height / aImage.Width then
-        ScaledHeight := Round(aHeight * aImage.Height / aImage.Width)
-      else
-        ScaledWidth := Round(aWidth * aImage.Width / aImage.Height);
-    end;
-    ScaledImage := aImage.CreateCopy as TCastleImage;
-    ScaledImage.Resize(ScaledWidth, ScaledHeight, InterfaceScalingMethod);
-
-    Image := DImage.Create(ScaledImage, true, true); //now Image owns the content because it's a copy
-    //ScaledImage := nil; //redundant
-  end;
-end;
+{
 }
 
 procedure DSimpleImage.Load(const aImage: DImage);
