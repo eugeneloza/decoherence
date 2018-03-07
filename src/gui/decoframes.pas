@@ -34,7 +34,7 @@ type
   DFrame = DSimpleImage;
 
 type
-  DRectagnoalFrame = class(DFrame)
+  DRectagonalFrame = class(DFrame)
   public
     procedure Draw; override;
   end;
