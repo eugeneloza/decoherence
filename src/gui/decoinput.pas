@@ -295,7 +295,8 @@ begin
       IntToStr(FingerIndex) + ' n=' + IntToStr(i));
     if Found then
     begin
-      if (DecoNow - TouchArray[i].TouchStart > InputOptions.LongTouch) then begin
+      if (DecoNow - TouchArray[i].TouchStart > InputOptions.LongTouch) then
+      begin
         Log(LogMouseInfo, CurrentRoutine, 'Long-touch caught!');
       end;
       if (TouchArray[i].ClickElement <> nil) then
