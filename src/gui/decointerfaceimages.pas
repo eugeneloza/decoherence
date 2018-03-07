@@ -24,13 +24,9 @@ unit DecoInterfaceImages;
 interface
 
 uses
-  CastleGLImages, CastleImages, CastleVectors,
+  CastleVectors,
   DecoInterfaceCore, DecoImages,
   DecoGlobal, DecoTime;
-
-const
-  { To quickly change Scaling Method. Maybe will be a variable some day to support older PCs. }
-  InterfaceScalingMethod: TResizeInterpolation = riBilinear;
 
 type
   { General routines shared by images, frames and labels }
@@ -54,7 +50,7 @@ type
   end;
 
 type
-  { Most basic image type, capable of loading and scaling
+  { Most basic image type, ready to display the provided image
     Warning: for this image type "image" is only a reference
     and must not be freed (specified by OwnsImage = false) }
   DSimpleImage = class(DAbstractImage)
@@ -69,7 +65,7 @@ type
 {............................................................................}
 implementation
 uses
-  SysUtils;
+  SysUtils, CastleGLImages;
 
 {============================================================================}
 {========================== D ABSTRACT IMAGE ================================}
@@ -87,10 +83,8 @@ end;
 procedure DAbstractImage.SetTint;
 begin
   //inherited SetTint; <---------- parent is abstract
-  if Image <> nil then begin
-    Update;
+  if Image <> nil then
     Image.Color := GUITint;
-  end;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -99,7 +93,10 @@ procedure DAbstractImage.Draw;
 begin
   //inherited Draw; <---------- parent is abstract
   if Image <> nil then
+  begin
+    Update;
     Image.Draw(Current.x, Current.y, Current.w, Current.h);
+  end;
 end;
 
 {-----------------------------------------------------------------------------}
