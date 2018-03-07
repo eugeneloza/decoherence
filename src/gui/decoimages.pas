@@ -41,6 +41,8 @@ type
     { Wrappers for Drawing TGLImage }
     procedure Draw(const X, Y: Single); TryInline
     procedure Draw(const X, Y, DrawWidth, DrawHeight: Single); TryInline
+    procedure Draw3x3(const X, Y, DrawWidth, DrawHeight: Single;
+      const CornerTop, CornerRight, CornerBottom, CornerLeft: Integer); TryInline
   public
     constructor Create(const AImage: TEncodedImage; const ASmoothScaling: boolean = true;
       const AOwnsImage: boolean = true);
@@ -69,6 +71,14 @@ end;
 procedure DImage.Draw(const X, Y, DrawWidth, DrawHeight: Single); TryInline
 begin
   FImage.Draw(X, Y, DrawWidth, DrawHeight);
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DImage.Draw3x3(const X, Y, DrawWidth, DrawHeight: Single;
+      const CornerTop, CornerRight, CornerBottom, CornerLeft: Integer); TryInline
+begin
+  FImage.Draw3x3(X, Y, DrawWidth, DrawHeight, CornerTop, CornerRight, CornerBottom, CornerLeft);
 end;
 
 {-----------------------------------------------------------------------------}
