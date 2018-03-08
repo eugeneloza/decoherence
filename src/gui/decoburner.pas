@@ -42,7 +42,8 @@ implementation
 {$IFDEF BurnerImage}
 uses
   SysUtils,
-  DecoImageLoader, DecoWindow, DecoLog;
+  DecoGUISCale,
+  DecoImageLoader, DecoLog;
 
 var
   BurnerImage: TCastleImage;  //todo: not freed automatically!!!!
@@ -66,7 +67,7 @@ procedure InitBurnerImage;
 begin
   Log(LogInit, CurrentRoutine, 'Loading burner...');
   BurnerImage := LoadCastleImage('GUI/Burner/burner_Pattern_203_CC0_by_Nobiax_diffuse.png');
-  BurnerImage.Resize(Window.Width, Window.Height, riBilinear);
+  BurnerImage.Resize(GUIWidth, GUIHeight, riBilinear);
 end;
 
 {$ENDIF}

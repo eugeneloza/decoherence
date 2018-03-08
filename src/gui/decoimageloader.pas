@@ -25,7 +25,7 @@ interface
 
 uses
   CastleImages,
-  DecoImages, DecoMouseCursor,
+  DecoImages,
   DecoGlobal;
 
 { Loads a TCastleImage and scales into DImage
@@ -36,17 +36,19 @@ function LoadDecoImage(const aImage: TEncodedImage; const aWidth: integer = 0;
   the resulting DImage is freed automatically as the game ends }
 function LoadDecoImage(const FileURL: string; const aWidth: integer = 0;
   const aHeight: integer = 0; const KeepProportions: boolean = false): DImage;
+{ Loads the image and scales it to full screen (GUI size) }
+function LoadFullScreenImage(const FileURL: string): DImage;
 { A wrapper for TCastleImage loading
   automatically frees the image as the game ends}
 function LoadCastleImage(const FileURL: string): TCastleImage;
-
+{ }
 function LoadCursorImage(const FileURL: string;
   const ShiftX, ShiftY: integer): DCursorImage;
 {............................................................................}
 implementation
 
 uses
-  DecoTrash,
+  DecoTrash, DecoGUIScale,
   DecoLog;
 
 function LoadDecoImage(const aImage: TEncodedImage; const aWidth: integer = 0;
@@ -94,6 +96,13 @@ function LoadDecoImage(const FileURL: string; const aWidth: integer = 0;
   const aHeight: integer = 0; const KeepProportions: boolean = false): DImage;
 begin
   Result := LoadDecoImage(LoadCastleImage(FileURL), aWidth, aHeight, KeepProportions);
+end;
+
+{-----------------------------------------------------------------------------}
+
+function LoadFullScreenImage(const FileURL: string): DImage;
+begin
+  Result := LoadDecoImage(LoadCastleImage(FileURL), GUIWidth, GUIHeight, false);
 end;
 
 {-----------------------------------------------------------------------------}
