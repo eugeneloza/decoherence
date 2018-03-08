@@ -83,6 +83,8 @@ type
     { Initialize this element with specific coordinates/size/alpha
       optionally animation may be specified }
     procedure SetSize(const ax, ay, aw, ah: integer; const aAlpha: DFloat = 1.0; const Animate: TAnimationStyle = asDefault);
+    { Scale this element to full screen (no animation) }
+    procedure FullScreen;
   public
     constructor Create; virtual; //override;
     destructor Destroy; override;
@@ -169,7 +171,7 @@ type
 implementation
 uses
   SysUtils,
-  DecoLog;
+  DecoGUIScale, DecoLog;
 
 {============================================================================}
 {======================== D ABSTRACT ELEMENT ================================}
@@ -279,6 +281,13 @@ begin
   AnimateTo(Animate);
 end;
 
+{-----------------------------------------------------------------------------}
+
+procedure DAbstractElement.FullScreen;
+begin
+  Next.SetIntSize(0, 0, GUIWidth, GUIHeight, 1);
+  ResetAnimation;
+end;
 
 {============================================================================}
 {===================== D SINGLE INTERFACE ELEMENT ===========================}
