@@ -65,6 +65,15 @@ type
     Corners: TVector4Integer;
   end;
 
+type
+  {}
+  DCursorImage = class(TObject)
+    Image: DImage;
+    { Coordinates shift of the cursor image vs cursor pointer position }
+    CursorShift: TVector2Integer;
+  end;
+
+
 {............................................................................}
 implementation
 

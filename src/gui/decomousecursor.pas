@@ -34,8 +34,7 @@ type TCursorType = (ctNone, ctDefault, ctMouseLook,
 type
   DCursor = class(TObject)
   private
-    CursorImg: array[TCursorType] of DImage;
-    CursorShift: array[TCursorType] of TVector2Integer;
+    CursorImg: array[TCursorType] of DCursorImage;
   public
     x, y: single;
     CurrentCursor: TCursorType;
@@ -49,23 +48,17 @@ type
 {............................................................................}
 implementation
 uses
-  SysUtils, CastleKeysMouse,
-  DecoImageLoader, DecoWindow;
+  SysUtils, CastleKeysMouse, DecoImageLoader,
+  DecoWindow;
 
 constructor DCursor.Create;
 begin
   //inherited Create; <--------- nothing to inherit
 
   {todo: remake it into something useful}
-  CursorImg[ctDefault] := LoadDecoImage('GUI/Cursors/cursor.png');
-  CursorShift[ctDefault].Data[0] := -1;
-  CursorShift[ctDefault].Data[1] := +1;
-  CursorImg[ctDefault_pressed] := LoadDecoImage('GUI/Cursors/cursor_pressed.png');
-  CursorShift[ctDefault_pressed].Data[0] := -1;
-  CursorShift[ctDefault_pressed].Data[1] := +1;
-  CursorImg[ctMouseLook] := LoadDecoImage('GUI/Cursors/mouselook.png');
-  CursorShift[ctMouseLook].Data[0] := -15;
-  CursorShift[ctMouseLook].Data[1] := +15;
+  CursorImg[ctDefault] := LoadCursorImage('GUI/Cursors/cursor.png', -1, +1);
+  CursorImg[ctDefault_pressed] := LoadCursorImage('GUI/Cursors/cursor_pressed.png', -1, +1);
+  CursorImg[ctMouseLook] := LoadCursorImage('GUI/Cursors/mouselook.png', -15, +15);
   CurrentCursor := ctDefault;
 end;
 
@@ -91,9 +84,9 @@ end;
 procedure DCursor.Draw;
 begin
   if not ScreenShotPending then //hide cursor for screenshots
-    if CurrentCursor <> ctNone then
-      CursorImg[CurrentCursor].Draw(x + CursorShift[CurrentCursor].Data[0],
-        y - CursorImg[CurrentCursor].Height + CursorShift[CurrentCursor].Data[1]);
+    if (CurrentCursor <> ctNone) and (CursorImg[CurrentCursor]<> Nil) then
+      CursorImg[CurrentCursor].Image.Draw(x + CursorImg[CurrentCursor].CursorShift.Data[0],
+        y - CursorImg[CurrentCursor].Image.Height + CursorImg[CurrentCursor].CursorShift.Data[1]);
 end;
 
 {-----------------------------------------------------------------------------}
@@ -104,7 +97,7 @@ var
 begin
   for c in TCursorType do
     if CursorImg[c] <> nil then
-      CursorImg[c].Color := GUITint;
+      CursorImg[c].Image.Color := GUITint;
 end;
 
 end.

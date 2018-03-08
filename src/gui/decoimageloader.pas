@@ -25,7 +25,7 @@ interface
 
 uses
   CastleImages,
-  DecoImages,
+  DecoImages, DecoMouseCursor,
   DecoGlobal;
 
 { Loads a TCastleImage and scales into DImage
@@ -39,6 +39,9 @@ function LoadDecoImage(const FileURL: string; const aWidth: integer = 0;
 { A wrapper for TCastleImage loading
   automatically frees the image as the game ends}
 function LoadCastleImage(const FileURL: string): TCastleImage;
+
+function LoadCursorImage(const FileURL: string;
+  const ShiftX, ShiftY: integer): DCursorImage;
 {............................................................................}
 implementation
 
@@ -98,6 +101,18 @@ end;
 function LoadCastleImage(const FileURL: string): TCastleImage;
 begin
   Result := LoadImage(GameFolder(FileURL));
+  AutoFree.Add(Result);
+end;
+
+{-----------------------------------------------------------------------------}
+
+function LoadCursorImage(const FileURL: string;
+  const ShiftX, ShiftY: integer): DCursorImage;
+begin
+  Result := DCursorImage.Create;
+  Result.Image := LoadDecoImage(FileURL);
+  Result.CursorShift.Data[0] := ShiftX;
+  Result.CursorShift.Data[1] := ShiftY;
   AutoFree.Add(Result);
 end;
 
