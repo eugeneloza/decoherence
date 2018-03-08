@@ -25,7 +25,7 @@ unit DecoImages;
 interface
 
 uses
-  CastleGLImages, CastleImages, CastleColors;
+  CastleGLImages, CastleImages, CastleColors, CastleVectors;
 
 type
   { Wrapper for TGLImage }
@@ -62,7 +62,7 @@ type
   {}
   DFrameImage = class(TCastleImage)
   public
-    cTop, cRight, cBottom, cLeft: integer
+    Corners: TVector4Integer;
   end;
 
 {............................................................................}

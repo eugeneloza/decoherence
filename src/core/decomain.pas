@@ -26,8 +26,6 @@ interface
 uses
   {<temporary included for debugging>}
   DecoInterfaceImages,
-  DecoFrames,
-  DecoBurner,
   {</temporary>}
   CastleWindow, DecoGlobal;
 

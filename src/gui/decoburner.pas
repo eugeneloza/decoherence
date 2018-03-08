@@ -69,7 +69,7 @@ begin
   BurnerImage.Resize(Window.Width, Window.Height, riBilinear);
 end;
 
-{ //not needed, will be auto freed
+{ //not needed, will be auto freed by DecoTrash
 procedure FreeBurnerImage;
 begin
   FreeAndNil(BurnerImage);

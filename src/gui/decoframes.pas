@@ -39,20 +39,61 @@ type
 type
   { Rectagonal frame is scaled 3x3 and accepts DFrameImage}
   DRectagonalFrame = class(DFrame)
+  private
+    FrameImage: DFrameImage;
+    InitPending: boolean;
+    procedure ResizeFrame;
   public
+    procedure Draw; override;
     procedure Load(const aImage: DFrameImage);
+  public
+    constructor Create; override;
   end;
 
 
 {............................................................................}
 implementation
 uses
-  CastleImages,
+  SysUtils,
+  CastleImages, CastleVectors, CastleRectangles,
   {$IFDEF BurnerImage}DecoBurner{$ENDIF};
+
+procedure DRectagonalFrame.ResizeFrame;
+var
+  TempImage: TCastleImage;
+begin
+  FreeAndNil(Image);
+  TempImage := TRGBAlphaImage.Create(Next.w, Next.h);
+  TempImage.Clear(Vector4(0,0,0,0));
+  TempImage.DrawFrom3x3( Rectangle(0, 0, Next.w, Next.h),
+    FrameImage, FrameImage.Corners, dmOverwrite, InterfaceScalingMethod);
+  {$IFDEF BurnerImage}Burn(TempImage, Next);{$ENDIF}
+  Image := DImage.Create(TempImage, true, true)
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DRectagonalFrame.Draw;
+begin
+  if InitPending then ResizeFrame;
+  inherited Draw;
+end;
+
+{-----------------------------------------------------------------------------}
 
 procedure DRectagonalFrame.Load(const aImage: DFrameImage);
 begin
+  FrameImage := aImage;
+  InitPending := true;
+end;
 
+{-----------------------------------------------------------------------------}
+
+constructor DRectagonalFrame.Create;
+begin
+  inherited Create;
+  InitPending := false;
+  OwnsImage := true;
 end;
 
 end.
