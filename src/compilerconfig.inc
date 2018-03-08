@@ -17,10 +17,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 
 (* Compiler directives/options to include in every unit *)
 
-//yes, I use this horrible stuff {hmm... why doesn't it work???}
-{$WARN 2005 off : Comment level $1 found}
+{====================== PASCAL-SPECIFIC DIRECTIVES =========================}
 
-{====================== LANGUAGE-SPECIFIC DIRECTIVES =========================}
+//yes, I use this horrible stuff
+{$WARN 2005 off : Comment level $1 found}
 
 {$SMARTLINK ON} // Enable smart-linking
 
@@ -63,4 +63,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 
 { Activate useful macros }
 {$INCLUDE macro.inc}
+
+{======================== GAME-SPECIFIC DIRECTIVES =========================}
+
+{$DEFINE BurnerImage}
 

@@ -46,6 +46,9 @@ type
 
 {............................................................................}
 implementation
+uses
+  CastleImages,
+  {$IFDEF BurnerImage}DecoBurner{$ENDIF};
 
 procedure DRectagonalFrame.Load(const aImage: DFrameImage);
 begin
