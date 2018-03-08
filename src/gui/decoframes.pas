@@ -26,31 +26,31 @@ unit DecoFrames;
 interface
 
 uses
+  DecoImages,
   DecoInterfaceImages,
   DecoGlobal;
 
 type
-  { Just an alias to be able to assign a DSimpleImage as a frame }
-  DFrame = DSimpleImage;
+  { Just an alias to be able to assign a DSimpleImage as a frame
+    However, in some time, we might want to add "burner" to
+    non-rectagonal frames. Thou I'm unsure if it worth the trouble. }
+  DFrame = DAbstractImage;
 
 type
+  { Rectagonal frame is scaled 3x3 and accepts DFrameImage}
   DRectagonalFrame = class(DFrame)
   public
     procedure Draw; override;
+    procedure Load(const aImage: DFrameImage);
   end;
 
 
 {............................................................................}
 implementation
 
-procedure DRectagonalFrame.Draw;
+procedure DRectagonalFrame.Load(const aImage: TCastleImage);
 begin
-  //inherited Draw; <------- this draw replaces parent method
-  if Image <> nil then
-  begin
-    Update;
-    Image.Draw(Current.x, Current.y, Current.w, Current.h);
-  end;
+
 end;
 
 end.

@@ -58,6 +58,13 @@ type
   DAnimatedImage = class(DImage)
   end;
 
+type
+  {}
+  DFrameImage = class(TCastleImage)
+  public
+    cTop, cRight, cBottom, cLeft: integer
+  end;
+
 {............................................................................}
 implementation
 
