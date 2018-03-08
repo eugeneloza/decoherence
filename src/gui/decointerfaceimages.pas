@@ -26,7 +26,7 @@ interface
 uses
   CastleVectors,
   DecoInterfaceCore, DecoImages,
-  DecoGlobal, DecoTime;
+  DecoGlobal;
 
 type
   { General routines shared by images, frames and labels }
@@ -60,7 +60,6 @@ type
   public
     constructor Create; override;
   end;
-
 
 {............................................................................}
 implementation
