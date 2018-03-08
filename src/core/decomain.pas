@@ -18,6 +18,7 @@
 (* Core file of the game. Processes Window events and initializes the game *)
 
 unit DecoMain;
+
 {$INCLUDE compilerconfig.inc}
 
 interface
@@ -26,6 +27,7 @@ uses
   {<temporary included for debugging>}
   DecoInterfaceImages,
   DecoFrames,
+  DecoBurner,
   {</temporary>}
   CastleWindow, DecoGlobal;
 
