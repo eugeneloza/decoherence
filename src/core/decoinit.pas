@@ -78,7 +78,9 @@ begin
   InitInput;
   InitGlobal;
   InitManagement;
+  {$IFDEF TextureProfiler}
   Log(LogInit, CurrentRoutine, TextureMemoryProfiler.Summary);
+  {$ENDIF}
   Log(LogInit, CurrentRoutine, 'Init sequence finished.');
 end;
 
@@ -90,7 +92,7 @@ begin
   InitLog;
   Log(LogInit, CurrentRoutine, 'Initializing Application and Window.');
   OnGetApplicationName := @GetApplicationName;
-  TextureMemoryProfiler.Enabled := true;
+  TextureMemoryProfiler.Enabled := {$IFDEF TextureProfiler}true{$ELSE}false{$ENDIF};
   InitTranslation;
   SetLoadingImage;
   InitWindow;
@@ -114,6 +116,9 @@ begin
   FreeGUI;
   FreeTime;
   FreeTrash;
+  {$IFDEF TextureProfiler}
+  Log(LogInit, CurrentRoutine, TextureMemoryProfiler.Summary);
+  {$ENDIF}
   Log(LogInit, CurrentRoutine, 'Finished.');
   FreeLog;
 end;
