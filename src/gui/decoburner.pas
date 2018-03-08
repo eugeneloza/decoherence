@@ -64,16 +64,10 @@ end;
 
 procedure InitBurnerImage;
 begin
-  Log(LogInit, CurrentRoutine, 'Loading burner');
-  BurnerImage := LoadCastleImage('GUI/burner/burner_Pattern_203_CC0_by_Nobiax_diffuse.png');
+  Log(LogInit, CurrentRoutine, 'Loading burner...');
+  BurnerImage := LoadCastleImage('GUI/Burner/burner_Pattern_203_CC0_by_Nobiax_diffuse.png');
   BurnerImage.Resize(Window.Width, Window.Height, riBilinear);
 end;
-
-{ //not needed, will be auto freed by DecoTrash
-procedure FreeBurnerImage;
-begin
-  FreeAndNil(BurnerImage);
-end;}
 
 {$ENDIF}
 
