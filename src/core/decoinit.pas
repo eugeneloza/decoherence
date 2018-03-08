@@ -33,9 +33,9 @@ implementation
 uses
   SysUtils, CastleWindow, CastleControls, CastleGLImages,
   CastleApplicationProperties,
-  DecoLoadEmbedded, {$IFDEF BurnerImage}DecoBurner,{$ENDIF}
+  DecoLoadEmbedded,
   DecoTranslation,
-  DecoInput, DecoPlayer, DecoGUI,
+  DecoInput, DecoPlayer, DecoGUI, DecoInterfaceLoader,
   DecoTrash,
   DecoMain,
   DecoTime, DecoLog, DecoWindow, DecoGlobal;
@@ -73,9 +73,7 @@ begin
   Log(LogInit, CurrentRoutine, 'Init sequence started.');
   InitTrash;
   InitTime;
-  {$IFDEF BurnerImage}
-  InitBurnerImage;
-  {$ENDIF}
+  LoadInterface;
   InitGUI;
   InitPlayer;
   InitInput;
