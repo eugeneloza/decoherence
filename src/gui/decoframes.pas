@@ -40,7 +40,6 @@ type
   { Rectagonal frame is scaled 3x3 and accepts DFrameImage}
   DRectagonalFrame = class(DFrame)
   public
-    procedure Draw; override;
     procedure Load(const aImage: DFrameImage);
   end;
 
@@ -48,7 +47,7 @@ type
 {............................................................................}
 implementation
 
-procedure DRectagonalFrame.Load(const aImage: TCastleImage);
+procedure DRectagonalFrame.Load(const aImage: DFrameImage);
 begin
 
 end;
