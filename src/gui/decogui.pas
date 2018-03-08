@@ -61,7 +61,7 @@ procedure FreeGUI;
 implementation
 uses
   SysUtils, CastleColors, CastleGLUtils,
-  DecoPlayer,
+  DecoPlayer, DecoGameMode,
   DecoLog;
 
 procedure DGUI.ShowMessage(const aMessage: string);
@@ -78,7 +78,7 @@ begin
 
   { clear the screen depending on the game mode
     in case SceneManager doesn't clear it }
-//  if GameModeNeedsClearingScreen then
+  if GameModeNeedsClearingScreen then
     RenderContext.Clear([cbColor], Black);
 
   { draw children elements }

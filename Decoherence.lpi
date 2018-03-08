@@ -116,7 +116,7 @@
         <PackageName Value="castle_base"/>
       </Item2>
     </RequiredPackages>
-    <Units Count="29">
+    <Units Count="30">
       <Unit0>
         <Filename Value="Decoherence.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -256,6 +256,11 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="DecoInterfaceLoader"/>
       </Unit28>
+      <Unit29>
+        <Filename Value="src/core/decogamemode.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoGameMode"/>
+      </Unit29>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
