@@ -59,6 +59,7 @@ begin
   CursorImg[ctDefault] := LoadCursorImage('GUI/Cursors/cursor.png', -1, +1);
   CursorImg[ctDefault_pressed] := LoadCursorImage('GUI/Cursors/cursor_pressed.png', -1, +1);
   CursorImg[ctMouseLook] := LoadCursorImage('GUI/Cursors/mouselook.png', -15, +15);
+
   CurrentCursor := ctDefault;
 end;
 
@@ -84,7 +85,7 @@ end;
 procedure DCursor.Draw;
 begin
   if not ScreenShotPending then //hide cursor for screenshots
-    if (CurrentCursor <> ctNone) and (CursorImg[CurrentCursor]<> Nil) then
+    if (CurrentCursor <> ctNone) and (CursorImg[CurrentCursor].Image <> Nil) then
       CursorImg[CurrentCursor].Image.Draw(x + CursorImg[CurrentCursor].CursorShift.Data[0],
         y - CursorImg[CurrentCursor].Image.Height + CursorImg[CurrentCursor].CursorShift.Data[1]);
 end;
@@ -96,7 +97,7 @@ var
   c: TCursorType;
 begin
   for c in TCursorType do
-    if CursorImg[c] <> nil then
+    if CursorImg[c].Image <> nil then
       CursorImg[c].Image.Color := GUITint;
 end;
 

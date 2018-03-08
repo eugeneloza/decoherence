@@ -109,11 +109,9 @@ end;
 function LoadCursorImage(const FileURL: string;
   const ShiftX, ShiftY: integer): DCursorImage;
 begin
-  Result := DCursorImage.Create;
   Result.Image := LoadDecoImage(FileURL);
   Result.CursorShift.Data[0] := ShiftX;
   Result.CursorShift.Data[1] := ShiftY;
-  AutoFree.Add(Result);
 end;
 
 end.

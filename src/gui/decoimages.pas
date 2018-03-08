@@ -67,7 +67,7 @@ type
 
 type
   {}
-  DCursorImage = class(TObject)
+  DCursorImage = record
     Image: DImage;
     { Coordinates shift of the cursor image vs cursor pointer position }
     CursorShift: TVector2Integer;
