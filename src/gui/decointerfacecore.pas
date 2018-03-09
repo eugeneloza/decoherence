@@ -152,6 +152,7 @@ type
     procedure Draw; override;
     { Assign given element as a child }
     procedure Grab(const aChild: DSingleInterfaceElement);
+    procedure Clear;
 
     (* Mouse routines *)
   public
@@ -412,6 +413,13 @@ begin
   //this should fire as recoursive because children owns elements, which in turn will fire their destructors onfree
   Children.Free;
   inherited Destroy;
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DInterfaceElement.Clear;
+begin
+  Children.Clear;
 end;
 
 {----------------------------------------------------------------------------}
