@@ -56,7 +56,8 @@ type
 {............................................................................}
 implementation
 uses
-  CastleVectors;
+  CastleVectors,
+  DecoGUIScale;
 
 constructor DWindImage.Create;
 begin
@@ -106,9 +107,23 @@ end;
 {----------------------------------------------------------------------------}
 
 procedure DWindImage.Draw;
+var
+  PhaseScaled: integer;
 begin
   //inherited Draw <------------ replacing parent completely
+  Image.SetAlpha(Current.a + Current.a / 4 * Sin(2 * Pi * OpacityPhase));
+  PhaseScaled := Round((1 - Phase) * GUIWidth);
 
+  //draw first part of the image
+  Image.Draw(PhaseScaled, 0,
+    GUIWidth - PhaseScaled, GUIHeight,
+    0, 0,
+    GUIWidth - PhaseScaled, GUIHeight);
+  //draw second part of the image
+  Image.Draw(0, 0,
+    PhaseScaled, GUIHeight,
+    GUIWidth - PhaseScaled, 0,
+    PhaseScaled, GUIHeight);
 end;
 
 {===========================================================================}
