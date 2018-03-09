@@ -72,12 +72,12 @@ begin
     as some units require others being already initialized }
   Log(LogInit, CurrentRoutine, 'Init sequence started.');
   InitTrash;
+  InitGlobal;
   InitTime;
   LoadInterface;
   InitGUI;
   InitPlayer;
   InitInput;
-  InitGlobal;
   InitManagement;
   {$IFDEF TextureProfiler}
   Log(LogInit, CurrentRoutine, TextureMemoryProfiler.Summary);
@@ -111,12 +111,12 @@ begin
     as some units might accidentally (thou unlikely) send a call to already-freed instance }
   Log(LogInit, CurrentRoutine, 'Game over. Freeing all data.');
   FreeManagement;
-  FreeGlobal;
   FreeInput;
   FreePlayer;
   FreeGUI;
   FreeTime;
   FreeTrash;
+  FreeGlobal;
   {$IFDEF TextureProfiler}
   Log(LogInit, CurrentRoutine, TextureMemoryProfiler.Summary);
   {$ENDIF}
