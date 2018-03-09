@@ -89,8 +89,18 @@ var
 begin
   inherited Update;
   PhaseShift := DeltaT * PhaseSpeed;
-  Phase += PhaseShift * (1 + 0.1 * DRND.Random);
-
+  if PhaseShift < 0.5 then
+  begin
+    Phase += PhaseShift * (1 + 0.1 * DRND.Random);
+    if Phase > 1 then
+      Phase -= 1;
+    OpacityPhase += PhaseShift / 2 * (1 + 0.2 * DRND.Random);
+    if OpacityPhase > 1 then
+      OpacityPhase -= 1;
+  end
+  else
+    { if it was too long since last frame, reset the wind phase }
+    ResetPhase;
 end;
 
 {----------------------------------------------------------------------------}
