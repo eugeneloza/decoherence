@@ -25,6 +25,7 @@ interface
 
 uses
   DecoInterfaceCore, DecoMouseCursor,
+  DecoWind,
   DecoGlobal, DecoGUIScale;
 
 type
@@ -32,6 +33,7 @@ type
   DGUI = class(DInterfaceElement)
   strict private
     Cursor: DCursor;
+  strict private
     FFirstRender: boolean;
     { Some post-initialization routines, that require graphics context fully available }
     procedure FirstRender;
@@ -45,6 +47,8 @@ type
     procedure Draw; override;
     { Updates cursor position and image }
     procedure UpdateCursor(const CursorX, CursorY: single; const MousePressed: boolean);
+  public
+    procedure TestInterface;
   public
     constructor Create; override;
     destructor Destroy; override;
@@ -82,7 +86,7 @@ begin
     RenderContext.Clear([cbColor], Black);
 
   { draw children elements }
-  //inherited Draw;
+  inherited Draw;
 
   Cursor.Draw;
 
@@ -142,8 +146,10 @@ begin
 
   FFirstRender := true;
   Cursor := DCursor.Create;
+
   SetTint;
-  //...
+
+  TestInterface;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -153,6 +159,14 @@ begin
   FreeAndNil(Cursor);
   //...
   inherited Destroy;
+end;
+
+{===================== SPECIFIC INTERFACE KINDS ============================}
+
+procedure DGUI.TestInterface;
+begin
+  Clear;
+  Grab(DWind.Create);
 end;
 
 {............................................................................}
