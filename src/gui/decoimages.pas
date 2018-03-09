@@ -38,9 +38,12 @@ type
     Width, Height: integer;
     { Assign tint color of this image }
     property Color: TCastleColor write SetColor;
+    procedure SetAlpha(const aValue: Single); TryInline
     { Wrappers for Drawing TGLImage }
     procedure Draw(const X, Y: Single); TryInline
     procedure Draw(const X, Y, DrawWidth, DrawHeight: Single); TryInline
+    procedure Draw(const X, Y, DrawWidth, DrawHeight: Single;
+      const ImageX, ImageY, ImageWidth, ImageHeight: Single); TryInline
     procedure Draw3x3(const X, Y, DrawWidth, DrawHeight: Single;
       const CornerTop, CornerRight, CornerBottom, CornerLeft: Integer); TryInline
   public
@@ -91,6 +94,14 @@ end;
 
 {-----------------------------------------------------------------------------}
 
+procedure DImage.Draw(const X, Y, DrawWidth, DrawHeight: Single;
+  const ImageX, ImageY, ImageWidth, ImageHeight: Single); TryInline
+begin
+  FImage.Draw(X, Y, DrawWidth, DrawHeight, ImageX, ImageY, ImageWidth, ImageHeight);
+end;
+
+{-----------------------------------------------------------------------------}
+
 procedure DImage.Draw3x3(const X, Y, DrawWidth, DrawHeight: Single;
       const CornerTop, CornerRight, CornerBottom, CornerLeft: Integer); TryInline
 begin
@@ -102,6 +113,13 @@ end;
 procedure DImage.SetColor(const aColor: TCastleColor);
 begin
   FImage.Color := aColor;
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DImage.SetAlpha(const aValue: Single); TryInline
+begin
+  FImage.Color[3] := aValue;
 end;
 
 {-----------------------------------------------------------------------------}
