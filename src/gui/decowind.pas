@@ -30,7 +30,7 @@ uses
 type
   { Image that changes its location with phase }
   DWindImage = class(DSimpleImage)
-  strict protected
+  strict private
     Phase, OpacityPhase: DFloat;
     procedure ResetPhase;
   public
@@ -57,7 +57,8 @@ type
 implementation
 uses
   CastleVectors,
-  DecoGUIScale;
+  DecoImageLoader, DecoGUIScale,
+  DecoLog;
 
 constructor DWindImage.Create;
 begin
@@ -131,7 +132,19 @@ end;
 constructor DWind.Create;
 begin
   inherited Create;
+  Log(LogInterfaceImageLoading, CurrentRoutine, 'Loading wind...');
+  Wind1 := DWindImage.Create;
+  Wind2 := DWindImage.Create;
+  Wind1.FullScreen;
+  Wind2.FullScreen;
+  Wind1.PhaseSpeed := 1 / (15 + DRND.Random);
+  Wind2.PhaseSpeed := 1 / (10 + DRND.Random);
+  Wind1.Load(LoadFullScreenImage('GUI/Wind/WindClouds1_GIMP.jpg'));
+  Wind2.Load(LoadFullScreenImage('GUI/Wind/WindClouds2_GIMP.jpg'));
+  Grab(Wind1);
+  Grab(Wind2);
 end;
+
 
 end.
 
