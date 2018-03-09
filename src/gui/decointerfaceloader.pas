@@ -31,7 +31,7 @@ procedure LoadInterface;
 implementation
 
 uses
-  {$IFDEF BurnerImage}DecoBurner,{$ENDIF}
+  {$IFDEF BurnerImage}DecoBurner,{$ENDIF} DecoWind,
   DecoImageLoader;
 
 
@@ -40,6 +40,7 @@ begin
   {$IFDEF BurnerImage}
   InitBurnerImage;
   {$ENDIF}
+  InitWind;
 end;
 
 end.

@@ -53,11 +53,13 @@ type
   public
     constructor Create; override;
   end;
+
+procedure InitWind;
 {............................................................................}
 implementation
 uses
   CastleVectors,
-  DecoImageLoader, DecoGUIScale,
+  DecoImageLoader, DecoGUIScale, DecoImages,
   DecoLog;
 
 constructor DWindImage.Create;
@@ -129,20 +131,33 @@ end;
 
 {===========================================================================}
 
+var
+  WindImage1, WindImage2: DImage;
+
 constructor DWind.Create;
 begin
   inherited Create;
   Log(LogInterfaceImageLoading, CurrentRoutine, 'Loading wind...');
+  Self.FullScreen;
   Wind1 := DWindImage.Create;
   Wind2 := DWindImage.Create;
   Wind1.FullScreen;
   Wind2.FullScreen;
   Wind1.PhaseSpeed := 1 / (15 + DRND.Random);
   Wind2.PhaseSpeed := 1 / (10 + DRND.Random);
-  Wind1.Load(LoadFullScreenImage('GUI/Wind/WindClouds1_GIMP.jpg'));
-  Wind2.Load(LoadFullScreenImage('GUI/Wind/WindClouds2_GIMP.jpg'));
+  Wind1.Load(WindImage1);
+  Wind2.Load(WindImage2);
   Grab(Wind1);
   Grab(Wind2);
+end;
+
+{..........................................................................}
+
+procedure InitWind;
+begin
+  WindImage1 := LoadFullScreenImage('GUI/Wind/WindClouds1_GIMP.jpg');
+  WindImage2 := LoadFullScreenImage('GUI/Wind/WindClouds2_GIMP.jpg');
+  { will be freed automatically at game end }
 end;
 
 
