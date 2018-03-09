@@ -114,6 +114,8 @@ var
   PhaseScaled: integer;
 begin
   //inherited Draw <------------ replacing parent completely
+  Update;
+
   Image.SetAlpha(Current.a + Current.a / 4 * Sin(2 * Pi * OpacityPhase));
   PhaseScaled := Round((1 - Phase) * GUIWidth);
 
@@ -141,12 +143,13 @@ begin
   Self.FullScreen;
   Wind1 := DWindImage.Create;
   Wind2 := DWindImage.Create;
-  Wind1.FullScreen;
-  Wind2.FullScreen;
+  Wind1.FullScreen(0.1);
+  Wind2.FullScreen(0.1);
   Wind1.PhaseSpeed := 1 / (15 + DRND.Random);
   Wind2.PhaseSpeed := 1 / (10 + DRND.Random);
   Wind1.Load(WindImage1);
   Wind2.Load(WindImage2);
+
   Grab(Wind1);
   Grab(Wind2);
 end;
