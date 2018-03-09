@@ -84,7 +84,7 @@ type
       optionally animation may be specified }
     procedure SetSize(const ax, ay, aw, ah: integer; const aAlpha: DFloat = 1.0; const Animate: TAnimationStyle = asDefault);
     { Scale this element to full screen (no animation) }
-    procedure FullScreen;
+    procedure FullScreen(const Alpha: Single = 1);
   public
     constructor Create; virtual; //override;
     destructor Destroy; override;
@@ -284,9 +284,9 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-procedure DAbstractElement.FullScreen;
+procedure DAbstractElement.FullScreen(const Alpha: Single = 1);
 begin
-  Next.SetIntSize(0, 0, GUIWidth, GUIHeight, 1);
+  Next.SetIntSize(0, 0, GUIWidth, GUIHeight, Alpha);
   ResetAnimation;
 end;
 
