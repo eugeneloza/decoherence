@@ -48,6 +48,7 @@ function LoadCursorImage(const FileURL: string;
 implementation
 
 uses
+  SysUtils,
   DecoTrash, DecoGUIScale,
   DecoLog;
 
@@ -82,6 +83,8 @@ begin
       else
         ScaledWidth := Round(aWidth * aImage.Width / aImage.Height);
     end;
+    Log(LogInterfaceImageLoading, CurrentRoutine, 'Scaling image to ' +
+      IntToStr(ScaledWidth) + 'x' + IntToStr(ScaledHeight));
     ScaledImage := aImage.CreateCopy as TCastleImage;
     ScaledImage.Resize(ScaledWidth, ScaledHeight, InterfaceScalingMethod);
 
@@ -109,6 +112,7 @@ end;
 
 function LoadCastleImage(const FileURL: string): TCastleImage;
 begin
+  Log(LogInterfaceImageLoading, CurrentRoutine, 'Loading image: ' + FileURL);
   Result := LoadImage(GameFolder(FileURL));
   AutoFree.Add(Result);
 end;
