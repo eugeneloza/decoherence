@@ -31,10 +31,23 @@ type
 var
   AutoFree: TTrash;
 
+{ Frees an object from the trash }
+procedure FreeTrashObject(constref aObject: TObject);
+{ Initialize trash routines }
 procedure InitTrash;
+{ Release trash routines}
 procedure FreeTrash;
 {............................................................................}
 implementation
+
+procedure FreeTrashObject(constref aObject: TObject);
+begin
+  {not sure if it works fine}
+  AutoFree.Remove(aObject); //<------- automatically frees the object
+  // aObject.Free;
+end;
+
+{............................................................................}
 
 procedure InitTrash;
 begin
