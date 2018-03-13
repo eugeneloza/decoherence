@@ -97,7 +97,7 @@ procedure FreeInput;
 implementation
 
 uses CastleWindow,
-  DecoPlayer,
+  DecoPlayer, DecoGameMode,
   DecoGUIScale, DecoGUI,
   DecoWindow, DecoLog;
 
@@ -353,15 +353,16 @@ begin
 
   i := TouchArray.Add(NewEventTouch);
 
-  if (not InterfaceCaughtEvent) then
-  begin
-    if Event.MouseButton = mbRight then
-      Player.ToggleMouseLook
-    else
-    //start dragging mouse look
-    if i = 0 then
-      DragMouseLook := true;
-  end;
+  if GameModeMouseLook then
+    if (not InterfaceCaughtEvent) then
+    begin
+      if Event.MouseButton = mbRight then
+          Player.ToggleMouseLook
+      else
+      //start dragging mouse look
+      if i = 0 then
+        DragMouseLook := true;
+    end;
 
   GUI.UpdateCursor(Event.Position[0], Event.Position[1], TouchArray.Count > 0);
 
