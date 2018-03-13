@@ -27,7 +27,13 @@ uses
   DecoGlobal;
 
 
+{ Does this mode needs clearing screen?
+  Equals to "if SceneManager is active at the moment?"
+  Usually it discerns between 3D rendered world game mode and other screens
+  (like menus or character interface) }
 function GameModeNeedsClearingScreen: boolean;
+{ Is the current game mode 3D using mouse/drag look feature }
+function GameModeMouseLook: boolean;
 {............................................................................}
 implementation
 
@@ -38,6 +44,13 @@ function GameModeNeedsClearingScreen: boolean;
 begin
   { Something more efficient, or world-attached might be here }
   Result := (Window.SceneManager = nil) or not Window.SceneManager.Exists;
+end;
+
+{-----------------------------------------------------------------------------}
+
+function GameModeMouseLook: boolean;
+begin
+  Result := not GameModeNeedsClearingScreen; //todo
 end;
 
 end.
