@@ -29,13 +29,16 @@ uses
   DecoGlobal;
 
 { Loads a TCastleImage and scales into DImage
-  the resulting DImage is freed automatically as the game ends }
+  the resulting DImage is freed automatically as the game ends
+  KeepImageCopy determines whether the "original" image will be kept
+  in memory (means anything only if the image is scaled)
+  KeepProportions determines whether the image proportions will be kept during scaling }
 function LoadDecoImage(const aImage: TEncodedImage; const aWidth: integer = 0;
-  const aHeight: integer = 0; const KeepProportions: boolean = false): DImage;
+  const aHeight: integer = 0; const KeepImageCopy: boolean = true; const KeepProportions: boolean = false): DImage;
 { Loads a DImage from an URL
   the resulting DImage is freed automatically as the game ends }
 function LoadDecoImage(const FileURL: string; const aWidth: integer = 0;
-  const aHeight: integer = 0; const KeepProportions: boolean = false): DImage;
+  const aHeight: integer = 0; const KeepImageCopy: boolean = true; const KeepProportions: boolean = false): DImage;
 { Loads the image and scales it to full screen (GUI size) }
 function LoadFullScreenImage(const FileURL: string): DImage;
 { A wrapper for TCastleImage loading
@@ -53,7 +56,7 @@ uses
   DecoLog;
 
 function LoadDecoImage(const aImage: TEncodedImage; const aWidth: integer = 0;
-  const aHeight: integer = 0; const KeepProportions: boolean = false): DImage;
+  const aHeight: integer = 0; const KeepImageCopy: boolean = true; const KeepProportions: boolean = false): DImage;
 var
   ScaledImage: TCastleImage;
   ScaledWidth, ScaledHeight: integer;
@@ -83,12 +86,21 @@ begin
       else
         ScaledWidth := Round(aWidth * aImage.Width / aImage.Height);
     end;
+
     Log(LogInterfaceImageLoading, CurrentRoutine, 'Scaling image to ' +
       IntToStr(ScaledWidth) + 'x' + IntToStr(ScaledHeight));
-    ScaledImage := aImage.CreateCopy as TCastleImage;
+
+    if KeepImageCopy then
+      ScaledImage := aImage.CreateCopy as TCastleImage
+    else
+    begin
+      ScaledImage := aImage as TCastleImage;
+      AutoFree.Extract(aImage); //<----- "extract" doesn't free the aImage unlike "remove"
+    end;
+
     ScaledImage.Resize(ScaledWidth, ScaledHeight, InterfaceScalingMethod);
 
-    Result := DImage.Create(ScaledImage, true, true); //now Image owns the content because it's a copy
+    Result := DImage.Create(ScaledImage, true, true);
   end;
   AutoFree.Add(Result);
 end;
@@ -96,16 +108,16 @@ end;
 {-----------------------------------------------------------------------------}
 
 function LoadDecoImage(const FileURL: string; const aWidth: integer = 0;
-  const aHeight: integer = 0; const KeepProportions: boolean = false): DImage;
+  const aHeight: integer = 0; const KeepImageCopy: boolean = true; const KeepProportions: boolean = false): DImage;
 begin
-  Result := LoadDecoImage(LoadCastleImage(FileURL), aWidth, aHeight, KeepProportions);
+  Result := LoadDecoImage(LoadCastleImage(FileURL), aWidth, aHeight, KeepImageCopy, KeepProportions);
 end;
 
 {-----------------------------------------------------------------------------}
 
 function LoadFullScreenImage(const FileURL: string): DImage;
 begin
-  Result := LoadDecoImage(LoadCastleImage(FileURL), GUIWidth, GUIHeight, false);
+  Result := LoadDecoImage(LoadCastleImage(FileURL), GUIWidth, GUIHeight, false, false);
 end;
 
 {-----------------------------------------------------------------------------}
