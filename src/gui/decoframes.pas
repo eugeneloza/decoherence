@@ -40,16 +40,20 @@ type
   { Rectagonal frame is scaled 3x3 and accepts DFrameImage}
   DRectagonalFrame = class(DFrame)
   private
+    { frame must be a DImage to scale properly during animations
+      this is just a source image link, stored only until next render
+      the delayed rescale is made as a safe-guard to avoid accident
+      frame sclaing before the NEXT was initialized properly }
     FrameImage: DFrameImage;
     InitPending: boolean;
     procedure ResizeFrame;
   public
     procedure Draw; override;
+    { Load a frame image here }
     procedure Load(const aImage: DFrameImage);
   public
     constructor Create; override;
   end;
-
 
 {............................................................................}
 implementation

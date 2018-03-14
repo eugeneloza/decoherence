@@ -27,6 +27,7 @@ uses
   {<temporary included for debugging>}
   DecoInterfaceImages,
   DecoWind,
+  DecoFrames,
   {</temporary>}
   CastleWindow, DecoGlobal;
 
