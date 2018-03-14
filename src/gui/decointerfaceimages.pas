@@ -94,7 +94,7 @@ begin
   if Image <> nil then
   begin
     Update;
-    Image.SetAlpha(Current.a);
+    Image.SetAlpha(Self.Alpha);
     Image.Draw(Current.x, Current.y, Current.w, Current.h);
   end;
 end;

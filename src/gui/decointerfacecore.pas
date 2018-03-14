@@ -57,6 +57,7 @@ type
     AnimationSuicide: boolean;
     { Updates/caches Current container }
     procedure GetAnimationState; TryInline
+    function GetAlpha: DFloat;
   strict protected
     { Parent interface element }
     Parent: DAbstractElement;
@@ -78,6 +79,7 @@ type
       (e.g. gets the current animation state) }
     procedure Update; virtual;
   public
+    property Alpha: Single read GetAlpha;
     { Draw the element / as abstract as it might be :) }
     procedure Draw; virtual; abstract;
     { Set tint of the element }
@@ -86,7 +88,7 @@ type
       optionally animation may be specified }
     procedure SetSize(const ax, ay, aw, ah: integer; const aAlpha: DFloat = 1.0; const Animate: TAnimationStyle = asDefault);
     { Scale this element to full screen (no animation) }
-    procedure FullScreen(const Alpha: Single = 1);
+    procedure FullScreen(const aAlpha: Single = 1);
   public
     constructor Create; virtual; //override;
     destructor Destroy; override;
@@ -239,6 +241,16 @@ end;
 
 {-----------------------------------------------------------------------------}
 
+function DAbstractElement.GetAlpha: DFloat;
+begin
+  if Parent <> nil then
+    Result := Current.a * Parent.Alpha
+  else
+    Result := Current.a;
+end;
+
+{-----------------------------------------------------------------------------}
+
 procedure DAbstractElement.AnimateTo(const Animate: TAnimationStyle;
   const Duration: DFloat = DefaultAnimationDuration);
 begin
@@ -286,9 +298,9 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-procedure DAbstractElement.FullScreen(const Alpha: Single = 1);
+procedure DAbstractElement.FullScreen(const aAlpha: Single = 1);
 begin
-  Next.SetIntSize(0, 0, GUIWidth, GUIHeight, Alpha);
+  Next.SetIntSize(0, 0, GUIWidth, GUIHeight, aAlpha);
   ResetAnimation;
 end;
 
@@ -337,7 +349,7 @@ const
 begin
   if (xx >= Next.x) and (xx <= Next.x2) and
     (yy >= Next.y) and (yy <= Next.y2) and
-    (Next.a > CutTransparency) then
+    (Self.Alpha > CutTransparency) then
     Result := true
   else
     Result := false;
