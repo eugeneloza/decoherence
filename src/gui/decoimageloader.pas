@@ -38,7 +38,7 @@ function LoadDecoImage(const aImage: TEncodedImage; const aWidth: integer = 0;
 { Loads a DImage from an URL
   the resulting DImage is freed automatically as the game ends }
 function LoadDecoImage(const FileURL: string; const aWidth: integer = 0;
-  const aHeight: integer = 0; const KeepImageCopy: boolean = true; const KeepProportions: boolean = false): DImage;
+  const aHeight: integer = 0; const KeepProportions: boolean = false): DImage;
 { Loads the image and scales it to full screen (GUI size) }
 function LoadFullScreenImage(const FileURL: string): DImage;
 { A wrapper for TCastleImage loading
@@ -108,9 +108,9 @@ end;
 {-----------------------------------------------------------------------------}
 
 function LoadDecoImage(const FileURL: string; const aWidth: integer = 0;
-  const aHeight: integer = 0; const KeepImageCopy: boolean = true; const KeepProportions: boolean = false): DImage;
+  const aHeight: integer = 0; const KeepProportions: boolean = false): DImage;
 begin
-  Result := LoadDecoImage(LoadCastleImage(FileURL), aWidth, aHeight, KeepImageCopy, KeepProportions);
+  Result := LoadDecoImage(LoadCastleImage(FileURL), aWidth, aHeight, false, KeepProportions);
 end;
 
 {-----------------------------------------------------------------------------}
