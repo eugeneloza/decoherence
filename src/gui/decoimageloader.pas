@@ -44,9 +44,13 @@ function LoadFullScreenImage(const FileURL: string): DImage;
 { A wrapper for TCastleImage loading
   automatically frees the image as the game ends}
 function LoadCastleImage(const FileURL: string): TCastleImage;
-{ }
+
+{ Load a single cursor image with parameters }
 function LoadCursorImage(const FileURL: string;
   const ShiftX, ShiftY: integer): DCursorImage;
+{ Load a single frame image with parameters }
+function LoadFrameImage(const FileURL: string;
+  const CornerTop, CornerRight, CornerBottom, CornerLeft: integer): DFrameImage;
 {............................................................................}
 implementation
 
@@ -137,6 +141,18 @@ begin
   Result.Image := LoadDecoImage(FileURL);
   Result.CursorShift.Data[0] := ShiftX;
   Result.CursorShift.Data[1] := ShiftY;
+end;
+
+{-----------------------------------------------------------------------------}
+
+function LoadFrameImage(const FileURL: string;
+  const CornerTop, CornerRight, CornerBottom, CornerLeft: integer): DFrameImage;
+begin
+  Result := LoadCastleImage(FileURL) as DFrameImage;
+  Result.Corners[0] := CornerTop;
+  Result.Corners[1] := CornerRight;
+  Result.Corners[2] := CornerBottom;
+  Result.Corners[3] := CornerLeft;
 end;
 
 end.

@@ -62,7 +62,7 @@ type
   end;
 
 type
-  {}
+  { A simple CastleImage with Corners attached }
   DFrameImage = class(TCastleImage)
   public
     Corners: TVector4Integer;
