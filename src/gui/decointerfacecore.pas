@@ -58,6 +58,8 @@ type
     { Updates/caches Current container }
     procedure GetAnimationState; TryInline
   strict protected
+    { Parent interface element }
+    Parent: DAbstractElement;
     { Container of this inhterface element determined based on
       Last and Next state of the animation}
     Current: DInterfaceContainer;
@@ -470,6 +472,7 @@ end;
 procedure DInterfaceElement.Grab(const aChild: DSingleInterfaceElement);
 begin
   Children.Add(aChild);
+  aChild.Parent := Self;
 end;
 
 {----------------------------------------------------------------------------}
