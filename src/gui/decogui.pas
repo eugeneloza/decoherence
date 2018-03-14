@@ -141,6 +141,7 @@ end;
 constructor DGUI.Create;
 begin
   inherited Create;
+  FullScreen;
 
   GUITint := White;
 
@@ -167,6 +168,7 @@ procedure DGUI.TestInterface;
 begin
   Clear;
   Grab(DWind.Create);
+  //Children[0].KillMePlease := true;
 end;
 
 {............................................................................}

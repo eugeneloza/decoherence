@@ -441,19 +441,16 @@ end;
 procedure DInterfaceElement.Update;
 var
   i: integer;
-  c: DSingleInterfaceElement;
 begin
   i := 0;
   repeat
     if Children[i].KillMePlease then
-    begin
-      c := Children[i];
-      Children.Remove(c);
-      c.Free;
-    end
+      Children.Delete(i)
     else
       inc(i);
   until i >= Children.Count;
+
+  inherited Update;
 end;
 
 {----------------------------------------------------------------------------}
