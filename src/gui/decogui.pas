@@ -168,7 +168,6 @@ procedure DGUI.TestInterface;
 begin
   Clear;
   Grab(DWind.Create);
-  //Children[0].KillMePlease := true;
 end;
 
 {............................................................................}
