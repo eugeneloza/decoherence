@@ -26,8 +26,8 @@ unit DecoFrames;
 interface
 
 uses
-  DecoImages,
-  DecoInterfaceImages,
+  Generics.Collections,
+  DecoImages, DecoInterfaceImages,
   DecoGlobal;
 
 type
@@ -55,12 +55,33 @@ type
     constructor Create; override;
   end;
 
+type
+  TFramesDictionary = specialize TObjectDictionary<string, DFrameImage>;
+
+var
+  FramesDictionary: TFramesDictionary;
+
+function GetFrameByName(const ItemName: string): DFrameImage; TryInline
 {............................................................................}
 implementation
 uses
   SysUtils,
   CastleImages, CastleVectors, CastleRectangles,
-  {$IFDEF BurnerImage}DecoBurner{$ENDIF};
+  {$IFDEF BurnerImage}DecoBurner,{$ENDIF}
+  DecoLog;
+
+function GetFrameByName(const ItemName: string): DFrameImage; TryInline
+begin
+  Result := nil; //to avoid uninitialized variable hint
+  if not FramesDictionary.TryGetValue(ItemName, Result) then
+  begin
+    Log(LogInterfaceError, CurrentRoutine, 'Unknown Frame Name: ' + ItemName);
+    Result := nil;
+  end;
+end;
+
+{=============================================================================}
+
 
 procedure DRectagonalFrame.ResizeFrame;
 var

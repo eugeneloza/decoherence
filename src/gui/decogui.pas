@@ -25,7 +25,11 @@ interface
 
 uses
   DecoInterfaceCore, DecoMouseCursor,
+  {<temporary included for debugging>}
+  DecoInterfaceImages,
   DecoWind,
+  DecoFrames,
+  {</temporary>}
   DecoGlobal, DecoGUIScale;
 
 type
@@ -165,9 +169,14 @@ end;
 {===================== SPECIFIC INTERFACE KINDS ============================}
 
 procedure DGUI.TestInterface;
+var
+  Frame: DRectagonalFrame;
 begin
   Clear;
   Grab(DWind.Create);
+  Frame := DRectagonalFrame.Create;
+  Frame.Load(GetFrameByName('RegularFrame'));
+  Grab(Frame);
 end;
 
 {............................................................................}

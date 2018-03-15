@@ -24,14 +24,8 @@ unit DecoInterfaceLoader;
 interface
 
 uses
-  Generics.Collections,
-  DecoImages, DecoGlobal;
+  DecoGlobal;
 
-type
-  TFramesDictionary = specialize TObjectDictionary<string, DFrameImage>;
-
-var
-  FramesDictionary: TFramesDictionary;
 
 { Read all interface images, icons, cursor pointers, and so on }
 procedure LoadInterface;
@@ -39,13 +33,16 @@ procedure FreeInterface;
 {............................................................................}
 implementation
 uses
-  {$IFDEF BurnerImage}DecoBurner,{$ENDIF} DecoWind,
+  Generics.Collections,
+  {$IFDEF BurnerImage}DecoBurner,{$ENDIF}
+  DecoWind, DecoFrames,
   DecoImageLoader;
 
 procedure LoadFrames;
 begin
   FramesDictionary := TFramesDictionary.Create([doOwnsKeys]);
-
+  FramesDictionary.Add('RegularFrame',
+    LoadFrameImage('GUI/Frames/GradientFrame.png',3,3,3,3)) //AddOrSetValue;
 end;
 
 
