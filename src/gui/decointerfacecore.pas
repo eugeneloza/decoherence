@@ -212,14 +212,11 @@ begin
   //if this is start of the animation - init time
   if AnimationStart < 0 then
     AnimationStart := DecoNow;
-  {bugfix? weird}
-  if AnimationDuration <= 0 then
-    AnimationDuration := DefaultAnimationDuration;
 
   if not Next.isInitialized then
     Log(LogInterfaceError, CurrentRoutine, 'Warning: NEXT is not initialized!');
 
-  if (DecoNow - AnimationStart < AnimationDuration) or (not Last.isInitialized) then
+  if (DecoNow - AnimationStart < AnimationDuration) and (Last.isInitialized) then
   begin
     //determine the animation time passed relative to AnimationDuration
     Phase := (DecoNow - AnimationStart) / AnimationDuration;
@@ -263,6 +260,7 @@ begin
 
   AnimationStart := -1;
   AnimationDuration := Duration;
+  AnimationSuicide := false;
 
   case Animate of
     asNone: AnimationDuration := -1; //no animation will just assign Current = Next on next frame
@@ -296,6 +294,7 @@ end;
 procedure DAbstractElement.SetSize(const ax, ay, aw, ah: integer; const aAlpha: DFloat = 1.0; const Animate: TAnimationStyle = asDefault);
 begin
   Next.SetIntSize(ax, ay, aw, ah, aAlpha);
+  if not Last.isInitialized then Last.AssignFrom(Next);
   AnimateTo(Animate);
 end;
 
