@@ -29,6 +29,7 @@ uses
   DecoInterfaceImages,
   DecoWind,
   DecoFrames,
+  DecoInterfaceBars,
   {</temporary>}
   DecoGlobal, DecoGUIScale;
 

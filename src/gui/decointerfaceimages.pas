@@ -15,7 +15,7 @@
 
 {---------------------------------------------------------------------------}
 
-(* Different types of interface images *)
+(* Basic types of interface images *)
 
 unit DecoInterfaceImages;
 
