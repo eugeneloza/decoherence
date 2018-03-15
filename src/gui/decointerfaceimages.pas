@@ -131,6 +131,7 @@ end;
 procedure DSimpleImage.Load(const aImage: DImage);
 begin
   Image := aImage;
+  SetTint;
 end;
 
 end.

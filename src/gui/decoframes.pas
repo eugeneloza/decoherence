@@ -82,7 +82,6 @@ end;
 
 {=============================================================================}
 
-
 procedure DRectagonalFrame.ResizeFrame;
 var
   TempImage: TCastleImage;
@@ -93,7 +92,8 @@ begin
   TempImage.DrawFrom3x3( Rectangle(0, 0, Next.w, Next.h),
     FrameImage.Image, FrameImage.Corners, dmOverwrite, InterfaceScalingMethod);
   {$IFDEF BurnerImage}Burn(TempImage, Next);{$ENDIF}
-  Image := DImage.Create(TempImage, true, true)
+  Image := DImage.Create(TempImage, true, true);
+  SetTint;
 end;
 
 {-----------------------------------------------------------------------------}
