@@ -175,7 +175,7 @@ begin
   Clear;
   Grab(DWind.Create);
   Frame := DRectagonalFrame.Create;
-  Frame.SetSize(100, 100, 300, 300, 0.9);
+  Frame.SetSize(100, 100, 300, 300, 0.9, asZoomIn);
   Frame.Load(GetFrameByName('RegularFrame'));
   Grab(Frame);
 end;

@@ -122,8 +122,8 @@ end;
 
 procedure DInterfaceContainer.SetIntWidthHeight(const aw, ah: integer; const aAlpha: DFloat = 1);
 begin
-  x := x - (w - aw) div 2;
-  y := y - (h - ah) div 2;
+  x := x + (w - aw) div 2;
+  y := y + (h - ah) div 2;
   w := aw;
   h := ah;
   x2 := x + w; //cache x2,y2
