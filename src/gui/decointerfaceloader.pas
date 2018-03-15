@@ -40,7 +40,7 @@ uses
 
 procedure LoadFrames;
 begin
-  FramesDictionary := TFramesDictionary.Create([doOwnsKeys]);
+  FramesDictionary := TFramesDictionary.Create([]);
   FramesDictionary.Add('RegularFrame',
     LoadFrameImage('GUI/Frames/GradientFrame.png',3,3,3,3)) //AddOrSetValue;
 end;

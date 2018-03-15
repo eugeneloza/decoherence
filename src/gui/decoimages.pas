@@ -25,11 +25,12 @@ unit DecoImages;
 interface
 
 uses
-  CastleGLImages, CastleImages, CastleColors, CastleVectors;
+  CastleGLImages, CastleImages, CastleColors, CastleVectors,
+  DecoGlobal;
 
 type
   { Wrapper for TGLImage }
-  DImage = class(TObject)
+  DImage = class(DObject)
   strict private
     FImage: TGLImage;
     procedure SetColor(const aColor: TCastleColor);
@@ -63,8 +64,9 @@ type
 
 type
   { A simple CastleImage with Corners attached }
-  DFrameImage = class(TCastleImage)
+  DFrameImage = class(DObject)
   public
+    Image: TCastleImage;
     Corners: TVector4Integer;
   end;
 

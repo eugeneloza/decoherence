@@ -91,7 +91,7 @@ begin
   TempImage := TRGBAlphaImage.Create(Next.w, Next.h);
   TempImage.Clear(Vector4(0,0,0,0));
   TempImage.DrawFrom3x3( Rectangle(0, 0, Next.w, Next.h),
-    FrameImage, FrameImage.Corners, dmOverwrite, InterfaceScalingMethod);
+    FrameImage.Image, FrameImage.Corners, dmOverwrite, InterfaceScalingMethod);
   {$IFDEF BurnerImage}Burn(TempImage, Next);{$ENDIF}
   Image := DImage.Create(TempImage, true, true)
 end;

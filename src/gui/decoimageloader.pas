@@ -148,11 +148,13 @@ end;
 function LoadFrameImage(const FileURL: string;
   const CornerTop, CornerRight, CornerBottom, CornerLeft: integer): DFrameImage;
 begin
-  Result := LoadCastleImage(FileURL) as DFrameImage;
+  Result := DFrameImage.Create;
+  Result.Image := LoadCastleImage(FileURL);
   Result.Corners[0] := CornerTop;
   Result.Corners[1] := CornerRight;
   Result.Corners[2] := CornerBottom;
   Result.Corners[3] := CornerLeft;
+  AutoFree.Add(Result);
 end;
 
 end.

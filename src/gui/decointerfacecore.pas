@@ -212,6 +212,9 @@ begin
   //if this is start of the animation - init time
   if AnimationStart < 0 then
     AnimationStart := DecoNow;
+  {bugfix? weird}
+  if AnimationDuration <= 0 then
+    AnimationDuration := DefaultAnimationDuration;
 
   if not Next.isInitialized then
     Log(LogInterfaceError, CurrentRoutine, 'Warning: NEXT is not initialized!');
