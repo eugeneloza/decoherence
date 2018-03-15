@@ -114,6 +114,7 @@ begin
   FreeInput;
   FreePlayer;
   FreeGUI;
+  FreeInterface;
   FreeTime;
   FreeTrash;
   FreeGlobal;
