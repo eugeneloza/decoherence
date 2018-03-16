@@ -81,7 +81,7 @@ end;
 
 procedure DAbstractImage.SetTint;
 begin
-  //inherited SetTint; <---------- parent is abstract
+  //inherited SetTint; <---------- parent is an "empty" virtual procedure
   if Image <> nil then
     Image.Color := GUITint;
 end;

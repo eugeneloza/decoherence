@@ -83,7 +83,7 @@ type
     { Draw the element / as abstract as it might be :) }
     procedure Draw; virtual; abstract;
     { Set tint of the element }
-    procedure SetTint; virtual; abstract;
+    procedure SetTint; virtual;
     { Initialize this element with specific coordinates/size/alpha
       optionally animation may be specified }
     procedure SetSize(const ax, ay, aw, ah: integer; const aAlpha: DFloat = 1.0; const Animate: TAnimationStyle = asDefault);
@@ -237,6 +237,13 @@ begin
     if AnimationSuicide then
       Self.KillMePlease := true;
   end;
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DAbstractElement.SetTint;
+begin
+  //just does nothing
 end;
 
 {-----------------------------------------------------------------------------}
@@ -462,11 +469,11 @@ end;
 
 procedure DInterfaceElement.SetTint;
 var
-  i: integer;
+  c: DSingleInterfaceElement;
 begin
-  //inherited SetTint; <---------- parent is abstract
-  for i := 0 to Pred(Children.Count) do
-    Children[i].SetTint;
+  //inherited SetTint; <---------- parent is an "empty" virtual procedure
+  for c in Children do
+    c.SetTint;
 end;
 
 {----------------------------------------------------------------------------}
