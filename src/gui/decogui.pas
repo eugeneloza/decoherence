@@ -31,6 +31,7 @@ uses
   DecoFrames,
   DecoInterfaceBars,
   DecoInterfaceArrangers,
+  DecoImageLoader,
   {</temporary>}
   DecoGlobal, DecoGUIScale;
 
@@ -173,13 +174,32 @@ end;
 procedure DGUI.TestInterface;
 var
   Frame: DRectagonalFrame;
+  Arr: DCenterArranger;
+  Img: DSimpleImage;
 begin
   Clear;
   Grab(DWind.Create);
+
   Frame := DRectagonalFrame.Create;
   Frame.SetSize(100, 100, 300, 300, 0.9, asZoomIn, 2.0);
   Frame.Load(GetFrameByName('RegularFrame'));
   Grab(Frame);
+
+  Arr := DCenterArranger.Create;
+  Arr.SetSize(600,100,200,200);
+
+  Img := DSimpleImage.Create;
+  Img.Load(LoadDecoImage('GUI/Frames/GradientFrame.png',50,50));
+  Img.SetSize(0,0,150,150);
+  Arr.Grab(Img);
+
+  Img := DSimpleImage.Create;
+  Img.Load(LoadDecoImage('GUI/Frames/GradientFrame.png',50,50));
+  Img.SetSize(0,0,50,50);
+  Arr.Grab(Img);
+
+
+  Grab(Arr);
 end;
 
 {............................................................................}
