@@ -30,6 +30,7 @@ const
 
   { interface info and errors }
   LogInterfaceError = true;
+  LogInterfaceInfo = true;
   LogImageScaleError = true;
   LogLanguageError = true;
   LogInterfaceImageLoading = true;
@@ -82,6 +83,8 @@ begin
   WriteLnLog('(i) Compilation Date',{$I %DATE%} + ' Time: ' + {$I %TIME%});
   WriteLnLog('(i) Pointer is', IntToStr(SizeOf(Pointer) * 8) + ' bit');
 end;
+
+{-----------------------------------------------------------------------------}
 
 procedure FreeLog;
 begin
