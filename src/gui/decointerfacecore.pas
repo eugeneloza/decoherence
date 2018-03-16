@@ -69,7 +69,7 @@ type
     Last, Next: DInterfaceContainer;
     { Init the animation of this element }
     procedure AnimateTo(const Animate: TAnimationStyle;
-      const Duration: DFloat = DefaultAnimationDuration);
+      const Duration: DTime = DefaultAnimationDuration);
     { Stops any animation, and sets Last = Next }
     procedure ResetAnimation;
   strict protected
@@ -86,7 +86,8 @@ type
     procedure SetTint; virtual;
     { Initialize this element with specific coordinates/size/alpha
       optionally animation may be specified }
-    procedure SetSize(const ax, ay, aw, ah: integer; const aAlpha: DFloat = 1.0; const Animate: TAnimationStyle = asDefault);
+    procedure SetSize(const ax, ay, aw, ah: integer; const aAlpha: DFloat = 1.0;
+      const Animate: TAnimationStyle = asDefault; const Duration: DTime = DefaultAnimationDuration);
     { Scale this element to full screen (no animation) }
     procedure FullScreen(const aAlpha: Single = 1);
   public
@@ -259,7 +260,7 @@ end;
 {-----------------------------------------------------------------------------}
 
 procedure DAbstractElement.AnimateTo(const Animate: TAnimationStyle;
-  const Duration: DFloat = DefaultAnimationDuration);
+  const Duration: DTime = DefaultAnimationDuration);
 begin
   { Next must be set before the AnimateTo! }
   GetAnimationState;
@@ -298,11 +299,12 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-procedure DAbstractElement.SetSize(const ax, ay, aw, ah: integer; const aAlpha: DFloat = 1.0; const Animate: TAnimationStyle = asDefault);
+procedure DAbstractElement.SetSize(const ax, ay, aw, ah: integer; const aAlpha: DFloat = 1.0;
+  const Animate: TAnimationStyle = asDefault; const Duration: DTime = DefaultAnimationDuration);
 begin
   Next.SetIntSize(ax, ay, aw, ah, aAlpha);
   if not Last.isInitialized then Last.AssignFrom(Next);
-  AnimateTo(Animate);
+  AnimateTo(Animate, Duration);
 end;
 
 {-----------------------------------------------------------------------------}

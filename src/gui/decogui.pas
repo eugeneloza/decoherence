@@ -148,7 +148,7 @@ begin
   inherited Create;
   FullScreen;
 
-  GUITint := White;
+  GUITint := Yellow;
 
   FFirstRender := true;
   Cursor := DCursor.Create;
@@ -176,7 +176,7 @@ begin
   Clear;
   Grab(DWind.Create);
   Frame := DRectagonalFrame.Create;
-  Frame.SetSize(100, 100, 300, 300, 0.9, asZoomIn);
+  Frame.SetSize(100, 100, 300, 300, 0.9, asZoomIn, 2.0);
   Frame.Load(GetFrameByName('RegularFrame'));
   Grab(Frame);
 end;
