@@ -28,14 +28,21 @@ uses
   DecoGlobal;
 
 type
-  {}
+  { calls ManageChildren in Update and resets their animation state }
   DAbstractArranger = class(DInterfaceElement)
   strict private
     procedure ResetChildren;
   strict protected
-    procedure ManageChildren; virtual; abstract;
+    procedure ArrangeChildren; virtual; abstract;
   public
     procedure Update; override;
+  end;
+
+type
+  { arranges children relative to its center without scaling them }
+  DCenterArranger = class(DAbstractArranger)
+  strict protected
+    procedure ArrangeChildren; override;
   end;
 
 {............................................................................}
@@ -46,7 +53,7 @@ uses
 procedure DAbstractArranger.Update;
 begin
   inherited Update; //gets animation state and kills children
-  ManageChildren;   //sets NEXT for children
+  ArrangeChildren;  //sets NEXT for children
   ResetChildren;    //Resets children animation state to NEXT
 end;
 
@@ -58,6 +65,19 @@ var
 begin
   for c in Children do
     c.ResetAnimation;
+end;
+
+{======================  DCenterArranger =====================================}
+
+procedure DCenterArranger.ArrangeChildren;
+var
+  c: DSingleInterfaceElement;
+begin
+  for c in Children do
+    c.SetSize(Self.Current.x + (Self.Current.w - c.Current.w) div 2,
+      Self.Current.y + (Self.Current.h - c.Current.h) div 2,
+      c.Current.w, c.Current.h, c.Current.a, asNone, -1);
+    //c.Next.AssignFrom(Self.Current); //this is not right
 end;
 
 end.

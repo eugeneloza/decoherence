@@ -453,6 +453,7 @@ procedure DInterfaceElement.Update;
 var
   i: integer;
 begin
+  { does not call update on children as they will call their own update on draw }
   if Children.Count > 0 then
   begin
     i := 0;
