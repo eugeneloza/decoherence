@@ -74,10 +74,9 @@ var
   c: DSingleInterfaceElement;
 begin
   for c in Children do
-    c.SetSize(Self.Current.x + (Self.Current.w - c.Current.w) div 2,
-      Self.Current.y + (Self.Current.h - c.Current.h) div 2,
-      c.Current.w, c.Current.h, c.Current.a, asNone, -1);
-    //c.Next.AssignFrom(Self.Current); //this is not right
+    c.SetSize(Self.Current.x + (Self.Current.w - c.Next.w) div 2,
+      Self.Current.y + (Self.Current.h - c.Next.h) div 2,
+      c.Next.w, c.Next.h, c.Next.a, asNone, -1);
 end;
 
 end.
