@@ -30,6 +30,7 @@ uses
   DecoWind,
   DecoFrames,
   DecoInterfaceBars,
+  DecoInterfaceArrangers,
   {</temporary>}
   DecoGlobal, DecoGUIScale;
 
