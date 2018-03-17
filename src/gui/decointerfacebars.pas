@@ -50,7 +50,8 @@ uses
 
 procedure DAbstractBarImage.Draw;
 var
-  xx: integer;
+  Phase: DFloat;
+  PositionSource, PositionScaled: integer;
 begin
   //inherited <---------- this render is different
   if Max = Min then
@@ -60,15 +61,21 @@ begin
   end;
 
   Update;
+
+  Phase := Position / (Max - Min);
   if Kind = bsVertical then
   begin
-    xx := Round(Current.h * Position / (Max - Min));
-    Image.Draw(Current.x, Current.y, Current.w, xx);
+    PositionScaled := Round(Current.h * Phase);
+    PositionSource := Round(Image.Height * Phase);
+    Image.Draw(Current.x, Current.y, Current.w, PositionScaled,
+      0, 0, Image.Width, PositionSource);
   end
   else
   begin
-    xx := Round(Current.w * Position / (Max - Min));
-    Image.Draw(Current.x, Current.y, xx, Current.h);
+    PositionScaled := Round(Current.w * Phase);
+    PositionSource := Round(Image.Width * Phase);
+    Image.Draw(Current.x, Current.y, PositionScaled, Current.h,
+      0, 0, PositionSource, Image.Height);
   end;
 end;
 
