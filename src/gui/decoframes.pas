@@ -27,6 +27,7 @@ interface
 
 uses
   Generics.Collections,
+  CastleVectors,
   DecoImages, DecoInterfaceImages,
   DecoGlobal;
 
@@ -34,19 +35,58 @@ type
   { Just an alias to be able to assign a DSimpleImage as a frame
     However, in some time, we might want to add "burner" to
     non-rectagonal frames. Thou I'm unsure if it worth the trouble. }
-  DFrame = DAbstractImage;
+  DAbstractFrame = DAbstractImage;
+
+type
+  { Despite the differences, gaps must be calculated for both frames types }
+  IFrame = interface
+  ['{E8BBFE03-2AFD-4042-891E-565654657415}']
+    function GapLeft: integer;
+    function GapBottom: integer;
+    function GapRight: integer;
+    function GapTop: integer;
+  end;
+
+type
+  DImageFrame = class(DSimpleImage, IFrame)
+  strict private
+    Corners: TVector4Integer;
+  public
+    function GapLeft: integer;
+    function GapBottom: integer;
+    function GapRight: integer;
+    function GapTop: integer;
+    { Determine frame gaps to take space between the frame and the content
+      Specifying value < 0 means this corner will be equal to gLeft
+      i.e. to SetGap(10,10,10,10) just SetGap(10) may be used;
+      as image frames are usually expected to be symmetric }
+    procedure SetGap(const gLeft: integer = -1; const gBottom: integer = -1;
+  const gRight: integer = -1; const gTop: integer = -1);
+  end;
 
 type
   { Rectagonal frame is scaled 3x3 and accepts DFrameImage}
-  DRectagonalFrame = class(DFrame)
-  private
+  DRectagonalFrame = class(DAbstractFrame, IFrame)
+  strict private
     { frame must be a DImage to scale properly during animations
       this is just a source image link, stored only until next render
       the delayed rescale is made as a safe-guard to avoid accident
       frame sclaing before the NEXT was initialized properly }
     FrameImage: DFrameImage;
+  strict private
+    Corners: TVector4Integer;
     InitPending: boolean;
     procedure ResizeFrame;
+  public
+    function GapLeft: integer;
+    function GapBottom: integer;
+    function GapRight: integer;
+    function GapTop: integer;
+    { Determine additional gaps for the frame (including frame internal gaps)
+      Specifying value < 0 means this corner will be equal to gLeft
+      i.e. to SetGap(10,10,10,10) just SetGap(10) may be used }
+    procedure SetGap(const gLeft: integer = 0; const gBottom: integer = -1;
+      const gRight: integer = -1; const gTop: integer = -1);
   public
     procedure Draw; override;
     { Load a frame image here }
@@ -54,6 +94,15 @@ type
   public
     constructor Create; override;
   end;
+
+{
+type
+  DFramedElement = class(DAbstractSorter)
+  private
+    Frame: DAbstractFrame;
+
+  end;
+}
 
 type
   TFramesDictionary = specialize TObjectDictionary<string, DFrameImage>;
@@ -66,7 +115,7 @@ function GetFrameByName(const ItemName: string): DFrameImage; TryInline
 implementation
 uses
   SysUtils,
-  CastleImages, CastleVectors, CastleRectangles,
+  CastleImages, CastleRectangles,
   {$IFDEF BurnerImage}DecoBurner,{$ENDIF}
   DecoLog;
 
@@ -81,6 +130,96 @@ begin
 end;
 
 {=============================================================================}
+
+function DImageFrame.GapLeft: integer;
+begin
+  Result := Corners[0];
+end;
+function DImageFrame.GapBottom: integer;
+begin
+  Result := Corners[1];
+end;
+function DImageFrame.GapRight: integer;
+begin
+  Result := Corners[2];
+end;
+function DImageFrame.GapTop: integer;
+begin
+  Result := Corners[3];
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DImageFrame.SetGap(const gLeft: integer = -1; const gBottom: integer = -1;
+  const gRight: integer = -1; const gTop: integer = -1);
+begin
+  if gLeft > 0 then
+    Corners[0] := gLeft
+  else
+    Corners[0] := 0;
+
+  if gBottom >= 0 then
+    Corners[1] := gBottom
+  else
+    Corners[1] := Corners[0];
+
+  if gRight >= 0 then
+    Corners[2] := gRight
+  else
+    Corners[2] := Corners[0];
+
+  if gTop >= 0 then
+    Corners[3] := gTop
+  else
+    Corners[3] := Corners[0];
+end;
+
+{=============================================================================}
+
+function DRectagonalFrame.GapLeft: integer;
+begin
+  Result := FrameImage.Corners[0] + Corners[0];
+end;
+function DRectagonalFrame.GapBottom: integer;
+begin
+  Result := FrameImage.Corners[1] + Corners[1];
+end;
+function DRectagonalFrame.GapRight: integer;
+begin
+  Result := FrameImage.Corners[2] + Corners[2];
+end;
+function DRectagonalFrame.GapTop: integer;
+begin
+  Result := FrameImage.Corners[3] + Corners[3];
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DRectagonalFrame.SetGap(const gLeft: integer = 0; const gBottom: integer = -1;
+  const gRight: integer = -1; const gTop: integer = -1);
+begin
+  if gLeft > 0 then
+    Corners[0] := gLeft
+  else
+    Corners[0] := 0;
+
+  if gBottom >= 0 then
+    Corners[1] := gBottom
+  else
+    Corners[1] := Corners[0];
+
+  if gRight >= 0 then
+    Corners[2] := gRight
+  else
+    Corners[2] := Corners[0];
+
+  if gTop >= 0 then
+    Corners[3] := gTop
+  else
+    Corners[3] := Corners[0];
+end;
+
+{-----------------------------------------------------------------------------}
 
 procedure DRectagonalFrame.ResizeFrame;
 var
@@ -119,6 +258,7 @@ begin
   inherited Create;
   InitPending := false;
   OwnsImage := true;
+  Corners := TVector4Integer.Zero;
 end;
 
 end.
