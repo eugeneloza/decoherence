@@ -30,9 +30,8 @@ uses
 type
   { calls ManageChildren in Update and resets their animation state }
   DAbstractArranger = class(DInterfaceElement)
-  strict private
-    procedure ResetChildren;
   strict protected
+    procedure ResetChildren;
     procedure ArrangeChildren; virtual; abstract;
   public
     procedure Update; override;
@@ -54,7 +53,6 @@ procedure DAbstractArranger.Update;
 begin
   inherited Update; //gets animation state and kills children
   ArrangeChildren;  //sets NEXT for children
-  ResetChildren;    //Resets children animation state to NEXT
 end;
 
 {-----------------------------------------------------------------------------}
@@ -73,10 +71,15 @@ procedure DCenterArranger.ArrangeChildren;
 var
   c: DSingleInterfaceElement;
 begin
+  //inherited <------- parent is abstract
   for c in Children do
     c.SetSize(Self.Current.x + (Self.Current.w - c.Next.w) div 2,
       Self.Current.y + (Self.Current.h - c.Next.h) div 2,
-      c.Next.w, c.Next.h, c.Next.a, asNone, -1);
+      Round(c.Next.w {* Self.Current.w / Self.Next.w}),
+      Round(c.Next.h {* Self.Current.h / Self.Next.h}),
+      c.Next.a, asNone, -1);
+
+  ResetChildren;    //Resets children animation state to NEXT
 end;
 
 end.
