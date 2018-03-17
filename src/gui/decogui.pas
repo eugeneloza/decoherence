@@ -187,33 +187,33 @@ begin
   Grab(Frame);
 
   Arr := DCenterArranger.Create;
-  Arr.SetSize(600, 100, 200, 200);
+  Arr.SetSize(600, 100, 200, 200, 0.5, asZoomIn, 2.0);
 
   Img := DSimpleImage.Create;
-  Img.Load(LoadDecoImage('GUI/Frames/GradientFrame.png',50,50));
+  Img.Load(LoadDecoImage('GUI/Frames/GradientFrame.png', 50, 50));
   Img.SetSize(0, 0, 150, 150);
   Arr.Grab(Img);
 
   Img := DSimpleImage.Create;
-  Img.Load(LoadDecoImage('GUI/Frames/GradientFrame.png',50,50));
+  Img.Load(LoadDecoImage('GUI/Frames/GradientFrame.png', 50, 50));
   Img.SetSize(0, 0, 50, 50);
   Arr.Grab(Img);
 
+  Grab(Arr);
+
   Bar := DAbstractBarImage.Create;
-  Bar.Load(LoadDecoImage('GUI/ProgressBar/ProgressBar.png',500,32));
-  Bar.SetSize(50, 500, 500, 32);
+  Bar.Load(LoadDecoImage('GUI/ProgressBar/ProgressBar.png', 500, 32));
+  Bar.SetSize(50, 500, 800, 16);
   Bar.Kind := bsHorizontal;
   Bar.Position := 0.7;
   Grab(Bar);
 
   Bar := DAbstractBarImage.Create;
-  Bar.Load(LoadDecoImage('GUI/StatBar/HealthBar.png',32,329));
-  Bar.SetSize(600, 200, 32, 329);
+  Bar.Load(LoadDecoImage('GUI/StatBar/HealthBar.png', 32, 329));
+  Bar.SetSize(600, 200, 16, 165);
   Bar.Kind := bsVertical;
   Bar.Position := 0.7;
   Grab(Bar);
-
-  Grab(Arr);
 end;
 
 {............................................................................}
