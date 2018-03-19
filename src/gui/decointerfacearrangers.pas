@@ -63,9 +63,15 @@ var
   c: DSingleInterfaceElement;
 begin
   //inherited ArrangeChildren(Animate, Duration); <------- parent is abstract
+  Self.GetAnimationState;
 
   for c in Children do
   begin
+    c.GetAnimationState;
+    c.Next.x := Self.Current.x + (Self.Current.w - c.Next.w) div 2;
+    c.Next.y := Self.Current.y + (Self.Current.h - c.Next.h) div 2;
+    c.ResetAnimation;
+
     c.SetSize(Self.Next.x + (Self.Next.w - c.Next.w) div 2,
       Self.Next.y + (Self.Next.h - c.Next.h) div 2,
       c.Next.w,
