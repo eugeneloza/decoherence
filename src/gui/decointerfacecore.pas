@@ -36,7 +36,7 @@ const
 type
   { Style of the animation.
     asLinear is just linear interpolation,
-    asSquare is slower in the beginning and end, and faster in the middle}
+    asSquare is faster in the beginning and slower in the end}
   TAnimationCurve = (acLinear, acSquare);
 
 type
@@ -55,8 +55,6 @@ type
     AnimationDuration: DTime;
     AnimationCurve: TAnimationCurve;
     AnimationSuicide: boolean;
-    { Updates/caches Current container }
-    procedure GetAnimationState; TryInline
     function GetAlpha: DFloat;
   strict protected
     { Parent interface element }
@@ -78,6 +76,8 @@ type
     { updates the class each frame,
       (e.g. gets the current animation state) }
     procedure Update; virtual;
+    { Updates/caches Current container }
+    procedure GetAnimationState; TryInline
   public
     property Alpha: Single read GetAlpha;
     { Draw the element / as abstract as it might be :) }
@@ -224,10 +224,7 @@ begin
     //determine the animation phase
     case AnimationCurve of
       //acLinear: ; //<- change nothing.
-      acSquare: if Phase < 0.5 then
-          Phase := Sqr(2 * Phase) / 2
-        else
-          Phase := 1 - Sqr(2 * (1 - Phase)) / 2;
+      acSquare: Phase := Sqrt(Phase);
     end;
     Current.AssignMix(Last, Next, Phase);
   end
