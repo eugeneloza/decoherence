@@ -24,9 +24,21 @@ unit DecoFont;
 interface
 
 uses
+  CastleFonts,
   DecoFontEncoding,
   DecoGlobal;
 
+
+type
+  {}
+  DFont = class(TTextureFont)
+  end;
+
+var
+  DebugFont, DefaultFont: DFont;
+
+{}
+function GetFontByName(const FontName: string): DFont; TryInline
 {}
 procedure InitFonts;
 {}
@@ -37,6 +49,10 @@ uses
   CastleTextureFont_LinBiolinumRG_16, //a debug font
   DecoLog;
 
+function GetFontByName(const FontName: string): DFont; TryInline
+begin
+  Result := DefaultFont;
+end;
 
 {............................................................................}
 
