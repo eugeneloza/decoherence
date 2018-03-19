@@ -34,6 +34,7 @@ procedure FreeFonts;
 {............................................................................}
 implementation
 uses
+  CastleTextureFont_LinBiolinumRG_16, //a debug font
   DecoLog;
 
 
