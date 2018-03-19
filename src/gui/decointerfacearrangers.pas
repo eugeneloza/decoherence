@@ -31,8 +31,7 @@ type
   { calls ManageChildren in Update and resets their animation state }
   DAbstractArranger = class(DInterfaceElement)
   strict protected
-    procedure ResetChildren;
-    procedure ArrangeChildren(const Animate: TAnimationStyle; const Duration: DTime); virtual;
+    procedure ArrangeChildren(const Animate: TAnimationStyle; const Duration: DTime); virtual; abstract;
   public
     procedure SetSize(const ax, ay, aw, ah: integer; const aAlpha: DFloat = 1.0;
       const Animate: TAnimationStyle = asDefault; const Duration: DTime = DefaultAnimationDuration); override;
@@ -57,34 +56,14 @@ begin
   ArrangeChildren(Animate, Duration);
 end;
 
-{-----------------------------------------------------------------------------}
-
-procedure DAbstractArranger.ArrangeChildren(const Animate: TAnimationStyle; const Duration: DTime);
-var
-  c: DSingleInterfaceElement;
-begin
-  //no need to, as SetSize will fire those automatically
-{  for c in Children do
-    if c is DAbstractArranger then
-      DAbstractArranger(c).ArrangeChildren(Animate, Duration); }
-end;
-
-{-----------------------------------------------------------------------------}
-
-procedure DAbstractArranger.ResetChildren;
-var
-  c: DSingleInterfaceElement;
-begin
-  for c in Children do
-    c.ResetAnimation;
-end;
-
 {======================  DCenterArranger =====================================}
 
 procedure DCenterArranger.ArrangeChildren(const Animate: TAnimationStyle; const Duration: DTime);
 var
   c: DSingleInterfaceElement;
 begin
+  //inherited ArrangeChildren(Animate, Duration); <------- parent is abstract
+
   for c in Children do
   begin
     c.SetSize(Self.Next.x + (Self.Next.w - c.Next.w) div 2,
@@ -93,8 +72,6 @@ begin
       c.Next.h,
       c.Next.a, Animate, Duration);
   end;
-
-  inherited ArrangeChildren(Animate, Duration);
 end;
 
 end.
