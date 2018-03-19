@@ -1,0 +1,5 @@
+Biolinum Regular by Philipp Poll
+
+Libertine Fonts are free software under terms of the GPL and OFL.
+
+In a nutshell: Libertine Fonts are free and open source software. We publish our fonts together with the original format SFD. Changing the fonts is allowed as long as the derivative work is published under the same license again.  Our fonts are licensed under GPL (with font exception). Since version 2.1.9 Libertine Fonts are also licensed under the OFL. Further information about the GPL can be found here: GPL License text, Wikipedia. For the OFL respectively: OFL License text, Wikipedia.
