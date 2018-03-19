@@ -25,23 +25,24 @@ interface
 
 uses
   DecoInterfaceCore,
-  DecoGlobal;
+  DecoTime, DecoGlobal;
 
 type
   { calls ManageChildren in Update and resets their animation state }
   DAbstractArranger = class(DInterfaceElement)
   strict protected
     procedure ResetChildren;
-    procedure ArrangeChildren; virtual; abstract;
+    procedure ArrangeChildren(const Animate: TAnimationStyle; const Duration: DTime); virtual;
   public
-    procedure Update; override;
+    procedure SetSize(const ax, ay, aw, ah: integer; const aAlpha: DFloat = 1.0;
+      const Animate: TAnimationStyle = asDefault; const Duration: DTime = DefaultAnimationDuration); override;
   end;
 
 type
   { arranges children relative to its center without scaling them }
   DCenterArranger = class(DAbstractArranger)
   strict protected
-    procedure ArrangeChildren; override;
+    procedure ArrangeChildren(const Animate: TAnimationStyle; const Duration: DTime); override;
   end;
 
 {............................................................................}
@@ -49,10 +50,23 @@ implementation
 uses
   DecoLog;
 
-procedure DAbstractArranger.Update;
+procedure DAbstractArranger.SetSize(const ax, ay, aw, ah: integer; const aAlpha: DFloat = 1.0;
+  const Animate: TAnimationStyle = asDefault; const Duration: DTime = DefaultAnimationDuration);
 begin
-  inherited Update; //gets animation state and kills children
-  ArrangeChildren;  //sets NEXT for children
+  inherited SetSize(ax, ay, aw, ah, aAlpha, Animate, Duration);
+  ArrangeChildren(Animate, Duration);
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DAbstractArranger.ArrangeChildren(const Animate: TAnimationStyle; const Duration: DTime);
+var
+  c: DSingleInterfaceElement;
+begin
+  //no need to, as SetSize will fire those automatically
+{  for c in Children do
+    if c is DAbstractArranger then
+      DAbstractArranger(c).ArrangeChildren(Animate, Duration); }
 end;
 
 {-----------------------------------------------------------------------------}
@@ -67,19 +81,20 @@ end;
 
 {======================  DCenterArranger =====================================}
 
-procedure DCenterArranger.ArrangeChildren;
+procedure DCenterArranger.ArrangeChildren(const Animate: TAnimationStyle; const Duration: DTime);
 var
   c: DSingleInterfaceElement;
 begin
-  //inherited <------- parent is abstract
   for c in Children do
-    c.SetSize(Self.Current.x + (Self.Current.w - c.Next.w) div 2,
-      Self.Current.y + (Self.Current.h - c.Next.h) div 2,
-      Round(c.Next.w {* Self.Current.w / Self.Next.w}),
-      Round(c.Next.h {* Self.Current.h / Self.Next.h}),
-      c.Next.a, asNone, -1);
+  begin
+    c.SetSize(Self.Next.x + (Self.Next.w - c.Next.w) div 2,
+      Self.Next.y + (Self.Next.h - c.Next.h) div 2,
+      c.Next.w,
+      c.Next.h,
+      c.Next.a, Animate, Duration);
+  end;
 
-  ResetChildren;    //Resets children animation state to NEXT
+  inherited ArrangeChildren(Animate, Duration);
 end;
 
 end.

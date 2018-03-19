@@ -187,7 +187,6 @@ begin
   Grab(Frame);
 
   Arr := DCenterArranger.Create;
-  Arr.SetSize(600, 100, 200, 200, 0.5, asZoomIn, 2.0);
 
   Img := DSimpleImage.Create;
   Img.Load(LoadDecoImage('GUI/Frames/GradientFrame.png', 50, 50));
@@ -199,6 +198,7 @@ begin
   Img.SetSize(0, 0, 50, 50);
   Arr.Grab(Img);
 
+  Arr.SetSize(600, 100, 200, 200, 0.5, asZoomIn, 2.0);
   Grab(Arr);
 
   Bar := DAbstractBarImage.Create;

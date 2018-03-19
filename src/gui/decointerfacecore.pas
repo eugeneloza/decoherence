@@ -87,7 +87,7 @@ type
     { Initialize this element with specific coordinates/size/alpha
       optionally animation may be specified }
     procedure SetSize(const ax, ay, aw, ah: integer; const aAlpha: DFloat = 1.0;
-      const Animate: TAnimationStyle = asDefault; const Duration: DTime = DefaultAnimationDuration);
+      const Animate: TAnimationStyle = asDefault; const Duration: DTime = DefaultAnimationDuration); virtual;
     { Scale this element to full screen (no animation) }
     procedure FullScreen(const aAlpha: Single = 1);
   public
