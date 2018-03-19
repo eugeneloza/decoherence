@@ -36,7 +36,8 @@ uses
   {$IFDEF BurnerImage}DecoBurner,{$ENDIF}
   DecoFont,
   DecoWind, DecoFrames,
-  DecoImageLoader;
+  DecoImageLoader,
+  DecoLog;
 
 procedure LoadFrames;
 begin
@@ -50,6 +51,7 @@ end;
 
 procedure LoadInterface;
 begin
+  Log(LogInit, CurrentRoutine, 'Loading interface files.');
   InitFonts;
   {$IFDEF BurnerImage}
   InitBurnerImage;
@@ -58,8 +60,11 @@ begin
   LoadFrames;
 end;
 
+{-----------------------------------------------------------------------------}
+
 procedure FreeInterface;
 begin
+  Log(LogInit, CurrentRoutine, 'Freeing interface objects.');
   FreeFonts;
   FramesDictionary.Free;
 end;

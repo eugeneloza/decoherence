@@ -47,7 +47,7 @@ procedure FreeFonts;
 implementation
 uses
   CastleTextureFont_LinBiolinumRG_16, //a debug font
-  DecoLog;
+  DecoTrash, DecoLog;
 
 function GetFontByName(const FontName: string): DFont; TryInline
 begin
@@ -61,15 +61,19 @@ begin
   Log(LogInit, CurrentRoutine, 'Loading fonts.');
   InitEncoding;
 
+  DebugFont := DFont.Create(TextureFont_LinBiolinumRG_16);
+  AutoFree.Add(DebugFont);
+  DefaultFont := DebugFont;
 
-  FreeEncoding; //as soon as everything is loaded, we don't need it anymore
+  FreeEncoding; //as soon as all fonts are loaded, we don't need encoding anymore
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure FreeFonts;
 begin
-  //actually everything should be freed automatically, but let it remain here for now.
+  {actually everything should be freed automatically,
+   but let it remain here for now.}
 end;
 
 end.
