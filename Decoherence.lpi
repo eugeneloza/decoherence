@@ -116,7 +116,7 @@
         <PackageName Value="castle_base"/>
       </Item2>
     </RequiredPackages>
-    <Units Count="31">
+    <Units Count="35">
       <Unit0>
         <Filename Value="Decoherence.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -266,6 +266,26 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="DecoWind"/>
       </Unit30>
+      <Unit31>
+        <Filename Value="src/gui/decointerfacebars.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoInterfaceBars"/>
+      </Unit31>
+      <Unit32>
+        <Filename Value="src/gui/decointerfacearrangers.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoInterfaceArrangers"/>
+      </Unit32>
+      <Unit33>
+        <Filename Value="src/gui/decofontencoding.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoFontEncoding"/>
+      </Unit33>
+      <Unit34>
+        <Filename Value="src/gui/decofont.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoFont"/>
+      </Unit34>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

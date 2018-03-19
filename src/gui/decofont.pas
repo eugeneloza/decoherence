@@ -15,53 +15,44 @@
 
 {---------------------------------------------------------------------------}
 
-(* Load some content for the Interface *)
+(* Game fonts and text to image conversion *)
 
-unit DecoInterfaceLoader;
+unit DecoFont;
 
 {$INCLUDE compilerconfig.inc}
 
 interface
 
 uses
+  DecoFontEncoding,
   DecoGlobal;
 
-{ Read all interface images, icons, cursor pointers, and so on }
-procedure LoadInterface;
-{ Free all non-automatically freed interface-related stuff }
-procedure FreeInterface;
+{}
+procedure InitFonts;
+{}
+procedure FreeFonts;
 {............................................................................}
 implementation
 uses
-  {$IFDEF BurnerImage}DecoBurner,{$ENDIF}
-  DecoFont,
-  DecoWind, DecoFrames,
-  DecoImageLoader;
-
-procedure LoadFrames;
-begin
-  FramesDictionary := TFramesDictionary.Create([]);
-  FramesDictionary.Add('RegularFrame',
-    LoadFrameImage('GUI/Frames/GradientFrame.png', 3, 3, 3, 3)) //AddOrSetValue;
-end;
+  DecoLog;
 
 
 {............................................................................}
 
-procedure LoadInterface;
+procedure InitFonts;
 begin
-  InitFonts;
-  {$IFDEF BurnerImage}
-  InitBurnerImage;
-  {$ENDIF}
-  InitWind;
-  LoadFrames;
+  Log(LogInit, CurrentRoutine, 'Loading fonts.');
+  InitEncoding;
+
+
+  FreeEncoding; //as soon as everything is loaded, we don't need it anymore
 end;
 
-procedure FreeInterface;
+{-----------------------------------------------------------------------------}
+
+procedure FreeFonts;
 begin
-  FreeFonts;
-  FramesDictionary.Free;
+  //actually everything should be freed automatically, but let it remain here for now.
 end;
 
 end.

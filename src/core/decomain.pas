@@ -24,9 +24,6 @@ unit DecoMain;
 interface
 
 uses
-  {<temporary included for debugging>}
-  DecoFontEncoding,
-  {</temporary>}
   CastleWindow, DecoGlobal;
 
 
