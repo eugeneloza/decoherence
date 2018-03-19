@@ -1,4 +1,5 @@
 Biolinum Regular by Philipp Poll
+http://libertine-fonts.org
 
 Libertine Fonts are free software under terms of the GPL and OFL.
 
