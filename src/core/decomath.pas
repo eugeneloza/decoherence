@@ -34,9 +34,18 @@ function dZero(const a: DFloat): Boolean; TryInline
 { Returns "a" if a>0 or "0" if a<0 }
 function AboveZero(const a: DFloat): DFloat; TryInline
 { Returns larger number of a, b }
-function Maximum(a, b: DFloat): DFloat; TryInline
+function Maximum(const a, b: DFloat): DFloat; TryInline
 { Returns sign of a in +1,0,-1 }
-function Sign(a: DFloat): shortint; TryInline
+function Sign(const a: DFloat): shortint; TryInline
+{ Convenient procedures to operate max/min values
+  if aCompare > aMax then aMax := Compare
+  if aCompare < aMin then aMin := Compare }
+procedure AssignMax(var aMax: DFloat; const aCompare: DFloat); TryInline
+procedure AssignMax(var aMax: integer; const aCompare: integer); TryInline
+procedure AssignMin(var aMin: DFloat; const aCompare: DFloat); TryInline
+procedure AssignMin(var aMin: integer; const aCompare: integer); TryInline
+procedure AssignMinMax(var aMin, aMax: DFloat; const aCompare: DFloat); TryInline
+procedure AssignMinMax(var aMin, aMax: integer; const aCompare: integer); TryInline
 {.......................................................................}
 implementation
 
@@ -77,7 +86,7 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-function Maximum(a, b: DFloat): DFloat; TryInline
+function Maximum(const a, b: DFloat): DFloat; TryInline
 begin
   if a > b then
     Result := a
@@ -87,7 +96,7 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-function Sign(a: DFloat): shortint; TryInline
+function Sign(const a: DFloat): shortint; TryInline
 begin
   if a > 0 then   {a < Epsilon?}
     Result := +1
@@ -97,6 +106,46 @@ begin
   else
     Result := 0;
 end;
+
+{============================================================================}
+
+procedure AssignMax(var aMax: DFloat; const aCompare: DFloat); TryInline
+begin
+  if aMax < aCompare then
+    aMax := aCompare;
+end;
+procedure AssignMax(var aMax: integer; const aCompare: integer); TryInline
+begin
+  if aMax < aCompare then
+    aMax := aCompare;
+end;
+procedure AssignMin(var aMin: DFloat; const aCompare: DFloat); TryInline
+begin
+  if aMin > aCompare then
+    aMin := aCompare;
+end;
+procedure AssignMin(var aMin: integer; const aCompare: integer); TryInline
+begin
+  if aMin > aCompare then
+    aMin := aCompare;
+end;
+procedure AssignMinMax(var aMin, aMax: DFloat; const aCompare: DFloat); TryInline
+begin
+  if aMax < aCompare then
+    aMax := aCompare
+  else
+  if aMin > aCompare then
+    aMin := aCompare;
+end;
+procedure AssignMinMax(var aMin, aMax: integer; const aCompare: integer); TryInline
+begin
+  if aMax < aCompare then
+    aMax := aCompare
+  else
+  if aMin > aCompare then
+    aMin := aCompare;
+end;
+
 
 end.
 
