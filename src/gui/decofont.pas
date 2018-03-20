@@ -38,6 +38,7 @@ type
     Value: string;
     { Specific size parameters of this line }
     Width, Height, HeightBase: integer;
+    FullWidth: integer;
     { how much additional space may/should be used to adjust to width? }
     AdditionalSpace: integer;
     { how many words are in the line? }
@@ -87,7 +88,7 @@ uses
   Generics.Collections,
   CastleUnicode, CastleColors, CastleVectors,
   CastleTextureFont_LinBiolinumRG_16, //a debug font
-  DecoTrash, DecoLog;
+  DecoTrash, DecoLog, DecoMath;
 
 {-----------------------------------------------------------------------------}
 
@@ -151,12 +152,9 @@ begin
   {get maximum values of height, baseheight and width}
   for i := 0 to aString.Count - 1 do
   begin
-    if MaxH < aString[i].Height then
-      MaxH := aString[i].Height;
-    if MaxHb < aString[i].Height - aString[i].HeightBase then
-      MaxHb := aString[i].Height - aString[i].HeightBase;
-    if MaxW < aString[i].Width + aString[i].AdditionalSpace then
-      MaxW := aString[i].Width + aString[i].AdditionalSpace;
+    AssignMax(MaxH, aString[i].Height);
+    AssignMax(MaxHb, aString[i].Height - aString[i].HeightBase);
+    AssignMax(MaxW, aString[i].FullWidth);
   end;
   MaxH += Self.AdditionalLineSpacing;
   Result := TGRayScaleAlphaImage.Create;
@@ -224,6 +222,7 @@ var
     NewString.HeightBase := TextHeightBase(NewString.Value);
     NewString.Height := TextHeight(NewString.Value);
     NewString.Width := TextWidth(NewString.Value);
+    NewString.FullWidth := aWidth;
     NewString.AdditionalSpace := aWidth - NewString.Width + SpaceWidth * (Length(Words) - 1);
     NewString.Words := Words;
     NewString.AdjustWidth := (not isLineBreak) and (Length(Words) > 1);
