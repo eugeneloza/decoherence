@@ -24,7 +24,7 @@ unit DecoFont;
 interface
 
 uses
-  CastleFonts, CastleUtils {for TStructList},
+  CastleFonts, CastleUtils {for TStructList}, CastleImages,
   DecoFontEncoding,
   DecoGlobal;
 
@@ -48,9 +48,21 @@ type
 type
   {}
   DFont = class(TTextureFont)
+  private
+    { Converts a single line of text to an image
+      if Width < s.NoSpaceWidth then it just renders the string
+      otherwise - justifies it along width }
+    function StringToImage(const s: string; const aWidth: integer = -1): TGrayscaleAlphaImage;
   public
     { Additional spacing between lines }
     AdditionalLineSpacing: integer;
+    { Converts a broken string into a single image }
+    function BrokenStringToImage(const s: DBrokenString): TGrayscaleAlphaImage;
+    { Converts a broken string into a single image with a shadow }
+    function BrokenStringToImageWithShadow(const s: DBrokenString;
+      ShadowStrength: DFloat; ShadowLength: integer): TGrayscaleAlphaImage;
+    { Breaks a string to a DBrokenString }
+    function BreakStings(const s: string; const w: integer): DBrokenString;
   end;
 
 var
@@ -67,9 +79,143 @@ procedure FreeFonts;
 implementation
 uses
   Generics.Collections,
-  CastleUnicode,
+  CastleUnicode, CastleColors, CastleVectors,
   CastleTextureFont_LinBiolinumRG_16, //a debug font
   DecoTrash, DecoLog;
+
+{-----------------------------------------------------------------------------}
+
+function DFont.StringToImage(const s: string; const aWidth: integer = -1): TGrayscaleAlphaImage;
+var
+  P: Pvector2byte;
+  i: integer;
+begin
+  Result := TGrayscaleAlphaImage.Create;
+  Result.SetSize(TextWidth(s), TextHeight(s) + Self.AdditionalLineSpacing);  //including baseline
+  Result.Clear(Vector2Byte(0, 255));
+
+  PushProperties; // save previous TargetImage value
+  TargetImage := Result;
+  Print(0, TextHeight(s) - TextHeightBase(s), White, S);
+  //shift text up from a baseline
+  PopProperties; // restore previous TargetImage value
+
+  //reset alpha for correct next drawing
+  //todo :  RGB alpha image
+  P := Result.Pixels;
+  for i := 1 to Result.Width * Result.Height * Result.Depth do
+  begin
+    p^[1] := p^[0];
+    p^[0] := 255;
+    inc(P);
+  end;
+end;
+
+{---------------------------------------------------------------------------}
+
+function DFont.BrokenStringToImage(const s: DBrokenString): TGrayscaleAlphaImage;
+var
+  DummyImage: TGrayscaleAlphaImage;
+  i: integer;
+  MaxH, MaxHb, MaxW: integer;
+begin
+  MaxH := 0;
+  MaxHb := 0;
+  MaxW := 0;
+  for i := 0 to s.Count - 1 do
+  begin
+    if MaxH < s[i].Height then
+      MaxH := s[i].Height;
+    if MaxHb < s[i].Height - s[i].HeightBase then
+      MaxHb := s[i].Height - s[i].HeightBase;
+    if MaxW < s[i].Width then
+      MaxW := s[i].Width;
+  end;
+  MaxH += Self.AdditionalLineSpacing;
+  //  Log('DFont.broken_string_to_image','max height base  =  ', inttostr(maxhb));
+  Result := TGRayScaleAlphaImage.Create;
+  Result.SetSize(MaxW, MaxH * (s.Count));
+  Result.Clear(Vector2Byte(0, 0));
+  for i := 0 to s.Count - 1 do
+  begin
+    DummyImage := StringToImage(s[i].Value);
+    Result.DrawFrom(DummyImage, 0, MaxH * (s.Count - 1 - i) + MaxHb -
+      (s[i].Height - s[i].HeightBase), dmBlendSmart);
+    DummyImage.Free;
+  end;
+end;
+
+{---------------------------------------------------------------------------}
+
+function DFont.BrokenStringToImageWithShadow(const s: DBrokenString;
+  ShadowStrength: DFloat; ShadowLength: integer): TGrayscaleAlphaImage;
+var
+  DummyImage, ShadowImage: TGrayscaleAlphaImage;
+  Iteration, i: integer;
+  p: PVector2byte;
+begin
+  DummyImage := BrokenStringToImage(s);
+  if (ShadowStrength > 0) and (ShadowLength > 0) then
+  begin
+    Result := TGrayscaleAlphaImage.Create(DummyImage.Width + ShadowLength,
+      DummyImage.Height + ShadowLength);//dummyImage.MakeCopy as TGrayscaleAlphaImage;
+    Result.Clear(Vector2Byte(0, 0));
+    ShadowImage := DummyImage.MakeCopy as TGrayscaleAlphaImage;
+    for Iteration := 1 to ShadowLength do
+    begin
+      p := ShadowImage.Pixels;
+      for i := 0 to ShadowImage.Width * ShadowImage.Height * ShadowImage.Depth - 1 do
+      begin
+        p^[1] := Round(p^[1] * ShadowStrength / Sqr(Iteration));
+        p^[0] := 0;
+        //shadow color intensity might be specified here... or even an RGB color if make Shadow a TRGBAlphaImage
+        inc(p);
+      end;
+      Result.DrawFrom(ShadowImage, Iteration, ShadowLength - Iteration, dmBlendSmart);
+    end;
+    Result.DrawFrom(DummyImage, 0, ShadowLength, dmBlendSmart);
+    ShadowImage.Free;
+    DummyImage.Free;
+  end
+  else
+    Result := DummyImage;
+end;
+
+{---------------------------------------------------------------------------}
+
+function DFont.BreakStings(const s: string; const w: integer): DBrokenString;
+var
+  i1, i2, i_break: integer;
+  NewString: DString;
+begin
+  Result := DBrokenString.Create;
+  i1 := 1;
+  i2 := 1;
+  i_break := i2;
+  while i2 <= Length(s) do
+  begin
+    if (Copy(s, i2, 1) = ' ') or (Copy(s, i2, Length(dLineBreak)) = dLineBreak) then
+      i_break := i2;
+    if (TextWidth(Copy(s, i1, i2 - i1)) > w) or (Copy(s, i2, Length(dLineBreak)) =
+      dLineBreak) then
+    begin
+      NewString.Value := Copy(s, i1, i_break - i1);
+      NewString.HeightBase := TextHeightBase(NewString.Value);
+      NewString.Height := TextHeight(NewString.Value);
+      NewString.Width := TextWidth(NewString.Value);
+      Result.Add(NewString);
+      i1 := i_break + 1;
+    end;
+    inc(i2);
+  end;
+  NewString.Value := Copy(s, i1, i2 - i1);
+  NewString.HeightBase := TextHeightBase(NewString.Value);
+  NewString.Height := TextHeight(NewString.Value);
+  NewString.Width := TextWidth(NewString.Value);
+  Result.Add(NewString);
+end;
+
+{============================================================================}
 
 type DFontDictionary = specialize TObjectDictionary<string, DFont>;
 
@@ -105,10 +251,10 @@ begin
 
   FontDictionary := DFontDictionary.Create([]);  //doesn't own children
 
-  FontDictionary.Add('PlayerHealth',GetLoadedFont('xolonium-12'));
-  FontDictionary.Add('PlayerName',GetLoadedFont('xolonium-12'));
-  FontDictionary.Add('LoadScreen',GetLoadedFont('xolonium-16'));
-  FontDictionary.Add('PlayerDamage',GetLoadedFont('xolonium-num-99'));
+  FontDictionary.Add('PlayerHealth', GetLoadedFont('xolonium-12'));
+  FontDictionary.Add('PlayerName', GetLoadedFont('xolonium-12'));
+  FontDictionary.Add('LoadScreen', GetLoadedFont('xolonium-16'));
+  FontDictionary.Add('PlayerDamage', GetLoadedFont('xolonium-num-99'));
 end;
 
 procedure InitFonts;
