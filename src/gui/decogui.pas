@@ -32,6 +32,7 @@ uses
   DecoInterfaceBars,
   DecoInterfaceArrangers,
   DecoImageLoader,
+  DecoLabels,
   {</temporary>}
   DecoGlobal, DecoGUIScale;
 
