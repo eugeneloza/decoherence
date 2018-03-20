@@ -52,7 +52,7 @@ type
     { Converts a single line of text to an image
       if Width < s.NoSpaceWidth then it just renders the string
       otherwise - justifies it along width }
-    function StringToImage(const s: string; const aWidth: integer = -1): TGrayscaleAlphaImage;
+    function StringToImage(const s: DString; const aWidth: integer = -1): TGrayscaleAlphaImage;
   public
     { Additional spacing between lines }
     AdditionalLineSpacing: integer;
@@ -85,19 +85,19 @@ uses
 
 {-----------------------------------------------------------------------------}
 
-function DFont.StringToImage(const s: string; const aWidth: integer = -1): TGrayscaleAlphaImage;
+function DFont.StringToImage(const s: DString; const aWidth: integer = -1): TGrayscaleAlphaImage;
 var
   P: Pvector2byte;
   i: integer;
 begin
   Result := TGrayscaleAlphaImage.Create;
-  Result.SetSize(TextWidth(s), TextHeight(s) + Self.AdditionalLineSpacing);  //including baseline
+  Result.SetSize(s.Width, s.Height + Self.AdditionalLineSpacing);  //including baseline
   Result.Clear(Vector2Byte(0, 255));
 
   PushProperties; // save previous TargetImage value
   TargetImage := Result;
-  Print(0, TextHeight(s) - TextHeightBase(s), White, S);
-  //shift text up from a baseline
+  Print(0, s.Height - s.HeightBase {shift text up from a baseline },
+    White, s.Value);
   PopProperties; // restore previous TargetImage value
 
   //reset alpha for correct next drawing
@@ -138,7 +138,7 @@ begin
   Result.Clear(Vector2Byte(0, 0));
   for i := 0 to s.Count - 1 do
   begin
-    DummyImage := StringToImage(s[i].Value);
+    DummyImage := StringToImage(s[i]);
     Result.DrawFrom(DummyImage, 0, MaxH * (s.Count - 1 - i) + MaxHb -
       (s[i].Height - s[i].HeightBase), dmBlendSmart);
     DummyImage.Free;
