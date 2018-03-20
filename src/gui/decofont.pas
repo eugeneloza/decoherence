@@ -35,9 +35,13 @@ const
 type
   {}
   DFont = class(TTextureFont)
+  public
+    { Additional spacing between lines }
+    AdditionalLineSpacing: integer;
   end;
 
 var
+  { Debug and DefaultFont }
   DebugFont, DefaultFont: DFont;
 
 {}
@@ -50,6 +54,7 @@ procedure FreeFonts;
 implementation
 uses
   Generics.Collections,
+  CastleUnicode,
   CastleTextureFont_LinBiolinumRG_16, //a debug font
   DecoTrash, DecoLog;
 
@@ -73,7 +78,42 @@ end;
 
 {............................................................................}
 
+procedure SetFonts;
+  function GetLoadedFont(const FontString: string): DFont;
+  begin
+    if not LoadedFonts.TryGetValue(FontString, Result) then
+    begin
+      Log(LogInterfaceError, CurrentRoutine, 'Unknown Font: ' + FontString);
+      Result := DefaultFont;
+    end;
+  end;
+begin
+  Log(LogInit, CurrentRoutine, 'Setting up fonts.');
+
+  FontDictionary := DFontDictionary.Create([]);  //doesn't own children
+
+  FontDictionary.Add('PlayerHealth',GetLoadedFont('xolonium-12'));
+  FontDictionary.Add('PlayerName',GetLoadedFont('xolonium-12'));
+  FontDictionary.Add('LoadScreen',GetLoadedFont('xolonium-16'));
+  FontDictionary.Add('PlayerDamage',GetLoadedFont('xolonium-num-99'));
+end;
+
 procedure InitFonts;
+  const
+    NormalFontFile = 'Xolonium-Regular.ttf';
+  function GetFontFile(const FontName: string; const CharSet: TUnicodeCharList;
+    const FontSize: integer; const AdditionalLineSpacing: integer = 0): DFont;
+  var
+    FontURL: string;
+  begin
+    FontURL := GameFolder('GUI/Fonts/' + FontName);
+    try
+      Result := DFont.Create(FontURL, FontSize, True, CharSet);
+      Result.AdditionalLineSpacing := AdditionalLineSpacing;
+    except
+      Log(LogInterfaceError, CurrentRoutine, 'Unable to load font ' + FontURL);
+    end;
+  end;
 begin
   Log(LogInit, CurrentRoutine, 'Initializing fonts.');
   InitEncoding;
@@ -83,12 +123,16 @@ begin
   DefaultFont := DebugFont;
 
   LoadedFonts := DFontDictionary.Create([doOwnsValues]);
-  FontDictionary := DFontDictionary.Create([]);
-
 
   Log(LogInit, CurrentRoutine, 'Loading fonts.');
 
+  LoadedFonts.Add('xolonium-12',GetFontFile(NormalFontFile, FullCharSet, 12, 3));
+  LoadedFonts.Add('xolonium-16',GetFontFile(NormalFontFile, FullCharSet, 16, 3));
+  LoadedFonts.Add('xolonium-num-99',GetFontFile(NormalFontFile, NumberCharSet, 99, 3));
+
   FreeEncoding; //as soon as all fonts are loaded, we don't need encoding anymore
+
+  SetFonts;
 end;
 
 {-----------------------------------------------------------------------------}

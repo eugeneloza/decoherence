@@ -41,7 +41,7 @@ uses
 
 procedure LoadFrames;
 begin
-  FramesDictionary := TFramesDictionary.Create([]);
+  FramesDictionary := TFramesDictionary.Create([]); //doesn't own children
   FramesDictionary.Add('RegularFrame',
     LoadFrameImage('GUI/Frames/GradientFrame.png', 3, 3, 3, 3)) //AddOrSetValue;
 end;
