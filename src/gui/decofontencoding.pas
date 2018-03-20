@@ -45,7 +45,8 @@ uses
   DecoTranslation, DecoLog;
 
 const
-  NumberString = '0123456789.';
+  { simple numbrs for a label, displaying damage }
+  NumberString = '0123456789.';  //maybe add ":" (for clock) and "+"/"-" here thou they would me more likely to be in "normal" fonts
 
   (* Latin languages *)
   AsciiString = SimpleAsciiCharacters;

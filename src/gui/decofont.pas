@@ -24,13 +24,26 @@ unit DecoFont;
 interface
 
 uses
-  CastleFonts,
+  CastleFonts, CastleUtils {for TStructList},
   DecoFontEncoding,
   DecoGlobal;
 
 const
   dLineBreak = sLineBreak;
 
+type
+  {}
+  DString = record
+    { Each line text content }
+    Value: string;
+    { Specific size parameters of this line }
+    Width, Height, HeightBase: integer;
+    NoSpaceWidth: integer;
+  end;
+
+type
+  {}
+  DBrokenString = specialize TStructList<DString>;
 
 type
   {}
@@ -126,9 +139,9 @@ begin
 
   Log(LogInit, CurrentRoutine, 'Loading fonts.');
 
-  LoadedFonts.Add('xolonium-12',GetFontFile(NormalFontFile, FullCharSet, 12, 3));
-  LoadedFonts.Add('xolonium-16',GetFontFile(NormalFontFile, FullCharSet, 16, 3));
-  LoadedFonts.Add('xolonium-num-99',GetFontFile(NormalFontFile, NumberCharSet, 99, 3));
+  LoadedFonts.Add('xolonium-12', GetFontFile(NormalFontFile, FullCharSet, 12, 3));
+  LoadedFonts.Add('xolonium-16', GetFontFile(NormalFontFile, FullCharSet, 16, 3));
+  LoadedFonts.Add('xolonium-num-99', GetFontFile(NormalFontFile, NumberCharSet, 99, 3));
 
   FreeEncoding; //as soon as all fonts are loaded, we don't need encoding anymore
 
