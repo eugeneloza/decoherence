@@ -38,7 +38,13 @@ type
     Value: string;
     { Specific size parameters of this line }
     Width, Height, HeightBase: integer;
-    NoSpaceWidth: integer;
+    { how much additional space may/should be used to adjust to width? }
+    AdditionalSpace: integer;
+    { how many words are in the line? }
+    Words: integer;
+    { Can this line be adjusted to width?
+      (e.g. the last line can't) }
+    AdjustWidth: boolean;
   end;
 
 type
@@ -52,7 +58,7 @@ type
     { Converts a single line of text to an image
       if Width < s.NoSpaceWidth then it just renders the string
       otherwise - justifies it along width }
-    function StringToImage(const s: DString; const aWidth: integer = -1): TGrayscaleAlphaImage;
+    function StringToImage(const aString: DString; const aWidth: integer = -1): TGrayscaleAlphaImage;
   public
     { Additional spacing between lines }
     AdditionalLineSpacing: integer;
@@ -62,7 +68,7 @@ type
     function BrokenStringToImageWithShadow(const s: DBrokenString;
       ShadowStrength: DFloat; ShadowLength: integer): TGrayscaleAlphaImage;
     { Breaks a string to a DBrokenString }
-    function BreakStings(const s: string; const w: integer): DBrokenString;
+    function BreakStings(const aString: string; const aWidth: integer): DBrokenString;
   end;
 
 var
@@ -85,19 +91,19 @@ uses
 
 {-----------------------------------------------------------------------------}
 
-function DFont.StringToImage(const s: DString; const aWidth: integer = -1): TGrayscaleAlphaImage;
+function DFont.StringToImage(const aString: DString; const aWidth: integer = -1): TGrayscaleAlphaImage;
 var
   P: Pvector2byte;
   i: integer;
 begin
   Result := TGrayscaleAlphaImage.Create;
-  Result.SetSize(s.Width, s.Height + Self.AdditionalLineSpacing);  //including baseline
+  Result.SetSize(aString.Width, aString.Height + Self.AdditionalLineSpacing);  //including baseline
   Result.Clear(Vector2Byte(0, 255));
 
   PushProperties; // save previous TargetImage value
   TargetImage := Result;
-  Print(0, s.Height - s.HeightBase {shift text up from a baseline },
-    White, s.Value);
+  Print(0, aString.Height - aString.HeightBase {shift text up from a baseline },
+    White, aString.Value);
   PopProperties; // restore previous TargetImage value
 
   //reset alpha for correct next drawing
@@ -183,35 +189,56 @@ end;
 
 {---------------------------------------------------------------------------}
 
-function DFont.BreakStings(const s: string; const w: integer): DBrokenString;
+function DFont.BreakStings(const aString: string; const aWidth: integer): DBrokenString;
 var
-  i1, i2, i_break: integer;
+  LineStart, CurrentChar, i_break: integer;
   NewString: DString;
+  isLineBreak: boolean;
+  isSpaceBar: boolean;
+  WordCount: integer;
 begin
   Result := DBrokenString.Create;
-  i1 := 1;
-  i2 := 1;
-  i_break := i2;
-  while i2 <= Length(s) do
+  LineStart := 1;
+  CurrentChar := 1;
+  i_break := CurrentChar;
+  WordCount := 0;
+  while CurrentChar <= Length(aString) do
   begin
-    if (Copy(s, i2, 1) = ' ') or (Copy(s, i2, Length(dLineBreak)) = dLineBreak) then
-      i_break := i2;
-    if (TextWidth(Copy(s, i1, i2 - i1)) > w) or (Copy(s, i2, Length(dLineBreak)) =
-      dLineBreak) then
+    isLineBreak := Copy(aString, CurrentChar, Length(dLineBreak)) = dLineBreak;
+    isSpaceBar := Copy(aString, CurrentChar, 1) = ' ';
+
+    { find the end of the word }
+    if isSpaceBar or isLineBreak then
     begin
-      NewString.Value := Copy(s, i1, i_break - i1);
+      i_break := CurrentChar;
+      inc(WordCount);
+    end;
+
+    if (TextWidth(Copy(aString, LineStart, CurrentChar - LineStart)) > aWidth)
+      or isLineBreak then
+    begin
+      { this is a line break until the text is over }
+      NewString.Value := Copy(aString, LineStart, i_break - LineStart);
       NewString.HeightBase := TextHeightBase(NewString.Value);
       NewString.Height := TextHeight(NewString.Value);
       NewString.Width := TextWidth(NewString.Value);
+      NewString.AdditionalSpace := aWidth - NewString.Width;
+      NewString.Words := WordCount;
+      NewString.AdjustWidth := not isLineBreak;
       Result.Add(NewString);
-      i1 := i_break + 1;
+      WordCount := 0;
+      LineStart := i_break + 1;
     end;
-    inc(i2);
+    inc(CurrentChar);
   end;
-  NewString.Value := Copy(s, i1, i2 - i1);
+  { add the last line }
+  NewString.Value := Copy(aString, LineStart, CurrentChar - LineStart);
   NewString.HeightBase := TextHeightBase(NewString.Value);
   NewString.Height := TextHeight(NewString.Value);
   NewString.Width := TextWidth(NewString.Value);
+  NewString.AdditionalSpace := aWidth - NewString.Width; //this is not needed
+  NewString.Words := WordCount; //this is not needed
+  NewString.AdjustWidth := false;
   Result.Add(NewString);
 end;
 
@@ -256,6 +283,8 @@ begin
   FontDictionary.Add('LoadScreen', GetLoadedFont('xolonium-16'));
   FontDictionary.Add('PlayerDamage', GetLoadedFont('xolonium-num-99'));
 end;
+
+{---------------------------------------------------------------------------}
 
 procedure InitFonts;
   const
