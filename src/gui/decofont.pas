@@ -196,6 +196,17 @@ var
   isLineBreak: boolean;
   isSpaceBar: boolean;
   WordCount: integer;
+  procedure AddNewString;
+  begin
+    NewString.Value := Copy(aString, LineStart, i_break - LineStart);
+    NewString.HeightBase := TextHeightBase(NewString.Value);
+    NewString.Height := TextHeight(NewString.Value);
+    NewString.Width := TextWidth(NewString.Value);
+    NewString.AdditionalSpace := aWidth - NewString.Width;
+    NewString.Words := WordCount;
+    NewString.AdjustWidth := not isLineBreak;
+    Result.Add(NewString);
+  end;
 begin
   Result := DBrokenString.Create;
   LineStart := 1;
@@ -218,28 +229,15 @@ begin
       or isLineBreak then
     begin
       { this is a line break until the text is over }
-      NewString.Value := Copy(aString, LineStart, i_break - LineStart);
-      NewString.HeightBase := TextHeightBase(NewString.Value);
-      NewString.Height := TextHeight(NewString.Value);
-      NewString.Width := TextWidth(NewString.Value);
-      NewString.AdditionalSpace := aWidth - NewString.Width;
-      NewString.Words := WordCount;
-      NewString.AdjustWidth := not isLineBreak;
-      Result.Add(NewString);
+      AddNewString;
       WordCount := 0;
       LineStart := i_break + 1;
     end;
     inc(CurrentChar);
   end;
   { add the last line }
-  NewString.Value := Copy(aString, LineStart, CurrentChar - LineStart);
-  NewString.HeightBase := TextHeightBase(NewString.Value);
-  NewString.Height := TextHeight(NewString.Value);
-  NewString.Width := TextWidth(NewString.Value);
-  NewString.AdditionalSpace := aWidth - NewString.Width; //this is not needed
-  NewString.Words := WordCount; //this is not needed
-  NewString.AdjustWidth := false;
-  Result.Add(NewString);
+  isLineBreak := true;
+  AddNewString;
 end;
 
 {============================================================================}
