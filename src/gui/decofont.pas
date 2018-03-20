@@ -58,14 +58,14 @@ type
     { Converts a single line of text to an image
       if Width < s.NoSpaceWidth then it just renders the string
       otherwise - justifies it along width }
-    function StringToImage(const aString: DString; const aWidth: integer = -1): TGrayscaleAlphaImage;
+    function StringToImage(const aString: DString): TGrayscaleAlphaImage;
   public
     { Additional spacing between lines }
     AdditionalLineSpacing: integer;
     { Converts a broken string into a single image }
-    function BrokenStringToImage(const s: DBrokenString): TGrayscaleAlphaImage;
+    function BrokenStringToImage(const aString: DBrokenString): TGrayscaleAlphaImage;
     { Converts a broken string into a single image with a shadow }
-    function BrokenStringToImageWithShadow(const s: DBrokenString;
+    function BrokenStringToImageWithShadow(const aString: DBrokenString;
       ShadowStrength: DFloat; ShadowLength: integer): TGrayscaleAlphaImage;
     { Breaks a string to a DBrokenString }
     function BreakStings(const aString: string; const aWidth: integer): DBrokenString;
@@ -91,7 +91,7 @@ uses
 
 {-----------------------------------------------------------------------------}
 
-function DFont.StringToImage(const aString: DString; const aWidth: integer = -1): TGrayscaleAlphaImage;
+function DFont.StringToImage(const aString: DString): TGrayscaleAlphaImage;
 var
   P: Pvector2byte;
   i: integer;
@@ -102,8 +102,12 @@ begin
 
   PushProperties; // save previous TargetImage value
   TargetImage := Result;
-  Print(0, aString.Height - aString.HeightBase {shift text up from a baseline },
-    White, aString.Value);
+
+  if true then
+    {Simply output the string}
+    Print(0, aString.Height - aString.HeightBase {shift text up from a baseline },
+      White, aString.Value);
+
   PopProperties; // restore previous TargetImage value
 
   //reset alpha for correct next drawing
@@ -119,7 +123,7 @@ end;
 
 {---------------------------------------------------------------------------}
 
-function DFont.BrokenStringToImage(const s: DBrokenString): TGrayscaleAlphaImage;
+function DFont.BrokenStringToImage(const aString: DBrokenString): TGrayscaleAlphaImage;
 var
   DummyImage: TGrayscaleAlphaImage;
   i: integer;
@@ -128,39 +132,40 @@ begin
   MaxH := 0;
   MaxHb := 0;
   MaxW := 0;
-  for i := 0 to s.Count - 1 do
+  {get maximum values of height, baseheight and width}
+  for i := 0 to aString.Count - 1 do
   begin
-    if MaxH < s[i].Height then
-      MaxH := s[i].Height;
-    if MaxHb < s[i].Height - s[i].HeightBase then
-      MaxHb := s[i].Height - s[i].HeightBase;
-    if MaxW < s[i].Width then
-      MaxW := s[i].Width;
+    if MaxH < aString[i].Height then
+      MaxH := aString[i].Height;
+    if MaxHb < aString[i].Height - aString[i].HeightBase then
+      MaxHb := aString[i].Height - aString[i].HeightBase;
+    if MaxW < aString[i].Width + aString[i].AdditionalSpace then
+      MaxW := aString[i].Width + aString[i].AdditionalSpace;
   end;
   MaxH += Self.AdditionalLineSpacing;
-  //  Log('DFont.broken_string_to_image','max height base  =  ', inttostr(maxhb));
   Result := TGRayScaleAlphaImage.Create;
-  Result.SetSize(MaxW, MaxH * (s.Count));
+  Result.SetSize(MaxW, MaxH * (aString.Count));
   Result.Clear(Vector2Byte(0, 0));
-  for i := 0 to s.Count - 1 do
+  for i := 0 to aString.Count - 1 do
   begin
-    DummyImage := StringToImage(s[i]);
-    Result.DrawFrom(DummyImage, 0, MaxH * (s.Count - 1 - i) + MaxHb -
-      (s[i].Height - s[i].HeightBase), dmBlendSmart);
+    DummyImage := StringToImage(aString[i]);
+    Result.DrawFrom(DummyImage, 0, MaxH * (aString.Count - 1 - i) + MaxHb -
+      (aString[i].Height - aString[i].HeightBase), dmBlendSmart);
     DummyImage.Free;
   end;
 end;
 
 {---------------------------------------------------------------------------}
 
-function DFont.BrokenStringToImageWithShadow(const s: DBrokenString;
+function DFont.BrokenStringToImageWithShadow(const aString: DBrokenString;
   ShadowStrength: DFloat; ShadowLength: integer): TGrayscaleAlphaImage;
 var
   DummyImage, ShadowImage: TGrayscaleAlphaImage;
   Iteration, i: integer;
   p: PVector2byte;
 begin
-  DummyImage := BrokenStringToImage(s);
+  DummyImage := BrokenStringToImage(aString);
+
   if (ShadowStrength > 0) and (ShadowLength > 0) then
   begin
     Result := TGrayscaleAlphaImage.Create(DummyImage.Width + ShadowLength,
@@ -172,7 +177,7 @@ begin
       p := ShadowImage.Pixels;
       for i := 0 to ShadowImage.Width * ShadowImage.Height * ShadowImage.Depth - 1 do
       begin
-        p^[1] := Round(p^[1] * ShadowStrength / Sqr(Iteration));
+        p^[1] := Round(p^[1] * ShadowStrength / sqr(Iteration));
         p^[0] := 0;
         //shadow color intensity might be specified here... or even an RGB color if make Shadow a TRGBAlphaImage
         inc(p);
@@ -236,7 +241,7 @@ begin
     inc(CurrentChar);
   end;
   { add the last line }
-  isLineBreak := true;
+  isLineBreak := true; //so that it'll be arranged correctly
   AddNewString;
 end;
 
