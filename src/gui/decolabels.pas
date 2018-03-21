@@ -31,12 +31,19 @@ uses
 type
   { a powerful text label, converted to GLImage to be extremely fast }
   DLabelImage = class(DAbstractImage)
-  private
+  strict private
     fText: string;
-    { a set of strings each no longer than label width }
-    BrokenString: DBrokenString;
+    { Change the current fText and call Prepare Text Image if needed }
     procedure SetText(const Value: string);
+    { converts string (Text) into an image }
+    procedure PrepareTextImage;
   public
+    { Font to print the label }
+    Font: DFont;
+    { Shadow intensity. Shadow=0 is no shadow (strictly) }
+    ShadowIntensity: DFloat;
+    { Shadow length in pixels }
+    ShadowLength: integer;
     { text at the label }
     property Text: string read fText write SetText;
   public
@@ -48,11 +55,16 @@ type
 implementation
 uses
   SysUtils,
+  CastleImages,
+  DecoImages,
   DecoLog;
 
 constructor DLabelImage.Create;
 begin
   inherited Create;
+  ShadowIntensity := 0;
+  ShadowLength := 3;
+  Font := DefaultFont;
   OwnsImage := true;
 end;
 
@@ -60,7 +72,6 @@ end;
 
 destructor DLabelImage.Destroy;
 begin
-  FreeAndNil(BrokenString);
   inherited Destroy;
 end;
 
@@ -71,9 +82,31 @@ begin
   if fText <> Value then
   begin
     fText := Value;
-    //PrepareTextImage;
+    PrepareTextImage;
   end;
 end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DLabelImage.PrepareTextImage;
+var
+  BrokenString: DBrokenString;
+  TextImage: TGrayscaleAlphaImage;
+begin
+  FreeAndNil(Image);
+
+  BrokenString := Font.BreakStings(fText, Next.w);
+  if ShadowIntensity = 0 then
+    TextImage := Font.BrokenStringToImage(BrokenString)
+  else
+    TextImage := Font.BrokenStringToImageWithShadow(
+      BrokenString, ShadowIntensity, ShadowLength);
+
+  FreeAndNil(BrokenString);
+
+  Image := DImage.Create(TextImage, true, true);
+end;
+
 
 
 end.
