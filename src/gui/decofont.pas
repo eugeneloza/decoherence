@@ -159,7 +159,10 @@ begin
   begin
     AssignMax(MaxH, BrokenString[i].Height);
     AssignMax(MaxHb, BrokenString[i].Height - BrokenString[i].HeightBase);
-    AssignMax(MaxW, BrokenString[i].FullWidth);
+    if FitWidth then
+      AssignMax(MaxW, BrokenString[i].FullWidth)
+    else
+      AssignMax(MaxW, BrokenString[i].Width)
   end;
   MaxH += Self.AdditionalLineSpacing;
   Result := TGRayScaleAlphaImage.Create;
@@ -323,6 +326,8 @@ begin
 
   FontDictionary := DFontDictionary.Create([]);  //doesn't own children
 
+  DefaultFont := GetLoadedFont('xolonium-12');
+
   FontDictionary.Add('PlayerHealth', GetLoadedFont('xolonium-12'));
   FontDictionary.Add('PlayerName', GetLoadedFont('xolonium-12'));
   FontDictionary.Add('LoadScreen', GetLoadedFont('xolonium-16'));
@@ -353,7 +358,6 @@ begin
 
   DebugFont := DFont.Create(TextureFont_LinBiolinumRG_16);
   AutoFree.Add(DebugFont); //debug font is managed separately from others
-  DefaultFont := DebugFont;
 
   LoadedFonts := DFontDictionary.Create([doOwnsValues]);
 

@@ -201,13 +201,14 @@ begin
   Arr.Grab(Img);
 
   Lab := DLabelImage.Create;
+  Lab.ShadowIntensity := 1;
   Lab.SetSize(330,330,50,50);
-  Lab.Font := GetFontByName('LoadScreen');
+  Lab.Font := DefaultFont;
   Lab.Text := '12345';
   Lab.ResetToRealSize;
-  Grab(Lab);
+  Arr.Grab(Lab);
 
-  Arr.SetSize(600, 100, 200, 200, 0.5, asZoomIn, 2.0);
+  Arr.SetSize(600, 100, 200, 200, 1, asZoomIn);
   Grab(Arr);
 
   Bar := DAbstractBarImage.Create;
