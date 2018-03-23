@@ -275,6 +275,7 @@ begin
   { add the last line }
   AddWord;
   isLineBreak := true; //so that it'll be arranged correctly
+  LastBreakPoint := Length(aString) + 0;
   AddNewString;
 end;
 
