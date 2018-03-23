@@ -206,7 +206,7 @@ begin
 
   Lab := DLabelImage.Create;
   Lab.ShadowIntensity := 1;
-  Lab.SetSize(330,330,50,50);
+  Lab.SetSize(330, 330, 50, 50);
   Lab.Font := DefaultFont;
   Lab.Text := '12345';
   Lab.ResetToRealSize;
@@ -228,6 +228,30 @@ begin
   Bar.Kind := bsVertical;
   Bar.Position := 0.7;
   Grab(Bar);
+
+  Lab := DLabelImage.Create;
+  Lab.SetSize(120, 160, 150, 50);
+  Lab.Font := DefaultFont;
+  Lab.LabelType := ltJustify;
+  Lab.Text := 'This is a very long text to test label "justify" method, which should align the text evenly along width with only the last line not aligned. Should keep an eye for correct spacebar handling.';
+  Lab.ResetToRealSize;
+  Grab(Lab);
+
+  Lab := DLabelImage.Create;
+  Lab.SetSize(230, 300, 150, 50);
+  Lab.Font := DefaultFont;
+  Lab.LabelType := ltSimple;
+  Lab.Text := 'This is a very long text to test simple label method, which just output the text trying not to exceed the with. Should keep an eye for correct line start and end.';
+  Lab.ResetToRealSize;
+  Grab(Lab);
+
+  Lab := DLabelImage.Create;
+  Lab.SetSize(140, 310, 10, 50);
+  Lab.Font := DefaultFont;
+  Lab.LabelType := ltSimple;
+  Lab.Text := 'This label is too small yet correct.';
+  Lab.ResetToRealSize;
+  Grab(Lab);
 end;
 
 {............................................................................}

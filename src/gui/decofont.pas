@@ -98,9 +98,14 @@ var
   P: Pvector2byte;
   i: integer;
   TotalFitSpace, CurrentPos, y, WhiteSpace: integer;
+  StringWidth: integer;
 begin
   Result := TGrayscaleAlphaImage.Create;
-  Result.SetSize(aString.Width, aString.Height + Self.AdditionalLineSpacing);  //including baseline
+  if FitWidth then
+    StringWidth := aString.FullWidth
+  else
+    StringWidth := aString.Width;
+  Result.SetSize(StringWidth, aString.Height + Self.AdditionalLineSpacing);  //including baseline
   Result.Clear(Vector2Byte(0, 255));
 
   PushProperties; // save previous TargetImage value
@@ -110,13 +115,17 @@ begin
   begin
     {draw word-by-word, adjusting space to fit width}
     TotalFitSpace := aString.AdditionalSpace;
+    //WhiteSpace := TotalFitSpace div Pred(Length(aString.Words));
     CurrentPos := 0;
     y := aString.Height - aString.HeightBase; {shift text up from a baseline }
     for i := 0 to Pred(Length(aString.Words)) do
     begin
       Print(CurrentPos, y, White, aString.Words[i]);
       CurrentPos += TextWidth(aString.Words[i]);
-      WhiteSpace := TotalFitSpace div (Length(aString.Words) - i);
+      if Length(aString.Words) - i - 1 > 0 then
+        WhiteSpace := TotalFitSpace div (Length(aString.Words) - i - 1)
+      else
+        WhiteSpace := TotalFitSpace;
       CurrentPos += WhiteSpace;
       TotalFitSpace -= WhiteSpace;
     end;
@@ -228,11 +237,12 @@ var
   procedure AddWord;
   begin
     SetLength(Words, Length(Words) + 1);
-    Words[Pred(Length(Words))] := Copy(aString, LastBreakPoint, CurrentChar - LastBreakPoint);
+    Words[Pred(Length(Words))] := Copy(aString, LastBreakPoint + 1, CurrentChar - LastBreakPoint - 1);
   end;
   procedure AddNewString;
   var
     NewString: DString;
+    i: integer;
   begin
     NewString.Value := Copy(aString, LineStart, LastBreakPoint - LineStart);
     NewString.HeightBase := TextHeightBase(NewString.Value);
@@ -247,12 +257,19 @@ var
         '" has width ' + NewString.Width.ToString +
         ' which is larger than requested text width ' + aWidth.ToString);
     end;
-    NewString.AdditionalSpace := aWidth - NewString.Width + SpaceWidth * (Length(Words) - 1);
+    if Length(Words) > 1 then
+      NewString.AdditionalSpace := aWidth - NewString.Width + SpaceWidth * (Length(Words) - 1)
+    else
+      NewString.AdditionalSpace := 0;
+    {for i := 0 to Pred(Length(Words)) do
+      NewString.AdditionalSpace -= TextWidth(Words[i]);}
     NewString.Words := Words;
     NewString.AdjustWidth := (not isLineBreak) and (Length(Words) > 1);
     Result.Add(NewString);
     Words := nil;
   end;
+  var
+    s: string;
 begin
   Result := DBrokenString.Create;
 
@@ -260,12 +277,20 @@ begin
 
   LineStart := 1;
   CurrentChar := 1;
-  LastBreakPoint := CurrentChar;
+  LastBreakPoint := 0;
   Words := nil;
   while CurrentChar <= Length(aString) do
   begin
     isLineBreak := Copy(aString, CurrentChar, Length(dLineBreak)) = dLineBreak;
     isSpaceBar := Copy(aString, CurrentChar, 1) = ' ';
+
+    if ((TextWidth(Copy(aString, LineStart, CurrentChar - LineStart)) >= aWidth)
+      and (Length(Words) > 0)) or isLineBreak then
+    begin
+      { this is a line break until the text is over }
+      AddNewString;
+      LineStart := LastBreakPoint + 1;
+    end;
 
     { find the end of the word }
     if isSpaceBar or isLineBreak then
@@ -274,13 +299,6 @@ begin
       LastBreakPoint := CurrentChar;
     end;
 
-    if (TextWidth(Copy(aString, LineStart, CurrentChar - LineStart)) > aWidth)
-      or isLineBreak then
-    begin
-      { this is a line break until the text is over }
-      AddNewString;
-      LineStart := LastBreakPoint + 1;
-    end;
     inc(CurrentChar);
   end;
   { add the last line }
