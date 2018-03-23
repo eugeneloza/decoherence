@@ -29,6 +29,13 @@ uses
   DecoTime, DecoGlobal;
 
 type
+  { Type of the label.
+    ltNormal is a most nomral label, breaking in lines along the width (default).
+    ltJustify is a large-text label, aligned to width.
+    ltOneLine is a simple label, occupying only one line. }
+  TLabelType = (ltSimple, ltJustify, ltOneLine);
+
+type
   { A powerful text label, converted to GLImage to be extremely fast }
   DLabelImage = class(DAbstractImage)
   strict private
@@ -44,6 +51,8 @@ type
     ShadowIntensity: DFloat;
     { Shadow length in pixels }
     ShadowLength: integer;
+    { Label type }
+    LabelType: TLabelType;
     { Text at the label }
     property Text: string read fText write SetText;
   public
@@ -80,6 +89,7 @@ uses
 constructor DLabelImage.Create;
 begin
   inherited Create;
+  LabelType := ltSimple;
   ShadowIntensity := 0;
   ShadowLength := 3;
   Font := DefaultFont;
@@ -109,14 +119,20 @@ end;
 procedure DLabelImage.PrepareTextImage;
 var
   TextImage: TGrayscaleAlphaImage;
+  LabelWidth: integer;
 begin
   FreeAndNil(Image);
 
-  if ShadowIntensity = 0 then
-    TextImage := Font.StringToImage(fText, Next.w)
+  if LabelType = ltOneLine then
+    LabelWidth := MaxInt div 2
   else
-    TextImage := Font.StringToImageWithShadow(fText, Next.w,
-      ShadowIntensity, ShadowLength);
+    LabelWidth := Next.w;
+
+  if ShadowIntensity = 0 then
+    TextImage := Font.StringToImage(fText, LabelWidth, LabelType = ltJustify)
+  else
+    TextImage := Font.StringToImageWithShadow(fText, LabelWidth,
+      ShadowIntensity, ShadowLength, LabelType = ltJustify);
 
   Image := DImage.Create(TextImage, true, true);
   SetTint;
@@ -130,6 +146,7 @@ end;
 constructor DFPSLabel.Create;
 begin
   inherited Create;
+  LabelType := ltOneLine;
   FPSCount := 0;
   LastRenderTime := -1;
 
@@ -147,7 +164,6 @@ begin
 
   if (DecoNow - LastRenderTime >= 1) then
   begin
-    Self.Next.w := 100; //just a large number, so that "text is larger than requested" error is not spawned
     Text := IntToStr(FPSCount){+' '+IntToStr(Round(Window.Fps.RealTime))};
     Self.Next.SetIntSize(0, 0, Self.RealWidth, Self.RealHeight, 1);
     Self.ResetAnimation;
