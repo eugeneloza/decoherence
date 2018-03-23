@@ -147,6 +147,7 @@ begin
 
   if (DecoNow - LastRenderTime >= 1) then
   begin
+    Self.Next.w := 100; //just a large number, so that "text is larger than requested" error is not spawned
     Text := IntToStr(FPSCount){+' '+IntToStr(Round(Window.Fps.RealTime))};
     Self.Next.SetIntSize(0, 0, Self.RealWidth, Self.RealHeight, 1);
     Self.ResetAnimation;

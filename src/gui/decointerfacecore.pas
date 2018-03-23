@@ -87,9 +87,11 @@ type
     { Initialize this element with specific coordinates/size/alpha
       optionally animation may be specified }
     procedure SetSize(const ax, ay, aw, ah: integer; const aAlpha: DFloat = 1.0;
-      const Animate: TAnimationStyle = asDefault; const Duration: DTime = DefaultAnimationDuration); virtual;
+      const Animate: TAnimationStyle = asDefault; const Duration: DTime = DefaultAnimationDuration);
     { Scale this element to full screen (no animation) }
     procedure FullScreen(const aAlpha: Single = 1);
+    { This procedure alerts Parent that this element has changed its size }
+    procedure SizeChanged(const Animate: TAnimationStyle; const Duration: DTime); virtual;
   public
     constructor Create; virtual; //override;
     destructor Destroy; override;
@@ -239,6 +241,14 @@ end;
 
 {-----------------------------------------------------------------------------}
 
+procedure DAbstractElement.SizeChanged(const Animate: TAnimationStyle; const Duration: DTime);
+begin
+  {if Parent <> nil then
+    Parent.SizeChanged(Animate, Duration);}
+end;
+
+{-----------------------------------------------------------------------------}
+
 procedure DAbstractElement.SetTint;
 begin
   //just does nothing
@@ -302,6 +312,7 @@ begin
   Next.SetIntSize(ax, ay, aw, ah, aAlpha);
   if not Last.isInitialized then Last.AssignFrom(Next);
   AnimateTo(Animate, Duration);
+  SizeChanged(Animate, Duration);
 end;
 
 {-----------------------------------------------------------------------------}
@@ -310,6 +321,7 @@ procedure DAbstractElement.FullScreen(const aAlpha: Single = 1);
 begin
   Next.SetIntSize(0, 0, GUIWidth, GUIHeight, aAlpha);
   ResetAnimation;
+  //SizeChanged <----- we don't call it, as it's very unlikely that a FullScreen element is a Child of some Arranger
 end;
 
 {============================================================================}

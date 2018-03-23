@@ -33,8 +33,7 @@ type
   strict protected
     procedure ArrangeChildren(const Animate: TAnimationStyle; const Duration: DTime); virtual; abstract;
   public
-    procedure SetSize(const ax, ay, aw, ah: integer; const aAlpha: DFloat = 1.0;
-      const Animate: TAnimationStyle = asDefault; const Duration: DTime = DefaultAnimationDuration); override;
+    procedure SizeChanged(const Animate: TAnimationStyle; const Duration: DTime); override;
   end;
 
 type
@@ -49,10 +48,9 @@ implementation
 uses
   DecoLog;
 
-procedure DAbstractArranger.SetSize(const ax, ay, aw, ah: integer; const aAlpha: DFloat = 1.0;
-  const Animate: TAnimationStyle = asDefault; const Duration: DTime = DefaultAnimationDuration);
+procedure DAbstractArranger.SizeChanged(const Animate: TAnimationStyle; const Duration: DTime);
 begin
-  inherited SetSize(ax, ay, aw, ah, aAlpha, Animate, Duration);
+  //inherited SizeChanged(Animate, Duration);
   ArrangeChildren(Animate, Duration);
 end;
 
