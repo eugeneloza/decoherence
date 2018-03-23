@@ -24,7 +24,6 @@ unit DecoInterfaceImages;
 interface
 
 uses
-  CastleVectors,
   DecoInterfaceCore, DecoImages,
   DecoGlobal;
 

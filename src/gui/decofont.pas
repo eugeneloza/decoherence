@@ -86,7 +86,7 @@ procedure FreeFonts;
 {............................................................................}
 implementation
 uses
-  Generics.Collections,
+  SysUtils, Generics.Collections,
   CastleUnicode, CastleColors, CastleVectors,
   CastleTextureFont_LinBiolinumRG_16, //a debug font
   DecoTrash, DecoLog, DecoMath;
@@ -235,7 +235,15 @@ var
     NewString.HeightBase := TextHeightBase(NewString.Value);
     NewString.Height := TextHeight(NewString.Value);
     NewString.Width := TextWidth(NewString.Value);
-    NewString.FullWidth := aWidth;
+    if NewString.Width <= aWidth then
+      NewString.FullWidth := aWidth
+    else
+    begin
+      NewString.FullWidth := NewString.Width;
+      Log(LogInterfaceInfo, CurrentRoutine, '"' + NewString.Value +
+        '" has width ' + NewString.Width.ToString +
+        ' which is larger than requested text width ' + aWidth.ToString);
+    end;
     NewString.AdditionalSpace := aWidth - NewString.Width + SpaceWidth * (Length(Words) - 1);
     NewString.Words := Words;
     NewString.AdjustWidth := (not isLineBreak) and (Length(Words) > 1);

@@ -94,13 +94,11 @@ var
 begin
   FreeAndNil(Image);
 
-
   if ShadowIntensity = 0 then
     TextImage := Font.StringToImage(fText, Next.w)
   else
     TextImage := Font.StringToImageWithShadow(fText, Next.w,
       ShadowIntensity, ShadowLength);
-
 
   Image := DImage.Create(TextImage, true, true);
   SetTint;
