@@ -104,7 +104,7 @@ end;
 
 function DAbstractImage.GetWidth: integer;
 begin
-  if Image <> nil then
+  if (Image <> nil) then
     Result := Image.Width
   else
     Result := -1;

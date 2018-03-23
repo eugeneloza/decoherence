@@ -81,6 +81,8 @@ type
 
 {............................................................................}
 implementation
+uses
+  DecoLog;
 
 procedure DImage.Draw(const X, Y: Single); TryInline
 begin
@@ -129,6 +131,8 @@ end;
 constructor DImage.Create(const AImage: TEncodedImage; const ASmoothScaling: boolean = true;
   const AOwnsImage: boolean = true);
 begin
+  if (AImage = nil) or (AImage.IsEmpty) then
+    Log(LogInterfaceError, CurrentRoutine, 'Error: Input image is nil or empty!');
   FImage := TGLImage.Create(AImage, ASmoothScaling, AOwnsImage);
   Width := FImage.Width;
   Height := FImage.Height;
