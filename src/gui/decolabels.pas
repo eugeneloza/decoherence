@@ -29,13 +29,13 @@ uses
   DecoTime, DecoGlobal;
 
 type
-  { a powerful text label, converted to GLImage to be extremely fast }
+  { A powerful text label, converted to GLImage to be extremely fast }
   DLabelImage = class(DAbstractImage)
   strict private
     fText: string;
     { Change the current fText and call Prepare Text Image if needed }
     procedure SetText(const Value: string);
-    { converts string (Text) into an image }
+    { Converts string (Text) into an image }
     procedure PrepareTextImage;
   public
     { Font to print the label }
@@ -44,12 +44,30 @@ type
     ShadowIntensity: DFloat;
     { Shadow length in pixels }
     ShadowLength: integer;
-    { text at the label }
+    { Text at the label }
     property Text: string read fText write SetText;
   public
     destructor Destroy; override;
     constructor Create; override;
   end;
+
+type
+  { A simple FPS-counting label
+    It's a separate GUI element and is used/managed directly by DGUI
+    Practically it just increases FPScount by 1 each CountFPS call
+    and changes displayed value approx once per second }
+  DFPSLabel = class(DLabelImage)
+  strict private
+    FPScount: integer;
+    LastRenderTime: DTime;
+  public
+    { Call this each frame instead of Draw,
+         Draw is automatically called here }
+    procedure CountFPS;
+  public
+    constructor Create; override;
+  end;
+
 
 {............................................................................}
 implementation
@@ -104,6 +122,42 @@ begin
   SetTint;
 end;
 
+
+{=============================================================================}
+{============================ FPS label ======================================}
+{=============================================================================}
+
+constructor DFPSLabel.Create;
+begin
+  inherited Create;
+  FPSCount := 0;
+  LastRenderTime := -1;
+
+  SetSize(0, 0, 1, 1);
+  Font := DebugFont;
+  Text := ' '; //initialize the label, so that it always has an image
+end;
+
+{---------------------------------------------------------------------------}
+
+procedure DFPSLabel.CountFPS;
+begin
+  if LastRenderTime < 0 then
+    LastRenderTime := DecoNow;
+
+  if (DecoNow - LastRenderTime >= 1) then
+  begin
+    Text := IntToStr(FPSCount){+' '+IntToStr(Round(Window.Fps.RealTime))};
+    Self.Next.SetIntSize(0, 0, Self.RealWidth, Self.RealHeight, 1);
+    Self.ResetAnimation;
+    FPSCount := 0;
+    LastRenderTime := DecoNow;
+  end
+  else
+    inc(FPSCount);
+
+  Draw;
+end;
 
 
 end.

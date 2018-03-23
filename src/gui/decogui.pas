@@ -32,14 +32,16 @@ uses
   DecoInterfaceBars,
   DecoInterfaceArrangers,
   DecoImageLoader,
-  DecoLabels, DecoFont,
+  DecoFont,
   {</temporary>}
+  DecoLabels,
   DecoGlobal, DecoGUIScale;
 
 type
   { GUI container, manages all other GUI elements }
   DGUI = class(DInterfaceElement)
   strict private
+    FPSLabel: DFPSLabel;
     Cursor: DCursor;
   strict private
     FFirstRender: boolean;
@@ -96,10 +98,9 @@ begin
   { draw children elements }
   inherited Draw;
 
-  Cursor.Draw;
-
   { draw special elements }
-  //FPSLabel.CountFPS;
+  FPSLabel.CountFPS;
+  Cursor.Draw;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -156,6 +157,8 @@ begin
   FFirstRender := true;
   Cursor := DCursor.Create;
 
+  FPSLabel := DFPSLabel.Create;
+
   SetTint;
 
   TestInterface;
@@ -166,7 +169,7 @@ end;
 destructor DGUI.Destroy;
 begin
   FreeAndNil(Cursor);
-  //...
+  FreeAndNil(FPSLabel);
   inherited Destroy;
 end;
 
@@ -181,6 +184,7 @@ var
   Lab: DLabelImage;
 begin
   Clear;
+
   Grab(DWind.Create);
 
   Frame := DRectagonalFrame.Create;
