@@ -59,7 +59,7 @@ type
     { Converts a single line of text to an image
       if Width < s.NoSpaceWidth then it just renders the string
       otherwise - justifies it along width }
-    function StringToImage(const aString: DString; const FitWidth: boolean = false): TGrayscaleAlphaImage;
+    function LineToImage(const aString: DString; const FitWidth: boolean = false): TGrayscaleAlphaImage;
   public
     { Additional spacing between lines }
     AdditionalLineSpacing: integer;
@@ -93,7 +93,7 @@ uses
 
 {-----------------------------------------------------------------------------}
 
-function DFont.StringToImage(const aString: DString; const FitWidth: boolean = false): TGrayscaleAlphaImage;
+function DFont.LineToImage(const aString: DString; const FitWidth: boolean = false): TGrayscaleAlphaImage;
 var
   P: Pvector2byte;
   i: integer;
@@ -123,7 +123,7 @@ begin
   end
   else
     {Simply output the string}
-    Print(0, aString.Height - aString.HeightBase {shift text up from a baseline },
+    Print(0, aString.Height - aString.HeightBase {shift text up from a baseline},
       White, aString.Value);
 
   PopProperties; // restore previous TargetImage value
@@ -142,7 +142,7 @@ end;
 {---------------------------------------------------------------------------}
 
 function DFont.StringToImage(const aString: string; const aWidth: integer;
-  const FitWidth: boolean = false): TGrayscaleAlphaImage;
+      const FitWidth: boolean = false): TGrayscaleAlphaImage;
 var
   DummyImage: TGrayscaleAlphaImage;
   i: integer;
@@ -167,7 +167,7 @@ begin
   Result.Clear(Vector2Byte(0, 0));
   for i := 0 to BrokenString.Count - 1 do
   begin
-    DummyImage := StringToImage(BrokenString[i], FitWidth);
+    DummyImage := LineToImage(BrokenString[i], FitWidth);
     Result.DrawFrom(DummyImage, 0, MaxH * (BrokenString.Count - 1 - i) + MaxHb -
       (BrokenString[i].Height - BrokenString[i].HeightBase), dmBlendSmart);
     DummyImage.Free;
@@ -219,11 +219,17 @@ function DFont.BreakStings(const aString: string; const aWidth: integer): DBroke
 var
   SpaceWidth: integer;
   LineStart, CurrentChar, LastBreakPoint: integer;
-  NewString: DString;
   isLineBreak: boolean;
   isSpaceBar: boolean;
   Words: array of string;
+  procedure AddWord;
+  begin
+    SetLength(Words, Length(Words) + 1);
+    Words[Pred(Length(Words))] := Copy(aString, LastBreakPoint, CurrentChar - LastBreakPoint);
+  end;
   procedure AddNewString;
+  var
+    NewString: DString;
   begin
     NewString.Value := Copy(aString, LineStart, LastBreakPoint - LineStart);
     NewString.HeightBase := TextHeightBase(NewString.Value);
@@ -234,6 +240,7 @@ var
     NewString.Words := Words;
     NewString.AdjustWidth := (not isLineBreak) and (Length(Words) > 1);
     Result.Add(NewString);
+    Words := nil;
   end;
 begin
   Result := DBrokenString.Create;
@@ -252,9 +259,7 @@ begin
     { find the end of the word }
     if isSpaceBar or isLineBreak then
     begin
-      SetLength(Words, Length(Words) + 1);
-      Words[Pred(Length(Words))] := Copy(aString, LastBreakPoint, CurrentChar - LastBreakPoint);
-
+      AddWord;
       LastBreakPoint := CurrentChar;
     end;
 
@@ -263,12 +268,12 @@ begin
     begin
       { this is a line break until the text is over }
       AddNewString;
-      Words := nil;
       LineStart := LastBreakPoint + 1;
     end;
     inc(CurrentChar);
   end;
   { add the last line }
+  AddWord;
   isLineBreak := true; //so that it'll be arranged correctly
   AddNewString;
 end;

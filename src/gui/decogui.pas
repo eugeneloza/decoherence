@@ -32,7 +32,7 @@ uses
   DecoInterfaceBars,
   DecoInterfaceArrangers,
   DecoImageLoader,
-  DecoLabels,
+  DecoLabels, DecoFont,
   {</temporary>}
   DecoGlobal, DecoGUIScale;
 
@@ -202,6 +202,7 @@ begin
 
   Lab := DLabelImage.Create;
   Lab.SetSize(330,330,50,50);
+  Lab.Font := GetFontByName('LoadScreen');
   Lab.Text := '12345';
   Grab(Lab);
 
