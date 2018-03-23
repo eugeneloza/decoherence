@@ -92,6 +92,8 @@ begin
     Window.Height := ConfigWindowHeight;
   end;
 
+  Application.LimitFPS := 0;
+
   ResetGUIScale;
 
   ScreenShotPending := false;
