@@ -204,6 +204,7 @@ begin
   Lab.SetSize(330,330,50,50);
   Lab.Font := GetFontByName('LoadScreen');
   Lab.Text := '12345';
+  Lab.ResetToRealSize;
   Grab(Lab);
 
   Arr.SetSize(600, 100, 200, 200, 0.5, asZoomIn, 2.0);

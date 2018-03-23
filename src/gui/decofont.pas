@@ -275,7 +275,7 @@ begin
   { add the last line }
   AddWord;
   isLineBreak := true; //so that it'll be arranged correctly
-  LastBreakPoint := Length(aString) + 0;
+  LastBreakPoint := Length(aString) + 1; //the last break point is EOL symbol
   AddNewString;
 end;
 

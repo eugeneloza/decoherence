@@ -90,7 +90,6 @@ end;
 
 procedure DLabelImage.PrepareTextImage;
 var
-  BrokenString: DBrokenString;
   TextImage: TGrayscaleAlphaImage;
 begin
   FreeAndNil(Image);

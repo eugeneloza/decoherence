@@ -43,6 +43,7 @@ type
   public
     property RealWidth: integer read GetWidth;
     property RealHeight: integer read GetHeight;
+    procedure ResetToRealSize(const ResetAnim: boolean = false);
     procedure Draw; override;
     procedure SetTint; override;
   public
@@ -114,6 +115,14 @@ begin
     Result := Image.Height
   else
     Result := -1;
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DAbstractImage.ResetToRealSize(const ResetAnim: boolean = false);
+begin
+  Next.SetIntWidthHeight(GetWidth, GetHeight, Next.a);
+  if ResetAnim then ResetAnimation;
 end;
 
 {============================================================================}
