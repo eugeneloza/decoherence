@@ -95,16 +95,16 @@ var
 begin
   FreeAndNil(Image);
 
-  BrokenString := Font.BreakStings(fText, Next.w);
-  if ShadowIntensity = 0 then
-    TextImage := Font.BrokenStringToImage(BrokenString)
-  else
-    TextImage := Font.BrokenStringToImageWithShadow(
-      BrokenString, ShadowIntensity, ShadowLength);
 
-  FreeAndNil(BrokenString);
+  if ShadowIntensity = 0 then
+    TextImage := Font.StringToImage(fText, Next.w)
+  else
+    TextImage := Font.StringToImageWithShadow(fText, Next.w,
+      ShadowIntensity, ShadowLength);
+
 
   Image := DImage.Create(TextImage, true, true);
+  SetTint;
 end;
 
 

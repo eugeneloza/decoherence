@@ -64,9 +64,10 @@ type
     { Additional spacing between lines }
     AdditionalLineSpacing: integer;
     { Converts a broken string into a single image }
-    function BrokenStringToImage(const aString: DBrokenString; const FitWidth: boolean = false): TGrayscaleAlphaImage;
+    function StringToImage(const aString: string; const aWidth: integer;
+      const FitWidth: boolean = false): TGrayscaleAlphaImage;
     { Converts a broken string into a single image with a shadow }
-    function BrokenStringToImageWithShadow(const aString: DBrokenString;
+    function StringToImageWithShadow(const aString: string; const aWidth: integer;
       ShadowStrength: DFloat; ShadowLength: integer; const FitWidth: boolean = false): TGrayscaleAlphaImage;
     { Breaks a string to a DBrokenString }
     function BreakStings(const aString: string; const aWidth: integer): DBrokenString;
@@ -140,45 +141,51 @@ end;
 
 {---------------------------------------------------------------------------}
 
-function DFont.BrokenStringToImage(const aString: DBrokenString; const FitWidth: boolean = false): TGrayscaleAlphaImage;
+function DFont.StringToImage(const aString: string; const aWidth: integer;
+  const FitWidth: boolean = false): TGrayscaleAlphaImage;
 var
   DummyImage: TGrayscaleAlphaImage;
   i: integer;
   MaxH, MaxHb, MaxW: integer;
+  BrokenString: DBrokenString;
 begin
+  BrokenString := Self.BreakStings(aString, aWidth);
+
   MaxH := 0;
   MaxHb := 0;
   MaxW := 0;
   {get maximum values of height, baseheight and width}
-  for i := 0 to aString.Count - 1 do
+  for i := 0 to BrokenString.Count - 1 do
   begin
-    AssignMax(MaxH, aString[i].Height);
-    AssignMax(MaxHb, aString[i].Height - aString[i].HeightBase);
-    AssignMax(MaxW, aString[i].FullWidth);
+    AssignMax(MaxH, BrokenString[i].Height);
+    AssignMax(MaxHb, BrokenString[i].Height - BrokenString[i].HeightBase);
+    AssignMax(MaxW, BrokenString[i].FullWidth);
   end;
   MaxH += Self.AdditionalLineSpacing;
   Result := TGRayScaleAlphaImage.Create;
-  Result.SetSize(MaxW, MaxH * (aString.Count));
+  Result.SetSize(MaxW, MaxH * (BrokenString.Count));
   Result.Clear(Vector2Byte(0, 0));
-  for i := 0 to aString.Count - 1 do
+  for i := 0 to BrokenString.Count - 1 do
   begin
-    DummyImage := StringToImage(aString[i], FitWidth);
-    Result.DrawFrom(DummyImage, 0, MaxH * (aString.Count - 1 - i) + MaxHb -
-      (aString[i].Height - aString[i].HeightBase), dmBlendSmart);
+    DummyImage := StringToImage(BrokenString[i], FitWidth);
+    Result.DrawFrom(DummyImage, 0, MaxH * (BrokenString.Count - 1 - i) + MaxHb -
+      (BrokenString[i].Height - BrokenString[i].HeightBase), dmBlendSmart);
     DummyImage.Free;
   end;
+
+  BrokenString.Free;
 end;
 
 {---------------------------------------------------------------------------}
 
-function DFont.BrokenStringToImageWithShadow(const aString: DBrokenString;
-  ShadowStrength: DFloat; ShadowLength: integer; const FitWidth: boolean = false): TGrayscaleAlphaImage;
+function DFont.StringToImageWithShadow(const aString: string; const aWidth: integer;
+      ShadowStrength: DFloat; ShadowLength: integer; const FitWidth: boolean = false): TGrayscaleAlphaImage;
 var
   DummyImage, ShadowImage: TGrayscaleAlphaImage;
   Iteration, i: integer;
   p: PVector2byte;
 begin
-  DummyImage := BrokenStringToImage(aString, FitWidth);
+  DummyImage := Self.StringToImage(aString, aWidth, FitWidth);
 
   if (ShadowStrength > 0) and (ShadowLength > 0) then
   begin

@@ -178,6 +178,7 @@ var
   Arr: DCenterArranger;
   Img: DSimpleImage;
   Bar: DAbstractBarImage;
+  Lab: DLabelImage;
 begin
   Clear;
   Grab(DWind.Create);
@@ -198,6 +199,11 @@ begin
   Img.Load(LoadDecoImage('GUI/Frames/GradientFrame.png', 50, 50));
   Img.SetSize(0, 0, 50, 50);
   Arr.Grab(Img);
+
+  Lab := DLabelImage.Create;
+  Lab.SetSize(330,330,50,50);
+  Lab.Text := '12345';
+  Grab(Lab);
 
   Arr.SetSize(600, 100, 200, 200, 0.5, asZoomIn, 2.0);
   Grab(Arr);
