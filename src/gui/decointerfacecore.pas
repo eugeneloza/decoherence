@@ -128,9 +128,13 @@ type
     { If mouse is over this element }
     isMouseOver: boolean;
     DragX, DragY: integer;
+    { To support for Drag-n-drop return item to its origin in case it
+      cannot be dropped here }
+    SavedContainerState: DInterfaceContainer;
   public
     procedure Drag(const xx, yy: integer);
     procedure StartDrag(const xx, yy: integer);
+    procedure Drop;
   public
     { Mouse/touch Events }
     OnMouseEnter: TXYProcedure;
@@ -139,7 +143,7 @@ type
     OnMousePress: TXYProcedure;
     OnMouseRelease: TXYProcedure;
     { Dragg-n-drop routines }
-    OnDrop: TXYProcedure;
+    //OnDrop: TXYProcedure;
   public
     constructor Create; override;
     destructor Destroy; override;
@@ -340,6 +344,7 @@ end;
 destructor DSingleInterfaceElement.Destroy;
 begin
   FreeAndNil(Timer);
+  FreeAndNil(SavedContainerState);
   inherited Destroy;
 end;
 
@@ -416,6 +421,9 @@ end;
 procedure DSingleInterfaceElement.StartDrag(const xx, yy: integer);
 begin
   ResetAnimation;
+  if SavedContainerState = nil then
+    SavedContainerState := DInterfaceContainer.Create;
+  SavedContainerState.AssignFrom(Next);
   DragX := Next.x - xx;
   DragY := Next.y - yy;
 end;
@@ -428,6 +436,16 @@ begin
   Next.y := DragY + yy;
   //this is ugly!
   ResetAnimation;
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DSingleInterfaceElement.Drop;
+begin
+  //if CanDropHere
+  AnimateTo(asDefault);
+  Next.AssignFrom(SavedContainerState);
+  AnimateTo(asDefault);
 end;
 
 {============================================================================}

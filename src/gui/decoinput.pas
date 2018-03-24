@@ -305,9 +305,10 @@ begin
           TouchArray[i].ClickElement.OnMouseRelease(
             TouchArray[i].ClickElement, Round(TouchArray[i].OldPos[0]),
             Round(TouchArray[i].OldPos[1]));
-        if Assigned(TouchArray[i].ClickElement.OnDrop) then
+        TouchArray[i].ClickElement.Drop;
+{        if Assigned(TouchArray[i].ClickElement.OnDrop) then
           TouchArray[i].ClickElement.OnDrop(TouchArray[i].ClickElement,
-            Round(TouchArray[i].OldPos[0]), Round(TouchArray[i].OldPos[1]));
+            Round(TouchArray[i].OldPos[0]), Round(TouchArray[i].OldPos[1]));}
       end;
       TouchArray.Remove(TouchArray[i]);
     end
