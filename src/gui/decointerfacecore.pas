@@ -396,7 +396,7 @@ begin
       if Assigned(onMouseOver) then
         onMouseOver(Self, xx, yy);
     end;
-    if CanMouseOver then  //todo
+    if (CanMouseOver) or (CanDrag) then  //todo
       Result := Self;
   end
   else
@@ -541,7 +541,7 @@ begin
   // maybe rewrite it using isMouseOver - the idea is still a little different
   tmp := Self.ifMouseOver(xx, yy, false, false);
   if (tmp <> nil) and (tmp is DSingleInterfaceElement) and
-    (DSingleInterfaceElement(tmp).CanMouseOver) then
+    ((DSingleInterfaceElement(tmp).CanMouseOver) or (DSingleInterfaceElement(tmp).CanDrag)) then
     isMouseOverTree := true
   else
     isMouseOverTree := false;
