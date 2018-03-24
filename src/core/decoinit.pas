@@ -33,7 +33,7 @@ implementation
 uses
   SysUtils, CastleWindow, CastleControls, CastleGLImages,
   CastleApplicationProperties,
-  DecoLoadEmbedded,
+  DecoLoadEmbedded, DecoHDD,
   DecoTranslation,
   DecoInput, DecoPlayer, DecoGUI, DecoInterfaceLoader,
   DecoTrash,
@@ -72,6 +72,7 @@ begin
     as some units require others being already initialized }
   Log(LogInit, CurrentRoutine, 'Init sequence started.');
   InitTrash;
+  InitHDDLock;
   InitGlobal;
   InitTime;
   LoadInterface;
@@ -116,6 +117,7 @@ begin
   FreeGUI;
   FreeInterface;
   FreeTime;
+  FreeHDDLock;
   FreeTrash;
   FreeGlobal;
   {$IFDEF TextureProfiler}

@@ -56,7 +56,7 @@ implementation
 
 uses
   SysUtils,
-  DecoTrash, DecoGUIScale,
+  DecoTrash, DecoGUIScale, DecoHDD,
   DecoLog;
 
 function LoadDecoImage(const aImage: TEncodedImage; const aWidth: integer = 0;
@@ -129,7 +129,7 @@ end;
 function LoadCastleImage(const FileURL: string): TCastleImage;
 begin
   Log(LogInterfaceImageLoading, CurrentRoutine, 'Loading image: ' + FileURL);
-  Result := LoadImage(GameFolder(FileURL));
+  Result := LoadImageSafe(GameFolder(FileURL));
   AutoFree.Add(Result);
 end;
 
