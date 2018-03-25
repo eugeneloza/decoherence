@@ -23,6 +23,9 @@ unit DecoInit;
 
 interface
 
+uses
+  DecoGlobal;
+
 { Initializes all generic stuff }
 procedure InitDecoherence;
 { Frees everything initialized before }
@@ -38,7 +41,7 @@ uses
   DecoInput, DecoPlayer, DecoGUI, DecoInterfaceLoader,
   DecoTrash,
   DecoMain,
-  DecoTime, DecoLog, DecoWindow, DecoGlobal;
+  DecoTime, DecoLog, DecoWindow;
 
 { Displays a "Loading..." image for the language
   thanks to Michalis, it's simple :) see https://github.com/eugeneloza/decoherence/issues/22 }
@@ -99,6 +102,7 @@ begin
   SetLoadingImage;
   InitWindow;
   Application.MainWindow := Window;
+  MobileOS := Application.TouchDevice; //generally this is enough to determine whether we're on a Desktop or on a Mobile with touch-style input
   Application.OnInitialize := @ApplicationInitialize;
   Window.Caption := GetApplicationName;
 end;

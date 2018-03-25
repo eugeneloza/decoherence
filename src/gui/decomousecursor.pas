@@ -48,7 +48,8 @@ type
 {............................................................................}
 implementation
 uses
-  SysUtils, CastleKeysMouse, DecoImageLoader,
+  SysUtils, CastleKeysMouse,
+  DecoImageLoader,
   DecoWindow;
 
 constructor DCursor.Create;
@@ -84,10 +85,11 @@ end;
 
 procedure DCursor.Draw;
 begin
-  if not ScreenShotPending then //hide cursor for screenshots
-    if (CurrentCursor <> ctNone) and (CursorImg[CurrentCursor].Image <> Nil) then
-      CursorImg[CurrentCursor].Image.Draw(x + CursorImg[CurrentCursor].CursorShift.Data[0],
-        y - CursorImg[CurrentCursor].Image.Height + CursorImg[CurrentCursor].CursorShift.Data[1]);
+  if not MobileOS then
+    if not ScreenShotPending then //hide cursor for screenshots
+      if (CurrentCursor <> ctNone) and (CursorImg[CurrentCursor].Image <> Nil) then
+        CursorImg[CurrentCursor].Image.Draw(x + CursorImg[CurrentCursor].CursorShift.Data[0],
+          y - CursorImg[CurrentCursor].Image.Height + CursorImg[CurrentCursor].CursorShift.Data[1]);
 end;
 
 {-----------------------------------------------------------------------------}
