@@ -137,13 +137,13 @@ const
   begin
     Result := true;
     case aKey of
-      k_A: RecordedKeys += 'A';
-      k_F: RecordedKeys += 'F';
-      k_K: RecordedKeys += 'K';
-      k_Q: RecordedKeys += 'Q';
+      KeyA: RecordedKeys += 'A';
+      KeyF: RecordedKeys += 'F';
+      KeyK: RecordedKeys += 'K';
+      KeyQ: RecordedKeys += 'Q';
       {messing with letter a bit :)}
-      k_D: RecordedKeys += 'I';
-      k_I: RecordedKeys += 'D';
+      KeyD: RecordedKeys += 'I';
+      KeyI: RecordedKeys += 'D';
       else
         Result := false;
     end;
@@ -187,7 +187,7 @@ begin
         RecordKeys := false;
     end
     else
-    if (aKey = k_I) then
+    if (aKey = KeyI) then
     begin
       RecordedKeys := '';
       RecordKeys := true;
@@ -457,11 +457,11 @@ procedure DInputProcessor.LoadInputConfig;
 begin
   with InputOptions do
   begin
-    MoveForwardKey := K_W;
-    MoveBackwardKey := K_S;
-    StrafeLeftKey := K_A;
-    StrafeRightKey := K_D;
-    ScreenShotKey := K_P;
+    MoveForwardKey := KeyW;
+    MoveBackwardKey := KeyS;
+    StrafeLeftKey := KeyA;
+    StrafeRightKey := KeyD;
+    ScreenShotKey := KeyP;
     LongTouch := 0.5; { in seconds // 500ms is standard for Android }
   end;
 end;
@@ -481,7 +481,7 @@ begin
       MakeScreenShot;
     //hardcoded keys
     case Event.Key of
-      K_PrintScreen: //k_printscreen doesn't work in x-window system if assigned to some external program like scrot
+      KeyPrintScreen: //KeyPrintScreen doesn't work in x-window system if assigned to some external program like scrot
         MakeScreenShot;
     end;
 
