@@ -85,7 +85,7 @@ end;
 
 procedure DCursor.Draw;
 begin
-  if not MobileOS then
+  if not TouchDevice then
     if not ScreenShotPending then //hide cursor for screenshots
       if (CurrentCursor <> ctNone) and (CursorImg[CurrentCursor].Image <> Nil) then
         CursorImg[CurrentCursor].Image.Draw(x + CursorImg[CurrentCursor].CursorShift.Data[0],

@@ -102,7 +102,7 @@ begin
   SetLoadingImage;
   InitWindow;
   Application.MainWindow := Window;
-  MobileOS := Application.TouchDevice; //generally this is enough to determine whether we're on a Desktop or on a Mobile with touch-style input
+  TouchDevice := ApplicationProperties.TouchDevice; //generally this is enough to determine whether we're on a Desktop or on a Mobile with touch-style input
   Application.OnInitialize := @ApplicationInitialize;
   Window.Caption := GetApplicationName;
 end;
