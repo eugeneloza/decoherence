@@ -31,7 +31,7 @@
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir);src"/>
-            <OtherUnitFiles Value="src;src/core;src/gui;src/text;src/generated"/>
+            <OtherUnitFiles Value="src;src/core;src/gui;src/text;src/generated;src/input"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
           <Parsing>
@@ -76,7 +76,7 @@
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir);src"/>
-            <OtherUnitFiles Value="src;src/core;src/gui;src/text;src/generated"/>
+            <OtherUnitFiles Value="src;src/core;src/gui;src/text;src/generated;src/input"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
           <Parsing>
@@ -122,7 +122,7 @@
         <PackageName Value="castle_base"/>
       </Item2>
     </RequiredPackages>
-    <Units Count="38">
+    <Units Count="41">
       <Unit0>
         <Filename Value="Decoherence.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -188,7 +188,7 @@
         <IsPartOfProject Value="True"/>
       </Unit13>
       <Unit14>
-        <Filename Value="src/gui/decoinput.pas"/>
+        <Filename Value="src/input/decoinput.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="DecoInput"/>
       </Unit14>
@@ -306,6 +306,21 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="DecoHDD"/>
       </Unit37>
+      <Unit38>
+        <Filename Value="src/input/decokeyboard.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoKeyboard"/>
+      </Unit38>
+      <Unit39>
+        <Filename Value="src/input/decokeyboardrecorder.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoKeyboardRecorder"/>
+      </Unit39>
+      <Unit40>
+        <Filename Value="src/input/decotouch.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoTouch"/>
+      </Unit40>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
@@ -315,7 +330,7 @@
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir);src"/>
-      <OtherUnitFiles Value="src;src/core;src/gui;src/text;src/generated"/>
+      <OtherUnitFiles Value="src;src/core;src/gui;src/text;src/generated;src/input"/>
       <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <Parsing>
