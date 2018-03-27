@@ -401,7 +401,7 @@ begin
       if Assigned(onMouseOver) then
         onMouseOver(Self, xx, yy);
     end;
-    if (CanMouseOver) or (CanDrag) then  //todo
+    if (CanMouseOver) or (CanDrag) then
       Result := Self;
   end
   else

@@ -103,6 +103,8 @@ begin
   Window.OnPress := nil; //to be on the safe side so that already-freed Player won't accidentally get input
   Window.OnRelease := nil;
   Window.OnMotion := nil;
+  TouchInput.Free;
+  KeyboardInput.Free;
 end;
 
 end.
