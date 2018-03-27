@@ -52,7 +52,6 @@ type
   strict private
     { All currently active touches/clicks }
     TouchArray: DTouchList;
-    function GetFingerIndex(const Event: TInputPressRelease): integer;
     { Implements MouseLook (mouse only) }
     function doMouseLook(const Event: TInputMotion): boolean;
     { Implements MouseDrag (mouse/touch) }
@@ -81,10 +80,6 @@ uses
   SysUtils,
   DecoPlayer, DecoGUI, DecoGUIScale, DecoGameMode, DecoWindow,
   DecoLog;
-
-const
-  RightButtonFingerIndex = 100;
-  MiddleButtonFingerIndex = 200;
 
 {================================= TOUCH ====================================}
 
@@ -120,36 +115,21 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-function DTouchInput.GetFingerIndex(const Event: TInputPressRelease): integer;
-begin
-  if Event.MouseButton = mbLeft then
-    Result := Event.FingerIndex
-  else if Event.MouseButton = mbRight then
-    Result := RightButtonFingerIndex
-  else if Event.MouseButton = mbMiddle then
-    Result := MiddleButtonFingerIndex
-  else
-    Log(LogMouseError, CurrentRoutine, 'Unknown Event.FingerIndex');
-end;
-
-{-----------------------------------------------------------------------------}
-
 var
   { used to detect if mouse is in dragg-look mode }
   DragMouseLook: boolean = false;
 
 procedure DTouchInput.doMouseRelease(const Event: TInputPressRelease);
 var
-  i, FingerIndex: integer;
+  i: integer;
   Found: boolean;
 begin
   if TouchArray.Count > 0 then
   begin
-    FingerIndex := GetFingerIndex(Event);
     i := 0;
     Found := false;
     repeat
-      if TouchArray[i].FingerIndex = FingerIndex then
+      if TouchArray[i].FingerIndex = Event.FingerIndex then
         Found := true
       else
         inc(i);
@@ -160,7 +140,7 @@ begin
       DragMouseLook := false;
 
     Log(LogMouseInfo, CurrentRoutine, 'Caught mouse release finger=' +
-      IntToStr(FingerIndex) + ' n=' + IntToStr(i));
+      IntToStr(Event.FingerIndex) + ' n=' + IntToStr(i));
     if Found then
     begin
       if (DecoNow - TouchArray[i].TouchStart > TouchOptions.LongTouch) then
@@ -194,15 +174,13 @@ end;
 procedure DTouchInput.doMousePress(const Event: TInputPressRelease);
 var
   NewEventTouch: DTouch;
-  FingerIndex: integer;
   tmpLink: DAbstractElement;
   InterfaceCaughtEvent: boolean;
   i: integer;
 begin
   InterfaceCaughtEvent := false;
 
-  FingerIndex := GetFingerIndex(Event);
-  NewEventTouch := DTouch.Create(Event.Position, FingerIndex);
+  NewEventTouch := DTouch.Create(Event.Position, Event.FingerIndex);
 
   //catch the element which has been pressed
   tmpLink := GUI.IfMouseOver(Round(Event.Position[0]),
@@ -235,7 +213,7 @@ begin
 
   GUI.UpdateCursor(Event.Position[0], Event.Position[1], TouchArray.Count > 0);
 
-  Log(LogMouseInfo, CurrentRoutine, 'Caught mouse press finger=' + IntToStr(FingerIndex));
+  Log(LogMouseInfo, CurrentRoutine, 'Caught mouse press finger=' + IntToStr(Event.FingerIndex));
 end;
 
 {----------------------------------------------------------------------------}

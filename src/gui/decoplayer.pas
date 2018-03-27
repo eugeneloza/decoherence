@@ -63,7 +63,7 @@ procedure FreePlayer;
 implementation
 uses
   CastleKeysMouse,
-  DecoInput, DecoWindow,
+  DecoInput,
   DecoMath;
 
 procedure DPlayerControl.ReleaseControls;
