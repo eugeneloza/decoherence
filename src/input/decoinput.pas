@@ -15,7 +15,8 @@
 
 {---------------------------------------------------------------------------}
 
-(* Handles keyboard, mouse, gamepad, touch behaviour *)
+(* Basic unit for handling input handlers:
+   Mouse(touch) and keyboard at the moment*)
 
 unit DecoInput;
 
@@ -23,27 +24,14 @@ unit DecoInput;
 
 interface
 
-uses Classes, SysUtils,
-  CastleVectors, CastleFilesUtils, CastleKeysMouse,
-  DecoInterfaceCore,
+uses
   DecoKeyboard, DecoTouch,
-  DecoTime, DecoGlobal;
-
-type
-  DInputProcessor = class(DObject)
-  public
-    TouchInput: DTouchInput;
-    KeyboardInput: DKeyboardInput;
-    //GamepadInput: ...
-  public
-    constructor Create; //override;
-    destructor Destroy; override;
-  end;
-
+  DecoGlobal;
 
 var
-  { Handles all possible ways of input }
-  InputProcessor: DInputProcessor;
+  TouchInput: DTouchInput;
+  KeyboardInput: DKeyboardInput;
+  //GamepadInput: ...
 
 { Initializes Input events and loads key bindings
   Input must be initialized AFTER window is created }
@@ -52,29 +40,9 @@ procedure InitInput;
 procedure FreeInput;
 {............................................................................}
 implementation
-
-uses CastleWindow,
+uses CastleWindow, CastleKeysMouse,
   DecoWindow,
   DecoLog;
-
-constructor DInputProcessor.Create;
-begin
-  //inherited Create <------ nothing to inherit
-  TouchInput := DTouchInput.Create;
-  KeyboardInput := DKeyboardInput.Create;
-end;
-
-{----------------------------------------------------------------------------}
-
-destructor DInputProcessor.Destroy;
-begin
-  TouchInput.Free;
-  KeyboardInput.Free;
-  inherited Destroy;
-end;
-
-{----------------------------------------------------------------------------}
-
 
 {======================== EVENTS =================================}
 
@@ -82,12 +50,12 @@ end;
 procedure doPress(Container: TUIContainer; const Event: TInputPressRelease);
 begin
   if Event.EventType = itMouseButton then
-    InputProcessor.TouchInput.doMousePress(Event)
+    TouchInput.doMousePress(Event)
   else
   if Event.EventType = itKey then
   begin
     {some generic buttons here}
-    if Event.Key = InputProcessor.KeyboardInput.KeyboardOptions.ScreenShotKey then
+    if Event.Key = KeyboardInput.KeyboardOptions.ScreenShotKey then
       MakeScreenShot;
     //hardcoded keys
     case Event.Key of
@@ -95,7 +63,7 @@ begin
         MakeScreenShot;
     end;
 
-    InputProcessor.KeyboardInput.doKeyboardPress(Event.Key);
+    KeyboardInput.doKeyboardPress(Event.Key);
   end;
 end;
 
@@ -104,33 +72,34 @@ end;
 procedure doRelease(Container: TUIContainer; const Event: TInputPressRelease);
 begin
   if Event.EventType = itMouseButton then
-    InputProcessor.TouchInput.doMouseRelease(Event)
+    TouchInput.doMouseRelease(Event)
   else
   if Event.EventType = itKey then
-    InputProcessor.KeyboardInput.doKeyboardRelease(Event.Key);
+    KeyboardInput.doKeyboardRelease(Event.Key);
 end;
 
 {--------------------------------------------------------------------------}
 
 procedure doMotion(Container: TUIContainer; const Event: TInputMotion);
 begin
-  InputProcessor.TouchInput.doMouseMotion(Event);
+  TouchInput.doMouseMotion(Event);
 end;
 {$POP}
 
 {............................................................................}
 procedure InitInput;
 begin
-  InputProcessor := DInputProcessor.Create;
+  TouchInput := DTouchInput.Create;
+  KeyboardInput := DKeyboardInput.Create;
   Window.OnPress := @doPress;
   Window.OnRelease := @doRelease;
   Window.OnMotion := @doMotion;
-  InputProcessor.TouchInput.CenterMouseCursor;
+  // init mouse cursor so that it always starts in a defined location, instead of (-1,-1)
+  TouchInput.CenterMouseCursor;
 end;
 
 procedure FreeInput;
 begin
-  InputProcessor.Free;
   Window.OnPress := nil; //to be on the safe side so that already-freed Player won't accidentally get input
   Window.OnRelease := nil;
   Window.OnMotion := nil;
