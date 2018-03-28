@@ -59,6 +59,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 { Fix a windows encoding bug }
 {$IFDEF Windows}{$DEFINE UTF8Encode}{$ENDIF}
 
+{================================ MOBILE-OS =================================}
+
+{ Determines whether we're running a Desktop or Mobile OS
+  used to optimize code concerning input and memory usage }
+{$IFDEF ANDROID}{$DEFINE MOBILE}{$ENDIF}
+{$IFDEF IOS}{$DEFINE MOBILE}{$ENDIF}
+{$IFNDEF MOBILE}{$DEFINE DESKTOP}{$ENDIF}
+
 {============================== ENABLE MACRO ================================}
 
 { Activate useful macros }
