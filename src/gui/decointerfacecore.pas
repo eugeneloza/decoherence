@@ -299,6 +299,7 @@ procedure DAbstractElement.ResetAnimation;
 begin
   Last.AssignFrom(Next);
   AnimationDuration := -1;
+  GetAnimationState;
 end;
 
 {-----------------------------------------------------------------------------}
