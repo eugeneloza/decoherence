@@ -24,7 +24,7 @@ unit DecoMain;
 interface
 
 uses
-  CastleWindow, DecoGlobal;
+  CastleWindow;
 
 
 { Assign Window.OnBeforeRender event }

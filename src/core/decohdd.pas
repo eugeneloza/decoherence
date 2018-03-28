@@ -27,8 +27,7 @@ uses
   CastleImages,
   CastleXMLUtils, DOM,
   X3DNodes,
-  CastleSoundEngine, CastleTimeUtils,
-  DecoGlobal;
+  CastleSoundEngine;
 
 {safe wrapper for CastleImages.LoadImage, overloaded}
 function LoadImageSafe(const URL: String): TCastleImage;
@@ -50,8 +49,7 @@ procedure FreeHDDLock;
 implementation
 uses
   SyncObjs,
-  x3dload,
-  DecoLog;
+  x3dload;
 
 {============================================================================}
 {====================== SAFE LOADING (WITH LOCKS) ==========================}

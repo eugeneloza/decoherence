@@ -23,9 +23,6 @@ unit DecoInterfaceLoader;
 
 interface
 
-uses
-  DecoGlobal;
-
 { Read all interface images, icons, cursor pointers, and so on }
 procedure LoadInterface;
 { Free all non-automatically freed interface-related stuff }

@@ -25,8 +25,7 @@ unit DecoInput;
 interface
 
 uses
-  DecoKeyboard, DecoTouch,
-  DecoGlobal;
+  DecoKeyboard, DecoTouch;
 
 var
   TouchInput: DTouchInput;
@@ -41,8 +40,7 @@ procedure FreeInput;
 {............................................................................}
 implementation
 uses CastleWindow, CastleKeysMouse,
-  DecoWindow,
-  DecoLog;
+  DecoWindow;
 
 {======================== EVENTS =================================}
 

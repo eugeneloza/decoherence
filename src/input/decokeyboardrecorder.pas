@@ -36,8 +36,7 @@ type
 {............................................................................}
 implementation
 uses
-  DecoGUI,
-  DecoLog;
+  DecoGUI;
 
 var
   RecordKeys: boolean = false;

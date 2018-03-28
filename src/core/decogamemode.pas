@@ -23,10 +23,6 @@ unit DecoGameMode;
 
 interface
 
-uses
-  DecoGlobal;
-
-
 { Does this mode needs clearing screen?
   Equals to "if SceneManager is active at the moment?"
   Usually it discerns between 3D rendered world game mode and other screens

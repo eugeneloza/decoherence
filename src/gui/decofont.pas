@@ -242,7 +242,6 @@ var
   procedure AddNewString;
   var
     NewString: DString;
-    i: integer;
   begin
     NewString.Value := Copy(aString, LineStart, LastBreakPoint - LineStart);
     NewString.HeightBase := TextHeightBase(NewString.Value);
@@ -268,8 +267,6 @@ var
     Result.Add(NewString);
     Words := nil;
   end;
-  var
-    s: string;
 begin
   Result := DBrokenString.Create;
 

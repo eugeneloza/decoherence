@@ -83,8 +83,7 @@ implementation
 uses
   SysUtils,
   CastleImages,
-  DecoImages,
-  DecoLog;
+  DecoImages;
 
 constructor DLabelImage.Create;
 begin
