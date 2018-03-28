@@ -58,8 +58,6 @@ var
   DRND: DRandom;
   { Tint of the Interface (including cursor) }
   GUITint: TCastleColor;
-  { if we're running a mobile OS, like Android or iOS }
-  TouchDevice: boolean;
 
 {$IFDEF LINUX}
 {$DEFINE USE_DEV_URANDOM}
