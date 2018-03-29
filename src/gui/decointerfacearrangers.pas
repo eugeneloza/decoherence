@@ -31,6 +31,7 @@ type
   { calls ManageChildren in Update and resets their animation state }
   DAbstractArranger = class(DInterfaceElement)
   strict protected
+    {}
     procedure ArrangeChildren(const Animate: TAnimationStyle; const Duration: DTime); virtual; abstract;
   public
     procedure SizeChanged(const Animate: TAnimationStyle; const Duration: DTime); override;

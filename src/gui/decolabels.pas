@@ -25,6 +25,7 @@ unit DecoLabels;
 interface
 
 uses
+  DecoInterfaceCore,
   DecoInterfaceImages, DecoFont,
   DecoTime, DecoGlobal;
 
@@ -40,8 +41,12 @@ type
   DLabelImage = class(DAbstractImage)
   strict private
     fText: string;
+    { Width at which the text image was rendered }
+    RecentLabelWidth: integer;
     { Change the current fText and call Prepare Text Image if needed }
     procedure SetText(const Value: string);
+    { Get the label width to prepare text image }
+    function GetLabelWidth: integer;
     { Converts string (Text) into an image }
     procedure PrepareTextImage;
   public
@@ -55,6 +60,8 @@ type
     LabelType: TLabelType;
     { Text at the label }
     property Text: string read fText write SetText;
+    property LabelWidth: integer read GetLabelWidth;
+    procedure SizeChanged(const Animate: TAnimationStyle; const Duration: DTime); override;
   public
     destructor Destroy; override;
     constructor Create; override;
@@ -83,11 +90,13 @@ implementation
 uses
   SysUtils,
   CastleImages,
-  DecoImages;
+  DecoImages,
+  DecoLog;
 
 constructor DLabelImage.Create;
 begin
   inherited Create;
+  RecentLabelWidth := -1;
   LabelType := ltSimple;
   ShadowIntensity := 0;
   ShadowLength := 3;
@@ -115,17 +124,23 @@ end;
 
 {-----------------------------------------------------------------------------}
 
+function DLabelImage.GetLabelWidth: integer;
+begin
+  if LabelType = ltOneLine then
+    Result := MaxInt div 2
+  else
+    Result := Next.w;
+end;
+
+{-----------------------------------------------------------------------------}
+
 procedure DLabelImage.PrepareTextImage;
 var
   TextImage: TGrayscaleAlphaImage;
-  LabelWidth: integer;
 begin
   FreeAndNil(Image);
 
-  if LabelType = ltOneLine then
-    LabelWidth := MaxInt div 2
-  else
-    LabelWidth := Next.w;
+  RecentLabelWidth := GetLabelWidth;
 
   if ShadowIntensity = 0 then
     TextImage := Font.StringToImage(fText, LabelWidth, LabelType = ltJustify)
@@ -137,6 +152,16 @@ begin
   SetTint;
 end;
 
+{-----------------------------------------------------------------------------}
+
+procedure DLabelImage.SizeChanged(const Animate: TAnimationStyle; const Duration: DTime);
+begin
+  if (FText <> '') and (LabelWidth <> RecentLabelWidth) then
+  begin
+    Log(LogInterfaceWarning, CurrentRoutine, 'Warning: changing size of a non-empty label; content = ' + FText);
+    PrepareTextImage;
+  end;
+end;
 
 {=============================================================================}
 {============================ FPS label ======================================}

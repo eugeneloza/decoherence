@@ -208,7 +208,7 @@ begin
   Lab.ShadowIntensity := 1;
   Lab.SetSize(330, 330, 50, 50);
   Lab.Font := DefaultFont;
-  Lab.Text := '12345';
+  Lab.Text := 'DragMe';
   Lab.CanDrag := true;
   Lab.ResetToRealSize;
   Arr.Grab(Lab);
