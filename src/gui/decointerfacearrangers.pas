@@ -25,7 +25,7 @@ interface
 
 uses
   DecoInterfaceCore,
-  DecoTime, DecoGlobal;
+  DecoTime;
 
 type
   { calls ManageChildren in Update and resets their animation state }
@@ -46,8 +46,8 @@ type
 
 {............................................................................}
 implementation
-uses
-  DecoLog;
+{uses
+  DecoLog;}
 
 procedure DAbstractArranger.SizeChanged(const Animate: TAnimationStyle; const Duration: DTime);
 begin

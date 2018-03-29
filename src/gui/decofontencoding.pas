@@ -23,8 +23,7 @@ unit DecoFontEncoding;
 
 interface
 uses
-  CastleUnicode,
-  DecoGlobal;
+  CastleUnicode;
 
 var
   { Used to display nubmers, maybe fixed-point, e.g. health }
