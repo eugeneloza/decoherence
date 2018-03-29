@@ -6,6 +6,7 @@ bash purge.sh
 
 rm Decoherence
 rm Decoherence.exe
+rm ConstructorTool
 
 # Remove screenshots
 
