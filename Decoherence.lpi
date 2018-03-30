@@ -317,9 +317,9 @@
         <UnitName Value="DecoKeyboardRecorder"/>
       </Unit39>
       <Unit40>
-        <Filename Value="src/input/decotouch.pas"/>
+        <Filename Value="src/input/decomouse.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="DecoTouch"/>
+        <UnitName Value="DecoMouse"/>
       </Unit40>
     </Units>
   </ProjectOptions>

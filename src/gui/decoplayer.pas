@@ -126,7 +126,7 @@ end;
 
 procedure DPlayerControl.ToggleMouseLook;
 begin
-  TouchInput.CenterMouseCursor;
+  MouseInput.CenterMouseCursor;
   MouseLook := not MouseLook;
 end;
 

@@ -30,13 +30,7 @@ uses
   DecoGlobal, DecoTime;
 
 type
-  { Currently assigned control keys }
-  DTouchOptions = record
-    LongTouch: single;
-  end;
-
-type
-  DTouchInput = class(DObject)
+  DMouseInput = class(DObject)
   strict private
   type
     { Class for a single touch / mouse click }
@@ -57,7 +51,6 @@ type
     { Implements MouseDrag (mouse/touch) }
     function doMouseDrag(const Event: TInputMotion): boolean;
   public
-    TouchOptions: DTouchOptions;
     { If mouse has been moved }
     procedure doMouseMotion(const Event: TInputMotion);
     { If mouse button / touch has been pressed }
@@ -66,8 +59,6 @@ type
     procedure doMouseRelease(const Event: TInputPressRelease);
     { Centers the mouse cursor coordinates, without causing MouseLook }
     procedure CenterMouseCursor;
-
-    procedure LoadTouchConfig;
   public
     constructor Create; //override;
     destructor Destroy; override;
@@ -81,9 +72,7 @@ uses
   DecoPlayer, DecoGUI, DecoGUIScale, DecoGameMode, DecoWindow,
   DecoLog;
 
-{================================= TOUCH ====================================}
-
-constructor DTouchInput.DTouch.Create(const Pos: TVector2; const Finger: integer);
+constructor DMouseInput.DTouch.Create(const Pos: TVector2; const Finger: integer);
 begin
   //inherited Create <------- nothing to inherit
   OldPos := Pos;
@@ -93,14 +82,14 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-procedure DTouchInput.DTouch.Update(const Event: TInputMotion);
+procedure DMouseInput.DTouch.Update(const Event: TInputMotion);
 begin
   OldPos := Event.Position;
 end;
 
 {===========================================================================}
 
-procedure DTouchInput.doMouseMotion(const Event: TInputMotion);
+procedure DMouseInput.doMouseMotion(const Event: TInputMotion);
 var
   Dragging: boolean;
 begin
@@ -119,7 +108,7 @@ var
   { used to detect if mouse is in dragg-look mode }
   DragMouseLook: boolean = false;
 
-procedure DTouchInput.doMouseRelease(const Event: TInputPressRelease);
+procedure DMouseInput.doMouseRelease(const Event: TInputPressRelease);
 var
   i: integer;
   Found: boolean;
@@ -143,10 +132,6 @@ begin
       IntToStr(Event.FingerIndex) + ' n=' + IntToStr(i));
     if Found then
     begin
-      if (DecoNow - TouchArray[i].TouchStart > TouchOptions.LongTouch) then
-      begin
-        Log(LogMouseInfo, CurrentRoutine, 'Long-touch caught!');
-      end;
       if (TouchArray[i].ClickElement <> nil) then
       begin
         if Assigned(touchArray[i].ClickElement.OnMouseRelease) then
@@ -171,7 +156,7 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-procedure DTouchInput.doMousePress(const Event: TInputPressRelease);
+procedure DMouseInput.doMousePress(const Event: TInputPressRelease);
 var
   NewEventTouch: DTouch;
   tmpLink: DAbstractElement;
@@ -218,7 +203,7 @@ end;
 
 {----------------------------------------------------------------------------}
 
-function DTouchInput.doMouseLook(const Event: TInputMotion): boolean;
+function DMouseInput.doMouseLook(const Event: TInputMotion): boolean;
 begin
   //if gamemode ... then Exit;
   if Player.MouseLook then
@@ -246,14 +231,14 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DTouchInput.CenterMouseCursor;
+procedure DMouseInput.CenterMouseCursor;
 begin
   Window.MousePosition := GUICenter;
 end;
 
 {----------------------------------------------------------------------------}
 
-function DTouchInput.doMouseDrag(const Event: TInputMotion): boolean;
+function DMouseInput.doMouseDrag(const Event: TInputMotion): boolean;
 var
   i: integer;
 begin
@@ -283,26 +268,15 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DTouchInput.LoadTouchConfig;
-begin
-  with TouchOptions do
-  begin
-    LongTouch := 0.5; { in seconds // 500ms is standard for Android }
-  end;
-end;
-
-{----------------------------------------------------------------------------}
-
-constructor DTouchInput.Create;
+constructor DMouseInput.Create;
 begin
   //inherited <---------- nothing to inherit
   TouchArray := DTouchList.Create;
-  LoadTouchConfig;
 end;
 
 {----------------------------------------------------------------------------}
 
-destructor DTouchInput.Destroy;
+destructor DMouseInput.Destroy;
 begin
   TouchArray.Free;
   inherited Destroy;

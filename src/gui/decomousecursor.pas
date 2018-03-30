@@ -89,6 +89,9 @@ begin
     if (CurrentCursor <> ctNone) and (CursorImg[CurrentCursor].Image <> Nil) then
       CursorImg[CurrentCursor].Image.Draw(x + CursorImg[CurrentCursor].CursorShift.Data[0],
         y - CursorImg[CurrentCursor].Image.Height + CursorImg[CurrentCursor].CursorShift.Data[1]);
+
+  // and draw hint or
+  // draw dragged item
 end;
 
 {-----------------------------------------------------------------------------}

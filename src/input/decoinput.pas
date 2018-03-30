@@ -28,7 +28,7 @@ uses
   DecoKeyboard, DecoMouse;
 
 var
-  TouchInput: DTouchInput;
+  MouseInput: DMouseInput;
   KeyboardInput: DKeyboardInput;
   //GamepadInput: ...
 
@@ -48,7 +48,7 @@ uses CastleWindow, CastleKeysMouse,
 procedure doPress(Container: TUIContainer; const Event: TInputPressRelease);
 begin
   if Event.EventType = itMouseButton then
-    TouchInput.doMousePress(Event)
+    MouseInput.doMousePress(Event)
   else
   if Event.EventType = itKey then
   begin
@@ -70,7 +70,7 @@ end;
 procedure doRelease(Container: TUIContainer; const Event: TInputPressRelease);
 begin
   if Event.EventType = itMouseButton then
-    TouchInput.doMouseRelease(Event)
+    MouseInput.doMouseRelease(Event)
   else
   if Event.EventType = itKey then
     KeyboardInput.doKeyboardRelease(Event.Key);
@@ -80,20 +80,20 @@ end;
 
 procedure doMotion(Container: TUIContainer; const Event: TInputMotion);
 begin
-  TouchInput.doMouseMotion(Event);
+  MouseInput.doMouseMotion(Event);
 end;
 {$POP}
 
 {............................................................................}
 procedure InitInput;
 begin
-  TouchInput := DTouchInput.Create;
+  MouseInput := DMouseInput.Create;
   KeyboardInput := DKeyboardInput.Create;
   Window.OnPress := @doPress;
   Window.OnRelease := @doRelease;
   Window.OnMotion := @doMotion;
   // init mouse cursor so that it always starts in a defined location, instead of (-1,-1)
-  TouchInput.CenterMouseCursor;
+  MouseInput.CenterMouseCursor;
 end;
 
 procedure FreeInput;
@@ -101,7 +101,7 @@ begin
   Window.OnPress := nil; //to be on the safe side so that already-freed Player won't accidentally get input
   Window.OnRelease := nil;
   Window.OnMotion := nil;
-  TouchInput.Free;
+  MouseInput.Free;
   KeyboardInput.Free;
 end;
 
