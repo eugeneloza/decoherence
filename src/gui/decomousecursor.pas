@@ -25,22 +25,31 @@ interface
 
 uses
   CastleVectors,
-  DecoImages,
+  DecoImages, DecoInterfaceCore,
   DecoGlobal;
 
-type TCursorType = (ctNone, ctDefault, ctMouseLook,
-  ctDefault_pressed);
+type TCursorType = (ctNone, ctDefault, ctMouseLook);
 
 type
+  {}
   DCursor = class(TObject)
   private
+    {}
     CursorImg: array[TCursorType] of DCursorImage;
   public
+    {}
     x, y: single;
+    {}
     CurrentCursor: TCursorType;
+    {}
+    DragElement: DSingleInterfaceElement;
+    {}
     procedure SetTint;
+    {}
     procedure Draw;
+    {}
     procedure HideOSCursor;
+  public
     constructor Create; //override;
     destructor Destroy; override;
   end;
@@ -58,7 +67,6 @@ begin
 
   {todo: remake it into something useful}
   CursorImg[ctDefault] := LoadCursorImage('GUI/Cursors/cursor.png', -1, +1);
-  CursorImg[ctDefault_pressed] := LoadCursorImage('GUI/Cursors/cursor_pressed.png', -1, +1);
   CursorImg[ctMouseLook] := LoadCursorImage('GUI/Cursors/mouselook.png', -15, +15);
 
   CurrentCursor := ctDefault;
@@ -85,13 +93,16 @@ end;
 
 procedure DCursor.Draw;
 begin
-  if not ScreenShotPending then //hide cursor for screenshots
-    if (CurrentCursor <> ctNone) and (CursorImg[CurrentCursor].Image <> Nil) then
-      CursorImg[CurrentCursor].Image.Draw(x + CursorImg[CurrentCursor].CursorShift.Data[0],
-        y - CursorImg[CurrentCursor].Image.Height + CursorImg[CurrentCursor].CursorShift.Data[1]);
-
-  // and draw hint or
-  // draw dragged item
+  if DragElement = Nil then
+  begin
+    if not ScreenShotPending then //hide cursor for screenshots
+      if (CurrentCursor <> ctNone) and (CursorImg[CurrentCursor].Image <> Nil) then
+        CursorImg[CurrentCursor].Image.Draw(x + CursorImg[CurrentCursor].CursorShift.Data[0],
+          y - CursorImg[CurrentCursor].Image.Height + CursorImg[CurrentCursor].CursorShift.Data[1]);
+    // and draw hint
+  end
+  else
+    DragElement.Draw;
 end;
 
 {-----------------------------------------------------------------------------}

@@ -42,7 +42,6 @@ type
   DGUI = class(DInterfaceElement)
   strict private
     FPSLabel: DFPSLabel;
-    Cursor: DCursor;
   strict private
     FFirstRender: boolean;
     { Some post-initialization routines, that require graphics context fully available }
@@ -55,9 +54,14 @@ type
     procedure SetTint; override;
     { Draw the GUI and all its child elements }
     procedure Draw; override;
-    { Updates cursor position and image }
-    procedure UpdateCursor(const CursorX, CursorY: single; const MousePressed: boolean);
   public
+    {}
+    Cursor: DCursor;
+    { Updates cursor position and image }
+    procedure UpdateCursor(const CursorX, CursorY: single;
+      const DragElement: DSingleInterfaceElement = nil);
+  public
+    (* Specific interface cases *)
     procedure TestInterface;
   public
     constructor Create; override;
@@ -105,27 +109,29 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-procedure DGUI.UpdateCursor(const CursorX, CursorY: single; const MousePressed: boolean);
+procedure DGUI.UpdateCursor(const CursorX, CursorY: single;
+  const DragElement: DSingleInterfaceElement = nil);
 begin
-  if Player.MouseLook then
-    Cursor.CurrentCursor := ctMouseLook
-  else
+  Cursor.DragElement := DragElement;
+
+  if Cursor.DragElement = nil then
   begin
-    if MousePressed then
-      Cursor.CurrentCursor := ctDefault_Pressed
+    if Player.MouseLook then
+      Cursor.CurrentCursor := ctMouseLook
     else
       Cursor.CurrentCursor := ctDefault;
-  end;
 
-  if Player.MouseLook then
-  begin
-    Cursor.x := GUICenter[0];
-    Cursor.y := GUICenter[1];
-  end
-  else
-  begin
-    Cursor.x := CursorX;
-    Cursor.y := CursorY;
+    if Player.MouseLook then
+    begin
+      //looks redundant, but let it be here, no bugs
+      Cursor.x := GUICenter[0];
+      Cursor.y := GUICenter[1];
+    end
+    else
+    begin
+      Cursor.x := CursorX;
+      Cursor.y := CursorY;
+    end;
   end;
 end;
 

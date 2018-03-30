@@ -132,6 +132,7 @@ type
       cannot be dropped here }
     SavedContainerState: DInterfaceContainer;
   public
+    { Dragg-n-drop routines }
     procedure Drag(const xx, yy: integer);
     procedure StartDrag(const xx, yy: integer);
     procedure Drop;
@@ -140,10 +141,9 @@ type
     OnMouseEnter: TXYProcedure;
     OnMouseLeave: TXYProcedure;
     OnMouseOver: TXYProcedure;
-    OnMousePress: TXYProcedure;
+    OnMouseLeftButton: TXYProcedure;
+    OnMouseRightButton: TXYProcedure;
     OnMouseRelease: TXYProcedure;
-    { Dragg-n-drop routines }
-    //OnDrop: TXYProcedure;
   public
     constructor Create; override;
     destructor Destroy; override;
