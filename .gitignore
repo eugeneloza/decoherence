@@ -56,8 +56,8 @@ zlib1.dll
 
 # Linux executables
 
-decoherence_desktop
-constructor_tool
+Decoherence
+ConstructorTool
 ProfilerTest
 
 # License-unsafe files
