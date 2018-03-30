@@ -39,6 +39,7 @@ type
     procedure doMouseRelease(const Event: TInputPressRelease); virtual; abstract;
   end;
 
+{............................................................................}
 implementation
 
 end.
