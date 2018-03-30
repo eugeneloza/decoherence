@@ -17,7 +17,7 @@
 
 (* Handles mouse and touch behaviour *)
 
-unit DecoTouch;
+unit DecoMouse;
 
 {$INCLUDE compilerconfig.inc}
 

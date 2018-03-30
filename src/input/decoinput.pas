@@ -25,7 +25,7 @@ unit DecoInput;
 interface
 
 uses
-  DecoKeyboard, DecoTouch;
+  DecoKeyboard, DecoMouse;
 
 var
   TouchInput: DTouchInput;
