@@ -63,7 +63,7 @@ procedure FreePlayer;
 implementation
 uses
   CastleKeysMouse,
-  DecoInput,
+  DecoInput, DecoMouse,
   DecoMath;
 
 procedure DPlayerControl.ReleaseControls;
@@ -126,7 +126,7 @@ end;
 
 procedure DPlayerControl.ToggleMouseLook;
 begin
-  MouseInput.CenterMouseCursor;
+  (PointerInput as DMouseInput).CenterMouseCursor;
   MouseLook := not MouseLook;
 end;
 

@@ -30,7 +30,19 @@ uses
   DecoGlobal, DecoTime;
 
 type
-  DMouseInput = class(DObject)
+  DPointerDeviceInput = class abstract(DObject)
+  public
+    { If mouse has been moved }
+    procedure doMouseMotion(const Event: TInputMotion); virtual; abstract;
+    { If mouse button / touch has been pressed }
+    procedure doMousePress(const Event: TInputPressRelease); virtual; abstract;
+    { If mouse button / touch has been released }
+    procedure doMouseRelease(const Event: TInputPressRelease); virtual; abstract;
+  end;
+
+
+type
+  DMouseInput = class(DPointerDeviceInput)
   strict private
   type
     { Class for a single touch / mouse click }
@@ -52,11 +64,11 @@ type
     function doMouseDrag(const Event: TInputMotion): boolean;
   public
     { If mouse has been moved }
-    procedure doMouseMotion(const Event: TInputMotion);
+    procedure doMouseMotion(const Event: TInputMotion); override;
     { If mouse button / touch has been pressed }
-    procedure doMousePress(const Event: TInputPressRelease);
+    procedure doMousePress(const Event: TInputPressRelease); override;
     { If mouse button / touch has been released }
-    procedure doMouseRelease(const Event: TInputPressRelease);
+    procedure doMouseRelease(const Event: TInputPressRelease); override;
     { Centers the mouse cursor coordinates, without causing MouseLook }
     procedure CenterMouseCursor;
   public
@@ -272,6 +284,8 @@ constructor DMouseInput.Create;
 begin
   //inherited <---------- nothing to inherit
   TouchArray := DTouchList.Create;
+  // init mouse cursor so that it always starts in a defined location, instead of (-1,-1)
+  CenterMouseCursor;
 end;
 
 {----------------------------------------------------------------------------}
