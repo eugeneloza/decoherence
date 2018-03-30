@@ -25,15 +25,11 @@ unit DecoInput;
 interface
 
 uses
-  DecoKeyboard, DecoMouse;
+  DecoKeyboard, DecoPointerDeviceInput;
 
 var
   { Handles mouse or touch input }
   PointerInput: DPointerDeviceInput;
-  { Handles keyboard input }
-  KeyboardInput: DKeyboardInput;
-  { Handles gamepad/joystick input }
-  //GamepadInput: ...
 
 { Initializes Input events and loads key bindings
   Input must be initialized AFTER window is created }
@@ -43,7 +39,14 @@ procedure FreeInput;
 {............................................................................}
 implementation
 uses CastleWindow, CastleKeysMouse,
+  DecoMouse,
   DecoWindow;
+
+var
+  { Handles keyboard input }
+  KeyboardInput: DKeyboardInput;
+  { Handles gamepad/joystick input }
+  //GamepadInput: ...
 
 {======================== EVENTS =================================}
 

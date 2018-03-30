@@ -15,7 +15,7 @@
 
 {---------------------------------------------------------------------------}
 
-(* Handles mouse and touch behaviour *)
+(* Handles mouse behaviour *)
 
 unit DecoMouse;
 
@@ -26,20 +26,8 @@ interface
 uses
   Generics.Collections,
   CastleKeysMouse, CastleVectors,
-  DecoInterfaceCore,
+  DecoPointerDeviceInput, DecoInterfaceCore,
   DecoGlobal, DecoTime;
-
-type
-  DPointerDeviceInput = class abstract(DObject)
-  public
-    { If mouse has been moved }
-    procedure doMouseMotion(const Event: TInputMotion); virtual; abstract;
-    { If mouse button / touch has been pressed }
-    procedure doMousePress(const Event: TInputPressRelease); virtual; abstract;
-    { If mouse button / touch has been released }
-    procedure doMouseRelease(const Event: TInputPressRelease); virtual; abstract;
-  end;
-
 
 type
   DMouseInput = class(DPointerDeviceInput)
