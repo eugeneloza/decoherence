@@ -32,24 +32,18 @@ uses
 type
   DMouseInput = class(DPointerDeviceInput)
   strict private
-  type
-    { Class for a single touch / mouse click }
-    DTouch = class(DObject)
-      TouchStart: DTime;
-      FingerIndex: cardinal;
-      OldPos: TVector2;     //to handle sweeps, drags and cancels
-      ClickElement: DSingleInterfaceElement;
-      constructor Create(const Pos: TVector2; const Finger: integer);
-      procedure Update(const Event: TInputMotion);
+    type DMousePressEvent = record
+      { If this mouse button is pressed}
+      isPressed: boolean;
+      { Coordinates where the press occured }
+      Position: TVector2;
+      { Caches if this event is not a dragging event }
+      isDragging: boolean;
     end;
-    DTouchList = specialize TObjectList<DTouch>;
   strict private
-    { All currently active touches/clicks }
-    TouchArray: DTouchList;
+    MouseButton: array [TMouseButton] of DMousePressEvent;
     { Implements MouseLook (mouse only) }
     function doMouseLook(const Event: TInputMotion): boolean;
-    { Implements MouseDrag (mouse/touch) }
-    function doMouseDrag(const Event: TInputMotion): boolean;
   public
     { If mouse has been moved }
     procedure doMouseMotion(const Event: TInputMotion); override;
@@ -72,133 +66,137 @@ uses
   DecoPlayer, DecoGUI, DecoGUIScale, DecoGameMode, DecoWindow,
   DecoLog;
 
-constructor DMouseInput.DTouch.Create(const Pos: TVector2; const Finger: integer);
+var
+  { used to detect if mouse is in dragg-look mode }
+  DragMouseLook: boolean = false;
+
+
+procedure DMouseInput.doMousePress(const Event: TInputPressRelease);
+var
+  tmpLink: DAbstractElement;
+  InterfaceCaughtEvent: boolean;
+  ClickElement, DragElement: DSingleInterfaceElement;
 begin
-  //inherited Create <------- nothing to inherit
-  OldPos := Pos;
-  FingerIndex := Finger;
-  TouchStart := DecoNow;
+  InterfaceCaughtEvent := false;
+
+  // record start of the click
+  with MouseButton[Event.MouseButton] do
+  begin
+    isPressed := true;
+    Position := Event.Position;
+    isDragging := false;
+  end;
+
+  if GUI.Cursor.DragElement <> nil then
+    GUI.Cursor.DragElement.Drop;
+
+  DragElement := nil;
+  //catch the element which has been pressed
+  tmpLink := GUI.IfMouseOver(Round(Event.Position[0]), Round(Event.Position[1]),
+    true, true);
+
+  //process click event
+  if (tmpLink is DSingleInterfaceElement) then
+  begin
+    ClickElement := DSingleInterfaceElement(tmpLink);
+
+    if Event.MouseButton = mbLeft then
+    begin
+      if Assigned(ClickElement.OnMouseLeftButton) then
+      begin
+       ClickElement.OnMouseLeftButton(
+          tmpLink, Round(Event.Position[0]), Round(Event.Position[1]));
+        InterfaceCaughtEvent := true;
+      end;
+      if ClickElement.CanDrag then
+      begin
+        DragElement := ClickElement;
+        DragElement.StartDrag(Round(Event.Position[0]), Round(Event.Position[1]));
+      end;
+    end
+    else
+    begin
+      //!!! TODO: onRelease !!!//
+      if Assigned(ClickElement.OnMouseRightButton) then
+      begin
+        ClickElement.OnMouseRightButton(
+          tmpLink, Round(Event.Position[0]), Round(Event.Position[1]));
+        InterfaceCaughtEvent := true;
+      end;
+    end;
+  end;
+
+  if (not InterfaceCaughtEvent) and GameModeMouseLook then
+  begin
+    // if this is a right-click, change control mode
+    if Event.MouseButton = mbRight then
+    begin
+      CenterMouseCursor;
+      Player.ToggleMouseLook
+    end;
+
+    //start dragging mouse look
+    if (Event.MouseButton = mbMiddle) then
+      DragMouseLook := true;
+  end;
+
+  GUI.UpdateCursor(Event.Position[0], Event.Position[1], DragElement);
+
+  Log(LogMouseInfo, CurrentRoutine, 'Caught mouse press finger=' + IntToStr(Event.FingerIndex));
 end;
 
 {-----------------------------------------------------------------------------}
 
-procedure DMouseInput.DTouch.Update(const Event: TInputMotion);
-begin
-  OldPos := Event.Position;
-end;
-
-{===========================================================================}
-
 procedure DMouseInput.doMouseMotion(const Event: TInputMotion);
 var
-  Dragging: boolean;
+  mb: TMouseButton;
 begin
   if Player.MouseLook then
     if doMouseLook(Event) then
       Exit;
 
-  Dragging := doMouseDrag(Event);
+  { if mouse cursor shifted too far away (1 interface item away)
+    then it's a drag-move, not a click }
+  for mb in Event.Pressed do
+    if (MouseButton[mb].Position[0] - Event.Position[0] > GUIUnit / 2) or
+       (MouseButton[mb].Position[1] - Event.Position[1] > GUIUnit / 2) then
+      MouseButton[mb].isDragging := false;
 
-  GUI.UpdateCursor(Event.Position[0], Event.Position[1], TouchArray.Count > 0);
+  // if we have a interface element dragging - update it.
+  //!!! TODO: move it to GUI.UpdateCursor !!!
+  if (GUI.Cursor.DragElement <> nil) then
+    GUI.Cursor.DragElement.Drag(Round(Event.Position[0]), Round(Event.Position[1]));
+
+  //!!! TODO: Drag mouse look ???
+
+  GUI.UpdateCursor(Event.Position[0], Event.Position[1], GUI.Cursor.DragElement);
 end;
 
 {-----------------------------------------------------------------------------}
-
-var
-  { used to detect if mouse is in dragg-look mode }
-  DragMouseLook: boolean = false;
 
 procedure DMouseInput.doMouseRelease(const Event: TInputPressRelease);
-var
-  i: integer;
-  Found: boolean;
 begin
-  if TouchArray.Count > 0 then
+  // process of the click
+  with MouseButton[Event.MouseButton] do
   begin
-    i := 0;
-    Found := false;
-    repeat
-      if TouchArray[i].FingerIndex = Event.FingerIndex then
-        Found := true
-      else
-        inc(i);
-    until (i >= TouchArray.Count) or Found;
-
-    //stop dragging
-    if i = 0 then
-      DragMouseLook := false;
-
-    Log(LogMouseInfo, CurrentRoutine, 'Caught mouse release finger=' +
-      IntToStr(Event.FingerIndex) + ' n=' + IntToStr(i));
-    if Found then
-    begin
-      if (TouchArray[i].ClickElement <> nil) then
-      begin
-        if Assigned(touchArray[i].ClickElement.OnMouseRelease) then
-          TouchArray[i].ClickElement.OnMouseRelease(
-            TouchArray[i].ClickElement, Round(TouchArray[i].OldPos[0]),
-            Round(TouchArray[i].OldPos[1]));
-        TouchArray[i].ClickElement.Drop;
-{        if Assigned(TouchArray[i].ClickElement.OnDrop) then
-          TouchArray[i].ClickElement.OnDrop(TouchArray[i].ClickElement,
-            Round(TouchArray[i].OldPos[0]), Round(TouchArray[i].OldPos[1]));}
-      end;
-      TouchArray.Remove(TouchArray[i]);
-    end
-    else
-      Log(LogMouseError, CurrentRoutine, 'ERROR: Touch event not found!');
-  end
-  else
-    Log(LogMouseError, CurrentRoutine, 'ERROR: Touch event list is empty!');
-
-  GUI.UpdateCursor(Event.Position[0], Event.Position[1], TouchArray.Count > 0);
-end;
-
-{-----------------------------------------------------------------------------}
-
-procedure DMouseInput.doMousePress(const Event: TInputPressRelease);
-var
-  NewEventTouch: DTouch;
-  tmpLink: DAbstractElement;
-  InterfaceCaughtEvent: boolean;
-  i: integer;
-begin
-  InterfaceCaughtEvent := false;
-
-  NewEventTouch := DTouch.Create(Event.Position, Event.FingerIndex);
-
-  //catch the element which has been pressed
-  tmpLink := GUI.IfMouseOver(Round(Event.Position[0]),
-    Round(Event.Position[1]), true, true);
-  if (tmpLink is DSingleInterfaceElement) then
-  begin
-    NewEventTouch.ClickElement := DSingleInterfaceElement(tmpLink);
-    if Assigned(NewEventTouch.ClickElement.OnMousePress) then
-    begin
-      NewEventTouch.ClickElement.OnMousePress(
-        tmpLink, Round(Event.Position[0]), Round(Event.Position[1]));
-      InterfaceCaughtEvent := true;
-    end;
-    if NewEventTouch.ClickElement.CanDrag then
-      NewEventTouch.ClickElement.StartDrag(Round(Event.Position[0]), Round(Event.Position[1]));
+    isPressed := false;
+    Position := Event.Position;
+    isDragging := false;
   end;
 
-  i := TouchArray.Add(NewEventTouch);
+  //stop dragging
+  if Event.MouseButton = mbMiddle then
+    DragMouseLook := false;
 
-  if GameModeMouseLook then
-    if (not InterfaceCaughtEvent) then
-    begin
-      if Event.MouseButton = mbRight then
-          Player.ToggleMouseLook
-      else
-      //start dragging mouse look
-      if i = 0 then
-        DragMouseLook := true;
-    end;
+  if Event.MouseButton = mbLeft then
+  begin
+    {if Assigned(ClickElement.OnMouseRelease) then
+    ClickElement.OnMouseRelease(ClickElement, Round(Pos[0]), Round(Pos[1]));}
+    if GUI.Cursor.DragElement <> nil then
+      GUI.Cursor.DragElement.Drop;
+  end;
 
-  GUI.UpdateCursor(Event.Position[0], Event.Position[1], TouchArray.Count > 0);
-
-  Log(LogMouseInfo, CurrentRoutine, 'Caught mouse press finger=' + IntToStr(Event.FingerIndex));
+  GUI.UpdateCursor(Event.Position[0], Event.Position[1]);
 end;
 
 {----------------------------------------------------------------------------}
@@ -238,40 +236,10 @@ end;
 
 {----------------------------------------------------------------------------}
 
-function DMouseInput.doMouseDrag(const Event: TInputMotion): boolean;
-var
-  i: integer;
-begin
-  {check for drag-n-drops}
-  Result := false;
-
-  if TouchArray.Count > 0 then
-  begin
-    i := 0;
-    repeat
-      if TouchArray[i].FingerIndex = Event.FingerIndex then
-      begin
-        TouchArray[i].Update(Event);
-        if (TouchArray[i].ClickElement <> nil) and
-          (TouchArray[i].ClickElement.CanDrag) then
-        begin
-          TouchArray[i].ClickElement.Drag(Round(Event.Position[0]),
-            Round(Event.Position[1]));
-          Result := true;
-        end;
-        Break;
-      end;
-      inc(i);
-    until (i >= TouchArray.Count);
-  end;
-end;
-
-{----------------------------------------------------------------------------}
-
 constructor DMouseInput.Create;
 begin
   //inherited <---------- nothing to inherit
-  TouchArray := DTouchList.Create;
+
   // init mouse cursor so that it always starts in a defined location, instead of (-1,-1)
   CenterMouseCursor;
 end;
@@ -280,7 +248,6 @@ end;
 
 destructor DMouseInput.Destroy;
 begin
-  TouchArray.Free;
   inherited Destroy;
 end;
 

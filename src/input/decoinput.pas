@@ -27,10 +27,6 @@ interface
 uses
   DecoKeyboard, DecoPointerDeviceInput;
 
-var
-  { Handles mouse or touch input }
-  PointerInput: DPointerDeviceInput;
-
 { Initializes Input events and loads key bindings
   Input must be initialized AFTER window is created }
 procedure InitInput;
@@ -43,6 +39,8 @@ uses CastleWindow, CastleKeysMouse,
   DecoWindow;
 
 var
+  { Handles mouse or touch input }
+  PointerInput: DPointerDeviceInput;
   { Handles keyboard input }
   KeyboardInput: DKeyboardInput;
   { Handles gamepad/joystick input }
@@ -95,16 +93,21 @@ procedure InitInput;
 begin
   PointerInput := DMouseInput.Create;
   KeyboardInput := DKeyboardInput.Create;
+
   Window.OnPress := @doPress;
   Window.OnRelease := @doRelease;
   Window.OnMotion := @doMotion;
 end;
 
+{--------------------------------------------------------------------------}
+
 procedure FreeInput;
 begin
-  Window.OnPress := nil; //to be on the safe side so that already-freed Player won't accidentally get input
+  //to be on the safe side so that already-freed Player won't accidentally get input
+  Window.OnPress := nil;
   Window.OnRelease := nil;
   Window.OnMotion := nil;
+
   PointerInput.Free;
   KeyboardInput.Free;
 end;
