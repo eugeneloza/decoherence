@@ -24,10 +24,8 @@ unit DecoMouse;
 interface
 
 uses
-  Generics.Collections,
   CastleKeysMouse, CastleVectors,
-  DecoPointerDeviceInput, DecoInterfaceCore,
-  DecoGlobal, DecoTime;
+  DecoPointerDeviceInput, DecoInterfaceCore;
 
 type
   DMouseInput = class(DPointerDeviceInput)
