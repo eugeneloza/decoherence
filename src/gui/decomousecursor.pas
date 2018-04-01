@@ -42,7 +42,7 @@ type
     {}
     CurrentCursor: TCursorType;
     {}
-    DragElement: DSingleInterfaceElement;
+    DragElement, ClickElement: DSingleInterfaceElement;
     {}
     procedure SetTint;
     {}

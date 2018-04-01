@@ -44,6 +44,7 @@ type
     MouseButton: array [TMouseButton] of DMousePressEvent;
     { Implements MouseLook (mouse only) }
     function doMouseLook(const Event: TInputMotion): boolean;
+    procedure TryClick(const Event: TInputPressRelease);
   public
     { If mouse has been moved }
     procedure doMouseMotion(const Event: TInputMotion); override;
@@ -87,6 +88,7 @@ begin
     isDragging := false;
   end;
 
+  //UGLY BUGFIX
   if GUI.Cursor.DragElement <> nil then
     GUI.Cursor.DragElement.Drop;
 
@@ -102,27 +104,19 @@ begin
 
     if Event.MouseButton = mbLeft then
     begin
-      if Assigned(ClickElement.OnMouseLeftButton) then
-      begin
-       ClickElement.OnMouseLeftButton(
-          tmpLink, Round(Event.Position[0]), Round(Event.Position[1]));
-        InterfaceCaughtEvent := true;
-      end;
       if ClickElement.CanDrag then
       begin
         DragElement := ClickElement;
         DragElement.StartDrag(Round(Event.Position[0]), Round(Event.Position[1]));
-      end;
-    end
-    else
-    begin
-      //!!! TODO: onRelease !!!//
-      if Assigned(ClickElement.OnMouseRightButton) then
-      begin
-        ClickElement.OnMouseRightButton(
-          tmpLink, Round(Event.Position[0]), Round(Event.Position[1]));
         InterfaceCaughtEvent := true;
       end;
+    end;
+
+    if Assigned(ClickElement.OnMouseLeftButton) or
+      Assigned(ClickElement.OnMouseRightButton) then
+    begin
+      GUI.Cursor.ClickElement := ClickElement;
+      InterfaceCaughtEvent := true;
     end;
   end;
 
@@ -151,9 +145,10 @@ procedure DMouseInput.doMouseMotion(const Event: TInputMotion);
 var
   mb: TMouseButton;
 begin
-  if Player.MouseLook then
-    if doMouseLook(Event) then
-      Exit;
+  { this will check all conditions properly and handle both
+    mouse look and mouse drag depending on the current mode }
+  if doMouseLook(Event) then
+    Exit;
 
   { if mouse cursor shifted too far away (1 interface item away)
     then it's a drag-move, not a click }
@@ -167,33 +162,51 @@ begin
   if (GUI.Cursor.DragElement <> nil) then
     GUI.Cursor.DragElement.Drag(Round(Event.Position[0]), Round(Event.Position[1]));
 
-  //!!! TODO: Drag mouse look ???
-
   GUI.UpdateCursor(Event.Position[0], Event.Position[1], GUI.Cursor.DragElement);
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DMouseInput.TryClick(const Event: TInputPressRelease);
+begin
+  if GUI.Cursor.ClickElement = nil then Exit;
+  { There might be (and quiet possible) a bug here - when the "shift" of the
+    cursor is not too large to cancel the click, but the element the click was
+    made is different. }
+
+  if (Event.MouseButton = mbLeft) and
+    Assigned(GUI.Cursor.ClickElement.OnMouseLeftButton) then
+    GUI.Cursor.ClickElement.OnMouseLeftButton(
+      GUI.Cursor.ClickElement, Round(Event.Position[0]), Round(Event.Position[1]))
+  else
+  if (Event.MouseButton = mbRight) and
+    Assigned(GUI.Cursor.ClickElement.OnMouseRightButton) then
+    GUI.Cursor.ClickElement.OnMouseRightButton(
+      GUI.Cursor.ClickElement, Round(Event.Position[0]), Round(Event.Position[1]));
+
+  GUI.Cursor.ClickElement := nil;
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure DMouseInput.doMouseRelease(const Event: TInputPressRelease);
 begin
-  // process of the click
-  with MouseButton[Event.MouseButton] do
-  begin
-    isPressed := false;
-    Position := Event.Position;
-    isDragging := false;
-  end;
+  // stop the click
+  MouseButton[Event.MouseButton].isPressed := false;
 
-  //stop dragging
+  //stop drag mouse look
   if Event.MouseButton = mbMiddle then
     DragMouseLook := false;
 
   if Event.MouseButton = mbLeft then
   begin
-    {if Assigned(ClickElement.OnMouseRelease) then
-    ClickElement.OnMouseRelease(ClickElement, Round(Pos[0]), Round(Pos[1]));}
+    //stop dragging interface element
     if GUI.Cursor.DragElement <> nil then
       GUI.Cursor.DragElement.Drop;
+
+    //try clicking it if mouse didn't move too far away
+    if MouseButton[Event.MouseButton].isDragging = false then
+      TryClick(Event);
   end;
 
   GUI.UpdateCursor(Event.Position[0], Event.Position[1]);
@@ -203,13 +216,14 @@ end;
 
 function DMouseInput.doMouseLook(const Event: TInputMotion): boolean;
 begin
+  Result := false;
+
   //if gamemode ... then Exit;
   if Player.MouseLook then
   begin
     if not TVector2.PerfectlyEquals(Event.Position, GUICenter) then
     begin
       //Player.InputMouse(Event.Position - GUICenter);
-      Result := false;
       Window.MousePosition := GUICenter; //=CenterMouseCursor inlined
     end
     else
