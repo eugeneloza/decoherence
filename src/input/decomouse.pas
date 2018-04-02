@@ -221,7 +221,7 @@ begin
   begin
     if not TVector2.PerfectlyEquals(Event.Position, GUICenter) then
     begin
-      //Player.InputMouse(Event.Position - GUICenter);
+      Player.doLook(Event.Position - GUICenter);
       Window.MousePosition := GUICenter; //=CenterMouseCursor inlined
     end
     else
@@ -234,7 +234,7 @@ begin
     //DragMouseLook doesn't change cursor.position
     {however, it's a good idea to catch DragMouseLook not to go outside window
      - scroll it like Blender does}
-    //Player.InputMouse(Event.OldPosition - Event.Position);
+    Player.doLook(Event.OldPosition - Event.Position);
     Result := false;
   end;
 end;

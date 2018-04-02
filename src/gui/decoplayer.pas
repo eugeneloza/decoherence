@@ -24,6 +24,7 @@ unit DecoPlayer;
 interface
 
 uses
+  CastleVectors,
   DecoGlobal;
 
 type
@@ -46,6 +47,7 @@ type
     procedure MoveKeyRelease(const aKey: DMoveKey);
     { Turn MouseLook on/off }
     procedure ToggleMouseLook;
+    procedure doLook(const Delta: TVector2);
   public
     procedure Manage;
     constructor Create; //override;
@@ -117,9 +119,9 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DPlayerControl.Manage;
+procedure DPlayerControl.doLook(const Delta: TVector2);
 begin
-  doMove;
+  //todo
 end;
 
 {----------------------------------------------------------------------------}
@@ -127,6 +129,13 @@ end;
 procedure DPlayerControl.ToggleMouseLook;
 begin
   MouseLook := not MouseLook;
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DPlayerControl.Manage;
+begin
+  doMove;
 end;
 
 {----------------------------------------------------------------------------}
