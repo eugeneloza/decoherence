@@ -28,26 +28,24 @@ uses
   DecoGlobal;
 
 type
-  DMoveKey = (KeyboardForward, KeyboardBackward, KeyboardStrafeLeft, KeyboardStrafeRight);
-
-type
   { Handling of player movement }
   DPlayerControl = class(DObject)
   private
-    MoveKeys: array[DMoveKey] of boolean;
+    {}
+    AccelerationForward, AccelerationStrafe: DFloat;
+    {}
     procedure doMove;
   public
     //CurrentParty
     //CameraMman
     MouseLook: boolean;
-    { Reset all input controls to initial values }
-    procedure ReleaseControls;
-    { Keyboard movement }
-    procedure MoveKeyPress(const aKey: DMoveKey);
-    procedure MoveKeyRelease(const aKey: DMoveKey);
     { Turn MouseLook on/off }
     procedure ToggleMouseLook;
+    { Change CameraMan look direction }
     procedure doLook(const Delta: TVector2);
+    { Change CameraMan acceleration }
+    procedure doAccelerateForward(const Value: DFloat);
+    procedure doAccelerateStrafe(const Value: DFloat);
   public
     procedure Manage;
     constructor Create; //override;
@@ -68,26 +66,20 @@ uses
   //DecoInput,
   DecoMath;
 
-procedure DPlayerControl.ReleaseControls;
-var
-  k: DMoveKey;
+
+
+{----------------------------------------------------------------------------}
+
+procedure DPlayerControl.doAccelerateForward(const Value: DFloat);
 begin
-  for k in DMoveKey do
-    MoveKeys[k] := false;
+  AccelerationForward := Value;
 end;
 
 {----------------------------------------------------------------------------}
 
-procedure DPlayerControl.MoveKeyPress(const aKey: DMoveKey);
+procedure DPlayerControl.doAccelerateStrafe(const Value: DFloat);
 begin
-  MoveKeys[aKey] := true;
-end;
-
-{----------------------------------------------------------------------------}
-
-procedure DPlayerControl.MoveKeyRelease(const aKey: DMoveKey);
-begin
-  MoveKeys[aKey] := false;
+  AccelerationStrafe := Value;
 end;
 
 {----------------------------------------------------------------------------}
@@ -96,24 +88,16 @@ procedure DPlayerControl.doMove;
 var
   InputAccelerationForward, InputAccelerationStrafe: DFloat;
 begin
-  //collect all sources of possible movement and adjust CameraMan position and location
-  InputAccelerationForward := 0;
-  InputAccelerationStrafe := 0;
-  //get keyboard input
-  if MoveKeys[KeyboardForward] then
-    InputAccelerationForward += 1;
-  if MoveKeys[KeyboardBackward] then
-    InputAccelerationForward += -1;
-  if MoveKeys[KeyboardStrafeLeft] then
-    InputAccelerationStrafe += 1;
-  if MoveKeys[KeyboardStrafeRight] then
-    InputAccelerationStrafe += -1;
-  //get mousedrag input
-  //get gamepad input
-  if Abs(InputAccelerationForward) > 1 then
-    InputAccelerationForward := Sign(InputAccelerationForward);
-  if Abs(InputAccelerationStrafe) > 1 then
-    InputAccelerationStrafe := Sign(InputAccelerationStrafe);
+
+  if Abs(AccelerationForward) > 1 then
+    InputAccelerationForward := Sign(AccelerationForward)
+  else
+    InputAccelerationForward := AccelerationForward;
+
+  if Abs(AccelerationStrafe) > 1 then
+    InputAccelerationStrafe := Sign(AccelerationStrafe)
+  else
+    InputAccelerationStrafe := AccelerationStrafe;
 
 end;
 
@@ -142,7 +126,7 @@ end;
 
 constructor DPlayerControl.Create;
 begin
-  ReleaseControls;
+  //...
 end;
 
 {............................................................................}

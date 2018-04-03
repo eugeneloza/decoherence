@@ -36,11 +36,23 @@ type
   end;
 
 type
+  { Internal names for movement keys }
+  DMoveKey = (KeyboardForward, KeyboardBackward, KeyboardStrafeLeft, KeyboardStrafeRight);
+
+
+type
   {}
   DKeyboardInput = class(DObject)
   private
-    {}
+    { Records keys sequences }
     KeyboardRecorder: DKeyboardRecorder;
+    { Keys are source of discrete movement unlike Proplusion and Gamepad axes }
+    MoveKeys: array[DMoveKey] of boolean;
+    { Keyboard movement }
+    procedure MoveKeyPress(const aKey: DMoveKey);
+    procedure MoveKeyRelease(const aKey: DMoveKey);
+    { Reset all input controls to initial values }
+    procedure ReleaseControls;
   public
     { Currently assigned keyboard keys }
     KeyboardOptions: DKeyboardOptions;
@@ -61,20 +73,49 @@ implementation
 uses
   DecoPlayer;
 
+{----------------------------------------------------------------------------}
+
+procedure DKeyboardInput.MoveKeyPress(const aKey: DMoveKey);
+begin
+  MoveKeys[aKey] := true;
+  case aKey of
+    KeyboardForward: Player.doAccelerateForward(+1.0);
+    KeyboardBackward: Player.DoAccelerateForward(-1.0);
+    KeyboardStrafeLeft: Player.doAccelerateStrafe(+1.0);
+    KeyboardStrafeRight: Player.doAccelerateStrafe(-1.0);
+  end;
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DKeyboardInput.MoveKeyRelease(const aKey: DMoveKey);
+begin
+  MoveKeys[aKey] := false;
+  {not sure if this is the right behaviour, but let it be for now}
+  case aKey of
+    KeyboardForward: Player.doAccelerateForward(0);
+    KeyboardBackward: Player.DoAccelerateForward(0);
+    KeyboardStrafeLeft: Player.doAccelerateStrafe(0);
+    KeyboardStrafeRight: Player.doAccelerateStrafe(0);
+  end;
+end;
+
+{----------------------------------------------------------------------------}
+
 procedure DKeyboardInput.doKeyboardRelease(const aKey: TKey);
 begin
   {if context is 3D then }
   if aKey = KeyboardOptions.MoveForwardKey then
-    Player.MoveKeyRelease(KeyboardForward)
+    MoveKeyRelease(KeyboardForward)
   else
   if aKey = KeyboardOptions.MoveBackwardKey then
-    Player.MoveKeyRelease(KeyboardBackward)
+    MoveKeyRelease(KeyboardBackward)
   else
   if aKey = KeyboardOptions.StrafeLeftKey then
-    Player.MoveKeyRelease(KeyboardStrafeLeft)
+    MoveKeyRelease(KeyboardStrafeLeft)
   else
   if aKey = KeyboardOptions.StrafeRightKey then
-    Player.MoveKeyRelease(KeyboardStrafeRight);
+    MoveKeyRelease(KeyboardStrafeRight);
 end;
 
 {-----------------------------------------------------------------------------}
@@ -83,16 +124,16 @@ procedure DKeyboardInput.doKeyboardPress(const aKey: TKey);
 begin
   {if context is 3D then }
   if aKey = KeyboardOptions.MoveForwardKey then
-    Player.MoveKeyPress(KeyboardForward)
+    MoveKeyPress(KeyboardForward)
   else
   if aKey = KeyboardOptions.MoveBackwardKey then
-    Player.MoveKeyPress(KeyboardBackward)
+    MoveKeyPress(KeyboardBackward)
   else
   if aKey = KeyboardOptions.StrafeLeftKey then
-    Player.MoveKeyPress(KeyboardStrafeLeft)
+    MoveKeyPress(KeyboardStrafeLeft)
   else
   if aKey = KeyboardOptions.StrafeRightKey then
-    Player.MoveKeyPress(KeyboardStrafeRight);
+    MoveKeyPress(KeyboardStrafeRight);
 
   KeyboardRecorder.KeyRecorder(aKey);
 end;
@@ -113,11 +154,22 @@ end;
 
 {-----------------------------------------------------------------------------}
 
+procedure DKeyboardInput.ReleaseControls;
+var
+  k: DMoveKey;
+begin
+  for k in DMoveKey do
+    MoveKeys[k] := false;
+end;
+
+{-----------------------------------------------------------------------------}
+
 constructor DKeyboardInput.Create;
 begin
   //inherited <-------- nothing to inherit
   KeyboardRecorder := DKeyboardRecorder.Create;
   LoadKeyboardConfig;
+  ReleaseControls;
 end;
 
 {-----------------------------------------------------------------------------}
