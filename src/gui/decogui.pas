@@ -79,7 +79,7 @@ procedure FreeGUI;
 implementation
 uses
   SysUtils, CastleColors, CastleGLUtils,
-  DecoPlayer, DecoGameMode,
+  DecoPlayer, DecoGameMode, DecoMouse,
   DecoLog;
 
 procedure DGUI.ShowMessage(const aMessage: string);
@@ -116,14 +116,14 @@ begin
 
   if Cursor.DragElement = nil then
   begin
-    if Player.MouseLook then
+    if MouseLook then
       Cursor.CurrentCursor := ctMouseLook
     else
       Cursor.CurrentCursor := ctDefault;
 
-    if Player.MouseLook then
+    if MouseLook then
     begin
-      //looks redundant, but let it be here, no bugs
+      { it's important to avoid mouse shimmer during MouseLook }
       Cursor.x := GUICenter[0];
       Cursor.y := GUICenter[1];
     end

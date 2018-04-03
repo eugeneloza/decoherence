@@ -38,9 +38,6 @@ type
   public
     //CurrentParty
     //CameraMman
-    MouseLook: boolean;
-    { Turn MouseLook on/off }
-    procedure ToggleMouseLook;
     { Change CameraMan look direction }
     procedure doLook(const Delta: TVector2);
     { Change CameraMan acceleration }
@@ -49,6 +46,7 @@ type
   public
     procedure Manage;
     constructor Create; //override;
+    //destructor Destroy; override;
   end;
 
 var
@@ -65,10 +63,6 @@ uses
   CastleKeysMouse,
   //DecoInput,
   DecoMath;
-
-
-
-{----------------------------------------------------------------------------}
 
 procedure DPlayerControl.doAccelerateForward(const Value: DFloat);
 begin
@@ -108,12 +102,6 @@ begin
   //todo
 end;
 
-{----------------------------------------------------------------------------}
-
-procedure DPlayerControl.ToggleMouseLook;
-begin
-  MouseLook := not MouseLook;
-end;
 
 {----------------------------------------------------------------------------}
 

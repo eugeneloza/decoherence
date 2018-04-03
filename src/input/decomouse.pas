@@ -40,6 +40,8 @@ type
     end;
   strict private
     MouseButton: array [TMouseButton] of DMousePressEvent;
+    { Turn MouseLook on/off }
+    procedure ToggleMouseLook;
     { Implements MouseLook (mouse only) }
     function doMouseLook(const Event: TInputMotion): boolean;
     procedure TryClick(const Event: TInputPressRelease);
@@ -57,6 +59,9 @@ type
     destructor Destroy; override;
   end;
 
+var
+  { Defines the state of MouseLook }
+  MouseLook: boolean = false;
 
 {............................................................................}
 implementation
@@ -124,7 +129,7 @@ begin
     if Event.MouseButton = mbRight then
     begin
       CenterMouseCursor;
-      Player.ToggleMouseLook
+      ToggleMouseLook
     end;
 
     //start dragging mouse look
@@ -212,12 +217,19 @@ end;
 
 {----------------------------------------------------------------------------}
 
+procedure DMouseInput.ToggleMouseLook;
+begin
+  MouseLook := not MouseLook;
+end;
+
+{----------------------------------------------------------------------------}
+
 function DMouseInput.doMouseLook(const Event: TInputMotion): boolean;
 begin
   Result := false;
 
   //if gamemode ... then Exit;
-  if Player.MouseLook then
+  if MouseLook then
   begin
     if not TVector2.PerfectlyEquals(Event.Position, GUICenter) then
     begin
@@ -226,7 +238,6 @@ begin
     end
     else
       Result := true; {prevent onMotion call-back}
-
   end
   else
   if DragMouseLook then
@@ -251,7 +262,7 @@ end;
 constructor DMouseInput.Create;
 begin
   //inherited <---------- nothing to inherit
-
+  MouseLook := false;
   // init mouse cursor so that it always starts in a defined location, instead of (-1,-1)
   CenterMouseCursor;
 end;
