@@ -39,11 +39,13 @@ type
       isDragging: boolean;
     end;
   strict private
+    { Current state of mouse buttons }
     MouseButton: array [TMouseButton] of DMousePressEvent;
     { Turn MouseLook on/off }
     procedure ToggleMouseLook;
     { Implements MouseLook (mouse only) }
     function doMouseLook(const Event: TInputMotion): boolean;
+    { Tries clicking the element mouse is over}
     procedure TryClick(const Event: TInputPressRelease);
   public
     { If mouse has been moved }
@@ -60,7 +62,8 @@ type
   end;
 
 var
-  { Defines the state of MouseLook }
+  { Defines the state of MouseLook
+    We need it at interface to be used by GUI to set proper cursor }
   MouseLook: boolean = false;
 
 {............................................................................}
@@ -91,7 +94,8 @@ begin
     isDragging := false;
   end;
 
-  //UGLY BUGFIX
+  { if the element was dragged, then drop it
+    I don't like this behavior, but let it protect us from bugs for now }
   if GUI.Cursor.DragElement <> nil then
     GUI.Cursor.DragElement.Drop;
 
@@ -228,25 +232,27 @@ function DMouseInput.doMouseLook(const Event: TInputMotion): boolean;
 begin
   Result := false;
 
-  //if gamemode ... then Exit;
-  if MouseLook then
+  if GameModeMouseLook then
   begin
-    if not TVector2.PerfectlyEquals(Event.Position, GUICenter) then
+    if MouseLook then
     begin
-      Player.doLook(Event.Position - GUICenter);
-      Window.MousePosition := GUICenter; //=CenterMouseCursor inlined
+      if not TVector2.PerfectlyEquals(Event.Position, GUICenter) then
+      begin
+        Player.doLook(Event.Position - GUICenter);
+        Window.MousePosition := GUICenter; //=CenterMouseCursor inlined
+      end
+      else
+        Result := true; {prevent onMotion call-back}
     end
     else
-      Result := true; {prevent onMotion call-back}
-  end
-  else
-  if DragMouseLook then
-  begin
-    //DragMouseLook doesn't change cursor.position
-    {however, it's a good idea to catch DragMouseLook not to go outside window
-     - scroll it like Blender does}
-    Player.doLook(Event.OldPosition - Event.Position);
-    Result := false;
+    if DragMouseLook then
+    begin
+      //DragMouseLook doesn't change cursor.position
+      {however, it's a good idea to catch DragMouseLook not to go outside window
+       - scroll it like Blender does}
+      Player.doLook(Event.OldPosition - Event.Position);
+      Result := false;
+    end;
   end;
 end;
 
