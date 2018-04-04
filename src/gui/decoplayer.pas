@@ -25,19 +25,22 @@ interface
 
 uses
   CastleVectors,
+  DecoCameraMan,
   DecoGlobal;
 
 type
   { Handling of player movement }
   DPlayerControl = class(DObject)
-  private
+  strict private
+    {}
+    CameraMan: DCameraMan;
     {}
     AccelerationForward, AccelerationStrafe: DFloat;
+  strict private
     {}
     procedure doMove;
   public
     //CurrentParty
-    //CameraMman
     { Change CameraMan look direction }
     procedure doLook(const Delta: TVector2);
     { Change CameraMan acceleration }
@@ -46,7 +49,7 @@ type
   public
     procedure Manage;
     constructor Create; //override;
-    //destructor Destroy; override;
+    destructor Destroy; override;
   end;
 
 var
@@ -114,7 +117,16 @@ end;
 
 constructor DPlayerControl.Create;
 begin
-  //...
+  //inherited Create
+  CameraMan := DCameraMan.Create;
+end;
+
+{----------------------------------------------------------------------------}
+
+destructor DPlayerControl.Destroy;
+begin
+  CameraMan.Free;
+  inherited Destroy;
 end;
 
 {............................................................................}
