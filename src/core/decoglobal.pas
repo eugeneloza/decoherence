@@ -75,6 +75,8 @@ procedure FreeGlobal;
 { Wrapper for CastleFilesUtils.ApplicationData
   to be able to switch between Game and Architect folder }
 function GameFolder(const FileURL: string): string;
+function GameConfigFolder(const FileURL: string): string;
+function SaveGameFolder(const FileURL: string): string;
 {............................................................................}
 implementation
 uses
@@ -109,6 +111,28 @@ end;
 function GameFolder(const FileURL: string): string;
 begin
   Result := ApplicationData(FileURL);
+end;
+
+{-----------------------------------------------------------------------------}
+
+function GameConfigFolder(const FileURL: string): string;
+begin
+  {$IFDEF Desktop}
+  Result := ApplicationData('Configuration/' + FileURL);
+  {$ELSE}
+  Result := ApplicationConfig(FileURL);
+  {$ENDIF}
+end;
+
+{-----------------------------------------------------------------------------}
+
+function SaveGameFolder(const FileURL: string): string;
+begin
+  {$IFDEF Desktop}
+  Result := ApplicationData('SavedGames/' + FileURL);
+  {$ELSE}
+  Result := ApplicationConfig(FileURL);
+  {$ENDIF}
 end;
 
 {.............................................................................}
