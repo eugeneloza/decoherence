@@ -43,6 +43,7 @@ implementation
 
 uses
   SysUtils,
+  CastleApplicationProperties,
   DecoGUIScale,
   DecoLog, DecoTime;
 
@@ -92,7 +93,7 @@ begin
     Window.Height := ConfigWindowHeight;
   end;
 
-  Application.LimitFPS := 0;
+  ApplicationProperties.LimitFPS := 0;
 
   ResetGUIScale;
 
