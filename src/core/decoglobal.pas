@@ -76,11 +76,12 @@ procedure FreeGlobal;
   to be able to switch between Game and Architect folder }
 function GameFolder(const FileURL: string): string;
 function GameConfigFolder(const FileURL: string): string;
-function SaveGameFolder(const FileURL: string): string;
+function SavedGamesFolder(const FileURL: string): string;
 {............................................................................}
 implementation
 uses
-  CastleFilesUtils;
+  SysUtils, CastleURIUtils, CastleUtils, CastleFilesUtils,
+  DecoLog;
 
 function GetRandomSeed: LongWord;
 {$IFDEF USE_DEV_URANDOM}
@@ -115,10 +116,22 @@ end;
 
 {-----------------------------------------------------------------------------}
 
+var
+  ConfigurationDirURL: string = '';
+
+
 function GameConfigFolder(const FileURL: string): string;
 begin
   {$IFDEF Desktop}
-  Result := ApplicationData('Configuration/' + FileURL);
+  if ConfigurationDirURL = '' then
+  begin
+    ConfigurationDirURL := InclPathDelim(GetCurrentDir) + 'Configuration' + PathDelim ;
+    if not ForceDirectories(ConfigurationDirURL) then
+      raise Exception.Create('ERROR: Unable to create Save Game folder!');
+    ConfigurationDirURL := FilenameToURISafe(ConfigurationDirURL);
+    Log(LogInit, CurrentRoutine, 'Configuration folder: ' + ConfigurationDirURL);
+  end;
+  Result := ConfigurationDirURL + FileURL;
   {$ELSE}
   Result := ApplicationConfig(FileURL);
   {$ENDIF}
@@ -126,10 +139,21 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-function SaveGameFolder(const FileURL: string): string;
+var
+  SavedGamesDirURL: string = '';
+
+function SavedGamesFolder(const FileURL: string): string;
 begin
   {$IFDEF Desktop}
-  Result := ApplicationData('SavedGames/' + FileURL);
+  if SavedGamesDirURL = '' then
+  begin
+    SavedGamesDirURL := InclPathDelim(GetCurrentDir) + 'SavedGames' + PathDelim ;
+    if not ForceDirectories(SavedGamesDirURL) then
+      raise Exception.Create('ERROR: Unable to create Save Game folder!');
+    SavedGamesDirURL := FilenameToURISafe(SavedGamesDirURL);
+    Log(LogInit, CurrentRoutine, 'Saved Games folder: ' + SavedGamesDirURL);
+  end;
+  Result := SavedGamesDirURL + FileURL;
   {$ELSE}
   Result := ApplicationConfig(FileURL);
   {$ENDIF}
