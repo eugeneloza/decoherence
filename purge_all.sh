@@ -11,3 +11,8 @@ rm ConstructorTool
 # Remove screenshots
 
 rm *.png
+
+# Remove saved games and config
+
+rm Configuration -rf
+rm SavedGames -rf
