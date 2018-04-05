@@ -49,7 +49,8 @@ type
 implementation
 uses
   Math,
-  DecoMath;
+  DecoMath, DecoInput,
+  DecoLog;
 
 constructor DCameraMan.Create;
 begin
@@ -72,7 +73,7 @@ procedure DCameraMan.ResetAngles;
 begin
   Theta := 0;//ArcSin(Direction[2] / Direction.Length);
   Phi := 0;//Sign(Direction[1]) * ArcCos(Direction[0] / (sqr(Direction[0]) + sqr(Direction[1])));
-  //CenterMouseCursor;
+  ResetMouseCursor;
 end;
 
 end.

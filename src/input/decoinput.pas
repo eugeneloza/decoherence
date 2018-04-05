@@ -27,6 +27,10 @@ interface
 uses
   DecoKeyboard, DecoPointerDeviceInput;
 
+{ Resets mouse cursor to the central position
+  does anything only in case Mouse is used as a pointer device}
+procedure ResetMouseCursor;
+
 { Initializes Input events and loads key bindings
   Input must be initialized AFTER window is created }
 procedure InitInput;
@@ -45,6 +49,13 @@ var
   KeyboardInput: DKeyboardInput;
   { Handles gamepad/joystick input }
   //GamepadInput: ...
+
+
+procedure ResetMouseCursor;
+begin
+  if PointerInput is DMouseInput then
+    DMouseInput(PointerInput).CenterMouseCursor;
+end;
 
 {======================== EVENTS =================================}
 
