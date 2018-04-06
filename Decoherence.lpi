@@ -31,7 +31,7 @@
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir);src"/>
-            <OtherUnitFiles Value="src;src/core;src/gui;src/text;src/generated;src/input;src/player"/>
+            <OtherUnitFiles Value="src;src/core;src/gui;src/text;src/generated;src/input;src/player;src/readwrite"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
           <Parsing>
@@ -76,7 +76,7 @@
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir);src"/>
-            <OtherUnitFiles Value="src;src/core;src/gui;src/text;src/generated;src/input;src/player"/>
+            <OtherUnitFiles Value="src;src/core;src/gui;src/text;src/generated;src/input;src/player;src/readwrite"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
           <Parsing>
@@ -122,7 +122,7 @@
         <PackageName Value="castle_base"/>
       </Item2>
     </RequiredPackages>
-    <Units Count="43">
+    <Units Count="44">
       <Unit0>
         <Filename Value="Decoherence.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -297,7 +297,7 @@
         <UnitName Value="DecoLabels"/>
       </Unit35>
       <Unit36>
-        <Filename Value="src/core/decohdd.pas"/>
+        <Filename Value="src/readwrite/decohdd.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="DecoHDD"/>
       </Unit36>
@@ -331,6 +331,11 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="DecoPlayer"/>
       </Unit42>
+      <Unit43>
+        <Filename Value="src/readwrite/decofolders.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoFolders"/>
+      </Unit43>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
@@ -340,7 +345,7 @@
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir);src"/>
-      <OtherUnitFiles Value="src;src/core;src/gui;src/text;src/generated;src/input;src/player"/>
+      <OtherUnitFiles Value="src;src/core;src/gui;src/text;src/generated;src/input;src/player;src/readwrite"/>
       <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <Parsing>

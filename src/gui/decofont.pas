@@ -89,6 +89,7 @@ uses
   SysUtils, Generics.Collections,
   CastleUnicode, CastleColors, CastleVectors,
   CastleTextureFont_LinBiolinumRG_16, //a debug font
+  DecoFolders,
   DecoTrash, DecoLog, DecoMath;
 
 {-----------------------------------------------------------------------------}

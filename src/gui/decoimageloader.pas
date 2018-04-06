@@ -56,7 +56,7 @@ implementation
 
 uses
   SysUtils,
-  DecoTrash, DecoGUIScale, DecoHDD,
+  DecoTrash, DecoGUIScale, DecoHDD, DecoFolders,
   DecoLog;
 
 function LoadDecoImage(const aImage: TEncodedImage; const aWidth: integer = 0;

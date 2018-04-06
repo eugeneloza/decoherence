@@ -49,7 +49,7 @@ procedure FreeHDDLock;
 implementation
 uses
   SyncObjs,
-  x3dload;
+  X3DLoad;
 
 {============================================================================}
 {====================== SAFE LOADING (WITH LOCKS) ==========================}
