@@ -57,6 +57,7 @@ var
   FileOpen: boolean = false;
 
   XMLDoc: TXMLDocument;
+  RootNode: TDOMElement;
 
 { set the global variables and make a FileOpen check }
 procedure PrepareFileOpen(const URL: string);
@@ -76,6 +77,7 @@ begin
   PrepareFileOpen(URL);
   Log(LogFileAccess, CurrentRoutine, 'Reading file ' + CurrentFileURL);
   XMLDoc := URLReadXMLSafe(CurrentFileURL);
+  RootNode := XMLDoc.DocumentElement;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -96,20 +98,22 @@ procedure CreateFile(const URL: string);
 begin
   PrepareFileOpen(URL);
   Log(LogFileAccess, CurrentRoutine, 'Creating file ' + CurrentFileURL);
-  XMLdoc := TXMLDocument.Create;
+  XMLDoc := TXMLDocument.Create;
+  RootNode := XMLDoc.CreateElement('Root');
+  XMLDoc.AppendChild(RootNode);
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure WriteFile;
 begin
-  if FileOpen then
+  if (FileOpen) or (XMLDoc = nil) then
   begin
     URLWriteXMLSafe(XMLdoc, CurrentFileURL);
     XMLDoc.Free;
   end
   else
-    Log(LogReadWriteError, CurrentRoutine, 'Error: Cannot close file for read. It''s not open! ');
+    Log(LogReadWriteError, CurrentRoutine, 'Error: Cannot write file. It''s not open! ');
 
   FileOpen := false;
 end;
