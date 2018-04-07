@@ -44,6 +44,7 @@ implementation
 uses
   SysUtils,
   CastleApplicationProperties,
+  DecoFiles,
   DecoGUIScale,
   DecoLog, DecoTime;
 

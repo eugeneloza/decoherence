@@ -122,7 +122,7 @@
         <PackageName Value="castle_base"/>
       </Item2>
     </RequiredPackages>
-    <Units Count="44">
+    <Units Count="45">
       <Unit0>
         <Filename Value="Decoherence.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -336,6 +336,11 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="DecoFolders"/>
       </Unit43>
+      <Unit44>
+        <Filename Value="src/readwrite/decofiles.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoFiles"/>
+      </Unit44>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

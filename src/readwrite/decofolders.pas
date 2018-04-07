@@ -34,7 +34,7 @@ function GameConfigFolder(const FileURL: string): string;
 { Saved games folder, created if inexistent, including subfolders
   SubFolder should go in WORLD_001 ... WORLD_999, SAVE_001...SAVE_999
   and should have no sub-folders to avoid multiple URL-dir-URL conversions
-  SavedGames folder should contain only index.xml of saved games }
+  SavedGames root folder should contain only index.xml of saved games }
 function SavedGamesFolder(const SubFolder: string; const FileURL: string): string;
 {............................................................................}
 implementation

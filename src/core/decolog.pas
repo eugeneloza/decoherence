@@ -40,6 +40,10 @@ const
   LogMouseError = true;
   LogMouseInfo = true;
 
+  { hdd }
+  LogReadWriteError = true;
+  LogFileAccess = true;
+
 { Initializes Castle Log and display basic info }
 procedure InitLog;
 procedure FreeLog;
