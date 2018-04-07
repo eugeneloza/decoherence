@@ -15,8 +15,7 @@
 
 { --------------------------------------------------------------------------- }
 
-(* Defines some generic types and variables,
-   also handles random initialzation and other minor but global tasks *)
+(* Constants and routines to define and manage game folders *)
 
 unit DecoFolders;
 
@@ -30,8 +29,13 @@ uses
 { Wrapper for CastleFilesUtils.ApplicationData
   to be able to switch between Game and Architect folder }
 function GameFolder(const FileURL: string): string;
+{ Game configuration folder, created if inexistend }
 function GameConfigFolder(const FileURL: string): string;
-function SavedGamesFolder(const FileURL: string): string;
+{ Saved games folder, created if inexistent, including subfolders
+  SubFolder should go in WORLD_001 ... WORLD_999, SAVE_001...SAVE_999
+  and should have no sub-folders to avoid multiple URL-dir-URL conversions
+  SavedGames folder should contain only index.xml of saved games }
+function SavedGamesFolder(const SubFolder: string; const FileURL: string): string;
 {............................................................................}
 implementation
 uses
@@ -69,20 +73,26 @@ end;
 {-----------------------------------------------------------------------------}
 
 var
+  SavedGamesDir: string = '';
   SavedGamesDirURL: string = '';
 
-function SavedGamesFolder(const FileURL: string): string;
+function SavedGamesFolder(const SubFolder: string; const FileURL: string): string;
 begin
   {$IFDEF Desktop}
-  if SavedGamesDirURL = '' then
+  if SavedGamesDir = '' then
   begin
-    SavedGamesDirURL := InclPathDelim(GetCurrentDir) + 'SavedGames' + PathDelim ;
-    if not ForceDirectories(SavedGamesDirURL) then
-      raise Exception.Create('ERROR: Unable to create Save Game folder!');
+    SavedGamesDir := InclPathDelim(GetCurrentDir) + 'SavedGames' + PathDelim ;
+    if not ForceDirectories(SavedGamesDir) then
+      raise Exception.Create('ERROR: Unable to create ' + SavedGamesDir + ' folder!');
     SavedGamesDirURL := FilenameToURISafe(SavedGamesDirURL);
     Log(LogInit, CurrentRoutine, 'Saved Games folder: ' + SavedGamesDirURL);
   end;
-  Result := SavedGamesDirURL + FileURL;
+
+  if not ForceDirectories(SavedGamesDir + SubFolder + PathDelim) then
+    raise Exception.Create('ERROR: Unable to create ' + SavedGamesDir
+      + PathDelim + SubFolder + ' folder!');
+
+  Result := SavedGamesDirURL + SubFolder + '/' + FileURL;
   {$ELSE}
   Result := ApplicationConfig(FileURL);
   {$ENDIF}
