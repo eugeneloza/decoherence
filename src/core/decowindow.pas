@@ -44,7 +44,7 @@ implementation
 uses
   SysUtils,
   CastleApplicationProperties,
-  DecoFiles,
+  DOM, DecoFiles, DecoFolders,
   DecoGUIScale,
   DecoLog, DecoTime;
 
@@ -64,11 +64,39 @@ end;
 
 {.......................................................................}
 
-procedure ReadWindowConfiguration;
+procedure WriteWindowConfiguration;
+var
+  RootNode: TDOMElement;
 begin
-  ConfigFullScreen := false;
-  ConfigWindowWidth := 1024;
-  ConfigWindowHeight := 600;
+  RootNode := CreateFile(GameConfigFolder('Window.xml'));
+  WriteBoolean(RootNode, 'FullScreen', ConfigFullScreen);
+  WriteInteger(RootNode, 'Width', ConfigWindowWidth);
+  WriteInteger(RootNode, 'Height', ConfigWindowHeight);
+  WriteFile;
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure ReadWindowConfiguration;
+var
+  RootNode: TDOMElement;
+begin
+  RootNode := StartReadFile(GameConfigFolder('Window.xml'));
+  if RootNode = nil then
+  begin
+    { get default }
+    ConfigFullScreen := false;
+    ConfigWindowWidth := 1024;
+    ConfigWindowHeight := 600;
+    WriteWindowConfiguration;
+  end
+  else
+  begin
+    ConfigFullScreen := ReadBoolean(RootNode, 'FullScreen');
+    ConfigWindowWidth := ReadInteger(RootNode, 'Width');
+    ConfigWindowHeight := ReadInteger(RootNode, 'Height');
+    EndReadFile;
+  end;
 end;
 
 {----------------------------------------------------------------------------}

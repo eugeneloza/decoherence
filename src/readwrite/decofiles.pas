@@ -87,7 +87,7 @@ begin
   end
   else
   begin
-    Log(LogFileAccess, CurrentRoutine, 'Reading file ' + CurrentFileURL);
+    Log(LogFileAccess, CurrentRoutine, 'WARNING: File does not exist: ' + CurrentFileURL);
     Result := nil;
     FileOpen := false;
   end;

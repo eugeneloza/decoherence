@@ -75,7 +75,6 @@ begin
     as some units require others being already initialized }
   Log(LogInit, CurrentRoutine, 'Init sequence started.');
   InitTrash;
-  InitHDDLock;
   InitGlobal;
   InitTime;
   LoadInterface;
@@ -100,6 +99,7 @@ begin
   TextureMemoryProfiler.Enabled := {$IFDEF TextureProfiler}true{$ELSE}false{$ENDIF};
   InitTranslation;
   SetLoadingImage;
+  InitHDDLock;
   InitWindow;
   Application.MainWindow := Window;
   Application.OnInitialize := @ApplicationInitialize;
@@ -120,9 +120,9 @@ begin
   FreeGUI;
   FreeInterface;
   FreeTime;
-  FreeHDDLock;
   FreeTrash;
   FreeGlobal;
+  FreeHDDLock;
   {$IFDEF TextureProfiler}
   Log(LogInit, CurrentRoutine, TextureMemoryProfiler.Summary);
   {$ENDIF}
