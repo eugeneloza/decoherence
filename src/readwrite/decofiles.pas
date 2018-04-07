@@ -25,7 +25,11 @@ unit DecoFiles;
 interface
 
 uses
-  DecoGlobal;
+  DOM;
+
+type
+  {}
+  DXMLNode = TDOMElement;
 
 type
   { This is an abstract class with support of read and write procedures
@@ -38,18 +42,18 @@ type
   end;
 
 {}
-procedure StartReadFile(const URL: string);
+function StartReadFile(const URL: string): DXMLNode;
 {}
 procedure EndReadFile;
 {}
-procedure CreateFile(const URL: string);
+function CreateFile(const URL: string): DXMLNode;
 {}
 procedure WriteFile;
 
 {............................................................................}
 implementation
 uses
-  DOM, CastleXMLUtils,
+  CastleXMLUtils, CastleURIUtils,
   DecoHDD, DecoLog;
 
 var
@@ -57,7 +61,6 @@ var
   FileOpen: boolean = false;
 
   XMLDoc: TXMLDocument;
-  RootNode: TDOMElement;
 
 { set the global variables and make a FileOpen check }
 procedure PrepareFileOpen(const URL: string);
@@ -65,19 +68,26 @@ begin
   if FileOpen then
     Log(LogReadWriteError, CurrentRoutine, 'ERROR: File ' + CurrentFileURL +
       ' was not closed properly!');
-
   CurrentFileURL := URL;
   FileOpen := true;
 end;
 
 {-----------------------------------------------------------------------------}
 
-procedure StartReadFile(const URL: string);
+function StartReadFile(const URL: string): DXMLNode;
 begin
   PrepareFileOpen(URL);
-  Log(LogFileAccess, CurrentRoutine, 'Reading file ' + CurrentFileURL);
-  XMLDoc := URLReadXMLSafe(CurrentFileURL);
-  RootNode := XMLDoc.DocumentElement;
+  if URIFileExists(CurrentFileURL) then
+  begin
+    Log(LogFileAccess, CurrentRoutine, 'Reading file ' + CurrentFileURL);
+    XMLDoc := URLReadXMLSafe(CurrentFileURL);
+    Result := XMLDoc.DocumentElement;
+  end
+  else
+  begin
+    Log(LogFileAccess, CurrentRoutine, 'Reading file ' + CurrentFileURL);
+    Result := nil;
+  end;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -94,13 +104,13 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-procedure CreateFile(const URL: string);
+function CreateFile(const URL: string): DXMLNode;
 begin
   PrepareFileOpen(URL);
   Log(LogFileAccess, CurrentRoutine, 'Creating file ' + CurrentFileURL);
   XMLDoc := TXMLDocument.Create;
-  RootNode := XMLDoc.CreateElement('Root');
-  XMLDoc.AppendChild(RootNode);
+  Result := XMLDoc.CreateElement('Root');
+  XMLDoc.AppendChild(Result);
 end;
 
 {-----------------------------------------------------------------------------}

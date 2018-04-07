@@ -24,7 +24,7 @@ unit DecoFolders;
 interface
 
 uses
-  Classes, SysUtils;
+  DecoGlobal;
 
 { Wrapper for CastleFilesUtils.ApplicationData
   to be able to switch between Game and Architect folder }
@@ -39,6 +39,7 @@ function SavedGamesFolder(const SubFolder: string; const FileURL: string): strin
 {............................................................................}
 implementation
 uses
+  SysUtils,
   CastleURIUtils, CastleUtils, CastleFilesUtils,
   DecoLog;
 
