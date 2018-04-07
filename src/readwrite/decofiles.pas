@@ -30,10 +30,6 @@ uses
   DOM;
 
 type
-  {}
-  DXMLNode = TDOMElement;
-
-type
   { This is an abstract class with support of read and write procedures
     capable of inheritance }
   //RWObject = class abstract(DObject)
@@ -44,15 +40,15 @@ type
   end;
 
 { Start reading or writing file }
-function StartReadFile(const URL: string): DXMLNode;
-function CreateFile(const URL: string): DXMLNode;
+function StartReadFile(const URL: string): TDOMElement;
+function CreateFile(const URL: string): TDOMElement;
 { Finish reading or rwiting file }
 procedure WriteFile;
 procedure EndReadFile;
 
 { Pairs of read/write procedures }
-procedure WriteInteger(const aParent: DXMLNode; const aName: string; const aInteger: integer);
-function ReadInteger(const aParent: DXMLNode; const aName: string): integer;
+procedure WriteInteger(const aParent: TDOMElement; const aName: string; const aInteger: integer);
+function ReadInteger(const aParent: TDOMElement; const aName: string): integer;
 
 {............................................................................}
 implementation
@@ -78,7 +74,7 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-function StartReadFile(const URL: string): DXMLNode;
+function StartReadFile(const URL: string): TDOMElement;
 begin
   PrepareFileOpen(URL);
   if URIFileExists(CurrentFileURL) then
@@ -109,7 +105,7 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-function CreateFile(const URL: string): DXMLNode;
+function CreateFile(const URL: string): TDOMElement;
 begin
   PrepareFileOpen(URL);
   Log(LogFileAccess, CurrentRoutine, 'Creating file ' + CurrentFileURL);
@@ -135,20 +131,13 @@ end;
 
 {================================ READ/WRITE =================================}
 
-procedure WriteInteger(const aParent: DXMLNode; const aName: string; const aInteger: integer);
-var
-  aNode: DXMLNode;
+procedure WriteInteger(const aParent: TDOMElement; const aName: string; const aInteger: integer);
 begin
-  aNode := XMLDoc.CreateElement(aName);
-  aNode.AttributeSet('Value', aInteger);
-  aParent.AppendChild(aNode);
+  aParent.CreateChild(aName).AttributeSet('Value', aInteger);
 end;
-function ReadInteger(const aParent: DXMLNode; const aName: string): integer;
-var
-  aNode: DXMLNode;
+function ReadInteger(const aParent: TDOMElement; const aName: string): integer;
 begin
-  aNode := aParent.ChildElement(aName);
-  Result := aParent.AttributeInteger('Value');
+  Result := aParent.ChildElement(aName).AttributeInteger('Value');
 end;
 
 end.
