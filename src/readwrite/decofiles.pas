@@ -16,7 +16,9 @@
 {---------------------------------------------------------------------------}
 
 (* Implementation of reading and writing routines and relative objects
-   this is highly experimental feature for now. *)
+   this is highly experimental feature for now.
+   WARNING: only one file may be open at a time. So, this unit's routines are
+   absolutely thread-unsafe. *)
 
 unit DecoFiles;
 
@@ -41,14 +43,16 @@ type
     procedure WriteMe;
   end;
 
-{}
+{ Start reading or writing file }
 function StartReadFile(const URL: string): DXMLNode;
-{}
-procedure EndReadFile;
-{}
 function CreateFile(const URL: string): DXMLNode;
-{}
+{ Finish reading or rwiting file }
 procedure WriteFile;
+procedure EndReadFile;
+
+{ Pairs of read/write procedures }
+procedure WriteInteger(const aParent: DXMLNode; const aName: string; const aInteger: integer);
+function ReadInteger(const aParent: DXMLNode; const aName: string): integer;
 
 {............................................................................}
 implementation
@@ -87,6 +91,7 @@ begin
   begin
     Log(LogFileAccess, CurrentRoutine, 'Reading file ' + CurrentFileURL);
     Result := nil;
+    FileOpen := false;
   end;
 end;
 
@@ -128,7 +133,23 @@ begin
   FileOpen := false;
 end;
 
-{-----------------------------------------------------------------------------}
+{================================ READ/WRITE =================================}
+
+procedure WriteInteger(const aParent: DXMLNode; const aName: string; const aInteger: integer);
+var
+  aNode: DXMLNode;
+begin
+  aNode := XMLDoc.CreateElement(aName);
+  aNode.AttributeSet('Value', aInteger);
+  aParent.AppendChild(aNode);
+end;
+function ReadInteger(const aParent: DXMLNode; const aName: string): integer;
+var
+  aNode: DXMLNode;
+begin
+  aNode := aParent.ChildElement(aName);
+  Result := aParent.AttributeInteger('Value');
+end;
 
 end.
 
