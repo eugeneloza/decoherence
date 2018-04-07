@@ -49,6 +49,8 @@ procedure EndReadFile;
 { Pairs of read/write procedures }
 procedure WriteInteger(const aParent: TDOMElement; const aName: string; const aInteger: integer);
 function ReadInteger(const aParent: TDOMElement; const aName: string): integer;
+procedure WriteBoolean(const aParent: TDOMElement; const aName: string; const aBoolean: boolean);
+function ReadBoolean(const aParent: TDOMElement; const aName: string): boolean;
 
 {............................................................................}
 implementation
@@ -138,6 +140,14 @@ end;
 function ReadInteger(const aParent: TDOMElement; const aName: string): integer;
 begin
   Result := aParent.ChildElement(aName).AttributeInteger('Value');
+end;
+procedure WriteBoolean(const aParent: TDOMElement; const aName: string; const aBoolean: boolean);
+begin
+  aParent.CreateChild(aName).AttributeSet('Value', aBoolean);
+end;
+function ReadBoolean(const aParent: TDOMElement; const aName: string): boolean;
+begin
+  Result := aParent.ChildElement(aName).AttributeBoolean('Value');
 end;
 
 end.
