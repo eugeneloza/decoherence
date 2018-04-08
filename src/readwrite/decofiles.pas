@@ -30,19 +30,31 @@ uses
   Classes, DOM, CastleVectors,
   DecoGlobal;
 
-{type
+type
   { This is a reference to a generic list enumerator procedure
     which should be a local/nested procedure in the writing routine
+
     like this:
-      procedure SomeNestedProcedure;
+      procedure SomeNestedProcedure(constref aParent: TDOMElement);
       var
         i: TObject1;
       begin
         for i in List do
-          i.ReadMe;
+          i.WriteMe(aParent);
       end;
   }
-  TListEnumeratorProcedure = procedure is nested;}
+  TListWriterProcedure = procedure(constref aParent: TDOMElement) is nested;
+  { This is a reference to a generic list reader procedure
+    which should be a local/nested procedure in the reading routine
+    it creates and reads the object
+
+    like this:
+      procedure SomeNestedProcedure(constref aParent: TDOMElement);
+      begin
+        List.Add(TObject1.Create.ReadMe(aParent));
+      end;
+  }
+  TListReaderProcedure = procedure(constref aParent: TDOMElement) is nested;
 
 type
   { This is an abstract class with support of read and write procedures
@@ -50,8 +62,8 @@ type
   //RWObject = class abstract(DObject)
   IReadWrite = interface
    ['{8834C4DE-5CA0-4293-8A8A-C633A509B40A}']
-    procedure ReadMe;
-    procedure WriteMe;
+    procedure ReadMe(constref aParent: TDOMElement);
+    procedure WriteMe(constref aParent: TDOMElement);
   end;
 
 {type
@@ -89,8 +101,12 @@ function ReadVector4int(const aParent: TDOMElement; const aName: string): TVecto
 {}
 procedure WriteStringList(const aParent: TDOMElement; const aName: string; const aValue: TStringList);
 function ReadStringList(const aParent: TDOMElement; const aName: string): TStringList;
-{}
-//procedure WriteList(const aParent: TDOMElement; const aName: string; const aWriterProcedure: TListEnumeratorProcedure);
+{ This is an ugly endeavour to automatize reading of a generic lists
+  See examples of how aWriterProcedure/aReaderProcedure should look like
+  Pay attention, that ReadList is a procedure, not a function,
+  so the generic list and all its children should be created in host reading routines }
+procedure WriteList(const aParent: TDOMElement; const aName: string; const aWriterProcedure: TListWriterProcedure);
+procedure ReadList(const aParent: TDOMElement; const aName: string; const aReaderProcedure: TListReaderProcedure);
 {............................................................................}
 implementation
 uses
@@ -263,12 +279,12 @@ end;
 
 procedure WriteStringList(const aParent: TDOMElement; const aName: string; const aValue: TStringList);
 var
-  WriterNode: TDOMElement;
+  ContainerNode: TDOMElement;
   i: integer;
 begin
-  WriterNode := aParent.CreateChild(aName);
+  ContainerNode := aParent.CreateChild(aName);
   for i := 0 to Pred(aValue.Count) do
-    WriterNode.CreateChild('s' + i.ToString).AttributeSet('Value', aValue[i]);
+    ContainerNode.CreateChild('String_' + i.ToString).AttributeSet('Value', aValue[i]);
 end;
 function ReadStringList(const aParent: TDOMElement; const aName: string): TStringList;
 var
@@ -278,14 +294,31 @@ begin
   Iterator := aParent.ChildElement(aName).ChildrenIterator;
   try
     while Iterator.GetNext do
-    begin
       Result.Add(Iterator.Current.AttributeString('Value'));
-    end;
   finally
     FreeAndNil(Iterator);
   end;
 end;
 
+procedure WriteList(const aParent: TDOMElement; const aName: string; const aWriterProcedure: TListWriterProcedure);
+var
+  ContainerNode: TDOMElement;
+begin
+  ContainerNode := aParent.CreateChild(aName);
+  aWriterProcedure(ContainerNode);
+end;
+procedure ReadList(const aParent: TDOMElement; const aName: string; const aReaderProcedure: TListReaderProcedure);
+var
+  Iterator: TXMLElementIterator;
+begin
+  Iterator := aParent.ChildElement(aName).ChildrenIterator;
+  try
+    while Iterator.GetNext do
+      aReaderProcedure(Iterator.Current);
+  finally
+    FreeAndNil(Iterator);
+  end;
+end;
 
 end.
 
