@@ -36,6 +36,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 { Use simple corba interfaces }
 {$INTERFACES corba}
 
+{ Can use definition of `procedure is nested` }
+{$MODESWITCH nestedprocvars}
+
 { I should try using cmem some day. They say in some cases it may +30% speed and -50% RAM usage. However, I didn't test it yet. }
 //{$DEFINE useCMEM}
 
