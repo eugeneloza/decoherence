@@ -18,9 +18,9 @@
 (* Some inlined CastleVectors conversions
    At the moment they are used only for reading/writing to a file *)
 
-unit DecoMathVectors;
-
 {$INCLUDE compilerconfig.inc}
+
+unit DecoMathVectors;
 
 interface
 

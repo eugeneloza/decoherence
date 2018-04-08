@@ -20,9 +20,9 @@
    WARNING: only one file may be open at a time. So, this unit's routines are
    absolutely thread-unsafe. *)
 
-unit DecoFiles;
-
 {$INCLUDE compilerconfig.inc}
+
+unit DecoFiles;
 
 interface
 

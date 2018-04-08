@@ -17,9 +17,9 @@
 
 (* Management of mouse cursor/pointer *)
 
-unit DecoMouseCursor;
-
 {$INCLUDE compilerconfig.inc}
+
+unit DecoMouseCursor;
 
 interface
 

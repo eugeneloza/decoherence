@@ -17,9 +17,9 @@
 
 (* Constants and routines to define and manage game folders *)
 
-unit DecoFolders;
-
 {$INCLUDE compilerconfig.inc}
+
+unit DecoFolders;
 
 interface
 

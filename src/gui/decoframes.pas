@@ -19,9 +19,9 @@
    Image frames - drawn as simple underlying image
    Rectagonal frames - drawn as Draw3x3 *)
 
-unit DecoFrames;
-
 {$INCLUDE compilerconfig.inc}
+
+unit DecoFrames;
 
 interface
 

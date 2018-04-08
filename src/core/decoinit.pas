@@ -17,9 +17,9 @@
 
 (* Initializes and frees the application *)
 
-unit DecoInit;
-
 {$INCLUDE compilerconfig.inc}
+
+unit DecoInit;
 
 interface
 

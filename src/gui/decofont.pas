@@ -17,9 +17,9 @@
 
 (* Game fonts and text to image conversion *)
 
-unit DecoFont;
-
 {$INCLUDE compilerconfig.inc}
+
+unit DecoFont;
 
 interface
 

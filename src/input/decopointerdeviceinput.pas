@@ -18,9 +18,9 @@
 (* Handles abstract pointer device behaviour
    abstract routines common for both mouse and touch *)
 
-unit DecoPointerDeviceInput;
-
 {$INCLUDE compilerconfig.inc}
+
+unit DecoPointerDeviceInput;
 
 interface
 

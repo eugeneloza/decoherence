@@ -19,7 +19,7 @@
     <VersionInfo>
       <UseVersionInfo Value="True"/>
       <AutoIncrementBuild Value="True"/>
-      <BuildNr Value="4"/>
+      <BuildNr Value="6"/>
     </VersionInfo>
     <BuildModes Count="3">
       <Item1 Name="Default" Default="True"/>
@@ -290,6 +290,7 @@
       <Unit34>
         <Filename Value="src/generated/castletexturefont_linbiolinumrg_16.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="CastleTextureFont_LinBiolinumRG_16"/>
       </Unit34>
       <Unit35>
         <Filename Value="src/gui/decolabels.pas"/>

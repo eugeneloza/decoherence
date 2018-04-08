@@ -18,9 +18,9 @@
 (* Logging utility supporting different verbosity levels
    Most of it is just a wrapper to CastleLog *)
 
-unit DecoLog;
-
 {$INCLUDE compilerconfig.inc}
+
+unit DecoLog;
 
 interface
 

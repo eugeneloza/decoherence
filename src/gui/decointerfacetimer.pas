@@ -17,9 +17,9 @@
 
 (* Contains most of interface basics and grouping *)
 
-unit DecoInterfaceTimer;
-
 {$INCLUDE compilerconfig.inc}
+
+unit DecoInterfaceTimer;
 
 interface
 

@@ -17,9 +17,9 @@
 
 (* Wind image that floats from right to left *)
 
-unit DecoWind;
-
 {$INCLUDE compilerconfig.inc}
+
+unit DecoWind;
 
 interface
 

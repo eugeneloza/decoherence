@@ -17,9 +17,9 @@
 
 (* Write-and-forget keyboard recorder for an easter egg *)
 
-unit DecoKeyboardRecorder;
-
 {$INCLUDE compilerconfig.inc}
+
+unit DecoKeyboardRecorder;
 
 interface
 

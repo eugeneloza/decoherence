@@ -18,9 +18,9 @@
 (* Basic math operations, inlined replacement for Math routines
    Name is too "strong" for such a tiny and minor unit *)
 
-unit DecoMath;
-
 {$INCLUDE compilerconfig.inc}
+
+unit DecoMath;
 
 interface
 

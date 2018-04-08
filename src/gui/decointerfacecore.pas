@@ -17,9 +17,9 @@
 
 (* Contains most of interface basics and grouping *)
 
-unit DecoInterfaceCore;
-
 {$INCLUDE compilerconfig.inc}
+
+unit DecoInterfaceCore;
 
 interface
 

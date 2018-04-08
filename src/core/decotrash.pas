@@ -17,9 +17,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 
 (* Defines a "TThrash" list, creates it and frees at game end. *)
 
+{$INCLUDE compilerconfig.inc}
+
 unit DecoTrash;
 
-{$INCLUDE compilerconfig.inc}
 interface
 
 uses

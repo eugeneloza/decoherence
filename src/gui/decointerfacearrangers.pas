@@ -17,9 +17,9 @@
 
 (* Meta-elements arranging children *)
 
-unit DecoInterfaceArrangers;
-
 {$INCLUDE compilerconfig.inc}
+
+unit DecoInterfaceArrangers;
 
 interface
 

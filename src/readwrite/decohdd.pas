@@ -17,9 +17,9 @@
 
 (* Ensure thread-safety of input/output functions (hopefully) *)
 
-unit DecoHDD;
-
 {$INCLUDE compilerconfig.inc}
+
+unit DecoHDD;
 
 interface
 

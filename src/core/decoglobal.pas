@@ -18,9 +18,9 @@
 (* Defines some generic types and variables,
    also handles random initialzation and other minor but global tasks *)
 
-unit DecoGlobal;
-
 {$INCLUDE compilerconfig.inc}
+
+unit DecoGlobal;
 
 interface
 

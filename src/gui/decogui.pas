@@ -17,9 +17,9 @@
 
 (* A highets-level container for the interface and its routines *)
 
-unit DecoGUI;
-
 {$INCLUDE compilerconfig.inc}
+
+unit DecoGUI;
 
 interface
 

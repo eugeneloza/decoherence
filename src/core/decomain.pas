@@ -17,9 +17,9 @@
 
 (* Core file of the game. Processes Window events and initializes the game *)
 
-unit DecoMain;
-
 {$INCLUDE compilerconfig.inc}
+
+unit DecoMain;
 
 interface
 

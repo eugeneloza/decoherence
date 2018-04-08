@@ -18,9 +18,9 @@
 (* Different types of labels
    All labels are rendered as images to (significantly) boost performance. *)
 
-unit DecoLabels;
-
 {$INCLUDE compilerconfig.inc}
+
+unit DecoLabels;
 
 interface
 

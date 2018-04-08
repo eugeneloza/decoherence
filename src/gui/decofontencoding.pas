@@ -17,9 +17,9 @@
 
 (* Presets for different encodings *)
 
-unit DecoFontEncoding;
-
 {$INCLUDE compilerconfig.inc}
+
+unit DecoFontEncoding;
 
 interface
 uses

@@ -17,9 +17,9 @@
 
 (* Handles keyboard behaviour *)
 
-unit DecoKeyboard;
-
 {$INCLUDE compilerconfig.inc}
+
+unit DecoKeyboard;
 
 interface
 

@@ -19,9 +19,9 @@
    but this unit may be completely unused in case the BurnerImage compiler directive
    is not active. *)
 
-unit DecoBurner;
-
 {$INCLUDE compilerconfig.inc}
+
+unit DecoBurner;
 
 interface
 

@@ -17,9 +17,9 @@
 
 (* Loading of TCastleImage -> DImage, scaling, ownership and thrash *)
 
-unit DecoImageLoader;
-
 {$INCLUDE compilerconfig.inc}
+
+unit DecoImageLoader;
 
 interface
 

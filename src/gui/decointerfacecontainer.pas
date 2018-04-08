@@ -18,9 +18,9 @@
 (* Container of interface elements
    Responsible for scale and animation of the interface elements *)
 
-unit DecoInterfaceContainer;
-
 {$INCLUDE compilerconfig.inc}
+
+unit DecoInterfaceContainer;
 
 interface
 

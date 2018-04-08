@@ -18,9 +18,9 @@
 (* CameraMan is a "virtual" character, holding the camera during the
    player party travel through the game world or cutscenes *)
 
-unit DecoCameraMan;
-
 {$INCLUDE compilerconfig.inc}
+
+unit DecoCameraMan;
 
 interface
 

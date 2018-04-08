@@ -17,9 +17,9 @@
 
 (* Handles mouse behaviour *)
 
-unit DecoMouse;
-
 {$INCLUDE compilerconfig.inc}
+
+unit DecoMouse;
 
 interface
 

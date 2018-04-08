@@ -18,9 +18,9 @@
 (* Basic unit for handling input handlers:
    Mouse(touch) and keyboard at the moment*)
 
-unit DecoInput;
-
 {$INCLUDE compilerconfig.inc}
+
+unit DecoInput;
 
 interface
 

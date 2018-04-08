@@ -17,9 +17,9 @@
 
 (* Load some content for the Interface *)
 
-unit DecoInterfaceLoader;
-
 {$INCLUDE compilerconfig.inc}
+
+unit DecoInterfaceLoader;
 
 interface
 

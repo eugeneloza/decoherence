@@ -22,9 +22,10 @@
    GetNowThread and ForceGetNowThread are very specific and should be used
    only in extremely time-critical routines often calculating time like World.Manage *)
 
+{$INCLUDE compilerconfig.inc}
+
 unit DecoTime;
 
-{$INCLUDE compilerconfig.inc}
 {$DEFINE UseFloatTimer}
 
 interface

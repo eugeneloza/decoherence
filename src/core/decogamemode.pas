@@ -17,9 +17,9 @@
 
 (* Hanldes changes of game mode and corresponding interface changes *)
 
-unit DecoGameMode;
-
 {$INCLUDE compilerconfig.inc}
+
+unit DecoGameMode;
 
 interface
 

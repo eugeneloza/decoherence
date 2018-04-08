@@ -17,9 +17,9 @@
 
 (* Handling camera and movement of player-controlled party *)
 
-unit DecoPlayer;
-
 {$INCLUDE compilerconfig.inc}
+
+unit DecoPlayer;
 
 interface
 

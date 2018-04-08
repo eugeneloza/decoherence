@@ -18,9 +18,9 @@
 (* A stuipd wrapper for CastleGlImages with hope to provide for
    equal API for both animated and non-animated GL images *)
 
-unit DecoImages;
-
 {$INCLUDE compilerconfig.inc}
+
+unit DecoImages;
 
 interface
 

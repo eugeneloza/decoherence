@@ -17,9 +17,9 @@
 
 (* Bar images, that are displayed partially based on progress *)
 
-unit DecoInterfaceBars;
-
 {$INCLUDE compilerconfig.inc}
+
+unit DecoInterfaceBars;
 
 interface
 

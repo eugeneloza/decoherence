@@ -17,9 +17,9 @@
 
 (* Basic types of interface images *)
 
-unit DecoInterfaceImages;
-
 {$INCLUDE compilerconfig.inc}
+
+unit DecoInterfaceImages;
 
 interface
 

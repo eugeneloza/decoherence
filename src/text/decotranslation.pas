@@ -17,9 +17,9 @@
 
 (* Management of game translations *)
 
-unit DecoTranslation;
-
 {$INCLUDE compilerconfig.inc}
+
+unit DecoTranslation;
 
 interface
 
