@@ -27,8 +27,22 @@ unit DecoFiles;
 interface
 
 uses
-  DOM, CastleVectors,
+  Classes, DOM, CastleVectors,
   DecoGlobal;
+
+{type
+  { This is a reference to a generic list enumerator procedure
+    which should be a local/nested procedure in the writing routine
+    like this:
+      procedure SomeNestedProcedure;
+      var
+        i: TObject1;
+      begin
+        for i in List do
+          i.ReadMe;
+      end;
+  }
+  TListEnumeratorProcedure = procedure is nested;}
 
 type
   { This is an abstract class with support of read and write procedures
@@ -39,6 +53,9 @@ type
     procedure ReadMe;
     procedure WriteMe;
   end;
+
+{type
+  TInterfaceLink = function: IReadWrite;}
 
 { Start reading or writing file }
 function StartReadFile(const URL: string): TDOMElement;
@@ -56,7 +73,7 @@ procedure WriteFloat(const aParent: TDOMElement; const aName: string; const aVal
 function ReadFloat(const aParent: TDOMElement; const aName: string): DFloat;
 procedure WriteString(const aParent: TDOMElement; const aName: string; const aValue: string);
 function ReadString(const aParent: TDOMElement; const aName: string): string;
-
+{}
 procedure WriteVector2(const aParent: TDOMElement; const aName: string; const aValue: TVector2);
 function ReadVector2(const aParent: TDOMElement; const aName: string): TVector2;
 procedure WriteVector3(const aParent: TDOMElement; const aName: string; const aValue: TVector3);
@@ -69,10 +86,15 @@ procedure WriteVector3int(const aParent: TDOMElement; const aName: string; const
 function ReadVector3int(const aParent: TDOMElement; const aName: string): TVector3Integer;
 procedure WriteVector4int(const aParent: TDOMElement; const aName: string; const aValue: TVector4Integer);
 function ReadVector4int(const aParent: TDOMElement; const aName: string): TVector4Integer;
-
+{}
+procedure WriteStringList(const aParent: TDOMElement; const aName: string; const aValue: TStringList);
+function ReadStringList(const aParent: TDOMElement; const aName: string): TStringList;
+{}
+//procedure WriteList(const aParent: TDOMElement; const aName: string; const aWriterProcedure: TListEnumeratorProcedure);
 {............................................................................}
 implementation
 uses
+  SysUtils,
   CastleXMLUtils, CastleURIUtils,
   DecoMathVectors,
   DecoHDD, DecoLog;
@@ -184,6 +206,7 @@ function ReadString(const aParent: TDOMElement; const aName: string): string;
 begin
   Result := aParent.ChildElement(aName).AttributeString('Value');
 end;
+
 procedure WriteVector2(const aParent: TDOMElement; const aName: string; const aValue: TVector2);
 begin
   aParent.CreateChild(aName).AttributeSet('Value', aValue);
@@ -238,6 +261,30 @@ begin
   Result := VectorFloatToInteger(aParent.ChildElement(aName).AttributeVector4('Value'));
 end;
 
+procedure WriteStringList(const aParent: TDOMElement; const aName: string; const aValue: TStringList);
+var
+  WriterNode: TDOMElement;
+  i: integer;
+begin
+  WriterNode := aParent.CreateChild(aName);
+  for i := 0 to Pred(aValue.Count) do
+    WriterNode.CreateChild('s' + i.ToString).AttributeSet('Value', aValue[i]);
+end;
+function ReadStringList(const aParent: TDOMElement; const aName: string): TStringList;
+var
+  Iterator: TXMLElementIterator;
+begin
+  Result := TStringList.Create;
+  Iterator := aParent.ChildElement(aName).ChildrenIterator;
+  try
+    while Iterator.GetNext do
+    begin
+      Result.Add(Iterator.Current.AttributeString('Value'));
+    end;
+  finally
+    FreeAndNil(Iterator);
+  end;
+end;
 
 
 end.
