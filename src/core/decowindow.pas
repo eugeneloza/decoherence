@@ -88,10 +88,11 @@ begin
     ConfigFullScreen := false;
     ConfigWindowWidth := 1024;
     ConfigWindowHeight := 600;
-    WriteWindowConfiguration;
+    //WriteWindowConfiguration; //it's default, no need to write it
   end
   else
   begin
+    { Read config from a file }
     ConfigFullScreen := ReadBoolean(RootNode, 'FullScreen');
     ConfigWindowWidth := ReadInteger(RootNode, 'Width');
     ConfigWindowHeight := ReadInteger(RootNode, 'Height');
