@@ -27,7 +27,8 @@ unit DecoFiles;
 interface
 
 uses
-  DOM;
+  DOM,
+  DecoGlobal;
 
 type
   { This is an abstract class with support of read and write procedures
@@ -47,10 +48,14 @@ procedure WriteFile;
 procedure EndReadFile;
 
 { Pairs of read/write procedures }
-procedure WriteInteger(const aParent: TDOMElement; const aName: string; const aInteger: integer);
+procedure WriteInteger(const aParent: TDOMElement; const aName: string; const aValue: integer);
 function ReadInteger(const aParent: TDOMElement; const aName: string): integer;
-procedure WriteBoolean(const aParent: TDOMElement; const aName: string; const aBoolean: boolean);
+procedure WriteBoolean(const aParent: TDOMElement; const aName: string; const aValue: boolean);
 function ReadBoolean(const aParent: TDOMElement; const aName: string): boolean;
+procedure WriteFloat(const aParent: TDOMElement; const aName: string; const aValue: DFloat);
+function ReadFloat(const aParent: TDOMElement; const aName: string): DFloat;
+procedure WriteString(const aParent: TDOMElement; const aName: string; const aValue: string);
+function ReadString(const aParent: TDOMElement; const aName: string): string;
 
 {............................................................................}
 implementation
@@ -133,22 +138,40 @@ end;
 
 {================================ READ/WRITE =================================}
 
-procedure WriteInteger(const aParent: TDOMElement; const aName: string; const aInteger: integer);
+procedure WriteInteger(const aParent: TDOMElement; const aName: string; const aValue: integer);
 begin
-  aParent.CreateChild(aName).AttributeSet('Value', aInteger);
+  aParent.CreateChild(aName).AttributeSet('Value', aValue);
 end;
 function ReadInteger(const aParent: TDOMElement; const aName: string): integer;
 begin
   Result := aParent.ChildElement(aName).AttributeInteger('Value');
 end;
-procedure WriteBoolean(const aParent: TDOMElement; const aName: string; const aBoolean: boolean);
+procedure WriteBoolean(const aParent: TDOMElement; const aName: string; const aValue: boolean);
 begin
-  aParent.CreateChild(aName).AttributeSet('Value', aBoolean);
+  aParent.CreateChild(aName).AttributeSet('Value', aValue);
 end;
 function ReadBoolean(const aParent: TDOMElement; const aName: string): boolean;
 begin
   Result := aParent.ChildElement(aName).AttributeBoolean('Value');
 end;
+procedure WriteFloat(const aParent: TDOMElement; const aName: string; const aValue: DFloat);
+begin
+  aParent.CreateChild(aName).AttributeSet('Value', aValue);
+end;
+function ReadFloat(const aParent: TDOMElement; const aName: string): DFloat;
+begin
+  Result := aParent.ChildElement(aName).AttributeFloat('Value');
+end;
+procedure WriteString(const aParent: TDOMElement; const aName: string; const aValue: string);
+begin
+  aParent.CreateChild(aName).AttributeSet('Value', aValue);
+end;
+function ReadString(const aParent: TDOMElement; const aName: string): string;
+begin
+  Result := aParent.ChildElement(aName).AttributeString('Value');
+end;
+
+
 
 end.
 
