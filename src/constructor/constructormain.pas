@@ -18,9 +18,9 @@
 (* Main Form of the Constructor
    It spawns and manages all other Constructor Forms *)
 
-unit ConstructorMain;
-
 {$INCLUDE compilerconfig.inc}
+
+unit ConstructorMain;
 
 interface
 
