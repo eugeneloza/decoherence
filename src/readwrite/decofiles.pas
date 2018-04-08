@@ -62,18 +62,19 @@ function ReadVector2(const aParent: TDOMElement; const aName: string): TVector2;
 procedure WriteVector3(const aParent: TDOMElement; const aName: string; const aValue: TVector3);
 function ReadVector3(const aParent: TDOMElement; const aName: string): TVector3;
 {procedure WriteVector4(const aParent: TDOMElement; const aName: string; const aValue: TVector4);
-function ReadVector4(const aParent: TDOMElement; const aName: string): TVector4;
+function ReadVector4(const aParent: TDOMElement; const aName: string): TVector4;}
 procedure WriteVector2int(const aParent: TDOMElement; const aName: string; const aValue: TVector2Integer);
 function ReadVector2int(const aParent: TDOMElement; const aName: string): TVector2Integer;
 procedure WriteVector3int(const aParent: TDOMElement; const aName: string; const aValue: TVector3Integer);
 function ReadVector3int(const aParent: TDOMElement; const aName: string): TVector3Integer;
-procedure WriteVector4int(const aParent: TDOMElement; const aName: string; const aValue: TVector4Integer);
+{procedure WriteVector4int(const aParent: TDOMElement; const aName: string; const aValue: TVector4Integer);
 function ReadVector4int(const aParent: TDOMElement; const aName: string): TVector4Integer;}
 
 {............................................................................}
 implementation
 uses
   CastleXMLUtils, CastleURIUtils,
+  DecoMathVectors,
   DecoHDD, DecoLog;
 
 var
@@ -205,32 +206,35 @@ begin
 end;
 function ReadVector4(const aParent: TDOMElement; const aName: string): TVector4;
 begin
-  Result := aParent.ChildElement(aName).AttributeVector4('Value');
-end;
+  Result := aParent.ChildElement(aName).AttributeColor('Value');
+end;}
+
+{ we're using a hack to convert integer->float->integer of vectors here through DecoMathVectors
+  ast here is no support for directly reading/writing integer vectors in CastleXMLUtils }
 procedure WriteVector2int(const aParent: TDOMElement; const aName: string; const aValue: TVector2Integer);
 begin
-  aParent.CreateChild(aName).AttributeSet('Value', aValue);
+  aParent.CreateChild(aName).AttributeSet('Value', VectorIntegerToFloat(aValue));
 end;
 function ReadVector2int(const aParent: TDOMElement; const aName: string): TVector2Integer;
 begin
-  Result := aParent.ChildElement(aName).AttributeVector2Integer('Value');
+  Result := VectorFloatToInteger(aParent.ChildElement(aName).AttributeVector2('Value'));
 end;
 procedure WriteVector3int(const aParent: TDOMElement; const aName: string; const aValue: TVector3Integer);
 begin
-  aParent.CreateChild(aName).AttributeSet('Value', aValue);
+  aParent.CreateChild(aName).AttributeSet('Value', VectorIntegerToFloat(aValue));
 end;
 function ReadVector3int(const aParent: TDOMElement; const aName: string): TVector3Integer;
 begin
-  Result := aParent.ChildElement(aName).AttributeVector3Integer('Value');
+  Result := VectorFloatToInteger(aParent.ChildElement(aName).AttributeVector3('Value'));
 end;
-procedure WriteVector4int(const aParent: TDOMElement; const aName: string; const aValue: TVector4Integer);
+{procedure WriteVector4int(const aParent: TDOMElement; const aName: string; const aValue: TVector4Integer);
 begin
-  aParent.CreateChild(aName).AttributeSet('Value', aValue);
+  aParent.CreateChild(aName).AttributeSet('Value', VectorIntegerToFloat(aValue));
 end;
 function ReadVector4int(const aParent: TDOMElement; const aName: string): TVector4Integer;
 begin
-  Result := aParent.ChildElement(aName).AttributeVector4Integer('Value');
-end; }
+  Result := VectorFloatToInteger(aParent.ChildElement(aName).AttributeVector4('Value'));
+end;}
 
 
 
