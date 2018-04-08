@@ -122,7 +122,7 @@
         <PackageName Value="castle_base"/>
       </Item2>
     </RequiredPackages>
-    <Units Count="45">
+    <Units Count="46">
       <Unit0>
         <Filename Value="Decoherence.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -341,6 +341,11 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="DecoFiles"/>
       </Unit44>
+      <Unit45>
+        <Filename Value="src/core/decomathvectors.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoMathVectors"/>
+      </Unit45>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
