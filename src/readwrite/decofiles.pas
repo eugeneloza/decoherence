@@ -53,6 +53,23 @@ type
       begin
         List.Add(TObject1.Create.ReadMe(aParent));
       end;
+
+    I also highly insist on making a wrapping function to create and
+    read the whole generic list
+
+    like this:
+    function ReadGenericList(aParentBase: TDomElement): TGenericList;
+    var
+      GenericList: TGenericList;
+      procedure SomeNestedProcedure(constref aParent: TDOMElement);
+      begin
+        GenericList.Add(TObject1.Create.ReadMe(aParent)); //Maybe I can use Result here?
+      end;
+    begin
+      GenericList := TGenericList.Create;
+      ReadList(aParentBase, 'ThisListName', @SomeNestedProcedure);
+      Result := GenericList;
+    end;
   }
   TListReaderProcedure = procedure(constref aParent: TDOMElement) is nested;
 
