@@ -17,8 +17,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.}
 
 (* Init file of the game. Here everything starts. *)
 
-program Decoherence;
 {$INCLUDE compilerconfig.inc}
+
+program Decoherence;
 
 {$IFDEF Windows}{$IFDEF RELEASE}{$APPTYPE GUI}{$ELSE}{$APPTYPE CONSOLE}{$ENDIF}{$ENDIF}
 
@@ -44,6 +45,7 @@ begin
   SetHeapTraceOutput('heap.trc');
   {$ENDIF}{$ENDIF}
 
+  { Write an error if FPC version is too low }
   {$IF FPC_FULLVERSION < 30101}
   {$ERROR FPC version 3.1.1+ is required!}
   {$ENDIF}
