@@ -78,16 +78,19 @@ end;
 {----------------------------------------------------------------------------}
 
 procedure ReadWindowConfiguration;
+  procedure DefaultWindowConfig;
+  begin
+    ConfigFullScreen := false;
+    ConfigWindowWidth := 1024;
+    ConfigWindowHeight := 600;
+  end;
 var
   RootNode: TDOMElement;
 begin
   RootNode := StartReadFile(GameConfigFolder('Window.xml'));
   if RootNode = nil then
   begin
-    { get default }
-    ConfigFullScreen := false;
-    ConfigWindowWidth := 1024;
-    ConfigWindowHeight := 600;
+    DefaultWindowConfig;
     //WriteWindowConfiguration; //it's default, no need to write it
   end
   else
