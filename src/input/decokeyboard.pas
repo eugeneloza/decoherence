@@ -41,7 +41,7 @@ type
 
 
 type
-  {}
+  { Processes keyboard events }
   DKeyboardInput = class(DObject)
   private
     { Records keys sequences }
@@ -61,7 +61,7 @@ type
     procedure doKeyboardPress(const aKey: TKey);
     { If keyboard button has been released }
     procedure doKeyboardRelease(const aKey: TKey);
-    { Loads input configuration (key bindings, etc) }
+    { Read/write input configuration (key bindings, etc) }
     procedure LoadKeyboardConfig;
     procedure WriteKeyboardConfig;
   public
@@ -73,7 +73,8 @@ type
 implementation
 uses
   DecoPlayer,
-  DOM, DecoFiles, DecoFolders;
+  DOM, DecoFiles, DecoFolders,
+  DecoGameMode;
 
 {----------------------------------------------------------------------------}
 
@@ -106,38 +107,41 @@ end;
 
 procedure DKeyboardInput.doKeyboardRelease(const aKey: TKey);
 begin
-  {if context is 3D then }
-  if aKey = KeyboardOptions.MoveForwardKey then
-    MoveKeyRelease(KeyboardForward)
-  else
-  if aKey = KeyboardOptions.MoveBackwardKey then
-    MoveKeyRelease(KeyboardBackward)
-  else
-  if aKey = KeyboardOptions.StrafeLeftKey then
-    MoveKeyRelease(KeyboardStrafeLeft)
-  else
-  if aKey = KeyboardOptions.StrafeRightKey then
-    MoveKeyRelease(KeyboardStrafeRight);
+  if GameModeWalk then
+  begin
+    if aKey = KeyboardOptions.MoveForwardKey then
+      MoveKeyRelease(KeyboardForward)
+    else
+    if aKey = KeyboardOptions.MoveBackwardKey then
+      MoveKeyRelease(KeyboardBackward)
+    else
+    if aKey = KeyboardOptions.StrafeLeftKey then
+      MoveKeyRelease(KeyboardStrafeLeft)
+    else
+    if aKey = KeyboardOptions.StrafeRightKey then
+      MoveKeyRelease(KeyboardStrafeRight);
+  end;
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure DKeyboardInput.doKeyboardPress(const aKey: TKey);
 begin
-  {if context is 3D then }
-  if aKey = KeyboardOptions.MoveForwardKey then
-    MoveKeyPress(KeyboardForward)
-  else
-  if aKey = KeyboardOptions.MoveBackwardKey then
-    MoveKeyPress(KeyboardBackward)
-  else
-  if aKey = KeyboardOptions.StrafeLeftKey then
-    MoveKeyPress(KeyboardStrafeLeft)
-  else
-  if aKey = KeyboardOptions.StrafeRightKey then
-    MoveKeyPress(KeyboardStrafeRight);
-
-  KeyboardRecorder.KeyRecorder(aKey);
+  if GameModeWalk then
+  begin
+    if aKey = KeyboardOptions.MoveForwardKey then
+      MoveKeyPress(KeyboardForward)
+    else
+    if aKey = KeyboardOptions.MoveBackwardKey then
+      MoveKeyPress(KeyboardBackward)
+    else
+    if aKey = KeyboardOptions.StrafeLeftKey then
+      MoveKeyPress(KeyboardStrafeLeft)
+    else
+    if aKey = KeyboardOptions.StrafeRightKey then
+      MoveKeyPress(KeyboardStrafeRight);
+    KeyboardRecorder.KeyRecorder(aKey);
+  end;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -167,7 +171,8 @@ begin
   { Read config from a file }
   with KeyboardOptions do
   begin
-    DefaultKeyboardConfig;
+    DefaultKeyboardConfig; //we load default keyboard config in case something goes wrong
+    {we might write a specialized functions to read/write TKey, but I don't think it worth it}
     MoveForwardKey := StrToKey(ReadString(RootNode, 'MoveForwardKey'), MoveForwardKey);
     MoveBackwardKey := StrToKey(ReadString(RootNode, 'MoveBackwardKey'), MoveBackwardKey);
     StrafeLeftKey := StrToKey(ReadString(RootNode, 'StrafeLeftKey'), StrafeLeftKey);

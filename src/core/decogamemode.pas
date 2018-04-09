@@ -30,6 +30,8 @@ interface
 function GameModeNeedsClearingScreen: boolean;
 { Is the current game mode 3D using mouse/drag look feature }
 function GameModeMouseLook: boolean;
+{ Is the current game mode 3D accepting walk commands }
+function GameModeWalk: boolean;
 {............................................................................}
 implementation
 
@@ -47,6 +49,14 @@ end;
 function GameModeMouseLook: boolean;
 begin
   Result := not GameModeNeedsClearingScreen; //todo
+end;
+
+{-----------------------------------------------------------------------------}
+
+function GameModeWalk: boolean;
+begin
+  //not sure yet, but let it be this way for now
+  Result := GameModeMouseLook;
 end;
 
 end.
