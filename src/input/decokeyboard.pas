@@ -63,6 +63,7 @@ type
     procedure doKeyboardRelease(const aKey: TKey);
     { Loads input configuration (key bindings, etc) }
     procedure LoadKeyboardConfig;
+    procedure WriteKeyboardConfig;
   public
     constructor Create; //override;
     destructor Destroy; override;
@@ -71,7 +72,8 @@ type
 {............................................................................}
 implementation
 uses
-  DecoPlayer;
+  DecoPlayer,
+  DOM, DecoFiles, DecoFolders;
 
 {----------------------------------------------------------------------------}
 
@@ -141,17 +143,58 @@ end;
 {-----------------------------------------------------------------------------}
 
 procedure DKeyboardInput.LoadKeyboardConfig;
+  procedure DefaultKeyboardConfig;
+  begin
+    with KeyboardOptions do
+    begin
+      MoveForwardKey := KeyW;
+      MoveBackwardKey := KeyS;
+      StrafeLeftKey := KeyA;
+      StrafeRightKey := KeyD;
+      ScreenShotKey := KeyP;
+    end;
+  end;
+var
+  RootNode: TDOMElement;
 begin
+  RootNode := StartReadFile(GameConfigFolder('Keyboard.xml'));
+  if RootNode = nil then
+  begin
+    DefaultKeyboardConfig;
+    //WriteKeyboardConfig; //it's default, no need to write it
+  end
+  else
+  { Read config from a file }
   with KeyboardOptions do
   begin
-    MoveForwardKey := KeyW;
-    MoveBackwardKey := KeyS;
-    StrafeLeftKey := KeyA;
-    StrafeRightKey := KeyD;
-    ScreenShotKey := KeyP;
+    DefaultKeyboardConfig;
+    MoveForwardKey := StrToKey(ReadString(RootNode, 'MoveForwardKey'), MoveForwardKey);
+    MoveBackwardKey := StrToKey(ReadString(RootNode, 'MoveBackwardKey'), MoveBackwardKey);
+    StrafeLeftKey := StrToKey(ReadString(RootNode, 'StrafeLeftKey'), StrafeLeftKey);
+    StrafeRightKey := StrToKey(ReadString(RootNode, 'StrafeRightKey'), StrafeRightKey);
+    ScreenShotKey := StrToKey(ReadString(RootNode, 'ScreenShotKey'), ScreenShotKey);
+    EndReadFile;
   end;
+
 end;
 
+{-----------------------------------------------------------------------------}
+
+procedure DKeyboardInput.WriteKeyboardConfig;
+var
+  RootNode: TDOMElement;
+begin
+  RootNode := CreateFile(GameConfigFolder('Keyboard.xml'));
+  with KeyboardOptions do
+  begin
+    WriteString(RootNode, 'MoveForwardKey', KeyToStr(MoveForwardKey));
+    WriteString(RootNode, 'MoveBackwardKey', KeyToStr(MoveBackwardKey));
+    WriteString(RootNode, 'StrafeLeftKey', KeyToStr(StrafeLeftKey));
+    WriteString(RootNode, 'StrafeRightKey', KeyToStr(StrafeRightKey));
+    WriteString(RootNode, 'ScreenShotKey', KeyToStr(ScreenShotKey));
+  end;
+  WriteFile;
+end;
 {-----------------------------------------------------------------------------}
 
 procedure DKeyboardInput.ReleaseControls;
