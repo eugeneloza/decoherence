@@ -33,6 +33,7 @@ uses
   DecoInterfaceArrangers,
   DecoImageLoader,
   DecoFont,
+  DecoFramedElement,
   {</temporary>}
   DecoLabels,
   DecoGlobal, DecoGUIScale;

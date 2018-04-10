@@ -21,12 +21,12 @@
 
 unit DecoFramedElement;
 
-{$mode objfpc}{$H+}
-
 interface
 
 uses
-  DecoFrames, DecoInterfaceArrangers;
+  DecoInterfaceCore,
+  DecoFrames, DecoInterfaceArrangers,
+  DecoGlobal, DecoTime;
 
 type
   {
@@ -43,32 +43,38 @@ type
 
 {............................................................................}
 implementation
+uses
+  DecoLog;
 
 procedure DFramedElement.SetFrame(const Value: DAbstractFrame);
 begin
 
 end;
 
-procedure DCenterArranger.ArrangeChildren(const Animate: TAnimationStyle; const Duration: DTime);
+procedure DFramedElement.ArrangeChildren(const Animate: TAnimationStyle; const Duration: DTime);
 var
   c: DSingleInterfaceElement;
 begin
+  if FFrame = nil then
+    Log(LogInterfaceError, CurrentRoutine, 'ERROR: Frame is nil!');
   //inherited ArrangeChildren(Animate, Duration); <------- parent is abstract
   Self.GetAnimationState;
 
-{  for c in Children do
+  for c in Children do
   begin
     c.GetAnimationState;
-    c.Next.x := Self.Current.x + (Self.Current.w - c.Next.w) div 2;
-    c.Next.y := Self.Current.y + (Self.Current.h - c.Next.h) div 2;
+    c.Next.w := Self.Current.w - ((FFrame as IFrame).GapLeft + (FFrame as IFrame).GapRight);
+    c.Next.h := Self.Current.h - ((FFrame as IFrame).GapTop + (FFrame as IFrame).GapBottom);
+    c.Next.x := Self.Current.x + (FFrame as IFrame).GapLeft;
+    c.Next.y := Self.Current.y + (FFrame as IFrame).GapBottom;
     c.ResetAnimation;
 
-    c.SetSize(Self.Next.x + (Self.Next.w - c.Next.w) div 2,
+    {c.SetSize(Self.Next.x + (Self.Next.w - c.Next.w) div 2,
       Self.Next.y + (Self.Next.h - c.Next.h) div 2,
       c.Next.w,
       c.Next.h,
-      c.Next.a, Animate, Duration);
-  end;}
+      c.Next.a, Animate, Duration);}
+  end;
 end;
 
 end.
