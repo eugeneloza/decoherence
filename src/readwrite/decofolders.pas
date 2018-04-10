@@ -23,8 +23,8 @@ unit DecoFolders;
 
 interface
 
-uses
-  DecoGlobal;
+{uses
+  DecoGlobal;}
 
 { Wrapper for CastleFilesUtils.ApplicationData
   to be able to switch between Game and Architect folder }

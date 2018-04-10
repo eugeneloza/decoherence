@@ -95,15 +95,6 @@ type
     constructor Create; override;
   end;
 
-{
-type
-  DFramedElement = class(DAbstractSorter)
-  private
-    Frame: DAbstractFrame;
-
-  end;
-}
-
 type
   TFramesDictionary = specialize TObjectDictionary<string, DFrameImage>;
 
