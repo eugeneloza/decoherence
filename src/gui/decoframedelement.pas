@@ -24,7 +24,7 @@ unit DecoFramedElement;
 interface
 
 uses
-  DecoInterfaceCore,
+  DecoInterfaceCore, DecoInterfaceContainer,
   DecoFrames, DecoInterfaceArrangers,
   DecoGlobal, DecoTime;
 
@@ -32,9 +32,10 @@ type
   {
     May be used "as is", but expected to contain only one CenterArranger child }
   DFramedElement = class(DAbstractArranger)
-  private
+  strict private
     FFrame: DAbstractFrame;
     procedure SetFrame(const Value: DAbstractFrame);
+    function SubstractFrame(const aContainer: DInterfaceContainer): DInterfaceContainer;
   strict protected
     procedure ArrangeChildren(const Animate: TAnimationStyle; const Duration: DTime); override;
     {}
@@ -44,39 +45,54 @@ type
 {............................................................................}
 implementation
 uses
-  DecoLog;
+  DecoMath, DecoLog;
 
 procedure DFramedElement.SetFrame(const Value: DAbstractFrame);
 begin
-
+  ///!
 end;
+
+{-----------------------------------------------------------------------------}
+
+function DFramedElement.SubstractFrame(const aContainer: DInterfaceContainer): DInterfaceContainer;
+begin
+  Result.AssignFrom(aContainer);
+  Result.w := AboveZeroInt(aContainer.w - ((FFrame as IFrame).GapLeft + (FFrame as IFrame).GapRight));
+  Result.h := AboveZeroInt(aContainer.h - ((FFrame as IFrame).GapTop + (FFrame as IFrame).GapBottom));
+  if Result.w > 0 then
+    Result.x := aContainer.x + (FFrame as IFrame).GapLeft
+  else
+    Result.x := aContainer.x; //to fix zoom-in animation
+  if Result.h > 0 then
+    Result.y := aContainer.y + (FFrame as IFrame).GapBottom
+  else
+    Result.y := aContainer.y;
+end;
+
+{-----------------------------------------------------------------------------}
 
 procedure DFramedElement.ArrangeChildren(const Animate: TAnimationStyle; const Duration: DTime);
 var
   c: DSingleInterfaceElement;
+  FromState, ToState: DInterfaceContainer;
 begin
   if FFrame = nil then
   begin
     Log(LogInterfaceError, CurrentRoutine, 'ERROR: Frame is nil!');
     Exit;
   end;
+
   //inherited ArrangeChildren(Animate, Duration); <------- parent is abstract
+
   Self.GetAnimationState;
+
+  FromState := SubstractFrame(Self.Current);
+  ToState := SubstractFrame(Self.Next);
 
   for c in Children do
   begin
-    c.GetAnimationState;
-    c.Next.w := Self.Current.w - ((FFrame as IFrame).GapLeft + (FFrame as IFrame).GapRight);
-    c.Next.h := Self.Current.h - ((FFrame as IFrame).GapTop + (FFrame as IFrame).GapBottom);
-    c.Next.x := Self.Current.x + (FFrame as IFrame).GapLeft;
-    c.Next.y := Self.Current.y + (FFrame as IFrame).GapBottom;
-    c.ResetAnimation;
-
-    {c.SetSize(Self.Next.x + (Self.Next.w - c.Next.w) div 2,
-      Self.Next.y + (Self.Next.h - c.Next.h) div 2,
-      c.Next.w,
-      c.Next.h,
-      c.Next.a, Animate, Duration);}
+    c.ForceSize(FromState);
+    c.SetSize(ToState, Animate, Duration);
   end;
 end;
 

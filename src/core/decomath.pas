@@ -33,6 +33,7 @@ function dEqual(const a, b: DFloat): Boolean; TryInline
 function dZero(const a: DFloat): Boolean; TryInline
 { Returns "a" if a>0 or "0" if a<0 }
 function AboveZero(const a: DFloat): DFloat; TryInline
+function AboveZeroInt(const a: integer): integer; TryInline
 { Returns larger number of a, b }
 function Maximum(const a, b: DFloat): DFloat; TryInline
 { Returns sign of a in +1,0,-1 }
@@ -77,6 +78,13 @@ end;
 {-----------------------------------------------------------------------------}
 
 function AboveZero(const a: DFloat): DFloat; TryInline
+begin
+  if a > 0 then
+    Result := a
+  else
+    Result := 0;
+end;
+function AboveZeroInt(const a: integer): integer; TryInline
 begin
   if a > 0 then
     Result := a
