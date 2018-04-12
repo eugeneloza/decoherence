@@ -24,7 +24,7 @@ unit DecoInterfaceArrangers;
 interface
 
 uses
-  DecoInterfaceCore,
+  DecoInterfaceCore, DecoInterfaceContainer,
   DecoTime;
 
 type
@@ -60,22 +60,21 @@ end;
 procedure DCenterArranger.ArrangeChildren(const Animate: TAnimationStyle; const Duration: DTime);
 var
   c: DSingleInterfaceElement;
+  FromState, ToState: DInterfaceContainer;
 begin
   //inherited ArrangeChildren(Animate, Duration); <------- parent is abstract
   Self.GetAnimationState;
 
+  FromState.AssignFrom(Self.Current);
+
   for c in Children do
   begin
-    c.GetAnimationState;
-    c.Next.x := Self.Current.x + (Self.Current.w - c.Next.w) div 2;
-    c.Next.y := Self.Current.y + (Self.Current.h - c.Next.h) div 2;
-    c.ResetAnimation;
+    ToState.AssignFrom(c.Next);
+    ToState.x := Self.Next.x + (Self.Next.w - c.Next.w) div 2;
+    ToState.y := Self.Next.y + (Self.Next.h - c.Next.h) div 2;
 
-    c.SetSize(Self.Next.x + (Self.Next.w - c.Next.w) div 2,
-      Self.Next.y + (Self.Next.h - c.Next.h) div 2,
-      c.Next.w,
-      c.Next.h,
-      c.Next.a, Animate, Duration);
+    c.ForceSize(FromState);
+    c.SetSize(ToState, Animate, Duration);
   end;
 end;
 

@@ -220,7 +220,7 @@ begin
   Lab.ResetToRealSize;
   Arr.Grab(Lab);
 
-  Arr.SetSize(600, 100, 200, 200, 1, asZoomIn);
+  Arr.SetSize(600, 100, 200, 200, 1, asZoomIn, 0.6);
   Grab(Arr);
 
   Bar := DAbstractBarImage.Create;

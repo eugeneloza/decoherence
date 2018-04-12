@@ -90,9 +90,11 @@ type
       const Animate: TAnimationStyle = asDefault; const Duration: DTime = DefaultAnimationDuration);
     procedure SetSize(const aContainer: DInterfaceContainer;
       const Animate: TAnimationStyle = asDefault; const Duration: DTime = DefaultAnimationDuration);
-    { Forces the element size to a specific value and resets the animation }
+    { Forces the element size to a specific value and resets the animation
+      Careful, it doesn't trigger SetSize events sequence,
+      e.g. doesn't call SizeChanged }
     procedure ForceSize(const ax, ay, aw, ah: integer; const aAlpha: DFloat = 1.0);
-      procedure ForceSize(const aContainer: DInterfaceContainer);
+    procedure ForceSize(const aContainer: DInterfaceContainer);
     { Scale this element to full screen (no animation) }
     procedure FullScreen(const aAlpha: Single = 1);
     { This procedure alerts Parent that this element has changed its size }
