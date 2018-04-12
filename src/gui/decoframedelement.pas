@@ -49,7 +49,11 @@ uses
 
 procedure DFramedElement.SetFrame(const Value: DAbstractFrame);
 begin
-  ///!
+  if (FFrame <> Value) and (Value <> nil) then
+  begin
+    FFrame := Value;
+    ArrangeChildren(asNone, -1); //just reset the animation
+  end;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -57,16 +61,19 @@ end;
 function DFramedElement.SubstractFrame(const aContainer: DInterfaceContainer): DInterfaceContainer;
 begin
   Result.AssignFrom(aContainer);
-  Result.w := AboveZeroInt(aContainer.w - ((FFrame as IFrame).GapLeft + (FFrame as IFrame).GapRight));
-  Result.h := AboveZeroInt(aContainer.h - ((FFrame as IFrame).GapTop + (FFrame as IFrame).GapBottom));
-  if Result.w > 0 then
-    Result.x := aContainer.x + (FFrame as IFrame).GapLeft
-  else
-    Result.x := aContainer.x; //to fix zoom-in animation
-  if Result.h > 0 then
-    Result.y := aContainer.y + (FFrame as IFrame).GapBottom
-  else
-    Result.y := aContainer.y;
+  if FFrame <> nil then
+  begin
+    Result.w := AboveZeroInt(aContainer.w - ((FFrame as IFrame).GapLeft + (FFrame as IFrame).GapRight));
+    Result.h := AboveZeroInt(aContainer.h - ((FFrame as IFrame).GapTop + (FFrame as IFrame).GapBottom));
+    if Result.w > 0 then
+      Result.x := aContainer.x + (FFrame as IFrame).GapLeft
+    else
+      Result.x := aContainer.x; //to fix zoom-in animation
+    if Result.h > 0 then
+      Result.y := aContainer.y + (FFrame as IFrame).GapBottom
+    else
+      Result.y := aContainer.y;
+  end;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -79,7 +86,7 @@ begin
   if FFrame = nil then
   begin
     Log(LogInterfaceError, CurrentRoutine, 'ERROR: Frame is nil!');
-    Exit;
+    //Exit;
   end;
 
   //inherited ArrangeChildren(Animate, Duration); <------- parent is abstract
