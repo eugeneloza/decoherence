@@ -193,9 +193,9 @@ constructor DAbstractElement.Create;
 begin
   //inherited <------- nothing to inherit
   KillMePlease := false;
-  Last := DInterfaceContainer.Create;
-  Next := DInterfaceContainer.Create;
-  Current := DInterfaceContainer.Create;
+  Last.Create;
+  Next.Create;
+  Current.Create;
   AnimationCurve := acSquare;
   AnimationSuicide := false;
 end;
@@ -204,9 +204,7 @@ end;
 
 destructor DAbstractElement.Destroy;
 begin
-  Current.Free;
-  Next.Free;
-  Last.Free;
+
   inherited Destroy;
 end;
 
@@ -345,7 +343,6 @@ end;
 destructor DSingleInterfaceElement.Destroy;
 begin
   FreeAndNil(Timer);
-  FreeAndNil(SavedContainerState);
   inherited Destroy;
 end;
 
@@ -422,8 +419,6 @@ end;
 procedure DSingleInterfaceElement.StartDrag(const xx, yy: integer);
 begin
   ResetAnimation;
-  if SavedContainerState = nil then
-    SavedContainerState := DInterfaceContainer.Create;
   SavedContainerState.AssignFrom(Next);
   DragX := Next.x - xx;
   DragY := Next.y - yy;

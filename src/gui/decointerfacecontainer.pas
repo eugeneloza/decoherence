@@ -29,7 +29,7 @@ uses
 
 type
   { Determines coordinates and size of a interface element }
-  DInterfaceContainer = class(DObject)
+  DInterfaceContainer = object //class(DObject)
   public
     isInitialized: boolean;
     x, y, w, h: integer;
@@ -37,7 +37,7 @@ type
     { cached to accelerate things, never assign them }
     x2, y2: integer;
     { Copy current container's xywha to aDest }
-    procedure AssignTo(const aDest: DInterfaceContainer); TryInline
+    procedure AssignTo(var aDest: DInterfaceContainer); TryInline
     { Copy current container's xywha from aSource }
     procedure AssignFrom(const aSource: DInterfaceContainer); TryInline
     { Mix this container's xywha from aLast and aNext with aPhase as a weight }
@@ -62,7 +62,7 @@ implementation
 uses
   DecoGUIScale;
 
-procedure DInterfaceContainer.AssignTo(const aDest: DInterfaceContainer); TryInline
+procedure DInterfaceContainer.AssignTo(var aDest: DInterfaceContainer); TryInline
 begin
   aDest.x := Self.x;
   aDest.y := Self.y;
