@@ -56,7 +56,10 @@ var
   c: DSingleInterfaceElement;
 begin
   if FFrame = nil then
+  begin
     Log(LogInterfaceError, CurrentRoutine, 'ERROR: Frame is nil!');
+    Exit;
+  end;
   //inherited ArrangeChildren(Animate, Duration); <------- parent is abstract
   Self.GetAnimationState;
 
