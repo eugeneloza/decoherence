@@ -88,6 +88,11 @@ type
       optionally animation may be specified }
     procedure SetSize(const ax, ay, aw, ah: integer; const aAlpha: DFloat = 1.0;
       const Animate: TAnimationStyle = asDefault; const Duration: DTime = DefaultAnimationDuration);
+    procedure SetSize(const aContainer: DInterfaceContainer;
+      const Animate: TAnimationStyle = asDefault; const Duration: DTime = DefaultAnimationDuration);
+    { Forces the element size to a specific value and resets the animation }
+    procedure ForceSize(const ax, ay, aw, ah: integer; const aAlpha: DFloat = 1.0);
+      procedure ForceSize(const aContainer: DInterfaceContainer);
     { Scale this element to full screen (no animation) }
     procedure FullScreen(const aAlpha: Single = 1);
     { This procedure alerts Parent that this element has changed its size }
@@ -316,6 +321,27 @@ begin
   if not Last.isInitialized then Last.AssignFrom(Next);
   AnimateTo(Animate, Duration);
   SizeChanged(Animate, Duration);
+end;
+
+procedure DAbstractElement.SetSize(const aContainer: DInterfaceContainer;
+  const Animate: TAnimationStyle = asDefault; const Duration: DTime = DefaultAnimationDuration);
+begin
+  SetSize(aContainer.x, aContainer.y, aContainer.w, aContainer.h, aContainer.a,
+    Animate, Duration);
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DAbstractElement.ForceSize(const ax, ay, aw, ah: integer; const aAlpha: DFloat = 1.0);
+begin
+  Next.SetIntSize(ax, ay, aw, ah, aAlpha);
+  ResetAnimation
+end;
+
+procedure DAbstractElement.ForceSize(const aContainer: DInterfaceContainer);
+begin
+  Next.AssignFrom(aContainer);
+  ResetAnimation;
 end;
 
 {-----------------------------------------------------------------------------}
