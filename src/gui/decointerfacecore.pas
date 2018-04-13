@@ -73,7 +73,7 @@ type
     { Stops any animation, and sets Last = Next }
     procedure ResetAnimation;
   strict protected
-    {}
+    { If this element is full-screen? }
     isFullScreen: boolean;
     { Enables suicide of this element in case it has vanished }
     KillMePlease: Boolean;
@@ -82,11 +82,12 @@ type
     procedure Update; virtual;
     { Updates/caches Current container }
     procedure GetAnimationState; TryInline
-    {}
+    { If CurrentAnimation is a suicide animation }
     function AnimationSuicide: boolean;
-    {}
+    { If CurrentAnimatino is suitable for full-screen elements? }
     function AnimationFullScreen: boolean;
   public
+    { Transparency of current element, stacking all parents' transparation }
     property Alpha: Single read GetAlpha;
     { Draw the element / as abstract as it might be :) }
     procedure Draw; virtual; abstract;
@@ -307,6 +308,8 @@ end;
 
 procedure DAbstractElement.AnimateTo(const Animate: TAnimationStyle;
   const Duration: DTime = DefaultAnimationDuration);
+var
+  mx, my: integer;
 begin
   { Next must be set before the AnimateTo! }
   GetAnimationState;
@@ -334,10 +337,43 @@ begin
     asZoomIn: Last.SetIntWidthHeight(1, 1, 0);
     asZoomOut: Next.SetIntWidthHeight(1, 1, 0);
     {fly in/out}
-{   asFlyInRadial: Last.SetIntSize();
-    asFlyOutRadial: Last.SetIntSize();
-    asFlyInRandom: Last.SetIntSize();
-    asFlyOutRandom: Last.SetIntSize();}
+    asFlyInRadial,asFlyOutRadial,asFlyInRandom,asFlyOutRandom:
+      begin
+        if Animate in [asFlyInRadial, asFlyOutRadial] then
+        begin
+          if Current.x < GUICenter[0] then
+            mx := 0
+          else
+            mx := GUIWidth;
+          if Current.x < GUICenter[0] then
+            mx := 0
+          else
+            mx := GUIWidth;
+        end
+        else
+          case DRND.Random(4) of
+            0: begin
+                 mx := 0;
+                 my := DRND.Random(GUIHeight);
+               end;
+            1: begin
+                 mx := GUIWidth;
+                 my := DRND.Random(GUIHeight);
+               end;
+            2: begin
+                 mx := DRND.Random(GUIWidth);
+                 my := 0;
+               end;
+            3: begin
+                 mx := DRND.Random(GUIWidth);
+                 my := GUIHeight;
+               end;
+          end;
+        case Animate of
+          asFlyInRadial, asFlyInRandom: Last.SetIntSize(mx, my, 1, 1, 0);
+          asFlyOutRadial, asFlyOutRandom: Next.SetIntSize(mx, my, 1, 1, 0);
+        end;
+      end;
   end;
 end;
 
