@@ -170,7 +170,8 @@ type
     procedure Draw; override;
     { Assign given element as a child }
     procedure Grab(const aChild: DSingleInterfaceElement);
-    procedure Clear;
+    procedure Clear(const Animate: TAnimationStyle = asNone;
+      const Duration: DTime = DefaultAnimationDuration);
 
     (* Mouse routines *)
   public
@@ -493,9 +494,20 @@ end;
 
 {----------------------------------------------------------------------------}
 
-procedure DInterfaceElement.Clear;
+procedure DInterfaceElement.Clear(const Animate: TAnimationStyle = asNone;
+      const Duration: DTime = DefaultAnimationDuration);
+var
+  c: DSingleInterfaceElement;
 begin
-  Children.Clear;
+  if Animate = asNone then
+    Children.Clear
+  else
+    for c in Children do
+    begin
+      c.AnimateTo(Animate, Duration);
+      if c is DInterfaceElement then
+        DInterfaceElement(c).Clear(Animate, Duration);
+    end;
 end;
 
 {----------------------------------------------------------------------------}
