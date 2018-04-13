@@ -25,10 +25,10 @@ unit DecoLog;
 interface
 
 const
-  { normal log levels }
+  { Normal log levels }
   LogInit = true;
 
-  { interface info and errors }
+  { Interface info and errors }
   LogInterfaceError = true;
   LogInterfaceWarning = true;
   LogInterfaceInfo = true;
@@ -36,13 +36,16 @@ const
   LogLanguageError = true;
   LogInterfaceImageLoading = true;
 
-  { input }
+  { Input }
   LogMouseError = true;
   LogMouseInfo = true;
 
-  { hdd }
+  { HDD }
   LogReadWriteError = true;
   LogFileAccess = true;
+
+  { Actors }
+  LogActorWarning = true;
 
 { Initializes Castle Log and display basic info }
 procedure InitLog;

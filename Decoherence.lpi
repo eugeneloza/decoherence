@@ -31,7 +31,7 @@
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir);src"/>
-            <OtherUnitFiles Value="src;src/core;src/gui;src/text;src/generated;src/input;src/player;src/readwrite"/>
+            <OtherUnitFiles Value="src;src/core;src/gui;src/text;src/generated;src/input;src/player;src/readwrite;src/actor"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
           <Parsing>
@@ -76,7 +76,7 @@
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir);src"/>
-            <OtherUnitFiles Value="src;src/core;src/gui;src/text;src/generated;src/input;src/player;src/readwrite"/>
+            <OtherUnitFiles Value="src;src/core;src/gui;src/text;src/generated;src/input;src/player;src/readwrite;src/actor"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
           <Parsing>
@@ -122,7 +122,7 @@
         <PackageName Value="castle_base"/>
       </Item2>
     </RequiredPackages>
-    <Units Count="47">
+    <Units Count="48">
       <Unit0>
         <Filename Value="Decoherence.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -352,6 +352,11 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="DecoFramedElement"/>
       </Unit46>
+      <Unit47>
+        <Filename Value="src/actor/decoactorstats.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoActorStats"/>
+      </Unit47>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
@@ -361,7 +366,7 @@
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir);src"/>
-      <OtherUnitFiles Value="src;src/core;src/gui;src/text;src/generated;src/input;src/player;src/readwrite"/>
+      <OtherUnitFiles Value="src;src/core;src/gui;src/text;src/generated;src/input;src/player;src/readwrite;src/actor"/>
       <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <Parsing>

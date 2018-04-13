@@ -34,6 +34,7 @@ uses
   DecoImageLoader,
   DecoFont,
   DecoFramedElement,
+  DecoActorStats,
   {</temporary>}
   DecoLabels,
   DecoGlobal, DecoGUIScale;
