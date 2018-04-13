@@ -44,7 +44,9 @@ type
     presuming that there was some "previous state"}
   TAnimationStyle = (asNone, asDefault,
     asFadeIn, asFadeOut,
-    asZoomIn, asZoomOut);
+    asZoomIn, asZoomOut,
+    asFlyInRadial, asFlyOutRadial,
+    asFlyInRandom, asFlyOutRandom);
 
 type
   { Most abstract container for interface elements
@@ -54,7 +56,7 @@ type
     AnimationStart: DTime;
     AnimationDuration: DTime;
     AnimationCurve: TAnimationCurve;
-    AnimationSuicide: boolean;
+    CurrentAnimation: TAnimationStyle;
     function GetAlpha: DFloat;
   strict protected
     { Parent interface element }
@@ -71,6 +73,8 @@ type
     { Stops any animation, and sets Last = Next }
     procedure ResetAnimation;
   strict protected
+    {}
+    isFullScreen: boolean;
     { Enables suicide of this element in case it has vanished }
     KillMePlease: Boolean;
     { updates the class each frame,
@@ -78,6 +82,10 @@ type
     procedure Update; virtual;
     { Updates/caches Current container }
     procedure GetAnimationState; TryInline
+    {}
+    function AnimationSuicide: boolean;
+    {}
+    function AnimationFullScreen: boolean;
   public
     property Alpha: Single read GetAlpha;
     { Draw the element / as abstract as it might be :) }
@@ -205,7 +213,8 @@ begin
   Next.Create;
   Current.Create;
   AnimationCurve := acSquare;
-  AnimationSuicide := false;
+  CurrentAnimation := asNone;
+  isFullScreen := false;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -214,6 +223,26 @@ destructor DAbstractElement.Destroy;
 begin
 
   inherited Destroy;
+end;
+
+{-----------------------------------------------------------------------------}
+
+function DAbstractElement.AnimationSuicide: boolean;
+begin
+  if (CurrentAnimation in [asFadeOut, asZoomOut, asFlyOutRadial, asFlyOutRandom]) then
+    Result := true
+  else
+    Result := false;
+end;
+
+{-----------------------------------------------------------------------------}
+
+function DAbstractElement.AnimationFullScreen: boolean;
+begin
+  if (CurrentAnimation in [asNone, asDefault, asFadeIn, asFadeOut]) then
+    Result := true
+  else
+    Result := false;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -285,7 +314,7 @@ begin
 
   AnimationStart := -1;
   AnimationDuration := Duration;
-  AnimationSuicide := false;
+  CurrentAnimation := Animate;
 
   case Animate of
     asNone: AnimationDuration := -1; //no animation will just assign Current = Next on next frame
@@ -295,7 +324,12 @@ begin
     asFadeOut: Next.a := 0;
     {zooms in/out element}
     asZoomIn: Last.SetIntWidthHeight(1, 1, 0);
-    asZoomOut: Next.SetIntWidthHeight(1, 1 , 0);
+    asZoomOut: Next.SetIntWidthHeight(1, 1, 0);
+    {fly in/out}
+{   asFlyInRadial: Last.SetIntSize();
+    asFlyOutRadial: Last.SetIntSize();
+    asFlyInRandom: Last.SetIntSize();
+    asFlyOutRandom: Last.SetIntSize();}
   end;
 end;
 
@@ -353,6 +387,7 @@ procedure DAbstractElement.FullScreen(const aAlpha: Single = 1);
 begin
   Next.SetIntSize(0, 0, GUIWidth, GUIHeight, aAlpha);
   ResetAnimation;
+  isFullScreen := true;
   //SizeChanged <----- we don't call it, as it's very unlikely that a FullScreen element is a Child of some Arranger
 end;
 
