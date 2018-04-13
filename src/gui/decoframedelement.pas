@@ -40,6 +40,7 @@ type
     function SubstractFrame(const aContainer: DInterfaceContainer): DInterfaceContainer;
   strict protected
     procedure ArrangeChildren(const Animate: TAnimationStyle; const Duration: DTime); override;
+  public
     { Frame around this element }
     property Frame: DAbstractFrame read FFrame write SetFrame;
   end;
@@ -53,7 +54,10 @@ procedure DFramedElement.SetFrame(const Value: DAbstractFrame);
 begin
   if (FFrame <> Value) and (Value is IFrame) then
   begin
+    if FFrame <> nil then
+      Children.Remove(FFrame);
     FFrame := Value;
+    Children.Add(FFrame);
     ArrangeChildren(asNone, -1); //just reset the animation
   end;
 end;
