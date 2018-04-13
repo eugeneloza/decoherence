@@ -85,15 +85,13 @@ var
   c: DSingleInterfaceElement;
   FromState, ToState: DInterfaceContainer;
 begin
+  //inherited ArrangeChildren(Animate, Duration); <------- parent is abstract
+
   if FFrame is IFrame then
   begin
     Log(LogInterfaceError, CurrentRoutine, 'ERROR: Frame is nil!');
-    //Exit; //well, the procedure is robust and will handle Frame=nil just as gap=0.
+    //Exit; //the procedure is robust and will handle Frame=nil just as gap=0.
   end;
-
-  //inherited ArrangeChildren(Animate, Duration); <------- parent is abstract
-
-  Self.GetAnimationState;
 
   FromState := SubstractFrame(Self.Current);
   ToState := SubstractFrame(Self.Next);

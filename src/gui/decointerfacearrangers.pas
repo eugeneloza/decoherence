@@ -64,6 +64,7 @@ implementation
 procedure DAbstractArranger.SizeChanged(const Animate: TAnimationStyle; const Duration: DTime);
 begin
   //inherited SizeChanged(Animate, Duration);
+  Self.GetAnimationState;
   ArrangeChildren(Animate, Duration);
 end;
 
@@ -75,7 +76,6 @@ var
   FromState, ToState: DInterfaceContainer;
 begin
   //inherited ArrangeChildren(Animate, Duration); <------- parent is abstract
-  Self.GetAnimationState;
 
   FromState.AssignFrom(Self.Current);
 
