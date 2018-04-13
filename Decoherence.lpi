@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
   <ProjectOptions>
-    <Version Value="11"/>
+    <Version Value="10"/>
     <General>
       <Flags>
         <MainUnitHasUsesSectionForAllUnits Value="False"/>
@@ -109,10 +109,9 @@
       <Version Value="2"/>
     </PublishOptions>
     <RunParams>
-      <FormatVersion Value="2"/>
-      <Modes Count="1">
-        <Mode0 Name="default"/>
-      </Modes>
+      <local>
+        <FormatVersion Value="1"/>
+      </local>
     </RunParams>
     <RequiredPackages Count="2">
       <Item1>
@@ -122,7 +121,7 @@
         <PackageName Value="castle_base"/>
       </Item2>
     </RequiredPackages>
-    <Units Count="48">
+    <Units Count="49">
       <Unit0>
         <Filename Value="Decoherence.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -357,6 +356,11 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="DecoActorStats"/>
       </Unit47>
+      <Unit48>
+        <Filename Value="src/core/decogenerics.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoGenerics"/>
+      </Unit48>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

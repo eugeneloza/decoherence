@@ -27,6 +27,7 @@ interface
 const
   { Normal log levels }
   LogInit = true;
+  LogWarning = true;
 
   { Interface info and errors }
   LogInterfaceError = true;
