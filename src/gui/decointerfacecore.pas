@@ -310,6 +310,7 @@ procedure DAbstractElement.AnimateTo(const Animate: TAnimationStyle;
   const Duration: DTime = DefaultAnimationDuration);
 var
   mx, my: integer;
+  dx, dy, ddx, ddy: DFloat;
 begin
   { Next must be set before the AnimateTo! }
   GetAnimationState;
@@ -341,14 +342,26 @@ begin
       begin
         if Animate in [asFlyInRadial, asFlyOutRadial] then
         begin
-          if Current.x < GUICenter[0] then
-            mx := 0
+          dx := Current.x - GUICenter[0];
+          dy := Current.y - GUICenter[1];
+          ddy := abs(dy / GUIHeight);
+          ddx := abs(dx / GUIWidth);
+          if ddy > ddx then
+          begin
+            if dy < 0 then
+              my := 0
+            else
+              my := GUIHeight;
+            mx := Round(GUIWidth * ddy);
+          end
           else
-            mx := GUIWidth;
-          if Current.x < GUICenter[0] then
-            mx := 0
-          else
-            mx := GUIWidth;
+          begin
+            if dx < 0 then
+              mx := 0
+            else
+              mx := GUIWidth;
+            my := Round(GUIHeight * ddx);
+          end;
         end
         else
           case DRND.Random(4) of
