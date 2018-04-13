@@ -15,7 +15,7 @@
 
 {---------------------------------------------------------------------------}
 
-(* Meta-elements arranging children *)
+(* An abstract stat container enabling changing values and preforming automatic checks *)
 
 {$INCLUDE compilerconfig.inc}
 
