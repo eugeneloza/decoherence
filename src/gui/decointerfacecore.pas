@@ -316,6 +316,14 @@ begin
   AnimationDuration := Duration;
   CurrentAnimation := Animate;
 
+  if isFullScreen and not AnimationFullScreen then
+  begin
+    if AnimationSuicide then
+      CurrentAnimation := asFadeOut
+    else
+      CurrentAnimation := asFadeIn;
+  end;
+
   case Animate of
     asNone: AnimationDuration := -1; //no animation will just assign Current = Next on next frame
     //asDefault: <------ will simply animate from "Last = Current (= Next if uninitialized)" to "Next"
