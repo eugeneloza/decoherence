@@ -28,19 +28,19 @@ uses
   DecoTime;
 
 type
-  {}
-  TVerticalAlign = (vaTop, vaCenter, vaBottom);
-  THorizontalAlign = (haLeft, haCenter, haRight);
-
-type
-  { calls ManageChildren in Update and resets their animation state }
-  DAbstractArranger = class(DInterfaceElement)
+  { Calls ArrangeChildren in SizeChanged }
+  DAbstractArranger = class abstract(DInterfaceElement)
   strict protected
-    {}
+    { Arranges Children according to the Arranger type }
     procedure ArrangeChildren(const Animate: TAnimationStyle; const Duration: DTime); virtual; abstract;
   public
     procedure SizeChanged(const Animate: TAnimationStyle; const Duration: DTime); override;
   end;
+
+type
+  { Alignment of the content within the Aligned Arranger }
+  TVerticalAlign = (vaTop, vaCenter, vaBottom);
+  THorizontalAlign = (haLeft, haCenter, haRight);
 
 type
   { arranges children relative to its coordinates without scaling them
@@ -49,7 +49,7 @@ type
   strict protected
     procedure ArrangeChildren(const Animate: TAnimationStyle; const Duration: DTime); override;
   public
-    {}
+    { Alignment of the content }
     VAlign: TVerticalAlign;
     HAlign: THorizontalAlign;
   public

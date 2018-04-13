@@ -32,18 +32,20 @@ type
   { Handling of player movement }
   DPlayerControl = class(DObject)
   strict private
-    {}
+    { This is the holder of the camera for all world situations in game
+      Note, that special cases of camera usage are handled by their own cameras }
     CameraMan: DCameraMan;
-    {}
+    { Acceleration impetus of the controllers
+      (sums up all the acceleration sources like keyboard, gamepad or interface elements) }
     AccelerationForward, AccelerationStrafe: DFloat;
   strict private
-    {}
+    { Preform all actions relative to party movement }
     procedure doMove;
   public
-    //CurrentParty
-    { Change CameraMan look direction }
+    //CurrentParty: DPlayerParty; //enchanced version of DActorGroup
+    { Change Party look direction }
     procedure doLook(const Delta: TVector2);
-    { Change CameraMan acceleration }
+    { Change Party acceleration }
     procedure doAccelerateForward(const Value: DFloat);
     procedure doAccelerateStrafe(const Value: DFloat);
   public

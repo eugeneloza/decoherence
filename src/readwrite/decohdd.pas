@@ -41,9 +41,9 @@ function LoadBufferSafe(const URL: string): TSoundBuffer;
 {safe wrapper for x3dload.Load3D}
 function Load3DSafe(const URL: string): TX3DRootNode;
 
-{}
+{ Initialize HDD lock which prevents simultaneous access to HDD from threads }
 procedure InitHDDLock;
-{}
+{ Free HDD lock }
 procedure FreeHDDLock;
 {............................................................................}
 implementation

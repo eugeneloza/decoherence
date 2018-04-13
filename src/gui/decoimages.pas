@@ -71,7 +71,8 @@ type
   end;
 
 type
-  {}
+  { Image supplemented by a predefined shift from the original coordinates
+    to provide for accurate cursor image positioning relative to pointer coordinates }
   DCursorImage = record
     Image: DImage;
     { Coordinates shift of the cursor image vs cursor pointer position }

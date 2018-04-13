@@ -57,7 +57,8 @@ type
     { Draw the GUI and all its child elements }
     procedure Draw; override;
   public
-    {}
+    { Mouse cursor and corresponding operations 
+      Also used to render dragged image }
     Cursor: DCursor;
     { Updates cursor position and image }
     procedure UpdateCursor(const CursorX, CursorY: single;

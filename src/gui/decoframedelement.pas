@@ -29,7 +29,9 @@ uses
   DecoGlobal, DecoTime;
 
 type
-  {
+  { An element with a frame
+    Automatically manages frame gaps based on IFrame interface
+    Supports both rectagonal and image frames
     May be used "as is", but expected to contain only one CenterArranger child }
   DFramedElement = class(DAbstractArranger)
   strict private
@@ -38,7 +40,7 @@ type
     function SubstractFrame(const aContainer: DInterfaceContainer): DInterfaceContainer;
   strict protected
     procedure ArrangeChildren(const Animate: TAnimationStyle; const Duration: DTime); override;
-    {}
+    { Frame around this element }
     property Frame: DAbstractFrame read FFrame write SetFrame;
   end;
 

@@ -31,23 +31,23 @@ uses
 type TCursorType = (ctNone, ctDefault, ctMouseLook);
 
 type
-  {}
+  { Mouse/touch cursor }
   DCursor = class(TObject)
   private
-    {}
+    { A set of images to be used to display cursor in different situations }
     CursorImg: array[TCursorType] of DCursorImage;
   public
-    {}
+    { Coordinates of the cursor }
     x, y: single;
-    {}
+    { Current cursor type (determines displayed cursor image) }
     CurrentCursor: TCursorType;
-    {}
+    { Element this cursor currently drags or clicks }
     DragElement, ClickElement: DSingleInterfaceElement;
-    {}
+    { Change the tint of the cursor }
     procedure SetTint;
-    {}
+    { Draw the cursor on screen }
     procedure Draw;
-    {}
+    { Hides the OS cursor }
     procedure HideOSCursor;
   public
     constructor Create; //override;

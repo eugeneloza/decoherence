@@ -28,7 +28,11 @@ uses
   DecoGlobal, CastleVectors;
 
 type
-  {}
+  { This is an entity, that "carries camera" used everywhere around the game:
+    for walking around the world
+    to imitate character's vision during combat
+    to fly around in cutscenes
+    etc. }
   DCameraMan = class(DObject)
   private
     { Sets Up to GravityUp }

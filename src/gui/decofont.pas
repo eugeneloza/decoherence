@@ -32,7 +32,8 @@ const
   dLineBreak = sLineBreak;
 
 type
-  {}
+  { This is a generic representation of a string
+    containing all the parameters required to render it }
   DString = record
     { Each line text content }
     Value: string;
@@ -49,11 +50,12 @@ type
   end;
 
 type
-  {}
+  { A list of DStrings broken to fit Width }
   DBrokenString = specialize TStructList<DString>;
 
 type
-  {}
+  { Class used to operate and render the text into image
+    to be used in DecoLabel to display it on screen }
   DFont = class(TTextureFont)
   private
     { Converts a single line of text to an image
@@ -77,11 +79,11 @@ var
   { Debug and DefaultFont }
   DebugFont, DefaultFont: DFont;
 
-{}
+{ Get font by its name reference }
 function GetFontByName(const FontName: string): DFont; TryInline
-{}
+{ Load, initialize and assign names for the fonts }
 procedure InitFonts;
-{}
+{ Free all memory taken up by fonts and supplementary classes }
 procedure FreeFonts;
 {............................................................................}
 implementation

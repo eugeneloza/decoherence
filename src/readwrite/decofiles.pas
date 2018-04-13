@@ -44,6 +44,7 @@ type
       end;
   }
   TListWriterProcedure = procedure(constref aParent: TDOMElement) is nested;
+
   { This is a reference to a generic list reader procedure
     which should be a local/nested procedure in the reading routine
     it creates and reads the object
@@ -102,22 +103,29 @@ procedure WriteFloat(const aParent: TDOMElement; const aName: string; const aVal
 function ReadFloat(const aParent: TDOMElement; const aName: string): DFloat;
 procedure WriteString(const aParent: TDOMElement; const aName: string; const aValue: string);
 function ReadString(const aParent: TDOMElement; const aName: string): string;
-{}
+
+{ Reading and writing float vectors }
 procedure WriteVector2(const aParent: TDOMElement; const aName: string; const aValue: TVector2);
 function ReadVector2(const aParent: TDOMElement; const aName: string): TVector2;
 procedure WriteVector3(const aParent: TDOMElement; const aName: string; const aValue: TVector3);
 function ReadVector3(const aParent: TDOMElement; const aName: string): TVector3;
 procedure WriteVector4(const aParent: TDOMElement; const aName: string; const aValue: TVector4);
 function ReadVector4(const aParent: TDOMElement; const aName: string): TVector4;
+{ Reading and writing integer vectors,
+  Caution, integer vectors are managed through a "hack"
+  and therefore there is no type-checking during reading
+  (i.e. reading a float vector would just round it to integer) }
 procedure WriteVector2int(const aParent: TDOMElement; const aName: string; const aValue: TVector2Integer);
 function ReadVector2int(const aParent: TDOMElement; const aName: string): TVector2Integer;
 procedure WriteVector3int(const aParent: TDOMElement; const aName: string; const aValue: TVector3Integer);
 function ReadVector3int(const aParent: TDOMElement; const aName: string): TVector3Integer;
 procedure WriteVector4int(const aParent: TDOMElement; const aName: string; const aValue: TVector4Integer);
 function ReadVector4int(const aParent: TDOMElement; const aName: string): TVector4Integer;
-{}
+
+{ Write simple predefined generic lists }
 procedure WriteStringList(const aParent: TDOMElement; const aName: string; const aValue: TStringList);
 function ReadStringList(const aParent: TDOMElement; const aName: string): TStringList;
+
 { This is an ugly endeavour to automatize reading of a generic lists
   See examples of how aWriterProcedure/aReaderProcedure should look like
   Pay attention, that ReadList is a procedure, not a function,
