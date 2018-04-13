@@ -344,15 +344,15 @@ begin
         begin
           dx := Current.x - GUICenter[0];
           dy := Current.y - GUICenter[1];
-          ddy := abs(dy / GUIHeight);
-          ddx := abs(dx / GUIWidth);
-          if ddy > ddx then
+          ddy := dy / GUIHeight;
+          ddx := dx / GUIWidth;
+          if abs(ddy) > abs(ddx) then
           begin
             if dy < 0 then
               my := 0
             else
               my := GUIHeight;
-            mx := Round(GUIWidth * ddy);
+            mx := Round(GUIWidth * (1 + ddx / abs(ddy)) / 2);
           end
           else
           begin
@@ -360,7 +360,7 @@ begin
               mx := 0
             else
               mx := GUIWidth;
-            my := Round(GUIHeight * ddx);
+            my := Round(GUIHeight * (1 + ddy / abs(ddx)) / 2);
           end;
         end
         else
