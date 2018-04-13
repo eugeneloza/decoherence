@@ -28,12 +28,19 @@ uses
   Generics.Collections;
 
 type
-  {}
+  { Dictionary that links two strings
+    Usually this is finding a "internal name" by specific "use case"
+    Multiple use cases may reference to a single "internal name" }
   DStringDictionary = specialize TDictionary<string, string>;
-  {}
+  { Does exactly the same as the previous one
+    Just to make it distinctive that this dictionary links
+    "internal name" to a file URL
+    It is not mandatory but recommended that each "internal name"
+    would reference only to a single URL (file) }
   DURLDictionary = DStringDictionary;
 
-{}
+{ Obtain a Dictionary record through a function
+  Bypasses all the TDictionary heavy routines and automatically log erors }
 function GetStringByKey(const Source: DStringDictionary; const aKey: string): string;
 {............................................................................}
 implementation
