@@ -185,7 +185,7 @@ end;
 procedure DGUI.TestInterface;
 var
   Frame: DRectagonalFrame;
-  Arr: DCenterArranger;
+  Arr: DAlignedArranger;
   Img: DSimpleImage;
   Bar: DAbstractBarImage;
   Lab: DLabelImage;
@@ -199,7 +199,7 @@ begin
   Frame.Load(GetFrameByName('RegularFrame'));
   Grab(Frame);
 
-  Arr := DCenterArranger.Create;
+  Arr := DAlignedArranger.Create;
 
   Img := DSimpleImage.Create;
   Img.Load(LoadDecoImage('GUI/Frames/GradientFrame.png', 50, 50));

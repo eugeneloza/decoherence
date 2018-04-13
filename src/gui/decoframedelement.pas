@@ -86,7 +86,7 @@ begin
   if FFrame = nil then
   begin
     Log(LogInterfaceError, CurrentRoutine, 'ERROR: Frame is nil!');
-    //Exit;
+    //Exit; //well, the procedure is robust and will handle Frame=nil just as gap=0.
   end;
 
   //inherited ArrangeChildren(Animate, Duration); <------- parent is abstract

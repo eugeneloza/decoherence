@@ -28,6 +28,11 @@ uses
   DecoTime;
 
 type
+  {}
+  TVerticalAlign = (vaTop, vaCenter, vaBottom);
+  THorizontalAlign = (haLeft, haCenter, haRight);
+
+type
   { calls ManageChildren in Update and resets their animation state }
   DAbstractArranger = class(DInterfaceElement)
   strict protected
@@ -38,10 +43,17 @@ type
   end;
 
 type
-  { arranges children relative to its center without scaling them }
-  DCenterArranger = class(DAbstractArranger)
+  { arranges children relative to its coordinates without scaling them
+    default is: center alignment }
+  DAlignedArranger = class(DAbstractArranger)
   strict protected
     procedure ArrangeChildren(const Animate: TAnimationStyle; const Duration: DTime); override;
+  public
+    {}
+    VAlign: TVerticalAlign;
+    HAlign: THorizontalAlign;
+  public
+    constructor Create; override;
   end;
 
 {............................................................................}
@@ -57,7 +69,7 @@ end;
 
 {======================  DCenterArranger =====================================}
 
-procedure DCenterArranger.ArrangeChildren(const Animate: TAnimationStyle; const Duration: DTime);
+procedure DAlignedArranger.ArrangeChildren(const Animate: TAnimationStyle; const Duration: DTime);
 var
   c: DSingleInterfaceElement;
   FromState, ToState: DInterfaceContainer;
@@ -69,13 +81,31 @@ begin
 
   for c in Children do
   begin
+
     ToState.AssignFrom(c.Next);
-    ToState.x := Self.Next.x + (Self.Next.w - c.Next.w) div 2;
-    ToState.y := Self.Next.y + (Self.Next.h - c.Next.h) div 2;
+    case HAlign of
+      haCenter: ToState.x := Self.Next.x + (Self.Next.w - c.Next.w) div 2;
+      haLeft: ToState.x := Self.Next.x;
+      haRight: ToState.x := Self.Next.x2 - c.Next.w;
+    end;
+    case VAlign of
+      vaCenter: ToState.y := Self.Next.y + (Self.Next.h - c.Next.h) div 2;
+      vaBottom: ToState.y := Self.Next.y;
+      vaTop: ToState.y := Self.Next.y2 - c.Next.h;
+    end;
 
     c.ForceSize(FromState);
     c.SetSize(ToState, Animate, Duration);
   end;
+end;
+
+{-----------------------------------------------------------------------------}
+
+constructor DAlignedArranger.Create;
+begin
+  inherited Create;
+  VAlign := vaCenter;
+  HAlign := haCenter;
 end;
 
 end.
