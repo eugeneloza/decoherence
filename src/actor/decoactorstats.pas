@@ -37,13 +37,25 @@ type
 
 
 type
-  {}
+  { A stat, such as health, stamina or strength which are relatively static for Actor
+    but can temporarily change in game situations
+
+    Value[0] = Current value, represents current state of the stat
+    Value[1] = Max value, represents current maximum value of the stat
+               Current value cannot be greater than Max
+               But the Max can be changed by buffs or debuffs
+    Value[2] = MaxMax value, or absolute current maximum value
+               determined by the Actor's current level/type
+               Neither current, nor max values can be greater than this
+               (warning: some buffs should be able to increase Max above MaxMax) }
   DStat = object
   public
     { [0]Current - [1]Max - [2]Max-Max value }
     Value: TVector3;
   public
-    {}
+    { Change values of this stat
+      aSkill must be in 0..1 range and represents how much the aValue change
+      affects Max value. }
     function ChangeCurrent(const aValue: DFloat; const aSkill: DFloat): TStatResult;
     function ChangeMax(const aValue: DFloat): TStatResult;
     function SetValue(const aValue: DFloat): TStatResult;
@@ -152,10 +164,6 @@ begin
   Value[1] := Value[2];
   Value[0] := Value[1];
 end;
-
-{-----------------------------------------------------------------------------}
-
-
 
 end.
 
