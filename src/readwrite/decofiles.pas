@@ -28,7 +28,7 @@ interface
 
 uses
   Classes, DOM, CastleVectors,
-  DecoGlobal;
+  DecoGenerics, DecoGlobal;
 
 type
   { This is a reference to a generic list enumerator procedure
@@ -125,6 +125,8 @@ function ReadVector4int(const aParent: TDOMElement; const aName: string): TVecto
 { Write simple predefined generic lists }
 procedure WriteStringList(const aParent: TDOMElement; const aName: string; const aValue: TStringList);
 function ReadStringList(const aParent: TDOMElement; const aName: string): TStringList;
+procedure WriteStringDictionary(const aParent: TDOMElement; const aName: string; const aValue: DStringDictionary);
+function ReadStringDictionary(const aParent: TDOMElement; const aName: string): DStringDictionary;
 
 { This is an ugly endeavour to automatize reading of a generic lists
   See examples of how aWriterProcedure/aReaderProcedure should look like
@@ -248,6 +250,8 @@ begin
   Result := aParent.ChildElement(aName).AttributeString('Value');
 end;
 
+{-----------------------------------------------------------------------------}
+
 procedure WriteVector2(const aParent: TDOMElement; const aName: string; const aValue: TVector2);
 begin
   aParent.CreateChild(aName).AttributeSet('Value', aValue);
@@ -272,6 +276,8 @@ function ReadVector4(const aParent: TDOMElement; const aName: string): TVector4;
 begin
   Result := aParent.ChildElement(aName).AttributeColor('Value');
 end;
+
+{-----------------------------------------------------------------------------}
 
 { we're using a relatively clean hack to convert integer->float->integer
   here through DecoMathVectors as there is no support
@@ -302,6 +308,8 @@ begin
   Result := VectorFloatToInteger(aParent.ChildElement(aName).AttributeVector4('Value'));
 end;
 
+{-----------------------------------------------------------------------------}
+
 procedure WriteStringList(const aParent: TDOMElement; const aName: string; const aValue: TStringList);
 var
   ContainerNode: TDOMElement;
@@ -324,6 +332,45 @@ begin
     FreeAndNil(Iterator);
   end;
 end;
+
+{-----------------------------------------------------------------------------}
+
+procedure WriteStringDictionary(const aParent: TDOMElement; const aName: string; const aValue: DStringDictionary);
+var
+  ContainerNode: TDOMElement;
+  WorkNode: TDOMElement;
+  i: integer;
+  v: string;
+begin
+  ContainerNode := aParent.CreateChild(aName);
+  i := 0;
+  for v in aValue.keys do
+  begin
+    WorkNode := ContainerNode.CreateChild('String_' + i.ToString);
+    WorkNode.AttributeSet('Key', v);
+    WorkNode.AttributeSet('Value', GetStringByKey(aValue, v));
+    inc(i);
+  end;
+end;
+function ReadStringDictionary(const aParent: TDOMElement; const aName: string): DStringDictionary;
+var
+  Iterator: TXMLElementIterator;
+  WorkNode: TDOMElement;
+begin
+  Result := DStringDictionary.Create;
+  Iterator := aParent.ChildElement(aName).ChildrenIterator;
+  try
+    while Iterator.GetNext do
+    begin
+      WorkNode := Iterator.Current;
+      Result.Add(WorkNode.AttributeString('Key'), WorkNode.AttributeString('Value'));
+    end;
+  finally
+    FreeAndNil(Iterator);
+  end;
+end;
+
+{-----------------------------------------------------------------------------}
 
 procedure WriteList(const aParent: TDOMElement; const aName: string; const aWriterProcedure: TListWriterProcedure);
 var
