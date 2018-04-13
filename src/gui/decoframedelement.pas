@@ -51,7 +51,7 @@ uses
 
 procedure DFramedElement.SetFrame(const Value: DAbstractFrame);
 begin
-  if (FFrame <> Value) and (Value <> nil) then
+  if (FFrame <> Value) and (Value is IFrame) then
   begin
     FFrame := Value;
     ArrangeChildren(asNone, -1); //just reset the animation
@@ -63,7 +63,7 @@ end;
 function DFramedElement.SubstractFrame(const aContainer: DInterfaceContainer): DInterfaceContainer;
 begin
   Result.AssignFrom(aContainer);
-  if FFrame <> nil then
+  if FFrame is IFrame then
   begin
     Result.w := AboveZeroInt(aContainer.w - ((FFrame as IFrame).GapLeft + (FFrame as IFrame).GapRight));
     Result.h := AboveZeroInt(aContainer.h - ((FFrame as IFrame).GapTop + (FFrame as IFrame).GapBottom));
@@ -85,7 +85,7 @@ var
   c: DSingleInterfaceElement;
   FromState, ToState: DInterfaceContainer;
 begin
-  if FFrame = nil then
+  if FFrame is IFrame then
   begin
     Log(LogInterfaceError, CurrentRoutine, 'ERROR: Frame is nil!');
     //Exit; //well, the procedure is robust and will handle Frame=nil just as gap=0.
