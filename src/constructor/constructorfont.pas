@@ -25,10 +25,13 @@ unit ConstructorFont;
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, Graphics, Dialogs;
+  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ComCtrls,
+  DecoGenerics;
 
 type
   TFontEditor = class(TForm)
+    PageControl1: TPageControl;
+    procedure FormCreate(Sender: TObject);
   private
 
   public
@@ -39,8 +42,30 @@ var
   FontEditor: TFontEditor;
 
 implementation
+uses
+  DecoFont;
 
 {$R *.lfm}
+
+{ TFontEditor }
+
+{to move outside}
+procedure MakeURLTab(constref aTab: TTabSheet; constref aURL: DURLDictionary);
+begin
+  aTab.Caption := 'URL';
+
+end;
+
+procedure TFontEditor.FormCreate(Sender: TObject);
+var
+  Tab: TTabSheet;
+  URLs: DURLDictionary;
+begin
+  //load URL dictionary
+  //load alias dictionary
+  Tab := PageControl1.AddTabSheet;
+  MakeURLTab(Tab, URLs);
+end;
 
 end.
 

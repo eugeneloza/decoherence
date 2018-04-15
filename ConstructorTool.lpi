@@ -24,7 +24,7 @@
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir);src"/>
-            <OtherUnitFiles Value="src/constructor;src/core;src/gui;src/readwrite;src/text"/>
+            <OtherUnitFiles Value="src/constructor;src/core;src/gui;src/readwrite;src/text;src/generated"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
           <Parsing>
@@ -67,7 +67,7 @@
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir);src"/>
-            <OtherUnitFiles Value="src/constructor;src/core;src/gui;src/readwrite;src/text"/>
+            <OtherUnitFiles Value="src/constructor;src/core;src/gui;src/readwrite;src/text;src/generated"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
           <CodeGeneration>
@@ -111,7 +111,7 @@
         <PackageName Value="LCL"/>
       </Item3>
     </RequiredPackages>
-    <Units Count="15">
+    <Units Count="16">
       <Unit0>
         <Filename Value="ConstructorTool.pas"/>
         <IsPartOfProject Value="True"/>
@@ -132,6 +132,7 @@
         <Filename Value="src/constructor/constructorfont.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="FontEditor"/>
+        <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="ConstructorFont"/>
       </Unit3>
@@ -146,6 +147,7 @@
       <Unit6>
         <Filename Value="src/core/decogenerics.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoGenerics"/>
       </Unit6>
       <Unit7>
         <Filename Value="src/core/decomath.pas"/>
@@ -162,10 +164,12 @@
       <Unit10>
         <Filename Value="src/gui/decofont.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoFont"/>
       </Unit10>
       <Unit11>
         <Filename Value="src/gui/decofontencoding.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoFontEncoding"/>
       </Unit11>
       <Unit12>
         <Filename Value="src/readwrite/decofiles.pas"/>
@@ -179,6 +183,10 @@
         <Filename Value="src/text/decotranslation.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit14>
+      <Unit15>
+        <Filename Value="src/generated/castletexturefont_linbiolinumrg_16.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit15>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
@@ -188,7 +196,7 @@
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir);src"/>
-      <OtherUnitFiles Value="src/constructor;src/core;src/gui;src/readwrite;src/text"/>
+      <OtherUnitFiles Value="src/constructor;src/core;src/gui;src/readwrite;src/text;src/generated"/>
       <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <Linking>
