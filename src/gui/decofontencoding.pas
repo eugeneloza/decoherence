@@ -49,12 +49,13 @@ const
 
   (* Latin languages *)
   AsciiString = SimpleAsciiCharacters;
-  //GermanString = 'ÄäÖöÜüẞß';
+  GermanString = 'ÄäÖöÜüẞß';
+  PolishString = 'ŚĆĘĄŹŁŻÓŃśćęąźłżóń'
 
   (* Cyrillic languages *)
   CyrillicString = 'ЙЦУКЕНГШЩЗХФВАПРОЛДЖЯЧСМИТЬБЮйцукенгшщзхфвапролджячсмитьбю';
   RussianString = 'ЁЪЫЭёъыэ';
-  //UkrainianString = 'ЇІЄҐїієґ';
+  UkrainianString = 'ЇІЄҐїієґ';
 
 procedure InitEncoding;
 begin
