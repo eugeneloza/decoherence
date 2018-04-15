@@ -25,11 +25,12 @@ interface
 
 uses
   Generics.Collections,
+  DOM,
   DecoFontEncoding;
 
 type
   { For reading-writing a Font file }
-  DFontRecord = record
+  DFontInfo = record
     {}
     URL: string;
     {}
@@ -41,10 +42,64 @@ type
   end;
 
 type
-  DFontRecordDictionary = specialize TDictionary<string, DFontRecord>;
+  DFontInfoDictionary = specialize TDictionary<string, DFontInfo>;
 
+procedure WriteFontInfo(const aParent: TDOMElement; const aName: string; const aValue: DFontInfoDictionary);
+function ReadFontInfo(const aParent: TDOMElement; const aName: string): DFontInfoDictionary;
 {............................................................................}
 implementation
+uses
+  SysUtils, CastleXMLUtils,
+  DecoLog;
+
+procedure WriteFontInfo(const aParent: TDOMElement; const aName: string; const aValue: DFontInfoDictionary);
+var
+  ContainerNode: TDOMElement;
+  WorkNode: TDOMElement;
+  i: integer;
+  v: string;
+  f: DFontInfo;
+begin
+  ContainerNode := aParent.CreateChild(aName);
+  i := 0;
+  for v in aValue.keys do
+  begin
+    WorkNode := ContainerNode.CreateChild('Font_' + i.ToString);
+    WorkNode.AttributeSet('Alias', v);
+    if aValue.TryGetValue(v, f) then
+    begin
+      WorkNode.AttributeSet('URL', f.URL);
+      WorkNode.AttributeSet('Size', f.Size);
+      WorkNode.AttributeSet('AdditionalLineSpacing', f.AdditionalLineSpacing);
+      WorkNode.AttributeSet('Charset', CharSetToString(f.Charset));
+    end
+    else
+      Log(LogFontError, CurrentRoutine, 'Cannot find font alias ' + v);
+    inc(i);
+  end;
+end;
+function ReadFontInfo(const aParent: TDOMElement; const aName: string): DFontInfoDictionary;
+var
+  Iterator: TXMLElementIterator;
+  WorkNode: TDOMElement;
+  f: DFontInfo;
+begin
+  Result := DFontInfoDictionary.Create;
+  Iterator := aParent.ChildElement(aName).ChildrenIterator;
+  try
+    while Iterator.GetNext do
+    begin
+      WorkNode := Iterator.Current;
+      f.URL := WorkNode.AttributeString('URL');
+      f.Size := WorkNode.AttributeInteger('Size');
+      f.AdditionalLineSpacing := WorkNode.AttributeInteger('AdditionalLineSpacing');
+      f.Charset := StringToCharSet(WorkNode.AttributeString('Charset'));
+      Result.Add(WorkNode.AttributeString('Alias'), f);
+    end;
+  finally
+    FreeAndNil(Iterator);
+  end;
+end;
 
 end.
 

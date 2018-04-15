@@ -111,7 +111,7 @@
         <PackageName Value="LCL"/>
       </Item3>
     </RequiredPackages>
-    <Units Count="16">
+    <Units Count="17">
       <Unit0>
         <Filename Value="ConstructorTool.pas"/>
         <IsPartOfProject Value="True"/>
@@ -139,6 +139,7 @@
       <Unit4>
         <Filename Value="src/core/decolog.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoLog"/>
       </Unit4>
       <Unit5>
         <Filename Value="src/core/decoglobal.pas"/>
@@ -174,6 +175,7 @@
       <Unit12>
         <Filename Value="src/readwrite/decofiles.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoFiles"/>
       </Unit12>
       <Unit13>
         <Filename Value="src/readwrite/decofolders.pas"/>
@@ -187,6 +189,10 @@
         <Filename Value="src/generated/castletexturefont_linbiolinumrg_16.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit15>
+      <Unit16>
+        <Filename Value="src/readwrite/decofontfile.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit16>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
