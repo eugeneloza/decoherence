@@ -49,13 +49,21 @@ const
 
   (* Latin languages *)
   AsciiString = SimpleAsciiCharacters;
-  GermanString = 'ÄäÖöÜüẞß';
-  PolishString = 'ŚĆĘĄŹŁŻÓŃśćęąźłżóń'
+  //GermanString = 'ÄäÖöÜüẞß';  // not available
+  //PolishString = 'ŚĆĘĄŹŁŻÓŃśćęąźłżóń';  // not available
 
   (* Cyrillic languages *)
   CyrillicString = 'ЙЦУКЕНГШЩЗХФВАПРОЛДЖЯЧСМИТЬБЮйцукенгшщзхфвапролджячсмитьбю';
   RussianString = 'ЁЪЫЭёъыэ';
-  UkrainianString = 'ЇІЄҐїієґ';
+  //UkrainianString = 'ЇІЄҐїієґ'; // not available
+
+function isLanguageCyrillic(const aLanguage: TLanguage): boolean;
+begin
+  if aLanguage in [Language_Russian] then
+    Result := true
+  else
+    Result := false;
+end;
 
 procedure InitEncoding;
 begin
@@ -70,14 +78,15 @@ begin
   //initialize a full char set depending on current game language
   FullCharSet := TUnicodeCharList.Create;
   FullCharSet.Add(AsciiString);
+  if isLanguageCyrillic(CurrentLanguage) then FullCharSet.Add(CyrillicString);
 
   //add language-specific characters
   case CurrentLanguage of
     //Language_English: basic ASCII is enough
-    Language_Russian: begin
-                        FullCharSet.Add(CyrillicString);
-                        FullCharSet.Add(RussianString);
-                      end;
+    //Language_German: FullCharSet.Add(GermanString); // not available
+    //Language_Polish: FullCharSet.Add(PolishString); // not available
+    Language_Russian: FullCharSet.Add(RussianString);
+    //Language_Ukrainian: FullCharSet.Add(RussianString); // not available
   end;
 end;
 
