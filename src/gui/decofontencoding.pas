@@ -25,6 +25,12 @@ interface
 uses
   CastleUnicode;
 
+type
+  { csNumeric includes only numbers 0..9 and a floating point symbol
+    csASCII includes all typable ASCII characters
+    csFull includes ASCII characters and additional local symbols if needed }
+  TCharSet = (csNumeric, csASCII, csFull);
+
 var
   { Used to display nubmers, maybe fixed-point, e.g. health }
   NumberCharSet: TUnicodeCharList;
@@ -33,6 +39,10 @@ var
   { Full char set supported in game, always includes ASCII symbols }
   FullCharSet: TUnicodeCharList;
 
+{}
+function StringToCharSet(const aString: string): TCharSet;
+{}
+function CharSetToString(const aCharSet: TCharSet): string;
 { Initialize char sets }
 procedure InitEncoding;
 { Free char sets after texture fonts are initialized }
@@ -87,6 +97,32 @@ begin
     //Language_Polish: FullCharSet.Add(PolishString); // not available
     Language_Russian: FullCharSet.Add(RussianString);
     //Language_Ukrainian: FullCharSet.Add(RussianString); // not available
+  end;
+end;
+
+{-----------------------------------------------------------------------------}
+
+function CharSetToString(const aCharSet: TCharSet): string;
+begin
+  case aCharSet of
+    csNumeric: Result := 'csNumeric';
+    csASCII: Result := 'csASCII';
+    csFull: Result := 'csFull';
+    else
+      Log(LogFontError, CurrentRoutine, 'Error: unknown CharSet!');
+  end;
+end;
+
+{-----------------------------------------------------------------------------}
+
+function StringToCharSet(const aString: string): TCharSet;
+begin
+  case aString of
+    'csNumeric': Result := csNumeric;
+    'csASCII': Result := csASCII;
+    'csFull': Result := csFull;
+    else
+      Log(LogFontError, CurrentRoutine, 'Error: unknown CharSet!');
   end;
 end;
 

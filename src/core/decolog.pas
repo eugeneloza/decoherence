@@ -36,6 +36,7 @@ const
   LogImageScaleError = true;
   LogLanguageError = true;
   LogInterfaceImageLoading = true;
+  LogFontError = true;
 
   { Input }
   LogMouseError = true;
