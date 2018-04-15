@@ -27,7 +27,8 @@ interface
   DecoGlobal;}
 
 { Wrapper for CastleFilesUtils.ApplicationData
-  to be able to switch between Game and Architect folder }
+  to be able to switch between Game and Architect folder
+  Warning: it doesn't create any folders, the structure must exist }
 function GameFolder(const FileURL: string): string;
 { Game configuration folder, created if inexistend }
 function GameConfigFolder(const FileURL: string): string;

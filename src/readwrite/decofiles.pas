@@ -315,6 +315,12 @@ var
   ContainerNode: TDOMElement;
   i: integer;
 begin
+  if aValue = nil then
+  begin
+    Log(LogFontError, CurrentRoutine, 'ERROR: TStringList is nil!');
+    Exit;
+  end;
+
   ContainerNode := aParent.CreateChild(aName);
   for i := 0 to Pred(aValue.Count) do
     ContainerNode.CreateChild('String_' + i.ToString).AttributeSet('Value', aValue[i]);
@@ -342,6 +348,12 @@ var
   i: integer;
   v: string;
 begin
+  if aValue = nil then
+  begin
+    Log(LogFontError, CurrentRoutine, 'ERROR: DStringDictionary is nil!');
+    Exit;
+  end;
+
   ContainerNode := aParent.CreateChild(aName);
   i := 0;
   for v in aValue.keys do
