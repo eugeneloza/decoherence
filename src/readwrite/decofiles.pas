@@ -282,7 +282,7 @@ end;
 { we're using a relatively clean hack to convert integer->float->integer
   here through DecoMathVectors as there is no support
   for directly reading/writing integer vectors in CastleXMLUtils at the moment
-  (and might be unneeded actually }
+  (and might be unneeded actually) }
 procedure WriteVector2int(const aParent: TDOMElement; const aName: string; const aValue: TVector2Integer);
 begin
   aParent.CreateChild(aName).AttributeSet('Value', VectorIntegerToFloat(aValue));

@@ -25,7 +25,6 @@ interface
 
 uses
   CastleFonts, CastleUtils {for TStructList}, CastleImages,
-  DecoFontEncoding,
   DecoGlobal;
 
 const
@@ -91,7 +90,7 @@ uses
   SysUtils, Generics.Collections,
   CastleUnicode, CastleColors, CastleVectors,
   CastleTextureFont_LinBiolinumRG_16, //a debug font
-  DecoFolders,
+  DecoFolders, DecoFontFile, DecoFontEncoding,
   DecoTrash, DecoLog, DecoMath;
 
 {-----------------------------------------------------------------------------}
