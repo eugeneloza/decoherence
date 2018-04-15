@@ -26,7 +26,7 @@ interface
 uses
   Generics.Collections,
   DOM,
-  DecoFontEncoding;
+  DecoGenerics, DecoFontEncoding;
 
 type
   { For reading-writing a Font file }
@@ -42,15 +42,25 @@ type
   end;
 
 type
+  {}
   DFontInfoDictionary = specialize TDictionary<string, DFontInfo>;
 
-procedure WriteFontInfo(const aParent: TDOMElement; const aName: string; const aValue: DFontInfoDictionary);
-function ReadFontInfo(const aParent: TDOMElement; const aName: string): DFontInfoDictionary;
+var
+  {}
+  FontInfo: DFontInfoDictionary;
+  {}
+  FontAlias: DStringDictionary;
+
+{}
+function ReadFonts: boolean;
+function WriteFonts: boolean;
 {............................................................................}
 implementation
 uses
   SysUtils, CastleXMLUtils,
+  DecoFiles, DecoFolders,
   DecoLog;
+
 
 procedure WriteFontInfo(const aParent: TDOMElement; const aName: string; const aValue: DFontInfoDictionary);
 var
@@ -60,6 +70,12 @@ var
   v: string;
   f: DFontInfo;
 begin
+  if aValue = nil then
+  begin
+    Log(LogFontError, CurrentRoutine, 'ERROR: DFontInfoDictionary is nil!');
+    Exit;
+  end;
+
   ContainerNode := aParent.CreateChild(aName);
   i := 0;
   for v in aValue.keys do
@@ -98,6 +114,41 @@ begin
     end;
   finally
     FreeAndNil(Iterator);
+  end;
+end;
+
+{--------------------------------------------------------------------------}
+
+function ReadFonts: boolean;
+var
+  RootNode: TDOMElement;
+begin
+  RootNode := StartReadFile(GameFolder('GUI/Fonts/Fonts.xml'));
+  if RootNode = nil then
+    Result := false
+  else
+  begin
+    { Read config from a file }
+    FontInfo := ReadFontInfo(RootNode, 'FontInfo');
+    FontAlias := ReadStringDictionary(RootNode, 'FontAlias');
+    EndReadFile;
+    Result := true;
+  end;
+end;
+
+{--------------------------------------------------------------------------}
+
+function WriteFonts: boolean;
+var
+  RootNode: TDOMElement;
+begin
+  RootNode := CreateFile(GameFolder('GUI/Fonts/Fonts.xml'));
+  Result := not (RootNode = nil);
+  if RootNode <> nil then
+  begin
+    WriteFontInfo(RootNode, 'FontInfo', FontInfo);
+    WriteStringDictionary(RootNode, 'FontAlias', FontAlias);
+    WriteFile;
   end;
 end;
 
