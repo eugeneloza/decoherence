@@ -54,7 +54,7 @@ const
   (* Cyrillic languages *)
   CyrillicString = 'ЙЦУКЕНГШЩЗХФВАПРОЛДЖЯЧСМИТЬБЮйцукенгшщзхфвапролджячсмитьбю';
   RussianString = 'ЁЪЫЭёъыэ';
-  //UkrainianString = 'ЇІЄїіє';
+  //UkrainianString = 'ЇІЄҐїієґ';
 
 procedure InitEncoding;
 begin
