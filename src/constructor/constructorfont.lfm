@@ -1,0 +1,8 @@
+object FontEditor: TFontEditor
+  Left = 583
+  Height = 240
+  Top = 122
+  Width = 320
+  Caption = 'Font Editor'
+  LCLVersion = '1.9.0.0'
+end

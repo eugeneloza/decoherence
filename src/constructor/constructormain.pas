@@ -25,10 +25,16 @@ unit ConstructorMain;
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, Graphics, Dialogs;
+  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls,
+  {Editor forms}
+  ConstructorFont,
+  {other}
+  DecoLog, DecoGlobal;
 
 type
   TMainForm = class(TForm)
+    FontButton: TButton;
+    procedure FontButtonClick(Sender: TObject);
   private
 
   public
@@ -42,6 +48,13 @@ var
 implementation
 
 {$R *.lfm}
+
+{ TMainForm }
+
+procedure TMainForm.FontButtonClick(Sender: TObject);
+begin
+  FontEditor.Show;
+end;
 
 end.
 

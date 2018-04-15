@@ -15,29 +15,32 @@
 
 {---------------------------------------------------------------------------}
 
-(* Constructor is an editor for Decoherence game data
-   this is the initalization file *)
+(* Main Form of the Constructor
+   It spawns and manages all other Constructor Forms *)
 
 {$INCLUDE compilerconfig.inc}
 
-program ConstructorTool;
+unit ConstructorFont;
+
+interface
 
 uses
-  {$IFDEF UNIX}{$IFDEF UseCThreads}
-  cthreads,
-  {$ENDIF}{$ENDIF}
-  Interfaces, // this includes the LCL widgetset
-  Forms, castle_base, castle_components, constructormain, constructorfont
-  { you can add units after this };
+  Classes, SysUtils, Forms, Controls, Graphics, Dialogs;
 
-{$R *.res}
+type
+  TFontEditor = class(TForm)
+  private
 
-begin
-  RequireDerivedFormResource := True;
-  Application.Scaled := True;
-  Application.Initialize;
-  Application.CreateForm(TMainForm, MainForm);
-  Application.CreateForm(TFontEditor, FontEditor);
-  Application.Run;
+  public
+
+  end;
+
+var
+  FontEditor: TFontEditor;
+
+implementation
+
+{$R *.lfm}
+
 end.
 
