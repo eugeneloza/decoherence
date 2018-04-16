@@ -43,28 +43,32 @@ var
 
 implementation
 uses
-  DecoFont;
+  DecoFont, DecoFontEncoding, DecoFontFile,
+  DecoLog;
 
 {$R *.lfm}
 
 { TFontEditor }
 
-{to move outside}
-procedure MakeURLTab(constref aTab: TTabSheet; constref aURL: DURLDictionary);
+{to move outside?}
+procedure MakeInfoTab(constref aTab: TTabSheet; constref aFontInfo: DFontInfoDictionary);
 begin
-  aTab.Caption := 'URL';
+  aTab.Caption := 'Fonts';
 
 end;
 
-procedure TFontEditor.FormCreate(Sender: TObject);
-var
-  Tab: TTabSheet;
-  URLs: DURLDictionary;
+{this one certanily should be moved outisde}
+procedure MakeAliasTab(constref aTab: TTabSheet; constref aAliasDictionary: DStringDictionary);
 begin
-  //load URL dictionary
+  aTab.Caption := 'Aliases';
+end;
+
+procedure TFontEditor.FormCreate(Sender: TObject);
+begin
+  ReadFonts;
   //load alias dictionary
-  Tab := PageControl1.AddTabSheet;
-  MakeURLTab(Tab, URLs);
+  MakeInfoTab(PageControl1.AddTabSheet, FontInfo);
+  MakeAliasTab(PageControl1.AddTabSheet, FontAlias);
 end;
 
 end.
