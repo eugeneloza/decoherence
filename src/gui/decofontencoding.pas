@@ -39,9 +39,9 @@ var
   { Full char set supported in game, always includes ASCII symbols }
   FullCharSet: TUnicodeCharList;
 
-{}
+{ Converts a file string to TCharSet }
 function StringToCharSet(const aString: string): TCharSet;
-{}
+{ Converts a TCharSet to a string to write to a file}
 function CharSetToString(const aCharSet: TCharSet): string;
 { Initialize char sets }
 procedure InitEncoding;

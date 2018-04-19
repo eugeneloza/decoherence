@@ -29,29 +29,32 @@ uses
   DecoGenerics, DecoFontEncoding;
 
 type
-  { For reading-writing a Font file }
+  { For reading-writing a Font file
+    Specifies all required paramters to initialize a specific font }
   DFontInfo = record
-    {}
+    { Relative URL to the file }
     URL: string;
-    {}
+    { Size of the font }
     Size: integer;
-    {}
+    { Additional spacing between font lines }
     AdditionalLineSpacing: integer;
-    {}
+    { What char set should this font use (numbers/ascii/full) }
     Charset: TCharSet;
   end;
 
 type
-  {}
+  { Dictionary of DFontInfo to read/write all fonts for the game }
   DFontInfoDictionary = specialize TDictionary<string, DFontInfo>;
 
 var
-  {}
+  { Info of all the fonts in game
+    used only for loading and in Constructor }
   FontInfo: DFontInfoDictionary;
-  {}
+  { Link between font alias used in game and font instance alias
+    used only for loading and in constructor }
   FontAlias: DStringDictionary;
 
-{}
+{ Read/write all fonts data (FontInfo and FontAlias) }
 function ReadFonts: boolean;
 function WriteFonts: boolean;
 {............................................................................}
