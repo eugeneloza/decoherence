@@ -192,6 +192,7 @@
       <Unit16>
         <Filename Value="src/readwrite/decofontfile.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoFontFile"/>
       </Unit16>
     </Units>
   </ProjectOptions>
