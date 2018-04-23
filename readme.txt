@@ -45,3 +45,6 @@ You also need X-system and GTK at least version 2, however, you are very likely 
 # Links
 
 Development blog: https://decoherencestudio.wordpress.com
+Source code repository: https://github.com/eugeneloza/decoherence
+Please, report any bugs, issues and ideas to: https://github.com/eugeneloza/decoherence/issues
+(maybe, some day we'll have a forum :))
