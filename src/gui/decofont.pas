@@ -338,6 +338,8 @@ procedure SetFonts;
       Result := DefaultFont;
     end;
   end;
+var
+  s: string;
 begin
   Log(LogInit, CurrentRoutine, 'Setting up fonts.');
 
@@ -345,29 +347,13 @@ begin
 
   DefaultFont := GetLoadedFont('xolonium-12');
 
-  FontDictionary.Add('Default', GetLoadedFont('xolonium-12'));
-  FontDictionary.Add('PlayerHealth', GetLoadedFont('xolonium-12'));
-  FontDictionary.Add('PlayerName', GetLoadedFont('xolonium-12'));
-  FontDictionary.Add('LoadScreen', GetLoadedFont('xolonium-16'));
-  FontDictionary.Add('PlayerDamage', GetLoadedFont('xolonium-num-99'));
+  for s in FontAlias.Keys do
+    FontDictionary.Add(s, GetLoadedFont(FontAlias.Items[s]));
 end;
 
 {---------------------------------------------------------------------------}
 
 procedure InitFonts;
-  {function GetFontFile(const FontName: string; const CharSet: TUnicodeCharList;
-    const FontSize: integer; const AdditionalLineSpacing: integer = 0): DFont;
-  var
-    FontURL: string;
-  begin
-    FontURL := GameFolder('GUI/Fonts/' + FontName);
-    try
-      Result := DFont.Create(FontURL, FontSize, True, CharSet);
-      Result.AdditionalLineSpacing := AdditionalLineSpacing;
-    except
-      Log(LogInterfaceError, CurrentRoutine, 'Unable to load font ' + FontURL);
-    end;
-  end;}
   function GetFontFile(const f: DFontInfo): DFont;
   var
     FontURL: string;
@@ -400,9 +386,10 @@ begin
     LoadedFonts.Add(s, GetFontFile(FontInfo.Items[s]));
 
   FreeEncoding; //as soon as all fonts are loaded, we don't need encoding anymore
-  FreeFontsInfo;
 
   SetFonts;
+
+  FreeFontsInfo;
 end;
 
 {-----------------------------------------------------------------------------}

@@ -166,7 +166,6 @@ var
   f: DFontInfo;
 begin
   FontInfo := DFontInfoDictionary.Create;
-  FontAlias := DStringDictionary.Create;
 
   f.URL := 'Xolonium-Regular.ttf';
   f.Size := 12;
@@ -185,6 +184,14 @@ begin
   f.CharSet := csNumeric;
   f.AdditionalLineSpacing := 3;
   FontInfo.Add('xolonium-num-99', f);
+
+  FontAlias := DStringDictionary.Create;
+  FontAlias.Add('Default', 'xolonium-12');
+  FontAlias.Add('PlayerHealth', 'xolonium-12');
+  FontAlias.Add('PlayerName', 'xolonium-12');
+  FontAlias.Add('LoadScreen', 'xolonium-16');
+  FontAlias.Add('PlayerDamage', 'xolonium-num-99');
+
 end;
 
 {--------------------------------------------------------------------------}
