@@ -31,18 +31,12 @@ type
     csFull includes ASCII characters and additional local symbols if needed }
   TCharSet = (csNumeric, csASCII, csFull);
 
-var
-  { Used to display nubmers, maybe fixed-point, e.g. health }
-  NumberCharSet: TUnicodeCharList;
-  { Used to display English text, e.g. debug info }
-  AsciiCharSet: TUnicodeCharList;
-  { Full char set supported in game, always includes ASCII symbols }
-  FullCharSet: TUnicodeCharList;
-
 { Converts a file string to TCharSet }
 function StringToCharSet(const aString: string): TCharSet;
 { Converts a TCharSet to a string to write to a file}
 function CharSetToString(const aCharSet: TCharSet): string;
+{}
+function GetCharSet(const aCharSet: TCharSet): TUnicodeCharList;
 { Initialize char sets }
 procedure InitEncoding;
 { Free char sets after texture fonts are initialized }
@@ -52,6 +46,26 @@ implementation
 uses
   SysUtils, CastleStringUtils,
   DecoTranslation, DecoLog;
+
+var
+  { Used to display nubmers, maybe fixed-point, e.g. health }
+  NumberCharSet: TUnicodeCharList;
+  { Used to display English text, e.g. debug info }
+  AsciiCharSet: TUnicodeCharList;
+  { Full char set supported in game, always includes ASCII symbols }
+  FullCharSet: TUnicodeCharList;
+
+function GetCharSet(const aCharSet: TCharSet): TUnicodeCharList;
+begin
+  case aCharSet of
+    csNumeric: Result := NumberCharSet;
+    csASCII: Result := AsciiCharSet;
+    csFull: Result := FullCharSet;
+    else
+      Log(LogFontError, CurrentRoutine, 'Error: unknown CharSet!');
+  end;
+end;
+
 
 const
   { simple numbrs for a label, displaying damage }

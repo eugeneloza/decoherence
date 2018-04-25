@@ -345,6 +345,7 @@ begin
 
   DefaultFont := GetLoadedFont('xolonium-12');
 
+  FontDictionary.Add('Default', GetLoadedFont('xolonium-12'));
   FontDictionary.Add('PlayerHealth', GetLoadedFont('xolonium-12'));
   FontDictionary.Add('PlayerName', GetLoadedFont('xolonium-12'));
   FontDictionary.Add('LoadScreen', GetLoadedFont('xolonium-16'));
@@ -354,9 +355,7 @@ end;
 {---------------------------------------------------------------------------}
 
 procedure InitFonts;
-  const
-    NormalFontFile = 'Xolonium-Regular.ttf';
-  function GetFontFile(const FontName: string; const CharSet: TUnicodeCharList;
+  {function GetFontFile(const FontName: string; const CharSet: TUnicodeCharList;
     const FontSize: integer; const AdditionalLineSpacing: integer = 0): DFont;
   var
     FontURL: string;
@@ -368,7 +367,21 @@ procedure InitFonts;
     except
       Log(LogInterfaceError, CurrentRoutine, 'Unable to load font ' + FontURL);
     end;
+  end;}
+  function GetFontFile(const f: DFontInfo): DFont;
+  var
+    FontURL: string;
+  begin
+    FontURL := GameFolder('GUI/Fonts/' + f.URL);
+    try
+      Result := DFont.Create(FontURL, f.Size, True {antialiased}, GetCharSet(f.CharSet));
+      Result.AdditionalLineSpacing := f.AdditionalLineSpacing;
+    except
+      Log(LogInterfaceError, CurrentRoutine, 'Unable to load font ' + FontURL);
+    end;
   end;
+var
+  s: string;
 begin
   Log(LogInit, CurrentRoutine, 'Initializing fonts.');
   InitEncoding;
@@ -380,11 +393,14 @@ begin
 
   Log(LogInit, CurrentRoutine, 'Loading fonts.');
 
-  LoadedFonts.Add('xolonium-12', GetFontFile(NormalFontFile, FullCharSet, 12, 3));
-  LoadedFonts.Add('xolonium-16', GetFontFile(NormalFontFile, FullCharSet, 16, 3));
-  LoadedFonts.Add('xolonium-num-99', GetFontFile(NormalFontFile, NumberCharSet, 99, 3));
+  if not ReadFontsInfo then
+    DefaultFontInfo;
+
+  for s in FontInfo.Keys do
+    LoadedFonts.Add(s, GetFontFile(FontInfo.Items[s]));
 
   FreeEncoding; //as soon as all fonts are loaded, we don't need encoding anymore
+  FreeFontsInfo;
 
   SetFonts;
 end;
