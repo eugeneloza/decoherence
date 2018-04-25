@@ -41,18 +41,20 @@ type
 
 { Obtain a Dictionary record through a function
   Bypasses all the TDictionary heavy routines and automatically log erors }
-function GetStringByKey(const Source: DStringDictionary; const aKey: string): string;
+function GetStringByKey(const Source: DStringDictionary; const aKey: string;
+  const aDefault: string = ''): string;
 {............................................................................}
 implementation
 uses
   DecoLog;
 
-function GetStringByKey(const Source: DStringDictionary; const aKey: string): string;
+function GetStringByKey(const Source: DStringDictionary; const aKey: string;
+  const aDefault: string = ''): string;
 begin
   if not Source.TryGetValue(aKey, Result) then
   begin
     Log(LogWarning, CurrentRoutine, 'Unknown Key: ' + aKey);
-    Result := '';
+    Result := aDefault;
   end
 end;
 
