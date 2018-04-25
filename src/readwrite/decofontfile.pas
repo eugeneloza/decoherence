@@ -39,7 +39,7 @@ type
     { Additional spacing between font lines }
     AdditionalLineSpacing: integer;
     { What char set should this font use (numbers/ascii/full) }
-    Charset: TCharSet;
+    CharSet: TCharSet;
   end;
 
 type
@@ -55,15 +55,18 @@ var
   FontAlias: DStringDictionary;
 
 { Read/write all fonts data (FontInfo and FontAlias) }
-function ReadFonts: boolean;
-function WriteFonts: boolean;
+function ReadFontsInfo: boolean;
+function WriteFontsInfo: boolean;
+{}
+procedure DefaultFontInfo;
+{}
+procedure FreeFontsInfo;
 {............................................................................}
 implementation
 uses
   SysUtils, CastleXMLUtils,
   DecoFiles, DecoFolders,
   DecoLog;
-
 
 procedure WriteFontInfo(const aParent: TDOMElement; const aName: string; const aValue: DFontInfoDictionary);
 var
@@ -90,13 +93,14 @@ begin
       WorkNode.AttributeSet('URL', f.URL);
       WorkNode.AttributeSet('Size', f.Size);
       WorkNode.AttributeSet('AdditionalLineSpacing', f.AdditionalLineSpacing);
-      WorkNode.AttributeSet('Charset', CharSetToString(f.Charset));
+      WorkNode.AttributeSet('Charset', CharSetToString(f.CharSet));
     end
     else
       Log(LogFontError, CurrentRoutine, 'Cannot find font alias ' + v);
     inc(i);
   end;
 end;
+
 function ReadFontInfo(const aParent: TDOMElement; const aName: string): DFontInfoDictionary;
 var
   Iterator: TXMLElementIterator;
@@ -112,7 +116,7 @@ begin
       f.URL := WorkNode.AttributeString('URL');
       f.Size := WorkNode.AttributeInteger('Size');
       f.AdditionalLineSpacing := WorkNode.AttributeInteger('AdditionalLineSpacing');
-      f.Charset := StringToCharSet(WorkNode.AttributeString('Charset'));
+      f.CharSet := StringToCharSet(WorkNode.AttributeString('CharSet'));
       Result.Add(WorkNode.AttributeString('Alias'), f);
     end;
   finally
@@ -122,7 +126,7 @@ end;
 
 {--------------------------------------------------------------------------}
 
-function ReadFonts: boolean;
+function ReadFontsInfo: boolean;
 var
   RootNode: TDOMElement;
 begin
@@ -141,7 +145,7 @@ end;
 
 {--------------------------------------------------------------------------}
 
-function WriteFonts: boolean;
+function WriteFontsInfo: boolean;
 var
   RootNode: TDOMElement;
 begin
@@ -153,6 +157,42 @@ begin
     WriteStringDictionary(RootNode, 'FontAlias', FontAlias);
     WriteFile;
   end;
+end;
+
+{--------------------------------------------------------------------------}
+
+procedure DefaultFontInfo;
+var
+  f: DFontInfo;
+begin
+  FontInfo := DFontInfoDictionary.Create;
+  FontAlias := DStringDictionary.Create;
+
+  f.URL := 'Xolonium-Regular.ttf';
+  f.Size := 12;
+  f.CharSet := csFull;
+  f.AdditionalLineSpacing := 3;
+  FontInfo.Add('xolonium-12', f);
+
+  f.URL := 'Xolonium-Regular.ttf';
+  f.Size := 16;
+  f.CharSet := csFull;
+  f.AdditionalLineSpacing := 3;
+  FontInfo.Add('xolonium-16', f);
+
+  f.URL := 'Xolonium-Regular.ttf';
+  f.Size := 99;
+  f.CharSet := csNumeric;
+  f.AdditionalLineSpacing := 3;
+  FontInfo.Add('xolonium-num-99', f);
+end;
+
+{--------------------------------------------------------------------------}
+
+procedure FreeFontsInfo;
+begin
+  FreeAndNil(FontInfo);
+  FreeAndNil(FontAlias);
 end;
 
 end.
