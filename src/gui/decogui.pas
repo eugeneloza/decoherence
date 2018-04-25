@@ -187,7 +187,7 @@ end;
 procedure DGUI.TestInterface;
 var
   Frame: DRectagonalFrame;
-  Arr: DAlignedArranger;
+  Arr: DFramedElement;
   Img: DSimpleImage;
   Bar: DAbstractBarImage;
   Lab: DLabelImage;
@@ -197,32 +197,24 @@ begin
   Grab(DWind.Create);
 
   Frame := DRectagonalFrame.Create;
-  Frame.SetSize(100, 100, 300, 300, 0.9, asZoomIn, 2.0);
+  Frame.SetSize(100, 100, 300, 300, 0.9, asFlyInRadial, 2.0);
   Frame.Load(GetFrameByName('RegularFrame'));
-  Grab(Frame);
+  //Grab(Frame);
 
-  Arr := DAlignedArranger.Create;
+  Arr := DFramedElement.Create;
+  Arr.Frame := Frame;
 
-  Img := DSimpleImage.Create;
-  Img.Load(LoadDecoImage('GUI/Frames/GradientFrame.png', 50, 50));
-  Img.SetSize(0, 0, 150, 150);
-  Arr.Grab(Img);
-
-  Img := DSimpleImage.Create;
-  Img.Load(LoadDecoImage('GUI/Frames/GradientFrame.png', 50, 50));
-  Img.SetSize(0, 0, 50, 50);
-  Arr.Grab(Img);
 
   Lab := DLabelImage.Create;
   Lab.ShadowIntensity := 1;
   Lab.SetSize(330, 330, 50, 50);
-  Lab.Font := DefaultFont;
+  Lab.Font := GetFontByName('Default');
   Lab.Text := 'DragMe';
   Lab.CanDrag := true;
   Lab.ResetToRealSize;
   Arr.Grab(Lab);
 
-  Arr.SetSize(600, 100, 200, 200, 1, asZoomIn, 0.6);
+  Arr.SetSize(600, 100, 200, 200, 1.0, asFlyInRadial, 0.6);
   Grab(Arr);
 
   Bar := DAbstractBarImage.Create;
@@ -240,24 +232,24 @@ begin
   Grab(Bar);
 
   Lab := DLabelImage.Create;
-  Lab.SetSize(120, 160, 150, 50);
-  Lab.Font := DefaultFont;
+  Lab.SetSize(120, 160, 150, 50, 1.0, asFlyInRadial);
+  Lab.Font := GetFontByName('Default');
   Lab.LabelType := ltJustify;
   Lab.Text := 'This is a very long text to test label "justify" method, which should align the text evenly along width with only the last line not aligned. Should keep an eye for correct spacebar handling.';
   Lab.ResetToRealSize;
   Grab(Lab);
 
   Lab := DLabelImage.Create;
-  Lab.SetSize(230, 300, 150, 50);
-  Lab.Font := DefaultFont;
+  Lab.SetSize(230, 300, 150, 50, 1.0, asFlyInRadial);
+  Lab.Font := GetFontByName('Default');
   Lab.LabelType := ltSimple;
   Lab.Text := 'This is a very long text to test simple label method, which just output the text trying not to exceed the with. Should keep an eye for correct line start and end.';
   Lab.ResetToRealSize;
   Grab(Lab);
 
   Lab := DLabelImage.Create;
-  Lab.SetSize(140, 310, 10, 50);
-  Lab.Font := DefaultFont;
+  Lab.SetSize(140, 310, 10, 50, 1.0, asFlyInRadial);
+  Lab.Font := GetFontByName('Default');
   Lab.LabelType := ltSimple;
   Lab.Text := 'This label is too small yet correct.';
   Lab.ResetToRealSize;

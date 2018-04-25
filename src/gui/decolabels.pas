@@ -100,7 +100,7 @@ begin
   LabelType := ltSimple;
   ShadowIntensity := 0;
   ShadowLength := 3;
-  Font := DefaultFont;
+  Font := DebugFont;
   OwnsImage := true;
 end;
 

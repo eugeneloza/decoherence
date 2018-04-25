@@ -199,7 +199,6 @@ end;
 procedure FreeFontsInfo;
 begin
   FreeAndNil(FontInfo);
-  FreeAndNil(FontAlias);
 end;
 
 end.

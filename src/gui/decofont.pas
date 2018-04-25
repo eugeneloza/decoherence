@@ -75,11 +75,11 @@ type
   end;
 
 var
-  { Debug and DefaultFont }
-  DebugFont, DefaultFont: DFont;
+  { Debug Font (is 100% sure to work) }
+  DebugFont: DFont;
 
 { Get font by its name reference }
-function GetFontByName(const FontName: string): DFont; TryInline
+function GetFontByName(const FontName: string): DFont;
 { Load, initialize and assign names for the fonts }
 procedure InitFonts;
 { Free all memory taken up by fonts and supplementary classes }
@@ -88,10 +88,10 @@ procedure FreeFonts;
 implementation
 uses
   SysUtils, Generics.Collections,
-  CastleUnicode, CastleColors, CastleVectors,
+  CastleColors, CastleVectors,
   CastleTextureFont_LinBiolinumRG_16, //a debug font
   DecoFolders, DecoFontFile, DecoFontEncoding,
-  DecoTrash, DecoLog, DecoMath;
+  DecoGenerics, DecoTrash, DecoLog, DecoMath;
 
 {-----------------------------------------------------------------------------}
 
@@ -315,43 +315,21 @@ var
   { a list of loaded fonts with aliases
     Owns values }
   LoadedFonts: DFontDictionary;
-  { a list of references to fonts based on game situation }
-  FontDictionary: DFontDictionary;
 
-function GetFontByName(const FontName: string): DFont; TryInline
-begin
-  if not FontDictionary.TryGetValue(FontName, Result) then
-  begin
-    Log(LogInterfaceError, CurrentRoutine, 'Unknown Font: ' + FontName);
-    Result := DefaultFont;
-  end;
-end;
-
-{............................................................................}
-
-procedure SetFonts;
+function GetFontByName(const FontName: string): DFont;
   function GetLoadedFont(const FontString: string): DFont;
   begin
     if not LoadedFonts.TryGetValue(FontString, Result) then
     begin
       Log(LogInterfaceError, CurrentRoutine, 'Unknown Font: ' + FontString);
-      Result := DefaultFont;
+      Result := DebugFont;
     end;
   end;
-var
-  s: string;
 begin
-  Log(LogInit, CurrentRoutine, 'Setting up fonts.');
-
-  FontDictionary := DFontDictionary.Create([]);  //doesn't own children
-
-  DefaultFont := GetLoadedFont('xolonium-12');
-
-  for s in FontAlias.Keys do
-    FontDictionary.Add(s, GetLoadedFont(FontAlias.Items[s]));
+  Result := GetLoadedFont(GetStringByKey(FontAlias, FontName, 'Default'));
 end;
 
-{---------------------------------------------------------------------------}
+{............................................................................}
 
 procedure InitFonts;
   function GetFontFile(const f: DFontInfo): DFont;
@@ -379,6 +357,7 @@ begin
 
   Log(LogInit, CurrentRoutine, 'Loading fonts.');
 
+  {FontInfo and FontAlias are read here}
   if not ReadFontsInfo then
     DefaultFontInfo;
 
@@ -387,16 +366,14 @@ begin
 
   FreeEncoding; //as soon as all fonts are loaded, we don't need encoding anymore
 
-  SetFonts;
-
-  FreeFontsInfo;
+  FreeFontsInfo; //as soon as all fonts are loaded, we don't need FontInfo anymore
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure FreeFonts;
 begin
-  FontDictionary.Free; //will not free children
+  FreeAndNil(FontAlias);
   LoadedFonts.Free; //will free children
 end;
 
