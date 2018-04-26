@@ -7,6 +7,7 @@ object FontEditor: TFontEditor
   ClientHeight = 240
   ClientWidth = 320
   OnCreate = FormCreate
+  OnDestroy = FormDestroy
   LCLVersion = '1.9.0.0'
   object PageControl1: TPageControl
     Left = 32

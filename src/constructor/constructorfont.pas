@@ -32,6 +32,7 @@ type
   TFontEditor = class(TForm)
     PageControl1: TPageControl;
     procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
   private
 
   public
@@ -65,10 +66,19 @@ end;
 
 procedure TFontEditor.FormCreate(Sender: TObject);
 begin
-  ReadFonts;
+  {FontInfo and FontAlias are read here}
+  if not ReadFontsInfo then
+    DefaultFontInfo;
+
   //load alias dictionary
   MakeInfoTab(PageControl1.AddTabSheet, FontInfo);
   MakeAliasTab(PageControl1.AddTabSheet, FontAlias);
+end;
+
+procedure TFontEditor.FormDestroy(Sender: TObject);
+begin
+  FreeAndNil(FontInfo);
+  FreeAndNil(FontAlias);
 end;
 
 end.
