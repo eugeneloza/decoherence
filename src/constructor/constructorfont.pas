@@ -25,7 +25,7 @@ unit ConstructorFont;
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ComCtrls,
+  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ComCtrls, ValEdit,
   DecoGenerics;
 
 type
@@ -58,10 +58,24 @@ begin
 
 end;
 
+function StringDictionaryEditor(constref aParent: TWinControl; constref aStringDictionary: DStringDictionary): TValueListEditor;
+var
+  s: string;
+begin
+  //I don't like such parenting (which will certainly waste memory in multilingual forms), but I also don't want to pass around aParent for now
+  Result := TValueListEditor.Create(aParent);
+  Result.Parent := aParent;
+  for s in aStringDictionary.Keys do
+    Result.InsertRow(s, aStringDictionary.Items[s], false);
+end;
+
 {this one certanily should be moved outisde}
 procedure MakeAliasTab(constref aTab: TTabSheet; constref aAliasDictionary: DStringDictionary);
+//var
+
 begin
   aTab.Caption := 'Aliases';
+  StringDictionaryEditor(aTab, aAliasDictionary);
 end;
 
 procedure TFontEditor.FormCreate(Sender: TObject);
@@ -71,8 +85,8 @@ begin
     DefaultFontInfo;
 
   //load alias dictionary
-  MakeInfoTab(PageControl1.AddTabSheet, FontInfo);
   MakeAliasTab(PageControl1.AddTabSheet, FontAlias);
+  MakeInfoTab(PageControl1.AddTabSheet, FontInfo);
 end;
 
 procedure TFontEditor.FormDestroy(Sender: TObject);
