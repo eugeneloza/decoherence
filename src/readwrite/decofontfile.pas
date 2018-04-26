@@ -165,6 +165,7 @@ procedure DefaultFontInfo;
 var
   f: DFontInfo;
 begin
+  Log(LogFontWarning, CurrentRoutine, 'Warning: Loading default fonts configuration.');
   FontInfo := DFontInfoDictionary.Create;
 
   f.URL := 'Xolonium-Regular.ttf';
