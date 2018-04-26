@@ -62,20 +62,22 @@ function StringDictionaryEditor(constref aParent: TWinControl; constref aStringD
 var
   s: string;
 begin
-  //I don't like such parenting (which will certainly waste memory in multilingual forms), but I also don't want to pass around aParent for now
   Result := TValueListEditor.Create(aParent);
   Result.Parent := aParent;
+  Result.Flat := true;
   for s in aStringDictionary.Keys do
     Result.InsertRow(s, aStringDictionary.Items[s], false);
 end;
 
 {this one certanily should be moved outisde}
 procedure MakeAliasTab(constref aTab: TTabSheet; constref aAliasDictionary: DStringDictionary);
-//var
-
+var
+  ValueListEditor: TValueListEditor;
 begin
   aTab.Caption := 'Aliases';
-  StringDictionaryEditor(aTab, aAliasDictionary);
+  ValueListEditor := StringDictionaryEditor(aTab, aAliasDictionary);
+  ValueListEditor.Cells[0, 0] := 'Alias';
+  ValueListEditor.Cells[1, 0] := 'Reference';
 end;
 
 procedure TFontEditor.FormCreate(Sender: TObject);
