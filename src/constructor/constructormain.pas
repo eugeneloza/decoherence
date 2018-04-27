@@ -35,6 +35,8 @@ type
   TMainForm = class(TForm)
     FontButton: TButton;
     procedure FontButtonClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
   private
 
   public
@@ -46,6 +48,8 @@ var
 
 {............................................................................}
 implementation
+uses
+  DecoTrash;
 
 {$R *.lfm}
 
@@ -54,6 +58,16 @@ implementation
 procedure TMainForm.FontButtonClick(Sender: TObject);
 begin
   FontEditor.Show;
+end;
+
+procedure TMainForm.FormCreate(Sender: TObject);
+begin
+  InitTrash;
+end;
+
+procedure TMainForm.FormDestroy(Sender: TObject);
+begin
+  FreeTrash;
 end;
 
 end.

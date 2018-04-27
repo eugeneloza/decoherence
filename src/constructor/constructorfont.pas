@@ -93,8 +93,7 @@ end;
 
 procedure TFontEditor.FormDestroy(Sender: TObject);
 begin
-  FreeAndNil(FontInfo);
-  FreeAndNil(FontAlias);
+  FreeFontsInfo;
 end;
 
 end.
