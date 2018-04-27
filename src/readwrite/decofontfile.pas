@@ -57,16 +57,19 @@ var
 { Read/write all fonts data (FontInfo and FontAlias) }
 function ReadFontsInfo: boolean;
 function WriteFontsInfo: boolean;
-{}
+{ Create default font info. Should be used as a last resort
+  in case the font info could not be loaded.
+  Falls back to DebugFont for all GUI aliases. }
 procedure DefaultFontInfo;
-{}
+{ Free FontInfo after loading
+  Will also add FontAlias to AutoFree on game over }
 procedure FreeFontsInfo;
 {............................................................................}
 implementation
 uses
   SysUtils, CastleXMLUtils,
   DecoFiles, DecoFolders,
-  DecoLog;
+  DecoLog, DecoTrash;
 
 procedure WriteFontInfo(const aParent: TDOMElement; const aName: string; const aValue: DFontInfoDictionary);
 var
@@ -200,6 +203,8 @@ end;
 procedure FreeFontsInfo;
 begin
   FreeAndNil(FontInfo);
+  if FontAlias <> nil then
+    AutoFree.Add(FontAlias);
 end;
 
 end.

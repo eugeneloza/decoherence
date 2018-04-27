@@ -373,7 +373,6 @@ end;
 
 procedure FreeFonts;
 begin
-  FreeAndNil(FontAlias);
   LoadedFonts.Free; //will free children
 end;
 
