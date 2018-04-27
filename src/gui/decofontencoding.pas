@@ -35,7 +35,7 @@ type
 function StringToCharSet(const aString: string): TCharSet;
 { Converts a TCharSet to a string to write to a file}
 function CharSetToString(const aCharSet: TCharSet): string;
-{}
+{ Converts a TCharSet to an actual encoding char list to supply to the font file }
 function GetCharSet(const aCharSet: TCharSet): TUnicodeCharList;
 { Initialize char sets }
 procedure InitEncoding;

@@ -37,6 +37,7 @@ const
   LogLanguageError = true;
   LogInterfaceImageLoading = true;
   LogFontError = true;
+  LogFontWarning = true;
 
   { Input }
   LogMouseError = true;
