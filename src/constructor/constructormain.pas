@@ -26,13 +26,14 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls,
+  ConstructorGlobal,
   {Editor forms}
   ConstructorFont,
   {other}
-  DecoLog, DecoGlobal;
+  DecoGlobal;
 
 type
-  TMainForm = class(TForm)
+  TMainForm = class(TConstructorForm)
     FontButton: TButton;
     procedure FontButtonClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -49,7 +50,7 @@ var
 {............................................................................}
 implementation
 uses
-  DecoTrash, DecoHDD;
+  DecoLog, DecoTrash, DecoHDD;
 
 {$R *.lfm}
 
@@ -62,12 +63,14 @@ end;
 
 procedure TMainForm.FormCreate(Sender: TObject);
 begin
+  InitLog;
   InitHDDLock;
   InitTrash;
 end;
 
 procedure TMainForm.FormDestroy(Sender: TObject);
 begin
+  FreeLog;
   FreeHDDLock;
   FreeTrash;
 end;

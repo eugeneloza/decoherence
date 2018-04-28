@@ -3,6 +3,9 @@
   <ProjectOptions>
     <Version Value="11"/>
     <General>
+      <Flags>
+        <MainUnitHasUsesSectionForAllUnits Value="False"/>
+      </Flags>
       <SessionStorage Value="InProjectDir"/>
       <MainUnit Value="0"/>
       <Title Value="ConstructorTool"/>
@@ -111,7 +114,7 @@
         <PackageName Value="LCL"/>
       </Item3>
     </RequiredPackages>
-    <Units Count="18">
+    <Units Count="19">
       <Unit0>
         <Filename Value="ConstructorTool.pas"/>
         <IsPartOfProject Value="True"/>
@@ -199,6 +202,11 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="DecoTrash"/>
       </Unit17>
+      <Unit18>
+        <Filename Value="src/constructor/constructorglobal.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="ConstructorGlobal"/>
+      </Unit18>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

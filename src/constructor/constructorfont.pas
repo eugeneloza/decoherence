@@ -26,10 +26,11 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ComCtrls, ValEdit,
+  ConstructorGlobal,
   DecoGenerics;
 
 type
-  TFontEditor = class(TForm)
+  TFontEditor = class(TConstructorForm)
     PageControl1: TPageControl;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -42,6 +43,7 @@ type
 var
   FontEditor: TFontEditor;
 
+{............................................................................}
 implementation
 uses
   DecoFont, DecoFontEncoding, DecoFontFile,
@@ -78,6 +80,7 @@ begin
   ValueListEditor := StringDictionaryEditor(aTab, aAliasDictionary);
   ValueListEditor.Cells[0, 0] := 'Alias';
   ValueListEditor.Cells[1, 0] := 'Reference';
+  //ValueListEditor.OnEditingDone := @.SetChanged;
 end;
 
 procedure TFontEditor.FormCreate(Sender: TObject);
