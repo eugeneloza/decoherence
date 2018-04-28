@@ -96,7 +96,7 @@ begin
       WorkNode.AttributeSet('URL', f.URL);
       WorkNode.AttributeSet('Size', f.Size);
       WorkNode.AttributeSet('AdditionalLineSpacing', f.AdditionalLineSpacing);
-      WorkNode.AttributeSet('Charset', CharSetToString(f.CharSet));
+      WorkNode.AttributeSet('CharSet', CharSetToString(f.CharSet));
     end
     else
       Log(LogFontError, CurrentRoutine, 'Cannot find font alias ' + v);
