@@ -49,7 +49,7 @@ var
 {............................................................................}
 implementation
 uses
-  DecoTrash;
+  DecoTrash, DecoHDD;
 
 {$R *.lfm}
 
@@ -62,11 +62,13 @@ end;
 
 procedure TMainForm.FormCreate(Sender: TObject);
 begin
+  InitHDDLock;
   InitTrash;
 end;
 
 procedure TMainForm.FormDestroy(Sender: TObject);
 begin
+  FreeHDDLock;
   FreeTrash;
 end;
 
