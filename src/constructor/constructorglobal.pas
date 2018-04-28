@@ -24,7 +24,8 @@ unit ConstructorGlobal;
 interface
 
 uses
-  Classes, SysUtils, Forms;
+  Classes, SysUtils, Forms,
+  DecoGlobal, DecoFolders;
 
 type
   { Form, capable of tracking it's "changed" state and calling
@@ -34,33 +35,76 @@ type
     We can't use second child of TForm, therefore we can't make a
     LanguageForm separate from ConstructorFomr (at least for now)
     see https://github.com/eugeneloza/decoherence/issues/56 }
-  TConstructorForm = class abstract(TForm)
+
+  { it doesn't really like class abstract formulation here too! :D }
+  TConstructorForm = class(TForm)
   end;
 
 type
-  { Data modules }
+  { abstract data module
+    children will contain the data and implement read/write functions }
   TDataModule = class abstract(TObject)
   strict private
     fisChanged: boolean;
+    fisDirectWrite: boolean;
+  strict protected
+    WritingToGameFolder: boolean;
+    URL: string;
   public
+    { if this data module has been changed? }
     property isChanged: boolean read fisChanged write fisChanged default false;
+    { does this data module works directly on game data
+      or through intermediate Constructor folder? }
+    property isDirectWrite: boolean read fisDirectWrite write fisDirectWrite default false;
+
+    { Write this data module (core routine - do the actual writing) }
     procedure WriteMe; virtual; abstract;
+    { Write this data module to game folder }
+    procedure WriteToGameFolder;
+    { Write this data module to constructor folder }
+    procedure WriteToConstructorFolder;
+
+    { Read this data module }
     procedure ReadMe; virtual; abstract;
+    { If this data module is valid? }
     function isValid: boolean; virtual;
+    { Call-back event in case this data module has been changed }
     procedure SetChanged(Sender: TObject); //TNotifyEvent
   end;
 
 {............................................................................}
 implementation
+uses
+  DecoLog;
 
 procedure TDataModule.SetChanged(Sender: TObject);
 begin
   fisChanged := true;
 end;
 
+{-----------------------------------------------------------------------------}
+
 function TDataModule.isValid: boolean;
 begin
   Result := true;
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure TDataModule.WriteToGameFolder;
+begin
+  WritingToGameFolder := true;
+  URL := GameFolder('');
+  WriteMe;
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure TDataModule.WriteToConstructorFolder;
+begin
+  WritingToGameFolder := false;
+  URL := GameFolder('');
+  WriteMe;
 end;
 
 end.

@@ -57,6 +57,7 @@ var
 
 function GameConfigFolder(const FileURL: string): string;
 begin
+  {based on CGE implementation}
   {$IFDEF Desktop}
   if ConfigurationDirURL = '' then
   begin
@@ -80,6 +81,7 @@ var
 
 function SavedGamesFolder(const SubFolder: string; const FileURL: string): string;
 begin
+  {based on CGE implementation}
   {$IFDEF Desktop}
   if SavedGamesDir = '' then
   begin
