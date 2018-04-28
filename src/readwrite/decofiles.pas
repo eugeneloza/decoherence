@@ -168,8 +168,7 @@ begin
     Log(LogFileAccess, CurrentRoutine, 'Reading file ' + CurrentFileURL);
     XMLDoc := URLReadXMLSafe(CurrentFileURL);
     Result := XMLDoc.DocumentElement;
-  end
-  else
+  end else
   begin
     Log(LogFileAccess, CurrentRoutine, 'WARNING: File does not exist: ' + CurrentFileURL);
     Result := nil;
@@ -208,8 +207,7 @@ begin
   begin
     URLWriteXMLSafe(XMLdoc, CurrentFileURL);
     XMLDoc.Free;
-  end
-  else
+  end else
     Log(LogReadWriteError, CurrentRoutine, 'Error: Cannot write file. It''s not open! ');
 
   FileOpen := false;

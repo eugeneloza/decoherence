@@ -129,8 +129,7 @@ begin
       { it's important to avoid mouse shimmer during MouseLook }
       Cursor.x := GUICenter[0];
       Cursor.y := GUICenter[1];
-    end
-    else
+    end else
     begin
       Cursor.x := CursorX;
       Cursor.y := CursorY;

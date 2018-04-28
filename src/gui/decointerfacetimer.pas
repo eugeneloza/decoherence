@@ -65,12 +65,12 @@ begin
   if StartTime < 0 then
     StartTime := DecoNow
   else
-  if (DecoNow - StartTime) >= Interval then
-  begin
-    Enabled := false;
-    if Assigned(onTimer) then
-      onTimer;
-  end;
+    if (DecoNow - StartTime) >= Interval then
+    begin
+      Enabled := false;
+      if Assigned(onTimer) then
+        onTimer;
+    end;
 end;
 
 {-----------------------------------------------------------------------------}

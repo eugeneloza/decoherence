@@ -69,8 +69,7 @@ begin
     PositionSource := Round(Image.Height * Phase);
     Image.Draw(Current.x, Current.y, Current.w, PositionScaled,
       0, 0, Image.Width, PositionSource);
-  end
-  else
+  end else
   begin
     PositionScaled := Round(Current.w * Phase);
     PositionSource := Round(Image.Width * Phase);

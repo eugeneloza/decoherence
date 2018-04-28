@@ -131,8 +131,7 @@ begin
       CurrentPos += WhiteSpace;
       TotalFitSpace -= WhiteSpace;
     end;
-  end
-  else
+  end else
     {Simply output the string}
     Print(0, aString.Height - aString.HeightBase {shift text up from a baseline},
       White, aString.Value);
@@ -222,8 +221,7 @@ begin
     Result.DrawFrom(DummyImage, 0, ShadowLength, dmBlendSmart);
     ShadowImage.Free;
     DummyImage.Free;
-  end
-  else
+  end else
     Result := DummyImage;
 end;
 

@@ -65,19 +65,19 @@ begin
   if Event.EventType = itMouseButton then
     PointerInput.doMousePress(Event)
   else
-  if Event.EventType = itKey then
-  begin
-    {some generic buttons here}
-    if Event.Key = KeyboardInput.KeyboardOptions.ScreenShotKey then
-      MakeScreenShot;
-    //hardcoded keys
-    case Event.Key of
-      KeyPrintScreen: //KeyPrintScreen doesn't work in x-window system if assigned to some external program like scrot
+    if Event.EventType = itKey then
+    begin
+      {some generic buttons here}
+      if Event.Key = KeyboardInput.KeyboardOptions.ScreenShotKey then
         MakeScreenShot;
-    end;
+      //hardcoded keys
+      case Event.Key of
+        KeyPrintScreen: //KeyPrintScreen doesn't work in x-window system if assigned to some external program like scrot
+          MakeScreenShot;
+      end;
 
-    KeyboardInput.doKeyboardPress(Event.Key);
-  end;
+      KeyboardInput.doKeyboardPress(Event.Key);
+    end;
 end;
 
 {--------------------------------------------------------------------------}
@@ -87,8 +87,8 @@ begin
   if Event.EventType = itMouseButton then
     PointerInput.doMouseRelease(Event)
   else
-  if Event.EventType = itKey then
-    KeyboardInput.doKeyboardRelease(Event.Key);
+    if Event.EventType = itKey then
+      KeyboardInput.doKeyboardRelease(Event.Key);
 end;
 
 {--------------------------------------------------------------------------}

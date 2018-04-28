@@ -100,8 +100,7 @@ begin
         CursorImg[CurrentCursor].Image.Draw(x + CursorImg[CurrentCursor].CursorShift.Data[0],
           y - CursorImg[CurrentCursor].Image.Height + CursorImg[CurrentCursor].CursorShift.Data[1]);
     // and draw hint
-  end
-  else
+  end else
     DragElement.Draw;
 end;
 

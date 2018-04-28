@@ -94,14 +94,11 @@ begin
             GUI.ShowMessage('No! This is a different game!');
             RecordKeys := false;
           end;
-        end
-        else
+        end else
           RecordKeys := false;
-      end
-      else
+      end else
         RecordKeys := false;
-    end
-    else
+    end else
     if (aKey = KeyI) then
     begin
       RecordedKeys := '';

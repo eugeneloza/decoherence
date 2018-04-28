@@ -51,10 +51,11 @@ begin
   case Lang of
     Language_English: Result := 'ENG/';
     Language_Russian: Result := 'RUS/';
-    else begin
-      Result := 'ENG/';
-      Log(LogLanguageError, CurrentRoutine, 'ERROR: Unknown Language in DecoTranslation.LanguageDir! Falling back to English.');
-    end;
+    else
+      begin
+        Result := 'ENG/';
+        Log(LogLanguageError, CurrentRoutine, 'ERROR: Unknown Language in DecoTranslation.LanguageDir! Falling back to English.');
+      end;
   end;
   //Result := GetScenarioFolder + TextFolder + Result;
 end;

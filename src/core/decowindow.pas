@@ -92,8 +92,7 @@ begin
   begin
     DefaultWindowConfig;
     //WriteWindowConfiguration; //it's default, no need to write it
-  end
-  else
+  end else
   begin
     { Read config from a file }
     ConfigFullScreen := ReadBoolean(RootNode, 'FullScreen');
@@ -117,8 +116,7 @@ begin
   if ConfigFullScreen then
   begin
     Log(LogInit, CurrentRoutine, 'FullScreen mode ON');
-  end
-  else
+  end else
   begin
     Log(LogInit, CurrentRoutine, 'FullScreen mode OFF, Window resolution = ' +
       ConfigWindowWidth.ToString + 'x' + ConfigWindowHeight.ToString);

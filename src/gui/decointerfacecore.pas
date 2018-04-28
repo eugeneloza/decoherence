@@ -269,8 +269,7 @@ begin
       acSquare: Phase := Sqrt(Phase);
     end;
     Current.AssignMix(Last, Next, Phase);
-  end
-  else
+  end else
   begin
     Current.AssignFrom(Next);
     {if this was a suicide animation then kill this element}
@@ -353,8 +352,7 @@ begin
             else
               my := GUIHeight;
             mx := Round(GUIWidth * (1 + ddx / abs(ddy)) / 2);
-          end
-          else
+          end else
           begin
             if dx < 0 then
               mx := 0
@@ -362,8 +360,7 @@ begin
               mx := GUIWidth;
             my := Round(GUIHeight * (1 + ddy / abs(ddx)) / 2);
           end;
-        end
-        else
+        end else
           case DRND.Random(4) of
             0: begin
                  mx := 0;
@@ -522,8 +519,7 @@ begin
     end;
     if (CanMouseOver) or (CanDrag) then
       Result := Self;
-  end
-  else
+  end else
   begin
     if isMouseOver and RaiseEvents then
     begin

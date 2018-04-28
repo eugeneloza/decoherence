@@ -112,14 +112,14 @@ begin
     if aKey = KeyboardOptions.MoveForwardKey then
       MoveKeyRelease(KeyboardForward)
     else
-    if aKey = KeyboardOptions.MoveBackwardKey then
-      MoveKeyRelease(KeyboardBackward)
-    else
-    if aKey = KeyboardOptions.StrafeLeftKey then
-      MoveKeyRelease(KeyboardStrafeLeft)
-    else
-    if aKey = KeyboardOptions.StrafeRightKey then
-      MoveKeyRelease(KeyboardStrafeRight);
+      if aKey = KeyboardOptions.MoveBackwardKey then
+        MoveKeyRelease(KeyboardBackward)
+      else
+        if aKey = KeyboardOptions.StrafeLeftKey then
+          MoveKeyRelease(KeyboardStrafeLeft)
+        else
+          if aKey = KeyboardOptions.StrafeRightKey then
+            MoveKeyRelease(KeyboardStrafeRight);
   end;
 end;
 
@@ -132,15 +132,15 @@ begin
     if aKey = KeyboardOptions.MoveForwardKey then
       MoveKeyPress(KeyboardForward)
     else
-    if aKey = KeyboardOptions.MoveBackwardKey then
-      MoveKeyPress(KeyboardBackward)
-    else
-    if aKey = KeyboardOptions.StrafeLeftKey then
-      MoveKeyPress(KeyboardStrafeLeft)
-    else
-    if aKey = KeyboardOptions.StrafeRightKey then
-      MoveKeyPress(KeyboardStrafeRight);
-    KeyboardRecorder.KeyRecorder(aKey);
+      if aKey = KeyboardOptions.MoveBackwardKey then
+        MoveKeyPress(KeyboardBackward)
+      else
+        if aKey = KeyboardOptions.StrafeLeftKey then
+          MoveKeyPress(KeyboardStrafeLeft)
+        else
+          if aKey = KeyboardOptions.StrafeRightKey then
+            MoveKeyPress(KeyboardStrafeRight);
+          KeyboardRecorder.KeyRecorder(aKey);
   end;
 end;
 
@@ -166,20 +166,19 @@ begin
   begin
     DefaultKeyboardConfig;
     //WriteKeyboardConfig; //it's default, no need to write it
-  end
-  else
-  { Read config from a file }
-  with KeyboardOptions do
-  begin
-    DefaultKeyboardConfig; //we load default keyboard config in case something goes wrong
-    {we might write a specialized functions to read/write TKey, but I don't think it worth it}
-    MoveForwardKey := StrToKey(ReadString(RootNode, 'MoveForwardKey'), MoveForwardKey);
-    MoveBackwardKey := StrToKey(ReadString(RootNode, 'MoveBackwardKey'), MoveBackwardKey);
-    StrafeLeftKey := StrToKey(ReadString(RootNode, 'StrafeLeftKey'), StrafeLeftKey);
-    StrafeRightKey := StrToKey(ReadString(RootNode, 'StrafeRightKey'), StrafeRightKey);
-    ScreenShotKey := StrToKey(ReadString(RootNode, 'ScreenShotKey'), ScreenShotKey);
-    EndReadFile;
-  end;
+  end else
+    { Read config from a file }
+    with KeyboardOptions do
+    begin
+      DefaultKeyboardConfig; //we load default keyboard config in case something goes wrong
+      {we might write a specialized functions to read/write TKey, but I don't think it worth it}
+      MoveForwardKey := StrToKey(ReadString(RootNode, 'MoveForwardKey'), MoveForwardKey);
+      MoveBackwardKey := StrToKey(ReadString(RootNode, 'MoveBackwardKey'), MoveBackwardKey);
+      StrafeLeftKey := StrToKey(ReadString(RootNode, 'StrafeLeftKey'), StrafeLeftKey);
+      StrafeRightKey := StrToKey(ReadString(RootNode, 'StrafeRightKey'), StrafeRightKey);
+      ScreenShotKey := StrToKey(ReadString(RootNode, 'ScreenShotKey'), ScreenShotKey);
+      EndReadFile;
+    end;
 
 end;
 

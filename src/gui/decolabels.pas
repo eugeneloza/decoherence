@@ -193,8 +193,7 @@ begin
     Self.ResetAnimation;
     FPSCount := 0;
     LastRenderTime := DecoNow;
-  end
-  else
+  end else
     inc(FPSCount);
 
   Draw;

@@ -186,10 +186,10 @@ begin
     GUI.Cursor.ClickElement.OnMouseLeftButton(
       GUI.Cursor.ClickElement, Round(Event.Position[0]), Round(Event.Position[1]))
   else
-  if (Event.MouseButton = mbRight) and
-    Assigned(GUI.Cursor.ClickElement.OnMouseRightButton) then
-    GUI.Cursor.ClickElement.OnMouseRightButton(
-      GUI.Cursor.ClickElement, Round(Event.Position[0]), Round(Event.Position[1]));
+    if (Event.MouseButton = mbRight) and
+      Assigned(GUI.Cursor.ClickElement.OnMouseRightButton) then
+      GUI.Cursor.ClickElement.OnMouseRightButton(
+        GUI.Cursor.ClickElement, Round(Event.Position[0]), Round(Event.Position[1]));
 
   GUI.Cursor.ClickElement := nil;
 end;
@@ -240,11 +240,9 @@ begin
       begin
         Player.doLook(Event.Position - GUICenter);
         Window.MousePosition := GUICenter; //=CenterMouseCursor inlined
-      end
-      else
+      end else
         Result := true; {prevent onMotion call-back}
-    end
-    else
+    end else
     if DragMouseLook then
     begin
       //DragMouseLook doesn't change cursor.position
