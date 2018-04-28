@@ -15,7 +15,8 @@
 
 {---------------------------------------------------------------------------}
 
-(* An abstract stat container enabling changing values and preforming automatic checks *)
+(* An abstract stat container enabling changing values and preforming automatic checks
+   Works for: health, stamina, concentration and metaphysics *)
 
 {$INCLUDE compilerconfig.inc}
 
@@ -65,6 +66,7 @@ type
     { Resets Current and Max to MaxMax }
     procedure ResetToMaxMax;
   end;
+  PStat = ^DStat;
 
 {............................................................................}
 implementation
