@@ -86,6 +86,8 @@ begin
   if not ReadFontsInfo then
     DefaultFontInfo;
 
+  WriteFontsInfo;
+
   //load alias dictionary
   MakeAliasTab(PageControl1.AddTabSheet, FontAlias);
   MakeInfoTab(PageControl1.AddTabSheet, FontInfo);

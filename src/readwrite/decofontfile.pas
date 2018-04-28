@@ -191,10 +191,12 @@ begin
 
   FontAlias := DStringDictionary.Create;
   FontAlias.Add('Default', 'xolonium-12');
-  FontAlias.Add('PlayerHealth', 'xolonium-12');
+
+  //default interface aliases should go here
+  {FontAlias.Add('PlayerHealth', 'xolonium-12');
   FontAlias.Add('PlayerName', 'xolonium-12');
   FontAlias.Add('LoadScreen', 'xolonium-16');
-  FontAlias.Add('PlayerDamage', 'xolonium-num-99');
+  FontAlias.Add('PlayerDamage', 'xolonium-num-99');}
 
 end;
 

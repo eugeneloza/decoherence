@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Root>
+  <FontInfo>
+    <Font_0 URL="Xolonium-Regular.ttf" Size="99" Alias="xolonium-num-99" CharSet="csNumeric" AdditionalLineSpacing="3"/>
+    <Font_1 URL="Xolonium-Regular.ttf" Size="12" Alias="xolonium-12" CharSet="csFull" AdditionalLineSpacing="3"/>
+    <Font_2 URL="Xolonium-Regular.ttf" Size="16" Alias="xolonium-16" CharSet="csFull" AdditionalLineSpacing="3"/>
+  </FontInfo>
+  <FontAlias>
+    <String_0 Key="Default" Value="xolonium-12"/>
+  </FontAlias>
+</Root>
