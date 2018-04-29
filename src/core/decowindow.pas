@@ -31,7 +31,7 @@ uses
 var
   { Main window of the game }
   Window: TCastleWindow;
-
+  {}
   ScreenShotPending: boolean;
 
 { Creates and initializes the Window }
@@ -110,6 +110,7 @@ begin
   Window.DoubleBuffer := true;
   Window.ResizeAllowed := raOnlyAtOpen;
 
+  {$IFDEF Desktop}
   ReadWindowConfiguration;
 
   Window.FullScreen := ConfigFullScreen;
@@ -123,6 +124,7 @@ begin
     Window.Width := ConfigWindowWidth;
     Window.Height := ConfigWindowHeight;
   end;
+  {$ENDIF}
 
   ApplicationProperties.LimitFPS := 0;
 
