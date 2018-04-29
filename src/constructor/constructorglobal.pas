@@ -51,6 +51,8 @@ type
     WritingToGameFolder: boolean;
     URL: string;
   public
+    { Name of the current file (including sub-folder) }
+    FileName: string;
     { if this data module has been changed? }
     property isChanged: boolean read fisChanged write fisChanged default false;
     { does this data module works directly on game data
@@ -75,7 +77,15 @@ type
 {............................................................................}
 implementation
 uses
+  CastleFilesUtils,
   DecoLog;
+
+function ConstructorFolder(const FileURL: string): string;
+begin
+  Result := ApplicationData(FileURL);
+end;
+
+{-----------------------------------------------------------------------------}
 
 procedure TDataModule.SetChanged(Sender: TObject);
 begin
@@ -94,7 +104,7 @@ end;
 procedure TDataModule.WriteToGameFolder;
 begin
   WritingToGameFolder := true;
-  URL := GameFolder('');
+  URL := GameFolder(Self.FileName);
   WriteMe;
 end;
 
@@ -102,9 +112,14 @@ end;
 
 procedure TDataModule.WriteToConstructorFolder;
 begin
-  WritingToGameFolder := false;
-  URL := GameFolder('');
-  WriteMe;
+  if isDirectWrite then
+    WriteToGameFolder
+  else
+  begin
+    WritingToGameFolder := false;
+    URL := ConstructorFolder(Self.FileName);
+    WriteMe;
+  end;
 end;
 
 end.
