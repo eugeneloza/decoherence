@@ -147,6 +147,7 @@
       <Unit5>
         <Filename Value="src/core/decoglobal.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoGlobal"/>
       </Unit5>
       <Unit6>
         <Filename Value="src/core/decogenerics.pas"/>
@@ -183,6 +184,7 @@
       <Unit13>
         <Filename Value="src/readwrite/decofolders.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="DecoFolders"/>
       </Unit13>
       <Unit14>
         <Filename Value="src/text/decotranslation.pas"/>
