@@ -16,7 +16,16 @@
 {---------------------------------------------------------------------------}
 
 (* Main Form of the Constructor
-   It spawns and manages all other Constructor Forms *)
+   It spawns and manages all other Constructor Forms
+
+   DESKTOP ONLY.
+
+   While Constructor works on internationalized data, the tool itself is
+   ENGLISH ONLY. I'm not going to add any multilingual support in any future,
+   Because it's a specific tool to solve specific tasks that
+   while trying to keep everything simple, is a very complex thing to do
+   - it's not for "all and everybody" to use. It requires knowledge of English anyway.
+   If you want it - this is a FOSS project - do it :). *)
 
 {$INCLUDE compilerconfig.inc}
 
@@ -36,6 +45,7 @@ type
   TMainForm = class(TConstructorForm)
     FontButton: TButton;
     procedure FontButtonClick(Sender: TObject);
+    procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
   private
@@ -59,6 +69,21 @@ uses
 procedure TMainForm.FontButtonClick(Sender: TObject);
 begin
   FontEditor.Show;
+end;
+
+procedure TMainForm.FormClose(Sender: TObject; var CloseAction: TCloseAction);
+var
+  UnsavedData: boolean;
+begin
+  UnsavedData := false;
+
+  if UnsavedData then
+    if MessageDlg('There is unsaved data in ' + '' +
+      '! Really exit?', mtCustom, [mbYes, mbNo], 0) = mrNo then
+    begin
+      CloseAction := caNone;
+      Exit;
+    end;
 end;
 
 procedure TMainForm.FormCreate(Sender: TObject);

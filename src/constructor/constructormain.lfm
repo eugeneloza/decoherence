@@ -6,6 +6,7 @@ object MainForm: TMainForm
   Caption = 'CONSTRUCTOR'
   ClientHeight = 240
   ClientWidth = 320
+  OnClose = FormClose
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   LCLVersion = '1.9.0.0'

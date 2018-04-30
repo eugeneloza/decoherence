@@ -42,7 +42,8 @@ type
 
 type
   { abstract data module
-    children will contain the data and implement read/write functions }
+    children will contain the data and implement read/write functions
+    Each data module is a single FILE. }
   TDataModule = class abstract(TObject)
   strict private
     fisChanged: boolean;
