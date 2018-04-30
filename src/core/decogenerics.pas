@@ -43,6 +43,8 @@ type
   Bypasses all the TDictionary heavy routines and automatically log erors }
 function GetStringByKey(const Source: DStringDictionary; const aKey: string;
   const aDefault: string = ''): string;
+{ Are two string dictionaries equal? }
+function Equals(const Source1, Source2: DStringDictionary): boolean;
 {............................................................................}
 implementation
 uses
@@ -58,6 +60,28 @@ begin
   end
 end;
 
+{-----------------------------------------------------------------------------}
+
+function Equals(const Source1, Source2: DStringDictionary): boolean;
+var
+  s: string;
+begin
+  if Source1 = Source2 then //if pointers are equal
+    Result := true
+  else
+    if Source1.Count = Source2.Count then //if amount of records is equal
+    begin
+      Result := true;
+      for s in Source1.Keys do //scan every record until a difference is found-
+        if not (Source2.ContainsKey(s)) or not (Source2.Items[s] = Source1.Items[s]) then
+        begin
+          Result := false;
+          Break;
+        end;
+    end
+    else // if amount of records is not equal
+      Result := false;
+end;
 
 end.
 
