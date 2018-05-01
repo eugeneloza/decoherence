@@ -75,21 +75,31 @@ end;
 {-----------------------------------------------------------------------------}
 
 type
-  TComboBoxHelper = class helper for TComboBox
+  {}
+  THoverComboBox = class(TComboBox)
+    { wrapper for SetBounds to accept TRect }
     procedure SetBoundsRect(const aRect: TRect);
+    { finish editing and save }
+    procedure Finish(Sender: TObject);
   end;
 
-procedure TComboBoxHelper.SetBoundsRect(const aRect: TRect);
+procedure THoverComboBox.SetBoundsRect(const aRect: TRect);
 begin
   Self.SetBounds(aRect.Left, aRect.Top,
     aRect.Right - aRect.Left, aRect.Bottom - aRect.Top);
 end;
 
+procedure THoverComboBox.Finish(Sender: TObject);
+begin
+  Visible := false;
+end;
+{-----------------------------------------------------------------------------}
+
 {this one certanily should be moved outisde}
 procedure MakeAliasTab(constref aTab: TTabSheet; constref aAliasDictionary: DStringDictionary);
 var
   ValueListEditor: TValueListEditor;
-  ComboBox: TComboBox;
+  ComboBox: THoverComboBox;
   s: string;
 begin
   aTab.Caption := 'Aliases';
@@ -97,12 +107,13 @@ begin
   ValueListEditor.Cells[0, 0] := 'Alias';
   ValueListEditor.Cells[1, 0] := 'Reference';
 
-  ComboBox := TComboBox.Create(aTab);
+  ComboBox := THoverComboBox.Create(aTab);
   ComboBox.Parent := aTab;
   for s in aAliasDictionary.Keys do
     ComboBox.Items.Add(s);
   ComboBox.ItemIndex := 0;
   ComboBox.SetBoundsRect(ValueListEditor.CellRect(1, 1));
+  ComboBox.OnEditingDone := @ComboBox.Finish;
   //ValueListEditor.OnSelectCell := procedure(Sender: TObject; aCol, aRow: Integer; var CanSelect: Boolean);
   //ValueListEditor.CellRect();
   //ValueListEditor.OnEditingDone := @.SetChanged;
