@@ -26,8 +26,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ComCtrls, ValEdit,
-  ConstructorGlobal,
-  DecoGenerics;
+  StdCtrls, ConstructorGlobal, DecoGenerics;
 
 type
   TFontEditor = class(TConstructorForm)
@@ -60,6 +59,8 @@ begin
 
 end;
 
+{-----------------------------------------------------------------------------}
+
 function StringDictionaryEditor(constref aParent: TWinControl; constref aStringDictionary: DStringDictionary): TValueListEditor;
 var
   s: string;
@@ -71,17 +72,43 @@ begin
     Result.InsertRow(s, aStringDictionary.Items[s], false);
 end;
 
+{-----------------------------------------------------------------------------}
+
+type
+  TComboBoxHelper = class helper for TComboBox
+    procedure SetBoundsRect(const aRect: TRect);
+  end;
+
+procedure TComboBoxHelper.SetBoundsRect(const aRect: TRect);
+begin
+  Self.SetBounds(aRect.Left, aRect.Top,
+    aRect.Right - aRect.Left, aRect.Bottom - aRect.Top);
+end;
+
 {this one certanily should be moved outisde}
 procedure MakeAliasTab(constref aTab: TTabSheet; constref aAliasDictionary: DStringDictionary);
 var
   ValueListEditor: TValueListEditor;
+  ComboBox: TComboBox;
+  s: string;
 begin
   aTab.Caption := 'Aliases';
   ValueListEditor := StringDictionaryEditor(aTab, aAliasDictionary);
   ValueListEditor.Cells[0, 0] := 'Alias';
   ValueListEditor.Cells[1, 0] := 'Reference';
+
+  ComboBox := TComboBox.Create(aTab);
+  ComboBox.Parent := aTab;
+  for s in aAliasDictionary.Keys do
+    ComboBox.Items.Add(s);
+  ComboBox.ItemIndex := 0;
+  ComboBox.SetBoundsRect(ValueListEditor.CellRect(1, 1));
+  //ValueListEditor.OnSelectCell := procedure(Sender: TObject; aCol, aRow: Integer; var CanSelect: Boolean);
+  //ValueListEditor.CellRect();
   //ValueListEditor.OnEditingDone := @.SetChanged;
 end;
+
+{-----------------------------------------------------------------------------}
 
 procedure TFontEditor.FormCreate(Sender: TObject);
 begin
@@ -95,6 +122,8 @@ begin
   MakeAliasTab(PageControl1.AddTabSheet, FontAlias);
   MakeInfoTab(PageControl1.AddTabSheet, FontInfo);
 end;
+
+{-----------------------------------------------------------------------------}
 
 procedure TFontEditor.FormDestroy(Sender: TObject);
 begin

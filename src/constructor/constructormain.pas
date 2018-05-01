@@ -71,6 +71,8 @@ begin
   FontEditor.Show;
 end;
 
+{-----------------------------------------------------------------------------}
+
 procedure TMainForm.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 var
   UnsavedData: boolean;
@@ -78,7 +80,7 @@ begin
   UnsavedData := false;
 
   if UnsavedData then
-    if MessageDlg('There is unsaved data in ' + '' +
+    if MessageDlg('There is unsaved data in ' + '...' +
       '! Really exit?', mtCustom, [mbYes, mbNo], 0) = mrNo then
     begin
       CloseAction := caNone;
@@ -86,12 +88,16 @@ begin
     end;
 end;
 
+{-----------------------------------------------------------------------------}
+
 procedure TMainForm.FormCreate(Sender: TObject);
 begin
   InitLog;
   InitHDDLock;
   InitTrash;
 end;
+
+{-----------------------------------------------------------------------------}
 
 procedure TMainForm.FormDestroy(Sender: TObject);
 begin
