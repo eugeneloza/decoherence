@@ -27,10 +27,13 @@ First letter is lowercase in words "tmp" and "temp", e.g. `tmpVariable: integer`
 * Use `DClassName` instead of `TClassName` for game-specific objects/classes/records/enums
 Not sure if this is wise, but this is made to make a difference with regular FPC or CGE related classes.
 
-* Leave `{}` if comment is missing for some type/variable/routine definition.
-This makes it easier to find such missing comments automatically
+* Prefer longer and explanatory names for entities unless it is a local/nested variable/routine. E.g. `SourceData` instead of `Src`.
 
-* Use a dot-spacer before the implementation part and also before the initialization part (and every routine related to initalization). Like this:
+* Always comment every API element, even if its meaning is obvious. A bonus is a comment even for `private` fields.
+Virtual procedures usually should receive comment only once - during the first definition, unless `override` significantly changes its behavior.
+Leave `{}` if comment is missing for some type/variable/routine definition. This makes it easier to find such missing comments automatically
+
+* Use a dot-spacer before the `implementation` part and also before the initialization part (and every routine related to initalization). Like this:
 ```
 var
   x: integer;
@@ -63,9 +66,14 @@ end;
 end.
 ```
 
-* Never put anything into `initialization`..`finalization` parts. Create a InitXxx procedure and reference it in DecoInit. This allows to control the rigit initialization flow.
+* Never put anything into `initialization`..`finalization` parts. Create a `InitXxx` procedure and reference it in `DecoInit`. This allows to control the rigit initialization flow.
 
-* Always put {$INCLUDE compilerconfig.inc} before the unit name. Even if it doesn't use any compiler options.
+* Always put `{$INCLUDE compilerconfig.inc}` before the unit name. Even if it doesn't use any compiler options.
 
-* Use TryInline macro instead of Inline. Note that TryInclude is not followed by a semicolon: `procedure Foo; TryInline`.
+* Use `TryInline` macro instead of `inline`. Note that `TryInline` is not followed by a semicolon: `procedure Foo; TryInline`.
 
+* Always reference explicit `inherited`.
+
+* Prefer American English. E.g. "behavior", not "behaviour".
+
+* Always use `Result` variable to assign the `function` result.
