@@ -22,10 +22,10 @@ And when Science meets Magic...
 
 # System requirements
 
-at least 1.5GHz CPU recommended
-at least 1024x768 graphic mode recommended
-at least 1GB RAM recommended
-at least 256Mb VRAM recommended
+At least 1.5GHz CPU recommended
+At least 1024x768 graphic mode recommended
+At least 1GB RAM recommended
+At least 256Mb VRAM recommended
 
 No installation is required, just extract all files to one folder and play.
 You may need to set "executable" bit in Linux.
