@@ -26,7 +26,9 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ComCtrls, ValEdit,
-  StdCtrls, ConstructorGlobal, DecoGenerics;
+  StdCtrls,
+  AliasEditor,
+  ConstructorGlobal, DecoGenerics;
 
 type
   TFontEditor = class(TConstructorForm)
@@ -34,7 +36,7 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
   private
-
+    AliasEdit: TAliasEditor;
   public
 
   end;
@@ -61,59 +63,27 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-function StringDictionaryEditor(constref aParent: TWinControl; constref aStringDictionary: DStringDictionary): TValueListEditor;
+function StringDictionaryEditor(constref aParent: TWinControl; constref aStringDictionary: DStringDictionary): TAliasEditor;
 var
   s: string;
 begin
-  Result := TValueListEditor.Create(aParent);
+  Result := TAliasEditor.Create(aParent);
   Result.Parent := aParent;
   Result.Flat := true;
-  for s in aStringDictionary.Keys do
-    Result.InsertRow(s, aStringDictionary.Items[s], false);
+  Result.AssignDictionary(aStringDictionary);
 end;
 
-{-----------------------------------------------------------------------------}
-
-type
-  {}
-  THoverComboBox = class(TComboBox)
-    { wrapper for SetBounds to accept TRect }
-    procedure SetBoundsRect(const aRect: TRect);
-    { finish editing and save }
-    procedure Finish(Sender: TObject);
-  end;
-
-procedure THoverComboBox.SetBoundsRect(const aRect: TRect);
-begin
-  Self.SetBounds(aRect.Left, aRect.Top,
-    aRect.Right - aRect.Left, aRect.Bottom - aRect.Top);
-end;
-
-procedure THoverComboBox.Finish(Sender: TObject);
-begin
-  Visible := false;
-end;
 {-----------------------------------------------------------------------------}
 
 {this one certanily should be moved outisde}
 procedure MakeAliasTab(constref aTab: TTabSheet; constref aAliasDictionary: DStringDictionary);
 var
-  ValueListEditor: TValueListEditor;
-  ComboBox: THoverComboBox;
+  AliasEdit: TAliasEditor;
   s: string;
 begin
   aTab.Caption := 'Aliases';
-  ValueListEditor := StringDictionaryEditor(aTab, aAliasDictionary);
-  ValueListEditor.Cells[0, 0] := 'Alias';
-  ValueListEditor.Cells[1, 0] := 'Reference';
+  AliasEdit := StringDictionaryEditor(aTab, aAliasDictionary);
 
-  ComboBox := THoverComboBox.Create(aTab);
-  ComboBox.Parent := aTab;
-  for s in aAliasDictionary.Keys do
-    ComboBox.Items.Add(s);
-  ComboBox.ItemIndex := 0;
-  ComboBox.SetBoundsRect(ValueListEditor.CellRect(1, 1));
-  ComboBox.OnEditingDone := @ComboBox.Finish;
   //ValueListEditor.OnSelectCell := procedure(Sender: TObject; aCol, aRow: Integer; var CanSelect: Boolean);
   //ValueListEditor.CellRect();
   //ValueListEditor.OnEditingDone := @.SetChanged;

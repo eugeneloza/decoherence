@@ -27,7 +27,7 @@
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir);src"/>
-            <OtherUnitFiles Value="src/constructor;src/core;src/gui;src/readwrite;src/text;src/generated"/>
+            <OtherUnitFiles Value="src/constructor;src/core;src/gui;src/readwrite;src/text;src/generated;src/constructor/components"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
           <Parsing>
@@ -70,7 +70,7 @@
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir);src"/>
-            <OtherUnitFiles Value="src/constructor;src/core;src/gui;src/readwrite;src/text;src/generated"/>
+            <OtherUnitFiles Value="src/constructor;src/core;src/gui;src/readwrite;src/text;src/generated;src/constructor/components"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
           <CodeGeneration>
@@ -114,7 +114,7 @@
         <PackageName Value="LCL"/>
       </Item3>
     </RequiredPackages>
-    <Units Count="19">
+    <Units Count="20">
       <Unit0>
         <Filename Value="ConstructorTool.pas"/>
         <IsPartOfProject Value="True"/>
@@ -209,6 +209,11 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="ConstructorGlobal"/>
       </Unit18>
+      <Unit19>
+        <Filename Value="src/constructor/components/aliaseditor.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="AliasEditor"/>
+      </Unit19>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
@@ -218,7 +223,7 @@
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir);src"/>
-      <OtherUnitFiles Value="src/constructor;src/core;src/gui;src/readwrite;src/text;src/generated"/>
+      <OtherUnitFiles Value="src/constructor;src/core;src/gui;src/readwrite;src/text;src/generated;src/constructor/components"/>
       <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <Linking>
