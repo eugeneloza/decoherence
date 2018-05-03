@@ -24,7 +24,7 @@ unit DecoFontFile;
 interface
 
 uses
-  Generics.Collections,
+  Generics.Collections, Classes,
   DOM,
   DecoGenerics, DecoFontEncoding;
 
@@ -64,6 +64,8 @@ procedure DefaultFontInfo;
 { Free FontInfo after loading
   Will also add FontAlias to AutoFree on game over }
 procedure FreeFontsInfo;
+{}
+function ExtractFontReferences: TStringList;
 {............................................................................}
 implementation
 uses
@@ -194,6 +196,20 @@ begin
   FontAlias.Add('LoadScreen', 'xolonium-16');
   FontAlias.Add('PlayerDamage', 'xolonium-num-99');}
 
+end;
+
+{--------------------------------------------------------------------------}
+
+function ExtractFontReferences: TStringList;
+var
+  s: string;
+begin
+  Result := TStringList.Create;
+  {this is redundant
+  Result.Sorted := True;
+  Result.Duplicates := dupError;}
+  for s in FontInfo.Keys do
+    Result.Add(s);
 end;
 
 {--------------------------------------------------------------------------}
