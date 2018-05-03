@@ -25,7 +25,7 @@ unit ConstructorFont;
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ComCtrls, ValEdit,
+  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ComCtrls,
   StdCtrls,
   AliasEditor,
   ConstructorGlobal, DecoGenerics;

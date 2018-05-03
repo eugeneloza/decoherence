@@ -24,7 +24,7 @@ unit AliasEditor;
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ComCtrls, ValEdit,
+  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ComCtrls, Grids,
   StdCtrls,
   DecoGenerics;
 
@@ -39,7 +39,7 @@ type
 
 type
   {}
-  TStringDictionaryEdit = class(TValueListEditor)
+  TStringDictionaryEdit = class(TStringGrid)
   protected
     StringDictionary: DStringDictionary;
     AliasList: TStringList;
@@ -49,7 +49,7 @@ type
     {}
     procedure UpdateData; virtual;
   public
-    //constructor Create(AOwner: TComponent); override;
+    constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
   end;
 
@@ -59,6 +59,7 @@ type
   TAliasEditor = class(TStringDictionaryEdit)
   private
     ComboBox: THoverComboBox;
+    procedure SelectCell(Sender: TObject; aCol, aRow: Integer; var CanSelect: Boolean);
   public
     procedure UpdateData; override;
   public
@@ -98,9 +99,36 @@ procedure TStringDictionaryEdit.UpdateData;
 var
   s: string;
 begin
+  Clear;
+
+  RowCount := 1;
+  Cells[0, 0] := 'Alias';
+  Cells[1, 0] := 'Reference';
+
   for s in StringDictionary.Keys do
-    InsertRow(s, StringDictionary.Items[s], false);
+  begin
+    RowCount := RowCount + 1;
+    Self.Cells[0, Pred(RowCount)] := s;
+    Self.Cells[1, Pred(RowCount)] := StringDictionary.Items[s];
+  end;
 end;
+
+{-----------------------------------------------------------------------------}
+
+constructor TStringDictionaryEdit.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  AutoFillColumns := true;
+  RowCount := 1;
+  ColCount := 2;
+  FixedCols := 0;
+  FixedRows := 1;
+  Flat := false;
+  Options := [goAutoAddRows{, goCellHints}];
+  ScrollBars := ssAutoVertical;
+  //Columns[0].ReadOnly := true;
+end;
+
 
 {-----------------------------------------------------------------------------}
 
@@ -115,15 +143,21 @@ end;
 constructor TAliasEditor.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  Cells[0, 0] := 'Alias';
-  Cells[1, 0] := 'Reference';
-  //Columns[0].ReadOnly := true;
+
+  OnSelectCell := @SelectCell;
 
   ComboBox := THoverComboBox.Create(Self);
   ComboBox.Parent := Self;
+  ComboBox.Visible := false;
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure TAliasEditor.SelectCell(Sender: TObject; aCol, aRow: Integer; var CanSelect: Boolean);
+begin
   ComboBox.SetBoundsRect(CellRect(1, 1));
-  ComboBox.OnEditingDone := @ComboBox.Finish;
   ComboBox.Visible := true;
+  ComboBox.OnEditingDone := @ComboBox.Finish;
 end;
 
 {-----------------------------------------------------------------------------}
