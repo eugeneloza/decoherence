@@ -124,7 +124,7 @@ begin
   FixedCols := 0;
   FixedRows := 1;
   Flat := false;
-  Options := [goAutoAddRows{, goCellHints}];
+  Options := [goAutoAddRows, goEditing{, goCellHints}];
   ScrollBars := ssAutoVertical;
   //Columns[0].ReadOnly := true;
 end;
@@ -155,9 +155,13 @@ end;
 
 procedure TAliasEditor.SelectCell(Sender: TObject; aCol, aRow: Integer; var CanSelect: Boolean);
 begin
-  ComboBox.SetBoundsRect(CellRect(1, 1));
-  ComboBox.Visible := true;
-  ComboBox.OnEditingDone := @ComboBox.Finish;
+  if (aCol = 1) and (aRow > 0) then
+  begin
+    ComboBox.SetBoundsRect(CellRect(aCol, aRow));
+    ComboBox.Visible := true;
+    ComboBox.OnEditingDone := @ComboBox.Finish;
+    //Self.EditorHide;
+  end;
 end;
 
 {-----------------------------------------------------------------------------}
