@@ -42,13 +42,15 @@ type
   TStringDictionaryEdit = class(TValueListEditor)
   protected
     StringDictionary: DStringDictionary;
+    AliasList: TStringList;
   public
     {}
-    procedure AssignDictionary(aStringDictionary: DStringDictionary);
+    procedure AssignDictionary(aStringDictionary: DStringDictionary; aAliasList: TStringList);
     {}
     procedure UpdateData; virtual;
   public
     //constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
   end;
 
 type
@@ -65,7 +67,8 @@ type
 
 {.............................................................................}
 implementation
-//uses
+uses
+  DecoLog;
 
 procedure THoverComboBox.SetBoundsRect(const aRect: TRect);
 begin
@@ -82,9 +85,10 @@ end;
 
 {=============================================================================}
 
-procedure TStringDictionaryEdit.AssignDictionary(aStringDictionary: DStringDictionary);
+procedure TStringDictionaryEdit.AssignDictionary(aStringDictionary: DStringDictionary; aAliasList: TStringList);
 begin
   StringDictionary := aStringDictionary;
+  AliasList := aAliasList;
   UpdateData;
 end;
 
@@ -98,6 +102,14 @@ begin
     InsertRow(s, StringDictionary.Items[s], false);
 end;
 
+{-----------------------------------------------------------------------------}
+
+destructor TStringDictionaryEdit.Destroy;
+begin
+  FreeAndNil(AliasList);
+  inherited Destroy;
+end;
+
 {=============================================================================}
 
 constructor TAliasEditor.Create(AOwner: TComponent);
@@ -105,13 +117,13 @@ begin
   inherited Create(AOwner);
   Cells[0, 0] := 'Alias';
   Cells[1, 0] := 'Reference';
+  //Columns[0].ReadOnly := true;
 
   ComboBox := THoverComboBox.Create(Self);
-  if AOwner is TWinControl then
-    ComboBox.Parent := TWinControl(AOwner);
-  ComboBox.ItemIndex := 0;
+  ComboBox.Parent := Self;
   ComboBox.SetBoundsRect(CellRect(1, 1));
   ComboBox.OnEditingDone := @ComboBox.Finish;
+  ComboBox.Visible := true;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -122,8 +134,14 @@ var
 begin
   inherited UpdateData;
   ComboBox.Clear;
-  for s in StringDictionary.Keys do
-    ComboBox.Items.Add(s);
+  if AliasList <> nil then
+  begin
+    for s in AliasList do
+      ComboBox.Items.Add(s);
+    ComboBox.ItemIndex := 0;
+  end
+  else
+    Log(true, CurrentRoutine, 'ERROR: TAliasEditor.AliasList is nil!');
 end;
 
 

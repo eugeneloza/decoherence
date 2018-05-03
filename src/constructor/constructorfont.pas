@@ -70,7 +70,7 @@ begin
   Result := TAliasEditor.Create(aParent);
   Result.Parent := aParent;
   Result.Flat := true;
-  Result.AssignDictionary(aStringDictionary);
+  Result.AssignDictionary(aStringDictionary, ExtractFontReferences);
 end;
 
 {-----------------------------------------------------------------------------}
