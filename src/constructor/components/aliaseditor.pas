@@ -65,8 +65,9 @@ type
   // reordering of the elements is not needed
   TAliasEditor = class(TStringDictionaryEdit)
   private
+
     ComboBox: THoverComboBox;
-    procedure SelectCell(Sender: TObject; aCol, aRow: Integer; var CanSelect: Boolean);
+    procedure doSelectCell(Sender: TObject; aCol, aRow: Integer; var CanSelect: Boolean);
   public
     procedure UpdateData; override;
   public
@@ -161,7 +162,7 @@ constructor TAliasEditor.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
 
-  OnSelectCell := @SelectCell;
+  OnSelectCell := @doSelectCell;
 
   ComboBox := THoverComboBox.Create(Self);
   ComboBox.Parent := Self;
@@ -171,7 +172,7 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-procedure TAliasEditor.SelectCell(Sender: TObject; aCol, aRow: Integer; var CanSelect: Boolean);
+procedure TAliasEditor.doSelectCell(Sender: TObject; aCol, aRow: Integer; var CanSelect: Boolean);
 begin
   if (aCol = 1) and (aRow > 0) then
   begin
