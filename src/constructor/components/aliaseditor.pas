@@ -32,10 +32,15 @@ type
   { Combo box that automatically appears over the edited cell and
     propose a selection of predefined items instead of free edit }
   THoverComboBox = class(TComboBox)
+  private
+    eCol, eRow: integer;
+  public
     { wrapper for SetBounds to accept TRect }
     procedure SetBoundsRect(const aRect: TRect);
     { finish editing and save }
     procedure Finish(Sender: TObject);
+    {}
+    procedure EditCell(const aCol, aRow: integer);
   end;
 
 type
@@ -83,7 +88,17 @@ end;
 
 procedure THoverComboBox.Finish(Sender: TObject);
 begin
+  (Parent as TStringDictionaryEdit).Cells[eCol, eRow] := Self.Text;
   Visible := false;
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure THoverComboBox.EditCell(const aCol, aRow: integer);
+begin
+  Visible := true;
+  eCol := aCol;
+  eRow := aRow;
 end;
 
 {=============================================================================}
@@ -151,6 +166,7 @@ begin
   ComboBox := THoverComboBox.Create(Self);
   ComboBox.Parent := Self;
   ComboBox.Visible := false;
+  ComboBox.OnEditingDone := @ComboBox.Finish;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -160,8 +176,7 @@ begin
   if (aCol = 1) and (aRow > 0) then
   begin
     ComboBox.SetBoundsRect(CellRect(aCol, aRow));
-    ComboBox.Visible := true;
-    ComboBox.OnEditingDone := @ComboBox.Finish;
+    ComboBox.EditCell(aCol, aRow);
     //Self.EditorHide;
   end;
 end;
