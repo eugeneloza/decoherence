@@ -29,7 +29,8 @@ uses
   DecoGenerics;
 
 type
-  {}
+  { Combo box that automatically appears over the edited cell and
+    propose a selection of predefined items instead of free edit }
   THoverComboBox = class(TComboBox)
     { wrapper for SetBounds to accept TRect }
     procedure SetBoundsRect(const aRect: TRect);
@@ -38,15 +39,15 @@ type
   end;
 
 type
-  {}
+  { Editor for DStringDictionary }
   TStringDictionaryEdit = class(TStringGrid)
   protected
     StringDictionary: DStringDictionary;
     AliasList: TStringList;
   public
-    {}
+    { Initialize the editor with data }
     procedure AssignDictionary(aStringDictionary: DStringDictionary; aAliasList: TStringList);
-    {}
+    { Update the data displayed on the grid }
     procedure UpdateData; virtual;
   public
     constructor Create(AOwner: TComponent); override;
@@ -54,7 +55,8 @@ type
   end;
 
 type
-  {}
+  { Editor for Alias-Reference pair,
+    Reference is chosen from a predefined set of References in a comboBox }
   // reordering of the elements is not needed
   TAliasEditor = class(TStringDictionaryEdit)
   private
