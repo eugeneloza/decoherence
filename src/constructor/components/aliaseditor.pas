@@ -37,9 +37,11 @@ type
     { Get the index of currently selected Reference cell
       so that it would be default for editing }
     procedure GetIndex;
-  public
     { wrapper for SetBounds to accept TRect }
     procedure SetBoundsRect(const aRect: TRect);
+  public
+    { Place the HoverCombo in the valid place on the screen }
+    procedure UpdateLocation;
     { finish editing and save }
     procedure Finish(Sender: TObject);
     {}
@@ -70,9 +72,10 @@ type
   // reordering of the elements is not needed
   TAliasEditor = class(TStringDictionaryEdit)
   private
-
     ComboBox: THoverComboBox;
     procedure doSelectCell(Sender: TObject; aCol, aRow: Integer; var CanSelect: Boolean);
+    procedure MouseWheelChanged(Sender: TObject; Shift: TShiftState;
+             WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
   public
     procedure UpdateData; override;
   public
@@ -126,6 +129,12 @@ begin
   eCol := aCol;
   eRow := aRow;
   GetIndex;
+  UpdateLocation;
+end;
+
+procedure THoverComboBox.UpdateLocation;
+begin
+  SetBoundsRect((Parent as TStringGrid).CellRect(eCol, eRow));
 end;
 
 {-----------------------------------------------------------------------------}
@@ -200,9 +209,19 @@ constructor TAliasEditor.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
 
-  OnSelectCell := @doSelectCell;
-
   ComboBox := THoverComboBox.Create(Self);
+
+  OnSelectCell := @doSelectCell;
+  OnMouseWheel := @MouseWheelChanged;
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure TAliasEditor.MouseWheelChanged(Sender: TObject; Shift: TShiftState;
+         WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
+begin
+  if WheelDelta <> 0 then
+    ComboBox.UpdateLocation;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -212,7 +231,6 @@ begin
   Self.Options := Self.Options + [goEditing];
   if (aCol = 1) and (aRow > 0) then
   begin
-    ComboBox.SetBoundsRect(CellRect(aCol, aRow));
     ComboBox.EditCell(aCol, aRow);
     // magic bugfix to prevent automatic editor from showing up when the editing is done through THoverComboBox;
     Self.Options := Self.Options - [goEditing];
