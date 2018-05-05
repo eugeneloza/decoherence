@@ -34,6 +34,8 @@ type
   THoverComboBox = class(TComboBox)
   private
     eCol, eRow: integer;
+
+    procedure GetIndex;
   public
     { wrapper for SetBounds to accept TRect }
     procedure SetBoundsRect(const aRect: TRect);
@@ -95,11 +97,32 @@ end;
 
 {-----------------------------------------------------------------------------}
 
+procedure THoverComboBox.GetIndex;
+var
+  s1: string;
+  i: integer;
+begin
+  if Items.Count = 0 then
+    Exit;
+
+  Self.ItemIndex := 0;
+  s1 := (Parent as TStringDictionaryEdit).Cells[eCol, eRow];
+  for i := 0 to Items.Count do
+    if Items[i] = s1 then
+    begin
+      Self.ItemIndex := i;
+      Break;
+    end;
+end;
+
+{-----------------------------------------------------------------------------}
+
 procedure THoverComboBox.EditCell(const aCol, aRow: integer);
 begin
   Visible := true;
   eCol := aCol;
   eRow := aRow;
+  GetIndex;
 end;
 
 {=============================================================================}
