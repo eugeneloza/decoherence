@@ -34,7 +34,8 @@ type
   THoverComboBox = class(TComboBox)
   private
     eCol, eRow: integer;
-
+    { Get the index of currently selected Reference cell
+      so that it would be default for editing }
     procedure GetIndex;
   public
     { wrapper for SetBounds to accept TRect }
@@ -43,6 +44,8 @@ type
     procedure Finish(Sender: TObject);
     {}
     procedure EditCell(const aCol, aRow: integer);
+  public
+    constructor Create(TheOwner: TComponent); override;
   end;
 
 type
@@ -125,6 +128,18 @@ begin
   GetIndex;
 end;
 
+{-----------------------------------------------------------------------------}
+
+constructor THoverComboBox.Create(TheOwner: TComponent);
+begin
+  inherited Create(TheOwner);
+  OnChange := @Finish;
+  Visible := false;
+  Parent := TheOwner as TWinControl;
+  Style := csDropDownList;
+end;
+
+
 {=============================================================================}
 
 procedure TStringDictionaryEdit.AssignDictionary(aStringDictionary: DStringDictionary; aAliasList: TStringList);
@@ -188,20 +203,19 @@ begin
   OnSelectCell := @doSelectCell;
 
   ComboBox := THoverComboBox.Create(Self);
-  ComboBox.Parent := Self;
-  ComboBox.Visible := false;
-  ComboBox.OnEditingDone := @ComboBox.Finish;
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure TAliasEditor.doSelectCell(Sender: TObject; aCol, aRow: Integer; var CanSelect: Boolean);
 begin
+  Self.Options := Self.Options + [goEditing];
   if (aCol = 1) and (aRow > 0) then
   begin
     ComboBox.SetBoundsRect(CellRect(aCol, aRow));
     ComboBox.EditCell(aCol, aRow);
-    //Self.EditorHide;
+    // magic bugfix to prevent automatic editor from showing up when the editing is done through THoverComboBox;
+    Self.Options := Self.Options - [goEditing];
   end;
 end;
 
