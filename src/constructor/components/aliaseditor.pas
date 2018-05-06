@@ -61,6 +61,8 @@ type
     procedure AssignDictionary(aStringDictionary: DStringDictionary; aAliasList: TStringList);
     { Update the data displayed on the grid }
     procedure UpdateData; virtual;
+    {}
+    function ExportData: DStringDictionary;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -173,9 +175,20 @@ begin
   for s in StringDictionary.Keys do
   begin
     RowCount := RowCount + 1;
-    Self.Cells[0, Pred(RowCount)] := s;
-    Self.Cells[1, Pred(RowCount)] := StringDictionary.Items[s];
+    Cells[0, Pred(RowCount)] := s;
+    Cells[1, Pred(RowCount)] := StringDictionary.Items[s];
   end;
+end;
+
+{-----------------------------------------------------------------------------}
+
+function TStringDictionaryEdit.ExportData: DStringDictionary;
+var
+  i: integer;
+begin
+  Result := DStringDictionary.Create;
+  for i := 0 to Pred(RowCount) do
+    Result.Add(Cells[0, i], Cells[1, i]);
 end;
 
 {-----------------------------------------------------------------------------}
@@ -210,6 +223,14 @@ begin
   inherited Create(AOwner);
 
   ComboBox := THoverComboBox.Create(Self);
+
+{  Left := 4;
+  Top := 4;
+  if AOwner is TWinControl then
+  begin
+    Width := TWinControl(AOwner).Width - 4;
+    Height := TWinControl(AOwner).Height - 4;
+  end; }
 
   OnSelectCell := @doSelectCell;
   OnMouseWheel := @MouseWheelChanged;
