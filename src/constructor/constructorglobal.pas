@@ -24,7 +24,7 @@ unit ConstructorGlobal;
 interface
 
 uses
-  Classes, SysUtils, Forms,
+  Classes, SysUtils, Forms, Controls,
   DecoGlobal, DecoFolders;
 
 type
@@ -75,6 +75,13 @@ type
     procedure SetChanged(Sender: TObject); //TNotifyEvent
   end;
 
+type
+  {}
+  TControlHelper = class helper for TControl
+  public
+    function GetParent: TWinControl;
+  end;
+
 {............................................................................}
 implementation
 uses
@@ -121,6 +128,16 @@ begin
     URL := ConstructorFolder(Self.FileName);
     WriteMe;
   end;
+end;
+
+{-----------------------------------------------------------------------------}
+
+function TControlHelper.GetParent: TWinControl;
+begin
+  if Self.Parent is TWinControl then
+    Result := Self.Parent
+  else
+    Result := nil;
 end;
 
 end.

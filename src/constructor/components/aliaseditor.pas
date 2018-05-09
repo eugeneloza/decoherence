@@ -26,7 +26,8 @@ interface
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ComCtrls, Grids,
   StdCtrls,
-  DecoGenerics;
+  DecoGenerics,
+  ConstructorGlobal;
 
 type
   { Combo box that automatically appears over the edited cell and
@@ -224,13 +225,14 @@ begin
 
   ComboBox := THoverComboBox.Create(Self);
 
-{  Left := 4;
+  Left := 4;
   Top := 4;
-  if AOwner is TWinControl then
+  if AOwner is TControl then
   begin
-    Width := TWinControl(AOwner).Width - 4;
-    Height := TWinControl(AOwner).Height - 4;
-  end; }
+    // Parent is usually a TTab, and Parent.Parent is TTabControl
+    Width := TControl(AOwner).GetParent.Width - 8;
+    Height := TControl(AOwner).GetParent.Height - 8;
+  end;
 
   OnSelectCell := @doSelectCell;
   OnMouseWheel := @MouseWheelChanged;
