@@ -64,6 +64,8 @@ type
     procedure UpdateData; virtual;
     {}
     function ExportData: DStringDictionary;
+    {}
+    procedure SetValue(aValue: string; aCol, aRow: integer);
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -100,7 +102,7 @@ end;
 
 procedure THoverComboBox.Finish(Sender: TObject);
 begin
-  (Parent as TStringDictionaryEdit).Cells[eCol, eRow] := Self.Text;
+  (Parent as TStringDictionaryEdit).SetValue(Self.Text, eCol, eRow);
   Visible := false;
 end;
 
@@ -190,6 +192,13 @@ begin
   Result := DStringDictionary.Create;
   for i := 0 to Pred(RowCount) do
     Result.Add(Cells[0, i], Cells[1, i]);
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure TStringDictionaryEdit.SetValue(aValue: string; aCol, aRow: integer);
+begin
+  Cells[aCol, aRow] := aValue;
 end;
 
 {-----------------------------------------------------------------------------}
