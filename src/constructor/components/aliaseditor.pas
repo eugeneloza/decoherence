@@ -199,6 +199,7 @@ end;
 procedure TStringDictionaryEdit.SetValue(aValue: string; aCol, aRow: integer);
 begin
   Cells[aCol, aRow] := aValue;
+  //set changed
 end;
 
 {-----------------------------------------------------------------------------}

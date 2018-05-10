@@ -28,7 +28,7 @@ uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ComCtrls,
   StdCtrls,
   AliasEditor,
-  ConstructorGlobal, DecoGenerics;
+  ConstructorGlobal, DecoGenerics, DecoGlobal;
 
 type
   TFontEditor = class(TConstructorForm)
@@ -47,7 +47,8 @@ var
 {............................................................................}
 implementation
 uses
-  DecoFont, DecoFontEncoding, DecoFontFile,
+  DecoFont, DecoFontEncoding, DecoFontFile, DecoFolders,
+  CastleFindFiles,
   DecoLog;
 
 {$R *.lfm}
@@ -92,10 +93,19 @@ end;
 {-----------------------------------------------------------------------------}
 
 procedure TFontEditor.FormCreate(Sender: TObject);
+var
+  s: TFileInfo;
+  list: TFileInfoList;
 begin
   {FontInfo and FontAlias are read here}
   if not ReadFontsInfo then
     DefaultFontInfo;
+
+  list := GetFilesList(GameFolder('GUI/Fonts/*.ttf'));
+  for s in list do
+    Log(true, 'found: ', s.Name);
+  list.free;
+
 
   WriteFontsInfo;
 

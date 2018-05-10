@@ -25,6 +25,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls,
+  CastleFindFiles,
   DecoGlobal, DecoFolders;
 
 type
@@ -82,6 +83,7 @@ type
     function GetParent: TWinControl;
   end;
 
+function GetFilesList(aFileMask: string): TFileInfoList;
 {............................................................................}
 implementation
 uses
@@ -138,6 +140,23 @@ begin
     Result := Self.Parent
   else
     Result := nil;
+end;
+
+{-----------------------------------------------------------------------------}
+
+var
+  AFileList: TFileInfoList;
+
+procedure FileFound(const FileInfo: TFileInfo; Data: Pointer; var StopSearch: boolean);
+begin
+  AFileList.Add(FileInfo);
+end;
+
+function GetFilesList(aFileMask: string): TFileInfoList;
+begin
+  AFileList := TFileInfoList.Create;
+  FindFiles(aFileMask, False, @FileFound, nil, []);
+  Result := AFileList;
 end;
 
 end.
