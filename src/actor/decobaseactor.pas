@@ -37,8 +37,20 @@ type
     procedure TeleportTo(const aNav: TNav); virtual;
     { Procedures preformed on this actor every frame }
     procedure Manage; virtual; abstract;
+  public
+    constructor Create; virtual; //override;
   end;
 
+type
+  {}
+  DBaseActor = class(DSimpleActor)
+  protected
+    Hp, Sta, Mph: DStat;
+  public
+  public
+    constructor Create; override;
+    destructor Destroy; override;
+  end;
 {............................................................................}
 implementation
 uses
@@ -49,6 +61,30 @@ begin
   //release Nav block
   Nav := aNav;
 end;
+
+{-----------------------------------------------------------------------------}
+
+constructor DSimpleActor.Create;
+begin
+  //nothing?
+end;
+
+{=============================================================================}
+
+constructor DBaseActor.Create;
+begin
+  inherited Create;
+end;
+
+{-----------------------------------------------------------------------------}
+
+destructor DBaseActor.Destroy;
+begin
+  inherited Destroy;
+end;
+
+
+
 
 end.
 
