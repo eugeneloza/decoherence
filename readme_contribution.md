@@ -19,6 +19,8 @@ There are some minor differences in code style:
 
 * Always use CAPITALS for compiler directives and CamelCase for `$DEFINE` values. E.g. `{$IFDEF DesktopVairable}...{$ELSE}...{$ENDIF}`
 
+* "inc", "dec", "true", "false" keywords are exception and are written in lowercase.
+
 * Use extended names for compiler directives. E.g. not `{$I somefile.inc}` but `{$INCLUDE somefile.inc}`. Otherwise add a comment on what the compiler directive does (exception is `{$R+}{$Q+}`).
 
 * Always use lowercase for single-letter variables like `i`, `j`, `k`.
