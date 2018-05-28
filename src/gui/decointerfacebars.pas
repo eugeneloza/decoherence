@@ -24,7 +24,8 @@ unit DecoInterfaceBars;
 interface
 
 uses
-  DecoInterfaceImages,
+  DecoInterfaceImages, DecoFramedElement,
+  DecoBaseActor,
   DecoGlobal;
 
 type
@@ -40,13 +41,42 @@ type
     { vertical or horizontal style of the bar }
     Kind: TBarStyle;
     procedure Draw; override;
+  public
+    constructor Create; override;
+  end;
+
+type
+  {}
+  DFramedBar = class(DFramedElement)
+  strict protected
+    FBar: DabstractBarImage;
+  public
+    constructor Create; override;
+  end;
+
+type
+  {}
+  DStatBar = class(DFramedBar)
+  strict protected
+    FTarget: DBaseActor;
+    procedure SetTarget(const aTarget: DBaseActor);
+  public
+    {}
+    property Target: DBaseActor read FTarget write SetTarget;
+  end;
+
+type
+  {}
+  DHealthBar = class(DStatBar)
+  public
+    procedure Update; override;
     constructor Create; override;
   end;
 
 implementation
 
 uses
-  DecoLog;
+  DecoLog, DecoImageLoader;
 
 procedure DAbstractBarImage.Draw;
 var
@@ -87,6 +117,47 @@ begin
   Max := 1;
   Position := Max;
   Kind := bsHorizontal;
+end;
+
+{===========================================================================}
+
+constructor DFramedBar.Create;
+begin
+  inherited Create;
+  FBar := DAbstractBarImage.Create;
+  Grab(FBar);
+end;
+
+{===========================================================================}
+
+procedure DStatBar.SetTarget(const aTarget: DBaseActor);
+begin
+  if FTarget <> aTarget then
+  begin
+    FTarget := aTarget;
+    //and update something here?
+  end;
+end;
+
+{===========================================================================}
+
+constructor DHealthBar.Create;
+begin
+  inherited Create;
+  FBar.Load(LoadDecoImage('GUI/StatBar/HealthBar.png', 32, 329));
+end;
+
+{---------------------------------------------------------------------------}
+
+procedure DHealthBar.Update;
+begin
+  inherited Update;
+  if FTarget <> nil then
+  begin
+    FBar.Min := 0;
+    FBar.Max := FTarget.Hp.Value[2];
+    FBar.Position := FTarget.Hp.Value[0];
+  end;
 end;
 
 end.

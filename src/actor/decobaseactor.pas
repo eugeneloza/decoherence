@@ -44,9 +44,8 @@ type
 type
   {}
   DBaseActor = class(DSimpleActor)
-  protected
-    Hp, Sta, Mph: DStat;
   public
+    Hp, Sta, Mph: DStat;
   public
     constructor Create; override;
     destructor Destroy; override;
