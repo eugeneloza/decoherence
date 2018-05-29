@@ -145,6 +145,7 @@ constructor DHealthBar.Create;
 begin
   inherited Create;
   FBar.Load(LoadDecoImage('GUI/StatBar/HealthBar.png', 32, 329));
+  FBar.Kind := bsVertical;
 end;
 
 {---------------------------------------------------------------------------}

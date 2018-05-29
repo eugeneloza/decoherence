@@ -188,7 +188,7 @@ var
   Frame: DRectagonalFrame;
   Arr: DFramedElement;
   Img: DSimpleImage;
-  Bar: DAbstractBarImage;
+  Bar: DHealthBar;
   Lab: DLabelImage;
 begin
   Clear;
@@ -203,7 +203,6 @@ begin
   Arr := DFramedElement.Create;
   Arr.Frame := Frame;
 
-
   Lab := DLabelImage.Create;
   Lab.ShadowIntensity := 1;
   Lab.SetSize(330, 330, 50, 50);
@@ -216,18 +215,9 @@ begin
   Arr.SetSize(600, 100, 200, 200, 1.0, asFlyInRadial, 0.6);
   Grab(Arr);
 
-  Bar := DAbstractBarImage.Create;
-  Bar.Load(LoadDecoImage('GUI/ProgressBar/ProgressBar.png', 500, 32));
-  Bar.SetSize(50, 500, 800, 16);
-  Bar.Kind := bsHorizontal;
-  Bar.Position := 0.7;
-  Grab(Bar);
-
-  Bar := DAbstractBarImage.Create;
-  Bar.Load(LoadDecoImage('GUI/StatBar/HealthBar.png', 32, 329));
+  Bar := DHealthBar.Create;
   Bar.SetSize(600, 200, 16, 165);
-  Bar.Kind := bsVertical;
-  Bar.Position := 0.7;
+  //Bar.Frame := DRectagonalFrame.Create.Load(GetFrameByName('RegularFrame'));
   Grab(Bar);
 
   Lab := DLabelImage.Create;
