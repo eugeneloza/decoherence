@@ -28,6 +28,9 @@ uses
   DecoImages, DecoInterfaceCore,
   DecoGlobal;
 
+const
+  HideMouseCursorInScreenshot = true;
+
 type TCursorType = (ctNone, ctDefault, ctMouseLook);
 
 type
@@ -95,7 +98,7 @@ procedure DCursor.Draw;
 begin
   if DragElement = Nil then
   begin
-    if not ScreenShotPending then //hide cursor for screenshots
+    if (not ScreenShotPending) or (not HideMouseCursorInScreenshot) then //hide cursor for screenshots
       if (CurrentCursor <> ctNone) and (CursorImg[CurrentCursor].Image <> Nil) then
         CursorImg[CurrentCursor].Image.Draw(x + CursorImg[CurrentCursor].CursorShift.Data[0],
           y - CursorImg[CurrentCursor].Image.Height + CursorImg[CurrentCursor].CursorShift.Data[1]);
