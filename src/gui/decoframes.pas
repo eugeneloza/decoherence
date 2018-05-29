@@ -169,19 +169,31 @@ end;
 
 function DRectagonalFrame.GapLeft: integer;
 begin
-  Result := FrameImage.Corners[0] + Corners[0];
+  if FrameImage <> nil then
+    Result := FrameImage.Corners[0] + Corners[0]
+  else
+    Result := Corners[0];
 end;
 function DRectagonalFrame.GapBottom: integer;
 begin
-  Result := FrameImage.Corners[1] + Corners[1];
+  if FrameImage <> nil then
+    Result := FrameImage.Corners[1] + Corners[1]
+  else
+    Result := Corners[1];
 end;
 function DRectagonalFrame.GapRight: integer;
 begin
-  Result := FrameImage.Corners[2] + Corners[2];
+  if FrameImage <> nil then
+    Result := FrameImage.Corners[2] + Corners[2]
+  else
+    Result := Corners[2];
 end;
 function DRectagonalFrame.GapTop: integer;
 begin
-  Result := FrameImage.Corners[3] + Corners[3];
+  if FrameImage <> nil then
+    Result := FrameImage.Corners[3] + Corners[3]
+  else
+    Result := Corners[3];
 end;
 
 {-----------------------------------------------------------------------------}
