@@ -76,7 +76,7 @@ type
 implementation
 
 uses
-  DecoLog, DecoImageLoader;
+  DecoLog, DecoImageLoader, DecoMath;
 
 procedure DAbstractBarImage.Draw;
 var
@@ -157,7 +157,7 @@ begin
   begin
     FBar.Min := 0;
     FBar.Max := FTarget.Hp.Value[2];
-    FBar.Position := FTarget.Hp.Value[0];
+    FBar.Position := AboveZero(FTarget.Hp.Value[0]);
   end;
 end;
 
