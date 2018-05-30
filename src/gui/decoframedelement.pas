@@ -29,17 +29,19 @@ uses
   DecoGlobal, DecoTime;
 
 type
+  DAbstractFramedElement = class(DAbstractArranger)
+  strict protected
+    FFrame: DAbstractFrame;
+    function SubstractFrame(const aContainer: DInterfaceContainer): DInterfaceContainer;
+    procedure ArrangeChildren(const Animate: TAnimationStyle; const Duration: DTime); override;
+  end;
+
+type
   { An element with a frame
     Automatically manages frame gaps based on IFrame interface
     Supports only rectagonal frames (!)
     May be used "as is", but expected to contain only one CenterArranger child }
-  DFramedElement = class(DAbstractArranger)
-  strict private
-    FFrame: DRectagonalFrame;
-//    procedure SetFrame(const Value: DAbstractFrame);
-    function SubstractFrame(const aContainer: DInterfaceContainer): DInterfaceContainer;
-  strict protected
-    procedure ArrangeChildren(const Animate: TAnimationStyle; const Duration: DTime); override;
+  DFramedElement = class(DAbstractFramedElement)
   public
     procedure LoadFrame(const aImage: DFrameImage);
   public
@@ -51,30 +53,7 @@ implementation
 uses
   DecoMath, DecoLog;
 
-{procedure DFramedElement.SetFrame(const Value: DAbstractFrame);
-begin
-  if (FFrame <> Value) and (Value is IFrame) then
-  begin
-    if FFrame <> nil then
-      Children.Remove(FFrame);
-    FFrame := Value;
-    ArrangeChildren(asNone, -1); //just reset the animation
-  end;
-end;}
-
-procedure DFramedElement.LoadFrame(const aImage: DFrameImage);
-begin
-  if aImage <> nil then
-  begin
-    FFrame.Load(aImage);
-    ArrangeChildren(asNone, -1); //just reset the animation
-  end else
-    Log(LogInterfaceError, CurrentRoutine, 'Frame image provided is nil!');
-end;
-
-{-----------------------------------------------------------------------------}
-
-function DFramedElement.SubstractFrame(const aContainer: DInterfaceContainer): DInterfaceContainer;
+function DAbstractFramedElement.SubstractFrame(const aContainer: DInterfaceContainer): DInterfaceContainer;
 begin
   Result.AssignFrom(aContainer);
   if FFrame is IFrame then
@@ -94,7 +73,7 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-procedure DFramedElement.ArrangeChildren(const Animate: TAnimationStyle; const Duration: DTime);
+procedure DAbstractFramedElement.ArrangeChildren(const Animate: TAnimationStyle; const Duration: DTime);
 var
   c: DSingleInterfaceElement;
   FromState, ToState: DInterfaceContainer;
@@ -116,6 +95,21 @@ begin
     c.SetSize(ToState, Animate, Duration);
   end;
 end;
+
+{=============================================================================}
+
+procedure DFramedElement.LoadFrame(const aImage: DFrameImage);
+begin
+  if aImage <> nil then
+  begin
+    //FFrame is guaranteed to be DRectagonalFrame by Create
+    (FFrame as DRectagonalFrame).Load(aImage);
+    ArrangeChildren(asNone, -1); //just reset the animation
+  end else
+    Log(LogInterfaceError, CurrentRoutine, 'Frame image provided is nil!');
+end;
+
+{-----------------------------------------------------------------------------}
 
 constructor DFramedElement.Create;
 begin
