@@ -25,24 +25,25 @@ interface
 
 uses
   DecoInterfaceCore, DecoInterfaceContainer,
-  DecoFrames, DecoInterfaceArrangers,
+  DecoFrames, DecoImages, DecoInterfaceArrangers,
   DecoGlobal, DecoTime;
 
 type
   { An element with a frame
     Automatically manages frame gaps based on IFrame interface
-    Supports both rectagonal and image frames
+    Supports only rectagonal frames (!)
     May be used "as is", but expected to contain only one CenterArranger child }
   DFramedElement = class(DAbstractArranger)
   strict private
-    FFrame: DAbstractFrame;
-    procedure SetFrame(const Value: DAbstractFrame);
+    FFrame: DRectagonalFrame;
+//    procedure SetFrame(const Value: DAbstractFrame);
     function SubstractFrame(const aContainer: DInterfaceContainer): DInterfaceContainer;
   strict protected
     procedure ArrangeChildren(const Animate: TAnimationStyle; const Duration: DTime); override;
   public
-    { Frame around this element }
-    property Frame: DAbstractFrame read FFrame write SetFrame;
+    procedure LoadFrame(const aImage: DFrameImage);
+  public
+    constructor Create; override;
   end;
 
 {............................................................................}
@@ -50,16 +51,25 @@ implementation
 uses
   DecoMath, DecoLog;
 
-procedure DFramedElement.SetFrame(const Value: DAbstractFrame);
+{procedure DFramedElement.SetFrame(const Value: DAbstractFrame);
 begin
   if (FFrame <> Value) and (Value is IFrame) then
   begin
     if FFrame <> nil then
       Children.Remove(FFrame);
     FFrame := Value;
-    Children.Add(FFrame);
     ArrangeChildren(asNone, -1); //just reset the animation
   end;
+end;}
+
+procedure DFramedElement.LoadFrame(const aImage: DFrameImage);
+begin
+  if aImage <> nil then
+  begin
+    FFrame.Load(aImage);
+    ArrangeChildren(asNone, -1); //just reset the animation
+  end else
+    Log(LogInterfaceError, CurrentRoutine, 'Frame image provided is nil!');
 end;
 
 {-----------------------------------------------------------------------------}
@@ -105,6 +115,13 @@ begin
     c.ForceSize(FromState);
     c.SetSize(ToState, Animate, Duration);
   end;
+end;
+
+constructor DFramedElement.Create;
+begin
+  inherited Create;
+  FFrame := DRectagonalFrame.Create;
+  Children.Add(FFrame);
 end;
 
 end.

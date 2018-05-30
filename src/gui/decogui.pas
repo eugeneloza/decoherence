@@ -195,13 +195,13 @@ begin
 
   Grab(DWind.Create);
 
-  Frame := DRectagonalFrame.Create;
+{  Frame := DRectagonalFrame.Create;
   Frame.SetSize(100, 100, 300, 300, 0.9, asFlyInRadial, 2.0);
-  Frame.Load(GetFrameByName('RegularFrame'));
+  Frame.Load(GetFrameByName('RegularFrame'));}
   //Grab(Frame);
 
   Arr := DFramedElement.Create;
-  Arr.Frame := Frame;
+  Arr.LoadFrame(GetFrameByName('RegularFrame'));
 
   Lab := DLabelImage.Create;
   Lab.ShadowIntensity := 1;
@@ -216,8 +216,7 @@ begin
   Grab(Arr);
 
   Bar := DHealthBar.Create;
-  Bar.Frame := DRectagonalFrame.Create;
-  (Bar.Frame as DRectagonalFrame).Load(GetFrameByName('RegularFrame'));
+  Bar.LoadFrame(GetFrameByName('RegularFrame'));
   Bar.SetSize(600, 200, 16, 165);
   Grab(Bar);
 
