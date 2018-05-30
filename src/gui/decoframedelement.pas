@@ -41,7 +41,7 @@ type
     Automatically manages frame gaps based on IFrame interface
     Supports only rectagonal frames (!)
     May be used "as is", but expected to contain only one CenterArranger child }
-  DFramedElement = class(DAbstractFramedElement)
+  DRectagonalFramedElement = class(DAbstractFramedElement)
   public
     procedure LoadFrame(const aImage: DFrameImage);
   public
@@ -98,7 +98,7 @@ end;
 
 {=============================================================================}
 
-procedure DFramedElement.LoadFrame(const aImage: DFrameImage);
+procedure DRectagonalFramedElement.LoadFrame(const aImage: DFrameImage);
 begin
   if aImage <> nil then
   begin
@@ -111,7 +111,7 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-constructor DFramedElement.Create;
+constructor DRectagonalFramedElement.Create;
 begin
   inherited Create;
   FFrame := DRectagonalFrame.Create;

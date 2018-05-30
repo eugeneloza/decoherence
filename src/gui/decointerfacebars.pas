@@ -47,7 +47,7 @@ type
 
 type
   {}
-  DFramedBar = class(DFramedElement)
+  DFramedBar = class(DRectagonalFramedElement)
   strict protected
     FBar: DabstractBarImage;
   public

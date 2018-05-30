@@ -186,7 +186,7 @@ end;
 procedure DGUI.TestInterface;
 var
   Frame: DRectagonalFrame;
-  Arr: DFramedElement;
+  Arr: DRectagonalFramedElement;
   Img: DSimpleImage;
   Bar: DHealthBar;
   Lab: DLabelImage;
@@ -200,7 +200,7 @@ begin
   Frame.Load(GetFrameByName('RegularFrame'));}
   //Grab(Frame);
 
-  Arr := DFramedElement.Create;
+  Arr := DRectagonalFramedElement.Create;
   Arr.LoadFrame(GetFrameByName('RegularFrame'));
 
   Lab := DLabelImage.Create;
