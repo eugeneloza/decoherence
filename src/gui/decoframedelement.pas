@@ -49,6 +49,15 @@ type
     constructor Create; override;
   end;
 
+type
+  {}
+  DImageFramedElement = class(DAbstractFramedElement)
+  public
+    {}
+    procedure LoadFrame(const aImage: DImage);
+  public
+    constructor Create; override;
+  end;
 
 {............................................................................}
 implementation
@@ -120,6 +129,28 @@ constructor DRectagonalFramedElement.Create;
 begin
   inherited Create;
   FFrame := DRectagonalFrame.Create;
+  Children.Add(FFrame);
+end;
+
+{=============================================================================}
+
+procedure DImageFramedElement.LoadFrame(const aImage: DImage);
+begin
+  if aImage <> nil then
+  begin
+    //FFrame is guaranteed to be DRectagonalFrame by Create
+    (FFrame as DImageFrame).Load(aImage);
+    ArrangeChildren(asNone, -1); //just reset the animation
+  end else
+    Log(LogInterfaceError, CurrentRoutine, 'Frame image provided is nil!');
+end;
+
+{-----------------------------------------------------------------------------}
+
+constructor DImageFramedElement.Create;
+begin
+  inherited Create;
+  FFrame := DImageFrame.Create;
   Children.Add(FFrame);
 end;
 
