@@ -43,10 +43,12 @@ type
     May be used "as is", but expected to contain only one CenterArranger child }
   DRectagonalFramedElement = class(DAbstractFramedElement)
   public
+    {}
     procedure LoadFrame(const aImage: DFrameImage);
   public
     constructor Create; override;
   end;
+
 
 {............................................................................}
 implementation
@@ -80,20 +82,23 @@ var
 begin
   //inherited ArrangeChildren(Animate, Duration); <------- parent is abstract
 
-  if FFrame is IFrame then
+  if not (FFrame is IFrame) then
   begin
     Log(LogInterfaceError, CurrentRoutine, 'ERROR: Frame is nil!');
     //Exit; //the procedure is robust and will handle Frame=nil just as gap=0.
-  end;
+  end
+  else
+    FFrame.SetSize(Self.Next, asNone, -1);
 
   FromState := SubstractFrame(Self.Current);
   ToState := SubstractFrame(Self.Next);
 
   for c in Children do
-  begin
-    c.ForceSize(FromState);
-    c.SetSize(ToState, Animate, Duration);
-  end;
+    if c <> FFRame then
+    begin
+      c.ForceSize(FromState);
+      c.SetSize(ToState, Animate, Duration);
+    end;
 end;
 
 {=============================================================================}
