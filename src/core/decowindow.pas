@@ -33,6 +33,8 @@ var
   Window: TCastleWindow;
   {}
   ScreenShotPending: boolean;
+  {}
+  HideMouseCursorInScreenshot: boolean = true;
 
 { Creates and initializes the Window }
 procedure InitWindow;
@@ -72,6 +74,7 @@ begin
   WriteBoolean(RootNode, 'FullScreen', ConfigFullScreen);
   WriteInteger(RootNode, 'Width', ConfigWindowWidth);
   WriteInteger(RootNode, 'Height', ConfigWindowHeight);
+  WriteBoolean(RootNode, 'HideMouseCursorInScreenshot', HideMouseCursorInScreenshot);
   WriteFile;
 end;
 
@@ -83,6 +86,7 @@ procedure ReadWindowConfiguration;
     ConfigFullScreen := false;
     ConfigWindowWidth := 1024;
     ConfigWindowHeight := 600;
+    HideMouseCursorInScreenshot := true;
   end;
 var
   RootNode: TDOMElement;
@@ -98,6 +102,7 @@ begin
     ConfigFullScreen := ReadBoolean(RootNode, 'FullScreen');
     ConfigWindowWidth := ReadInteger(RootNode, 'Width');
     ConfigWindowHeight := ReadInteger(RootNode, 'Height');
+    HideMouseCursorInScreenshot := ReadBoolean(RootNode, 'HideMouseCursorInScreenshot');
     EndReadFile;
   end;
 end;

@@ -28,10 +28,8 @@ uses
   DecoImages, DecoInterfaceCore,
   DecoGlobal;
 
-const
-  HideMouseCursorInScreenshot = true;
-
-type TCursorType = (ctNone, ctDefault, ctMouseLook);
+type
+  TCursorType = (ctNone, ctDefault, ctMouseLook);
 
 type
   { Mouse/touch cursor }
