@@ -66,7 +66,7 @@ end;
 procedure InitBurnerImage;
 begin
   Log(LogInit, CurrentRoutine, 'Loading burner...');
-  BurnerImage := LoadCastleImage('GUI/Burner/burner_Pattern_203_CC0_by_Nobiax_diffuse.png');
+  BurnerImage := LoadCastleImage('GUI/Burner/abstract-background-1523717636ybk_cc0_by_Linnaea_Mallette_[burner].jpg');
   BurnerImage.Resize(GUIWidth, GUIHeight, riBilinear);
 end;
 

@@ -215,6 +215,12 @@ begin
   Arr.SetSize(600, 100, 200, 200, 1.0, asFlyInRadial, 0.6);
   Grab(Arr);
 
+  Arr := DRectagonalFramedElement.Create;
+  Arr.LoadFrame(GetFrameByName('RegularFrame'));
+  Arr.SetSize(100, 100, 400, 400, 1.0, asFlyInRadial, 0.6);
+  Grab(Arr);
+
+
   Bar := DPlayerBars.Create;
   Bar.SetSize(600, 200, 16, 165);
   Grab(Bar);
