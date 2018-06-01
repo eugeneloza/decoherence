@@ -61,6 +61,15 @@ type
     constructor Create; override;
   end;
 
+type
+  {}
+  DFullScreenImage = class(DAbstractImage)
+  public
+    { Load the image. Doesn't claim ownership of the image! }
+    procedure Load(const aImage: DImage);
+  public
+    constructor Create; override;
+  end;
 {............................................................................}
 implementation
 uses
@@ -140,6 +149,23 @@ procedure DSimpleImage.Load(const aImage: DImage);
 begin
   Image := aImage;
   SetTint;
+end;
+
+{============================================================================}
+
+constructor DFullScreenImage.Create;
+begin
+  inherited Create;
+  OwnsImage := false;
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DFullScreenImage.Load(const aImage: DImage);
+begin
+  Image := aImage;
+  SetTint;
+  FullScreen;
 end;
 
 end.

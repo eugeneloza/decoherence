@@ -185,13 +185,16 @@ end;
 
 procedure DGUI.TestInterface;
 var
-  Frame: DRectagonalFrame;
   Arr: DRectagonalFramedElement;
-  Img: DSimpleImage;
+  Img: DFullScreenImage;
   Bar: DPlayerBars;
   Lab: DLabelImage;
 begin
   Clear;
+
+  {Img := DFullScreenImage.Create;
+  Img.Load(LoadFullScreenImage('GUI/Burner/abstract-background-1523717636ybk_cc0_by_Linnaea_Mallette_[burner].jpg'));
+  Grab(Img);}
 
   Grab(DWind.Create);
 
@@ -219,7 +222,6 @@ begin
   Arr.LoadFrame(GetFrameByName('RegularFrame'));
   Arr.SetSize(100, 100, 400, 400, 1.0, asFlyInRadial, 0.6);
   Grab(Arr);
-
 
   Bar := DPlayerBars.Create;
   Bar.SetSize(600, 200, 16, 165);
