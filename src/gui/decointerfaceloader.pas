@@ -54,6 +54,12 @@ begin
   ImagesDictionary := TImagesDictionary.Create([]); //doesn't own children
   ImagesDictionary.Add('PlayerHealthBarImage',
     LoadDecoImage('GUI/StatBar/HealthBar.png', 32, 329));
+  ImagesDictionary.Add('PlayerStaminaBarImage',
+    LoadDecoImage('GUI/StatBar/StaminaBar.png', 32, 329));
+  ImagesDictionary.Add('PlayerConcentrationBarImage',
+    LoadDecoImage('GUI/StatBar/MentalBar.png', 32, 329));
+  ImagesDictionary.Add('PlayerMetaphysicsBarImage',
+    LoadDecoImage('GUI/StatBar/MetaphysicsBar.png', 32, 329));
 end;
 
 procedure LoadInterface;

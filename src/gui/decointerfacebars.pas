@@ -73,6 +73,30 @@ type
     constructor Create; override;
   end;
 
+type
+  {}
+  DStaminaBar = class(DStatBar)
+  public
+    procedure Update; override;
+    constructor Create; override;
+  end;
+
+type
+  {}
+  DConcentrationBar = class(DStatBar)
+  public
+    procedure Update; override;
+    constructor Create; override;
+  end;
+
+type
+  {}
+  DMetaphysicsBar = class(DStatBar)
+  public
+    procedure Update; override;
+    constructor Create; override;
+  end;
+
 implementation
 
 uses
@@ -161,6 +185,77 @@ begin
     FBar.Position := AboveZero(FTarget.Hp.Value[0]);
   end;
 end;
+
+{--------------------------------------------------------------------------}
+
+constructor DStaminaBar.Create;
+begin
+  inherited Create;
+  LoadFrame(GetFrameByName('PlayerStatBarFrame'));
+  FBar.Load(GetImageByName('PlayerStaminaBarImage'));
+  FBar.Kind := bsVertical;
+end;
+
+{---------------------------------------------------------------------------}
+
+procedure DStaminaBar.Update;
+begin
+  inherited Update;
+  if FTarget <> nil then
+  begin
+    FBar.Min := 0;
+    FBar.Max := FTarget.Sta.Value[2];
+    FBar.Position := AboveZero(FTarget.Sta.Value[0]);
+  end;
+end;
+
+{--------------------------------------------------------------------------}
+
+constructor DConcentrationBar.Create;
+begin
+  inherited Create;
+  LoadFrame(GetFrameByName('PlayerStatBarFrame'));
+  FBar.Load(GetImageByName('PlayerConcentrationBarImage'));
+  FBar.Kind := bsVertical;
+end;
+
+{---------------------------------------------------------------------------}
+
+procedure DConcentrationBar.Update;
+begin
+  inherited Update;
+  if FTarget <> nil then
+  begin
+    FBar.Min := 0;
+    FBar.Max := FTarget.Cnc.Value[2];
+    FBar.Position := AboveZero(FTarget.Cnc.Value[0]);
+  end;
+end;
+
+{--------------------------------------------------------------------------}
+
+constructor DMetaphysicsBar.Create;
+begin
+  inherited Create;
+  LoadFrame(GetFrameByName('PlayerStatBarFrame'));
+  FBar.Load(GetImageByName('PlayerMetaphysicsBarImage'));
+  FBar.Kind := bsVertical;
+end;
+
+{---------------------------------------------------------------------------}
+
+procedure DMetaphysicsBar.Update;
+begin
+  inherited Update;
+  if FTarget <> nil then
+  begin
+    FBar.Min := 0;
+    FBar.Max := FTarget.Mph.Value[2];
+    FBar.Position := AboveZero(FTarget.Mph.Value[0]);
+  end;
+end;
+
+{--------------------------------------------------------------------------}
 
 end.
 
