@@ -25,6 +25,7 @@ unit DecoImages;
 interface
 
 uses
+  Generics.Collections,
   CastleGLImages, CastleImages, CastleColors, CastleVectors,
   DecoGlobal;
 
@@ -79,11 +80,29 @@ type
     CursorShift: TVector2Integer;
   end;
 
+type
+  TImagesDictionary = specialize TObjectDictionary<string, DImage>;
 
+var
+  ImagesDictionary: TImagesDictionary;
+
+function GetImageByName(const ItemName: string): DImage; TryInline
 {............................................................................}
 implementation
 uses
   DecoLog;
+
+function GetImageByName(const ItemName: string): DImage; TryInline
+begin
+  Result := nil; //to avoid uninitialized variable hint
+  if not ImagesDictionary.TryGetValue(ItemName, Result) then
+  begin
+    Log(LogInterfaceError, CurrentRoutine, 'Unknown Image Name: ' + ItemName);
+    Result := nil;
+  end;
+end;
+
+{=============================================================================}
 
 procedure DImage.Draw(const X, Y: Single); TryInline
 begin

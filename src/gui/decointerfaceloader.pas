@@ -32,9 +32,11 @@ implementation
 uses
   {$IFDEF BurnerImage}DecoBurner,{$ENDIF}
   DecoFont,
-  DecoWind, DecoFrames,
+  DecoWind, DecoFrames, DecoImages,
   DecoImageLoader,
   DecoLog;
+
+{............................................................................}
 
 procedure LoadFrames;
 begin
@@ -45,8 +47,14 @@ begin
     LoadFrameImage('GUI/Frames/GradientFrame.png', 3, 3, 3, 3));
 end;
 
+{-----------------------------------------------------------------------------}
 
-{............................................................................}
+procedure LoadImages;
+begin
+  ImagesDictionary := TImagesDictionary.Create([]); //doesn't own children
+  ImagesDictionary.Add('PlayerHealthBarImage',
+    LoadDecoImage('GUI/StatBar/HealthBar.png', 32, 329));
+end;
 
 procedure LoadInterface;
 begin
@@ -57,6 +65,7 @@ begin
   {$ENDIF}
   InitWind;
   LoadFrames;
+  LoadImages;
 end;
 
 {-----------------------------------------------------------------------------}
@@ -66,6 +75,7 @@ begin
   Log(LogInit, CurrentRoutine, 'Freeing interface objects.');
   FreeFonts;
   FramesDictionary.Free;
+  ImagesDictionary.Free;
 end;
 
 end.
