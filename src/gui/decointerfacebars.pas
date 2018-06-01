@@ -76,7 +76,7 @@ type
 implementation
 
 uses
-  DecoLog, DecoImageLoader, DecoFrames, DecoMath;
+  DecoLog, DecoImageLoader, DecoImages, DecoFrames, DecoMath;
 
 procedure DAbstractBarImage.Draw;
 var
@@ -145,7 +145,7 @@ constructor DHealthBar.Create;
 begin
   inherited Create;
   LoadFrame(GetFrameByName('StatBarFrame'));
-  FBar.Load(LoadDecoImage('GUI/StatBar/HealthBar.png', 32, 329));
+  FBar.Load(GetImageByName('PlayerHealthBarImage'));
   FBar.Kind := bsVertical;
 end;
 
