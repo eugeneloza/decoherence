@@ -97,6 +97,21 @@ type
     constructor Create; override;
   end;
 
+type
+  {}
+  DPlayerBars = class(DRectagonalFramedElement)
+  strict private
+    HealthBar: DHealthBar;
+    StaminaBar: DStaminaBar;
+    ConcentrationBar: DConcentrationBar;
+    MetaphysicsBar: DMetaphysicsBar;
+    FTarget: DBaseActor;
+    procedure SetTarget(const aTarget: DBaseActor);
+  public
+    {}
+    property Target: DBaseActor read FTarget write SetTarget;
+  end;
+
 implementation
 
 uses
@@ -252,6 +267,20 @@ begin
     FBar.Min := 0;
     FBar.Max := FTarget.Mph.Value[2];
     FBar.Position := AboveZero(FTarget.Mph.Value[0]);
+  end;
+end;
+
+{==========================================================================}
+
+procedure DPlayerBars.SetTarget(const aTarget: DBaseActor);
+begin
+  if FTarget <> aTarget then
+  begin
+    FTarget := aTarget;
+    HealthBar.Target := FTarget;
+    StaminaBar.Target := FTarget;
+    ConcentrationBar.Target := FTarget;
+    MetaphysicsBar.Target := FTarget;
   end;
 end;
 
