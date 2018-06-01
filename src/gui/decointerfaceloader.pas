@@ -45,6 +45,8 @@ begin
     LoadFrameImage('GUI/Frames/GradientFrame.png', 3, 3, 3, 3));
   FramesDictionary.Add('PlayerStatBarFrame',
     LoadFrameImage('GUI/Frames/GradientFrame.png', 1, 1, 1, 1));
+  FramesDictionary.Add('PlayerBarsFrame',
+    LoadFrameImage('GUI/Frames/GradientFrame.png', 2, 2, 2, 2));
 end;
 
 {-----------------------------------------------------------------------------}

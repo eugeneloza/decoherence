@@ -110,6 +110,8 @@ type
   public
     {}
     property Target: DBaseActor read FTarget write SetTarget;
+  public
+    constructor Create; override;
   end;
 
 implementation
@@ -285,6 +287,24 @@ begin
 end;
 
 {--------------------------------------------------------------------------}
+
+constructor DPlayerBars.Create;
+begin
+  inherited Create;
+  HealthBar := DHealthBar.Create;
+  StaminaBar := DStaminaBar.Create;
+  ConcentrationBar := DConcentrationBar.Create;
+  MetaphysicsBar := DMetaphysicsBar.Create;
+  LoadFrame(GetFrameByName('PlayerBarsFrame'));
+  Grab(HealthBar);
+  Grab(StaminaBar);
+  Grab(ConcentrationBar);
+  Grab(MetaphysicsBar);
+end;
+
+{--------------------------------------------------------------------------}
+
+
 
 end.
 
