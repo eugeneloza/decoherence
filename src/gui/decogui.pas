@@ -188,7 +188,7 @@ var
   Frame: DRectagonalFrame;
   Arr: DRectagonalFramedElement;
   Img: DSimpleImage;
-  Bar: DHealthBar;
+  Bar: DPlayerBars;
   Lab: DLabelImage;
 begin
   Clear;
@@ -215,7 +215,7 @@ begin
   Arr.SetSize(600, 100, 200, 200, 1.0, asFlyInRadial, 0.6);
   Grab(Arr);
 
-  Bar := DHealthBar.Create;
+  Bar := DPlayerBars.Create;
   Bar.SetSize(600, 200, 16, 165);
   Grab(Bar);
 
