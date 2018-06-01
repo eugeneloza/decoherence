@@ -217,7 +217,6 @@ begin
 
   Bar := DHealthBar.Create;
   Bar.SetSize(600, 200, 16, 165);
-  Bar.LoadFrame(GetFrameByName('RegularFrame'));
   Grab(Bar);
 
   Lab := DLabelImage.Create;
