@@ -24,9 +24,9 @@ unit DecoInterfaceBars;
 interface
 
 uses
-  DecoInterfaceImages, DecoFramedElement,
+  DecoInterfaceImages, DecoFramedElement, DecoInterfaceCore,
   DecoBaseActor,
-  DecoGlobal;
+  DecoTime, DecoGlobal;
 
 type
   TBarStyle = (bsVertical, bsHorizontal);
@@ -107,6 +107,8 @@ type
     MetaphysicsBar: DMetaphysicsBar;
     FTarget: DBaseActor;
     procedure SetTarget(const aTarget: DBaseActor);
+  strict protected
+    procedure ArrangeChildren(const Animate: TAnimationStyle; const Duration: DTime); override;
   public
     {}
     property Target: DBaseActor read FTarget write SetTarget;
@@ -284,6 +286,34 @@ begin
     ConcentrationBar.Target := FTarget;
     MetaphysicsBar.Target := FTarget;
   end;
+end;
+
+{--------------------------------------------------------------------------}
+
+procedure DPlayerBars.ArrangeChildren(const Animate: TAnimationStyle; const Duration: DTime);
+begin
+  //inherited ArrangeChildren(Animate, Duration); <------- This arranger is different
+  UpdateFrame;
+  if (FTarget = nil) or (FTarget.isMage) then
+  begin
+    HealthBar.ForceSize(FromState);
+    HealthBar.SetSize(ToState, Animate, Duration);
+    StaminaBar.ForceSize(FromState);
+    StaminaBar.SetSize(ToState, Animate, Duration);
+    ConcentrationBar.ForceSize(FromState);
+    ConcentrationBar.SetSize(ToState, Animate, Duration);
+    MetaphysicsBar.ForceSize(FromState);
+    MetaphysicsBar.SetSize(ToState, Animate, Duration);
+  end else
+  begin
+    HealthBar.ForceSize(FromState);
+    HealthBar.SetSize(ToState, Animate, Duration);
+    StaminaBar.ForceSize(FromState);
+    StaminaBar.SetSize(ToState, Animate, Duration);
+    ConcentrationBar.ForceSize(FromState);
+    ConcentrationBar.SetSize(ToState, Animate, Duration);
+  end;
+
 end;
 
 {--------------------------------------------------------------------------}
