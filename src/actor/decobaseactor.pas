@@ -46,6 +46,7 @@ type
   DBaseActor = class(DSimpleActor)
   public
     Hp, Sta, Cnc, Mph: DStat;
+    function isMage: boolean;
   public
     constructor Create; override;
     destructor Destroy; override;
@@ -81,6 +82,14 @@ destructor DBaseActor.Destroy;
 begin
   inherited Destroy;
 end;
+
+{-----------------------------------------------------------------------------}
+
+function DBaseActor.isMage: boolean;
+begin
+  Result := Mph.Value[2] > 0;
+end;
+
 
 
 
