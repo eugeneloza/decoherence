@@ -457,7 +457,7 @@ begin
   {StartProfiler}
 
   Next.SetIntSize(ax, ay, aw, ah, aAlpha);
-  ResetAnimation
+  ResetAnimation;
 
   {StopProfiler}
 end;

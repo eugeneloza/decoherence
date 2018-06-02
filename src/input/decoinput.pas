@@ -40,7 +40,7 @@ procedure FreeInput;
 implementation
 uses CastleWindow, CastleKeysMouse,
   DecoMouse,
-  DecoWindow;
+  DecoWindow, Profiler;
 
 var
   { Handles mouse or touch input }

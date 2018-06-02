@@ -36,7 +36,7 @@ type
 {............................................................................}
 implementation
 uses
-  DecoGUI;
+  DecoGUI, Profiler; //DecoLog
 
 var
   RecordKeys: boolean = false;

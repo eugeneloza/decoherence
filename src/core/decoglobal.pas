@@ -75,7 +75,8 @@ procedure FreeGlobal;
 {............................................................................}
 implementation
 uses
-  SysUtils;
+  SysUtils,
+  Profiler; //DecoLog
 
 function GetRandomSeed: LongWord;
 {$IFDEF USE_DEV_URANDOM}
