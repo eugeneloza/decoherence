@@ -323,22 +323,15 @@ begin
   UpdateFrame;
   if (FTarget = nil) or (FTarget.isMage) then
   begin
-    HealthBar.ForceSize(FromState);
-    HealthBar.SetSize(ToState, Animate, Duration);
-    StaminaBar.ForceSize(FromState);
-    StaminaBar.SetSize(ToState, Animate, Duration);
-    ConcentrationBar.ForceSize(FromState);
-    ConcentrationBar.SetSize(ToState, Animate, Duration);
-    MetaphysicsBar.ForceSize(FromState);
-    MetaphysicsBar.SetSize(ToState, Animate, Duration);
+    HealthBar.FromToAnimate(FromState, ToState, Animate, Duration);
+    StaminaBar.FromToAnimate(FromState, ToState, Animate, Duration);
+    ConcentrationBar.FromToAnimate(FromState, ToState, Animate, Duration);
+    MetaphysicsBar.FromToAnimate(FromState, ToState, Animate, Duration);
   end else
   begin
-    HealthBar.ForceSize(FromState);
-    HealthBar.SetSize(ToState, Animate, Duration);
-    StaminaBar.ForceSize(FromState);
-    StaminaBar.SetSize(ToState, Animate, Duration);
-    ConcentrationBar.ForceSize(FromState);
-    ConcentrationBar.SetSize(ToState, Animate, Duration);
+    HealthBar.FromToAnimate(FromState, ToState, Animate, Duration);
+    StaminaBar.FromToAnimate(FromState, ToState, Animate, Duration);
+    ConcentrationBar.FromToAnimate(FromState, ToState, Animate, Duration);
   end;
 
   {StopProfiler}

@@ -126,8 +126,7 @@ begin
   for c in Children do
     if c <> FFRame then
     begin
-      c.ForceSize(FromState);
-      c.SetSize(ToState, Animate, Duration);
+      c.FromToAnimate(FromState, ToState, Animate, Duration);
     end;
 
   {StopProfiler}

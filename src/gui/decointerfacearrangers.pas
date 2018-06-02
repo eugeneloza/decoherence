@@ -100,8 +100,7 @@ begin
       vaTop: ToState.y := Self.Next.y2 - c.Next.h;
     end;
 
-    c.ForceSize(FromState);
-    c.SetSize(ToState, Animate, Duration);
+    c.FromToAnimate(FromState, ToState, Animate, Duration);
   end;
 
   {StopProfiler}

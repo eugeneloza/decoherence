@@ -104,6 +104,9 @@ type
       e.g. doesn't call SizeChanged }
     procedure ForceSize(const ax, ay, aw, ah: integer; const aAlpha: DFloat = 1.0);
     procedure ForceSize(const aContainer: DInterfaceContainer);
+    {}
+    procedure FromToAnimate(const FromContainer, ToContainer: DInterfaceContainer;
+      const Animate: TAnimationStyle = asDefault; const Duration: DTime = DefaultAnimationDuration);
     { Scale this element to full screen (no animation) }
     procedure FullScreen(const aAlpha: Single = 1);
     { This procedure alerts Parent that this element has changed its size }
@@ -468,6 +471,19 @@ begin
 
   Next.AssignFrom(aContainer);
   ResetAnimation;
+
+  {StopProfiler}
+end;
+
+{----------------------------------------------------------------------------}
+
+procedure DAbstractElement.FromToAnimate(const FromContainer, ToContainer: DInterfaceContainer;
+  const Animate: TAnimationStyle = asDefault; const Duration: DTime = DefaultAnimationDuration);
+begin
+  {StartProfiler}
+
+  ForceSize(FromContainer);
+  SetSize(ToContainer, Animate, Duration);
 
   {StopProfiler}
 end;
