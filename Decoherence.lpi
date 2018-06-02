@@ -122,7 +122,7 @@
         <PackageName Value="castle_base"/>
       </Item2>
     </RequiredPackages>
-    <Units Count="52">
+    <Units Count="53">
       <Unit0>
         <Filename Value="Decoherence.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -377,6 +377,11 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="DecoNavigation"/>
       </Unit51>
+      <Unit52>
+        <Filename Value="src/core/profiler.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Profiler"/>
+      </Unit52>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
