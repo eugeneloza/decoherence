@@ -72,10 +72,12 @@ type
 implementation
 uses
   SysUtils,
-  DecoMath, DecoLog;
+  DecoMath, DecoLog, Profiler;
 
 function DStat.ChangeCurrent(const aValue: DFloat; const aSkill: DFloat): TStatResult;
 begin
+  {StartProfiler}
+
   if (aSkill < 0) or (aSkill > 1) then
     Log(LogActorWarning, CurrentRoutine, 'Warning aSkill value is wrong: ' + FloatToStr(aSkill));
 
@@ -96,12 +98,16 @@ begin
   end
   else
     Result := srOk;
+
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
 
 function DStat.ChangeMax(const aValue: DFloat): TStatResult;
 begin
+  {StartProfiler}
+
   Value[1] := Value[1] + aValue;
 
   if Value[1] <= 0 then
@@ -117,12 +123,16 @@ begin
   end
   else
     Result := srOk;
+
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
 
 function DStat.SetValue(const aValue: DFloat): TStatResult;
 begin
+  {StartProfiler}
+
   if aValue <= 0 then
   begin
     Value[0] := aValue;
@@ -139,17 +149,23 @@ begin
     Value[0] := aValue;
     Result := srOk;
   end;
+
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
 
 function DStat.SetMaxMax(const aValue: DFloat): TStatResult;
 begin
+  {StartProfiler}
+
   Value[2] := aValue;
   if aValue > 0 then
     Result := srOk
   else
     Result := srBelowZero;
+
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}

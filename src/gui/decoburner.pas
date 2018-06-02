@@ -43,31 +43,43 @@ implementation
 uses
   SysUtils,
   DecoGUISCale,
-  DecoImageLoader, DecoLog;
+  DecoImageLoader, DecoLog, Profiler;
 
 var
   BurnerImage: TCastleImage;  //todo: not freed automatically!!!!
 
 procedure Burn(const aImage: TCastleImage; const x, y, w, h: integer);
 begin
+  {StartProfiler}
+
   {working directly on image!}
   aImage.DrawFrom(BurnerImage, 0, 0, x, y, w, h, dmMultiply);
+
+  {StopProfiler}
 end;
 
 procedure Burn(const aImage: TCastleImage; const aContainer: DInterfaceContainer);
 begin
+  {StartProfiler}
+
   {working directly on image!}
   aImage.DrawFrom(BurnerImage, 0, 0, aContainer.x, aContainer.y, aContainer.w,
     aContainer.h, dmMultiply);
+
+  {StopProfiler}
 end;
 
 {............................................................................}
 
 procedure InitBurnerImage;
 begin
+  {StartProfiler}
+
   Log(LogInit, CurrentRoutine, 'Loading burner...');
   BurnerImage := LoadCastleImage('GUI/Burner/abstract-background-1523717636ybk_cc0_by_Linnaea_Mallette_[burner].jpg');
   BurnerImage.Resize(GUIWidth, GUIHeight, riBilinear);
+
+  {StopProfiler}
 end;
 
 {$ENDIF}

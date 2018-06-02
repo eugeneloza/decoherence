@@ -60,7 +60,7 @@ implementation
 uses
   CastleVectors,
   DecoImageLoader, DecoGUIScale, DecoImages,
-  DecoLog;
+  DecoLog, Profiler;
 
 constructor DWindImage.Create;
 begin
@@ -91,6 +91,8 @@ procedure DWindImage.Update;
 var
   PhaseShift: DFloat;
 begin
+  {StartProfiler}
+
   inherited Update;
   PhaseShift := DeltaT * PhaseSpeed;
   if PhaseShift < 0.5 then
@@ -104,6 +106,8 @@ begin
   end else
     { if it was too long since last frame, reset the wind phase }
     ResetPhase;
+
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
@@ -112,6 +116,8 @@ procedure DWindImage.Draw;
 var
   PhaseScaled: integer;
 begin
+  {StartProfiler}
+
   //inherited Draw <------------ replacing parent completely
   Update;
 
@@ -128,6 +134,8 @@ begin
     PhaseScaled, GUIHeight,
     GUIWidth - PhaseScaled, 0,
     PhaseScaled, GUIHeight);
+
+  {StopProfiler}
 end;
 
 {===========================================================================}
@@ -137,6 +145,8 @@ var
 
 constructor DWind.Create;
 begin
+  {StartProfiler}
+
   inherited Create;
   Log(LogInterfaceImageLoading, CurrentRoutine, 'Loading wind...');
   Self.FullScreen;
@@ -151,15 +161,21 @@ begin
 
   Grab(Wind1);
   Grab(Wind2);
+
+  {StopProfiler}
 end;
 
 {..........................................................................}
 
 procedure InitWind;
 begin
+  {StartProfiler}
+
   WindImage1 := LoadFullScreenImage('GUI/Wind/WindClouds1_GIMP.jpg');
   WindImage2 := LoadFullScreenImage('GUI/Wind/WindClouds2_GIMP.jpg');
   { will be freed automatically at game end }
+
+  {StopProfiler}
 end;
 
 

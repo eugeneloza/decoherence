@@ -86,7 +86,7 @@ procedure FreeTime;
 implementation
 
 uses
-  SysUtils, Classes{$IFDEF Windows}, SyncObjs{$ENDIF};
+  SysUtils, Classes, Profiler{$IFDEF Windows}, SyncObjs{$ENDIF};
 
 function NiceDate: string;
 begin
@@ -103,6 +103,8 @@ const
 
 procedure doTime;
 begin
+  {StartProfiler}
+
   DecoNow := GetNow;
   if LastGlobalTime = -1 then
     LastGlobalTime := DecoNow;
@@ -130,6 +132,8 @@ begin
   LastGlobalTime := DecoNow;
 
   FrameStart := ForceGetNowThread;
+
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
@@ -264,6 +268,8 @@ end;
 
 procedure InitTime;
 begin
+  {StartProfiler}
+
   //create threaded timer and run it immediately to make sure everything is initialized properly
   ThreadedTimer := TTimerThread.Create(true);
   ThreadedTimer.Priority := tpLower;
@@ -282,7 +288,11 @@ begin
   end;
   TimerLock := TCriticalSection.Create;
   {$ENDIF}
+
+  {StopProfiler}
 end;
+
+{------------------------------------------------------------------------------}
 
 procedure FreeTime;
 begin

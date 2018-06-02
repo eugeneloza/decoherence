@@ -119,13 +119,16 @@ type
 implementation
 
 uses
-  DecoLog, DecoImages, DecoFrames, DecoMath;
+  DecoImages, DecoFrames,
+  DecoLog, DecoMath, Profiler;
 
 procedure DAbstractBarImage.Draw;
 var
   Phase: DFloat;
   PositionSource, PositionScaled: integer;
 begin
+  {StartProfiler}
+
   //inherited <---------- this render is different
   if Max = Min then
   begin
@@ -149,6 +152,8 @@ begin
     Image.Draw(Current.x, Current.y, PositionScaled, Current.h,
       0, 0, PositionSource, Image.Height);
   end;
+
+  {StopProfiler}
 end;
 
 {---------------------------------------------------------------------------}
@@ -196,6 +201,8 @@ end;
 
 procedure DHealthBar.Update;
 begin
+  {StartProfiler}
+
   inherited Update;
   if FTarget <> nil then
   begin
@@ -203,6 +210,8 @@ begin
     FBar.Max := FTarget.Hp.Value[2];
     FBar.Position := AboveZero(FTarget.Hp.Value[0]);
   end;
+
+  {StopProfiler}
 end;
 
 {--------------------------------------------------------------------------}
@@ -219,6 +228,8 @@ end;
 
 procedure DStaminaBar.Update;
 begin
+  {StartProfiler}
+
   inherited Update;
   if FTarget <> nil then
   begin
@@ -226,6 +237,8 @@ begin
     FBar.Max := FTarget.Sta.Value[2];
     FBar.Position := AboveZero(FTarget.Sta.Value[0]);
   end;
+
+  {StopProfiler}
 end;
 
 {--------------------------------------------------------------------------}
@@ -242,6 +255,8 @@ end;
 
 procedure DConcentrationBar.Update;
 begin
+  {StartProfiler}
+
   inherited Update;
   if FTarget <> nil then
   begin
@@ -249,6 +264,8 @@ begin
     FBar.Max := FTarget.Cnc.Value[2];
     FBar.Position := AboveZero(FTarget.Cnc.Value[0]);
   end;
+
+  {StopProfiler}
 end;
 
 {--------------------------------------------------------------------------}
@@ -265,6 +282,8 @@ end;
 
 procedure DMetaphysicsBar.Update;
 begin
+  {StartProfiler}
+
   inherited Update;
   if FTarget <> nil then
   begin
@@ -272,12 +291,16 @@ begin
     FBar.Max := FTarget.Mph.Value[2];
     FBar.Position := AboveZero(FTarget.Mph.Value[0]);
   end;
+
+  {StopProfiler}
 end;
 
 {==========================================================================}
 
 procedure DPlayerBars.SetTarget(const aTarget: DBaseActor);
 begin
+  {StartProfiler}
+
   if FTarget <> aTarget then
   begin
     FTarget := aTarget;
@@ -286,12 +309,16 @@ begin
     ConcentrationBar.Target := FTarget;
     MetaphysicsBar.Target := FTarget;
   end;
+
+  {StopProfiler}
 end;
 
 {--------------------------------------------------------------------------}
 
 procedure DPlayerBars.ArrangeChildren(const Animate: TAnimationStyle; const Duration: DTime);
 begin
+  {StartProfiler}
+
   //inherited ArrangeChildren(Animate, Duration); <------- This arranger is different
   UpdateFrame;
   if (FTarget = nil) or (FTarget.isMage) then
@@ -314,12 +341,15 @@ begin
     ConcentrationBar.SetSize(ToState, Animate, Duration);
   end;
 
+  {StopProfiler}
 end;
 
 {--------------------------------------------------------------------------}
 
 constructor DPlayerBars.Create;
 begin
+  {StartProfiler}
+
   inherited Create;
   HealthBar := DHealthBar.Create;
   StaminaBar := DStaminaBar.Create;
@@ -330,6 +360,8 @@ begin
   Grab(StaminaBar);
   Grab(ConcentrationBar);
   Grab(MetaphysicsBar);
+
+  {StopProfiler}
 end;
 
 {--------------------------------------------------------------------------}

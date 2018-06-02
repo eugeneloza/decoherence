@@ -71,7 +71,7 @@ implementation
 uses
   SysUtils,
   DecoPlayer, DecoGUI, DecoGUIScale, DecoGameMode, DecoWindow,
-  DecoLog;
+  DecoLog, Profiler;
 
 var
   { used to detect if mouse is in dragg-look mode }
@@ -84,6 +84,8 @@ var
   InterfaceCaughtEvent: boolean;
   ClickElement, DragElement: DSingleInterfaceElement;
 begin
+  {StartProfiler}
+
   InterfaceCaughtEvent := false;
 
   // record start of the click
@@ -144,6 +146,8 @@ begin
   GUI.UpdateCursor(Event.Position[0], Event.Position[1], DragElement);
 
   Log(LogMouseInfo, CurrentRoutine, 'Caught mouse press finger=' + IntToStr(Event.FingerIndex));
+
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
@@ -152,6 +156,8 @@ procedure DMouseInput.doMouseMotion(const Event: TInputMotion);
 var
   mb: TMouseButton;
 begin
+  {StartProfiler}
+
   { this will check all conditions properly and handle both
     mouse look and mouse drag depending on the current mode }
   if doMouseLook(Event) then
@@ -170,12 +176,16 @@ begin
     GUI.Cursor.DragElement.Drag(Round(Event.Position[0]), Round(Event.Position[1]));
 
   GUI.UpdateCursor(Event.Position[0], Event.Position[1], GUI.Cursor.DragElement);
+
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure DMouseInput.TryClick(const Event: TInputPressRelease);
 begin
+  {StartProfiler}
+
   if GUI.Cursor.ClickElement = nil then Exit;
   { There might be (and quiet possible) a bug here - when the "shift" of the
     cursor is not too large to cancel the click, but the element the click was
@@ -192,12 +202,16 @@ begin
         GUI.Cursor.ClickElement, Round(Event.Position[0]), Round(Event.Position[1]));
 
   GUI.Cursor.ClickElement := nil;
+
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure DMouseInput.doMouseRelease(const Event: TInputPressRelease);
 begin
+  {StartProfiler}
+
   // stop the click
   MouseButton[Event.MouseButton].isPressed := false;
 
@@ -217,6 +231,8 @@ begin
   end;
 
   GUI.UpdateCursor(Event.Position[0], Event.Position[1]);
+
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
@@ -230,6 +246,8 @@ end;
 
 function DMouseInput.doMouseLook(const Event: TInputMotion): boolean;
 begin
+  {StartProfiler}
+
   Result := false;
 
   if GameModeMouseLook then
@@ -252,13 +270,19 @@ begin
       Result := false;
     end;
   end;
+
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
 
 procedure DMouseInput.CenterMouseCursor;
 begin
+  {StartProfiler}
+
   Window.MousePosition := GUICenter;
+
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}

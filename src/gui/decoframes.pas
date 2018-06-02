@@ -108,16 +108,20 @@ uses
   SysUtils,
   CastleImages, CastleRectangles,
   {$IFDEF BurnerImage}DecoBurner,{$ENDIF}
-  DecoLog;
+  DecoLog, Profiler;
 
 function GetFrameByName(const ItemName: string): DFrameImage; TryInline
 begin
+  {StartProfiler}
+
   Result := nil; //to avoid uninitialized variable hint
   if not FramesDictionary.TryGetValue(ItemName, Result) then
   begin
     Log(LogInterfaceError, CurrentRoutine, 'Unknown Frame Name: ' + ItemName);
     Result := nil;
   end;
+
+  {StopProfiler}
 end;
 
 {=============================================================================}
@@ -228,6 +232,8 @@ procedure DRectagonalFrame.ResizeFrame;
 var
   TempImage: TCastleImage;
 begin
+  {StartProfiler}
+
   FreeAndNil(Image);
   TempImage := TRGBAlphaImage.Create(Next.w, Next.h);
   TempImage.Clear(Vector4(0,0,0,0));
@@ -236,22 +242,34 @@ begin
   {$IFDEF BurnerImage}Burn(TempImage, Next);{$ENDIF}
   Image := DImage.Create(TempImage, true, true);
   SetTint;
+  //InitPending := false;
+
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure DRectagonalFrame.Draw;
 begin
-  if InitPending then ResizeFrame;
+  {StartProfiler}
+
+  if InitPending then
+    ResizeFrame;
   inherited Draw;
+
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure DRectagonalFrame.Load(const aImage: DFrameImage);
 begin
+  {StartProfiler}
+
   FrameImage := aImage;
   InitPending := true;
+
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}

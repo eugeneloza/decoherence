@@ -81,6 +81,8 @@ const
   end;
 
 begin
+  {StartProfiler}
+
   if {CurrentGameMode = gmTravel} true then
   begin
     if RecordKeys then
@@ -107,6 +109,8 @@ begin
     end;
 
   end;
+
+  {StopProfiler}
 end;
 
 end.

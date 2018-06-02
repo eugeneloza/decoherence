@@ -82,6 +82,7 @@ function GetRandomSeed: LongWord;
 var
   DevRnd: file of integer;
 begin
+  {StartProfiler}
   { algorithm according to http://wiki.freepascal.org/Dev_random
     /dev/urandom is a native *nix very high-quality random number generator.
     it's 1000 times slower than CastleRandom,
@@ -93,6 +94,7 @@ begin
   until Result <> 0;
   // xorshift can't accept 0 as a random seed so we just read /dev/urandom until its not zero
   CloseFile(DevRnd);
+  {StopProfiler}
 end;
 {$ELSE}
 begin
@@ -102,10 +104,15 @@ end;
 {$ENDIF}
 
 {.............................................................................}
+
 procedure InitGlobal;
 begin
+  {StartProfiler}
   DRND := TCastleRandom.Create(GetRandomSeed);
+  {StopProfiler}
 end;
+
+{----------------------------------------------------------------------------}
 
 procedure FreeGlobal;
 begin

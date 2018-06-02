@@ -45,7 +45,7 @@ procedure FreeEncoding;
 implementation
 uses
   SysUtils, CastleStringUtils,
-  DecoTranslation, DecoLog;
+  DecoTranslation, DecoLog, Profiler;
 
 var
   { Used to display nubmers, maybe fixed-point, e.g. health }
@@ -91,6 +91,8 @@ end;
 
 procedure InitEncoding;
 begin
+  {StartProfiler}
+
   Log(LogInterfaceInfo, CurrentRoutine, 'Init encoding.');
 
   // create basic char sets
@@ -112,6 +114,8 @@ begin
     Language_Russian: FullCharSet.Add(RussianString);
     //Language_Ukrainian: FullCharSet.Add(RussianString); // not available
   end;
+
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}

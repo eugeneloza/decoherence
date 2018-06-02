@@ -91,7 +91,7 @@ uses
   CastleColors, CastleVectors,
   CastleTextureFont_LinBiolinumRG_16, //a debug font
   DecoFolders, DecoFontFile, DecoFontEncoding,
-  DecoGenerics, DecoTrash, DecoLog, DecoMath;
+  DecoGenerics, DecoTrash, DecoLog, DecoMath, Profiler;
 
 {-----------------------------------------------------------------------------}
 
@@ -102,6 +102,8 @@ var
   TotalFitSpace, CurrentPos, y, WhiteSpace: integer;
   StringWidth: integer;
 begin
+  {StartProfiler}
+
   Result := TGrayscaleAlphaImage.Create;
   if FitWidth then
     StringWidth := aString.FullWidth
@@ -147,6 +149,8 @@ begin
     p^[0] := 255;
     inc(P);
   end;
+
+  {StopProfiler}
 end;
 
 {---------------------------------------------------------------------------}
@@ -159,6 +163,8 @@ var
   MaxH, MaxHb, MaxW: integer;
   BrokenString: DBrokenString;
 begin
+  {StartProfiler}
+
   BrokenString := Self.BreakStings(aString, aWidth);
 
   MaxH := 0;
@@ -187,6 +193,8 @@ begin
   end;
 
   BrokenString.Free;
+
+  {StopProfiler}
 end;
 
 {---------------------------------------------------------------------------}
@@ -198,6 +206,8 @@ var
   Iteration, i: integer;
   p: PVector2byte;
 begin
+  {StartProfiler}
+
   DummyImage := Self.StringToImage(aString, aWidth, FitWidth);
 
   if (ShadowStrength > 0) and (ShadowLength > 0) then
@@ -223,6 +233,8 @@ begin
     DummyImage.Free;
   end else
     Result := DummyImage;
+
+  {StopProfiler}
 end;
 
 {---------------------------------------------------------------------------}
@@ -268,6 +280,8 @@ var
     Words := nil;
   end;
 begin
+  {StartProfiler}
+
   Result := DBrokenString.Create;
 
   SpaceWidth := TextWidth(' ');
@@ -303,6 +317,8 @@ begin
   isLineBreak := true; //so that it'll be arranged correctly
   LastBreakPoint := Length(aString) + 1; //the last break point is EOL symbol
   AddNewString;
+
+  {StopProfiler}
 end;
 
 {============================================================================}
@@ -324,7 +340,11 @@ function GetFontByName(const FontName: string): DFont;
     end;
   end;
 begin
+  {StartProfiler}
+
   Result := GetLoadedFont(GetStringByKey(FontAlias, FontName, 'Default'));
+
+  {StopProfiler}
 end;
 
 {............................................................................}
@@ -345,6 +365,8 @@ procedure InitFonts;
 var
   s: string;
 begin
+  {StartProfiler}
+
   Log(LogInit, CurrentRoutine, 'Initializing fonts.');
   InitEncoding;
 
@@ -365,13 +387,19 @@ begin
   FreeEncoding; //as soon as all fonts are loaded, we don't need encoding anymore
 
   FreeFontsInfo; //as soon as all fonts are loaded, we don't need FontInfo anymore
+
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure FreeFonts;
 begin
+  {StartProfiler}
+
   LoadedFonts.Free; //will free children
+
+  {StopProfiler}
 end;
 
 end.

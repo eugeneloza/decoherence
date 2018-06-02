@@ -48,16 +48,20 @@ function Equals(const Source1, Source2: DStringDictionary): boolean;
 {............................................................................}
 implementation
 uses
-  DecoLog;
+  DecoLog, Profiler;
 
 function GetStringByKey(const Source: DStringDictionary; const aKey: string;
   const aDefault: string = ''): string;
 begin
+  {StartProfiler}
+
   if not Source.TryGetValue(aKey, Result) then
   begin
     Log(LogWarning, CurrentRoutine, 'Unknown Key: ' + aKey);
     Result := aDefault;
-  end
+  end;
+
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
@@ -66,6 +70,8 @@ function Equals(const Source1, Source2: DStringDictionary): boolean;
 var
   s: string;
 begin
+  {StartProfiler}
+
   if Source1 = Source2 then //if pointers are equal
     Result := true
   else
@@ -81,6 +87,8 @@ begin
     end
     else // if amount of records is not equal
       Result := false;
+
+  {StopProfiler}
 end;
 
 end.

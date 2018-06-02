@@ -91,7 +91,7 @@ uses
   SysUtils,
   CastleImages,
   DecoImages,
-  DecoLog;
+  DecoLog, Profiler;
 
 constructor DLabelImage.Create;
 begin
@@ -115,11 +115,15 @@ end;
 
 procedure DLabelImage.SetText(const Value: string);
 begin
+  {StartProfiler}
+
   if fText <> Value then
   begin
     fText := Value;
     PrepareTextImage;
   end;
+
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
@@ -138,6 +142,8 @@ procedure DLabelImage.PrepareTextImage;
 var
   TextImage: TGrayscaleAlphaImage;
 begin
+  {StartProfiler}
+
   FreeAndNil(Image);
 
   RecentLabelWidth := GetLabelWidth;
@@ -150,17 +156,23 @@ begin
 
   Image := DImage.Create(TextImage, true, true);
   SetTint;
+
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure DLabelImage.SizeChanged(const Animate: TAnimationStyle; const Duration: DTime);
 begin
+  {StartProfiler}
+
   if (FText <> '') and (LabelWidth <> RecentLabelWidth) then
   begin
     Log(LogInterfaceWarning, CurrentRoutine, 'Warning: changing size of a non-empty label; content = ' + FText);
     PrepareTextImage;
   end;
+
+  {StopProfiler}
 end;
 
 {=============================================================================}

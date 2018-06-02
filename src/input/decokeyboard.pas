@@ -74,12 +74,14 @@ implementation
 uses
   DecoPlayer,
   DOM, DecoFiles, DecoFolders,
-  DecoGameMode;
+  DecoGameMode, Profiler; //DecoLog
 
 {----------------------------------------------------------------------------}
 
 procedure DKeyboardInput.MoveKeyPress(const aKey: DMoveKey);
 begin
+  {StartProfiler}
+
   MoveKeys[aKey] := true;
   case aKey of
     KeyboardForward: Player.doAccelerateForward(+1.0);
@@ -87,12 +89,16 @@ begin
     KeyboardStrafeLeft: Player.doAccelerateStrafe(+1.0);
     KeyboardStrafeRight: Player.doAccelerateStrafe(-1.0);
   end;
+
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
 
 procedure DKeyboardInput.MoveKeyRelease(const aKey: DMoveKey);
 begin
+  {StartProfiler}
+
   MoveKeys[aKey] := false;
   {not sure if this is the right behaviour, but let it be for now}
   case aKey of
@@ -101,12 +107,16 @@ begin
     KeyboardStrafeLeft: Player.doAccelerateStrafe(0);
     KeyboardStrafeRight: Player.doAccelerateStrafe(0);
   end;
+
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
 
 procedure DKeyboardInput.doKeyboardRelease(const aKey: TKey);
 begin
+  {StartProfiler}
+
   if GameModeWalk then
   begin
     if aKey = KeyboardOptions.MoveForwardKey then
@@ -121,12 +131,16 @@ begin
           if aKey = KeyboardOptions.StrafeRightKey then
             MoveKeyRelease(KeyboardStrafeRight);
   end;
+
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure DKeyboardInput.doKeyboardPress(const aKey: TKey);
 begin
+  {StartProfiler}
+
   if GameModeWalk then
   begin
     if aKey = KeyboardOptions.MoveForwardKey then
@@ -142,6 +156,8 @@ begin
             MoveKeyPress(KeyboardStrafeRight);
           KeyboardRecorder.KeyRecorder(aKey);
   end;
+
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
@@ -161,6 +177,8 @@ procedure DKeyboardInput.LoadKeyboardConfig;
 var
   RootNode: TDOMElement;
 begin
+  {StartProfiler}
+
   RootNode := StartReadFile(GameConfigFolder('Keyboard.xml'));
   if RootNode = nil then
   begin
@@ -180,6 +198,7 @@ begin
       EndReadFile;
     end;
 
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
@@ -188,6 +207,8 @@ procedure DKeyboardInput.WriteKeyboardConfig;
 var
   RootNode: TDOMElement;
 begin
+  {StartProfiler}
+
   RootNode := CreateFile(GameConfigFolder('Keyboard.xml'));
   with KeyboardOptions do
   begin
@@ -198,6 +219,8 @@ begin
     WriteString(RootNode, 'ScreenShotKey', KeyToStr(ScreenShotKey));
   end;
   WriteFile;
+
+  {StopProfiler}
 end;
 {-----------------------------------------------------------------------------}
 
@@ -205,8 +228,12 @@ procedure DKeyboardInput.ReleaseControls;
 var
   k: DMoveKey;
 begin
+  {StartProfiler}
+
   for k in DMoveKey do
     MoveKeys[k] := false;
+
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}

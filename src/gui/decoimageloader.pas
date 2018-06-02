@@ -57,7 +57,7 @@ implementation
 uses
   SysUtils,
   DecoTrash, DecoGUIScale, DecoHDD, DecoFolders,
-  DecoLog;
+  DecoLog, Profiler;
 
 function LoadDecoImage(const aImage: TEncodedImage; const aWidth: integer = 0;
   const aHeight: integer = 0; const KeepImageCopy: boolean = true; const KeepProportions: boolean = false): DImage;
@@ -65,6 +65,8 @@ var
   ScaledImage: TCastleImage;
   ScaledWidth, ScaledHeight: integer;
 begin
+  {StartProfiler}
+
   if (aImage = nil) or (aImage.IsEmpty) then
   begin
     Log(LogImageScaleError, CurrentRoutine, 'ERROR: No image to load.');
@@ -107,6 +109,8 @@ begin
     Result := DImage.Create(ScaledImage, true, true);
   end;
   AutoFree.Add(Result);
+
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
@@ -114,23 +118,35 @@ end;
 function LoadDecoImage(const FileURL: string; const aWidth: integer = 0;
   const aHeight: integer = 0; const KeepProportions: boolean = false): DImage;
 begin
+  {StartProfiler}
+
   Result := LoadDecoImage(LoadCastleImage(FileURL), aWidth, aHeight, false, KeepProportions);
+
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
 
 function LoadFullScreenImage(const FileURL: string): DImage;
 begin
+  {StartProfiler}
+
   Result := LoadDecoImage(LoadCastleImage(FileURL), GUIWidth, GUIHeight, false, false);
+
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
 
 function LoadCastleImage(const FileURL: string): TCastleImage;
 begin
+  {StartProfiler}
+
   Log(LogInterfaceImageLoading, CurrentRoutine, 'Loading image: ' + FileURL);
   Result := LoadImageSafe(GameFolder(FileURL));
   AutoFree.Add(Result);
+
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
@@ -138,9 +154,13 @@ end;
 function LoadCursorImage(const FileURL: string;
   const ShiftX, ShiftY: integer): DCursorImage;
 begin
+  {StartProfiler}
+
   Result.Image := LoadDecoImage(FileURL);
   Result.CursorShift.Data[0] := ShiftX;
   Result.CursorShift.Data[1] := ShiftY;
+
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
@@ -148,6 +168,8 @@ end;
 function LoadFrameImage(const FileURL: string;
   const CornerTop, CornerRight, CornerBottom, CornerLeft: integer): DFrameImage;
 begin
+  {StartProfiler}
+
   Result := DFrameImage.Create;
   Result.Image := LoadCastleImage(FileURL);
   Result.Corners[0] := CornerTop;
@@ -155,6 +177,8 @@ begin
   Result.Corners[2] := CornerBottom;
   Result.Corners[3] := CornerLeft;
   AutoFree.Add(Result);
+
+  {StopProfiler}
 end;
 
 end.

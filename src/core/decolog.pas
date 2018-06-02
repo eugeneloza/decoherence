@@ -62,7 +62,7 @@ implementation
 uses
   SysUtils,
   {$IFDEF WriteLog}Classes, DecoTime,{$ENDIF}
-  CastleApplicationProperties, CastleLog;
+  CastleApplicationProperties, CastleLog, Profiler;
 
 {$IFDEF WriteLog}
 var
@@ -81,6 +81,8 @@ procedure InitLog;
 const
   Version = {$INCLUDE version.inc};
 begin
+  {StartProfiler}
+
   //initialize the log
   {$IFDEF WriteLog}
   LogStream := TFileStream.Create(NiceDate + '.log', fmCreate);
@@ -93,6 +95,8 @@ begin
   {this is basic information, so just output directly}
   WriteLnLog('(i) Compilation Date',{$I %DATE%} + ' Time: ' + {$I %TIME%});
   WriteLnLog('(i) Pointer is', IntToStr(SizeOf(Pointer) * 8) + ' bit');
+
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}

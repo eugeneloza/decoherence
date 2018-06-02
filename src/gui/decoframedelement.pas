@@ -67,10 +67,12 @@ type
 {............................................................................}
 implementation
 uses
-  DecoMath, DecoLog;
+  DecoMath, DecoLog, Profiler;
 
 function DAbstractFramedElement.SubstractFrame(const aContainer: DInterfaceContainer): DInterfaceContainer;
 begin
+  {StartProfiler}
+
   Result.AssignFrom(aContainer);
   if FFrame is IFrame then
   begin
@@ -85,12 +87,16 @@ begin
     else
       Result.y := aContainer.y;
   end;
+
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure DAbstractFramedElement.UpdateFrame;
 begin
+  {StartProfiler}
+
   if not (FFrame is IFrame) then
   begin
     Log(LogInterfaceError, CurrentRoutine, 'ERROR: Frame is nil!');
@@ -101,6 +107,8 @@ begin
 
   FromState := SubstractFrame(Self.Current);
   ToState := SubstractFrame(Self.Next);
+
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
@@ -109,6 +117,8 @@ procedure DAbstractFramedElement.ArrangeChildren(const Animate: TAnimationStyle;
 var
   c: DSingleInterfaceElement;
 begin
+  {StartProfiler}
+
   //inherited ArrangeChildren(Animate, Duration); <------- parent is abstract
 
   UpdateFrame;
@@ -119,12 +129,16 @@ begin
       c.ForceSize(FromState);
       c.SetSize(ToState, Animate, Duration);
     end;
+
+  {StopProfiler}
 end;
 
 {=============================================================================}
 
 procedure DRectagonalFramedElement.LoadFrame(const aImage: DFrameImage);
 begin
+  {StartProfiler}
+
   if aImage <> nil then
   begin
     //FFrame is guaranteed to be DRectagonalFrame by Create
@@ -132,21 +146,29 @@ begin
     ArrangeChildren(asNone, -1); //just reset the animation
   end else
     Log(LogInterfaceError, CurrentRoutine, 'Frame image provided is nil!');
+
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
 
 constructor DRectagonalFramedElement.Create;
 begin
+  {StartProfiler}
+
   inherited Create;
   FFrame := DRectagonalFrame.Create;
   Children.Add(FFrame);
+
+  {StopProfiler}
 end;
 
 {=============================================================================}
 
 procedure DImageFramedElement.LoadFrame(const aImage: DImage);
 begin
+  {StartProfiler}
+
   if aImage <> nil then
   begin
     //FFrame is guaranteed to be DRectagonalFrame by Create
@@ -154,15 +176,21 @@ begin
     ArrangeChildren(asNone, -1); //just reset the animation
   end else
     Log(LogInterfaceError, CurrentRoutine, 'Frame image provided is nil!');
+
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
 
 constructor DImageFramedElement.Create;
 begin
+  {StartProfiler}
+
   inherited Create;
   FFrame := DImageFrame.Create;
   Children.Add(FFrame);
+
+  {StopProfiler}
 end;
 
 end.

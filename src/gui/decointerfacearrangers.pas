@@ -58,14 +58,18 @@ type
 
 {............................................................................}
 implementation
-{uses
-  DecoLog;}
+uses
+  Profiler;//DecoLog;
 
 procedure DAbstractArranger.SizeChanged(const Animate: TAnimationStyle; const Duration: DTime);
 begin
+  {StartProfiler}
+
   //inherited SizeChanged(Animate, Duration);
   Self.GetAnimationState;
   ArrangeChildren(Animate, Duration);
+
+  {StopProfiler}
 end;
 
 {======================  DCenterArranger =====================================}
@@ -75,6 +79,8 @@ var
   c: DSingleInterfaceElement;
   FromState, ToState: DInterfaceContainer;
 begin
+  {StartProfiler}
+
   //inherited ArrangeChildren(Animate, Duration); <------- parent is abstract
 
   FromState.AssignFrom(Self.Current);
@@ -97,6 +103,8 @@ begin
     c.ForceSize(FromState);
     c.SetSize(ToState, Animate, Duration);
   end;
+
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}

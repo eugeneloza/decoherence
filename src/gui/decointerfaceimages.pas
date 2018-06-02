@@ -73,7 +73,8 @@ type
 {............................................................................}
 implementation
 uses
-  SysUtils, CastleGLImages;
+  SysUtils, CastleGLImages,
+  Profiler;
 
 {============================================================================}
 {========================== D ABSTRACT IMAGE ================================}
@@ -99,6 +100,8 @@ end;
 
 procedure DAbstractImage.Draw;
 begin
+  {StartProfiler}
+
   //inherited Draw; <---------- parent is abstract
   if Image <> nil then
   begin
@@ -106,6 +109,8 @@ begin
     Image.SetAlpha(Self.Alpha);
     Image.Draw(Current.x, Current.y, Current.w, Current.h);
   end;
+
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
@@ -129,8 +134,12 @@ end;
 
 procedure DAbstractImage.ResetToRealSize(const ResetAnim: boolean = false);
 begin
+  {StartProfiler}
+
   Next.SetIntWidthHeight(GetWidth, GetHeight, Next.a);
   if ResetAnim then ResetAnimation;
+
+  {StopProfiler}
 end;
 
 {============================================================================}

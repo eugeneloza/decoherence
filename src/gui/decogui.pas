@@ -83,7 +83,7 @@ implementation
 uses
   SysUtils, CastleColors, CastleGLUtils,
   DecoPlayer, DecoGameMode, DecoMouse,
-  DecoLog;
+  DecoLog, Profiler;
 
 procedure DGUI.ShowMessage(const aMessage: string);
 begin
@@ -95,6 +95,9 @@ end;
 
 procedure DGUI.Draw;
 begin
+  {StartProfiler}
+
+
   if FFirstRender then FirstRender;
 
   { clear the screen depending on the game mode
@@ -108,6 +111,8 @@ begin
   { draw special elements }
   FPSLabel.CountFPS;
   Cursor.Draw;
+
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
@@ -115,6 +120,8 @@ end;
 procedure DGUI.UpdateCursor(const CursorX, CursorY: single;
   const DragElement: DSingleInterfaceElement = nil);
 begin
+  {StartProfiler}
+
   Cursor.DragElement := DragElement;
 
   if Cursor.DragElement = nil then
@@ -135,28 +142,40 @@ begin
       Cursor.y := CursorY;
     end;
   end;
+
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure DGUI.SetTint;
 begin
+  {StartProfiler}
+
   inherited SetTint;
   Cursor.SetTint;
+
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure DGUI.FirstRender;
 begin
+  {StartProfiler}
+
   FFirstRender := false;
   Cursor.HideOSCursor;
+
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
 
 constructor DGUI.Create;
 begin
+  {StartProfiler}
+
   inherited Create;
   FullScreen;
 
@@ -170,15 +189,21 @@ begin
   SetTint;
 
   TestInterface;
+
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
 
 destructor DGUI.Destroy;
 begin
+  {StartProfiler}
+
   FreeAndNil(Cursor);
   FreeAndNil(FPSLabel);
   inherited Destroy;
+
+  {StopProfiler}
 end;
 
 {===================== SPECIFIC INTERFACE KINDS ============================}
@@ -187,6 +212,7 @@ procedure DGUI.TestInterface;
 var
   Arr: DRectagonalFramedElement;
   Img: DFullScreenImage;
+  Frame: DRectagonalFrame;
   Bar: DPlayerBars;
   Lab: DLabelImage;
 begin
@@ -198,10 +224,10 @@ begin
 
   Grab(DWind.Create);
 
-{  Frame := DRectagonalFrame.Create;
+  Frame := DRectagonalFrame.Create;
   Frame.SetSize(100, 100, 300, 300, 0.9, asFlyInRadial, 2.0);
-  Frame.Load(GetFrameByName('RegularFrame'));}
-  //Grab(Frame);
+  Frame.Load(GetFrameByName('RegularFrame'));
+  Grab(Frame);
 
   Arr := DRectagonalFramedElement.Create;
   Arr.LoadFrame(GetFrameByName('RegularFrame'));
@@ -257,14 +283,22 @@ end;
 
 procedure InitGUI;
 begin
+  {StartProfiler}
+
   GUI := DGUI.Create;
+
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure FreeGUI;
 begin
+  {StartProfiler}
+
   GUI.Free;
+
+  {StopProfiler}
 end;
 
 end.

@@ -54,7 +54,7 @@ implementation
 uses
   Math,
   DecoMath, DecoInput,
-  DecoLog;
+  DecoLog, Profiler;
 
 constructor DCameraMan.Create;
 begin
@@ -68,16 +68,24 @@ end;
 
 procedure DCameraMan.ResetUp;
 begin
+  {StartProfiler}
+
   //Up := CurrentWorld.GetGravity(Position);
+
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
 
 procedure DCameraMan.ResetAngles;
 begin
+  {StartProfiler}
+
   Theta := 0;//ArcSin(Direction[2] / Direction.Length);
   Phi := 0;//Sign(Direction[1]) * ArcCos(Direction[0] / (sqr(Direction[0]) + sqr(Direction[1])));
   ResetMouseCursor;
+
+  {StopProfiler}
 end;
 
 end.

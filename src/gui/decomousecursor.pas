@@ -60,7 +60,7 @@ implementation
 uses
   SysUtils, CastleKeysMouse,
   DecoImageLoader,
-  DecoWindow;
+  DecoWindow, Profiler; //DecoLog
 
 constructor DCursor.Create;
 begin
@@ -85,15 +85,21 @@ end;
 
 procedure DCursor.HideOSCursor;
 begin
+  {StartProfiler}
+
   Window.SceneManager.Camera.Cursor := mcForceNone;
   Window.SceneManager.Camera.ExclusiveEvents := false;
   //InitInput will take care of providing cursor coordinates initialization to window center
+
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure DCursor.Draw;
 begin
+  {StartProfiler}
+
   if DragElement = Nil then
   begin
     if (not ScreenShotPending) or (not HideMouseCursorInScreenshot) then //hide cursor for screenshots
@@ -103,6 +109,8 @@ begin
     // and draw hint
   end else
     DragElement.Draw;
+
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}

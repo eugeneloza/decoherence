@@ -54,12 +54,16 @@ type
 {............................................................................}
 implementation
 uses
-  DecoLog;
+  DecoLog, Profiler;
 
 procedure DSimpleActor.TeleportTo(const aNav: TNav);
 begin
+  {StartProfiler}
+
   //release Nav block
   Nav := aNav;
+
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
@@ -74,12 +78,14 @@ end;
 constructor DBaseActor.Create;
 begin
   inherited Create;
+  //...
 end;
 
 {-----------------------------------------------------------------------------}
 
 destructor DBaseActor.Destroy;
 begin
+  //...
   inherited Destroy;
 end;
 

@@ -48,7 +48,7 @@ uses
   CastleApplicationProperties,
   DOM, DecoFiles, DecoFolders,
   DecoGUIScale,
-  DecoLog, DecoTime;
+  DecoLog, DecoTime, Profiler;
 
 var
   ConfigFullScreen: boolean;
@@ -70,12 +70,16 @@ procedure WriteWindowConfiguration;
 var
   RootNode: TDOMElement;
 begin
+  {StartProfiler}
+
   RootNode := CreateFile(GameConfigFolder('Window.xml'));
   WriteBoolean(RootNode, 'FullScreen', ConfigFullScreen);
   WriteInteger(RootNode, 'Width', ConfigWindowWidth);
   WriteInteger(RootNode, 'Height', ConfigWindowHeight);
   WriteBoolean(RootNode, 'HideMouseCursorInScreenshot', HideMouseCursorInScreenshot);
   WriteFile;
+
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
@@ -91,6 +95,8 @@ procedure ReadWindowConfiguration;
 var
   RootNode: TDOMElement;
 begin
+  {StartProfiler}
+
   RootNode := StartReadFile(GameConfigFolder('Window.xml'));
   if RootNode = nil then
   begin
@@ -105,12 +111,16 @@ begin
     HideMouseCursorInScreenshot := ReadBoolean(RootNode, 'HideMouseCursorInScreenshot');
     EndReadFile;
   end;
+
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
 
 procedure InitWindow;
 begin
+  {StartProfiler}
+
   Window := TCastleWindow.Create(Application);
   Window.DoubleBuffer := true;
   Window.ResizeAllowed := raOnlyAtOpen;
@@ -136,6 +146,8 @@ begin
   ResetGUIScale;
 
   ScreenShotPending := false;
+
+  {StopProfiler}
 end;
 
 end.

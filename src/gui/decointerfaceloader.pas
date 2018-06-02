@@ -34,12 +34,14 @@ uses
   DecoFont,
   DecoWind, DecoFrames, DecoImages,
   DecoImageLoader,
-  DecoLog;
+  DecoLog, Profiler;
 
 {............................................................................}
 
 procedure LoadFrames;
 begin
+  {StartProfiler}
+
   FramesDictionary := TFramesDictionary.Create([]); //doesn't own children
   FramesDictionary.Add('RegularFrame',
     LoadFrameImage('GUI/Frames/GradientFrame.png', 3, 3, 3, 3));
@@ -47,12 +49,16 @@ begin
     LoadFrameImage('GUI/Frames/StrictCornerFrame.png', 1, 1, 1, 1));
   FramesDictionary.Add('PlayerBarsFrame',
     LoadFrameImage('GUI/Frames/StrictCornerFrame.png', 2, 2, 2, 2));
+
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure LoadImages;
 begin
+  {StartProfiler}
+
   ImagesDictionary := TImagesDictionary.Create([]); //doesn't own children
   ImagesDictionary.Add('PlayerHealthBarImage',
     LoadDecoImage('GUI/StatBar/HealthBar.png', 32, 329));
@@ -62,10 +68,16 @@ begin
     LoadDecoImage('GUI/StatBar/MentalBar.png', 32, 329));
   ImagesDictionary.Add('PlayerMetaphysicsBarImage',
     LoadDecoImage('GUI/StatBar/MetaphysicsBar.png', 32, 329));
+
+  {StopProfiler}
 end;
+
+{-----------------------------------------------------------------------------}
 
 procedure LoadInterface;
 begin
+  {StartProfiler}
+
   Log(LogInit, CurrentRoutine, 'Loading interface files.');
   InitFonts;
   {$IFDEF BurnerImage}
@@ -74,6 +86,8 @@ begin
   InitWind;
   LoadFrames;
   LoadImages;
+
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}

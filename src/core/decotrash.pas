@@ -40,26 +40,40 @@ procedure InitTrash;
 procedure FreeTrash;
 {............................................................................}
 implementation
+uses
+  Profiler;
 
 procedure FreeTrashObject(constref aObject: TObject);
 begin
+  {StartProfiler}
+
   {not sure if it works fine}
   AutoFree.Remove(aObject); //<------- automatically frees the object
   // aObject.Free;
+
+  {StopProfiler}
 end;
 
 {............................................................................}
 
 procedure InitTrash;
 begin
+  {StartProfiler}
+
   AutoFree := TTrash.Create(true);
+
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure FreeTrash;
 begin
+  {StartProfiler}
+
   AutoFree.Free;
+
+  {StopProfiler}
 end;
 
 

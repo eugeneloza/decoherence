@@ -67,7 +67,7 @@ implementation
 uses
   CastleKeysMouse,
   //DecoInput,
-  DecoMath;
+  DecoMath, Profiler; //DecoLog
 
 procedure DPlayerControl.doAccelerateForward(const Value: DFloat);
 begin
@@ -87,6 +87,7 @@ procedure DPlayerControl.doMove;
 var
   InputAccelerationForward, InputAccelerationStrafe: DFloat;
 begin
+  {StartProfiler}
 
   if Abs(AccelerationForward) > 1 then
     InputAccelerationForward := Sign(AccelerationForward)
@@ -98,21 +99,29 @@ begin
   else
     InputAccelerationStrafe := AccelerationStrafe;
 
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
 
 procedure DPlayerControl.doLook(const Delta: TVector2);
 begin
-  //todo
-end;
+  {StartProfiler}
 
+  //todo
+
+  {StopProfiler}
+end;
 
 {----------------------------------------------------------------------------}
 
 procedure DPlayerControl.Manage;
 begin
+  {StartProfiler}
+
   doMove;
+
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}

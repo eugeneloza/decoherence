@@ -41,7 +41,7 @@ uses
   DecoInput, DecoPlayer, DecoGUI, DecoInterfaceLoader,
   DecoTrash,
   DecoMain,
-  DecoTime, DecoLog, DecoWindow;
+  DecoTime, DecoLog, DecoWindow, Profiler;
 
 { Displays a "Loading..." image for the language
   thanks to Michalis, it's simple :) see https://github.com/eugeneloza/decoherence/issues/22 }
@@ -71,6 +71,8 @@ end;
 
 procedure ApplicationInitialize;
 begin
+  {StartProfiler}
+
   { Be careful with init sequence and do not change the init order
     unless you know what you are doing
     as some units require others being already initialized }
@@ -87,12 +89,16 @@ begin
   Log(LogInit, CurrentRoutine, TextureMemoryProfiler.Summary);
   {$ENDIF}
   Log(LogInit, CurrentRoutine, 'Init sequence finished.');
+
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure InitDecoherence;
 begin
+  {StartProfiler}
+
   ApplicationProperties(true).ApplicationName := GetApplicationName;
   InitLog;
   Log(LogInit, CurrentRoutine, 'Initializing Application and Window.');
@@ -105,12 +111,16 @@ begin
   Application.MainWindow := Window;
   Application.OnInitialize := @ApplicationInitialize;
   Window.Caption := GetApplicationName;
+
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure FreeDecoherence;
 begin
+  {StartProfiler}
+
   { Be careful with free sequence and do not change the init order
     unless you know what you are doing
     as some units might accidentally (thou unlikely) send a call to already-freed instance }
@@ -129,6 +139,8 @@ begin
   {$ENDIF}
   Log(LogInit, CurrentRoutine, 'Finished.');
   FreeLog;
+
+  {StopProfiler}
 end;
 
 end.

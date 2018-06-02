@@ -90,16 +90,20 @@ function GetImageByName(const ItemName: string): DImage; TryInline
 {............................................................................}
 implementation
 uses
-  DecoLog;
+  DecoLog, Profiler;
 
 function GetImageByName(const ItemName: string): DImage; TryInline
 begin
+  {StartProfiler}
+
   Result := nil; //to avoid uninitialized variable hint
   if not ImagesDictionary.TryGetValue(ItemName, Result) then
   begin
     Log(LogInterfaceError, CurrentRoutine, 'Unknown Image Name: ' + ItemName);
     Result := nil;
   end;
+
+  {StopProfiler}
 end;
 
 {=============================================================================}
@@ -151,11 +155,15 @@ end;
 constructor DImage.Create(const AImage: TEncodedImage; const ASmoothScaling: boolean = true;
   const AOwnsImage: boolean = true);
 begin
+  {StartProfiler}
+
   if (AImage = nil) or (AImage.IsEmpty) then
     Log(LogInterfaceError, CurrentRoutine, 'Error: Input image is nil or empty!');
   FImage := TGLImage.Create(AImage, ASmoothScaling, AOwnsImage);
   Width := FImage.Width;
   Height := FImage.Height;
+
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}

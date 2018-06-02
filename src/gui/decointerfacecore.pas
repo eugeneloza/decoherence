@@ -200,7 +200,7 @@ type
 implementation
 uses
   SysUtils,
-  DecoGUIScale, DecoLog;
+  DecoGUIScale, DecoLog, Profiler;
 
 {============================================================================}
 {======================== D ABSTRACT ELEMENT ================================}
@@ -222,7 +222,7 @@ end;
 
 destructor DAbstractElement.Destroy;
 begin
-
+  //...
   inherited Destroy;
 end;
 
@@ -252,6 +252,8 @@ procedure DAbstractElement.GetAnimationState; TryInline
 var
   Phase: DFloat;
 begin
+  {StartProfiler}
+
   //if this is start of the animation - init time
   if AnimationStart < 0 then
     AnimationStart := DecoNow;
@@ -276,12 +278,15 @@ begin
     if AnimationSuicide then
       Self.KillMePlease := true;
   end;
+
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure DAbstractElement.SizeChanged(const Animate: TAnimationStyle; const Duration: DTime);
 begin
+  //...
   {if Parent <> nil then
     Parent.SizeChanged(Animate, Duration);}
 end;
@@ -297,10 +302,14 @@ end;
 
 function DAbstractElement.GetAlpha: DFloat;
 begin
+  {StartProfiler}
+
   if Parent <> nil then
     Result := Current.a * Parent.Alpha
   else
     Result := Current.a;
+
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
@@ -311,6 +320,8 @@ var
   mx, my: integer;
   dx, dy, ddx, ddy: DFloat;
 begin
+  {StartProfiler}
+
   { Next must be set before the AnimateTo! }
   GetAnimationState;
   Last.AssignFrom(Current);   //to current animation state
@@ -385,22 +396,32 @@ begin
         end;
       end;
   end;
+
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure DAbstractElement.ResetAnimation;
 begin
+  {StartProfiler}
+
   Last.AssignFrom(Next);
   AnimationDuration := -1;
   GetAnimationState;
+
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure DAbstractElement.Update;
 begin
+  {StartProfiler}
+
   GetAnimationState;
+
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
@@ -408,41 +429,61 @@ end;
 procedure DAbstractElement.SetSize(const ax, ay, aw, ah: integer; const aAlpha: DFloat = 1.0;
   const Animate: TAnimationStyle = asDefault; const Duration: DTime = DefaultAnimationDuration);
 begin
+  {StartProfiler}
+
   Next.SetIntSize(ax, ay, aw, ah, aAlpha);
   if not Last.isInitialized then Last.AssignFrom(Next);
   AnimateTo(Animate, Duration);
   SizeChanged(Animate, Duration);
+
+  {StopProfiler}
 end;
 
 procedure DAbstractElement.SetSize(const aContainer: DInterfaceContainer;
   const Animate: TAnimationStyle = asDefault; const Duration: DTime = DefaultAnimationDuration);
 begin
+  {StartProfiler}
+
   SetSize(aContainer.x, aContainer.y, aContainer.w, aContainer.h, aContainer.a,
     Animate, Duration);
+
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure DAbstractElement.ForceSize(const ax, ay, aw, ah: integer; const aAlpha: DFloat = 1.0);
 begin
+  {StartProfiler}
+
   Next.SetIntSize(ax, ay, aw, ah, aAlpha);
   ResetAnimation
+
+  {StopProfiler}
 end;
 
 procedure DAbstractElement.ForceSize(const aContainer: DInterfaceContainer);
 begin
+  {StartProfiler}
+
   Next.AssignFrom(aContainer);
   ResetAnimation;
+
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure DAbstractElement.FullScreen(const aAlpha: Single = 1);
 begin
+  {StartProfiler}
+
   Next.SetIntSize(0, 0, GUIWidth, GUIHeight, aAlpha);
   ResetAnimation;
   isFullScreen := true;
   //SizeChanged <----- we don't call it, as it's very unlikely that a FullScreen element is a Child of some Arranger
+
+  {StopProfiler}
 end;
 
 {============================================================================}
@@ -468,18 +509,26 @@ end;
 
 procedure DSingleInterfaceElement.Update;
 begin
+  {StartProfiler}
+
   inherited Update;
   if (Timer <> nil) and (Timer.Enabled) then
     Timer.Update;
+
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure DSingleInterfaceElement.SetTimeOut(const Seconds: DTime);
 begin
+  {StartProfiler}
+
   if Timer = nil then
     Timer := DTimer.Create;
   Timer.SetTimeOut(Seconds);
+
+  {StopProfiler}
 end;
 
 {==============================  Mouse handling =============================}
@@ -488,12 +537,16 @@ function DSingleInterfaceElement.IAmHere(const xx, yy: integer): boolean; TryInl
 const
   CutTransparency = 0.3;
 begin
+  {StartProfiler}
+
   if (xx >= Next.x) and (xx <= Next.x2) and
     (yy >= Next.y) and (yy <= Next.y2) and
     (Self.Alpha > CutTransparency) then
     Result := true
   else
     Result := false;
+
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
@@ -503,6 +556,8 @@ end;
 function DSingleInterfaceElement.ifMouseOver(const xx, yy: integer;
   const RaiseEvents: boolean; const AllTree: boolean): DAbstractElement;
 begin
+  {StartProfiler}
+
   Result := nil;
   if IAmHere(xx, yy) then
   begin
@@ -528,6 +583,8 @@ begin
       isMouseOver := false;
     end;
   end;
+
+  {StopProfiler}
 end;
 {$POP}
 
@@ -535,30 +592,42 @@ end;
 
 procedure DSingleInterfaceElement.StartDrag(const xx, yy: integer);
 begin
+  {StartProfiler}
+
   ResetAnimation;
   SavedContainerState.AssignFrom(Next);
   DragX := Next.x - xx;
   DragY := Next.y - yy;
+
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure DSingleInterfaceElement.Drag(const xx, yy: integer);
 begin
+  {StartProfiler}
+
   Next.x := DragX + xx;
   Next.y := DragY + yy;
   //this is ugly!
   ResetAnimation;
+
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure DSingleInterfaceElement.Drop;
 begin
+  {StartProfiler}
+
   //if CanDropHere
   AnimateTo(asDefault);
   Next.AssignFrom(SavedContainerState);
   AnimateTo(asDefault);
+
+  {StopProfiler}
 end;
 
 {============================================================================}
@@ -587,6 +656,8 @@ procedure DInterfaceElement.Clear(const Animate: TAnimationStyle = asNone;
 var
   c: DSingleInterfaceElement;
 begin
+  {StartProfiler}
+
   if Animate = asNone then
     Children.Clear
   else
@@ -596,6 +667,8 @@ begin
       if c is DInterfaceElement then
         DInterfaceElement(c).Clear(Animate, Duration);
     end;
+
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
@@ -604,6 +677,8 @@ procedure DInterfaceElement.Update;
 var
   i: integer;
 begin
+  {StartProfiler}
+
   { does not call update on children as they will call their own update on draw }
   if Children.Count > 0 then
   begin
@@ -617,6 +692,8 @@ begin
   end;
 
   inherited Update;
+
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
@@ -625,9 +702,13 @@ procedure DInterfaceElement.SetTint;
 var
   c: DSingleInterfaceElement;
 begin
+  {StartProfiler}
+
   //inherited SetTint; <---------- parent is an "empty" virtual procedure
   for c in Children do
     c.SetTint;
+
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
@@ -636,18 +717,26 @@ procedure DInterfaceElement.Draw;
 var
   c: DSingleInterfaceElement;
 begin
+  {StartProfiler}
+
   //inherited Draw; <---------- parent is abstract
   Update;
   for c in Children do
     c.Draw;
+
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
 
 procedure DInterfaceElement.Grab(const aChild: DSingleInterfaceElement);
 begin
+  {StartProfiler}
+
   Children.Add(aChild);
   aChild.Parent := Self;
+
+  {StopProfiler}
 end;
 
 {----------------------------------------------------------------------------}
@@ -658,6 +747,8 @@ var
   i: integer;
   tmpLink: DAbstractElement;
 begin
+  {StartProfiler}
+
   Result := inherited ifMouseOver(xx, yy, RaiseEvents, AllTree);
   //if rsult<>nil ... *or drag-n-drop should get the lowest child?
 
@@ -672,6 +763,8 @@ begin
         Break; // if drag-n-drop one is enough
     end;
   end;
+
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
@@ -680,6 +773,8 @@ function DInterfaceElement.MouseOverTree(const xx, yy: integer): boolean;
 var
   tmp: DAbstractElement;
 begin
+  {StartProfiler}
+
   // maybe rewrite it using isMouseOver - the idea is still a little different
   tmp := Self.ifMouseOver(xx, yy, false, false);
   if (tmp <> nil) and (tmp is DSingleInterfaceElement) and
@@ -689,6 +784,8 @@ begin
     isMouseOverTree := false;
 
   Result := isMouseOverTree;
+
+  {StopProfiler}
 end;
 
 end.

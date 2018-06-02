@@ -48,9 +48,8 @@ var
 procedure ResetGUIScale;
 {............................................................................}
 implementation
-
 uses
-  DecoWindow, DecoLog;
+  DecoWindow, DecoLog, Profiler;
 
 var GuiScaleInitialized: boolean = false;
 
@@ -61,6 +60,8 @@ procedure ResetGUIScale;
     if Result < 1 then Result := 1;
   end;
 begin
+  {StartProfiler}
+
   if GuiScaleInitialized then
     Log(LogInterfaceError, CurrentRoutine, 'WARNING: Reinitializing the GUI Scale!');
   GuiScaleInitialized := true;
@@ -77,6 +78,8 @@ begin
 
   GUICenter[0] := GUIWidth / 2;
   GUICenter[1] := GUIHeight / 2;
+
+  {StopProfiler}
 end;
 
 

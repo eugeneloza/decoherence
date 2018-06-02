@@ -26,7 +26,6 @@ interface
 uses
   CastleWindow;
 
-
 { Assign Window.OnBeforeRender event }
 procedure InitManagement;
 { Release Window.OnBeforeRender event }
@@ -36,11 +35,13 @@ implementation
 
 uses
   DecoInit, DecoPlayer, DecoGUI,
-  DecoTime, DecoWindow;
+  DecoTime, DecoWindow, Profiler;
 
 {$PUSH}{$WARN 5024 off : Parameter "$1" not used}
 procedure doUpdate(Container: TUIContainer);
 begin
+  {StartProfiler}
+
   {if (FrameStart < 0) then
     doTime; // this is the first initialization of time
     FrameStart += SecondEquivalent; //first frame is fine to wait a mintue for management
@@ -51,14 +52,20 @@ begin
   //Actors.Manage;
   //Music.Manage;
   Player.Manage;
+
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}
 
 procedure doRender(Container: TUIContainer);
 begin
+  {StartProfiler}
+
   doTime; //will init FrameStart = ForceThreadedTime
   GUI.Draw;
+
+  {StopProfiler}
 end;
 {$POP}
 
@@ -80,10 +87,14 @@ end;
 
 
 initialization
+  {StartProfiler}
   InitDecoherence;
+  {StopProfiler}
 
 finalization
+  {StartProfiler}
   FreeDecoherence;
+  {StopProfiler}
 
 end.
 

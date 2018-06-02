@@ -50,6 +50,8 @@ type
 
 {............................................................................}
 implementation
+uses
+  Profiler; //DecoLog
 
 constructor DTimer.Create;
 begin
@@ -62,6 +64,8 @@ end;
 
 procedure DTimer.Update;
 begin
+  {StartProfiler}
+
   if StartTime < 0 then
     StartTime := DecoNow
   else
@@ -71,6 +75,8 @@ begin
       if Assigned(onTimer) then
         onTimer;
     end;
+
+  {StopProfiler}
 end;
 
 {-----------------------------------------------------------------------------}

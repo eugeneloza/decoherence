@@ -53,8 +53,12 @@ var
 
 procedure ResetMouseCursor;
 begin
+  {StartProfiler}
+
   if PointerInput is DMouseInput then
     DMouseInput(PointerInput).CenterMouseCursor;
+
+  {StopProfiler}
 end;
 
 {======================== EVENTS =================================}
@@ -62,6 +66,8 @@ end;
 {$PUSH}{$WARN 5024 off : Parameter "$1" not used}
 procedure doPress(Container: TUIContainer; const Event: TInputPressRelease);
 begin
+  {StartProfiler}
+
   if Event.EventType = itMouseButton then
     PointerInput.doMousePress(Event)
   else
@@ -78,36 +84,51 @@ begin
 
       KeyboardInput.doKeyboardPress(Event.Key);
     end;
+
+  {StopProfiler}
 end;
 
 {--------------------------------------------------------------------------}
 
 procedure doRelease(Container: TUIContainer; const Event: TInputPressRelease);
 begin
+  {StartProfiler}
+
   if Event.EventType = itMouseButton then
     PointerInput.doMouseRelease(Event)
   else
     if Event.EventType = itKey then
       KeyboardInput.doKeyboardRelease(Event.Key);
+
+  {StopProfiler}
 end;
 
 {--------------------------------------------------------------------------}
 
 procedure doMotion(Container: TUIContainer; const Event: TInputMotion);
 begin
+  {StartProfiler}
+
   PointerInput.doMouseMotion(Event);
+
+  {StopProfiler}
 end;
 {$POP}
 
 {............................................................................}
+
 procedure InitInput;
 begin
+  {StartProfiler}
+
   PointerInput := DMouseInput.Create;
   KeyboardInput := DKeyboardInput.Create;
 
   Window.OnPress := @doPress;
   Window.OnRelease := @doRelease;
   Window.OnMotion := @doMotion;
+
+  {StopProfiler}
 end;
 
 {--------------------------------------------------------------------------}
