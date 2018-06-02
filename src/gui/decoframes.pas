@@ -242,7 +242,7 @@ begin
   {$IFDEF BurnerImage}Burn(TempImage, Next);{$ENDIF}
   Image := DImage.Create(TempImage, true, true);
   SetTint;
-  //InitPending := false;
+  InitPending := false;
 
   {StopProfiler}
 end;
