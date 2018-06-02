@@ -29,10 +29,15 @@ uses
   DecoGlobal, DecoTime;
 
 type
+  {}
   DAbstractFramedElement = class(DAbstractArranger)
   strict protected
     FFrame: DAbstractFrame;
+    FromState, ToState: DInterfaceContainer;
+    {}
     function SubstractFrame(const aContainer: DInterfaceContainer): DInterfaceContainer;
+    {}
+    procedure UpdateFrame;
     procedure ArrangeChildren(const Animate: TAnimationStyle; const Duration: DTime); override;
   end;
 
@@ -84,13 +89,8 @@ end;
 
 {-----------------------------------------------------------------------------}
 
-procedure DAbstractFramedElement.ArrangeChildren(const Animate: TAnimationStyle; const Duration: DTime);
-var
-  c: DSingleInterfaceElement;
-  FromState, ToState: DInterfaceContainer;
+procedure DAbstractFramedElement.UpdateFrame;
 begin
-  //inherited ArrangeChildren(Animate, Duration); <------- parent is abstract
-
   if not (FFrame is IFrame) then
   begin
     Log(LogInterfaceError, CurrentRoutine, 'ERROR: Frame is nil!');
@@ -101,6 +101,17 @@ begin
 
   FromState := SubstractFrame(Self.Current);
   ToState := SubstractFrame(Self.Next);
+end;
+
+{-----------------------------------------------------------------------------}
+
+procedure DAbstractFramedElement.ArrangeChildren(const Animate: TAnimationStyle; const Duration: DTime);
+var
+  c: DSingleInterfaceElement;
+begin
+  //inherited ArrangeChildren(Animate, Duration); <------- parent is abstract
+
+  UpdateFrame;
 
   for c in Children do
     if c <> FFRame then
