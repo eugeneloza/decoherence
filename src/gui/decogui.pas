@@ -250,7 +250,7 @@ begin
   Grab(Arr);   }
 
   Bar := DPlayerBars.Create;
-  Bar.SetSize(600, 200, 16, 165);
+  Bar.SetSize(600, 200, 26, 165);
   //Bar.SetSize(100, 100, 400, 400);
   Grab(Bar);
 

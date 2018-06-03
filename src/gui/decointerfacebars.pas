@@ -119,7 +119,7 @@ type
 implementation
 
 uses
-  DecoImages, DecoFrames,
+  DecoImages, DecoFrames, DecoInterfaceContainer,
   DecoLog, DecoMath, Profiler;
 
 procedure DAbstractBarImage.Draw;
@@ -316,6 +316,12 @@ end;
 {--------------------------------------------------------------------------}
 
 procedure DPlayerBars.ArrangeChildren(const Animate: TAnimationStyle; const Duration: DTime);
+  function DoArrange(const ArrangeContainer: DInterfaceContainer; const XShift, WidthMod: DFloat): DInterfaceContainer;
+  begin
+    Result.AssignFrom(ArrangeContainer);
+    Result.SetIntSize(Round(ArrangeContainer.x + ArrangeContainer.w * XShift), ArrangeContainer.y,
+      Round(ArrangeContainer.w * WidthMod), ArrangeContainer.h, ArrangeContainer.a);
+  end;
 begin
   {StartProfiler}
 
@@ -323,15 +329,15 @@ begin
   UpdateFrame;
   if (FTarget = nil) or (FTarget.isMage) then
   begin
-    HealthBar.FromToAnimate(FromState, ToState, Animate, Duration);
-    StaminaBar.FromToAnimate(FromState, ToState, Animate, Duration);
-    ConcentrationBar.FromToAnimate(FromState, ToState, Animate, Duration);
-    MetaphysicsBar.FromToAnimate(FromState, ToState, Animate, Duration);
+    HealthBar.FromToAnimate(DoArrange(FromState, 0/4, 1/4), DoArrange(ToState, 0/4, 1/4), Animate, Duration);
+    StaminaBar.FromToAnimate(DoArrange(FromState, 1/4, 1/4), DoArrange(ToState, 1/4, 1/4), Animate, Duration);
+    ConcentrationBar.FromToAnimate(DoArrange(FromState, 2/4, 1/4), DoArrange(ToState, 2/4, 1/4), Animate, Duration);
+    MetaphysicsBar.FromToAnimate(DoArrange(FromState, 3/4, 1/4), DoArrange(ToState, 3/4, 1/4), Animate, Duration);
   end else
   begin
-    HealthBar.FromToAnimate(FromState, ToState, Animate, Duration);
-    StaminaBar.FromToAnimate(FromState, ToState, Animate, Duration);
-    ConcentrationBar.FromToAnimate(FromState, ToState, Animate, Duration);
+    HealthBar.FromToAnimate(DoArrange(FromState, 0/3, 1/3), DoArrange(ToState, 0/3, 1/3), Animate, Duration);
+    StaminaBar.FromToAnimate(DoArrange(FromState, 1/3, 1/3), DoArrange(ToState, 1/3, 1/3), Animate, Duration);
+    ConcentrationBar.FromToAnimate(DoArrange(FromState, 2/3, 1/3), DoArrange(ToState, 2/3, 1/3), Animate, Duration);
   end;
 
   {StopProfiler}
